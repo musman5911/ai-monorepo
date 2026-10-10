@@ -1,0 +1,16 @@
+# ── Malik Usman Farms monorepo ignores ─────────────────────────
+# node_modules and build output stay OFF git. Builds happen locally
+# (build-all.bat) and muf-sync mirrors the app folders (with dist)
+# to the live sibling repos, so nothing depends on these being tracked.
+node_modules/
+**/dist/
+*.log
+
+# Sandbox artifacts — must never be tracked in this repo.
+# skills/ is the agent sandbox's installed skills directory.
+# tool-results/ is a temp folder where oversized tool outputs land.
+skills/
+tool-results/
+
+# Local env files (each app keeps its own .env; .env.example is tracked)
+**/.env

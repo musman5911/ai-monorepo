@@ -1,0 +1,196 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-farm-50: #f4f8f4;
+  --color-farm-100: #e2ede5;
+  --color-farm-200: #c0dbc8;
+  --color-farm-300: #93c4a1;
+  --color-farm-400: #5ea772;
+  --color-farm-500: #1b854a;
+  --color-farm-600: #136334;
+  --color-farm-700: #105229;
+  --color-farm-800: #0d421f;
+  --color-farm-900: #0a3216;
+  --color-farm-950: #041f0a;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Mobile-friendly fixed viewport: use dynamic viewport units so the Chrome/Safari
+   URL bar doesn't shove modals off-center on phones. Fall back to 100vh. */
+.ff-modal-host,
+.fixed.inset-0 {
+  /* supported on modern mobile browsers; harmless if unsupported */
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Base resets / theming */
+html, body {
+  font-family: var(--font-sans);
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.dark html,
+.dark body {
+  background-color: #020617;
+  color: #e2e8f0;
+}
+
+h1, h2, h3, h4, .display-font {
+  font-family: var(--font-display);
+}
+
+.mono-font {
+  font-family: var(--font-mono);
+}
+
+/* Hides scrollbar for the horizontal tab bar while keeping it scrollable */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+button:not(:disabled),
+a[href],
+[role="button"]:not([aria-disabled="true"]),
+summary,
+.cursor-pointer {
+  cursor: pointer;
+}
+
+button:disabled,
+[aria-disabled="true"],
+:disabled {
+  cursor: not-allowed;
+}
+
+/* ---- Dark-mode safety net ----
+   Many legacy components hard-code light-text colors (text-slate-800,
+   text-gray-900, etc.) without dark variants. The rules below promote
+   those to readable light colors when inside a .dark ancestor, without
+   touching elements that already have an explicit dark:text-* class.
+   They use :not() to skip elements that already declare dark:text-*.  */
+.dark .text-slate-800:not([class*="dark:text"]),
+.dark .text-slate-900:not([class*="dark:text"]),
+.dark .text-gray-800:not([class*="dark:text"]),
+.dark .text-gray-900:not([class*="dark:text"]),
+.dark .text-black:not([class*="dark:text"]) {
+  color: #e2e8f0 !important; /* slate-200 */
+}
+.dark .text-slate-700:not([class*="dark:text"]) {
+  color: #cbd5e1 !important; /* slate-300 */
+}
+.dark .text-slate-600:not([class*="dark:text"]) {
+  color: #94a3b8 !important; /* slate-400 */
+}
+.dark .bg-white:not([class*="dark:bg"]) {
+  background-color: #0f172a !important; /* slate-900 */
+}
+.dark .border-slate-200:not([class*="dark:border"]),
+.dark .border-slate-300:not([class*="dark:border"]) {
+  border-color: #1e293b !important; /* slate-800 */
+}
+.dark .border-slate-100:not([class*="dark:border"]) {
+  border-color: #1e293b !important;
+}
+
+/* Dark-mode inputs that don't have explicit dark:bg */
+.dark input:not([class*="dark:bg"]),
+.dark select:not([class*="dark:bg"]),
+.dark textarea:not([class*="dark:bg"]) {
+  background-color: #1e293b;
+  color: #e2e8f0;
+  border-color: #334155;
+}
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #64748b;
+}
+
+
+/* ================================================================
+   MUF SHARED DESIGN SYSTEM  (Malik Usman Farms)
+   Single parent design, inherited by all three farm apps:
+   agri_farm (parent) / dairy_farm / flock_farm.
+   Keep this block identical in all three apps.
+   ================================================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(128, 237, 153, 0.2); }
+  50% { border-color: rgba(128, 237, 153, 0.6); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pulse-border-hover {
+  transition: all 0.3s ease;
+}
+.pulse-border-hover:hover {
+  animation: pulseBorder 2s infinite;
+  box-shadow: 0 4px 12px rgba(128, 237, 153, 0.1);
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounceSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
+.animate-bounce-soft {
+  animation: bounceSoft 2.4s ease-in-out infinite;
+}
+
+/* All muf- design-system classes now live in muf-style.css (imported after this file). */

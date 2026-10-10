@@ -1,0 +1,31 @@
+{
+  "short_name": "Flock Farm",
+  "name": "Usman Flock Farm",
+  "description": "Poultry farm management — flock, eggs, feed, finances, health & daily operations.",
+  "icons": [
+    {
+      "src": "/flock-farm-logo-round-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/flock-farm-logo-round-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/flock-farm-logo-round-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "any"
+}

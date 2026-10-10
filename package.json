@@ -1,0 +1,13 @@
+{
+  "name": "dairy-flock-agri-monorepo",
+  "private": true,
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check-sync": "node check-muf-sync.js",
+    "check-ui": "node check-ui-safety.js"
+  },
+  "devDependencies": {
+    "vitest": "^3.0.0"
+  }
+}

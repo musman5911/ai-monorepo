@@ -1,0 +1,143 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-display: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --color-farm-50: #f4f8f4;
+  --color-farm-100: #e2ede5;
+  --color-farm-200: #c0dbc8;
+  --color-farm-300: #93c4a1;
+  --color-farm-400: #5ea772;
+  --color-farm-500: #1b854a;
+  --color-farm-600: #136334;
+  --color-farm-700: #105229;
+  --color-farm-800: #0d421f;
+  --color-farm-900: #0a3216;
+  --color-farm-950: #041f0a;
+}
+
+:root {
+  --text: #6b6375;
+  --text-h: #08060d;
+  --bg: #fff;
+  --border: #e5e4e7;
+  --code-bg: #f4f3ec;
+  --accent: #aa3bff;
+  --accent-bg: rgba(170, 59, 255, 0.1);
+  --accent-border: rgba(170, 59, 255, 0.5);
+  --social-bg: rgba(244, 243, 236, 0.5);
+  --shadow:
+    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+
+  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
+  --mono: ui-monospace, Consolas, monospace;
+
+  font-family: 'Inter', sans-serif;
+  letter-spacing: 0.18px;
+  color-scheme: light;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+
+body {
+  margin: 0;
+}
+
+/* ─── CUSTOM ANIMATIONS ─── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(128, 237, 153, 0.2); }
+  50% { border-color: rgba(128, 237, 153, 0.6); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pulse-border-hover {
+  transition: all 0.3s ease;
+}
+.pulse-border-hover:hover {
+  animation: pulseBorder 2s infinite;
+  box-shadow: 0 4px 12px rgba(128, 237, 153, 0.1);
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounceSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
+.animate-bounce-soft {
+  animation: bounceSoft 2.4s ease-in-out infinite;
+}
+
+/* ============================================================
+   USMAN AGRI FARM - IMAGE 02 CROP MANAGER DESIGN SYSTEM
+   Visual layer only. Existing React/API logic remains intact.
+   ============================================================ */
+:root {
+  --muf-green:#116b35;
+  --muf-green-2:#1e8a46;
+  --muf-green-dark:#0b4725;
+  --muf-pale:#eaf5e7;
+  --muf-cream:#f7f4eb;
+  --muf-line:#e4e7df;
+  --muf-text:#10291c;
+  --muf-muted:#68736e;
+  --muf-card:#fffefb;
+  --muf-shadow:0 9px 28px rgba(34,55,39,.08);
+}
+
+/* All muf- design-system classes now live in muf-style.css (imported after this file). */

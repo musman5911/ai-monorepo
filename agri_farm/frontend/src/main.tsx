@@ -1,0 +1,36 @@
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import './muf-style.css'
+import App from './App'
+import ConfirmProvider from './muf-confirm'
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async () => {
+    // Never let an old production service worker serve stale UI while using Vite dev.
+    if (import.meta.env.DEV) {
+      try {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(registrations.map((registration) => registration.unregister()));
+        const cacheKeys = await caches.keys();
+        await Promise.all(cacheKeys.filter((key) => key.startsWith('agrifarm-')).map((key) => caches.delete(key)));
+        console.log('PWA development cache cleared.');
+      } catch (err) {
+        console.warn('Could not clear development PWA cache:', err);
+      }
+      return;
+    }
+
+    navigator.serviceWorker.register('/sw.js')
+      .then(reg => console.log('PWA Service Worker registered successfully:', reg))
+      .catch(err => console.warn('PWA Service Worker registration failed:', err));
+  });
+}
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <ConfirmProvider>
+      <App />
+    </ConfirmProvider>
+  </StrictMode>,
+)
