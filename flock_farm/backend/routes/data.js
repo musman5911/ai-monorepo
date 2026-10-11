@@ -104,24 +104,21 @@ function validateWorkerBirdWrite(existingBirds, incomingBirds) {
 }
 
 // ─── Image space GC ─────────────────────────────────────────────────────────
-// Bird photos are stored as Image documents in MongoDB and referenced by
-// '/api/images/<id>' paths inside the birds array. Whenever the birds bucket
-// is saved, any image that is NO LONGER referenced (photo replaced, photo
-// removed, or bird deleted) is deleted from the DB so storage space is freed
-// instead of accumulating orphaned images forever.
+// Bird and diary photos are stored as Image documents in MongoDB and referenced
+// by '/api/images/<id>' paths. When either bucket is saved, unreferenced images
+// are deleted so replaced/removed photos do not accumulate forever.
 function extractImageIds(value) {
   const ids = new Set();
   if (Array.isArray(value)) {
     for (const item of value) {
-      const p = item && typeof item.image === 'string' ? item.image : '';
-      const m = p.match(/^\/api\/images\/([a-f0-9]{24})$/i);
-      if (m) ids.add(m[1]);
+      const candidates = [item && typeof item.image === 'string' ? item.image : '', ...(Array.isArray(item?.photos) ? item.photos.map((photo) => typeof photo?.data === 'string' ? photo.data : '') : [])];
+      for (const p of candidates) { const m = p.match(/^\/api\/images\/([a-f0-9]{24})$/i); if (m) ids.add(m[1]); }
     }
   }
   return ids;
 }
 
-async function cleanupOrphanedBirdImages(oldIds, newIds) {
+async function cleanupOrphanedImages(oldIds, newIds) {
   try {
     const orphaned = [...oldIds].filter((id) => !newIds.has(id));
     for (const id of orphaned) {
@@ -130,10 +127,10 @@ async function cleanupOrphanedBirdImages(oldIds, newIds) {
       }
     }
     if (orphaned.length > 0) {
-      console.log(`🗑️  Freed ${orphaned.length} orphaned bird image(s) from the DB.`);
+      console.log(`🗑️  Freed ${orphaned.length} orphaned farm image(s) from the DB.`);
     }
   } catch (err) {
-    console.error('Bird image cleanup failed (non-fatal):', err.message);
+    console.error('Image cleanup failed (non-fatal):', err.message);
   }
 }
 
@@ -192,10 +189,10 @@ router.put('/data/:key', authRequired, async (req, res) => {
 
     const current = await DataStore.findOne({ key });
     const currentVersion = current ? (current.version || 0) : 0;
-    // Snapshot image references BEFORE the write — needed for the bird-image
-    // GC below (in-memory mode returns live objects, so reading after the
+    // Snapshot image references BEFORE the write — needed for image garbage collection
+    // below (in-memory mode returns live objects, so reading after the
     // update would already show the new value).
-    const oldImageIds = key === 'birds' ? extractImageIds(current ? current.value : null) : null;
+    const oldImageIds = (key === 'birds' || key === 'diary') ? extractImageIds(current ? current.value : null) : null;
 
     // Optimistic-concurrency check (only when the client opts in by sending
     // baseVersion — keeps backwards compatibility with older clients).
@@ -256,7 +253,7 @@ router.put('/data/:key', authRequired, async (req, res) => {
     }
 
     // Free storage: delete Image docs no longer referenced by any bird
-    if (key === 'birds' && oldImageIds) {
+    if ((key === 'birds' || key === 'diary') && oldImageIds) {
       await cleanupOrphanedBirdImages(oldImageIds, extractImageIds(doc.value));
     }
 

@@ -127,3 +127,19 @@ These changes are frontend-only. The existing backend summary endpoints remain t
 - Updated confirmed animal/expense/crop/ledger/liability/inventory/task deletions to remove the item from visible client state immediately, then refresh server data.
 - Improved large popup viewport sizing and overflow behavior across all three frontends.
 - No backend routes, schemas, or business calculations were intentionally changed.
+
+
+## Audit branch additions (2026-10-11)
+
+The `audit/ui-v2-merge` branch now contains a selective integration on top of the current `main`; it does not replace the current modal or shared stylesheet.
+
+- Diary photos are compressed on-device and stored with farm database records, not browser IndexedDB. The UI supports camera capture, multi-select, up to 10 photos per diary date, viewing, and deletion.
+- Dairy Farm stores photos alongside the existing daily log document and keeps its existing server-backed voice-note flow.
+- Flock Farm stores diary photos in its existing MongoDB Image collection and keeps only image references in the diary bucket; removed/replaced photo records are cleaned up. Existing voice-note handling remains intact.
+- Agri Farm stores diary photos in a dedicated `diary_media` MongoDB collection exposed through authenticated API routes. Existing diary-note behavior is unchanged.
+- A shared, conservative accessibility helper fills missing label associations, icon-only button names from title attributes, image alt attributes, password autocomplete hints, and numeric input hints. It does not rewrite click handlers or layout.
+- The uploaded ZIP/snapshot archive was removed from this branch. Current `muf-modal.tsx` and `muf-style.css` were left untouched so the existing desktop popup/backdrop fix remains intact.
+
+### Validation status
+
+The branch diff was checked against `main`: one integration commit, no files behind `main`, and only the files needed for the selected features changed. A local dependency install and full frontend/backend builds have **not** been run in this environment, so this is ready for owner-side build and device testing, not yet marked build-verified.

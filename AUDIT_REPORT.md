@@ -53,3 +53,8 @@ Audited the supplied three-app ZIP: Dairy Farm, Flock Farm, and Agri Farm. All e
 ## Remaining verification required
 
 Install dependencies in a normal connected development environment, then run the three frontend build commands and root Vitest suite. Finally, manually test online and offline create/edit/delete, dashboard/detail refresh, all Finance dropdown items, mobile popups, and memory-mode sample data against each deployed backend. No claim is made that live API or browser/device testing was possible from this ZIP-only environment.
+
+
+## Audit branch update (2026-10-11)
+
+`audit/ui-v2-merge` was rebuilt from the current `main` and the snapshot archive removed. The branch adds database-backed Diary photos for all three apps plus a shared non-invasive accessibility helper. The popup component and shared stylesheet are unchanged. Full builds and runtime checks remain pending owner-side testing; do not treat this branch as build-verified until those checks pass.

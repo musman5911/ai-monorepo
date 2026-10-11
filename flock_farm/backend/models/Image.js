@@ -6,7 +6,7 @@ import mongoose from 'mongoose';
 // (well under MongoDB's 16MB doc limit).
 const imageSchema = new mongoose.Schema(
   {
-    kind: { type: String, enum: ['bird', 'batch'], required: true },
+    kind: { type: String, enum: ['bird', 'batch', 'diary'], required: true },
     contentType: { type: String, required: true },
     data: { type: Buffer, required: true },
     size: { type: Number, default: 0 },

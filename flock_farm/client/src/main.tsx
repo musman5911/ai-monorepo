@@ -2,6 +2,7 @@ import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
 import App from './App.tsx';
 import ConfirmProvider from './muf-confirm';
+import { initMufA11y } from './muf-a11y';
 import './index.css';
 import './muf-style.css';
 
@@ -27,6 +28,8 @@ if ('serviceWorker' in navigator) {
       .catch((err) => console.warn('PWA Service Worker registration failed:', err));
   });
 }
+
+initMufA11y();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

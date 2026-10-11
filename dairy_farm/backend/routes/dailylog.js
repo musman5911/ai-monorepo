@@ -8,7 +8,7 @@ router.get('/:date', protect, async (req, res) => {
   try {
     const log = await DailyLog.findById(req.params.date);
     if (!log) {
-      return res.json({ _id: req.params.date, date: req.params.date, checklist: [], notes: '', voiceNotes: [] });
+      return res.json({ _id: req.params.date, date: req.params.date, checklist: [], notes: '', voiceNotes: [], photos: [] });
     }
     res.json(log);
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -18,10 +18,16 @@ router.get('/:date', protect, async (req, res) => {
 // Both admin and worker can save — this is day-to-day operational input.
 router.put('/:date', protect, async (req, res) => {
   try {
-    const { checklist, notes, voiceNotes } = req.body;
+    const { checklist, notes, voiceNotes, photos } = req.body;
     const update = { date: req.params.date };
     if (checklist !== undefined) update.checklist = checklist;
     if (notes !== undefined) update.notes = notes;
+    if (photos !== undefined) {
+      if (!Array.isArray(photos) || photos.length > 10) return res.status(400).json({ error: 'photos is limited to 10 per day' });
+      const safePhotos = photos.map((p) => ({ id: String(p.id || ''), date: req.params.date, data: typeof p.data === 'string' && p.data.startsWith('data:image/jpeg;base64,') ? p.data : '', bytes: Math.max(0, Number(p.bytes) || 0), createdAt: String(p.createdAt || '') }));
+      if (safePhotos.some((p) => !p.id || !p.data || p.data.length > 230000)) return res.status(400).json({ error: 'Each diary photo must be a compressed JPEG under 160 KB' });
+      update.photos = safePhotos;
+    }
     if (voiceNotes !== undefined) {
       if (!Array.isArray(voiceNotes) || voiceNotes.length > 3) {
         return res.status(400).json({ error: 'voiceNotes is limited to 3 clips per day' });

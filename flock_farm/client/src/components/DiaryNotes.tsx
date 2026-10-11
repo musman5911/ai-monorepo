@@ -6,6 +6,8 @@ import { notify } from '../muf-confirm';
 import { DiaryEntry, Lang } from '../types';
 import { t } from '../i18n';
 import { todayStr } from '../utils/calculations';
+import MufDiaryMedia, { type DiaryPhoto } from '../muf-diary-media';
+import { uploadImage } from '../api';
 
 interface DiaryNotesProps {
   lang: Lang;
@@ -20,6 +22,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
   const [date, setDate] = useState(today);
   const [note, setNote] = useState(existing?.note ?? '');
   const [voiceBase64, setVoiceBase64] = useState<string | undefined>(existing?.voiceBase64);
+  const [photos, setPhotos] = useState<DiaryPhoto[]>(existing?.photos || []);
   const [recorder, setRecorder] = useState<VoiceRecorder | null>(null);
   const [recording, setRecording] = useState(false);
   const L = (en: string, urOrVars?: string | Record<string, string | number | null>) => mufL(lang, en, urOrVars);
@@ -28,6 +31,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
     const found = entries.find((e) => e.date === date);
     setNote(found?.note ?? '');
     setVoiceBase64(found?.voiceBase64);
+    setPhotos(found?.photos || []);
   }, [entries, date]);
 
   const loadDate = (d: string) => {
@@ -35,11 +39,12 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
     const found = entries.find((e) => e.date === d);
     setNote(found?.note ?? '');
     setVoiceBase64(found?.voiceBase64);
+    setPhotos(found?.photos || []);
   };
 
   const handleSave = () => {
-    if (!note.trim() && !voiceBase64) return;
-    onSave({ date, note: note.trim(), voiceBase64 });
+    if (!note.trim() && !voiceBase64 && photos.length === 0) return;
+    onSave({ date, note: note.trim(), voiceBase64, photos });
   };
 
   const handleRecordToggle = async () => {
@@ -47,7 +52,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
       try {
         const base64 = await recorder.stop();
         setVoiceBase64(base64);
-        onSave({ date, note: note.trim(), voiceBase64: base64 });
+        onSave({ date, note: note.trim(), voiceBase64: base64, photos });
         notify(L('Voice note saved.'));
       } catch (err) {
         notify(err instanceof Error ? err.message : 'Recording failed', 'error');
@@ -90,6 +95,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
         placeholder="Weather, issues, observations…"
         className="w-full text-xs px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl h-24 resize-none"
       />
+      <MufDiaryMedia date={date} photos={photos} canEdit={!readOnly} uploadPhoto={(file) => uploadImage(file, 'diary')} onChange={(next) => { setPhotos(next); onSave({ date, note: note.trim(), voiceBase64, photos: next }); }} />
       {/* ── Voice note (Urdu-friendly) — speak instead of typing ── */}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">

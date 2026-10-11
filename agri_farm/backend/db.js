@@ -52,11 +52,12 @@ const TelegramMetaSchema = looseSchema('telegram_meta');
 const SupplierSchema = looseSchema('suppliers');
 const SupplierPaymentSchema = looseSchema('supplier_payments');
 const SettingSchema = looseSchema('settings');
+const DiaryMediaSchema = looseSchema('diary_media');
 
 // ─── Models ─────────────────────────────────────────────────────────────────
 let User, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
-  Supplier, SupplierPayment, Setting;
+  Supplier, SupplierPayment, Setting, DiaryMedia;
 
 if (useMock) {
   const models = createStore({
@@ -77,10 +78,11 @@ if (useMock) {
     Supplier: SupplierSchema,
     SupplierPayment: SupplierPaymentSchema,
     Setting: SettingSchema,
+    DiaryMedia: DiaryMediaSchema,
   });
   ({ User, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
     CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
-    Supplier, SupplierPayment, Setting } = models);
+    Supplier, SupplierPayment, Setting, DiaryMedia } = models);
 } else {
   User = mongoose.model('User', UserSchema);
   Crop = mongoose.model('Crop', CropSchema);
@@ -99,6 +101,7 @@ if (useMock) {
   Supplier = mongoose.model('Supplier', SupplierSchema);
   SupplierPayment = mongoose.model('SupplierPayment', SupplierPaymentSchema);
   Setting = mongoose.model('Setting', SettingSchema);
+  DiaryMedia = mongoose.model('DiaryMedia', DiaryMediaSchema);
 }
 
 const connectDB = async () => {
@@ -152,5 +155,5 @@ export {
   connectDB, useMock,
   User, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
-  Supplier, SupplierPayment, Setting,
+  Supplier, SupplierPayment, Setting, DiaryMedia,
 };

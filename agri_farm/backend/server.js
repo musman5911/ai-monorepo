@@ -26,6 +26,7 @@ import laborRoutes from './routes/labor.js';
 import telegramRoutes, { initTelegram } from './routes/telegram.js';
 import backupRoutes, { maybeRunMonthlyAutoBackup } from './routes/backup.js';
 import cardsRoutes from './routes/cards.js';
+import diaryMediaRoutes from './routes/diary-media.js';
 import { MUF_ENV } from './muf-env.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -97,6 +98,7 @@ const apiRouters = [
   cropLogsRoutes,
   laborRoutes,
   backupRoutes,
+  diaryMediaRoutes,
 ];
 for (const r of apiRouters) {
   app.use('/', r);
