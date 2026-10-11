@@ -101,3 +101,12 @@ The three dashboards use the `muf-dashboard-workspace` visual scope for consiste
 ## UI audit — Phase 4 Admin and Superadmin presentation (2026-10-10)
 
 Admin navigation and Superadmin dashboard presentation received a shared CSS-only polish for responsive wrapping, content sizing, live KPI readability, and reduced-motion preferences. This layer must remain byte-identical across Dairy, Flock, and Agri. It must not be used to change data flow, API behavior, permissions, navigation, or business rules.
+
+## UI audit — final combined review (2026-10-11)
+
+The final static review confirms that `node check-muf-sync.js` and `node check-ui-safety.js` pass. Candidate files with no direct textual references (`components/FarmLogos.tsx` and `muf-admin-field.tsx`) were retained rather than deleted because a static grep alone is not sufficient proof of safe removal. Repeated CSS selectors were also retained where they may represent intentional cascade overrides. This final review does not claim that TypeScript errors in Dairy/Flock are fixed: the reported build process still skips type checking for those two apps. The root test command could not start in this environment because `vitest` is not installed. Run local builds and real-browser regression checks before deployment.
+
+
+## Final validation follow-up (2026-10-11)
+
+`build-all.js` now prints the original failed build output before its existing Vite-only fallback, so local runs expose the actual TypeScript errors. This does not change app code or the build fallback behavior. In the audit environment, npm dependency downloads failed with `EAI_AGAIN`, so a fresh typecheck could not be reproduced. `node check-muf-sync.js` and `node check-ui-safety.js` pass; the Dairy/Flock TypeScript issues remain outstanding until their diagnostics can be captured and fixed safely.

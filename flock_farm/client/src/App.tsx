@@ -372,15 +372,18 @@ export default function App() {
   const handleAddBird = (newBird: Omit<Bird, 'id'>) => {
     if (!canManageStructure) return;
     setBirds([...birds, { ...newBird, id: nextId(birds) }]);
+    notify('Bird added successfully.', 'success');
   };
   // Update bird is allowed for both (marking sick/dead/sold, updating vax)
   const handleUpdateBird = (id: number, updatedBird: Bird) => {
     if (!canLogDaily) return;
     setBirds(birds.map((b) => (b.id === id ? updatedBird : b)));
+    notify('Bird updated successfully.', 'success');
   };
   const handleDeleteBird = (id: number) => {
     if (!canDelete) return;
     setBirds((prev) => prev.filter((b) => b.id !== id));
+    notify('Bird deleted successfully.', 'success');
     setVaccinations((prev) => prev.filter((v) => v.birdId !== id));
   };
 

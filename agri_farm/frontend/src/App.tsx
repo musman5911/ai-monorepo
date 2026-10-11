@@ -990,8 +990,9 @@ function App() {
     setActionId(id);
     try {
       await api.deleteCrop(id);
+      setCrops(prev => prev.filter(c => c._id !== id));
       showAlert("Crop cycle record removed successfully!");
-      refreshData();
+      await refreshData();
     } catch (err) {
       showAlert("Failed to remove crop.", true);
     } finally {
@@ -1306,8 +1307,9 @@ function App() {
     setActionId(id);
     try {
       await api.deleteFinance(id);
+      setFinance(prev => prev.filter(f => f._id !== id));
       showAlert("Transaction successfully removed from ledger!");
-      refreshData();
+      await refreshData();
       return true;
     } catch (err) {
       showAlert("Failed to delete transaction.", true);
@@ -1407,8 +1409,9 @@ function App() {
     setActionId(id);
     try {
       await api.deleteLiability(id);
+      setLiabilities(prev => prev.filter(item => item._id !== id));
       showAlert("Liability record removed successfully.");
-      refreshData();
+      await refreshData();
     } catch (err) {
       showAlert("Failed to remove liability.", true);
     } finally {
@@ -1468,8 +1471,9 @@ function App() {
     setActionId(id);
     try {
       await api.deleteInventory(id);
+      setInventory(prev => prev.filter(item => item._id !== id));
       showAlert("Inventory stock item deleted successfully.");
-      refreshData();
+      await refreshData();
     } catch (err) {
       showAlert("Failed to delete stock item.", true);
     } finally {
@@ -1569,8 +1573,9 @@ function App() {
     setActionId(id);
     try {
       await api.deleteTask(id);
+      setTasks(prev => prev.filter(item => item._id !== id));
       showAlert("Care task assignment removed successfully!");
-      refreshData();
+      await refreshData();
     } catch (err) {
       showAlert("Failed to delete task.", true);
     } finally {
@@ -3075,8 +3080,8 @@ function App() {
                 <div className="muf-page-title">
                   <div className="muf-title-icon"><FileText size={30}/></div>
                   <div>
-                    <h2>{L('Finance')}</h2>
-                    <p>Verify seed logistics, operational fuels, wages, and harvest sales ledger flows.</p>
+                    <h2>{L('Finance')}{agriFinanceSubTab !== 'ledger' && <><span className="mx-2 text-slate-300 dark:text-slate-600">›</span><span className="text-emerald-700 dark:text-emerald-400">{L(({ suppliers: 'Supplier Khata', zakat: 'Zakat & Ushr', loan: 'Loan & Credit', inventory: 'Input Inventory' } as Record<string, string>)[agriFinanceSubTab] || 'Ledger')}</span></>}</h2>
+                    <p>{agriFinanceSubTab === 'ledger' ? 'Verify seed logistics, operational fuels, wages, and harvest sales ledger flows.' : `Finance section · ${L(({ suppliers: 'Supplier Khata', zakat: 'Zakat & Ushr', loan: 'Loan & Credit', inventory: 'Input Inventory' } as Record<string, string>)[agriFinanceSubTab] || 'Ledger')}`}</p>
                   </div>
                 </div>
               </div>
@@ -5659,3 +5664,4 @@ function App() {
 }
 
 export default App;
+

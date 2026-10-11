@@ -105,6 +105,15 @@ function buildProject(proj) {
   // Step 3: Auto-fix common errors
   console.log('   [!] Build failed — attempting auto-fix...');
 
+  // Always surface the original build diagnostics before any fallback. The old
+  // script hid the TypeScript output and made a Vite-only success look like a
+  // fully type-checked build. This is diagnostic-only; it does not alter source
+  // files or change the build/fallback decisions.
+  if (result.out && result.out.trim()) {
+    console.log('   [diagnostics] Original build output (last 80 lines):');
+    result.out.trim().split(/\r?\n/).slice(-80).forEach(line => console.log(`     ${line}`));
+  }
+
   // Fix 1: Unused imports
   if (fixUnusedImports(result.out, dir)) {
     console.log('   [OK] Fixed unused imports — retrying build...');

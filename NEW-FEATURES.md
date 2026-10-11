@@ -101,3 +101,29 @@ These changes are frontend-only. The existing backend summary endpoints remain t
 - Kept dark-mode borders and reduced-motion behavior aligned with the shared MUF visual system.
 - CSS-only presentation changes: no API requests, local-storage behavior, waybill data, calculations, navigation destinations, permissions, or features were changed.
 - Keep all three `muf-style.css` twins byte-identical.
+
+## 11. UI audit — final combined review (2026-10-11)
+
+- Completed a static review of shared UI consistency, popup safety, responsive styling, dashboard presentation, Admin/Superadmin presentation, and cross-farm twin synchronization.
+- Ran `node check-muf-sync.js`: passed. Shared frontend and backend MUF twins and the repository's listed invariants matched.
+- Ran `node check-ui-safety.js`: passed for Dairy, Flock, and Agri.
+- A static reference scan did not find direct source references to `components/FarmLogos.tsx` or `muf-admin-field.tsx`. These files were deliberately retained: a text search cannot prove they are safe to delete if dynamic loading, future use, or external tooling depends on them.
+- No additional broad component or stylesheet deletion was made. Repeated CSS selectors may be intentional overrides; removing them without browser comparison could change existing screens.
+- No backend files, API contracts, database schemas, domain calculations, authentication/authorization, navigation destinations, or feature workflows were intentionally changed in this final review.
+- Validation limitation: the archive does not include installed dependencies. `npm test -- --reporter=dot` was attempted but could not start because `vitest` is not installed (`vitest: not found`); fresh production builds were not run in this environment. Local `build-all.bat` output supplied by the project owner shows Dairy and Flock falling back to Vite-only builds because TypeScript checks fail; Agri passes the normal build. Treat the TypeScript errors as outstanding.
+- Before deployment, run `build-all.bat`, inspect each app with `start-all.bat`, and verify high-use forms/popups, Admin/Superadmin, dark mode, and phone/tablet/desktop widths.
+
+
+## 12. Final validation follow-up (2026-10-11)
+
+- Updated `build-all.js` to print the original failed build output (last 80 lines) before attempting the existing fallback. This makes TypeScript diagnostics visible instead of showing only that the build fell back to Vite.
+- This is build-tool diagnostics only: the build commands, fallback decisions, frontend runtime, backend, APIs, and business logic are unchanged.
+- The current local report still has TypeScript errors in Dairy and Flock. Dependency installation could not complete in the audit environment because npm registry requests failed with `EAI_AGAIN`; therefore the exact TypeScript diagnostics could not be reproduced here.
+- `node check-muf-sync.js` and `node check-ui-safety.js` both pass. Full tests and fresh production builds remain pending until dependencies are available.
+
+
+## 2026-10-11 corrective UI follow-up
+- Corrected QR waybill validation notice tone to the supported `info` tone in Dairy and Flock.
+- Updated confirmed animal/expense/crop/ledger/liability/inventory/task deletions to remove the item from visible client state immediately, then refresh server data.
+- Improved large popup viewport sizing and overflow behavior across all three frontends.
+- No backend routes, schemas, or business calculations were intentionally changed.

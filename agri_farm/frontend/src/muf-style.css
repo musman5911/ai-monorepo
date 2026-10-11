@@ -2415,3 +2415,39 @@ html, body {
     animation: none !important;
   }
 }
+
+/* MUF interaction polish — compact, readable entity/forms popups (visual only). */
+.muf-pup-sm, .muf-pup-lg { min-width: 0; overflow-wrap: anywhere; }
+.muf-pup-sm form, .muf-pup-lg form { gap: 1rem; }
+.muf-pup-sm form label, .muf-pup-lg form label { line-height: 1.35; }
+.muf-pup-sm form input, .muf-pup-sm form select, .muf-pup-sm form textarea,
+.muf-pup-lg form input, .muf-pup-lg form select, .muf-pup-lg form textarea { min-width: 0; max-width: 100%; }
+.muf-pup-lg .grid { min-width: 0; }
+.muf-pup-lg :is(h3,h4) { letter-spacing: -.01em; }
+@media (max-width: 640px) {
+  .muf-pup-sm, .muf-pup-lg { border-radius: 1.1rem !important; }
+  .muf-pup-sm form, .muf-pup-lg form { gap: .8rem; }
+  .muf-pup-lg .grid { grid-template-columns: minmax(0, 1fr) !important; }
+}
+/* Superadmin workspace sizing guard — harmless in projects without this view. */
+.muf-superadmin-page { display: block; width: 100%; min-width: 0; min-height: 24rem; }
+.muf-superadmin-page .muf-superadmin { display: flex; flex-direction: column; gap: 1rem; min-height: 24rem; width: 100%; }
+.muf-superadmin-page .muf-superadmin > * { flex-shrink: 0; }
+
+
+/* MUF UI follow-up: detail/form popups should use the available viewport, not crop their content. */
+.muf-pup-lg {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: min(88dvh, 820px) !important;
+  width: min(94vw, 52rem);
+  display: flex;
+  flex-direction: column;
+}
+.muf-pup-lg > .flex-1,
+.muf-pup-lg .overflow-y-auto,
+.muf-pup-sm .overflow-y-auto { min-height: 0; overscroll-behavior: contain; }
+.muf-pup-lg img { max-width: 100%; }
+@media (max-width: 640px) {
+  .muf-pup-lg { width: calc(100vw - 16px) !important; max-height: 90dvh !important; }
+}

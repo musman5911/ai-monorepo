@@ -79,15 +79,18 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
+      const wasEditing = !!editingCow;
       if (editingCow) {
         await api.updateCow(editingCow._id, formData);
       } else {
         await api.createCow(formData);
       }
+      notify(wasEditing ? 'Animal updated successfully.' : 'Animal added successfully.', 'success');
+      if (wasEditing && editingCow) setCows(prev => prev.map(c => c._id === editingCow._id ? { ...c, ...formData } as Cow : c));
       setShowForm(false);
       setEditingCow(null);
       resetForm();
-      loadCows();
+      await loadCows();
     } catch (error) {
       notify(error instanceof Error ? error.message : 'Failed to save cow', 'error');
     }
@@ -115,9 +118,10 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
         lactationNumber: 0,
         purchasePrice: calfForm.purchasePrice ? parseFloat(calfForm.purchasePrice) : 0,
       });
+      notify('Calf added successfully.', 'success');
       setShowCalfForm(false);
       setCalfForm({ name: '', breed: '', gender: 'female', motherId: '', birthDate: todayStr(), weight: '', notes: '', nursingMonths: 2.5, purchasePrice: '' });
-      loadCows();
+      await loadCows();
     } catch (error) {
       notify(error instanceof Error ? error.message : 'Failed to add calf', 'error');
     }
@@ -131,7 +135,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
       tone: 'danger',
     });
     if (!ok) return;
-    try { await api.deleteCow(id); loadCows(); } catch (error) { notify(error instanceof Error ? error.message : 'Failed to delete', 'error'); }
+    try { await api.deleteCow(id); setCows(prev => prev.filter(c => c._id !== id)); setDetailCowId(current => current === id ? null : current); notify('Animal deleted successfully.', 'success'); void loadCows(); } catch (error) { notify(error instanceof Error ? error.message : 'Failed to delete', 'error'); }
   };
 
   const handleRecordSale = async (e: React.FormEvent) => {

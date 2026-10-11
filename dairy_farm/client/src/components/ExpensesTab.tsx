@@ -104,11 +104,13 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin 
         receiptBase64,
       };
 
+      const wasEditing = !!editingId;
       if (editingId) {
         await api.updateExpense(editingId, data);
       } else {
         await api.addExpense(data);
       }
+      notify(wasEditing ? 'Expense updated successfully.' : 'Expense added successfully.', 'success');
 
       setFormData({
         date: todayStr(),
@@ -153,7 +155,9 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin 
     if (!ok) return;
     try {
       await api.deleteExpense(id);
-      fetchData();
+      setExpenses(prev => prev.filter(exp => exp._id !== id));
+      notify('Expense deleted successfully.', 'success');
+      void fetchData();
     } catch (error) {
       notify('Failed to delete expense', 'error');
     }

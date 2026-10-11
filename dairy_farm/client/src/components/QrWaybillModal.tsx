@@ -102,7 +102,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
       return;
     }
     if (activeFarm === 'super_admin') {
-      notify('Paste a real waybill payload into the field below. Sample waybills are disabled in Superadmin.', 'warning', 'No waybill payload');
+      notify('Paste a real waybill payload into the field below. Sample waybills are disabled in Superadmin.', 'info', 'No waybill payload');
       return;
     }
     const demoWaybill: WaybillData = {

@@ -62,7 +62,7 @@ export default function DetailModal({
   }, [open, modalId]);
 
   if (!open) return null;
-const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]' : 'w-[calc(100vw-2rem)] sm:w-[min(90vw,42rem,100vh)]';
+const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]' : 'w-[calc(100vw-1rem)] sm:w-[min(90vw,42rem,100vh)]';
   const alignCls = 'items-center';
   const computedZ = zIndex ?? (MUF_Z.POPUP + Math.max(0, stackLevel - 1) * MUF_Z.POPUP_STEP);
   const isChild = !!onBack;
