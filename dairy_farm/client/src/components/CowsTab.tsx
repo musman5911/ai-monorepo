@@ -76,21 +76,32 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
 
   useEffect(() => { loadCows(); }, []);
 
+  useEffect(() => {
+    const handleOfflineSynced = () => { void loadCows(); };
+    window.addEventListener('dm:offline-synced', handleOfflineSynced);
+    return () => window.removeEventListener('dm:offline-synced', handleOfflineSynced);
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const wasEditing = !!editingCow;
+      const savedCow = editingCow
+        ? await api.updateCow(editingCow._id, formData)
+        : await api.createCow(formData);
+      // Reconcile the visible list from the successful write response first. The
+      // follow-up fetch refreshes derived fields/batches without delaying the UI.
       if (editingCow) {
-        await api.updateCow(editingCow._id, formData);
-      } else {
-        await api.createCow(formData);
+        setCows(prev => prev.map(c => c._id === editingCow._id ? { ...c, ...formData, ...(savedCow && typeof savedCow === 'object' ? savedCow : {}), _id: editingCow._id } as Cow : c));
+      } else if (savedCow && typeof savedCow === 'object' && savedCow._id) {
+        setCows(prev => [savedCow as Cow, ...prev.filter(c => c._id !== savedCow._id)]);
       }
-      notify(wasEditing ? 'Animal updated successfully.' : 'Animal added successfully.', 'success');
-      if (wasEditing && editingCow) setCows(prev => prev.map(c => c._id === editingCow._id ? { ...c, ...formData } as Cow : c));
+      notify(savedCow?.offline ? 'Saved on this device. It will sync when internet returns.' : (wasEditing ? 'Animal updated successfully.' : 'Animal added successfully.'), savedCow?.offline ? 'info' : 'success');
       setShowForm(false);
       setEditingCow(null);
       resetForm();
-      await loadCows();
+      // Keep the successful server response as the source of truth for this render.
+      // A background list request can race the write and restore stale records.
     } catch (error) {
       notify(error instanceof Error ? error.message : 'Failed to save cow', 'error');
     }
@@ -104,7 +115,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
     nursingBase.setDate(nursingBase.getDate() + Math.round(calfForm.nursingMonths * 30));
     const nursingUntil = mufDateStr(nursingBase);
     try {
-      await api.createCow({
+      const savedCalf = await api.createCow({
         name: calfForm.name,
         breed: calfForm.breed || mother.breed,
         gender: calfForm.gender,
@@ -118,10 +129,13 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
         lactationNumber: 0,
         purchasePrice: calfForm.purchasePrice ? parseFloat(calfForm.purchasePrice) : 0,
       });
-      notify('Calf added successfully.', 'success');
+      if (savedCalf && typeof savedCalf === 'object' && savedCalf._id) {
+        setCows(prev => [savedCalf as Cow, ...prev.filter(c => c._id !== savedCalf._id)]);
+      }
+      notify(savedCalf?.offline ? 'Saved on this device. It will sync when internet returns.' : 'Calf added successfully.', savedCalf?.offline ? 'info' : 'success');
       setShowCalfForm(false);
       setCalfForm({ name: '', breed: '', gender: 'female', motherId: '', birthDate: todayStr(), weight: '', notes: '', nursingMonths: 2.5, purchasePrice: '' });
-      await loadCows();
+      // The newly-created calf is already reconciled into local state above.
     } catch (error) {
       notify(error instanceof Error ? error.message : 'Failed to add calf', 'error');
     }
@@ -135,7 +149,16 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
       tone: 'danger',
     });
     if (!ok) return;
-    try { await api.deleteCow(id); setCows(prev => prev.filter(c => c._id !== id)); setDetailCowId(current => current === id ? null : current); notify('Animal deleted successfully.', 'success'); void loadCows(); } catch (error) { notify(error instanceof Error ? error.message : 'Failed to delete', 'error'); }
+    try {
+      const deleteResult = await api.deleteCow(id);
+      // Only remove after the server confirms deletion (or the offline queue accepts it).
+      setCows(prev => prev.filter(c => c._id !== id));
+      setDetailCowId(current => current === id ? null : current);
+      notify(deleteResult?.offline ? 'Delete queued on this device. It will sync when internet returns.' : 'Animal deleted successfully.', deleteResult?.offline ? 'info' : 'success');
+      // Do not immediately refetch: some deployments briefly return a stale list after DELETE.
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Failed to delete', 'error');
+    }
   };
 
   const handleRecordSale = async (e: React.FormEvent) => {
@@ -255,11 +278,11 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
           const isActive = statusFilter === card.filter;
           return (
             <button key={card.filter} onClick={() => setStatusFilter(isActive ? 'all' : card.filter)}
-              className={`bg-white dark:bg-slate-900 rounded-xl border shadow-sm p-3 text-left transition-all cursor-pointer ${
+              className={`bg-white dark:bg-slate-900 rounded-xl border shadow-sm p-2 sm:p-3 text-left transition-all cursor-pointer min-w-0 ${
                 isActive ? 'border-farm-500 ring-2 ring-farm-500/20 dark:border-farm-400' : 'border-slate-200 dark:border-slate-800 hover:border-slate-300'
               }`}>
-              <p className="text-slate-500 dark:text-slate-400 text-[10px]">{card.label}</p>
-              <p className="text-xl font-bold text-slate-800 dark:text-slate-100">{card.value}</p>
+              <p className="text-slate-500 dark:text-slate-400 text-[9px] sm:text-[10px] leading-tight break-words">{card.label}</p>
+              <p className="text-lg sm:text-xl font-bold text-slate-800 dark:text-slate-100 leading-tight">{card.value}</p>
             </button>
           );
         })}
@@ -479,7 +502,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
       <style>{`.inp{width:100%;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.5rem 0.75rem;font-size:0.875rem;background:white;outline:none}.inp:focus{border-color:#1b854a}.dark .inp{background:#0f172a;border-color:#334155;color:#e2e8f0}`}</style>
       {/* ── Cow Detail (any card / row click) ───── */}
       {detailCowId && (
-        <CowDetailPopup cowId={detailCowId} rate={rate.value} rateDate={rate.date} isAdmin={isAdmin} onClose={() => setDetailCowId(null)} />
+        <CowDetailPopup cowId={detailCowId} rate={rate.value} rateDate={rate.date} isAdmin={isAdmin} onClose={() => setDetailCowId(null)} onCowUpdated={(updatedCow) => setCows(prev => prev.map(c => c._id === updatedCow._id ? { ...c, ...updatedCow } : c))} />
       )}
 
       {/* FAB — Add Animal / Add Calf */}

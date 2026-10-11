@@ -207,6 +207,17 @@ function App() {
   // Top navbar selection is intentionally separate from content tabs because
   // several navigation items share the same existing feature view.
   const [activeNav, setActiveNav] = useState('dashboard');
+  const [financeMenuOpen, setFinanceMenuOpen] = useState(false);
+  // Close Finance menu when the user clicks anywhere outside its navbar item.
+  useEffect(() => {
+    if (!financeMenuOpen) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Element && !target.closest('.muf-finance-nav-item')) setFinanceMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+  }, [financeMenuOpen]);
   const navRef = useRef(null);
   const navigateTo = (tab, navKey = tab) => {
     setActiveTab(tab);
@@ -941,15 +952,17 @@ function App() {
       setCropForm(getEmptyCropForm());
       setEditingCrop(null);
       setShowCropModal(false);
-      if (isOfflineSave(cropSaveRes)) {
-        if (editingCrop) {
-          setCrops(prev => prev.map(c => c._id === editingCrop._id ? { ...c, ...payload } : c));
-        } else {
-          setCrops(prev => [offlineRecord(payload, cropSaveRes), ...prev]);
-        }
-      } else {
-        refreshData();
+      if (editingCrop) {
+        const localCrop = { ...(editingCrop || {}), ...(savedCrop || {}), ...payload, _id: editingCrop._id };
+        setCrops(prev => prev.map(c => c._id === editingCrop._id ? localCrop : c));
+      } else if (isOfflineSave(cropSaveRes)) {
+        setCrops(prev => [offlineRecord(payload, cropSaveRes), ...prev]);
+      } else if (savedCrop && savedCrop._id) {
+        setCrops(prev => [savedCrop, ...prev.filter(c => c._id !== savedCrop._id)]);
       }
+      // Refresh derived lists (including seed-ledger entries) in the background;
+      // the crop list above is already reconciled for immediate feedback.
+      if (!isOfflineSave(cropSaveRes)) void refreshData();
     } catch (err) {
       showAlert("Failed to save crop entry.", true);
     }
@@ -992,7 +1005,7 @@ function App() {
       await api.deleteCrop(id);
       setCrops(prev => prev.filter(c => c._id !== id));
       showAlert("Crop cycle record removed successfully!");
-      await refreshData();
+      // Keep the confirmed local removal; an immediate refetch can return a stale cached list.
     } catch (err) {
       showAlert("Failed to remove crop.", true);
     } finally {
@@ -1191,15 +1204,17 @@ function App() {
       setEditingFinance(null);
       setFinanceBookTab('ledger');
       setShowFinanceModal(false);
-      if (isOfflineSave(saveRes)) {
-        if (editingFinance) {
-          setFinance(prev => prev.map(f => f._id === editingFinance._id ? { ...f, ...payload } : f));
-        } else {
-          setFinance(prev => [offlineRecord(payload, saveRes), ...prev]);
-        }
+      if (editingFinance) {
+        setFinance(prev => prev.map(f => f._id === editingFinance._id ? { ...f, ...payload } : f));
+      } else if (isOfflineSave(saveRes)) {
+        setFinance(prev => [offlineRecord(payload, saveRes), ...prev]);
       } else {
-        refreshData();
+        // The existing finance API returns {status:'ok'} rather than the saved
+        // document. Use a temporary client id until the authoritative reload
+        // supplies the server id; do not modify the backend contract.
+        setFinance(prev => [{ ...payload, _id: `pending-ui-${Date.now()}` }, ...prev]);
       }
+      if (!isOfflineSave(saveRes)) void refreshData();
     } catch (err) {
       showAlert("Failed to save ledger entry.", true);
     }
@@ -2435,14 +2450,12 @@ function App() {
                   ? [{ key: 'super_admin', tab: 'super_admin', label: 'Super Admin', Icon: ShieldCheck }]
                   : []),
               ].map(({ key, tab, label, Icon }) => (
-                <div className="muf-nav-item" key={key}>
-                  <button
-                    type="button"
-                    className={`muf-nav-link ${activeNav === key ? 'active' : ''}`}
-                    onClick={() => navigateTo(tab, key)}
-                  >
-                    <Icon size={15}/><span>{label}</span>
-                  </button>
+                <div className={`muf-nav-item relative ${key === 'finance' ? 'muf-finance-nav-item' : ''}`} key={key}>
+                  <div className="flex items-center">
+                    <button type="button" className={`muf-nav-link ${activeNav === key ? 'active' : ''}`} onClick={() => { navigateTo(tab, key); setFinanceMenuOpen(false); }}><Icon size={15}/><span>{label}</span></button>
+                    {key === 'finance' && <button type="button" aria-label="Open Finance sections" aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
+                  </div>
+                  {key === 'finance' && financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{id:'ledger',label:'Ledger'},{id:'suppliers',label:'Supplier Khata'},{id:'zakat',label:'Zakat & Ushr'},{id:'loan',label:'Loan & Credit'},{id:'inventory',label:'Input Inventory'}].filter(item => item.id !== 'inventory' || userRole === 'admin').map(item => <button key={item.id} type="button" onClick={() => { navigateTo('finance', 'finance'); setAgriFinanceSubTab(item.id); setFinanceMenuOpen(false); }} className={`block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800 ${agriFinanceSubTab === item.id ? 'font-bold text-emerald-700 dark:text-emerald-400' : ''}`}>{L(item.label)}</button>)}</div>}
                 </div>
               ))}
             </div>
@@ -3084,20 +3097,6 @@ function App() {
                     <p>{agriFinanceSubTab === 'ledger' ? 'Verify seed logistics, operational fuels, wages, and harvest sales ledger flows.' : `Finance section · ${L(({ suppliers: 'Supplier Khata', zakat: 'Zakat & Ushr', loan: 'Loan & Credit', inventory: 'Input Inventory' } as Record<string, string>)[agriFinanceSubTab] || 'Ledger')}`}</p>
                   </div>
                 </div>
-              </div>
-
-              {/* Finance sub-tabs are selected from a compact dropdown. */}
-              <div className="muf-panel p-3 flex flex-wrap items-center gap-3 muf-finance-surface">
-                <label htmlFor="agri-finance-section" className="text-xs font-bold text-slate-600 dark:text-slate-300">Finance section</label>
-                <select id="agri-finance-section" value={agriFinanceSubTab} onChange={e => setAgriFinanceSubTab(e.target.value)} className="min-w-0 flex-1 sm:flex-none sm:min-w-[230px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
-                  {[
-                    { id: 'ledger', label: L('Ledger') },
-                    { id: 'suppliers', label: L('Supplier Khata') },
-                    { id: 'zakat', label: L('Zakat & Ushr') },
-                    { id: 'loan', label: L('Loan & Credit') },
-                    { id: 'inventory', label: L('Input Inventory') },
-                  ].filter(tab => tab.id !== 'inventory' || userRole === 'admin').map(tab => <option key={tab.id} value={tab.id}>{tab.label}</option>)}
-                </select>
               </div>
 
               {/* ── LEDGER SUB-TAB ── */}
@@ -4082,6 +4081,7 @@ function App() {
             </div>
           )}
 
+          {activeTab === 'super_admin' && userRole === 'admin' && <SuperAdminTab />}
         </div>
       </main>
 
@@ -4602,8 +4602,6 @@ function App() {
         refreshData={refreshData}
         showAlert={showAlert}
       />
-
-      {activeTab === 'super_admin' && userRole === 'admin' && <SuperAdminTab />}
 
       {/* ─── DETAIL POPUPS (Dashboard Stat Card clicks) ─── */}
 

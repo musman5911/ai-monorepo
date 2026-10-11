@@ -613,7 +613,18 @@ export default function App() {
 
     return list;
   }, [isLoaded, birds, settings, feedRecords, eggProduction, lang]);
-  const [quickOpenLedgerTab, setQuickOpenLedgerTab] = useState<'feed' | 'expense' | 'egg' | 'customers' | null>(null);
+  const [quickOpenLedgerTab, setQuickOpenLedgerTab] = useState<'feed' | 'expense' | 'egg' | 'customers' | 'suppliers' | null>(null);
+  const [financeMenuOpen, setFinanceMenuOpen] = useState(false);
+  // Close Finance menu when the user clicks anywhere outside its navbar item.
+  useEffect(() => {
+    if (!financeMenuOpen) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Element && !target.closest('.muf-finance-nav-item')) setFinanceMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+  }, [financeMenuOpen]);
 
   const handleQuickAction = (actionType: 'bird' | 'egg' | 'expense' | 'feed') => {
     if (actionType === 'bird') {
@@ -800,16 +811,12 @@ export default function App() {
           {navItems.map(({ id, label, icon: Icon }) => {
             const active = activeTab === id;
             return (
-              <div className="muf-nav-item" key={id}>
-                <button
-                  type="button"
-                  className={`muf-nav-link ${active ? 'active' : ''}`}
-                  onClick={() => setActiveTab(id)}
-                  id={`nav-${id}`}
-                >
-                  <Icon size={15} />
-                  <span>{label}</span>
-                </button>
+              <div className={`muf-nav-item relative ${id === 'ledger' ? 'muf-finance-nav-item' : ''}`} key={id}>
+                <div className="flex items-center">
+                  <button type="button" className={`muf-nav-link ${active ? 'active' : ''}`} onClick={() => { setActiveTab(id); setFinanceMenuOpen(false); }} id={`nav-${id}`}><Icon size={15} /><span>{label}</span></button>
+                  {id === 'ledger' && <button type="button" aria-label="Open Finance sections" aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
+                </div>
+                {id === 'ledger' && financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{label:'Feed',value:'feed'},{label:'Expenses',value:'expense'},{label:'Eggs',value:'egg'},{label:'Customers',value:'customers'},{label:'Suppliers',value:'suppliers'}].map(item => <button key={item.value} type="button" onClick={() => { setActiveTab('ledger'); setQuickOpenLedgerTab(item.value as 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers'); setFinanceMenuOpen(false); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800">{item.label}</button>)}</div>}
               </div>
             );
           })}

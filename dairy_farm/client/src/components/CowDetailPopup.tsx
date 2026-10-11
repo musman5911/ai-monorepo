@@ -40,9 +40,10 @@ interface Props {
   rateDate?: string;
   onClose: () => void;
   isAdmin?: boolean;
+  onCowUpdated?: (cow: Cow) => void;
 }
 
-export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate = '', onClose, isAdmin = false }: Props) {
+export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate = '', onClose, isAdmin = false, onCowUpdated }: Props) {
   const [data, setData] = useState<CowSummary | null>(null);
   const [loading, setLoading] = useState(true);
   const confirmAction = useConfirm();
@@ -70,8 +71,10 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
     setMarketBusy(true);
     try {
       const updated = await api.updateCow(data.cow._id, fields);
-      setData({ ...data, cow: { ...data.cow, ...updated } });
-      notify('Saved', 'success');
+      const mergedCow = { ...data.cow, ...updated, _id: data.cow._id };
+      setData({ ...data, cow: mergedCow });
+      onCowUpdated?.(mergedCow);
+      notify(updated?.offline ? 'Saved on this device. It will sync when internet returns.' : 'Saved', updated?.offline ? 'info' : 'success');
     } catch (err) {
       notify(err instanceof Error ? err.message : 'Could not save', 'error');
     } finally { setMarketBusy(false); }

@@ -358,8 +358,8 @@
   /* Never wrap tabs to a second row — scroll horizontally instead
      (scrollbar is hidden; swipe/scroll still works on mobile & PC). */
   flex-wrap: nowrap;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: visible;
+  overflow-y: visible;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
@@ -1372,6 +1372,10 @@
     height: calc(100vh / 0.8) !important;
     height: calc(100dvh / 0.8) !important;
   }
+  .muf-overlay,
+  .ff-modal-host {
+    width: calc(100vw / 0.8) !important;
+  }
   .modal-overlay {
     width: calc(100vw / 0.8) !important;
     height: calc(100vh / 0.8) !important;
@@ -1685,8 +1689,8 @@ html, body {
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  overflow-x: auto;
-  overflow-y: hidden;
+  overflow-x: visible;
+  overflow-y: visible;
   white-space: nowrap;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
@@ -2450,4 +2454,52 @@ html, body {
 .muf-pup-lg img { max-width: 100%; }
 @media (max-width: 640px) {
   .muf-pup-lg { width: calc(100vw - 16px) !important; max-height: 90dvh !important; }
+}
+
+
+/* Responsive popup polish: keep form actions visible and prevent nested scrollbars. */
+.muf-overlay { align-items: center; overscroll-behavior: contain; }
+.muf-overlay .ff-modal-host, .muf-overlay [role="dialog"] { min-width: 0; max-width: min(100%, 64rem); }
+.muf-overlay form { min-width: 0; }
+.muf-overlay input, .muf-overlay select, .muf-overlay textarea { min-width: 0; max-width: 100%; }
+@media (max-width: 640px) {
+  .muf-overlay { padding: .5rem !important; }
+  .muf-overlay [role="dialog"] { width: 100% !important; max-height: calc(100dvh - 1rem) !important; border-radius: 1rem !important; }
+  .muf-overlay [role="dialog"] button { max-width: 100%; }
+}
+
+
+/* Super Admin visual hierarchy */
+.muf-superadmin-page .muf-superadmin h1 { line-height: 1.15; letter-spacing: -.025em; }
+.muf-superadmin-page .muf-superadmin h2, .muf-superadmin-page .muf-superadmin h3 { letter-spacing: -.01em; }
+.muf-superadmin-page .muf-superadmin section { min-width: 0; overflow-wrap: anywhere; }
+
+
+/* Desktop zoom regression fix: modal/backdrop must span the complete visual viewport.
+   Keep centered dialog sizing untouched; only correct the fullscreen overlay layer. */
+@media (min-width: 1024px) {
+  .muf-overlay,
+  .muf-form-overlay,
+  .modal-overlay,
+  .ff-modal-host,
+  .fixed.inset-0,
+  [data-radix-dialog-overlay],
+  [data-state="open"][class*="overlay"] {
+    position: fixed !important;
+    left: 0 !important;
+    right: auto !important;
+    top: 0 !important;
+    bottom: auto !important;
+    width: 125vw !important;
+    max-width: none !important;
+    height: 125vh !important;
+    min-height: 125vh !important;
+    box-sizing: border-box !important;
+  }
+  @supports (height: 100dvh) {
+    .muf-overlay, .muf-form-overlay, .modal-overlay, .ff-modal-host,
+    .fixed.inset-0, [data-radix-dialog-overlay], [data-state="open"][class*="overlay"] {
+      height: 125dvh !important; min-height: 125dvh !important;
+    }
+  }
 }

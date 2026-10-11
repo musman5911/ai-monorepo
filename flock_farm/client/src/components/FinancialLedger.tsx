@@ -48,7 +48,7 @@ interface FinancialLedgerProps {
   onAddVaccination: (record: Omit<VaccinationRecord, 'id'>) => void;
   onUpdateVaccination: (id: number, v: Omit<VaccinationRecord, 'id'>) => void;
   onDeleteVaccination: (id: number) => void;
-  quickOpenTab: 'feed' | 'expense' | 'egg' | 'customers' | null;
+  quickOpenTab: 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers' | null;
   onResetQuickOpenTab: () => void;
   isAdmin?: boolean;
   canDelete?: boolean;
@@ -109,6 +109,7 @@ export default function FinancialLedger({
       if (quickOpenTab === 'expense') setActiveSubTab('expense');
       if (quickOpenTab === 'egg') setActiveSubTab('egg');
       if (quickOpenTab === 'customers') setActiveSubTab('customers');
+      if (quickOpenTab === 'suppliers') setActiveSubTab('suppliers');
       onResetQuickOpenTab();
     }
   }, [quickOpenTab, onResetQuickOpenTab]);
@@ -422,24 +423,10 @@ export default function FinancialLedger({
         <div className="muf-page-title">
           <div className="muf-title-icon"><DollarSign size={28}/></div>
           <div>
-            <h2>{L('Finance')}</h2>
+            <h2>{L('Finance')}<span className="mx-2 text-slate-300 dark:text-slate-600">›</span><span className="text-emerald-700 dark:text-emerald-400">{L(({ feed: 'Feed', expense: 'Expenses', egg: 'Eggs', customers: 'Customers', suppliers: 'Suppliers' } as Record<string, string>)[activeSubTab])}</span></h2>
             <p>{L('Manage feed, expenses, egg production, customers, and health activity from one place.')}</p>
           </div>
         </div>
-      </div>
-
-      {/* Finance sections dropdown */}
-      <div className="muf-panel p-3 flex flex-wrap items-center gap-3 muf-finance-surface">
-        <label htmlFor="flock-finance-section" className="text-xs font-bold text-slate-600 dark:text-slate-300">Finance section</label>
-        <select id="flock-finance-section" value={activeSubTab} onChange={e => setActiveSubTab(e.target.value as typeof activeSubTab)} className="min-w-0 flex-1 sm:flex-none sm:min-w-[230px] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2 text-sm font-semibold text-slate-800 dark:text-slate-100">
-          {([
-            { id: 'feed', label: `${L('Feed')} (${feedRecords.length})` },
-            { id: 'expense', label: `${L('Expenses')} (${otherExpenses.length})` },
-            { id: 'egg', label: `${L('Eggs')} (${eggProduction.length})` },
-            { id: 'customers', label: `${L('Customers')} (${customers.length})` },
-            { id: 'suppliers', label: `${L('Suppliers')} (${suppliers.length})` },
-          ] as { id: 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers'; label: string }[]).map(tab => <option key={tab.id} value={tab.id}>{tab.label}</option>)}
-        </select>
       </div>
 
       {/* --- FEED RECORDS SECTION --- */}

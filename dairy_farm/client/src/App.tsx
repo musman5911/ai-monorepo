@@ -77,6 +77,18 @@ export default function App() {
     () => localStorage.getItem("dm_dark") === "true",
   );
   const [tab, setTab] = useState<Tab>("dashboard");
+  const [financeMenuOpen, setFinanceMenuOpen] = useState(false);
+  // Close Finance menu when the user clicks anywhere outside its navbar item.
+  useEffect(() => {
+    if (!financeMenuOpen) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const target = event.target;
+      if (target instanceof Element && !target.closest('.muf-finance-nav-item')) setFinanceMenuOpen(false);
+    };
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+  }, [financeMenuOpen]);
+  const [financeCategory, setFinanceCategory] = useState('');
   const [lang, setLangState] = useState<Lang>(getLang());
 
   // muf-applike: fade out the boot splash + enable pull-to-refresh on phones
@@ -382,18 +394,15 @@ export default function App() {
       {/* Tab Nav */}
       <nav className="muf-top-nav" aria-label="Primary navigation">
         <div className="muf-top-nav-scroll">
-          {visibleNav.map(({ id, label, icon: Icon }) => (
-            <div className="muf-nav-item" key={id}>
-              <button
-                type="button"
-                className={`muf-nav-link ${tab === id ? "active" : ""}`}
-                onClick={() => setTab(id)}
-              >
-                <Icon size={15} />
-                <span>{label}</span>
-              </button>
+          {visibleNav.map(({ id, label, icon: Icon }) => id === "expenses" ? (
+            <div className="muf-nav-item muf-finance-nav-item relative" key={id}>
+              <div className="flex items-center">
+                <button type="button" className={`muf-nav-link ${tab === id ? "active" : ""}`} onClick={() => { setTab(id); setFinanceMenuOpen(false); }}><Icon size={15}/><span>{label}</span></button>
+                <button type="button" aria-label="Open Finance sections" aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2" title="Finance sections"><ChevronDown size={14}/></button>
+              </div>
+              {financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{label:'All expenses',value:''},{label:'Feed',value:'feed'},{label:'Medicine',value:'medicine'},{label:'Equipment',value:'equipment'},{label:'Labor',value:'labor'},{label:'Purchasing',value:'purchasing'},{label:'Other',value:'misc'}].map(item => <button key={item.label} type="button" onClick={() => { setFinanceCategory(item.value); setTab('expenses'); setFinanceMenuOpen(false); }} className={`block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800 ${financeCategory === item.value ? 'font-bold text-emerald-700 dark:text-emerald-400' : ''}`}>{item.label}</button>)}</div>}
             </div>
-          ))}
+          ) : <div className="muf-nav-item" key={id}><button type="button" className={`muf-nav-link ${tab === id ? "active" : ""}`} onClick={() => setTab(id)}><Icon size={15}/><span>{label}</span></button></div>)}
         </div>
       </nav>
 
@@ -420,7 +429,7 @@ export default function App() {
             )}
             {tab === "breeding" && <BreedingTab isAdmin={isAdmin} />}
             {tab === "expenses" && (
-              <ExpensesTab isAdmin={canLogDaily} canDelete={isAdmin} />
+              <ExpensesTab isAdmin={canLogDaily} canDelete={isAdmin} financeCategory={financeCategory} />
             )}
             {tab === "health" && (
               <HealthTab isAdmin={canLogDaily} canDelete={isAdmin} />

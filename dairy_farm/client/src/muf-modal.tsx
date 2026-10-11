@@ -146,7 +146,7 @@ const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.25, delay: 0.08 }}
-                className="flex-1 overflow-y-auto overflow-x-hidden muf-scroll bg-white dark:bg-slate-900 dark:text-slate-200" style={{ padding: 'var(--pup-body-pad)', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}
+                className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain muf-scroll bg-white dark:bg-slate-900 dark:text-slate-200" style={{ padding: 'var(--pup-body-pad)', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', scrollbarGutter: 'stable' }}
               >
                 {children}
               </motion.div>

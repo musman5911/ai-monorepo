@@ -27,6 +27,7 @@ import { openMufPrint } from '../muf-print';
 interface ExpensesTabProps {
   isAdmin: boolean;
   canDelete?: boolean;
+  financeCategory?: string;
 }
 
 const typeStyles: Record<ExpenseType, string> = {
@@ -38,7 +39,7 @@ const typeStyles: Record<ExpenseType, string> = {
   misc: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400',
 };
 
-const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin }) => {
+const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin, financeCategory }) => {
   const confirmAction = useConfirm();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [cows, setCows] = useState<Cow[]>([]);
@@ -53,6 +54,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin 
   const [dateFrom, setDateFrom] = useState(defaultFrom);
   const [dateTo, setDateTo] = useState(defaultTo);
   const [typeFilter, setTypeFilter] = useState<string>('');
+  useEffect(() => { if (financeCategory !== undefined) setTypeFilter(financeCategory); }, [financeCategory]);
 
   // Form
   const [formData, setFormData] = useState({
@@ -175,7 +177,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin 
         <div className="muf-page-title">
           <div className="muf-title-icon"><Banknote size={28}/></div>
           <div>
-            <h2>{L('Finance')}</h2>
+            <h2>{L('Finance')}{financeCategory !== undefined && financeCategory !== '' && <> <span className="mx-2 text-slate-300 dark:text-slate-600">›</span><span className="text-emerald-700 dark:text-emerald-400">{L(({ feed: 'Feed', medicine: 'Medicine', equipment: 'Equipment', labor: 'Labor', purchasing: 'Purchasing', misc: 'Other' } as Record<string, string>)[financeCategory] || financeCategory)}</span></>}</h2>
             <p>{L('Track feed, medicine, labor, equipment and other farm costs.')}</p>
           </div>
         </div>
@@ -187,25 +189,6 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin 
             <Plus size={19}/> {L('Add New Expense')}
           </button>
         )}
-      </div>
-
-      {/* Expense sub-tabs — shortcuts over the existing type filter; no data or rules changed. */}
-      <div className="muf-expense-subtabs flex gap-2 overflow-x-auto pb-1" role="tablist" aria-label="Expense categories">
-        {[
-          { label: 'All expenses', value: '' },
-          { label: 'Feed', value: 'feed' },
-          { label: 'Medicine', value: 'medicine' },
-          { label: 'Equipment', value: 'equipment' },
-          { label: 'Labor', value: 'labor' },
-          { label: 'Purchasing', value: 'purchasing' },
-          { label: 'Other', value: 'misc' },
-        ].map(tab => (
-          <button key={tab.label} type="button" role="tab" aria-selected={typeFilter === tab.value}
-            onClick={() => setTypeFilter(tab.value)}
-            className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-semibold transition ${typeFilter === tab.value ? 'border-farm-600 bg-farm-600 text-white shadow-sm' : 'border-slate-200 bg-white text-slate-600 hover:border-farm-300 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'}`}>
-            {tab.label}
-          </button>
-        ))}
       </div>
 
       {/* KPI Grid — Total + per-type breakdown */}
