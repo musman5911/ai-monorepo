@@ -54,6 +54,7 @@ import DetailModal from '../muf-modal';
 import { useConfirm, notify } from '../muf-confirm';
 import { todayStr } from '../utils/calculations';
 import { formatRs, normalizePublicAssetPath, sortBatchesByProfitLoss } from './batches/batchUtils';
+import { L } from '../i18n';
 
 interface BatchesTabProps {
   lang: Lang;
@@ -368,7 +369,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
         {isAdmin && (
           <button
             onClick={() => setActiveModal('create')}
-            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold"
+            className="inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold"
           >
             <Plus className="w-4 h-4" /> {L('Create Batch')}
           </button>
@@ -503,7 +504,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
                 ['expense', L('Expense Log')],
                 ['sales', L('Sales Log')],
               ] as [DetailTab, string][]).map(([tab, label]) => (
-                <button key={tab} onClick={() => setDetailTab(tab)} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${detailTab === tab ? 'bg-emerald-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'}`}>
+                <button key={tab} onClick={() => setDetailTab(tab)} className={`px-3 py-1.5 rounded-lg text-xs font-semibold ${detailTab === tab ? 'bg-farm-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200'}`}>
                   {label}
                 </button>
               ))}
@@ -598,7 +599,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
                     }} className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">{L('Edit Batch')}</button>
                   )}
                   {isAdmin && detail.batch.status === 'Active' && (
-                    <button onClick={() => { setSelectedBatch(detail.batch); setActiveModal('intake'); }} className="px-3 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold">{L('Add Birds to Batch')}</button>
+                    <button onClick={() => { setSelectedBatch(detail.batch); setActiveModal('intake'); }} className="px-3 py-2 rounded-xl bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold">{L('Add Birds to Batch')}</button>
                   )}
                   {canLog && detail.batch.status === 'Active' && (
                     <>
@@ -692,10 +693,10 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input required placeholder={L('Batch name')} value={newBatch.name} onChange={(e) => setNewBatch({ ...newBatch, name: e.target.value })} className="px-3 py-2 border rounded-xl" />
               <select value={newBatch.type} onChange={(e) => setNewBatch({ ...newBatch, type: e.target.value as BatchType })} className="px-3 py-2 border rounded-xl">
-                <option value="Broiler">Broiler</option>
-                <option value="Layer">Layer</option>
-                <option value="Breeder">Breeder</option>
-                <option value="Custom">Custom</option>
+                <option value="Broiler">{L('Broiler')}</option>
+                <option value="Layer">{L('Layer')}</option>
+                <option value="Breeder">{L('Breeder')}</option>
+                <option value="Custom">{L('Custom')}</option>
               </select>
               <input type="date" required value={newBatch.start_date} onChange={(e) => setNewBatch({ ...newBatch, start_date: e.target.value })} className="px-3 py-2 border rounded-xl" />
               <input type="date" value={newBatch.expected_end_date} onChange={(e) => setNewBatch({ ...newBatch, expected_end_date: e.target.value })} className="px-3 py-2 border rounded-xl" />
@@ -716,7 +717,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
           </div>
           <div className="flex justify-end gap-2">
             <button type="button" onClick={closeModal} className="px-4 py-2 border rounded-xl">{L('Cancel')}</button>
-            <button type="submit" disabled={submitting} className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold">{submitting ? L('Saving…') : L('Create Batch')}</button>
+            <button type="submit" disabled={submitting} className="px-4 py-2 bg-farm-600 text-white rounded-xl font-semibold">{submitting ? L('Saving…') : L('Create Batch')}</button>
           </div>
         </form>
       </DetailModal>
@@ -727,10 +728,10 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <input required placeholder={L('Batch name')} value={editBatch.name} onChange={(e) => setEditBatch({ ...editBatch, name: e.target.value })} className="px-3 py-2 border rounded-xl" />
               <select value={editBatch.type} onChange={(e) => setEditBatch({ ...editBatch, type: e.target.value as BatchType })} className="px-3 py-2 border rounded-xl">
-                <option value="Broiler">Broiler</option>
-                <option value="Layer">Layer</option>
-                <option value="Breeder">Breeder</option>
-                <option value="Custom">Custom</option>
+                <option value="Broiler">{L('Broiler')}</option>
+                <option value="Layer">{L('Layer')}</option>
+                <option value="Breeder">{L('Breeder')}</option>
+                <option value="Custom">{L('Custom')}</option>
               </select>
               <input type="date" required value={editBatch.start_date} onChange={(e) => setEditBatch({ ...editBatch, start_date: e.target.value })} className="px-3 py-2 border rounded-xl" />
               <input type="date" value={editBatch.expected_end_date} onChange={(e) => setEditBatch({ ...editBatch, expected_end_date: e.target.value })} className="px-3 py-2 border rounded-xl" />
@@ -762,7 +763,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
           <div className="text-[11px] text-slate-500">{L('If a new cost is entered, the batch cost-per-bird will be recalculated as a weighted average.')}</div>
           <div className="flex justify-end gap-2">
             <button type="button" onClick={closeModal} className="px-4 py-2 border rounded-xl">{L('Cancel')}</button>
-            <button type="submit" disabled={submitting} className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold">{L('Add Birds')}</button>
+            <button type="submit" disabled={submitting} className="px-4 py-2 bg-farm-600 text-white rounded-xl font-semibold">{L('Add Birds')}</button>
           </div>
         </form>
       </DetailModal>
@@ -836,10 +837,10 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
         <form onSubmit={(e) => submitBatchLog(e, 'expense')} className="space-y-3 text-xs">
           <input type="date" value={expenseForm.date} onChange={(e) => setExpenseForm({ ...expenseForm, date: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
           <select value={expenseForm.category} onChange={(e) => setExpenseForm({ ...expenseForm, category: e.target.value as BatchExpenseLog['category'] })} className="w-full px-3 py-2 border rounded-xl">
-            <option value="Medicine">Medicine</option>
-            <option value="Vaccination">Vaccination</option>
-            <option value="Misc">Misc</option>
-            <option value="Other">Other</option>
+            <option value="Medicine">{L('Medicine')}</option>
+            <option value="Vaccination">{L('Vaccination')}</option>
+            <option value="Misc">{L('Misc')}</option>
+            <option value="Other">{L('Other')}</option>
           </select>
           <input required placeholder={L('Detail')} value={expenseForm.detail} onChange={(e) => setExpenseForm({ ...expenseForm, detail: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
           <input type="number" min="0.01" step="0.01" required placeholder={L('Amount')} value={expenseForm.amount} onChange={(e) => setExpenseForm({ ...expenseForm, amount: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
@@ -944,8 +945,8 @@ function BatchLogModal({ open, onClose, title, subtitle, icon, iconBg, children 
 function ModalActions({ submitting, onCancel, submitLabel }: { submitting: boolean; onCancel: () => void; submitLabel: string }) {
   return (
     <div className="flex justify-end gap-2">
-      <button type="button" onClick={onCancel} className="px-4 py-2 border rounded-xl">Cancel</button>
-      <button type="submit" disabled={submitting} className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold">{submitting ? 'Saving…' : submitLabel}</button>
+      <button type="button" onClick={onCancel} className="px-4 py-2 border rounded-xl">{L('Cancel')}</button>
+      <button type="submit" disabled={submitting} className="px-4 py-2 bg-farm-600 text-white rounded-xl font-semibold">{submitting ? 'Saving…' : submitLabel}</button>
     </div>
   );
 }
@@ -974,7 +975,7 @@ function LogTable<T extends { _id: string }>({
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
           {rows.length === 0 ? (
-            <tr><td colSpan={columns.length + 1} className="px-4 py-10 text-center text-slate-400">No records yet.</td></tr>
+            <tr><td colSpan={columns.length + 1} className="px-4 py-10 text-center text-slate-400">{L('No records yet.')}</td></tr>
           ) : rows.map((row) => (
             <tr key={row._id}>
               {columns.map(([label, render]) => (

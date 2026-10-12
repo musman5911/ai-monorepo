@@ -230,10 +230,10 @@ export default function FinancialLedger({
 
   const handleDeleteFeedFromDetail = async (record: FeedRecord) => {
     const ok = await confirmAction({
-      title: 'Delete Feed Record',
-      message: 'Delete this feed record?',
-      confirmLabel: 'Delete',
-      cancelLabel: 'Cancel',
+      title: L('Delete Feed Record'),
+      message: L('Delete this feed record?'),
+      confirmLabel: L('Delete'),
+      cancelLabel: L('Cancel'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -243,10 +243,10 @@ export default function FinancialLedger({
 
   const handleDeleteExpenseFromDetail = async (record: OtherExpense) => {
     const ok = await confirmAction({
-      title: 'Delete Expense Record',
-      message: 'Delete this operating expense record?',
-      confirmLabel: 'Delete',
-      cancelLabel: 'Cancel',
+      title: L('Delete Expense Record'),
+      message: L('Delete this operating expense record?'),
+      confirmLabel: L('Delete'),
+      cancelLabel: L('Cancel'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -256,10 +256,10 @@ export default function FinancialLedger({
 
   const handleDeleteEggFromDetail = async (record: EggProduction) => {
     const ok = await confirmAction({
-      title: 'Delete Egg Record',
-      message: 'Delete this egg collection record?',
-      confirmLabel: 'Delete',
-      cancelLabel: 'Cancel',
+      title: L('Delete Egg Record'),
+      message: L('Delete this egg collection record?'),
+      confirmLabel: L('Delete'),
+      cancelLabel: L('Cancel'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -273,7 +273,7 @@ export default function FinancialLedger({
     const qty = parseFloat(feedQty);
     const rate = parseFloat(feedRate);
     if (!qty || qty <= 0 || !rate || rate <= 0) {
-      return notify('Please enter valid quantity and rate', 'error');
+      return notify(L('Please enter valid quantity and rate'), 'error');
     }
     const payload = {
       date: feedDate,
@@ -301,8 +301,8 @@ export default function FinancialLedger({
   const handleExpenseSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const amt = parseFloat(expAmount);
-    if (!expDetail.trim()) return notify('Please enter expense detail', 'error');
-    if (!amt || amt <= 0) return notify('Please enter a valid amount', 'error');
+    if (!expDetail.trim()) return notify(L('Please enter expense detail'), 'error');
+    if (!amt || amt <= 0) return notify(L('Please enter a valid amount'), 'error');
 
     const payload = {
       date: expDate,
@@ -336,7 +336,7 @@ export default function FinancialLedger({
     const brok = parseInt(eggsBroken) || 0;
 
     if (col < 0 || sold < 0 || home < 0 || brok < 0) {
-      return notify('Values cannot be negative', 'error');
+      return notify(L('Values cannot be negative'), 'error');
     }
 
     const customerQty = customerEggsOnDate(eggDate);
@@ -373,10 +373,10 @@ export default function FinancialLedger({
       const exists = eggProduction.some(ep => ep.date === eggDate);
       if (exists) {
         const ok = await confirmAction({
-          title: 'Update Existing Egg Log',
+          title: L('Update Existing Egg Log'),
           message: `An egg production log already exists for date ${eggDate}. Do you want to update it with these new values?`,
-          confirmLabel: 'Update Log',
-          cancelLabel: 'Cancel',
+          confirmLabel: L('Update Log'),
+          cancelLabel: L('Cancel'),
           tone: 'warning',
         });
         if (!ok) {
@@ -442,10 +442,10 @@ export default function FinancialLedger({
           </div>
           )}
 
-          <DetailModal open={addModal === 'feed'} onClose={() => setAddModal(null)} title="Record Feed Purchase" icon={<Plus className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700" size="small">
+          <DetailModal open={addModal === 'feed'} onClose={() => setAddModal(null)} title={L('Record Feed Purchase')} icon={<Plus className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700" size="small">
             <form onSubmit={handleFeedSubmit} className="space-y-3.5 text-xs text-gray-700">
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Purchase Date</label>
+                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Purchase Date')}</label>
                 <input 
                   type="date"
                   required
@@ -456,20 +456,20 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Feed Type</label>
+                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Feed Type')}</label>
                 <select 
                   value={feedType}
                   onChange={(e) => setFeedType(e.target.value as FeedType)}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-amber-400 focus:outline-hidden"
                 >
-                  <option value="Khal & Choker">Khal & Choker</option>
-                  <option value="Corn">Corn</option>
-                  <option value="Wheat">Wheat</option>
-                  <option value="Grains">Grains</option>
-                  <option value="Supplements">Supplements</option>
-                  <option value="Medicine">Medicine</option>
-                  <option value="Eggs">Eggs</option>
-                  <option value="Other">Other</option>
+                  <option value="Khal & Choker">{L('Khal & Choker')}</option>
+                  <option value="Corn">{L('Corn')}</option>
+                  <option value="Wheat">{L('Wheat')}</option>
+                  <option value="Grains">{L('Grains')}</option>
+                  <option value="Supplements">{L('Supplements')}</option>
+                  <option value="Medicine">{L('Medicine')}</option>
+                  <option value="Eggs">{L('Eggs')}</option>
+                  <option value="Other">{L('Other')}</option>
                 </select>
               </div>
 
@@ -505,7 +505,7 @@ export default function FinancialLedger({
               {/* Automatic live multiplication display */}
               {parseFloat(feedQty) > 0 && parseFloat(feedRate) > 0 && (
                 <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl text-amber-900 font-mono text-2xs flex justify-between">
-                  <span>Auto-Calculated Total:</span>
+                  <span>{L('Auto-Calculated Total:')}</span>
                   <span className="font-bold">Rs {(parseFloat(feedQty) * parseFloat(feedRate)).toLocaleString()}</span>
                 </div>
               )}
@@ -519,9 +519,9 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Optional Notes</label>
+                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Optional Notes')}</label>
                 <textarea 
-                  placeholder="Brand, seller, or quality details..."
+                  placeholder={L('Brand, seller, or quality details...')}
                   value={feedNotes}
                   onChange={(e) => setFeedNotes(e.target.value)}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-amber-400 focus:outline-hidden h-16 resize-none"
@@ -533,7 +533,7 @@ export default function FinancialLedger({
                   type="submit"
                   className="flex-1 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded-xl transition cursor-pointer"
                 >
-                  Save Feed Purchase
+                  {L('Save Feed Purchase')}
                 </button>
                 {editingFeedId !== null && (
                   <button
@@ -541,7 +541,7 @@ export default function FinancialLedger({
                     onClick={cancelEditFeed}
                     className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition cursor-pointer"
                   >
-                    Cancel
+                    {L('Cancel')}
                   </button>
                 )}
               </div>
@@ -553,11 +553,11 @@ export default function FinancialLedger({
             {/* Quick Metrics */}
             <div className="grid grid-cols-2 gap-4 muf-panel p-4">
               <div>
-                <span className="text-3xs font-bold text-amber-700 uppercase tracking-wider block font-mono">Total Feed Purchased</span>
+                <span className="text-3xs font-bold text-amber-700 uppercase tracking-wider block font-mono">{L('Total Feed Purchased')}</span>
                 <span className="text-lg font-bold font-mono text-amber-900">{totalFeedWeight.toFixed(1)} kg</span>
               </div>
               <div>
-                <span className="text-3xs font-bold text-amber-700 uppercase tracking-wider block font-mono">Total Feed Investment</span>
+                <span className="text-3xs font-bold text-amber-700 uppercase tracking-wider block font-mono">{L('Total Feed Investment')}</span>
                 <span className="text-lg font-bold font-mono text-amber-900">Rs {totalFeedExpense.toLocaleString()}</span>
               </div>
             </div>
@@ -567,7 +567,7 @@ export default function FinancialLedger({
               <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input 
                 type="text"
-                placeholder="Search feed records by type or notes..."
+                placeholder={L('Search feed records by type or notes...')}
                 value={feedSearch}
                 onChange={(e) => setFeedSearch(e.target.value)}
                 className="w-full text-xs pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:border-amber-400 focus:outline-hidden"
@@ -580,10 +580,10 @@ export default function FinancialLedger({
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold font-mono uppercase text-3xs tracking-wider">
-                      <th className="p-3">Date</th>
-                      <th className="p-3">Feed Type</th>
-                      <th className="p-3">Qty (kg)</th>
-                      <th className="p-3 text-right">Total Cost</th>
+                      <th className="p-3">{L('Date')}</th>
+                      <th className="p-3">{L('Feed Type')}</th>
+                      <th className="p-3">{L('Qty (kg)')}</th>
+                      <th className="p-3 text-right">{L('Total Cost')}</th>
                       <th className="p-3 sm:hidden text-right"></th>
                     </tr>
                   </thead>
@@ -593,7 +593,7 @@ export default function FinancialLedger({
                         key={record.id}
                         className="hover:bg-gray-50/50 font-medium cursor-pointer"
                         onClick={() => openFeedDetail(record)}
-                        title="View full feed record"
+                        title={L('View full feed record')}
                       >
                         <td className="p-3 font-mono text-gray-600 shrink-0">{record.date}</td>
                         <td className="p-3">
@@ -610,7 +610,7 @@ export default function FinancialLedger({
                     ))}
                     {filteredFeedRecords.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="p-8 text-center text-gray-400 italic">No feed records logged.</td>
+                        <td colSpan={5} className="p-8 text-center text-gray-400 italic">{L('No feed records logged.')}</td>
                       </tr>
                     )}
                   </tbody>
@@ -634,10 +634,10 @@ export default function FinancialLedger({
           </div>
           )}
 
-          <DetailModal open={addModal === 'expense'} onClose={() => setAddModal(null)} title="Record Other Expense" icon={<Plus className="w-5 h-5" />} iconBg="bg-rose-100 text-rose-700" size="small">
+          <DetailModal open={addModal === 'expense'} onClose={() => setAddModal(null)} title={L('Record Other Expense')} icon={<Plus className="w-5 h-5" />} iconBg="bg-rose-100 text-rose-700" size="small">
             <form onSubmit={handleExpenseSubmit} className="space-y-3.5 text-xs text-gray-700">
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Expense Date</label>
+                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Expense Date')}</label>
                 <input 
                   type="date"
                   required
@@ -652,7 +652,7 @@ export default function FinancialLedger({
                 <input 
                   type="text"
                   required
-                  placeholder="e.g. Jali Darwazy ka liya"
+                  placeholder={L('e.g. Jali Darwazy ka liya')}
                   value={expDetail}
                   onChange={(e) => setExpDetail(e.target.value)}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-rose-400 focus:outline-hidden"
@@ -661,16 +661,16 @@ export default function FinancialLedger({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Category</label>
+                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Category')}</label>
                   <select 
                     value={expCategory}
                     onChange={(e) => setExpCategory(e.target.value as ExpenseCategory)}
                     className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-rose-400 focus:outline-hidden"
                   >
-                    <option value="Medicine">Medicine</option>
-                    <option value="Repair">Repair</option>
-                    <option value="Utility">Utility</option>
-                    <option value="Other">Other</option>
+                    <option value="Medicine">{L('Medicine')}</option>
+                    <option value="Repair">{L('Repair')}</option>
+                    <option value="Utility">{L('Utility')}</option>
+                    <option value="Other">{L('Other')}</option>
                   </select>
                 </div>
                 <div>
@@ -696,9 +696,9 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Optional Notes</label>
+                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Optional Notes')}</label>
                 <textarea 
-                  placeholder="Detailed observations or descriptions..."
+                  placeholder={L('Detailed observations or descriptions...')}
                   value={expNotes}
                   onChange={(e) => setExpNotes(e.target.value)}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-rose-400 focus:outline-hidden h-16 resize-none"
@@ -706,11 +706,11 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Receipt Photo (Optional)</label>
+                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Receipt Photo (Optional)')}</label>
                 {expReceipt ? (
                   <div className="flex items-center gap-3">
                     <img src={expReceipt} alt="Receipt" className="w-12 h-12 rounded-lg object-cover border border-gray-200 cursor-pointer" onClick={() => setViewReceipt(expReceipt)} />
-                    <button type="button" onClick={() => setExpReceipt('')} className="text-2xs font-semibold text-rose-500 hover:text-rose-700 transition cursor-pointer">Remove photo</button>
+                    <button type="button" onClick={() => setExpReceipt('')} className="text-2xs font-semibold text-rose-500 hover:text-rose-700 transition cursor-pointer">{L('Remove photo')}</button>
                   </div>
                 ) : (
                   <label className="flex items-center gap-2 px-3 py-2 rounded-xl border border-dashed border-gray-300 text-2xs font-semibold text-gray-500 cursor-pointer hover:border-rose-400 hover:text-rose-600 transition w-fit">
@@ -725,10 +725,10 @@ export default function FinancialLedger({
                         if (!file) return;
                         try {
                           const b64 = await compressToAvatar(file, 900, 0.72);
-                          if (b64.length > 400000) { notify('Photo is too large even after compression', 'error'); return; }
+                          if (b64.length > 400000) { notify(L('Photo is too large even after compression'), 'error'); return; }
                           setExpReceipt(b64);
                         } catch {
-                          notify('Could not read that image', 'error');
+                          notify(L('Could not read that image'), 'error');
                         }
                       }}
                     />
@@ -741,7 +741,7 @@ export default function FinancialLedger({
                   type="submit"
                   className="flex-1 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-xs rounded-xl transition cursor-pointer"
                 >
-                  Save Expense Record
+                  {L('Save Expense Record')}
                 </button>
                 {editingExpenseId !== null && (
                   <button
@@ -749,7 +749,7 @@ export default function FinancialLedger({
                     onClick={cancelEditExpense}
                     className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition cursor-pointer"
                   >
-                    Cancel
+                    {L('Cancel')}
                   </button>
                 )}
               </div>
@@ -761,7 +761,7 @@ export default function FinancialLedger({
             {/* Quick Metrics */}
             <div className="grid grid-cols-1 gap-4 muf-panel p-4">
               <div>
-                <span className="text-3xs font-bold text-rose-700 uppercase tracking-wider block font-mono">Total Other Operating Expenses</span>
+                <span className="text-3xs font-bold text-rose-700 uppercase tracking-wider block font-mono">{L('Total Other Operating Expenses')}</span>
                 <span className="text-lg font-bold font-mono text-rose-900">Rs {totalOtherExpensesSum.toLocaleString()}</span>
               </div>
             </div>
@@ -771,7 +771,7 @@ export default function FinancialLedger({
               <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input 
                 type="text"
-                placeholder="Search operating expenses by detail or notes..."
+                placeholder={L('Search operating expenses by detail or notes...')}
                 value={expenseSearch}
                 onChange={(e) => setExpenseSearch(e.target.value)}
                 className="w-full text-xs pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:border-rose-400 focus:outline-hidden"
@@ -784,10 +784,10 @@ export default function FinancialLedger({
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold font-mono uppercase text-3xs tracking-wider">
-                      <th className="p-3">Date</th>
-                      <th className="p-3">Detail</th>
-                      <th className="p-3">Category</th>
-                      <th className="p-3 text-right">Amount</th>
+                      <th className="p-3">{L('Date')}</th>
+                      <th className="p-3">{L('Detail')}</th>
+                      <th className="p-3">{L('Category')}</th>
+                      <th className="p-3 text-right">{L('Amount')}</th>
                       <th className="p-3 sm:hidden text-right"></th>
                     </tr>
                   </thead>
@@ -797,12 +797,12 @@ export default function FinancialLedger({
                         key={record.id}
                         className="hover:bg-gray-50/50 font-medium cursor-pointer"
                         onClick={() => openExpenseDetail(record)}
-                        title="View full expense record"
+                        title={L('View full expense record')}
                       >
                         <td className="p-3 font-mono text-gray-600 shrink-0">{record.date}</td>
                         <td className="p-3 text-gray-900 font-semibold">
                           <span className="inline-flex items-center gap-1.5">
-                            {record.receiptBase64 && <span title="Has receipt photo">📷</span>}
+                            {record.receiptBase64 && <span title={L('Has receipt photo')}>📷</span>}
                             {record.detail}
                           </span>
                         </td>
@@ -819,7 +819,7 @@ export default function FinancialLedger({
                     ))}
                     {filteredExpenseRecords.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="p-8 text-center text-gray-400 italic">No non-feed expenses logged.</td>
+                        <td colSpan={5} className="p-8 text-center text-gray-400 italic">{L('No non-feed expenses logged.')}</td>
                       </tr>
                     )}
                   </tbody>
@@ -843,10 +843,10 @@ export default function FinancialLedger({
           </div>
           )}
 
-          <DetailModal open={addModal === 'egg'} onClose={() => setAddModal(null)} title="Log Daily Egg Collections" icon={<Plus className="w-5 h-5" />} iconBg="bg-yellow-100 text-yellow-700" size="small">
+          <DetailModal open={addModal === 'egg'} onClose={() => setAddModal(null)} title={L('Log Daily Egg Collections')} icon={<Plus className="w-5 h-5" />} iconBg="bg-yellow-100 text-yellow-700" size="small">
             <form onSubmit={handleEggSubmit} className="space-y-3.5 text-xs text-gray-700">
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Collection Date</label>
+                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Collection Date')}</label>
                 <input 
                   type="date"
                   required
@@ -871,7 +871,7 @@ export default function FinancialLedger({
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Direct / Cash Sold</label>
+                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Direct / Cash Sold')}</label>
                   <input 
                     type="number"
                     min="0"
@@ -882,7 +882,7 @@ export default function FinancialLedger({
                   />
                 </div>
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Home Use</label>
+                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Home Use')}</label>
                   <input 
                     type="number"
                     min="0"
@@ -893,7 +893,7 @@ export default function FinancialLedger({
                   />
                 </div>
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Broken</label>
+                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Broken')}</label>
                   <input 
                     type="number"
                     min="0"
@@ -909,11 +909,11 @@ export default function FinancialLedger({
               {parseInt(eggsCollected) >= 0 && (
                 <div className="p-3 bg-yellow-50/50 border border-yellow-100 rounded-xl text-yellow-950 font-mono text-2xs space-y-1">
                   <div className="flex justify-between">
-                    <span>Customer eggs on this date:</span>
+                    <span>{L('Customer eggs on this date:')}</span>
                     <span className="font-bold">{customerEggsOnDate(eggDate)} eggs</span>
                   </div>
                   <div className="flex justify-between">
-                    <span>Remaining (In Stock):</span>
+                    <span>{L('Remaining (In Stock):')}</span>
                     <span className="font-bold">
                       {parseInt(eggsCollected) - (parseInt(eggsSold) || 0) - customerEggsOnDate(eggDate) - (parseInt(eggsHomeUse) || 0) - (parseInt(eggsBroken) || 0)} eggs
                     </span>
@@ -923,7 +923,7 @@ export default function FinancialLedger({
                   </div>
                   {parseInt(eggsSold) > 0 && (
                     <div className="flex justify-between border-t border-yellow-100/50 pt-1 mt-1">
-                      <span>Projected Direct Sale Revenue:</span>
+                      <span>{L('Projected Direct Sale Revenue:')}</span>
                       <span className="font-bold text-emerald-700">Rs {((parseInt(eggsSold) || 0) * settings.defaultPricePerEgg).toLocaleString()}</span>
                     </div>
                   )}
@@ -935,7 +935,7 @@ export default function FinancialLedger({
                   type="submit"
                   className="flex-1 py-2 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold text-xs rounded-xl transition cursor-pointer"
                 >
-                  Log Egg Production
+                  {L('Log Egg Production')}
                 </button>
                 {editingEggDate !== null && (
                   <button
@@ -943,7 +943,7 @@ export default function FinancialLedger({
                     onClick={cancelEditEgg}
                     className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition cursor-pointer"
                   >
-                    Cancel
+                    {L('Cancel')}
                   </button>
                 )}
               </div>
@@ -955,25 +955,25 @@ export default function FinancialLedger({
             {/* Quick Metrics */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-4 muf-panel p-4">
               <div>
-                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">Total Collected</span>
+                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">{L('Total Collected')}</span>
                 <span className="text-base font-bold font-mono text-yellow-900">{totalEggsCollectedSum} eggs</span>
               </div>
               <div>
-                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">Direct Sold</span>
+                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">{L('Direct Sold')}</span>
                 <span className="text-base font-bold font-mono text-yellow-900">{totalEggsSoldSum} eggs</span>
               </div>
               <div>
-                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">Customer Sales</span>
+                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">{L('Customer Sales')}</span>
                 <span className="text-base font-bold font-mono text-yellow-900">{totalCustomerEggsSum} eggs</span>
               </div>
               <div>
-                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">Total Remaining</span>
+                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">{L('Total Remaining')}</span>
                 <span className="text-base font-bold font-mono text-yellow-900">
                   {totalEggsCollectedSum - totalEggsSoldSum - totalCustomerEggsSum - totalEggsHomeSum - totalEggsBrokenSum} eggs
                 </span>
               </div>
               <div>
-                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">Income</span>
+                <span className="text-3xs font-bold text-yellow-700 uppercase tracking-wider block font-mono">{L('Income')}</span>
                 <span className="text-base font-bold font-mono text-emerald-800">Rs {(totalEggIncome + totalCustomerEggIncome).toLocaleString()}</span>
               </div>
             </div>
@@ -983,7 +983,7 @@ export default function FinancialLedger({
               <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" />
               <input 
                 type="text"
-                placeholder="Search egg records by date (YYYY-MM-DD)..."
+                placeholder={L('Search egg records by date (YYYY-MM-DD)...')}
                 value={eggSearch}
                 onChange={(e) => setEggSearch(e.target.value)}
                 className="w-full text-xs pl-9 pr-4 py-2 border border-gray-200 rounded-xl focus:border-yellow-400 focus:outline-hidden"
@@ -996,10 +996,10 @@ export default function FinancialLedger({
                 <table className="w-full text-left text-xs border-collapse">
                   <thead>
                     <tr className="bg-gray-50 border-b border-gray-100 text-gray-500 font-semibold font-mono uppercase text-3xs tracking-wider">
-                      <th className="p-3">Date</th>
-                      <th className="p-3 text-center">Collected</th>
-                      <th className="p-3 text-center">Sold / Remaining</th>
-                      <th className="p-3 text-right">Income (Rs)</th>
+                      <th className="p-3">{L('Date')}</th>
+                      <th className="p-3 text-center">{L('Collected')}</th>
+                      <th className="p-3 text-center">{L('Sold / Remaining')}</th>
+                      <th className="p-3 text-right">{L('Income (Rs)')}</th>
                       <th className="p-3 sm:hidden text-right"></th>
                     </tr>
                   </thead>
@@ -1014,7 +1014,7 @@ export default function FinancialLedger({
                           key={record.date}
                           className="hover:bg-gray-50/50 cursor-pointer"
                           onClick={() => openEggDetail(record)}
-                          title="View full egg record"
+                          title={L('View full egg record')}
                         >
                           <td className="p-3 font-mono text-gray-600 shrink-0">{record.date}</td>
                           <td className="p-3 text-center font-mono text-gray-900 font-bold">{record.totalEggsCollected}</td>
@@ -1028,7 +1028,7 @@ export default function FinancialLedger({
                     })}
                     {filteredEggRecords.length === 0 && (
                       <tr>
-                        <td colSpan={5} className="p-8 text-center text-gray-400 italic">No egg production records logged.</td>
+                        <td colSpan={5} className="p-8 text-center text-gray-400 italic">{L('No egg production records logged.')}</td>
                       </tr>
                     )}
                   </tbody>
@@ -1042,7 +1042,7 @@ export default function FinancialLedger({
       <DetailModal
         open={!!activeFeedDetail}
         onClose={() => setActiveFeedDetailId(null)}
-        title="Feed Record Details"
+        title={L('Feed Record Details')}
         subtitle={activeFeedDetail?.feedType}
         icon={<ShoppingBag className="w-5 h-5" />}
         iconBg="bg-amber-100 text-amber-700"
@@ -1051,17 +1051,17 @@ export default function FinancialLedger({
         {activeFeedDetail && (
           <div className="space-y-4 text-sm">
             <div className="grid grid-cols-2 gap-3">
-              <LedgerDetailTile label="Date" value={activeFeedDetail.date} />
-              <LedgerDetailTile label="Feed Type" value={activeFeedDetail.feedType} />
+              <LedgerDetailTile label={L('Date')} value={activeFeedDetail.date} />
+              <LedgerDetailTile label={L('Feed Type')} value={activeFeedDetail.feedType} />
               <LedgerDetailTile label="Quantity" value={`${activeFeedDetail.quantityKg} kg`} />
               <LedgerDetailTile label="Rate" value={`Rs ${activeFeedDetail.rateRsPerKg.toLocaleString()}`} />
             </div>
             <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-amber-700">Total Cost</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-amber-700">{L('Total Cost')}</p>
               <p className="mt-1 text-lg font-bold font-mono text-amber-900">Rs {(activeFeedDetail.quantityKg * activeFeedDetail.rateRsPerKg).toLocaleString()}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Notes</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{L('Notes')}</p>
               <p className="mt-1 text-sm text-slate-700">{activeFeedDetail.notes || 'No notes added.'}</p>
             </div>
             {(isAdmin || canDelete) && (
@@ -1070,9 +1070,9 @@ export default function FinancialLedger({
                   <button
                     type="button"
                     onClick={() => handleDeleteFeedFromDetail(activeFeedDetail)}
-                    className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold text-xs hover:bg-rose-100"
+                    className="muf-btn muf-btn-danger"
                   >
-                    Delete
+                    {L('Delete')}
                   </button>
                 )}
                 {isAdmin && (
@@ -1083,7 +1083,7 @@ export default function FinancialLedger({
                     }}
                     className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-700"
                   >
-                    Edit Record
+                    {L('Edit Record')}
                   </button>
                 )}
               </div>
@@ -1095,7 +1095,7 @@ export default function FinancialLedger({
       <DetailModal
         open={!!activeExpenseDetail}
         onClose={() => setActiveExpenseDetailId(null)}
-        title="Expense Record Details"
+        title={L('Expense Record Details')}
         subtitle={activeExpenseDetail?.detail}
         icon={<Coins className="w-5 h-5" />}
         iconBg="bg-rose-100 text-rose-700"
@@ -1104,24 +1104,24 @@ export default function FinancialLedger({
         {activeExpenseDetail && (
           <div className="space-y-4 text-sm">
             <div className="grid grid-cols-2 gap-3">
-              <LedgerDetailTile label="Date" value={activeExpenseDetail.date} />
-              <LedgerDetailTile label="Category" value={activeExpenseDetail.category} />
+              <LedgerDetailTile label={L('Date')} value={activeExpenseDetail.date} />
+              <LedgerDetailTile label={L('Category')} value={activeExpenseDetail.category} />
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Detail</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{L('Detail')}</p>
               <p className="mt-1 text-sm font-semibold text-slate-800">{activeExpenseDetail.detail}</p>
             </div>
             <div className="rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-rose-700">Amount</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-rose-700">{L('Amount')}</p>
               <p className="mt-1 text-lg font-bold font-mono text-rose-900">Rs {activeExpenseDetail.amount.toLocaleString()}</p>
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Notes</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{L('Notes')}</p>
               <p className="mt-1 text-sm text-slate-700">{activeExpenseDetail.notes || 'No notes added.'}</p>
             </div>
             {activeExpenseDetail.receiptBase64 && (
               <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Receipt Photo</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">{L('Receipt Photo')}</p>
                 <img
                   src={activeExpenseDetail.receiptBase64}
                   alt="Receipt"
@@ -1136,9 +1136,9 @@ export default function FinancialLedger({
                   <button
                     type="button"
                     onClick={() => handleDeleteExpenseFromDetail(activeExpenseDetail)}
-                    className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold text-xs hover:bg-rose-100"
+                    className="muf-btn muf-btn-danger"
                   >
-                    Delete
+                    {L('Delete')}
                   </button>
                 )}
                 {isAdmin && (
@@ -1149,7 +1149,7 @@ export default function FinancialLedger({
                     }}
                     className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-700"
                   >
-                    Edit Record
+                    {L('Edit Record')}
                   </button>
                 )}
               </div>
@@ -1161,7 +1161,7 @@ export default function FinancialLedger({
       <DetailModal
         open={!!activeEggDetail}
         onClose={() => setActiveEggDetailDate(null)}
-        title="Egg Record Details"
+        title={L('Egg Record Details')}
         subtitle={activeEggDetail?.date}
         icon={<Egg className="w-5 h-5" />}
         iconBg="bg-yellow-100 text-yellow-700"
@@ -1185,7 +1185,7 @@ export default function FinancialLedger({
                 <LedgerDetailTile label="Price/Egg" value={`Rs ${(activeEggDetail.pricePerEgg ?? settings.defaultPricePerEgg).toLocaleString()}`} />
               </div>
               <div className="rounded-2xl border border-yellow-200 bg-yellow-50 px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-yellow-700">Income</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-yellow-700">{L('Income')}</p>
                 <p className="mt-1 text-lg font-bold font-mono text-yellow-900">Rs {saleIncome.toLocaleString()}</p>
               </div>
               <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-xs text-slate-600">
@@ -1197,9 +1197,9 @@ export default function FinancialLedger({
                     <button
                       type="button"
                       onClick={() => handleDeleteEggFromDetail(activeEggDetail)}
-                      className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold text-xs hover:bg-rose-100"
+                      className="muf-btn muf-btn-danger"
                     >
-                      Delete
+                      {L('Delete')}
                     </button>
                   )}
                   {isAdmin && (
@@ -1210,7 +1210,7 @@ export default function FinancialLedger({
                       }}
                       className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-700"
                     >
-                      Edit Record
+                      {L('Edit Record')}
                     </button>
                   )}
                 </div>
@@ -1250,75 +1250,75 @@ export default function FinancialLedger({
         />
       )}
 
-      <DetailModal open={editingFeedId !== null} onClose={cancelEditFeed} title="Edit Feed Purchase" icon={<Pencil className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700" size="small">
+      <DetailModal open={editingFeedId !== null} onClose={cancelEditFeed} title={L('Edit Feed Purchase')} icon={<Pencil className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700" size="small">
         <form onSubmit={handleFeedSubmit} className="space-y-3.5 text-xs text-gray-700">
           <input type="date" required value={feedDate} onChange={(e) => setFeedDate(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
           <select value={feedType} onChange={(e) => setFeedType(e.target.value as FeedType)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl">
-            <option value="Khal & Choker">Khal & Choker</option>
-            <option value="Corn">Corn</option>
-            <option value="Wheat">Wheat</option>
-            <option value="Grains">Grains</option>
-            <option value="Supplements">Supplements</option>
-            <option value="Medicine">Medicine</option>
-            <option value="Eggs">Eggs</option>
-            <option value="Other">Other</option>
+            <option value="Khal & Choker">{L('Khal & Choker')}</option>
+            <option value="Corn">{L('Corn')}</option>
+            <option value="Wheat">{L('Wheat')}</option>
+            <option value="Grains">{L('Grains')}</option>
+            <option value="Supplements">{L('Supplements')}</option>
+            <option value="Medicine">{L('Medicine')}</option>
+            <option value="Eggs">{L('Eggs')}</option>
+            <option value="Other">{L('Other')}</option>
           </select>
           <div className="grid grid-cols-2 gap-3">
-            <input type="number" step="0.01" min="0.01" required placeholder="Quantity (kg)" value={feedQty} onChange={(e) => setFeedQty(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
-            <input type="number" step="0.01" min="0.01" required placeholder="Rate (Rs/kg)" value={feedRate} onChange={(e) => setFeedRate(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
+            <input type="number" step="0.01" min="0.01" required placeholder={L('Quantity (kg)')} value={feedQty} onChange={(e) => setFeedQty(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
+            <input type="number" step="0.01" min="0.01" required placeholder={L('Rate (Rs/kg)')} value={feedRate} onChange={(e) => setFeedRate(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
           </div>
           <select value={feedSupplier} onChange={(e) => setFeedSupplier(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl bg-white">
             <option value="">{L('Cash / no supplier')}</option>
             {suppliers.map((sup) => <option key={String(sup.id)} value={String(sup.id)}>{sup.name}</option>)}
           </select>
-          <textarea placeholder="Notes" value={feedNotes} onChange={(e) => setFeedNotes(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl h-16 resize-none" />
+          <textarea placeholder={L('Notes')} value={feedNotes} onChange={(e) => setFeedNotes(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl h-16 resize-none" />
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={cancelEditFeed} className="px-4 py-2 border rounded-xl">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700">Update Feed Purchase</button>
+            <button type="button" onClick={cancelEditFeed} className="px-4 py-2 border rounded-xl">{L('Cancel')}</button>
+            <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700">{L('Update Feed Purchase')}</button>
           </div>
         </form>
       </DetailModal>
 
-      <DetailModal open={editingExpenseId !== null} onClose={cancelEditExpense} title="Edit Other Expense" icon={<Pencil className="w-5 h-5" />} iconBg="bg-rose-100 text-rose-700" size="small">
+      <DetailModal open={editingExpenseId !== null} onClose={cancelEditExpense} title={L('Edit Other Expense')} icon={<Pencil className="w-5 h-5" />} iconBg="bg-rose-100 text-rose-700" size="small">
         <form onSubmit={handleExpenseSubmit} className="space-y-3.5 text-xs text-gray-700">
           <input type="date" required value={expDate} onChange={(e) => setExpDate(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
-          <input type="text" required placeholder="Expense Detail" value={expDetail} onChange={(e) => setExpDetail(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
+          <input type="text" required placeholder={L('Expense Detail')} value={expDetail} onChange={(e) => setExpDetail(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
           <div className="grid grid-cols-2 gap-3">
             <select value={expCategory} onChange={(e) => setExpCategory(e.target.value as ExpenseCategory)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl">
-              <option value="Medicine">Medicine</option>
-              <option value="Repair">Repair</option>
-              <option value="Utility">Utility</option>
-              <option value="Other">Other</option>
+              <option value="Medicine">{L('Medicine')}</option>
+              <option value="Repair">{L('Repair')}</option>
+              <option value="Utility">{L('Utility')}</option>
+              <option value="Other">{L('Other')}</option>
             </select>
-            <input type="number" min="1" required placeholder="Amount (Rs)" value={expAmount} onChange={(e) => setExpAmount(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
+            <input type="number" min="1" required placeholder={L('Amount (Rs)')} value={expAmount} onChange={(e) => setExpAmount(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
           </div>
           <select value={expSupplier} onChange={(e) => setExpSupplier(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl bg-white">
             <option value="">{L('Cash / no supplier')}</option>
             {suppliers.map((sup) => <option key={String(sup.id)} value={String(sup.id)}>{sup.name}</option>)}
           </select>
-          <textarea placeholder="Notes" value={expNotes} onChange={(e) => setExpNotes(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl h-16 resize-none" />
+          <textarea placeholder={L('Notes')} value={expNotes} onChange={(e) => setExpNotes(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl h-16 resize-none" />
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={cancelEditExpense} className="px-4 py-2 border rounded-xl">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-rose-600 text-white rounded-xl font-semibold hover:bg-rose-700">Update Expense Record</button>
+            <button type="button" onClick={cancelEditExpense} className="px-4 py-2 border rounded-xl">{L('Cancel')}</button>
+            <button type="submit" className="px-4 py-2 bg-rose-600 text-white rounded-xl font-semibold hover:bg-rose-700">{L('Update Expense Record')}</button>
           </div>
         </form>
       </DetailModal>
 
-      <DetailModal open={editingEggDate !== null} onClose={cancelEditEgg} title="Edit Egg Collection" subtitle={editingEggDate || ''} icon={<Pencil className="w-5 h-5" />} iconBg="bg-yellow-100 text-yellow-700" size="small">
+      <DetailModal open={editingEggDate !== null} onClose={cancelEditEgg} title={L('Edit Egg Collection')} subtitle={editingEggDate || ''} icon={<Pencil className="w-5 h-5" />} iconBg="bg-yellow-100 text-yellow-700" size="small">
         <form onSubmit={handleEggSubmit} className="space-y-3.5 text-xs text-gray-700">
           <input type="date" required value={eggDate} onChange={(e) => setEggDate(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
-          <input type="number" min="0" required placeholder="Eggs Collected" value={eggsCollected} onChange={(e) => setEggsCollected(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
+          <input type="number" min="0" required placeholder={L('Eggs Collected')} value={eggsCollected} onChange={(e) => setEggsCollected(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl" />
           <div className="grid grid-cols-3 gap-2">
-            <input type="number" min="0" placeholder="Direct Sold" value={eggsSold} onChange={(e) => setEggsSold(e.target.value)} className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded-xl" />
-            <input type="number" min="0" placeholder="Home Use" value={eggsHomeUse} onChange={(e) => setEggsHomeUse(e.target.value)} className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded-xl" />
-            <input type="number" min="0" placeholder="Broken" value={eggsBroken} onChange={(e) => setEggsBroken(e.target.value)} className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded-xl" />
+            <input type="number" min="0" placeholder={L('Direct Sold')} value={eggsSold} onChange={(e) => setEggsSold(e.target.value)} className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded-xl" />
+            <input type="number" min="0" placeholder={L('Home Use')} value={eggsHomeUse} onChange={(e) => setEggsHomeUse(e.target.value)} className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded-xl" />
+            <input type="number" min="0" placeholder={L('Broken')} value={eggsBroken} onChange={(e) => setEggsBroken(e.target.value)} className="w-full text-xs px-2 py-1.5 border border-gray-200 rounded-xl" />
           </div>
           <div className="rounded-xl border px-3 py-2 text-[11px] bg-yellow-50 border-yellow-200 text-yellow-900">
             Customer eggs on this date: {customerEggsOnDate(eggDate)} eggs. Keep direct/cash sold separate from customer sales.
           </div>
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={cancelEditEgg} className="px-4 py-2 border rounded-xl">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-yellow-500 text-white rounded-xl font-semibold hover:bg-yellow-600">Update Egg Collection</button>
+            <button type="button" onClick={cancelEditEgg} className="px-4 py-2 border rounded-xl">{L('Cancel')}</button>
+            <button type="submit" className="px-4 py-2 bg-yellow-500 text-white rounded-xl font-semibold hover:bg-yellow-600">{L('Update Egg Collection')}</button>
           </div>
         </form>
       </DetailModal>
@@ -1333,7 +1333,7 @@ export default function FinancialLedger({
             <button
               onClick={() => setViewReceipt(null)}
               className="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-white text-slate-700 shadow-lg flex items-center justify-center font-bold hover:rotate-90 transition-transform cursor-pointer"
-              aria-label="Close"
+              aria-label={L('Close')}
             >
               ✕
             </button>

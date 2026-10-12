@@ -261,10 +261,10 @@ export default function LaborTab() {
                     {w.notes && <p className="text-[11px] text-slate-500">{w.notes}</p>}
                   </div>
                   <div className="flex items-center gap-1">
-<button type="button" onClick={() => setQrFor({ id: w._id, name: w._id })} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label="QR card" title="QR card">
+<button type="button" onClick={() => setQrFor({ id: w._id, name: w._id })} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label={L('QR card')} title={L('QR card')}>
                     <QrCode className="w-4 h-4" />
                   </button>
-<button type="button" onClick={() => handleDeleteWorker(w)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label="Remove worker">
+<button type="button" onClick={() => handleDeleteWorker(w)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label={L('Remove worker')}>
                     <Trash2 className="w-4 h-4" />
                   </button>
                   </div>
@@ -287,10 +287,10 @@ export default function LaborTab() {
                     <div key={a._id} className="flex items-center justify-between gap-2 mt-1.5 text-[11px] p-1.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                       <span className="text-slate-500">{a.date} · Rs. {a.amount.toLocaleString()}{a.notes ? ` · ${a.notes}` : ''}</span>
                       <span className="flex items-center gap-0.5">
-                        <button type="button" onClick={() => { setEditAdv(a); setEditAdvForm({ date: a.date, amount: String(a.amount), notes: a.notes || '' }); }} className="p-0.5 rounded text-amber-500 hover:text-farm-600 transition" aria-label="Edit advance">
+                        <button type="button" onClick={() => { setEditAdv(a); setEditAdvForm({ date: a.date, amount: String(a.amount), notes: a.notes || '' }); }} className="p-0.5 rounded text-amber-500 hover:text-farm-600 transition" aria-label={L('Edit advance')}>
                           <Pencil className="w-3 h-3" />
                         </button>
-                        <button type="button" onClick={() => handleDeleteAdvance(a._id)} className="p-0.5 rounded text-amber-400 hover:text-red-500 transition" aria-label="Delete advance">
+                        <button type="button" onClick={() => handleDeleteAdvance(a._id)} className="p-0.5 rounded text-amber-400 hover:text-red-500 transition" aria-label={L('Delete advance')}>
                           <Trash2 className="w-3 h-3" />
                         </button>
                       </span>
@@ -323,10 +323,10 @@ export default function LaborTab() {
                   </div>
                   {!row.posted && (
                     <span className="flex items-center gap-0.5">
-                      <button type="button" onClick={() => { setEditAtt(row); setEditAttForm({ date: row.date, dayType: row.dayType, notes: row.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-farm-600 transition" aria-label="Edit attendance">
+                      <button type="button" onClick={() => { setEditAtt(row); setEditAttForm({ date: row.date, dayType: row.dayType, notes: row.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-farm-600 transition" aria-label={L('Edit attendance')}>
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
-                      <button type="button" onClick={() => handleDeleteAttendance(row._id)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label="Delete attendance">
+                      <button type="button" onClick={() => handleDeleteAttendance(row._id)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label={L('Delete attendance')}>
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </span>

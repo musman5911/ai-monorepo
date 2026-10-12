@@ -127,9 +127,9 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
 
   const handleDelete = async (id: string) => {
     const ok = await confirmAction({
-      title: 'Delete Milk Record',
-      message: 'Delete this milk record? This cannot be undone.',
-      confirmLabel: 'Delete',
+      title: L('Delete Milk Record'),
+      message: L('Delete this milk record? This cannot be undone.'),
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -221,7 +221,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
               {months.map(mk => <option key={mk} value={mk}>{monthLabel(mk)}</option>)}
             </select>
             <select className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none" value={historyCowFilter} onChange={e => setHistoryCowFilter(e.target.value)}>
-              <option value="">All Cows</option>
+              <option value="">{L('All Cows')}</option>
               {cows.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
             </select>
           </div>
@@ -244,21 +244,21 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
             <table className="w-full text-left">
               <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">
                 <tr>
-                  <th className="px-5 py-3">Cow</th>
-                  <th className="px-5 py-3">Morning (L)</th>
-                  <th className="px-5 py-3">Evening (L)</th>
-                  <th className="px-5 py-3">Calf Milk (L)</th>
-                  <th className="px-5 py-3">Buyer</th>
-                  <th className="px-5 py-3">Total</th>
-                  <th className="px-5 py-3">Saleable</th>
-                  <th className="px-5 py-3 text-right">Save</th>
+                  <th className="px-5 py-3">{L('Cow')}</th>
+                  <th className="px-5 py-3">{L('Morning (L)')}</th>
+                  <th className="px-5 py-3">{L('Evening (L)')}</th>
+                  <th className="px-5 py-3">{L('Calf Milk (L)')}</th>
+                  <th className="px-5 py-3">{L('Buyer')}</th>
+                  <th className="px-5 py-3">{L('Total')}</th>
+                  <th className="px-5 py-3">{L('Saleable')}</th>
+                  <th className="px-5 py-3 text-right">{L('Save')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                 {loading ? (
-                  <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">Loading...</td></tr>
+                  <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">{L('Loading...')}</td></tr>
                 ) : eligibleCows.length === 0 ? (
-                  <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">No eligible cows (active / pregnant / dry / calf)</td></tr>
+                  <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">{L('No eligible cows (active / pregnant / dry / calf)')}</td></tr>
                 ) : eligibleCows.map(cow => {
                   const entry = dailyEntries[cow._id] || { morning: '', evening: '', calfMilk: '', buyerId: '' };
                   const total = (parseFloat(entry.morning) || 0) + (parseFloat(entry.evening) || 0);
@@ -293,7 +293,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
                           value={entry.buyerId || ''}
                           onChange={e => setDailyEntries({ ...dailyEntries, [cow._id]: { ...entry, buyerId: e.target.value } })}
                         >
-                          <option value="">Default rate</option>
+                          <option value="">{L('Default rate')}</option>
                           {buyers.map(b => (
                             <option key={b._id} value={b._id}>
                               {b.name}{b.defaultRate ? ` (₨${b.defaultRate})` : ''}
@@ -317,7 +317,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
               </tbody>
               <tfoot className="bg-slate-50/50 dark:bg-slate-800/30">
                 <tr className="font-bold text-slate-800 dark:text-slate-100">
-                  <td className="px-5 py-3 text-sm">TOTALS</td>
+                  <td className="px-5 py-3 text-sm">{L('TOTALS')}</td>
                   <td className="px-5 py-3 text-sm">{fmt(dailyTotals.morning)} L</td>
                   <td className="px-5 py-3 text-sm">{fmt(dailyTotals.evening)} L</td>
                   <td className="px-5 py-3 text-sm text-pink-500">{fmt(dailyTotals.calfMilk)} L</td>
@@ -345,20 +345,20 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
           <div className="muf-panel p-5">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <p className="text-xs text-slate-400 uppercase">Month</p>
+                <p className="text-xs text-slate-400 uppercase">{L('Month')}</p>
                 <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{monthLabel(historyMonth)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">Total Milk</p>
+                <p className="text-xs text-slate-400 uppercase">{L('Total Milk')}</p>
                 <p className="text-lg font-bold text-farm-600">{fmtL(historyTotal)}</p>
                 <p className="text-[10px] text-slate-400">Saleable {fmtL(historySaleable)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">Revenue</p>
+                <p className="text-xs text-slate-400 uppercase">{L('Revenue')}</p>
                 <p className="text-lg font-bold text-emerald-600">{fmtPKR(historyRevenue)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">Records</p>
+                <p className="text-xs text-slate-400 uppercase">{L('Records')}</p>
                 <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{historyByCow.length}</p>
               </div>
             </div>
@@ -370,18 +370,18 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
               <table className="w-full text-left">
                 <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase">
                   <tr>
-                    <th className="px-5 py-3">Date</th>
-                    <th className="px-5 py-3">Cow</th>
-                    <th className="px-5 py-3">Morning</th>
-                    <th className="px-5 py-3">Evening</th>
-                    <th className="px-5 py-3">Calf</th>
-                    <th className="px-5 py-3">Total</th>
-                    {canDelete && <th className="px-5 py-3 text-right">Actions</th>}
+                    <th className="px-5 py-3">{L('Date')}</th>
+                    <th className="px-5 py-3">{L('Cow')}</th>
+                    <th className="px-5 py-3">{L('Morning')}</th>
+                    <th className="px-5 py-3">{L('Evening')}</th>
+                    <th className="px-5 py-3">{L('Calf')}</th>
+                    <th className="px-5 py-3">{L('Total')}</th>
+                    {canDelete && <th className="px-5 py-3 text-right">{L('Actions')}</th>}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                   {loading ? (
-                    <tr><td colSpan={canDelete ? 7 : 6} className="px-5 py-12 text-center text-slate-400">Loading...</td></tr>
+                    <tr><td colSpan={canDelete ? 7 : 6} className="px-5 py-12 text-center text-slate-400">{L('Loading...')}</td></tr>
                   ) : historyByCow.length === 0 ? (
                     <tr><td colSpan={canDelete ? 7 : 6} className="px-5 py-12 text-center text-slate-400">No records for {monthLabel(historyMonth)}</td></tr>
                   ) : historyByCow.map(record => (
@@ -394,7 +394,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
                       <td className="px-5 py-3 font-semibold text-farm-600">{fmt(record.morning + record.evening)} L</td>
                       {canDelete && (
                         <td className="px-5 py-3 text-right">
-                          <button onClick={() => openEdit(record)} className="p-1.5 text-slate-400 hover:text-farm-600" title="Edit record">
+                          <button onClick={() => openEdit(record)} className="p-1.5 text-slate-400 hover:text-farm-600" title={L('Edit record')}>
                             <Edit2 className="h-4 w-4" />
                           </button>
                           <button onClick={() => handleDelete(record._id)} className="p-1.5 text-slate-400 hover:text-red-500">
@@ -412,7 +412,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
       )}
 
       {/* ── Edit milk record ─────────────────── */}
-      <DetailModal open={!!editRecord} onClose={() => setEditRecord(null)} title="Edit Milk Record"
+      <DetailModal open={!!editRecord} onClose={() => setEditRecord(null)} title={L('Edit Milk Record')}
         icon={<Edit2 className="w-5 h-5" />} iconBg="bg-farm-100 text-farm-700" size="small">
         <form onSubmit={handleEditSubmit} className="space-y-4 muf-milk-edit-form">
           <div>
@@ -427,21 +427,21 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Morning (L)</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Morning (L)')}</label>
               <input type="number" min="0" step="0.1" className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950" value={editForm.morning} onChange={e => setEditForm({ ...editForm, morning: e.target.value })} />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Evening (L)</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Evening (L)')}</label>
               <input type="number" min="0" step="0.1" className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950" value={editForm.evening} onChange={e => setEditForm({ ...editForm, evening: e.target.value })} />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Calf (L)</label>
+              <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Calf (L)')}</label>
               <input type="number" min="0" step="0.1" className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950" value={editForm.calfMilk} onChange={e => setEditForm({ ...editForm, calfMilk: e.target.value })} />
             </div>
           </div>
           <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setEditRecord(null)} className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300">Cancel</button>
-            <button type="submit" disabled={saving === 'edit'} className="bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white rounded-lg px-5 py-2 text-sm font-medium">Save Changes</button>
+            <button type="button" onClick={() => setEditRecord(null)} className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300">{L('Cancel')}</button>
+            <button type="submit" disabled={saving === 'edit'} className="bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white rounded-lg px-5 py-2 text-sm font-medium">{L('Save Changes')}</button>
           </div>
         </form>
       </DetailModal>

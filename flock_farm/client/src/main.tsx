@@ -4,6 +4,7 @@ import App from './App.tsx';
 import ConfirmProvider from './muf-confirm';
 import './index.css';
 import './muf-style.css';
+import { initMufA11y } from './muf-a11y';
 
 // PWA service worker — same system as the other Malik Usman Farms apps.
 if ('serviceWorker' in navigator) {
@@ -27,6 +28,8 @@ if ('serviceWorker' in navigator) {
       .catch((err) => console.warn('PWA Service Worker registration failed:', err));
   });
 }
+
+initMufA11y();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

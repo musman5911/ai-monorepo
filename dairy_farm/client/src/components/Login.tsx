@@ -5,6 +5,9 @@ import {
   Mail, Check, LogIn,
 } from 'lucide-react';
 import { api, saveAuth } from '../api';
+import MufLoginLang from '../muf-login-lang';
+import type { Lang } from '../i18n';
+import { L } from '../i18n';
 
 type View = 'login' | 'forgotEmail' | 'forgotCode';
 
@@ -13,9 +16,13 @@ const MIN_PASSWORD_LENGTH = 8;
 export default function Login({
   onLogin,
   sessionNotice,
+  lang,
+  onToggleLang,
 }: {
   onLogin: (t: string, r: string, u: string) => void;
   sessionNotice?: string | null;
+  lang?: Lang;
+  onToggleLang?: () => void;
 }) {
   const [isSetup, setIsSetup] = useState<boolean | null>(null);
   const [view, setView] = useState<View>('login');
@@ -149,6 +156,7 @@ export default function Login({
 
   return (
     <div className="min-h-screen bg-[#faf9f6] dark:bg-[#070b13] flex flex-col justify-center items-center px-4 transition-colors">
+      {lang && onToggleLang && <MufLoginLang lang={lang} onToggle={onToggleLang} />}
       {error && (
         <div className="mb-6 p-4 rounded-xl shadow-lg border text-sm max-w-sm w-full bg-red-50 border-red-300 text-red-800 dark:bg-red-950/80 dark:border-red-500 dark:text-red-200">
           <div className="flex items-center gap-3">
@@ -171,13 +179,13 @@ export default function Login({
           <img
             src="/dairy-farm-logo-round-512.png"
             alt="Usman Dairy Farm logo"
-            className="w-20 h-20 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800 shadow-md shrink-0 animate-bounce-soft"
+            className="muf-login-logo"
           />
         </div>
-        <h2 className="font-sans text-center text-slate-800 dark:text-farm-400 text-2xl font-extrabold tracking-tight mb-1">
-          Usman Dairy Farm
+        <h2 className="muf-login-title">
+          {L('Usman Dairy Farm')}
         </h2>
-        <p className="text-center text-slate-500 dark:text-slate-400 text-xs mb-8 uppercase tracking-widest font-semibold">
+        <p className="muf-login-sub">
           {isFirstSetup ? 'Initial Setup' : 'Secure Sign-In Interface'}
         </p>
 
@@ -193,7 +201,7 @@ export default function Login({
               onSubmit={handleSubmit}
             >
               <div>
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">
+                <label className="muf-label">
                   {isFirstSetup ? 'Username' : 'Username or Email'}
                 </label>
                 <input
@@ -204,14 +212,14 @@ export default function Login({
                   onChange={(event) => setUsername(event.target.value)}
                   placeholder={isFirstSetup ? 'Enter your username' : 'Username or email'}
                   autoComplete="username"
-                  className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
+                  className="muf-field muf-field-lg"
                 />
               </div>
 
               {isFirstSetup && (
                 <div>
-                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">
-                    Admin email for password reset
+                  <label className="muf-label">
+                    {L('Admin email for password reset')}
                   </label>
                   <input
                     type="email"
@@ -219,14 +227,14 @@ export default function Login({
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="admin@farm.com"
                     autoComplete="email"
-                    className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
+                    className="muf-field muf-field-lg"
                   />
                 </div>
               )}
 
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Access Password</label>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{L('Access Password')}</label>
                   {!isFirstSetup && (
                     <button
                       type="button"
@@ -285,7 +293,7 @@ export default function Login({
                 </div>
               )}
               <div>
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Admin email</label>
+                <label className="muf-label">{L('Admin email')}</label>
                 <input
                   type="email"
                   required
@@ -293,11 +301,11 @@ export default function Login({
                   value={resetEmail}
                   onChange={(event) => setResetEmail(event.target.value)}
                   placeholder="admin@farm.com"
-                  className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
+                  className="muf-field muf-field-lg"
                 />
               </div>
               <button type="submit" disabled={loading} className="w-full py-3 bg-farm-600 hover:bg-farm-700 text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-farm-500/10 flex items-center justify-center gap-2 cursor-pointer mt-2 disabled:opacity-60">
-                {loading ? 'Sending...' : <><Mail className="w-[18px] h-[18px]" /> Send reset code</>}
+                {loading ? 'Sending...' : <><Mail className="w-[18px] h-[18px]" /> {L('Send reset code')}</>}
               </button>
             </motion.form>
           )}
@@ -314,7 +322,7 @@ export default function Login({
             >
               <BackButton onClick={() => goTo('forgotEmail')} />
               <div>
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">6-digit code</label>
+                <label className="muf-label">6-digit code</label>
                 <input
                   type="text"
                   inputMode="numeric"
@@ -328,19 +336,19 @@ export default function Login({
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">New password</label>
+                <label className="muf-label">{L('New password')}</label>
                 <input
                   type="password"
                   required
                   value={resetPassword}
                   onChange={(event) => setResetPassword(event.target.value)}
-                  placeholder="New password"
+                  placeholder={L('New password')}
                   autoComplete="new-password"
-                  className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
+                  className="muf-field muf-field-lg"
                 />
               </div>
               <button type="submit" disabled={loading} className="w-full py-3 bg-farm-600 hover:bg-farm-700 text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-farm-500/10 flex items-center justify-center gap-2 cursor-pointer mt-2 disabled:opacity-60">
-                {loading ? 'Resetting...' : <><Check className="w-[18px] h-[18px]" /> Reset password</>}
+                {loading ? 'Resetting...' : <><Check className="w-[18px] h-[18px]" /> {L('Reset password')}</>}
               </button>
             </motion.form>
           )}

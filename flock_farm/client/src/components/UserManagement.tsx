@@ -331,7 +331,7 @@ export default function UserManagement({ currentUser, lang }: Props) {
         </h3>
         <button
           onClick={() => setShowNewForm((v) => !v)}
-          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-1.5"
+          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-farm-600 text-white flex items-center gap-1.5"
         >
           <UserPlus className="w-3.5 h-3.5" />
           {showNewForm ? label.cancel : label.newUser}
@@ -359,7 +359,7 @@ export default function UserManagement({ currentUser, lang }: Props) {
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 className="w-full text-xs px-3 py-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-lg focus:outline-none focus:border-emerald-400 font-mono"
-                placeholder="e.g. aslam"
+                placeholder={L('e.g. aslam')}
               />
             </div>
             <div>

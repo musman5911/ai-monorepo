@@ -206,12 +206,12 @@ export default function FlockRegister({
     ],
     actions: (
       <>
-        <button onClick={() => handleOpenDetails(bird)} className="muf-detail-btn"><Eye size={15}/> Details</button>
+        <button onClick={() => handleOpenDetails(bird)} className="muf-detail-btn"><Eye size={15}/> {L('Details')}</button>
         {isAdmin && (
           <>
-            <button onClick={() => handleOpenEdit(bird)} className="muf-record-btn"><Pencil size={15}/> Edit</button>
+            <button onClick={() => handleOpenEdit(bird)} className="muf-record-btn"><Pencil size={15}/> {L('Edit')}</button>
             {canDelete && (
-              <button onClick={() => handleDeleteRequest(bird)} className="muf-mini-icon danger" title="Delete" aria-label="Delete bird"><Trash2 size={15}/></button>
+              <button onClick={() => handleDeleteRequest(bird)} className="muf-mini-icon danger" title={L('Delete')} aria-label={L('Delete bird')}><Trash2 size={15}/></button>
             )}
           </>
         )}
@@ -222,12 +222,12 @@ export default function FlockRegister({
   // Submit new bird
   const handleAddSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return notify('Please enter bird name', 'error');
-    if (breed === 'Custom' && !customBreed.trim()) return notify('Please enter a custom breed name.', 'error');
+    if (!name.trim()) return notify(L('Please enter bird name'), 'error');
+    if (breed === 'Custom' && !customBreed.trim()) return notify(L('Please enter a custom breed name.'), 'error');
 
     // Mortality check
     if (status === 'Dead' && (!dateDied || !deathReason)) {
-      return notify('Date Died and Death Reason are required for dead birds.', 'error');
+      return notify(L('Date Died and Death Reason are required for dead birds.'), 'error');
     }
 
     onAddBird({
@@ -277,12 +277,12 @@ export default function FlockRegister({
   const handleEditSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedBird) return;
-    if (!name.trim()) return notify('Please enter bird name', 'error');
-    if (breed === 'Custom' && !customBreed.trim()) return notify('Please enter a custom breed name.', 'error');
+    if (!name.trim()) return notify(L('Please enter bird name'), 'error');
+    if (breed === 'Custom' && !customBreed.trim()) return notify(L('Please enter a custom breed name.'), 'error');
 
     // Mortality check
     if (status === 'Dead' && (!dateDied || !deathReason)) {
-      return notify('Date Died and Death Reason are required for dead birds.', 'error');
+      return notify(L('Date Died and Death Reason are required for dead birds.'), 'error');
     }
 
     onUpdateBird(selectedBird.id, {
@@ -315,10 +315,10 @@ export default function FlockRegister({
 
   const handleDeleteRequest = async (bird: Bird) => {
     const ok = await confirmAction({
-      title: 'Delete Bird',
+      title: L('Delete Bird'),
       message: `Delete ${bird.name} from the flock registry?`,
-      confirmLabel: 'Delete Bird',
-      cancelLabel: 'Cancel',
+      confirmLabel: L('Delete Bird'),
+      cancelLabel: L('Cancel'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -373,10 +373,10 @@ export default function FlockRegister({
                         <input 
                           type="text"
                           required
-                          placeholder="e.g. Purana kukar, Lali"
+                          placeholder={L('e.g. Purana kukar, Lali')}
                           value={name}
                           onChange={(e) => setName(e.target.value)}
-                          className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-blue-400 focus:outline-hidden"
+                          className="muf-field"
                         />
                       </div>
       
@@ -385,45 +385,45 @@ export default function FlockRegister({
                         <select 
                           value={gender}
                           onChange={(e) => setGender(e.target.value as Gender)}
-                          className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-blue-400 focus:outline-hidden"
+                          className="muf-field"
                         >
-                          <option value="Female">Female (Hen)</option>
-                          <option value="Male">Male (Rooster)</option>
+                          <option value="Female">{L('Female (Hen)')}</option>
+                          <option value="Male">{L('Male (Rooster)')}</option>
                         </select>
                       </div>
                     </div>
       
                     <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_120px] gap-4 items-start">
                       <div>
-                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Breed / Type</label>
+                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Breed / Type')}</label>
                         <select
                           value={breed}
                           onChange={(e) => setBreed(e.target.value as BirdBreed)}
-                          className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-blue-400 focus:outline-hidden"
+                          className="muf-field"
                           id="add-bird-breed"
                         >
-                          <option value="Desi">Desi</option>
-                          <option value="Aseel">Aseel</option>
-                          <option value="Rhode Island">Rhode Island</option>
-                          <option value="Golden">Golden</option>
-                          <option value="Misri">Misri</option>
-                          <option value="Broiler">Broiler</option>
-                          <option value="Layer">Layer</option>
-                          <option value="Fayoumi">Fayoumi</option>
-                          <option value="Custom">Custom (type your own)</option>
+                          <option value="Desi">{L('Desi')}</option>
+                          <option value="Aseel">{L('Aseel')}</option>
+                          <option value="Rhode Island">{L('Rhode Island')}</option>
+                          <option value="Golden">{L('Golden')}</option>
+                          <option value="Misri">{L('Misri')}</option>
+                          <option value="Broiler">{L('Broiler')}</option>
+                          <option value="Layer">{L('Layer')}</option>
+                          <option value="Fayoumi">{L('Fayoumi')}</option>
+                          <option value="Custom">{L('Custom (type your own)')}</option>
                         </select>
                         {breed === 'Custom' && (
                           <input
                             type="text"
                             required
-                            placeholder="Custom breed name..."
+                            placeholder={L('Custom breed name...')}
                             value={customBreed}
                             onChange={(e) => setCustomBreed(e.target.value)}
                             className="mt-2 w-full text-xs px-3 py-2 border border-farm-200 bg-farm-50/40 rounded-xl focus:border-farm-400 focus:outline-hidden"
                           />
                         )}
                         <div className="mt-3 space-y-2">
-                          <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Bird Image</label>
+                          <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Bird Image')}</label>
                           <input
                             type="file"
                             accept="image/*"
@@ -436,61 +436,61 @@ export default function FlockRegister({
                             placeholder="/birds/kalu.jpg or https://..."
                             value={imagePath}
                             onChange={(e) => setImagePath(normalizePublicAssetPath(e.target.value))}
-                            className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-blue-400 focus:outline-hidden"
+                            className="muf-field"
                           />
                           <p className="mt-1 text-[10px] text-slate-400">Upload from device or paste a public path / full image URL.</p>
                         </div>
                       </div>
                       <div className="rounded-2xl border border-slate-200 bg-slate-50 p-3 flex flex-col items-center gap-2">
                         <BirdAvatar bird={previewBird} size="lg" showBadge={false} />
-                        <span className="text-[10px] text-slate-500 text-center">Image preview auto-fits with crop.</span>
+                        <span className="text-[10px] text-slate-500 text-center">{L('Image preview auto-fits with crop.')}</span>
                       </div>
                     </div>
       
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Price (Rs)</label>
+                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Price (Rs)')}</label>
                         <input 
                           type="number"
                           min="0"
-                          placeholder="Acquisition cost"
+                          placeholder={L('Acquisition cost')}
                           value={price}
                           onChange={(e) => setPrice(e.target.value)}
-                          className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-blue-400 focus:outline-hidden"
+                          className="muf-field"
                         />
                       </div>
       
                       <div>
-                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Age Bought (Days)</label>
+                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Age Bought (Days)')}</label>
                         <input 
                           type="number"
                           min="0"
-                          placeholder="Age in days when bought"
+                          placeholder={L('Age in days when bought')}
                           value={ageBoughtDays}
                           onChange={(e) => setAgeBoughtDays(e.target.value)}
-                          className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-blue-400 focus:outline-hidden"
+                          className="muf-field"
                         />
                       </div>
                     </div>
       
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Date Bought</label>
+                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Date Bought')}</label>
                         <input 
                           type="date"
                           value={dateBought}
                           onChange={(e) => setDateBought(e.target.value)}
-                          className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-blue-400 focus:outline-hidden"
+                          className="muf-field"
                         />
                       </div>
       
                       <div>
-                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Date of Birth (Optional)</label>
+                        <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Date of Birth (Optional)')}</label>
                         <input 
                           type="date"
                           value={dateOfBirth}
                           onChange={(e) => setDateOfBirth(e.target.value)}
-                          className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-blue-400 focus:outline-hidden"
+                          className="muf-field"
                         />
                       </div>
                     </div>
@@ -500,16 +500,16 @@ export default function FlockRegister({
                     </div>
       
                     <div className="border-t border-gray-100 pt-4">
-                      <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Registry Status</label>
+                      <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Registry Status')}</label>
                       <select 
                         value={status}
                         onChange={(e) => setStatus(e.target.value as BirdStatus)}
-                        className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-blue-400 focus:outline-hidden"
+                        className="muf-field"
                       >
-                        <option value="Active">Active (In Flock)</option>
-                        <option value="Sick">Sick (Needs care)</option>
-                        <option value="Sold">Sold</option>
-                        <option value="Dead">Dead (Deceased)</option>
+                        <option value="Active">{L('Active (In Flock)')}</option>
+                        <option value="Sick">{L('Sick (Needs care)')}</option>
+                        <option value="Sold">{L('Sold')}</option>
+                        <option value="Dead">{L('Dead (Deceased)')}</option>
                       </select>
                     </div>
       
@@ -527,7 +527,7 @@ export default function FlockRegister({
                           type="number"
                           min="0"
                           required
-                          placeholder="Amount received for this bird"
+                          placeholder={L('Amount received for this bird')}
                           value={salePrice}
                           onChange={(e) => setSalePrice(e.target.value)}
                           className="w-full text-xs px-3 py-2 border border-emerald-200 rounded-xl focus:border-emerald-400 focus:outline-hidden bg-white text-emerald-950"
@@ -540,7 +540,7 @@ export default function FlockRegister({
                           onChange={(e) => setSaleDate(e.target.value)}
                           className="w-full text-xs px-3 py-2 border border-emerald-200 rounded-xl focus:border-emerald-400 focus:outline-hidden bg-white text-emerald-950"
                         />
-                        <p className="text-3xs text-emerald-700">This is tracked as income in your Financial Ledger totals.</p>
+                        <p className="text-3xs text-emerald-700">{L('This is tracked as income in your Financial Ledger totals.')}</p>
                       </div>
                     )}
       
@@ -569,18 +569,18 @@ export default function FlockRegister({
                               onChange={(e) => setDeathReason(e.target.value as DeathReason)}
                               className="w-full text-xs px-2.5 py-1.5 border border-red-200 rounded-xl focus:border-red-400 focus:outline-hidden bg-white text-red-950"
                             >
-                              <option value="Disease">Disease</option>
-                              <option value="Injury">Injury</option>
-                              <option value="Predator">Predator</option>
-                              <option value="Other">Other</option>
-                              <option value="Unknown">Unknown</option>
+                              <option value="Disease">{L('Disease')}</option>
+                              <option value="Injury">{L('Injury')}</option>
+                              <option value="Predator">{L('Predator')}</option>
+                              <option value="Other">{L('Other')}</option>
+                              <option value="Unknown">{L('Unknown')}</option>
                             </select>
                           </div>
                         </div>
                         <div>
-                          <label className="block text-3xs font-bold text-red-700 uppercase tracking-wider mb-1">Death Detail Notes</label>
+                          <label className="block text-3xs font-bold text-red-700 uppercase tracking-wider mb-1">{L('Death Detail Notes')}</label>
                           <textarea 
-                            placeholder="e.g. Dawai no di thi us wqt, or secondary symptoms..."
+                            placeholder={L('e.g. Dawai no di thi us wqt, or secondary symptoms...')}
                             value={deathDetail}
                             onChange={(e) => setDeathDetail(e.target.value)}
                             className="w-full text-xs px-2.5 py-1.5 border border-red-200 rounded-xl focus:border-red-400 focus:outline-hidden bg-white text-red-950 h-16 resize-none"
@@ -596,13 +596,13 @@ export default function FlockRegister({
       {/* Header and Add button */}
       <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
         <div>
-          <h2 className="text-xl font-bold font-display text-slate-800">Flock Registry</h2>
+          <h2 className="text-xl font-bold font-display text-slate-800">{L('Flock Registry')}</h2>
           <p className="text-xs text-slate-500">Auto-sorted directory of your birds: Males bought oldest-to-newest first, then Females.</p>
         </div>
         <div className="flex items-center gap-2">
-          <div className="muf-view-toggle" title="Toggle view">
-            <button className={view === 'grid' ? 'on' : ''} onClick={() => setView('grid')}><LayoutGrid className="w-3.5 h-3.5" /> Grid</button>
-            <button className={view === 'list' ? 'on' : ''} onClick={() => setView('list')}><List className="w-3.5 h-3.5" /> List</button>
+          <div className="muf-view-toggle" title={L('Toggle view')}>
+            <button className={view === 'grid' ? 'on' : ''} onClick={() => setView('grid')}><LayoutGrid className="w-3.5 h-3.5" /> {L('Grid')}</button>
+            <button className={view === 'list' ? 'on' : ''} onClick={() => setView('list')}><List className="w-3.5 h-3.5" /> {L('List')}</button>
           </div>
           {isAdmin && (
           <span className="text-2xs font-semibold text-slate-400 bg-slate-100 px-3 py-2 rounded-xl shrink-0 hidden">Add via FAB ↓</span>
@@ -619,7 +619,7 @@ export default function FlockRegister({
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input 
             type="text"
-            placeholder="Search birds by name... (e.g. 'Purana')"
+            placeholder={L('Search birds by name... (e.g. \'Purana\')')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full text-xs pl-10 pr-4 py-2 border border-slate-200 rounded-xl focus:border-farm-400 focus:outline-hidden transition"
@@ -629,7 +629,7 @@ export default function FlockRegister({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 w-full">
           <div className="flex flex-wrap items-center gap-1.5 bg-gray-50 p-1.5 border border-slate-100 rounded-xl text-2xs font-semibold">
-            <span className="w-full sm:w-auto text-gray-400 px-2 font-mono uppercase text-3xs">Gender:</span>
+            <span className="w-full sm:w-auto text-gray-400 px-2 font-mono uppercase text-3xs">{L('Gender:')}</span>
             {(['All', 'Male', 'Female'] as const).map(g => (
               <button 
                 key={g}
@@ -644,7 +644,7 @@ export default function FlockRegister({
           </div>
 
           <div className="flex flex-wrap items-center gap-1.5 bg-gray-50 p-1.5 border border-slate-100 rounded-xl text-2xs font-semibold">
-            <span className="w-full sm:w-auto text-gray-400 px-2 font-mono uppercase text-3xs">Status:</span>
+            <span className="w-full sm:w-auto text-gray-400 px-2 font-mono uppercase text-3xs">{L('Status:')}</span>
             {(['All', 'Active', 'Sick', 'Sold', 'Dead'] as const).map(s => (
               <button
                 key={s}
@@ -664,7 +664,7 @@ export default function FlockRegister({
       {filteredAndSortedBirds.length === 0 ? (
         <div className="text-center py-16 bg-white rounded-3xl border border-dashed border-gray-200">
           <Activity className="w-12 h-12 text-gray-300 mx-auto mb-3" />
-          <p className="text-sm font-semibold text-gray-500">No birds match current filters.</p>
+          <p className="text-sm font-semibold text-gray-500">{L('No birds match current filters.')}</p>
           <p className="text-xs text-gray-400 mt-1">Try clearing your filters or adding a new bird to the registry.</p>
         </div>
       ) : view === 'grid' ? (
@@ -721,7 +721,7 @@ export default function FlockRegister({
                       </div>
 
                       <div className="shrink-0 text-right">
-                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">Price</p>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-slate-400">{L('Price')}</p>
                         <p className="font-mono text-sm font-bold text-slate-900 sm:text-base">Rs {bird.price.toLocaleString()}</p>
                       </div>
                     </div>
@@ -732,7 +732,7 @@ export default function FlockRegister({
                         <span>Bought {bird.dateBought}</span>
                         <span className="truncate">{secondaryMeta}</span>
                       </div>
-                      <span className="font-semibold text-farm-600 transition group-hover:text-farm-700">Tap for details</span>
+                      <span className="font-semibold text-farm-600 transition group-hover:text-farm-700">{L('Tap for details')}</span>
                     </div>
                   </div>
                 </div>
@@ -745,7 +745,7 @@ export default function FlockRegister({
       <DetailModal
         open={!!detailBird}
         onClose={() => setDetailBirdId(null)}
-        title="Bird Details"
+        title={L('Bird Details')}
         subtitle={detailBird ? `${breedLabel(detailBird)} · BRD-${detailBird.id.toString().padStart(3, '0')}` : undefined}
         icon={<BirdIcon className="w-5 h-5" />}
         iconBg="bg-farm-100 text-farm-700"
@@ -776,10 +776,10 @@ export default function FlockRegister({
                   </div>
 
                   <div className="grid grid-cols-2 gap-2 lg:grid-cols-4">
-                    <DetailValueCard label="Age" value={calculateCurrentAge(detailBird)} />
+                    <DetailValueCard label={L('Age')} value={calculateCurrentAge(detailBird)} />
                     <DetailValueCard label="Price" value={`Rs ${detailBird.price.toLocaleString()}`} />
-                    <DetailValueCard label="Bought" value={detailBird.dateBought} />
-                    <DetailValueCard label="Last Vaccine" value={detailBird.lastVaccinationDate || '—'} />
+                    <DetailValueCard label={L('Bought')} value={detailBird.dateBought} />
+                    <DetailValueCard label={L('Last Vaccine')} value={detailBird.lastVaccinationDate || '—'} />
                   </div>
                 </div>
               </div>
@@ -841,12 +841,12 @@ export default function FlockRegister({
                 </h4>
                 <div className="space-y-2">
                   <DetailRow label="Bird ID" value={`BRD-${detailBird.id.toString().padStart(3, '0')}`} mono />
-                  <DetailRow label="Gender" value={detailBird.gender} />
-                  <DetailRow label="Breed" value={breedLabel(detailBird)} />
-                  <DetailRow label="Date Bought" value={detailBird.dateBought} mono />
-                  <DetailRow label="Date of Birth" value={detailBird.dateOfBirth || '—'} mono />
+                  <DetailRow label={L('Gender')} value={detailBird.gender} />
+                  <DetailRow label={L('Breed')} value={breedLabel(detailBird)} />
+                  <DetailRow label={L('Date Bought')} value={detailBird.dateBought} mono />
+                  <DetailRow label={L('Date of Birth')} value={detailBird.dateOfBirth || '—'} mono />
                   <DetailRow label="Purchase Price" value={`Rs ${detailBird.price.toLocaleString()}`} mono />
-                  <DetailRow label="Vaccination Status" valueNode={getVaccinationBadge(detailBird.lastVaccinationDate)} />
+                  <DetailRow label={L('Vaccination Status')} valueNode={getVaccinationBadge(detailBird.lastVaccinationDate)} />
                 </div>
               </section>
 
@@ -856,10 +856,10 @@ export default function FlockRegister({
                 </h4>
                 {detailBird.status === 'Sold' ? (
                   <div className="space-y-2">
-                    <DetailRow label="Sale Date" value={detailBird.saleDate || '—'} mono />
+                    <DetailRow label={L('Sale Date')} value={detailBird.saleDate || '—'} mono />
                     <DetailRow label="Sale Price" value={`Rs ${(detailBird.salePrice ?? 0).toLocaleString()}`} mono />
                     <DetailRow
-                      label="Profit / Loss"
+                      label={L('Profit / Loss')}
                       value={`Rs ${((detailBird.salePrice ?? 0) - detailBird.price).toLocaleString()}`}
                       valueClassName={((detailBird.salePrice ?? 0) - detailBird.price) >= 0 ? 'text-emerald-700' : 'text-rose-700'}
                       mono
@@ -867,9 +867,9 @@ export default function FlockRegister({
                   </div>
                 ) : detailBird.status === 'Dead' ? (
                   <div className="space-y-2">
-                    <DetailRow label="Date Died" value={detailBird.dateDied || '—'} mono />
-                    <DetailRow label="Reason" value={detailBird.deathReason || '—'} />
-                    <DetailRow label="Notes" value={detailBird.deathDetail || '—'} />
+                    <DetailRow label={L('Date Died')} value={detailBird.dateDied || '—'} mono />
+                    <DetailRow label={L('Reason')} value={detailBird.deathReason || '—'} />
+                    <DetailRow label={L('Notes')} value={detailBird.deathDetail || '—'} />
                   </div>
                 ) : detailBird.status === 'Sick' ? (
                   <div className="rounded-2xl border border-orange-200 bg-orange-50 px-3 py-3 text-[12px] text-orange-800">
@@ -889,7 +889,7 @@ export default function FlockRegister({
               </h4>
               {detailVaccinations.length === 0 ? (
                 <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-6 text-center text-[12px] text-slate-500">
-                  No vaccination logs found for this bird yet.
+                  {L('No vaccination logs found for this bird yet.')}
                 </div>
               ) : (
                 <div className="space-y-2">
@@ -942,16 +942,16 @@ export default function FlockRegister({
       <DetailModal
         open={isAddModalOpen}
         onClose={() => setIsAddModalOpen(false)}
-        title="Log New Bird in Registry"
-        subtitle="Register new bird acquisition records"
+        title={L('Log New Bird in Registry')}
+        subtitle={L('Register new bird acquisition records')}
         icon={<BirdIcon className="w-5 h-5" />}
         iconBg="bg-farm-100 text-farm-700"
       >
         <form onSubmit={handleAddSubmit} className="space-y-4">
           {birdFormFields}
           <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
-            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white font-semibold text-xs rounded-xl transition">Save Bird Record</button>
+            <button type="button" onClick={() => setIsAddModalOpen(false)} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition">{L('Cancel')}</button>
+            <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white font-semibold text-xs rounded-xl transition">{L('Save Bird Record')}</button>
           </div>
         </form>
       </DetailModal>
@@ -960,7 +960,7 @@ export default function FlockRegister({
       <DetailModal
         open={isEditModalOpen && !!selectedBird}
         onClose={() => { setIsEditModalOpen(false); setSelectedBird(null); }}
-        title="Edit Bird Profile"
+        title={L('Edit Bird Profile')}
         subtitle={selectedBird ? `Modify ${selectedBird.name} — price, status, or details` : undefined}
         icon={<Pencil className="w-5 h-5" />}
         iconBg="bg-farm-100 text-farm-700"
@@ -968,8 +968,8 @@ export default function FlockRegister({
         <form onSubmit={handleEditSubmit} className="space-y-4">
           {birdFormFields}
           <div className="flex justify-end gap-3 border-t border-slate-100 pt-4">
-            <button type="button" onClick={() => { setIsEditModalOpen(false); setSelectedBird(null); }} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white font-semibold text-xs rounded-xl transition">Save Changes</button>
+            <button type="button" onClick={() => { setIsEditModalOpen(false); setSelectedBird(null); }} className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition">{L('Cancel')}</button>
+            <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white font-semibold text-xs rounded-xl transition">{L('Save Changes')}</button>
           </div>
         </form>
       </DetailModal>

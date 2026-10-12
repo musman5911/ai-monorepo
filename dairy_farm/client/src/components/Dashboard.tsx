@@ -397,7 +397,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
       )}
       <div className="relative z-20 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200 dark:border-[#203528] bg-white/90 dark:bg-[#0d1a11]/90 p-3 sm:p-4 shadow-sm backdrop-blur">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Date Range</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{L('Date Range')}</p>
           <p className="text-xs font-mono text-slate-500 dark:text-slate-400">{rangeLabel}</p>
         </div>
         {/* Quick preset chips */}
@@ -433,7 +433,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               `💰 Today's milk value: Rs ${todayMilkRev.toLocaleString()}\n` +
               `🐄 Active animals: ${data.cows.filter(c => c.status === 'active').length}`
             )}
-            title="Share today's summary on WhatsApp"
+            title={L('Share today\'s summary on WhatsApp')}
             className="flex items-center gap-1.5 rounded-xl border border-farm-300 dark:border-farm-700 px-3 py-2 text-xs font-bold text-farm-700 dark:text-farm-300 hover:bg-farm-50 dark:hover:bg-farm-900/30 transition"
           >
             <Share2 className="h-3.5 w-3.5" /> Share
@@ -452,7 +452,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
           <button
             type="button"
             onClick={openCustomRange}
-            title="Custom range"
+            title={L('Custom range')}
             className={`p-1.5 rounded-lg border transition ${
               !isCurrentMonthRange
                 ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
@@ -472,9 +472,9 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               className="absolute right-0 top-full mt-2 z-30 w-72 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl overflow-hidden"
             >
             <div className="p-4 space-y-3">
-              <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">Custom Range</h4>
+              <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">{L('Custom Range')}</h4>
               <label className="block space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">From</span>
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">{L('From')}</span>
                 <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} className="w-full px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 rounded-lg font-mono" />
               </label>
               <label className="block space-y-1">
@@ -482,8 +482,8 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="w-full px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 rounded-lg font-mono" />
               </label>
               <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setCustomOpen(false)} className="px-3 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200">Cancel</button>
-                <button type="button" onClick={applyCustomRange} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">Apply</button>
+                <button type="button" onClick={() => setCustomOpen(false)} className="px-3 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200">{L('Cancel')}</button>
+                <button type="button" onClick={applyCustomRange} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">{L('Apply')}</button>
               </div>
             </div>
             </motion.div>
@@ -644,19 +644,19 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
           <p className="text-[10px] text-slate-400 mb-3">{todayStr}</p>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-farm-50 dark:bg-farm-900/10 rounded-lg">
-              <span className="text-xs text-farm-700 dark:text-farm-400">Total Milk (gross)</span>
+              <span className="text-xs text-farm-700 dark:text-farm-400">{L('Total Milk (gross)')}</span>
               <span className="text-sm font-bold text-farm-700 dark:text-farm-400">{fmt(todayMilk)} L</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-farm-50/60 dark:bg-farm-900/5 rounded-lg">
-              <span className="text-xs text-farm-700 dark:text-farm-400">Saleable Milk</span>
+              <span className="text-xs text-farm-700 dark:text-farm-400">{L('Saleable Milk')}</span>
               <span className="text-sm font-bold text-farm-700 dark:text-farm-400">{fmt(todayMilkSaleable)} L</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg">
-              <span className="text-xs text-emerald-700 dark:text-emerald-400">Milk Revenue</span>
+              <span className="text-xs text-emerald-700 dark:text-emerald-400">{L('Milk Revenue')}</span>
               <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{fmtPKR(todayMilkRev)}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
-              <span className="text-xs text-red-700 dark:text-red-400">Total Expenses</span>
+              <span className="text-xs text-red-700 dark:text-red-400">{L('Total Expenses')}</span>
               <span className="text-sm font-bold text-red-700 dark:text-red-400">{fmtPKR(todayTotalExp)}</span>
             </div>
             {/* Compact expense breakdown bars */}
@@ -679,7 +679,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
             )}
             {todayPurchases > 0 && (
               <div className="flex justify-between items-center p-3 bg-amber-50 dark:bg-amber-900/10 rounded-lg">
-                <span className="text-xs text-amber-700 dark:text-amber-400">Animal Purchases</span>
+                <span className="text-xs text-amber-700 dark:text-amber-400">{L('Animal Purchases')}</span>
                 <span className="text-sm font-bold text-amber-700 dark:text-amber-400">{fmtPKR(todayPurchases)}</span>
               </div>
             )}
@@ -712,14 +712,14 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 </button>
               </StaggerItem>
             )) : (
-              <p className="text-xs text-slate-400 text-center py-4">No recent activity</p>
+              <p className="text-xs text-slate-400 text-center py-4">{L('No recent activity')}</p>
             )}
           </div>
         </div>
 
         <div className="muf-panel p-5">
           <div className="flex items-center justify-between gap-3 mb-3">
-            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Top Producers</h3>
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{L('Top Producers')}</h3>
             <button type="button" onClick={() => setShowTopPopup(true)} className="text-[11px] font-semibold text-farm-600 dark:text-farm-400 hover:underline">View details →</button>
           </div>
           <div className="space-y-2">
@@ -733,9 +733,9 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 <span className="text-xs font-extrabold text-farm-700 dark:text-farm-300 shrink-0">{fmt(p.milk)} L</span>
               </button>
             ))}
-            {topProducers.length === 0 && <p className="text-xs text-slate-400 text-center py-4">No milk data in this range</p>}
+            {topProducers.length === 0 && <p className="text-xs text-slate-400 text-center py-4">{L('No milk data in this range')}</p>}
           </div>
-          <p className="text-[10px] text-slate-400 mt-3">Based on the selected date range.</p>
+          <p className="text-[10px] text-slate-400 mt-3">{L('Based on the selected date range.')}</p>
         </div>
 
         <div className="muf-panel p-4 sm:p-5 muf-cow-pnl-compact">
@@ -847,7 +847,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
       )}
 
       {showMilkPopup && (
-        <Popup key="milk" title="Milk Production" rangeLabel={rangeLabel} onClose={() => setShowMilkPopup(false)}>
+        <Popup key="milk" title={L('Milk Production')} rangeLabel={rangeLabel} onClose={() => setShowMilkPopup(false)}>
           <div className="space-y-2">
             {rangeMilkByCow.map(d => (
               <div key={d.cow._id} className="flex items-center justify-between p-3 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
@@ -861,35 +861,35 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 </div>
               </div>
             ))}
-            {rangeMilkByCow.length === 0 && <p className="text-sm text-slate-400 text-center py-4">No milk recorded in this range</p>}
+            {rangeMilkByCow.length === 0 && <p className="text-sm text-slate-400 text-center py-4">{L('No milk recorded in this range')}</p>}
           </div>
           <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between">
-            <span className="text-sm font-medium text-slate-500">Total</span>
+            <span className="text-sm font-medium text-slate-500">{L('Total')}</span>
             <span className="text-lg font-bold text-farm-600">{fmt(rangeTotalMilk)}L</span>
           </div>
         </Popup>
       )}
 
       {showPnlPopup && (
-        <Popup key="pnl" title="Profit & Loss" rangeLabel={rangeLabel} onClose={() => setShowPnlPopup(false)}>
+        <Popup key="pnl" title={L('Profit & Loss')} rangeLabel={rangeLabel} onClose={() => setShowPnlPopup(false)}>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg">
-              <span className="text-xs text-emerald-700 dark:text-emerald-400">Milk Revenue</span>
+              <span className="text-xs text-emerald-700 dark:text-emerald-400">{L('Milk Revenue')}</span>
               <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{fmtPKR(rangeRevenue)}</span>
             </div>
             {rangeSalesIncome > 0 && (
               <div className="flex justify-between items-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
-                <span className="text-xs text-purple-700 dark:text-purple-400">Animal Sales</span>
+                <span className="text-xs text-purple-700 dark:text-purple-400">{L('Animal Sales')}</span>
                 <span className="text-sm font-bold text-purple-700 dark:text-purple-400">{fmtPKR(rangeSalesIncome)}</span>
               </div>
             )}
             <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
-              <span className="text-xs text-red-700 dark:text-red-400">Operating Expenses</span>
+              <span className="text-xs text-red-700 dark:text-red-400">{L('Operating Expenses')}</span>
               <span className="text-sm font-bold text-red-700 dark:text-red-400">{fmtPKR(rangeOperatingExpenses)}</span>
             </div>
             {rangePurchases > 0 && (
               <div className="flex justify-between items-center p-3 bg-amber-50 dark:bg-amber-900/10 rounded-lg">
-                <span className="text-xs text-amber-700 dark:text-amber-400">Animal Purchases</span>
+                <span className="text-xs text-amber-700 dark:text-amber-400">{L('Animal Purchases')}</span>
                 <span className="text-sm font-bold text-amber-700 dark:text-amber-400">{fmtPKR(rangePurchases)}</span>
               </div>
             )}
@@ -897,15 +897,15 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               <span className={`text-xs font-medium ${profitLoss >= 0 ? 'text-farm-700 dark:text-farm-400' : 'text-red-700 dark:text-red-400'}`}>Net Profit</span>
               <span className={`text-lg font-bold ${profitLoss >= 0 ? 'text-farm-700 dark:text-farm-400' : 'text-red-700 dark:text-red-400'}`}>{fmtPKR(profitLoss)}</span>
             </div>
-            <button onClick={() => { setShowPnlPopup(false); onNavigate('reports'); }} className="w-full rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2 text-sm font-semibold">Open Reports</button>
+            <button onClick={() => { setShowPnlPopup(false); onNavigate('reports'); }} className="w-full rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2 text-sm font-semibold">{L('Open Reports')}</button>
           </div>
         </Popup>
       )}
 
       {showRatePopup && (
-        <Popup key="rate" title="Milk Rate History" rangeLabel={rangeLabel} onClose={() => setShowRatePopup(false)}>
+        <Popup key="rate" title={L('Milk Rate History')} rangeLabel={rangeLabel} onClose={() => setShowRatePopup(false)}>
           <div className="flex items-center justify-between p-3 bg-farm-50 dark:bg-farm-900/20 rounded-lg mb-3">
-            <span className="text-xs text-farm-600 font-medium">Current Rate</span>
+            <span className="text-xs text-farm-600 font-medium">{L('Current Rate')}</span>
             <span className="text-lg font-bold text-farm-700 dark:text-farm-400">{fmtPKR(data.rate?.value || 0)}/L</span>
           </div>
           <div className="space-y-2">
@@ -915,7 +915,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 <span className="font-medium text-slate-700 dark:text-slate-300">{fmtPKR(h.value)}/L</span>
               </div>
             ))}
-            {rateHistory.length === 0 && <p className="text-xs text-slate-400 text-center py-4">No rate changes yet</p>}
+            {rateHistory.length === 0 && <p className="text-xs text-slate-400 text-center py-4">{L('No rate changes yet')}</p>}
           </div>
         </Popup>
       )}
@@ -1038,7 +1038,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
         const topList = Object.entries(topMilkMap).map(([id, milk]) => ({ cow: data.cows.find(c => c._id === id), milk })).filter(p => p.cow).sort((a, b) => b.milk - a.milk).slice(0, 10);
         const topDays = topRange === 'week' ? 7 : topRange === 'month' ? 30 : topRange === 'year' ? 365 : 365;
         return (
-        <Popup key="top" title="Top Producers" rangeLabel={topRange === 'all' ? 'All time' : topRange === 'week' ? 'Last 7 days' : topRange === 'month' ? 'This month' : 'This year'} onClose={() => setShowTopPopup(false)}>
+        <Popup key="top" title={L('Top Producers')} rangeLabel={topRange === 'all' ? 'All time' : topRange === 'week' ? 'Last 7 days' : topRange === 'month' ? 'This month' : 'This year'} onClose={() => setShowTopPopup(false)}>
           <div className="space-y-3">
             {/* Range selector */}
             <div className="flex items-center gap-1.5 flex-wrap pb-2 border-b border-slate-100 dark:border-slate-800">
@@ -1078,7 +1078,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 </div>
               );
             })}
-            {topList.length === 0 && <p className="text-xs text-slate-400 text-center py-4">No milk data in this range</p>}
+            {topList.length === 0 && <p className="text-xs text-slate-400 text-center py-4">{L('No milk data in this range')}</p>}
           </div>
         </Popup>
         );
@@ -1106,7 +1106,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
           );
         };
         return (
-        <Popup key="cowpnl" title="Cow P&L" rangeLabel="" onClose={() => setShowCowPnlPopup(false)}>
+        <Popup key="cowpnl" title={L('Cow P&L')} rangeLabel="" onClose={() => setShowCowPnlPopup(false)}>
           <div className="space-y-3">
             <div className="flex items-center gap-2">
               {(['running', 'lifetime'] as const).map((m) => (
@@ -1121,10 +1121,10 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 ? 'Milk + sale income minus operating expenses (feed/medicine) per cow.'
                 : 'Running P&L minus the cow\'s purchase price — full lifecycle picture.'}
             </p>
-            <h4 className="text-xs font-bold text-farm-700 dark:text-farm-400 uppercase tracking-wider">Top 5</h4>
+            <h4 className="text-xs font-bold text-farm-700 dark:text-farm-400 uppercase tracking-wider">{L('Top 5')}</h4>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {top.map((c, i) => row(c, i, 'good'))}
-              {top.length === 0 && <p className="text-xs text-slate-400 text-center py-3">No P&L data yet</p>}
+              {top.length === 0 && <p className="text-xs text-slate-400 text-center py-3">{L('No P&L data yet')}</p>}
             </div>
             {bottom.length > 0 && (<>
               <h4 className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Bottom {bottom.length}</h4>

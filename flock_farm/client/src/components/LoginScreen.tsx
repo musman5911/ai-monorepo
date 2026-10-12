@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { mufL } from '../muf-urdu';
 import { LogIn, AlertCircle, ArrowLeft, Check, Mail, UserPlus, Eye, EyeOff } from 'lucide-react';
 import { AnimatePresence, motion } from '../muf-motion';
+import MufLoginLang from '../muf-login-lang';
 import { Lang } from '../types';
 import {
   login, forgotPassword, resetPassword,
@@ -11,11 +12,12 @@ import {
 interface Props {
   lang: Lang;
   onLoginSuccess: () => void;
+  onToggleLang?: () => void;
 }
 
 type View = 'login' | 'forgotEmail' | 'forgotCode' | 'signup' | 'signupCode';
 
-export default function LoginScreen({ lang, onLoginSuccess }: Props) {
+export default function LoginScreen({ lang, onLoginSuccess, onToggleLang }: Props) {
   const L = (en: string, urOrVars?: string | Record<string, string | number | null>) => mufL(lang, en, urOrVars);
 
   const [view, setView] = useState<View>('login');
@@ -189,6 +191,7 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
 
   return (
     <div className={`min-h-screen bg-[#faf9f6] dark:bg-[#070b13] flex flex-col justify-center items-center px-4 transition-colors ${isRtl ? 'rtl' : 'ltr'}`}>
+      {onToggleLang && <MufLoginLang lang={lang} onToggle={onToggleLang} />}
       <div className="bg-[#fcfbf9] dark:bg-[#0f172a] border border-[#e2dfdb] dark:border-slate-800 p-6 md:p-8 rounded-2xl w-full max-w-md my-8 shadow-2xl flex flex-col transition-all pulse-border-hover">
         {view === 'login' && (
           <>
@@ -196,13 +199,13 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
               <img
                 src="/logo.png"
                 alt="Usman Flock Farm"
-                className="w-20 h-20 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800 shadow-md shrink-0 animate-bounce-soft"
+                className="muf-login-logo"
               />
             </div>
-            <h2 className="font-sans text-center text-slate-800 dark:text-farm-400 text-2xl font-extrabold tracking-tight mb-1">
+            <h2 className="muf-login-title">
               {L('Usman Flock Farm')}
             </h2>
-            <p className="text-center text-slate-500 dark:text-slate-400 text-xs mb-8 uppercase tracking-widest font-semibold">
+            <p className="muf-login-sub">
               {L('Secure Sign-In Interface')}
             </p>
           </>
@@ -221,7 +224,7 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
               {err && <AlertBox type="err" text={err} />}
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">
+              <label className="muf-label">
                 {L('Username or email')}
               </label>
               <input
@@ -231,8 +234,8 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
                 autoComplete="username"
                 value={loginId}
                 onChange={(e) => setLoginId(e.target.value)}
-                placeholder="admin"
-                className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
+                placeholder={L('admin')}
+                className="muf-field muf-field-lg"
                 disabled={busy}
               />
             </div>
@@ -376,7 +379,7 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
                 <div className="grid grid-cols-2 gap-3">
                   <Field label={L('Username')}>
                     <input type="text" autoFocus value={suUsername} onChange={(e) => setSuUsername(e.target.value)}
-                      placeholder="admin" className={inputCls} disabled={busy} />
+                      placeholder={L('admin')} className={inputCls} disabled={busy} />
                   </Field>
                   <Field label={L('Display name')}>
                     <input type="text" value={suName} onChange={(e) => setSuName(e.target.value)}

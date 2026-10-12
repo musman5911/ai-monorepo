@@ -128,7 +128,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
       setEditingId(null);
       fetchData();
     } catch (error) {
-      notify('Failed to save expense', 'error');
+      notify(L('Failed to save expense'), 'error');
     }
   };
 
@@ -149,19 +149,19 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
 
   const handleDelete = async (id: string) => {
     const ok = await confirmAction({
-      title: 'Delete Expense',
-      message: 'Are you sure you want to delete this expense?',
-      confirmLabel: 'Delete',
+      title: L('Delete Expense'),
+      message: L('Are you sure you want to delete this expense?'),
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
     if (!ok) return;
     try {
       await api.deleteExpense(id);
       setExpenses(prev => prev.filter(exp => exp._id !== id));
-      notify('Expense deleted successfully.', 'success');
+      notify(L('Expense deleted successfully.'), 'success');
       void fetchData();
     } catch (error) {
-      notify('Failed to delete expense', 'error');
+      notify(L('Failed to delete expense'), 'error');
     }
   };
 
@@ -251,7 +251,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                   required
                   value={formData.date}
                   onChange={e => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 />
               </div>
               <div className="space-y-1">
@@ -260,14 +260,14 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                   required
                   value={formData.type}
                   onChange={e => setFormData({ ...formData, type: e.target.value as ExpenseType })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 >
-                  <option value="feed">Feed</option>
-                  <option value="medicine">Medicine</option>
-                  <option value="equipment">Equipment</option>
-                  <option value="labor">Labor</option>
-                  <option value="purchasing">Purchasing</option>
-                  <option value="misc">Misc</option>
+                  <option value="feed">{L('Feed')}</option>
+                  <option value="medicine">{L('Medicine')}</option>
+                  <option value="equipment">{L('Equipment')}</option>
+                  <option value="labor">{L('Labor')}</option>
+                  <option value="purchasing">{L('Purchasing')}</option>
+                  <option value="misc">{L('Misc')}</option>
                 </select>
               </div>
               <div className="space-y-1">
@@ -278,7 +278,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                   min="0"
                   value={formData.amount}
                   onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                   placeholder="0.00"
                 />
               </div>
@@ -291,7 +291,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                     step="any"
                     value={formData.feedKg}
                     onChange={e => setFormData({ ...formData, feedKg: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                    className="muf-field"
                     placeholder="e.g. 350"
                   />
                 </div>
@@ -301,7 +301,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                 <select
                   value={formData.supplierId}
                   onChange={e => setFormData({ ...formData, supplierId: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 >
                   <option value="">{L('Cash / no supplier')}</option>
                   {suppliers.map(sup => <option key={sup._id} value={sup._id}>{sup.name}</option>)}
@@ -312,26 +312,26 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                 <select
                   value={formData.cowId}
                   onChange={e => setFormData({ ...formData, cowId: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 >
-                  <option value="">Farm-wide</option>
+                  <option value="">{L('Farm-wide')}</option>
                   {cows.map(cow => (
                     <option key={cow._id} value={cow._id}>{cow.name}</option>
                   ))}
                 </select>
               </div>
               <div className="space-y-1 lg:col-span-2">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Note</label>
+                <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Note')}</label>
                 <input
                   type="text"
                   value={formData.note}
                   onChange={e => setFormData({ ...formData, note: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
-                  placeholder="Additional details..."
+                  className="muf-field"
+                  placeholder={L('Additional details...')}
                 />
               </div>
               <div className="space-y-1 lg:col-span-3">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Receipt photo (optional)</label>
+                <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Receipt photo (optional)')}</label>
                 <div className="flex items-center gap-3">
                   {receiptBase64 ? (
                     <>
@@ -351,10 +351,10 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                           if (!file) return;
                           try {
                             const b64 = await compressToAvatar(file, 900, 0.72);
-                            if (b64.length > 400000) { notify('Photo is too large even after compression', 'error'); return; }
+                            if (b64.length > 400000) { notify(L('Photo is too large even after compression'), 'error'); return; }
                             setReceiptBase64(b64);
                           } catch {
-                            notify('Could not read that image', 'error');
+                            notify(L('Could not read that image'), 'error');
                           }
                         }}
                       />
@@ -381,7 +381,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                     }}
                     className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
                   >
-                    Cancel
+                    {L('Cancel')}
                   </button>
                 )}
                 <button
@@ -404,7 +404,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
               value={dateFrom}
               onChange={e => setDateFrom(e.target.value)}
               className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100"
-              placeholder="From"
+              placeholder={L('From')}
             />
             <span className="text-slate-400">to</span>
             <input
@@ -422,13 +422,13 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
               onChange={e => setTypeFilter(e.target.value)}
               className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100"
             >
-                <option value="">All Types</option>
-                <option value="feed">Feed</option>
-                <option value="medicine">Medicine</option>
-                <option value="equipment">Equipment</option>
-                <option value="labor">Labor</option>
-                <option value="purchasing">Purchasing</option>
-                <option value="misc">Misc</option>
+                <option value="">{L('All Types')}</option>
+                <option value="feed">{L('Feed')}</option>
+                <option value="medicine">{L('Medicine')}</option>
+                <option value="equipment">{L('Equipment')}</option>
+                <option value="labor">{L('Labor')}</option>
+                <option value="purchasing">{L('Purchasing')}</option>
+                <option value="misc">{L('Misc')}</option>
             </select>
           </div>
           {(dateFrom || dateTo || typeFilter) && (
@@ -457,22 +457,22 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
           <table className="w-full text-left">
             <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               <tr>
-                <th className="px-6 py-4 font-medium">Date</th>
-                <th className="px-6 py-4 font-medium">Type</th>
-                <th className="px-6 py-4 font-medium">Amount</th>
-                <th className="px-6 py-4 font-medium">Cow</th>
-                <th className="px-6 py-4 font-medium">Note</th>
-                {isAdmin && <th className="px-6 py-4 font-medium text-right">Actions</th>}
+                <th className="px-6 py-4 font-medium">{L('Date')}</th>
+                <th className="px-6 py-4 font-medium">{L('Type')}</th>
+                <th className="px-6 py-4 font-medium">{L('Amount')}</th>
+                <th className="px-6 py-4 font-medium">{L('Cow')}</th>
+                <th className="px-6 py-4 font-medium">{L('Note')}</th>
+                {isAdmin && <th className="px-6 py-4 font-medium text-right">{L('Actions')}</th>}
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {loading ? (
                 <tr>
-                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-slate-400">Loading expenses...</td>
+                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-slate-400">{L('Loading expenses...')}</td>
                 </tr>
               ) : expenses.length === 0 ? (
                 <tr>
-                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-slate-400">No expenses found</td>
+                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-slate-400">{L('No expenses found')}</td>
                 </tr>
               ) : expenses.map(expense => (
                 <tr key={expense._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
@@ -535,9 +535,9 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
       {viewMode === 'grid' && (
         <div className="muf-entity-grid">
           {loading ? (
-            <p className="col-span-full text-center text-slate-400 py-8">Loading expenses...</p>
+            <p className="col-span-full text-center text-slate-400 py-8">{L('Loading expenses...')}</p>
           ) : expenses.length === 0 ? (
-            <p className="col-span-full text-center text-slate-400 py-8">No expenses found</p>
+            <p className="col-span-full text-center text-slate-400 py-8">{L('No expenses found')}</p>
           ) : expenses.map(expense => {
             const cow = expense.cowId ? cows.find(c => c._id === expense.cowId) : null;
             return (
@@ -607,7 +607,7 @@ function ZakatCalculator({ expenses }: { expenses: Expense[] }) {
   const inputClass = 'w-full border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500';
   return (
     <>
-      <button onClick={() => setOpen(true)} className="w-full flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0d1a11] hover:shadow-md transition-shadow text-left">
+      <button onClick={() => setOpen(true)} className="muf-card-link w-full flex items-center gap-3 p-4 text-left">
         <span className="shrink-0 w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">🕌</span>
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{L('Zakat calculator (yearly)')}</p>

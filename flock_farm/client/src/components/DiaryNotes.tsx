@@ -6,6 +6,7 @@ import { notify } from '../muf-confirm';
 import { DiaryEntry, Lang } from '../types';
 import { t } from '../i18n';
 import { todayStr } from '../utils/calculations';
+import MufDiaryMedia from '../muf-diary-media';
 
 interface DiaryNotesProps {
   lang: Lang;
@@ -75,7 +76,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
         <BookOpen className="w-4 h-4" /> {t(lang, 'diary')}
       </h3>
       <div>
-        <label className="block text-3xs font-bold text-slate-400 uppercase mb-1">Date</label>
+        <label className="block text-3xs font-bold text-slate-400 uppercase mb-1">{L('Date')}</label>
         <input
           type="date"
           value={date}
@@ -87,7 +88,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
         value={note}
         onChange={(e) => setNote(e.target.value)}
         disabled={readOnly}
-        placeholder="Weather, issues, observations…"
+        placeholder={L('Weather, issues, observations…')}
         className="w-full text-xs px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl h-24 resize-none"
       />
       {/* ── Voice note (Urdu-friendly) — speak instead of typing ── */}
@@ -98,7 +99,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
             <button
               type="button"
               onClick={handleRecordToggle}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-3xs font-bold transition ${recording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-3xs font-bold transition ${recording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-farm-600 hover:bg-farm-700'}`}
             >
               {recording ? <Square className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
               {recording ? L('Stop & save') : (voiceBase64 ? L('Re-record') : L('Record'))}
@@ -113,7 +114,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
                 type="button"
                 onClick={() => { setVoiceBase64(undefined); onSave({ date, note: note.trim(), voiceBase64: undefined }); }}
                 className="p-1.5 rounded text-slate-400 hover:text-red-500 transition"
-                aria-label="Delete voice note"
+                aria-label={L('Delete voice note')}
               ><Trash2 className="w-4 h-4" /></button>
             )}
           </div>
@@ -131,7 +132,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
       )}
       {recent.length > 0 && (
         <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <p className="text-3xs font-bold text-slate-400 uppercase">Recent</p>
+          <p className="text-3xs font-bold text-slate-400 uppercase">{L('Recent')}</p>
           {recent.map((e) => (
             <button
               key={e.date}
@@ -145,6 +146,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
           ))}
         </div>
       )}
+      <MufDiaryMedia date={date} canEdit={!readOnly} />
     </div>
   );
 }

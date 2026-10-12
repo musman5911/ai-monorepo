@@ -1,4 +1,6 @@
 import { SuperAdminTab } from './components/SuperAdminTab';
+import MufDiaryMedia from './muf-diary-media';
+import MufLoginLang from './muf-login-lang';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from './muf-motion';
 import * as api from './api';
@@ -362,7 +364,7 @@ function App() {
     expense: 0,
     netProfit: 0,
     transactions: [],
-    title: "Operational Ledger Flow"
+    title: L('Operational Ledger Flow')
   });
 
   const openPopup = (type, data) => {
@@ -748,11 +750,11 @@ function App() {
 
   const handleLogout = async () => {
     const ok = await confirm({
-      title: 'Sign Out',
-      message: 'Are you sure you want to sign out of Usman Agri Farm?',
+      title: L('Sign Out'),
+      message: L('Are you sure you want to sign out of Usman Agri Farm?'),
       tone: 'warning',
-      confirmLabel: 'Sign Out',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Sign Out'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     performLogout();
@@ -993,11 +995,11 @@ function App() {
 
   const handleDeleteCrop = async (id) => {
     const ok = await confirm({
-      title: 'Delete Crop Record',
-      message: 'Delete this crop record? Linked ledger entries will remain. This cannot be undone.',
+      title: L('Delete Crop Record'),
+      message: L('Delete this crop record? Linked ledger entries will remain. This cannot be undone.'),
       tone: 'danger',
-      confirmLabel: 'Delete',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Delete'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -1312,11 +1314,11 @@ function App() {
 
   const handleDeleteFinance = async (id) => {
     const ok = await confirm({
-      title: 'Remove Transaction',
-      message: 'Remove this transaction log? This will modify your gross totals.',
+      title: L('Remove Transaction'),
+      message: L('Remove this transaction log? This will modify your gross totals.'),
       tone: 'danger',
-      confirmLabel: 'Remove',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Remove'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return false;
     setActionId(id);
@@ -1393,11 +1395,11 @@ function App() {
 
   const handlePayLiability = async (id) => {
     const ok = await confirm({
-      title: 'Settle Debt / Liability',
-      message: 'Mark this debt as Paid? This will automatically log a corresponding cash outflow expense in your Ledger.',
+      title: L('Settle Debt / Liability'),
+      message: L('Mark this debt as Paid? This will automatically log a corresponding cash outflow expense in your Ledger.'),
       tone: 'warning',
-      confirmLabel: 'Pay Off Debt',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Pay Off Debt'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -1414,11 +1416,11 @@ function App() {
 
   const handleDeleteLiability = async (id) => {
     const ok = await confirm({
-      title: 'Remove Liability Log',
-      message: 'Are you sure you want to delete this liability record? This does not log any cash outflow.',
+      title: L('Remove Liability Log'),
+      message: L('Are you sure you want to delete this liability record? This does not log any cash outflow.'),
       tone: 'danger',
-      confirmLabel: 'Delete Record',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Delete Record'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -1476,11 +1478,11 @@ function App() {
 
   const handleDeleteInventory = async (id) => {
     const ok = await confirm({
-      title: 'Remove Inventory Item',
-      message: 'Are you sure you want to permanently delete this stock item from inventory?',
+      title: L('Remove Inventory Item'),
+      message: L('Are you sure you want to permanently delete this stock item from inventory?'),
       tone: 'danger',
-      confirmLabel: 'Delete Item',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Delete Item'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -1578,11 +1580,11 @@ function App() {
 
   const handleDeleteTask = async (id) => {
     const ok = await confirm({
-      title: 'Delete Care Task',
-      message: 'Delete this duty roster task? This cannot be undone.',
+      title: L('Delete Care Task'),
+      message: L('Delete this duty roster task? This cannot be undone.'),
       tone: 'danger',
-      confirmLabel: 'Delete',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Delete'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -1797,14 +1799,14 @@ function App() {
       progressLabel: 'Crop Progress',
       actions: (
         <>
-          <button onClick={() => setSelectedCrop(c)} className="muf-detail-btn"><Eye size={15}/> Details</button>
+          <button onClick={() => setSelectedCrop(c)} className="muf-detail-btn"><Eye size={15}/> {L('Details')}</button>
           {userRole === 'admin' && (
             <>
-              <button onClick={() => handleEditCrop(c)} className="muf-record-btn"><Edit3 size={15}/> Edit</button>
+              <button onClick={() => handleEditCrop(c)} className="muf-record-btn"><Edit3 size={15}/> {L('Edit')}</button>
               {c.status === 'Completed' && (
-                <button onClick={() => handlePlanNext(c)} className="muf-record-btn" title="Plan next season"><CalendarPlus size={15}/> Next</button>
+                <button onClick={() => handlePlanNext(c)} className="muf-record-btn" title={L('Plan next season')}><CalendarPlus size={15}/> {L('Next')}</button>
               )}
-              <button onClick={() => handleDeleteCrop(c._id)} className="muf-mini-icon danger" title="Delete" aria-label="Delete crop"><Trash2 size={15}/></button>
+              <button onClick={() => handleDeleteCrop(c._id)} className="muf-mini-icon danger" title={L('Delete')} aria-label={L('Delete crop')}><Trash2 size={15}/></button>
             </>
           )}
         </>
@@ -2027,6 +2029,7 @@ function App() {
   // --- RENDER AUTHENTICATION & LOGIN ---
   if (!token) return (
     <div className="min-h-screen bg-[#faf9f6] dark:bg-[#070b13] flex flex-col justify-center items-center px-4 transition-colors">
+      <MufLoginLang lang={lang} onToggle={toggleLang} />
       {alertMsg.text && (
         <div className={`mb-6 p-4 rounded-xl shadow-lg border text-sm max-w-sm w-full animate-fade-in ${
           alertMsg.isError ? 'bg-red-50 border-red-300 text-red-800 dark:bg-red-950/80 dark:border-red-500 dark:text-red-200' : 'bg-farm-50 border-farm-300 text-farm-800 dark:bg-farm-950/80 dark:border-farm-500 dark:text-farm-200'
@@ -2044,25 +2047,25 @@ function App() {
           <div className="flex justify-center mb-4">
             <img 
               src="/logo.png" 
-              className="w-20 h-20 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800 shadow-md shrink-0 animate-bounce-soft" 
+              className="muf-login-logo" 
               onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }}
             />
           </div>
-          <h2 className="font-sans text-center text-slate-800 dark:text-farm-400 text-2xl font-extrabold tracking-tight mb-1">
-            Usman Agri Farm
+          <h2 className="muf-login-title">
+            {L('Usman Agri Farm')}
           </h2>
-          <p className="text-center text-slate-500 dark:text-slate-400 text-xs mb-8 uppercase tracking-widest font-semibold">
-            Secure Sign-In Interface
+          <p className="muf-login-sub">
+            {L('Sign in to continue')}
           </p>
           
           <form onSubmit={handleAuthSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Username or Email</label>
+              <label className="muf-label">{L('Username or Email')}</label>
               <input 
                 type="text"
                 required
-                className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
-                placeholder="username" 
+                className="muf-field muf-field-lg"
+                placeholder={L('username or email')} 
                 value={authForm.username}
                 onChange={e => setAuthForm({...authForm, username: e.target.value})} 
               />
@@ -2070,7 +2073,7 @@ function App() {
             
             <div>
               <div className="flex justify-between items-center mb-1">
-                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Access Password</label>
+                <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{L('Password')}</label>
                 <button 
                   type="button" 
                   onClick={() => setAuthMode('forgot_send')}
@@ -2091,6 +2094,7 @@ function App() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
                   className="absolute inset-y-0 right-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
@@ -2104,7 +2108,7 @@ function App() {
               disabled={loading}
             >
               {loading ? <Loader size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
-              Access Console
+              Sign in
             </button>
           </form>
         </div>
@@ -2116,36 +2120,36 @@ function App() {
           <div className="flex justify-center mb-4">
             <img 
               src="/logo.png" 
-              className="w-20 h-20 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800 shadow-md shrink-0 animate-bounce-soft" 
+              className="muf-login-logo" 
               onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }}
             />
           </div>
-          <h2 className="font-sans text-center text-slate-800 dark:text-farm-400 text-2xl font-extrabold tracking-tight mb-1">
+          <h2 className="muf-login-title">
             Usman Agri Farm — First-Time Setup
           </h2>
-          <p className="text-center text-slate-500 dark:text-slate-400 text-xs mb-8 uppercase tracking-widest font-semibold">
-            First-time Administrative Setup
+          <p className="muf-login-sub">
+            {L('First-time Administrative Setup')}
           </p>
           
           <form onSubmit={handleAuthSubmit} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Admin Username</label>
+              <label className="muf-label">{L('Admin Username')}</label>
               <input 
                 type="text"
                 required
-                className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
-                placeholder="e.g. admin" 
+                className="muf-field muf-field-lg"
+                placeholder={L('e.g. admin')} 
                 value={authForm.username}
                 onChange={e => setAuthForm({...authForm, username: e.target.value})} 
               />
             </div>
             
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Admin Email</label>
+              <label className="muf-label">{L('Admin Email')}</label>
               <input 
                 type="email"
                 required
-                className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
+                className="muf-field muf-field-lg"
                 placeholder="admin@farm.com" 
                 value={authForm.email}
                 onChange={e => setAuthForm({...authForm, email: e.target.value})} 
@@ -2153,13 +2157,13 @@ function App() {
             </div>
             
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Setup Password</label>
+              <label className="muf-label">{L('Setup Password')}</label>
               <div className="relative">
                 <input 
                   type={showPassword ? "text" : "password"} 
                   required
                   className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg pl-4 pr-11 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
-                  placeholder="Min 6 characters" 
+                  placeholder={L('Min 6 characters')} 
                   value={authForm.password}
                   onChange={e => setAuthForm({...authForm, password: e.target.value})} 
                 />
@@ -2174,13 +2178,13 @@ function App() {
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Confirm Password</label>
+              <label className="muf-label">{L('Confirm Password')}</label>
               <div className="relative">
                 <input 
                   type={showConfirmPassword ? "text" : "password"} 
                   required
                   className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg pl-4 pr-11 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
-                  placeholder="Confirm your password" 
+                  placeholder={L('Confirm your password')} 
                   value={authForm.confirmPassword || ''}
                   onChange={e => setAuthForm({...authForm, confirmPassword: e.target.value})} 
                 />
@@ -2212,24 +2216,24 @@ function App() {
           <div className="flex justify-center mb-4">
             <img 
               src="/logo.png" 
-              className="w-20 h-20 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800 shadow-md shrink-0 animate-bounce-soft" 
+              className="muf-login-logo" 
               onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }}
             />
           </div>
-          <h2 className="font-sans text-center text-slate-800 dark:text-farm-400 text-2xl font-extrabold tracking-tight mb-1">
-            Admin Password Reset
+          <h2 className="muf-login-title">
+            {L('Admin Password Reset')}
           </h2>
-          <p className="text-center text-slate-500 dark:text-slate-400 text-xs mb-8 uppercase tracking-widest font-semibold">
-            Send Verification Code
+          <p className="muf-login-sub">
+            {L('Send Verification Code')}
           </p>
           
           <form onSubmit={handleForgotSendCode} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Admin Email Address</label>
+              <label className="muf-label">{L('Admin Email Address')}</label>
               <input 
                 type="email"
                 required
-                className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
+                className="muf-field muf-field-lg"
                 placeholder="admin@farm.com" 
                 value={forgotEmail}
                 onChange={e => setForgotEmail(e.target.value)} 
@@ -2250,7 +2254,7 @@ function App() {
               onClick={() => setAuthMode('login')}
               className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg transition-all text-xs uppercase tracking-wider mt-2 cursor-pointer"
             >
-              Back to Login
+              {L('Back to Login')}
             </button>
           </form>
         </div>
@@ -2262,20 +2266,20 @@ function App() {
           <div className="flex justify-center mb-4">
             <img 
               src="/logo.png" 
-              className="w-20 h-20 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800 shadow-md shrink-0 animate-bounce-soft" 
+              className="muf-login-logo" 
               onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }}
             />
           </div>
-          <h2 className="font-sans text-center text-slate-800 dark:text-farm-400 text-2xl font-extrabold tracking-tight mb-1">
-            Authorize Password Reset
+          <h2 className="muf-login-title">
+            {L('Authorize Password Reset')}
           </h2>
-          <p className="text-center text-slate-500 dark:text-slate-400 text-xs mb-8 uppercase tracking-widest font-semibold">
-            Input Reset Code
+          <p className="muf-login-sub">
+            {L('Input Reset Code')}
           </p>
           
           <form onSubmit={handleForgotResetPw} className="space-y-4">
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Email Address</label>
+              <label className="muf-label">{L('Email Address')}</label>
               <input 
                 type="email"
                 required
@@ -2286,7 +2290,7 @@ function App() {
             </div>
             
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">6-Digit Verification Code</label>
+              <label className="muf-label">6-Digit Verification Code</label>
               <input 
                 type="text"
                 required
@@ -2299,12 +2303,12 @@ function App() {
             </div>
             
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">New Access Password</label>
+              <label className="muf-label">{L('New password')}</label>
               <input 
                 type="password"
                 required
-                className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
-                placeholder="Min 6 characters" 
+                className="muf-field muf-field-lg"
+                placeholder={L('Min 6 characters')} 
                 value={resetNewPw}
                 onChange={e => setResetNewPw(e.target.value)} 
               />
@@ -2324,7 +2328,7 @@ function App() {
               onClick={() => setAuthMode('forgot_send')}
               className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold rounded-lg transition-all text-xs uppercase tracking-wider mt-2 cursor-pointer"
             >
-              Request New Code
+              {L('Request New Code')}
             </button>
           </form>
         </div>
@@ -2360,13 +2364,13 @@ function App() {
             <div className="muf-header-brand cursor-pointer hover:opacity-90 transition-opacity" onClick={() => navigateTo('dashboard', 'dashboard')}>
               <img src="/logo.png" className="muf-brand-logo" onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }} alt="Usman Agri Farm" />
               <div>
-                <h1>Usman Agri Farm</h1>
+                <h1>{L('Usman Agri Farm')}</h1>
                 <p>Smart Farming • Better Harvest</p>
               </div>
             </div>
             <div className="muf-header-actions">
               {offlineQueueSize > 0 && (
-                <button onClick={syncOfflineQueue} className="muf-icon-button muf-queue" title="Sync offline changes" aria-label="Sync offline changes"><Clock size={18}/><span>{offlineQueueSize}</span></button>
+                <button onClick={syncOfflineQueue} className="muf-icon-button muf-queue" title={L('Sync offline changes')} aria-label={L('Sync offline changes')}><Clock size={18}/><span>{offlineQueueSize}</span></button>
               )}
               <HeaderSearch
                 lang={lang}
@@ -2387,11 +2391,11 @@ function App() {
                 className="muf-icon-button"
                 onClick={() => { loadDiaryDate(mufToday()); setDiaryOpen(true); }}
                 title={L('Diary')}
-                aria-label="Diary"
+                aria-label={L('Diary')}
               >
                 <BookOpen size={19}/>
               </button>
-              <button className="muf-icon-button muf-notif-wrap" title="Notifications" aria-label="Notifications" onClick={() => setModal('notifications')}>
+              <button className="muf-icon-button muf-notif-wrap" title={L('Notifications')} aria-label={L('Notifications')} onClick={() => setModal('notifications')}>
                 <Bell size={19}/>
                 {realNotifications.length > 0 && (
                   <span className="muf-notif-badge">{realNotifications.length}</span>
@@ -2401,8 +2405,8 @@ function App() {
               <button
                 className="muf-icon-button"
                 onClick={toggleLang}
-                title={L('Switch to English')}
-                aria-label="Switch language"
+                title={lang === 'en' ? L('Switch to Urdu') : lang === 'ur' ? L('Switch to Roman Urdu') : L('Switch to English')}
+                aria-label={L('Switch language')}
               >
                 <Languages size={19}/>
               </button>
@@ -2410,13 +2414,13 @@ function App() {
               <button 
                 className="muf-icon-button" 
                 onClick={() => setIsDark(!isDark)} 
-                title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'} 
-                aria-label="Toggle theme"
+                title={isDark ? L('Switch to Light Mode') : L('Switch to Dark Mode')} 
+                aria-label={L('Toggle theme')}
               >
                 {isDark ? <Sun size={19}/> : <Moon size={19}/>} 
               </button>
 
-              <button className="muf-profile" onClick={() => setAdminMenuOpen(true)} title="Open settings" aria-label="Open settings">
+              <button className="muf-profile" onClick={() => setAdminMenuOpen(true)} title={L('Open settings')} aria-label={L('Open settings')}>
                 <span className="muf-avatar">
                   {currentUserAvatar ? (
                     <img src={currentUserAvatar} className="object-cover rounded-full" alt={username} />
@@ -2427,11 +2431,11 @@ function App() {
                 <span><strong>{L('Welcome')} - {username}</strong><small>{userRole === 'admin' ? L('Administrator') : L('Worker')}</small></span>
                 <ChevronDown size={17}/>
               </button>
-              <button className="muf-icon-button muf-logout" onClick={handleLogout} title="Logout" aria-label="Logout"><LogOut size={18}/></button>
+              <button className="muf-icon-button muf-logout" onClick={handleLogout} title={L('Logout')} aria-label={L('Logout')}><LogOut size={18}/></button>
             </div>
           </header>
 
-          <nav className="muf-top-nav" aria-label="Primary navigation" ref={navRef}>
+          <nav className="muf-top-nav" aria-label={L('Primary navigation')} ref={navRef}>
             <div className="muf-top-nav-scroll">
               {[
                 { key: 'dashboard', tab: 'dashboard', label: L('Dashboard'), Icon: Home },
@@ -2453,7 +2457,7 @@ function App() {
                 <div className={`muf-nav-item relative ${key === 'finance' ? 'muf-finance-nav-item' : ''}`} key={key}>
                   <div className="flex items-center">
                     <button type="button" className={`muf-nav-link ${activeNav === key ? 'active' : ''}`} onClick={() => { navigateTo(tab, key); setFinanceMenuOpen(false); }}><Icon size={15}/><span>{label}</span></button>
-                    {key === 'finance' && <button type="button" aria-label="Open Finance sections" aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
+                    {key === 'finance' && <button type="button" aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
                   </div>
                   {key === 'finance' && financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-52 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{id:'ledger',label:'Ledger'},{id:'suppliers',label:'Supplier Khata'},{id:'zakat',label:'Zakat & Ushr'},{id:'loan',label:'Loan & Credit'},{id:'inventory',label:'Input Inventory'}].filter(item => item.id !== 'inventory' || userRole === 'admin').map(item => <button key={item.id} type="button" onClick={() => { navigateTo('finance', 'finance'); setAgriFinanceSubTab(item.id); setFinanceMenuOpen(false); }} className={`block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800 ${agriFinanceSubTab === item.id ? 'font-bold text-emerald-700 dark:text-emerald-400' : ''}`}>{L(item.label)}</button>)}</div>}
                 </div>
@@ -2465,8 +2469,8 @@ function App() {
             <main id="main-content" className="muf-main-content" tabIndex={-1}>
               {isDbMock && (
                 <div className="bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-900/30 text-amber-800 dark:text-amber-200 px-4 py-3 rounded-xl flex flex-wrap items-center justify-between gap-3 text-xs font-medium shadow-sm animate-fade-in">
-                  <div className="flex items-center gap-2 min-w-0"><AlertTriangle size={16} className="text-amber-600 dark:text-amber-400 shrink-0 animate-pulse"/><span><strong>Warning: Unreachable MongoDB.</strong> The system is using temporary in-memory storage.</span></div>
-                  <span className="text-[10px] bg-amber-200 dark:bg-amber-900/60 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">Memory Mode</span>
+                  <div className="flex items-center gap-2 min-w-0"><AlertTriangle size={16} className="text-amber-600 dark:text-amber-400 shrink-0 animate-pulse"/><span><strong>{L('Cannot reach the online database.')}</strong> {L('Your entries are kept on this device for now.')}</span></div>
+                  <span className="text-[10px] bg-amber-200 dark:bg-amber-900/60 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider">{L('Temporary mode')}</span>
                 </div>
               )}
 
@@ -2514,12 +2518,12 @@ function App() {
                       `🌱 Growing now: ${crops.filter(c => c.status === 'Growing').length}\n` +
                       `💰 Net profit: Rs ${Number(dbNetProfit || 0).toLocaleString()}`
                     )}`, '_blank', 'noopener,noreferrer')}
-                    title="Share today's summary on WhatsApp"
+                    title={L('Share today\'s summary on WhatsApp')}
                     className="flex items-center gap-1.5 rounded-lg border border-farm-300 dark:border-farm-700 px-3 py-2 text-xs font-bold text-farm-700 dark:text-farm-400 hover:bg-farm-50 dark:hover:bg-farm-900/30 transition cursor-pointer"
                   >
                     <Share2 size={14} /> Share
                   </button>
-                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Crop Filter:</span>
+                  <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{L('Crop Filter:')}</span>
                   <select 
                     className={`border rounded-lg text-xs px-3 py-2 outline-none focus:border-farm-500 font-bold cursor-pointer ${
                       isDark ? 'bg-[#0f172a] border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
@@ -2527,7 +2531,7 @@ function App() {
                     value={dashboardCropFilter}
                     onChange={e => setDashboardCropFilter(e.target.value)}
                   >
-                    <option value="all">All Crops (Blended)</option>
+                    <option value="all">{L('All Crops (Blended)')}</option>
                     {crops.map(c => (
                       <option key={c._id} value={c._id}>{c.name} ({c.season} {c.crop_year || 'N/A'})</option>
                     ))}
@@ -2638,13 +2642,13 @@ function App() {
                 <button type="button" onClick={() => setShowPlantedSectorsModal(true)} className="muf-panel text-left hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="muf-panel-heading">
                     <div>
-                      <h3><Sprout size={21} /> Planted Sectors</h3>
-                      <p>Latest active crop cycles in the soil.</p>
+                      <h3><Sprout size={21} /> {L('Planted Sectors')}</h3>
+                      <p>{L('Latest active crop cycles in the soil.')}</p>
                     </div>
                     <ArrowUpRight size={17} className="text-slate-400"/>
                   </div>
                   <div className="px-4 pb-4 pt-1 space-y-2">
-                    {dashCrops.length === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">No active crop cycles.</p> : dashCrops.slice(0, 3).map(c => <div key={c._id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{c.name}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{c.field || c.status || 'Active'}</span></div>)}
+                    {dashCrops.length === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">{L('No active crop cycles.')}</p> : dashCrops.slice(0, 3).map(c => <div key={c._id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{c.name}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{c.field || c.status || 'Active'}</span></div>)}
                     <div className="flex items-center justify-between pt-1"><span className="text-[10px] text-slate-500">{dashCrops.length} active crop cycles</span><span className="text-[10px] font-bold text-farm-600 dark:text-farm-400 uppercase tracking-wider">{L('View All')} →</span></div>
                   </div>
                 </button>
@@ -2653,13 +2657,13 @@ function App() {
                 <button type="button" onClick={() => setShowCareRosterModal(true)} className="muf-panel text-left hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="muf-panel-heading">
                     <div>
-                      <h3><HeartPulse size={21} /> Care & Operations Roster</h3>
-                      <p>Current pending care duty schedules.</p>
+                      <h3><HeartPulse size={21} /> {L('Care & Operations Roster')}</h3>
+                      <p>{L('Current pending care duty schedules.')}</p>
                     </div>
                     <ArrowUpRight size={17} className="text-slate-400"/>
                   </div>
                   <div className="px-4 pb-4 pt-1 space-y-2">
-                    {dashTasks.filter(t => t.status !== 'Completed').length === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">No pending care tasks.</p> : dashTasks.filter(t => t.status !== 'Completed').slice(0, 3).map(t => <div key={t._id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{t.title}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{t.priority || t.status || 'Pending'}</span></div>)}
+                    {dashTasks.filter(t => t.status !== 'Completed').length === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">{L('No pending care tasks.')}</p> : dashTasks.filter(t => t.status !== 'Completed').slice(0, 3).map(t => <div key={t._id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{t.title}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{t.priority || t.status || 'Pending'}</span></div>)}
                     <div className="flex items-center justify-between pt-1"><span className="text-[10px] text-slate-500">{dashTasks.filter(t => t.status !== 'Completed').length} pending tasks</span><span className="text-[10px] font-bold text-farm-600 dark:text-farm-400 uppercase tracking-wider">{L('Open Board')} →</span></div>
                   </div>
                 </button>
@@ -2672,13 +2676,13 @@ function App() {
                 <button type="button" onClick={() => setShowRecentActivitiesModal(true)} className="muf-panel text-left hover:shadow-lg transition-shadow cursor-pointer">
                   <div className="muf-panel-heading">
                     <div>
-                      <h3><Calendar size={21}/> Recent Activities</h3>
-                      <p>Historical log of crop care and financial balance entries.</p>
+                      <h3><Calendar size={21}/> {L('Recent Activities')}</h3>
+                      <p>{L('Historical log of crop care and financial balance entries.')}</p>
                     </div>
                     <ArrowUpRight size={17} className="text-slate-400"/>
                   </div>
                   <div className="px-4 pb-4 pt-1 space-y-2">
-                    {dashRecentActivities.length === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">No recent activities recorded.</p> : dashRecentActivities.slice(0, 4).map(a => <div key={a.id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{a.label}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{a.date || a.kind}</span></div>)}
+                    {dashRecentActivities.length === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">{L('No recent activities recorded.')}</p> : dashRecentActivities.slice(0, 4).map(a => <div key={a.id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{a.label}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{a.date || a.kind}</span></div>)}
                     <div className="flex items-center justify-between pt-1"><span className="text-[10px] text-slate-500">Showing up to 4 of {dashTasks.length + dashFinance.length}</span><span className="text-[10px] font-bold text-farm-600 dark:text-farm-400 uppercase tracking-wider">{L('View All')} →</span></div>
                   </div>
                 </button>
@@ -2687,8 +2691,8 @@ function App() {
                 <section className="muf-panel">
                   <div className="muf-panel-heading">
                     <div>
-                      <h3><CloudSun size={21}/> Live Weather & Farming Advice</h3>
-                      <p>Farm weather from the saved farm location (or Haripur default).</p>
+                      <h3><CloudSun size={21}/> {L('Live Weather & Farming Advice')}</h3>
+                      <p>{L('Farm weather from the saved farm location (or Haripur default).')}</p>
                     </div>
                   </div>
                   <div className="p-5 space-y-4">
@@ -2712,16 +2716,16 @@ function App() {
                     {(weather.humidity != null || weather.soilTemp != null || weather.wind != null || rainForecast24h > 0) && (
                       <div className="flex flex-wrap gap-2 text-[10px] font-bold">
                         {weather.soilTemp != null && (
-                          <span className="px-2 py-1 rounded-lg border border-[#e6e6de] dark:border-[#203528] bg-white/60 dark:bg-[#101625]/40 text-slate-600 dark:text-slate-300">Soil {weather.soilTemp}°C</span>
+                          <span className="muf-chip">Soil {weather.soilTemp}°C</span>
                         )}
                         {weather.humidity != null && (
-                          <span className="px-2 py-1 rounded-lg border border-[#e6e6de] dark:border-[#203528] bg-white/60 dark:bg-[#101625]/40 text-slate-600 dark:text-slate-300">Humidity {weather.humidity}%</span>
+                          <span className="muf-chip">Humidity {weather.humidity}%</span>
                         )}
                         {weather.wind != null && (
-                          <span className="px-2 py-1 rounded-lg border border-[#e6e6de] dark:border-[#203528] bg-white/60 dark:bg-[#101625]/40 text-slate-600 dark:text-slate-300">Wind {weather.wind} km/h</span>
+                          <span className="muf-chip">Wind {weather.wind} km/h</span>
                         )}
                         {rainForecast24h > 0 && (
-                          <span className="px-2 py-1 rounded-lg border border-[#e6e6de] dark:border-[#203528] bg-white/60 dark:bg-[#101625]/40 text-slate-600 dark:text-slate-300">Rain ~{rainForecast24h.toFixed(1)}mm/24h</span>
+                          <span className="muf-chip">Rain ~{rainForecast24h.toFixed(1)}mm/24h</span>
                         )}
                       </div>
                     )}
@@ -2747,7 +2751,7 @@ function App() {
               <DetailModal
                 open={showPlantedSectorsModal}
                 onClose={() => setShowPlantedSectorsModal(false)}
-                title="Planted Sectors"
+                title={L('Planted Sectors')}
                 subtitle={`${dashCrops.length} active crop cycles`}
                 icon={<Sprout size={20} />}
                 iconBg="bg-farm-100 text-farm-600 dark:bg-farm-900/30 dark:text-farm-400"
@@ -2755,7 +2759,7 @@ function App() {
               >
                 <div className="space-y-3">
                   {dashCrops.length === 0 ? (
-                    <p className="text-slate-500 text-xs text-center py-8">No crops currently registered.</p>
+                    <p className="text-slate-500 text-xs text-center py-8">{L('No crops currently registered.')}</p>
                   ) : dashCrops.map(c => (
                     <div key={c._id} className={`flex justify-between items-center p-3 rounded-xl border ${
                       isDark ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50 border-slate-200'
@@ -2777,7 +2781,7 @@ function App() {
               <DetailModal
                 open={showCareRosterModal}
                 onClose={() => setShowCareRosterModal(false)}
-                title="Care & Operations Roster"
+                title={L('Care & Operations Roster')}
                 subtitle={`${dashTasks.filter(t => t.status !== 'Completed').length} pending tasks`}
                 icon={<HeartPulse size={20} />}
                 iconBg="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
@@ -2785,7 +2789,7 @@ function App() {
               >
                 <div className="space-y-3">
                   {dashTasks.filter(t => t.status !== 'Completed').length === 0 ? (
-                    <p className="text-slate-500 text-xs text-center py-8">Care roster is clean.</p>
+                    <p className="text-slate-500 text-xs text-center py-8">{L('Care roster is clean.')}</p>
                   ) : dashTasks.filter(t => t.status !== 'Completed').map(t => (
                     <div key={t._id} className={`flex justify-between items-center p-3 rounded-xl border ${
                       isDark ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50 border-slate-200'
@@ -2810,7 +2814,7 @@ function App() {
               <DetailModal
                 open={showRecentActivitiesModal}
                 onClose={() => setShowRecentActivitiesModal(false)}
-                title="Recent Activities"
+                title={L('Recent Activities')}
                 subtitle={`${dashTasks.length + dashFinance.length} total activities`}
                 icon={<Calendar size={20} />}
                 iconBg="bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
@@ -2818,7 +2822,7 @@ function App() {
               >
                 <div className="space-y-3">
                   {dashTasks.length === 0 && dashFinance.length === 0 && (
-                    <p className="text-slate-500 text-xs text-center py-8">No activities recorded yet.</p>
+                    <p className="text-slate-500 text-xs text-center py-8">{L('No activities recorded yet.')}</p>
                   )}
                   {dashTasks.map(t => (
                     <div className="flex justify-between items-center p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40" key={t._id}>
@@ -2867,7 +2871,7 @@ function App() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2.5">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Crop Filter:</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{L('Crop Filter:')}</span>
                     <select 
                       className={`border rounded-lg text-xs px-3 py-2 outline-none focus:border-farm-500 font-bold cursor-pointer ${
                         isDark ? 'bg-[#0f172a] border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
@@ -2875,15 +2879,12 @@ function App() {
                       value={cropIdFilter}
                       onChange={e => setCropIdFilter(e.target.value)}
                     >
-                      <option value="all">All Crops (Blended)</option>
+                      <option value="all">{L('All Crops (Blended)')}</option>
                       {crops.map(c => (
                         <option key={c._id} value={c._id}>{c.name} ({c.season} {c.crop_year || 'N/A'})</option>
                       ))}
                     </select>
                   </div>
-                  {userRole === 'admin' && (
-                    <span className="hidden"></span>
-                  )}
                 </div>
               </div>
 
@@ -2896,7 +2897,7 @@ function App() {
                   <span className="muf-kpi-icon wheat"><Sprout size={22}/></span>
                   <div>
                     <small>{L('Total Cropped Area')}</small>
-                    <strong>{(filteredCrops.reduce((n, c) => n + (parseFloat(c.area_kanal) || 0), 0)).toFixed(1)} <em>Kanal</em></strong>
+                    <strong>{(filteredCrops.reduce((n, c) => n + (parseFloat(c.area_kanal) || 0), 0)).toFixed(1)} <em>{L('Kanal')}</em></strong>
                     <p className="up">↗ Filtered area (kanal)</p>
                   </div>
                 </div>
@@ -2908,7 +2909,7 @@ function App() {
                   <span className="muf-kpi-icon green"><Leaf size={22}/></span>
                   <div>
                     <small>{L('Total Production (Est.)')}</small>
-                    <strong>{(filteredCrops.reduce((n,c)=>n+(Number(toKg(c.yield_kg, c.yield_unit))||0),0)/1000).toFixed(1)} <em>Ton</em></strong>
+                    <strong>{(filteredCrops.reduce((n,c)=>n+(Number(toKg(c.yield_kg, c.yield_unit))||0),0)/1000).toFixed(1)} <em>{L('Ton')}</em></strong>
                     <p className="up">↗ Filtered production (normalized)</p>
                   </div>
                 </div>
@@ -2933,7 +2934,7 @@ function App() {
                   <div>
                     <small>{L('Care Duties')}</small>
                     <strong>{cropCareDutiesCount}</strong>
-                    <p>Pending duties for filtered crops</p>
+                    <p>{L('Pending duties for filtered crops')}</p>
                   </div>
                 </div>
 
@@ -2955,7 +2956,7 @@ function App() {
                     <div>
                       <small>{L('Growing Now')}</small>
                       <strong>{crops.filter(c => c.status === 'Growing').length}</strong>
-                      <p>Active crop cycles in the soil</p>
+                      <p>{L('Active crop cycles in the soil')}</p>
                     </div>
                   </div>
                 )}
@@ -2963,7 +2964,7 @@ function App() {
               )}
 
               <section className="muf-panel muf-my-crops">
-                <div className="muf-panel-heading"><div><h3><Leaf size={21}/> My Crops</h3><p>Monitor every crop record from planting to harvest.</p></div><button onClick={() => { setCropIdFilter('all'); setCropFilter('all'); setCropSearch(''); setCropFieldFilter('all'); setCropSeasonFilter('all'); setCropYearFilter('all'); }} className="muf-text-action">View All Crops <ArrowUpRight size={17}/></button></div>
+                <div className="muf-panel-heading"><div><h3><Leaf size={21}/> {L('My Crops')}</h3><p>{L('Monitor every crop record from planting to harvest.')}</p></div><button onClick={() => { setCropIdFilter('all'); setCropFilter('all'); setCropSearch(''); setCropFieldFilter('all'); setCropSeasonFilter('all'); setCropYearFilter('all'); }} className="muf-text-action">{L('View All Crops')} <ArrowUpRight size={17}/></button></div>
                 
                 {/* Search & Dynamic Filters Bar */}
                 <div className={`p-4 mt-4 mx-3 sm:mx-5 rounded-xl border flex flex-col sm:flex-row gap-3 items-stretch sm:items-center ${
@@ -2976,7 +2977,7 @@ function App() {
                     </span>
                     <input 
                       type="text"
-                      placeholder="Search crop, variety, or field plot..."
+                      placeholder={L('Search crop, variety, or field plot...')}
                       className={`w-full pl-9 pr-4 py-2 text-xs rounded-lg border outline-none focus:border-farm-500 transition-colors ${
                         isDark ? 'bg-[#0f172a] border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
                       }`}
@@ -2994,11 +2995,11 @@ function App() {
                       value={cropFilter}
                       onChange={(e) => setCropFilter(e.target.value)}
                     >
-                      <option value="all">All Phases</option>
-                      <option value="Planted">Planted</option>
-                      <option value="Growing">Growing</option>
-                      <option value="Harvesting">Harvesting</option>
-                      {userRole === 'admin' && <option value="Completed">Completed</option>}
+                      <option value="all">{L('All Phases')}</option>
+                      <option value="Planted">{L('Planted')}</option>
+                      <option value="Growing">{L('Growing')}</option>
+                      <option value="Harvesting">{L('Harvesting')}</option>
+                      {userRole === 'admin' && <option value="Completed">{L('Completed')}</option>}
                     </select>
 
                     {/* Field Plot Filter Dropdown */}
@@ -3009,7 +3010,7 @@ function App() {
                       value={cropFieldFilter}
                       onChange={(e) => setCropFieldFilter(e.target.value)}
                     >
-                      <option value="all">All Fields</option>
+                      <option value="all">{L('All Fields')}</option>
                       {uniqueFields.map(f => (
                         <option key={f} value={f}>{f}</option>
                       ))}
@@ -3023,9 +3024,9 @@ function App() {
                       value={cropSeasonFilter}
                       onChange={(e) => setCropSeasonFilter(e.target.value)}
                     >
-                      <option value="all">All Seasons</option>
-                      <option value="Rabi">Rabi</option>
-                      <option value="Kharif">Kharif</option>
+                      <option value="all">{L('All Seasons')}</option>
+                      <option value="Rabi">{L('Rabi')}</option>
+                      <option value="Kharif">{L('Kharif')}</option>
                       {uniqueSeasons.filter(s => s !== 'Rabi' && s !== 'Kharif').map(s => (
                         <option key={s} value={s}>{s}</option>
                       ))}
@@ -3039,7 +3040,7 @@ function App() {
                       value={cropYearFilter}
                       onChange={(e) => setCropYearFilter(e.target.value)}
                     >
-                      <option value="all">All Years</option>
+                      <option value="all">{L('All Years')}</option>
                       {uniqueYears.map(y => (
                         <option key={y} value={y}>{y}</option>
                       ))}
@@ -3048,9 +3049,9 @@ function App() {
                 </div>
 
                 {crops.length === 0 ? (
-                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>No crop records yet</h4><p>Add your first wheat, corn, bajra, mattar, jundra, or any other crop.</p>{userRole === 'admin' && (<button onClick={() => { setEditingCrop(null); setCropForm(getEmptyCropForm()); setShowCropModal(true); }} className="muf-primary-action small"><Plus size={16}/> Add Crop</button>)}</div>
+                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crop records yet')}</h4><p>Add your first wheat, corn, bajra, mattar, jundra, or any other crop.</p>{userRole === 'admin' && (<button onClick={() => { setEditingCrop(null); setCropForm(getEmptyCropForm()); setShowCropModal(true); }} className="muf-primary-action small"><Plus size={16}/> {L('Add Crop')}</button>)}</div>
                   ) : filteredCrops.length === 0 ? (
-                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>No crops match this filter</h4><p>Change the crop phase filter to see other records.</p></div>
+                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crops match this filter')}</h4><p>{L('Change the crop phase filter to see other records.')}</p></div>
                   ) : (
                     <MufEntityGrid
                       items={gridCrops}
@@ -3143,7 +3144,7 @@ function App() {
 
               {/* Filter controls heading */}
               <div className="flex flex-wrap items-center gap-2 justify-end">
-                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Crop Filter:</span>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{L('Crop Filter:')}</span>
                 <select 
                   className={`border rounded-lg text-xs px-3 py-2 outline-none focus:border-farm-500 cursor-pointer ${
                     isDark ? 'bg-[#0f172a] border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
@@ -3151,7 +3152,7 @@ function App() {
                   value={financeCropFilter}
                   onChange={e => setFinanceCropFilter(e.target.value)}
                 >
-                  <option value="all">All Crops</option>
+                  <option value="all">{L('All Crops')}</option>
                   {crops.map(c => (
                     <option key={c._id} value={c._id}>{c.name} ({c.season} {c.crop_year || 'N/A'})</option>
                   ))}
@@ -3163,16 +3164,16 @@ function App() {
                   value={financeFilter}
                   onChange={e => setFinanceFilter(e.target.value)}
                 >
-                  <option value="all">All Flows</option>
-                  <option value="income">Revenue Only</option>
-                  <option value="expense">Expense Only</option>
+                  <option value="all">{L('All Flows')}</option>
+                  <option value="income">{L('Revenue Only')}</option>
+                  <option value="expense">{L('Expense Only')}</option>
                 </select>
               </div>
               {/* Finance list grouped by crop folder */}
               <div className="space-y-4">
                 {groupedFinances.length === 0 ? (
                   <section className="muf-panel p-8 text-center text-slate-500">
-                    Financial ledger contains no logs.
+                    {L('Financial ledger contains no logs.')}
                   </section>
                 ) : groupedFinances.map(group => {
                   return (
@@ -3193,7 +3194,7 @@ function App() {
                         </div>
                         <div className="flex items-center gap-4 text-right">
                           <div className="text-xs">
-                            <span className="text-slate-400 block text-[9px] uppercase tracking-wider">Folder Balance</span>
+                            <span className="text-slate-400 block text-[9px] uppercase tracking-wider">{L('Folder Balance')}</span>
                             <strong className={`font-black text-sm ${group.net >= 0 ? 'text-farm-600 dark:text-farm-400' : 'text-red-500'}`}>
                               Rs. {formatCurrency(group.net)}
                             </strong>
@@ -3234,7 +3235,7 @@ function App() {
                     <button
                       type="button"
                       onClick={() => setShowZakatPopup(true)}
-                      className="w-full flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0d1a11] hover:shadow-md transition-shadow text-left"
+                      className="muf-card-link w-full flex items-center gap-3 p-4 text-left"
                     >
                       <span className="shrink-0 w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">🕌</span>
                       <div className="min-w-0 flex-1">
@@ -3255,15 +3256,15 @@ function App() {
                         </div>
                         <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">{L('Income')} ({zakatYear})</label>
+                            <label className="muf-label">{L('Income')} ({zakatYear})</label>
                             <input type="number" className={zInput} value={zakatIncomeOv === null ? autoIncome : zakatIncomeOv} onChange={e => setZakatIncomeOv(e.target.value)} />
                           </div>
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">{L('Expenses')} ({zakatYear})</label>
+                            <label className="muf-label">{L('Expenses')} ({zakatYear})</label>
                             <input type="number" className={zInput} value={zakatExpenseOv === null ? autoExpenses : zakatExpenseOv} onChange={e => setZakatExpenseOv(e.target.value)} />
                           </div>
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">{L('Rate')} %</label>
+                            <label className="muf-label">{L('Rate')} %</label>
                             <input type="number" step="any" min="0" className={zInput} value={zakatPct} onChange={e => setZakatPct(e.target.value)} />
                           </div>
                           <div className="flex flex-col justify-end">
@@ -3313,7 +3314,7 @@ function App() {
                                 ],
                                 monthly,
                                 sections: [
-                                  ...(catLines.length ? [{ title: 'Where the money went', lines: catLines }] : []),
+                                  ...(catLines.length ? [{ title: L('Where the money went'), lines: catLines }] : []),
                                   { title: `Zakat suggestion at ${pctNum}% of profit (your decision — see the zakat calculator)`, lines: [[`${Math.round(profit).toLocaleString()} × ${pctNum}%`, `Rs. ${Math.round(amount).toLocaleString()}`]] },
                                 ],
                               });
@@ -3356,14 +3357,14 @@ function App() {
               {agriFinanceSubTab === 'loan' && (
               <>
               <button type="button" onClick={() => setShowLiabilityDetailsModal(true)} className="muf-panel w-full text-left hover:shadow-md transition-shadow muf-finance-surface">
-                <div className="muf-panel-heading"><div><h3><Coins size={21}/> Loan & Credit Liability Tracker</h3><p>Review your recorded loans and credit liabilities.</p></div><span className="text-xs font-bold text-farm-600 dark:text-farm-400">Open details →</span></div>
+                <div className="muf-panel-heading"><div><h3><Coins size={21}/> {L('Loan & Credit Liability Tracker')}</h3><p>{L('Review your recorded loans and credit liabilities.')}</p></div><span className="text-xs font-bold text-farm-600 dark:text-farm-400">Open details →</span></div>
                 <div className="p-4 flex flex-wrap gap-4 text-xs"><span><strong>{liabilities.filter(l => l.status !== 'Paid').length}</strong> unpaid liabilities</span><span><strong>Rs. {formatCurrency(liabilities.filter(l => l.status !== 'Paid').reduce((sum, l) => sum + (Number(l.amount_owed) || 0), 0))}</strong> outstanding</span></div>
               </button>
               {showLiabilityDetailsModal && <DetailModal open={showLiabilityDetailsModal} onClose={() => setShowLiabilityDetailsModal(false)} title="Loan & Credit Liability Tracker" subtitle={`${liabilities.length} recorded liabilities`} icon={<Coins size={20}/>} size="big">
               <section className="muf-panel muf-finance-surface">
                 <div className="muf-panel-heading">
                   <div>
-                    <h3><Coins size={21}/> Loan & Credit Liability Tracker</h3>
+                    <h3><Coins size={21}/> {L('Loan & Credit Liability Tracker')}</h3>
                     <p>Track fertilizer, seed credit debts, and crop dealer loans (unpaid outlays count as committed crop costs).</p>
                   </div>
                   {userRole === 'admin' && (
@@ -3380,38 +3381,38 @@ function App() {
                   <table className="muf-reflow w-full text-left border-collapse">
                     <thead>
                       <tr>
-                        <th className="px-4 py-3">Creditor / Dealer</th>
-                        <th className="px-4 py-3">Due Date</th>
-                        <th className="px-4 py-3">Associated Crop</th>
-                        <th className="px-4 py-3">Liability Status</th>
-                        <th className="px-4 py-3 text-right">Amount Owed</th>
-                        <th className="px-4 py-3 text-right">Actions</th>
+                        <th className="px-4 py-3">{L('Creditor / Dealer')}</th>
+                        <th className="px-4 py-3">{L('Due Date')}</th>
+                        <th className="px-4 py-3">{L('Associated Crop')}</th>
+                        <th className="px-4 py-3">{L('Liability Status')}</th>
+                        <th className="px-4 py-3 text-right">{L('Amount Owed')}</th>
+                        <th className="px-4 py-3 text-right">{L('Actions')}</th>
                       </tr>
                     </thead>
                     <tbody className={`divide-y text-xs md:text-sm ${
                       isDark ? 'divide-slate-800 text-slate-300' : 'divide-slate-200 text-slate-700'
                     }`}>
                       {liabilities.length === 0 ? (
-                        <tr><td colSpan={6} className="px-4 py-8 text-center text-slate-500">No loans or credit liabilities recorded.</td></tr>
+                        <tr><td colSpan={6} className="px-4 py-8 text-center text-slate-500">{L('No loans or credit liabilities recorded.')}</td></tr>
                       ) : liabilities.map(l => {
                         const linkedCrop = crops.find(c => c._id === l.crop_id);
                         return (
                           <tr key={l._id} className="hover:bg-slate-100/40 dark:hover:bg-slate-900/30 transition-colors animate-fade-in">
-                            <td data-label="Creditor" className="px-4 py-4">
+                            <td data-label={L('Creditor')} className="px-4 py-4">
                               <div className="font-extrabold text-slate-800 dark:text-slate-100">{l.creditor}</div>
                               {l.notes && <div className="text-[11px] text-slate-500 dark:text-slate-400 max-w-[220px] break-words mt-0.5">{l.notes}</div>}
                             </td>
-                            <td data-label="Due Date" className="px-4 py-4 text-slate-500 whitespace-nowrap">{l.due_date || 'Ongoing'}</td>
-                            <td data-label="Crop" className="px-4 py-4">
+                            <td data-label={L('Due Date')} className="px-4 py-4 text-slate-500 whitespace-nowrap">{l.due_date || 'Ongoing'}</td>
+                            <td data-label={L('Crop')} className="px-4 py-4">
                               {linkedCrop ? (
                                 <span className="inline-flex items-center gap-1 bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30 px-2.5 py-0.5 rounded-full text-[10px] font-bold">
                                   <Sprout size={10} /> {linkedCrop.name}
                                 </span>
                               ) : (
-                                <span className="text-slate-500 dark:text-slate-400 text-xs">Farm-wide</span>
+                                <span className="text-slate-500 dark:text-slate-400 text-xs">{L('Farm-wide')}</span>
                               )}
                             </td>
-                            <td data-label="Status" className="px-4 py-4">
+                            <td data-label={L('Status')} className="px-4 py-4">
                               <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase border ${
                                 l.status === 'Paid'
                                   ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500'
@@ -3423,25 +3424,25 @@ function App() {
                             <td data-label="Amount" className={`px-4 py-4 text-right font-black whitespace-nowrap ${l.status === 'Paid' ? 'text-slate-400 dark:text-slate-500 line-through' : 'text-red-500'}`}>
                               Rs. {formatCurrency(l.amount_owed)}
                             </td>
-                            <td data-label="Actions" className="px-4 py-4 text-right whitespace-nowrap">
+                            <td data-label={L('Actions')} className="px-4 py-4 text-right whitespace-nowrap">
                               {userRole === 'admin' ? (
                                 <div className="inline-flex gap-1.5 justify-end">
                                   {l.status === 'Pending' && (
                                     <button 
                                       onClick={(e) => { e.stopPropagation(); handlePayLiability(l._id); }} 
                                       className="px-2.5 py-1 bg-amber-600 hover:bg-amber-700 text-white text-[10px] font-bold rounded cursor-pointer transition-colors"
-                                      title="Mark as Paid & log expense"
-                                      aria-label="Settle debt"
+                                      title={L('Mark as Paid & log expense')}
+                                      aria-label={L('Settle debt')}
                                     >
-                                      Settle Debt
+                                      {L('Settle Debt')}
                                     </button>
                                   )}
                                   {l.status === 'Pending' && (
                                     <button 
                                       onClick={(e) => { e.stopPropagation(); startEditLiability(l); }} 
                                       className="p-1 text-slate-500 dark:text-slate-400 hover:text-farm-600 rounded-lg cursor-pointer transition-colors" 
-                                      title="Edit Liability"
-                                      aria-label="Edit liability"
+                                      title={L('Edit Liability')}
+                                      aria-label={L('Edit liability')}
                                     >
                                       <Edit3 size={14} />
                                     </button>
@@ -3449,14 +3450,14 @@ function App() {
                                   <button 
                                     onClick={(e) => { e.stopPropagation(); handleDeleteLiability(l._id); }} 
                                     className="p-1 text-slate-500 dark:text-slate-400 hover:text-red-400 rounded-lg cursor-pointer transition-colors" 
-                                    title="Delete Record"
-                                    aria-label="Delete liability"
+                                    title={L('Delete Record')}
+                                    aria-label={L('Delete liability')}
                                   >
                                     <Trash2 size={14} />
                                   </button>
                                 </div>
                               ) : (
-                                <span className="text-slate-500 dark:text-slate-400 text-xs italic">Read-only</span>
+                                <span className="text-slate-500 dark:text-slate-400 text-xs italic">{L('Read-only')}</span>
                               )}
                             </td>
                           </tr>
@@ -3474,14 +3475,14 @@ function App() {
               {agriFinanceSubTab === 'inventory' && userRole === 'admin' && (
               <>
               <button type="button" onClick={() => setShowInventoryDetailsModal(true)} className="muf-panel w-full text-left hover:shadow-md transition-shadow muf-finance-surface">
-                <div className="muf-panel-heading"><div><h3><Database size={21}/> Input Inventory & Stocks</h3><p>Review recorded seed, fertilizer, and pesticide stock.</p></div><span className="text-xs font-bold text-farm-600 dark:text-farm-400">Open details →</span></div>
+                <div className="muf-panel-heading"><div><h3><Database size={21}/> {L('Input Inventory & Stocks')}</h3><p>{L('Review recorded seed, fertilizer, and pesticide stock.')}</p></div><span className="text-xs font-bold text-farm-600 dark:text-farm-400">Open details →</span></div>
                 <div className="p-4 flex flex-wrap gap-4 text-xs"><span><strong>{inventory.length}</strong> stock items</span><span><strong>{inventory.filter(i => Number(i.current_stock) <= Number(i.low_stock_threshold)).length}</strong> at or below low-stock threshold</span></div>
               </button>
               {showInventoryDetailsModal && <DetailModal open={showInventoryDetailsModal} onClose={() => setShowInventoryDetailsModal(false)} title="Input Inventory & Stocks" subtitle={`${inventory.length} recorded stock items`} icon={<Database size={20}/>} size="big">
               <section className="muf-panel animate-fade-in muf-finance-surface">
                 <div className="muf-panel-heading">
                   <div>
-                    <h3><Database size={21}/> Input Inventory & Stocks</h3>
+                    <h3><Database size={21}/> {L('Input Inventory & Stocks')}</h3>
                     <p>Track seeds, fertilizer, and pesticide stock levels (manually adjust or correct counts anytime).</p>
                   </div>
                   {userRole === 'admin' && (
@@ -3498,30 +3499,30 @@ function App() {
                   <table className="muf-reflow w-full text-left border-collapse">
                     <thead>
                       <tr>
-                        <th className="px-4 py-3">Stock Item</th>
-                        <th className="px-4 py-3">Category</th>
-                        <th className="px-4 py-3">Stock Level Status</th>
-                        <th className="px-4 py-3 text-right">Available Quantity</th>
-                        <th className="px-4 py-3 text-right">Actions</th>
+                        <th className="px-4 py-3">{L('Stock Item')}</th>
+                        <th className="px-4 py-3">{L('Category')}</th>
+                        <th className="px-4 py-3">{L('Stock Level Status')}</th>
+                        <th className="px-4 py-3 text-right">{L('Available Quantity')}</th>
+                        <th className="px-4 py-3 text-right">{L('Actions')}</th>
                       </tr>
                     </thead>
                     <tbody className={`divide-y text-xs md:text-sm ${
                       isDark ? 'divide-slate-800 text-slate-300' : 'divide-slate-200 text-slate-700'
                     }`}>
                       {inventory.length === 0 ? (
-                        <tr><td colSpan={5} className="px-4 py-8 text-center text-slate-500">No stock items logged in inventory.</td></tr>
+                        <tr><td colSpan={5} className="px-4 py-8 text-center text-slate-500">{L('No stock items logged in inventory.')}</td></tr>
                       ) : inventory.map(item => {
                         const isLow = item.current_stock <= item.low_stock_threshold;
                         return (
                           <tr key={item._id} className="hover:bg-slate-100/40 dark:hover:bg-slate-900/30 transition-colors animate-fade-in">
-                            <td data-label="Item" className="px-4 py-4">
+                            <td data-label={L('Item')} className="px-4 py-4">
                               <div className="font-extrabold text-slate-800 dark:text-slate-100">{item.name}</div>
                               <div className="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Threshold: {item.low_stock_threshold} {item.unit}</div>
                             </td>
-                            <td data-label="Category" className="px-4 py-4 whitespace-nowrap">
+                            <td data-label={L('Category')} className="px-4 py-4 whitespace-nowrap">
                               <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{item.category}</span>
                             </td>
-                            <td data-label="Status" className="px-4 py-4">
+                            <td data-label={L('Status')} className="px-4 py-4">
                               {isLow ? (
                                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 animate-pulse">
                                   ⚠️ Low Stock Alert
@@ -3541,7 +3542,7 @@ function App() {
                                 <button
                                   onClick={() => { setInvForm({ ...item, current_stock: item.current_stock.toString(), low_stock_threshold: item.low_stock_threshold.toString() }); setShowInventoryModal(true); }}
                                   className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-farm-500 rounded-lg cursor-pointer transition-colors"
-                                  title="Edit / Correct Stock Level"
+                                  title={L('Edit / Correct Stock Level')}
                                 >
                                   <Edit3 size={14} />
                                 </button>
@@ -3550,7 +3551,7 @@ function App() {
                                   <button
                                     onClick={() => handleDeleteInventory(item._id)}
                                     className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-red-400 rounded-lg cursor-pointer transition-colors"
-                                    title="Delete Stock Item"
+                                    title={L('Delete Stock Item')}
                                   >
                                     <Trash2 size={14} />
                                   </button>
@@ -3626,7 +3627,7 @@ function App() {
                   <section className="muf-panel animate-fade-in">
                     <div className="muf-panel-heading">
                       <div>
-                        <h3><HardHat size={21} /> Today's Field Crew</h3>
+                        <h3><HardHat size={21} /> {L('Today\'s Field Crew')}</h3>
                         <p>{todaysRows.length} of {laborers.length} marked present today • tap a name to open Field Labor</p>
                       </div>
                       <button onClick={() => navigateTo('labor')} className="muf-text-action">{L('Attendance Board')} <ArrowUpRight size={17}/></button>
@@ -3668,11 +3669,11 @@ function App() {
               <section className="muf-panel">
                 <div className="muf-panel-heading">
                   <div>
-                    <h3><HeartPulse size={21}/> Duty Care Roster</h3>
-                    <p>Monitor fertilizer applications, soil checkups, and water rosters.</p>
+                    <h3><HeartPulse size={21}/> {L('Duty Care Roster')}</h3>
+                    <p>{L('Monitor fertilizer applications, soil checkups, and water rosters.')}</p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Crop Filter:</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{L('Crop Filter:')}</span>
                     <select 
                       className={`border rounded-lg text-xs px-3 py-2 outline-none focus:border-farm-500 cursor-pointer ${
                         isDark ? 'bg-[#0f172a] border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
@@ -3680,7 +3681,7 @@ function App() {
                       value={taskCropFilter}
                       onChange={e => setTaskCropFilter(e.target.value)}
                     >
-                      <option value="all">All Crops (Blended)</option>
+                      <option value="all">{L('All Crops (Blended)')}</option>
                       {crops.map(c => (
                         <option key={c._id} value={c._id}>{c.name} ({c.season} {c.crop_year || 'N/A'})</option>
                       ))}
@@ -3692,9 +3693,9 @@ function App() {
                       value={taskFilter}
                       onChange={e => setTaskFilter(e.target.value)}
                     >
-                      <option value="all">All Assignments</option>
-                      <option value="Pending">Pending / In-Progress</option>
-                      <option value="Completed">Completed Duties</option>
+                      <option value="all">{L('All Assignments')}</option>
+                      <option value="Pending">{L('Pending / In-Progress')}</option>
+                      <option value="Completed">{L('Completed Duties')}</option>
                     </select>
                   </div>
                 </div>
@@ -3703,14 +3704,14 @@ function App() {
                   {tasks.length === 0 ? (
                     <div className="muf-empty-crops">
                       <div><HeartPulse size={36}/></div>
-                      <h4>Duty care roster is clean</h4>
-                      <p>No active care schedules or tasks registered in the database.</p>
+                      <h4>{L('Duty care roster is clean')}</h4>
+                      <p>{L('No active care schedules or tasks registered in the database.')}</p>
                     </div>
                   ) : filteredTasks.length === 0 ? (
                     <div className="muf-empty-crops">
                       <div><HeartPulse size={36}/></div>
-                      <h4>No duties match filter</h4>
-                      <p>Try switching to another status or scheduled care assignment filter.</p>
+                      <h4>{L('No duties match filter')}</h4>
+                      <p>{L('Try switching to another status or scheduled care assignment filter.')}</p>
                     </div>
                   ) : filteredTasks.map((t, idx) => (
                     <article 
@@ -3795,9 +3796,9 @@ function App() {
                                 <button 
                                   onClick={(e) => { e.stopPropagation(); handleRevertTask(t); }}
                                   className="text-[10px] text-amber-600 hover:text-amber-500 font-bold uppercase hover:underline cursor-pointer"
-                                  title="Undo / Revert to Pending"
+                                  title={L('Undo / Revert to Pending')}
                                 >
-                                  Undo
+                                  {L('Undo')}
                                 </button>
                               )}
                             </div>
@@ -3805,10 +3806,10 @@ function App() {
 
                           {userRole === 'admin' && (
                             <>
-                              <button onClick={(e) => { e.stopPropagation(); handleEditTask(t); }} className="muf-mini-icon" title="Edit Task" aria-label="Edit task">
+                              <button onClick={(e) => { e.stopPropagation(); handleEditTask(t); }} className="muf-mini-icon" title={L('Edit Task')} aria-label={L('Edit task')}>
                                 <Edit3 size={14} />
                               </button>
-                              <button onClick={(e) => { e.stopPropagation(); handleDeleteTask(t._id); }} className="muf-mini-icon danger" title="Delete Task" aria-label="Delete task">
+                              <button onClick={(e) => { e.stopPropagation(); handleDeleteTask(t._id); }} className="muf-mini-icon danger" title={L('Delete Task')} aria-label={L('Delete task')}>
                                 <Trash2 size={14} />
                               </button>
                             </>
@@ -3841,7 +3842,7 @@ function App() {
                 {/* Period & Crop Selectors */}
                 <div className="flex flex-wrap items-center gap-2.5">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Sort Order:</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{L('Sort Order:')}</span>
                     <select 
                       className={`border rounded-lg text-xs px-3 py-2 outline-none focus:border-farm-500 font-bold cursor-pointer ${
                         isDark ? 'bg-[#0f172a] border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
@@ -3849,12 +3850,12 @@ function App() {
                       value={sortOrder}
                       onChange={e => setSortOrder(e.target.value)}
                     >
-                      <option value="newest">Newest First</option>
-                      <option value="oldest">Oldest First</option>
+                      <option value="newest">{L('Newest First')}</option>
+                      <option value="oldest">{L('Oldest First')}</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-1.5">
-                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Crop Filter:</span>
+                    <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{L('Crop Filter:')}</span>
                     <select 
                       className={`border rounded-lg text-xs px-3 py-2 outline-none focus:border-farm-500 font-bold cursor-pointer ${
                         isDark ? 'bg-[#0f172a] border-slate-800 text-slate-300' : 'bg-white border-slate-200 text-slate-700'
@@ -3862,7 +3863,7 @@ function App() {
                       value={reportsCropFilter}
                       onChange={e => setReportsCropFilter(e.target.value)}
                     >
-                      <option value="all">All Crops (Blended)</option>
+                      <option value="all">{L('All Crops (Blended)')}</option>
                       {crops.map(c => (
                         <option key={c._id} value={c._id}>{c.name} ({c.season} {c.crop_year || 'N/A'})</option>
                       ))}
@@ -3903,7 +3904,7 @@ function App() {
                 >
                   <span className={`muf-kpi-icon ${periodNet >= 0 ? 'green' : 'blue'}`}><Scale size={22}/></span>
                   <div>
-                    <small>Operating Profit</small>
+                    <small>{L('Operating Profit')}</small>
                     <strong className={periodNet >= 0 ? 'text-farm-600 dark:text-farm-400' : 'text-red-400'}>
                       Rs. {formatCurrency(periodNet)}
                     </strong>
@@ -3917,9 +3918,9 @@ function App() {
                 >
                   <span className="muf-kpi-icon gold"><CheckCircle size={22}/></span>
                   <div>
-                    <small>Operating Margin</small>
+                    <small>{L('Operating Margin')}</small>
                     <strong>{periodMargin}%</strong>
-                    <p>Financial efficiency</p>
+                    <p>{L('Financial efficiency')}</p>
                   </div>
                 </div>
               </div>
@@ -3930,7 +3931,7 @@ function App() {
                 <section className="muf-panel">
                   <div className="muf-panel-heading">
                     <div>
-                      <h3><BarChart3 size={21}/> Month-by-Month Trends</h3>
+                      <h3><BarChart3 size={21}/> {L('Month-by-Month Trends')}</h3>
                       <p>Comparative crops and ledger cashflows per month (Click to drill down).</p>
                     </div>
                   </div>
@@ -3939,11 +3940,11 @@ function App() {
                     <table className="muf-reflow w-full text-left border-collapse text-xs md:text-sm">
                       <thead>
                         <tr>
-                          <th className="px-4 py-3">Month</th>
-                          <th className="px-4 py-3">Crops Planted</th>
-                          <th className="px-4 py-3">Income</th>
-                          <th className="px-4 py-3">Expense</th>
-                          <th className="px-4 py-3 text-right">Net Profit</th>
+                          <th className="px-4 py-3">{L('Month')}</th>
+                          <th className="px-4 py-3">{L('Crops Planted')}</th>
+                          <th className="px-4 py-3">{L('Income')}</th>
+                          <th className="px-4 py-3">{L('Expense')}</th>
+                          <th className="px-4 py-3 text-right">{L('Net Profit')}</th>
                         </tr>
                       </thead>
                       <tbody className={`divide-y text-xs md:text-sm ${
@@ -3955,10 +3956,10 @@ function App() {
                             onClick={() => setSelectedMonthRow([month, val])}
                             className="hover:bg-slate-100/40 dark:hover:bg-slate-900/30 transition-colors animate-fade-in cursor-pointer"
                           >
-                            <td data-label="Month" className="px-4 py-4 font-extrabold text-slate-700 dark:text-slate-300">{month}</td>
-                            <td data-label="Crops" className="px-4 py-4 text-slate-500">{val.cropsCount} cycles</td>
-                            <td data-label="Income" className="px-4 py-4 text-farm-600 dark:text-farm-400 font-bold">Rs. {formatCurrency(val.income)}</td>
-                            <td data-label="Expense" className="px-4 py-4 text-red-500 dark:text-red-400 font-bold">Rs. {formatCurrency(val.expense)}</td>
+                            <td data-label={L('Month')} className="px-4 py-4 font-extrabold text-slate-700 dark:text-slate-300">{month}</td>
+                            <td data-label={L('Crops')} className="px-4 py-4 text-slate-500">{val.cropsCount} cycles</td>
+                            <td data-label={L('Income')} className="px-4 py-4 text-farm-600 dark:text-farm-400 font-bold">Rs. {formatCurrency(val.income)}</td>
+                            <td data-label={L('Expense')} className="px-4 py-4 text-red-500 dark:text-red-400 font-bold">Rs. {formatCurrency(val.expense)}</td>
                             <td data-label="Net" className={`px-4 py-4 text-right font-black ${val.income - val.expense >= 0 ? 'text-farm-500' : 'text-red-500'}`}>
                               Rs. {formatCurrency(val.income - val.expense)}
                             </td>
@@ -3973,8 +3974,8 @@ function App() {
                 <section className="muf-panel">
                   <div className="muf-panel-heading">
                     <div>
-                      <h3><TrendingDown size={21}/> Outflow Breakdown</h3>
-                      <p>Direct expenditure category analysis (Click to drill down).</p>
+                      <h3><TrendingDown size={21}/> {L('Outflow Breakdown')}</h3>
+                      <p>{L('Direct expenditure category analysis (Click to drill down).')}</p>
                     </div>
                   </div>
                   
@@ -3998,7 +3999,7 @@ function App() {
                       </div>
                     ))}
                     {expenseBreakdown.length === 0 && (
-                      <p className="text-slate-500 text-xs text-center py-8 italic">No expenditures logged during this period range.</p>
+                      <p className="text-slate-500 text-xs text-center py-8 italic">{L('No expenditures logged during this period range.')}</p>
                     )}
                   </div>
                 </section>
@@ -4009,13 +4010,13 @@ function App() {
               <section className="muf-panel">
                 <div className="muf-panel-heading">
                   <div>
-                    <h3><TrendingUp size={21}/> Crop Profitability Leaderboard</h3>
-                    <p>Crops ranked by Net Profit per Kanal (highest profit-per-kanal first).</p>
+                    <h3><TrendingUp size={21}/> {L('Crop Profitability Leaderboard')}</h3>
+                    <p>{L('Crops ranked by Net Profit per Kanal (highest profit-per-kanal first).')}</p>
                   </div>
                 </div>
                 <div className="p-5">
                   {sortedCropsProfitability.length === 0 ? (
-                    <p className="text-center text-slate-500 italic py-8">No crops found to rank.</p>
+                    <p className="text-center text-slate-500 italic py-8">{L('No crops found to rank.')}</p>
                   ) : (
                     <div className="muf-entity-grid">
                       {sortedCropsProfitability.map((c, index) => {
@@ -4130,48 +4131,48 @@ function App() {
             <form onSubmit={handleCropSubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Crop Name *</label>
-                  <input required className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={cropForm.name} onChange={e => setCropForm({...cropForm, name: e.target.value})} placeholder="e.g. Premium Rice" />
+                  <label className="muf-label">Crop Name *</label>
+                  <input required className="muf-field" value={cropForm.name} onChange={e => setCropForm({...cropForm, name: e.target.value})} placeholder={L('e.g. Premium Rice')} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Variety / Classification</label>
-                  <input className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={cropForm.variety} onChange={e => setCropForm({...cropForm, variety: e.target.value})} placeholder="e.g. Basmati 370" />
+                  <label className="muf-label">{L('Variety / Classification')}</label>
+                  <input className="muf-field" value={cropForm.variety} onChange={e => setCropForm({...cropForm, variety: e.target.value})} placeholder={L('e.g. Basmati 370')} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Field / Plot Sector</label>
-                  <input className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={cropForm.field} onChange={e => setCropForm({...cropForm, field: e.target.value})} placeholder="e.g. Sector 3A" />
+                  <label className="muf-label">{L('Field / Plot Sector')}</label>
+                  <input className="muf-field" value={cropForm.field} onChange={e => setCropForm({...cropForm, field: e.target.value})} placeholder={L('e.g. Sector 3A')} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Sizing Area (Kanal) *</label>
-                  <input required type="number" step="0.1" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={cropForm.area_kanal} onChange={e => setCropForm({...cropForm, area_kanal: e.target.value})} placeholder="1.0" />
+                  <label className="muf-label">Sizing Area (Kanal) *</label>
+                  <input required type="number" step="0.1" className="muf-field" value={cropForm.area_kanal} onChange={e => setCropForm({...cropForm, area_kanal: e.target.value})} placeholder="1.0" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Expected Yield</label>
-                    <input type="number" step="0.1" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={cropForm.yield_kg} onChange={e => setCropForm({...cropForm, yield_kg: e.target.value})} placeholder="0.0" />
+                    <label className="muf-label">{L('Expected Yield')}</label>
+                    <input type="number" step="0.1" className="muf-field" value={cropForm.yield_kg} onChange={e => setCropForm({...cropForm, yield_kg: e.target.value})} placeholder="0.0" />
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Unit</label>
+                    <label className="muf-label">{L('Unit')}</label>
                     <select 
-                      className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium cursor-pointer"
+                      className="muf-field font-medium"
                       value={cropForm.yield_unit}
                       onChange={e => setCropForm({...cropForm, yield_unit: e.target.value})}
                     >
                       <option value="kg">kg (Kilograms)</option>
-                      <option value="maund">Maund (40kg)</option>
-                      <option value="ton">Ton (25 Maund)</option>
+                      <option value="maund">{L('Maund (40kg)')}</option>
+                      <option value="ton">{L('Ton (25 Maund)')}</option>
                     </select>
                   </div>
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 text-xs">
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Season</label>
+                    <label className="muf-label">{L('Season')}</label>
                     <select 
                       className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium cursor-pointer mb-1.5"
                       value={["Rabi", "Kharif"].includes(cropForm.season) ? cropForm.season : 'Custom'}
@@ -4184,9 +4185,9 @@ function App() {
                         }
                       }}
                     >
-                      <option value="Rabi">Rabi</option>
-                      <option value="Kharif">Kharif</option>
-                      <option value="Custom">Custom Season</option>
+                      <option value="Rabi">{L('Rabi')}</option>
+                      <option value="Kharif">{L('Kharif')}</option>
+                      <option value="Custom">{L('Custom Season')}</option>
                     </select>
                     {(!["Rabi", "Kharif"].includes(cropForm.season) || cropForm.season === '') && (
                       <input 
@@ -4194,16 +4195,16 @@ function App() {
                         className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-farm-500" 
                         value={cropForm.season} 
                         onChange={e => setCropForm({...cropForm, season: e.target.value})} 
-                        placeholder="Enter custom season..." 
+                        placeholder={L('Enter custom season...')} 
                       />
                     )}
                   </div>
                   <div>
-                    <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Crop Year *</label>
+                    <label className="muf-label">Crop Year *</label>
                     <input 
                       required 
                       type="number"
-                      className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" 
+                      className="muf-field" 
                       value={cropForm.crop_year || ''} 
                       onChange={e => setCropForm({...cropForm, crop_year: e.target.value})} 
                       placeholder="e.g. 2026" 
@@ -4214,58 +4215,58 @@ function App() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Planted Date</label>
-                  <input type="date" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={cropForm.plant_date} onChange={e => setCropForm({...cropForm, plant_date: e.target.value})} />
+                  <label className="muf-label">{L('Planted Date')}</label>
+                  <input type="date" className="muf-field font-medium" value={cropForm.plant_date} onChange={e => setCropForm({...cropForm, plant_date: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Harvest Date Target</label>
-                  <input type="date" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={cropForm.harvest_date} onChange={e => setCropForm({...cropForm, harvest_date: e.target.value})} />
+                  <label className="muf-label">{L('Harvest Date Target')}</label>
+                  <input type="date" className="muf-field font-medium" value={cropForm.harvest_date} onChange={e => setCropForm({...cropForm, harvest_date: e.target.value})} />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/30">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Seed Quantity</label>
+                  <label className="muf-label">{L('Seed Quantity')}</label>
                   <input type="number" step="any" min="0" className="w-full bg-white border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={cropForm.seed_quantity} onChange={e => setCropForm({...cropForm, seed_quantity: e.target.value})} placeholder="0" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Seed Unit</label>
+                  <label className="muf-label">{L('Seed Unit')}</label>
                   <select className="w-full bg-white border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 cursor-pointer" value={cropForm.seed_unit} onChange={e => setCropForm({...cropForm, seed_unit: e.target.value})}>
                     <option value="kg">kg</option>
-                    <option value="maund">Maund (40kg)</option>
-                    <option value="bag">Bag (50kg)</option>
+                    <option value="maund">{L('Maund (40kg)')}</option>
+                    <option value="bag">{L('Bag (50kg)')}</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Cost / Unit (Rs.)</label>
+                  <label className="muf-label">{L('Cost / Unit (Rs.)')}</label>
                   <input type="number" step="any" min="0" className="w-full bg-white border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={cropForm.seed_cost_per_unit} onChange={e => setCropForm({...cropForm, seed_cost_per_unit: e.target.value})} placeholder="0" />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider font-semibold">Current Cycle Status</label>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider font-semibold">{L('Current Cycle Status')}</label>
                 <select 
-                  className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium cursor-pointer"
+                  className="muf-field font-medium"
                   value={cropForm.status}
                   onChange={e => setCropForm({...cropForm, status: e.target.value})}
                 >
-                  <option value="Planted">Planted</option>
-                  <option value="Growing">Growing</option>
-                  <option value="Harvesting">Harvesting</option>
-                  <option value="Completed">Completed (Inactive)</option>
+                  <option value="Planted">{L('Planted')}</option>
+                  <option value="Growing">{L('Growing')}</option>
+                  <option value="Harvesting">{L('Harvesting')}</option>
+                  <option value="Completed">{L('Completed (Inactive)')}</option>
                 </select>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Notes / Soil Details</label>
-                <textarea rows="2" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={cropForm.notes} onChange={e => setCropForm({...cropForm, notes: e.target.value})} placeholder="Soil pH is 6.5, added organic fertilizer..." />
+                <label className="muf-label">{L('Notes / Soil Details')}</label>
+                <textarea rows="2" className="muf-field" value={cropForm.notes} onChange={e => setCropForm({...cropForm, notes: e.target.value})} placeholder={L('Soil pH is 6.5, added organic fertilizer...')} />
               </div>
 
               {/* Crop image upload and preview */}
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Crop Photo (PNG / JPEG)</label>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{L('Crop Photo (PNG / JPEG)')}</label>
                 <ImageUploader
-                  label="Upload Photo"
+                  label={L('Upload Photo')}
                   value={cropForm.image_base64}
                   onDone={(base64) => setCropForm({ ...cropForm, image_base64: base64 })}
                   onRemove={() => setCropForm({ ...cropForm, image_base64: '' })}
@@ -4273,7 +4274,7 @@ function App() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onClick={() => setShowCropModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">Cancel</button>
+                <button type="button" onClick={() => setShowCropModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
                 <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
                   <CheckCircle size={14} /> {editingCrop ? "Update Crop" : "Plant Crop"}
                 </button>
@@ -4315,34 +4316,34 @@ function App() {
         open={showLiabilityModal}
         onClose={resetLiabilityForm}
         title={editingLiabilityId ? "Edit Credit Debt / Loan" : "Log Credit Debt / Loan"}
-        subtitle="Record a payable"
+        subtitle={L('Record a payable')}
         icon={<Coins size={16} />}
        size="small">
             <form onSubmit={handleLiabilitySubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Creditor Name *</label>
-                  <input required className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={liaForm.creditor} onChange={e => setLiaForm({...liaForm, creditor: e.target.value})} placeholder="e.g. Sargodha Urea Dealer" />
+                  <label className="muf-label">Creditor Name *</label>
+                  <input required className="muf-field font-medium" value={liaForm.creditor} onChange={e => setLiaForm({...liaForm, creditor: e.target.value})} placeholder={L('e.g. Sargodha Urea Dealer')} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Amount Owed (Rs) *</label>
-                  <input required type="number" step="0.1" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={liaForm.amount_owed} onChange={e => setLiaForm({...liaForm, amount_owed: e.target.value})} placeholder="0.00" />
+                  <label className="muf-label">Amount Owed (Rs) *</label>
+                  <input required type="number" step="0.1" className="muf-field font-medium" value={liaForm.amount_owed} onChange={e => setLiaForm({...liaForm, amount_owed: e.target.value})} placeholder="0.00" />
                 </div>
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Due Date</label>
-                  <input type="date" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={liaForm.due_date} onChange={e => setLiaForm({...liaForm, due_date: e.target.value})} />
+                  <label className="muf-label">{L('Due Date')}</label>
+                  <input type="date" className="muf-field font-medium" value={liaForm.due_date} onChange={e => setLiaForm({...liaForm, due_date: e.target.value})} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Associate with Crop Sector</label>
+                  <label className="muf-label">{L('Associate with Crop Sector')}</label>
                   <select 
-                    className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium cursor-pointer"
+                    className="muf-field font-medium"
                     value={liaForm.crop_id}
                     onChange={e => setLiaForm({...liaForm, crop_id: e.target.value})}
                   >
-                    <option value="farm-wide">General / Farm-Wide Operational</option>
+                    <option value="farm-wide">{L('General / Farm-Wide Operational')}</option>
                     {crops.map(c => (
                       <option key={c._id} value={c._id}>Crop: {c.name} ({c.status})</option>
                     ))}
@@ -4351,12 +4352,12 @@ function App() {
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Additional Notes / Terms</label>
-                <textarea rows="2" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={liaForm.notes} onChange={e => setLiaForm({...liaForm, notes: e.target.value})} placeholder="To be settled in cash directly upon basmati rice harvest..." />
+                <label className="muf-label">{L('Additional Notes / Terms')}</label>
+                <textarea rows="2" className="muf-field font-medium" value={liaForm.notes} onChange={e => setLiaForm({...liaForm, notes: e.target.value})} placeholder={L('To be settled in cash directly upon basmati rice harvest...')} />
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onClick={resetLiabilityForm} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">Cancel</button>
+                <button type="button" onClick={resetLiabilityForm} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
                 <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
                   <CheckCircle size={14} /> {editingLiabilityId ? 'Save Changes' : 'Log Debt'}
                 </button>
@@ -4369,46 +4370,46 @@ function App() {
         open={showInventoryModal}
         onClose={() => setShowInventoryModal(false)}
         title={invForm._id ? "Adjust Stock Count" : "Log New Stock Item"}
-        subtitle="Inventory"
+        subtitle={L('Inventory')}
         icon={<Database size={16} />}
        size="small">
             <form onSubmit={handleInventorySubmit} className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Item Name *</label>
-                  <input required className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={invForm.name} onChange={e => setInvForm({...invForm, name: e.target.value})} placeholder="e.g. Di-Ammonium Phosphate (DAP)" />
+                  <label className="muf-label">Item Name *</label>
+                  <input required className="muf-field font-medium" value={invForm.name} onChange={e => setInvForm({...invForm, name: e.target.value})} placeholder={L('e.g. Di-Ammonium Phosphate (DAP)')} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider font-semibold">Stock Category</label>
+                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider font-semibold">{L('Stock Category')}</label>
                   <select 
                     className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-bold cursor-pointer transition-all"
                     value={invForm.category}
                     onChange={e => setInvForm({...invForm, category: e.target.value})}
                   >
-                    <option value="fertilizer">Fertilizer</option>
-                    <option value="seed">Seed</option>
-                    <option value="pesticide">Pesticide</option>
+                    <option value="fertilizer">{L('Fertilizer')}</option>
+                    <option value="seed">{L('Seed')}</option>
+                    <option value="pesticide">{L('Pesticide')}</option>
                   </select>
                 </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Current Stock *</label>
-                  <input required type="number" step="0.1" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={invForm.current_stock} onChange={e => setInvForm({...invForm, current_stock: e.target.value})} placeholder="0.00" />
+                  <label className="muf-label">Current Stock *</label>
+                  <input required type="number" step="0.1" className="muf-field font-medium" value={invForm.current_stock} onChange={e => setInvForm({...invForm, current_stock: e.target.value})} placeholder="0.00" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Stock Unit</label>
-                  <input required className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={invForm.unit} onChange={e => setInvForm({...invForm, unit: e.target.value})} placeholder="e.g. kg or bags" />
+                  <label className="muf-label">{L('Stock Unit')}</label>
+                  <input required className="muf-field font-medium" value={invForm.unit} onChange={e => setInvForm({...invForm, unit: e.target.value})} placeholder={L('e.g. kg or bags')} />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Low Threshold *</label>
-                  <input required type="number" step="0.1" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={invForm.low_stock_threshold} onChange={e => setInvForm({...invForm, low_stock_threshold: e.target.value})} placeholder="10.00" />
+                  <label className="muf-label">Low Threshold *</label>
+                  <input required type="number" step="0.1" className="muf-field font-medium" value={invForm.low_stock_threshold} onChange={e => setInvForm({...invForm, low_stock_threshold: e.target.value})} placeholder="10.00" />
                 </div>
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onClick={() => setShowInventoryModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">Cancel</button>
+                <button type="button" onClick={() => setShowInventoryModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
                 <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
                   <CheckCircle size={14} /> {invForm._id ? "Adjust Stock" : "Log Stock"}
                 </button>
@@ -4426,18 +4427,18 @@ function App() {
        size="small">
             <form onSubmit={handleTaskSubmit} className="space-y-4">
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Duty Description / Assignment Title *</label>
-                <input required className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={taskForm.title} onChange={e => setTaskForm({...taskForm, title: e.target.value})} placeholder="e.g. Fertilize Sector 3 Wheat" />
+                <label className="muf-label">Duty Description / Assignment Title *</label>
+                <input required className="muf-field" value={taskForm.title} onChange={e => setTaskForm({...taskForm, title: e.target.value})} placeholder={L('e.g. Fertilize Sector 3 Wheat')} />
               </div>
 
               <div>
-                <label className="block text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Link to Crop</label>
+                <label className="block text-[10px] md:text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">{L('Link to Crop')}</label>
                 <select
-                  className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium cursor-pointer"
+                  className="muf-field font-medium"
                   value={taskForm.crop_id}
                   onChange={e => setTaskForm({...taskForm, crop_id: e.target.value})}
                 >
-                  <option value="farm-wide">General / Farm-Wide</option>
+                  <option value="farm-wide">{L('General / Farm-Wide')}</option>
                   {crops.map(c => (
                     <option key={c._id} value={c._id}>Crop: {c.name} ({c.status})</option>
                   ))}
@@ -4446,28 +4447,28 @@ function App() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Assign to Worker</label>
+                  <label className="muf-label">{L('Assign to Worker')}</label>
                   <select 
-                    className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium cursor-pointer"
+                    className="muf-field font-medium"
                     value={taskForm.assigned_to}
                     onChange={e => setTaskForm({...taskForm, assigned_to: e.target.value})}
                   >
-                    <option value="">General / Broadcast Task</option>
+                    <option value="">{L('General / Broadcast Task')}</option>
                     {(users.length ? users : (username ? [{ _id: 'self', username, role: userRole }] : [])).map(u => (
                       <option key={u._id} value={u.username}>{u.username} ({u.role})</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Priority Level</label>
+                  <label className="muf-label">{L('Priority Level')}</label>
                   <select 
-                    className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium cursor-pointer"
+                    className="muf-field font-medium"
                     value={taskForm.priority}
                     onChange={e => setTaskForm({...taskForm, priority: e.target.value})}
                   >
-                    <option value="Low">Low Priority</option>
-                    <option value="Medium">Medium Priority</option>
-                    <option value="High">High Priority</option>
+                    <option value="Low">{L('Low Priority')}</option>
+                    <option value="Medium">{L('Medium Priority')}</option>
+                    <option value="High">{L('High Priority')}</option>
                   </select>
                 </div>
               </div>
@@ -4519,38 +4520,38 @@ function App() {
               )}
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Duty Due Date</label>
-                <input type="date" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium" value={taskForm.due_date} onChange={e => setTaskForm({...taskForm, due_date: e.target.value})} />
+                <label className="muf-label">{L('Duty Due Date')}</label>
+                <input type="date" className="muf-field font-medium" value={taskForm.due_date} onChange={e => setTaskForm({...taskForm, due_date: e.target.value})} />
               </div>
 
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Labor Wages (Rs)</label>
-                  <input type="number" step="0.1" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={taskForm.labor_cost} onChange={e => setTaskForm({...taskForm, labor_cost: e.target.value})} placeholder="0" />
+                  <label className="muf-label">{L('Labor Wages (Rs)')}</label>
+                  <input type="number" step="0.1" className="muf-field" value={taskForm.labor_cost} onChange={e => setTaskForm({...taskForm, labor_cost: e.target.value})} placeholder="0" />
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Deduct Stock</label>
+                  <label className="muf-label">{L('Deduct Stock')}</label>
                   <select 
-                    className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 font-medium cursor-pointer"
+                    className="muf-field font-medium"
                     value={taskForm.inventory_item_id}
                     onChange={e => setTaskForm({...taskForm, inventory_item_id: e.target.value})}
                   >
-                    <option value="">No Stock Consumed</option>
+                    <option value="">{L('No Stock Consumed')}</option>
                     {inventory.map(item => (
                       <option key={item._id} value={item._id}>{item.name} ({item.current_stock} {item.unit})</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Qty Consumed</label>
-                  <input type="number" step="0.1" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={taskForm.inventory_qty_consumed} onChange={e => setTaskForm({...taskForm, inventory_qty_consumed: e.target.value})} placeholder="0.0" disabled={!taskForm.inventory_item_id} />
+                  <label className="muf-label">{L('Qty Consumed')}</label>
+                  <input type="number" step="0.1" className="muf-field" value={taskForm.inventory_qty_consumed} onChange={e => setTaskForm({...taskForm, inventory_qty_consumed: e.target.value})} placeholder="0.0" disabled={!taskForm.inventory_item_id} />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Task Guidelines / Operational Instructions</label>
-                <textarea rows="2" className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500" value={taskForm.notes} onChange={e => setTaskForm({...taskForm, notes: e.target.value})} placeholder="Ensure irrigation valves are closed after 2 hours..." />
+                <label className="muf-label">{L('Task Guidelines / Operational Instructions')}</label>
+                <textarea rows="2" className="muf-field" value={taskForm.notes} onChange={e => setTaskForm({...taskForm, notes: e.target.value})} placeholder={L('Ensure irrigation valves are closed after 2 hours...')} />
               </div>
 
               {rainForecast24h > 5 && isIrrigationRelated(taskForm.title, taskForm.notes) && (
@@ -4565,9 +4566,9 @@ function App() {
 
               {/* Task image upload and preview */}
               <div className="space-y-1.5">
-                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Duty Attachment Photo (PNG / JPEG)</label>
+                <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{L('Duty Attachment Photo (PNG / JPEG)')}</label>
                 <ImageUploader
-                  label="Upload Photo"
+                  label={L('Upload Photo')}
                   value={taskForm.image_base64}
                   onDone={(base64) => setTaskForm({ ...taskForm, image_base64: base64 })}
                   onRemove={() => setTaskForm({ ...taskForm, image_base64: '' })}
@@ -4575,7 +4576,7 @@ function App() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onClick={() => setShowTaskModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">Cancel</button>
+                <button type="button" onClick={() => setShowTaskModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
                 <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
                   <CheckCircle size={14} /> {editingTask ? "Update Assignment" : "Assign Duty"}
                 </button>
@@ -4639,12 +4640,12 @@ function App() {
         {selectedFinance && (
           <div className="space-y-4 text-slate-800 dark:text-slate-100">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm">
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><FileText size={10} /> Category</p>
+              <div className="muf-tile space-y-1">
+                <p className="muf-caption flex items-center gap-1"><FileText size={10} /> {L('Category')}</p>
                 <p className="font-extrabold">{selectedFinance.category}</p>
               </div>
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Scale size={10} /> Ledger Flow</p>
+              <div className="muf-tile space-y-1">
+                <p className="muf-caption flex items-center gap-1"><Scale size={10} /> {L('Ledger Flow')}</p>
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border ${
                   selectedFinance.type === 'expense' 
                     ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400' 
@@ -4653,23 +4654,23 @@ function App() {
                   {selectedFinance.type === 'expense' ? 'Expense' : 'Income'}: {formatCurrency(selectedFinance.amount)}
                 </span>
               </div>
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Sprout size={10} /> Associated Crop</p>
+              <div className="muf-tile space-y-1">
+                <p className="muf-caption flex items-center gap-1"><Sprout size={10} /> {L('Associated Crop')}</p>
                 <p className="font-extrabold">
                   {crops.find(c => c._id === selectedFinance.crop_id)?.name || 'Farm-wide'}
                 </p>
               </div>
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Calendar size={10} /> Date Logged</p>
+              <div className="muf-tile space-y-1">
+                <p className="muf-caption flex items-center gap-1"><Calendar size={10} /> {L('Date Logged')}</p>
                 <p className="font-extrabold">{selectedFinance.date}</p>
               </div>
               {selectedFinance.type === 'income' && (selectedFinance.buyer_name || selectedFinance.quantity_sold) && (
                 <>
-                  <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Buyer</p>
+                  <div className="muf-tile space-y-1">
+                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Buyer')}</p>
                     <p className="font-extrabold">{selectedFinance.buyer_name || '—'}</p>
                   </div>
-                  <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
+                  <div className="muf-tile space-y-1">
                     <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Qty × Rate</p>
                     <p className="font-extrabold">{selectedFinance.quantity_sold || 0} × Rs. {formatCurrency(selectedFinance.rate_per_unit || 0)}</p>
                   </div>
@@ -4678,13 +4679,13 @@ function App() {
             </div>
             {selectedFinance.notes && (
               <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Additional Notes / Specifications</p>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Additional Notes / Specifications')}</p>
                 <p className="text-xs leading-relaxed font-medium text-slate-600 dark:text-slate-300 italic">"{selectedFinance.notes}"</p>
               </div>
             )}
             {selectedFinance.receipt_base64 && (
               <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Receipt Photo</p>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Receipt Photo')}</p>
                 <a href={selectedFinance.receipt_base64} target="_blank" rel="noopener noreferrer">
                   <img src={selectedFinance.receipt_base64} alt="Receipt" className="w-full max-h-64 object-contain rounded-lg bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 cursor-zoom-in" />
                 </a>
@@ -4734,12 +4735,12 @@ function App() {
             )}
             
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm">
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Users size={10} /> Assigned Worker</p>
+              <div className="muf-tile space-y-1">
+                <p className="muf-caption flex items-center gap-1"><Users size={10} /> {L('Assigned Worker')}</p>
                 <p className="font-extrabold">{selectedTask.assigned_to || ((selectedTask.laborer_names || []).length ? `Crew: ${(selectedTask.laborer_names || []).join(', ')}` : 'Broadcast Duty')}</p>
               </div>
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Clock size={10} /> Task Status</p>
+              <div className="muf-tile space-y-1">
+                <p className="muf-caption flex items-center gap-1"><Clock size={10} /> {L('Task Status')}</p>
                 <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-[10px] font-extrabold uppercase border ${
                   selectedTask.status === 'Completed' 
                     ? 'bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400' 
@@ -4748,8 +4749,8 @@ function App() {
                   {selectedTask.status}
                 </span>
               </div>
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><AlertTriangle size={10} /> Task Priority</p>
+              <div className="muf-tile space-y-1">
+                <p className="muf-caption flex items-center gap-1"><AlertTriangle size={10} /> {L('Task Priority')}</p>
                 <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase border ${
                   selectedTask.priority === 'High' 
                     ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400' 
@@ -4758,19 +4759,19 @@ function App() {
                   {selectedTask.priority}
                 </span>
               </div>
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Calendar size={10} /> Due Date</p>
+              <div className="muf-tile space-y-1">
+                <p className="muf-caption flex items-center gap-1"><Calendar size={10} /> {L('Due Date')}</p>
                 <p className="font-extrabold">{selectedTask.due_date || 'Ongoing care'}</p>
               </div>
               {userRole === 'admin' && (
                 <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 col-span-2">
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Coins size={10} /> Labor Wages Cost Contribution</p>
+                  <p className="muf-caption flex items-center gap-1"><Coins size={10} /> {L('Labor Wages Cost Contribution')}</p>
                   <p className="font-extrabold text-farm-600 dark:text-farm-400">Rs. {formatCurrency(selectedTask.labor_cost || 0)}</p>
                 </div>
               )}
               {(selectedTask.laborer_names || []).length > 0 && (
                 <div className="space-y-1.5 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 col-span-2">
-                  <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><HardHat size={10} /> Deployed Field Crew</p>
+                  <p className="muf-caption flex items-center gap-1"><HardHat size={10} /> {L('Deployed Field Crew')}</p>
                   <div className="flex flex-wrap gap-1.5">
                     {(selectedTask.laborer_names || []).map((name, i) => {
                       const lb = userRole === 'admin' ? laborers.find(x => x._id === (selectedTask.laborer_ids || [])[i]) : null;
@@ -4797,7 +4798,7 @@ function App() {
               return (
                 <div className="p-3.5 bg-slate-50 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 rounded-xl text-xs flex justify-between items-center animate-fade-in shadow-xs">
                   <div>
-                    <span className="text-[10px] text-slate-400 block uppercase tracking-wider">Associated Crop Cycle</span>
+                    <span className="text-[10px] text-slate-400 block uppercase tracking-wider">{L('Associated Crop Cycle')}</span>
                     <strong className="text-farm-600 dark:text-farm-400 font-extrabold">{foundLinkedCrop.name} ({foundLinkedCrop.variety || 'Standard'})</strong>
                   </div>
                   <button 
@@ -4816,7 +4817,7 @@ function App() {
             {/* Linked Stock Consumption */}
             {selectedTask.inventory_item_id && (
               <div className="p-3.5 bg-slate-50 dark:bg-slate-900/20 border border-slate-200 dark:border-slate-800 rounded-xl text-xs animate-fade-in shadow-xs">
-                <span className="text-[10px] text-slate-400 block uppercase tracking-wider">Stock Material Consumed</span>
+                <span className="text-[10px] text-slate-400 block uppercase tracking-wider">{L('Stock Material Consumed')}</span>
                 <strong className="text-slate-800 dark:text-slate-200 font-extrabold">
                   {inventory.find(item => item._id === selectedTask.inventory_item_id)?.name || 'Unknown Stock Item'}
                 </strong>
@@ -4838,7 +4839,7 @@ function App() {
 
             {selectedTask.notes && (
               <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Guidelines & Directions</p>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Guidelines & Directions')}</p>
                 <p className="text-xs leading-relaxed font-medium text-slate-600 dark:text-slate-300 italic">"{selectedTask.notes}"</p>
               </div>
             )}
@@ -4857,22 +4858,22 @@ function App() {
         {selectedMonthRow && (
           <div className="space-y-4 text-slate-800 dark:text-slate-100">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm">
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Monthly Income</p>
+              <div className="muf-tile space-y-1">
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Total Monthly Income')}</p>
                 <p className="font-extrabold text-farm-600 dark:text-farm-400">Rs. {formatCurrency(selectedMonthRow[1].income)}</p>
               </div>
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Monthly Expense</p>
+              <div className="muf-tile space-y-1">
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Total Monthly Expense')}</p>
                 <p className="font-extrabold text-red-500">Rs. {formatCurrency(selectedMonthRow[1].expense)}</p>
               </div>
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Monthly Net Profit</p>
+              <div className="muf-tile space-y-1">
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Monthly Net Profit')}</p>
                 <p className={`font-extrabold ${selectedMonthRow[1].income - selectedMonthRow[1].expense >= 0 ? 'text-farm-600 dark:text-farm-400' : 'text-red-500'}`}>
                   Rs. {formatCurrency(selectedMonthRow[1].income - selectedMonthRow[1].expense)}
                 </p>
               </div>
-              <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Crops Cycles Active</p>
+              <div className="muf-tile space-y-1">
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Crops Cycles Active')}</p>
                 <p className="font-extrabold">{selectedMonthRow[1].cropsCount} active cycles</p>
               </div>
             </div>
@@ -4888,7 +4889,7 @@ function App() {
                   </div>
                 ))}
                 {crops.filter(c => (reportsCropFilter === 'all' || c._id === reportsCropFilter) && String(c.plant_date || '').startsWith(selectedMonthRow[0].slice(0, 7))).length === 0 && (
-                  <p className="text-slate-500 italic py-2">No new crop cycle registrations logged in this month.</p>
+                  <p className="text-slate-500 italic py-2">{L('No new crop cycle registrations logged in this month.')}</p>
                 )}
               </div>
             </div>
@@ -4944,7 +4945,7 @@ function App() {
             
             {/* Timeline Row */}
             <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 space-y-3">
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Growth Timeline Stage</p>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Growth Timeline Stage')}</p>
               <div className="flex items-center justify-between relative pt-2">
                 {/* Connecting Line */}
                 <div className="absolute top-5 left-2 right-2 h-1 bg-slate-200 dark:bg-slate-800 -z-0 rounded-full">
@@ -4995,46 +4996,46 @@ function App() {
               const seedCostPerKanal = finalTotalSeedCost / (parseFloat(selectedCrop.area_kanal) || 1.0);
               return (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs md:text-sm">
-                  <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><MapPin size={10} /> Sector Plot</p>
+                  <div className="muf-tile space-y-1">
+                    <p className="muf-caption flex items-center gap-1"><MapPin size={10} /> {L('Sector Plot')}</p>
                     <p className="font-extrabold">{selectedCrop.field || 'Farm-wide'}</p>
                   </div>
                   {userRole === 'admin' && (
-                    <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Scale size={10} /> Yield harvested</p>
+                    <div className="muf-tile space-y-1">
+                      <p className="muf-caption flex items-center gap-1"><Scale size={10} /> {L('Yield harvested')}</p>
                       <p className="font-extrabold">{selectedCrop.yield_kg ? formatYield(toKg(selectedCrop.yield_kg, selectedCrop.yield_unit), selectedCrop.yield_unit) : 'None yet'}</p>
                     </div>
                   )}
-                  <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Calendar size={10} /> Planting Date</p>
+                  <div className="muf-tile space-y-1">
+                    <p className="muf-caption flex items-center gap-1"><Calendar size={10} /> {L('Planting Date')}</p>
                     <p className="font-extrabold">{selectedCrop.plant_date || 'N/A'}</p>
                   </div>
-                  <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Calendar size={10} /> Expected Harvest</p>
+                  <div className="muf-tile space-y-1">
+                    <p className="muf-caption flex items-center gap-1"><Calendar size={10} /> {L('Expected Harvest')}</p>
                     <p className="font-extrabold">{selectedCrop.harvest_date || 'N/A'}</p>
                   </div>
-                  <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                    <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Sprout size={10} /> Seed Variety</p>
+                  <div className="muf-tile space-y-1">
+                    <p className="muf-caption flex items-center gap-1"><Sprout size={10} /> {L('Seed Variety')}</p>
                     <p className="font-extrabold text-farm-600 dark:text-farm-400">{selectedCrop.variety || 'Standard'}</p>
                   </div>
                   {userRole === 'admin' && (
-                    <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                      <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Leaf size={10} /> Sowed Seed Quantity</p>
+                    <div className="muf-tile space-y-1">
+                      <p className="muf-caption flex items-center gap-1"><Leaf size={10} /> {L('Sowed Seed Quantity')}</p>
                       <p className="font-extrabold">{selectedCrop.seed_quantity ? `${selectedCrop.seed_quantity} ${selectedCrop.seed_unit || 'kg'}` : '0 kg'}</p>
                     </div>
                   )}
                   {userRole === 'admin' && (
                     <>
-                      <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Coins size={10} /> Total Seed Cost</p>
+                      <div className="muf-tile space-y-1">
+                        <p className="muf-caption flex items-center gap-1"><Coins size={10} /> {L('Total Seed Cost')}</p>
                         <p className="font-extrabold text-red-500">Rs. {formatCurrency(finalTotalSeedCost)}</p>
                       </div>
-                      <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><Coins size={10} /> Seed Cost / Kanal</p>
+                      <div className="muf-tile space-y-1">
+                        <p className="muf-caption flex items-center gap-1"><Coins size={10} /> {L('Seed Cost / Kanal')}</p>
                         <p className="font-extrabold text-red-500">Rs. {formatCurrency(seedCostPerKanal)}</p>
                       </div>
                       <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 col-span-2">
-                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider flex items-center gap-1"><TrendingUp size={10} /> Profit / Kanal</p>
+                        <p className="muf-caption flex items-center gap-1"><TrendingUp size={10} /> {L('Profit / Kanal')}</p>
                         <p className="font-extrabold text-farm-600 dark:text-farm-400">Rs. {formatCurrency(((() => {
                           const cropExpenses = finance.filter(f => f.crop_id === selectedCrop._id);
                           const spent = cropExpenses.filter(f => f.type === 'expense').reduce((sum, f) => sum + f.amount, 0);
@@ -5059,18 +5060,18 @@ function App() {
               return (
                 <div className="space-y-4">
                   <div className="p-4 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 space-y-3">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">💰 Financial Cost-Benefit Summary</h4>
+                    <h4 className="muf-caption flex items-center gap-1">💰 Financial Cost-Benefit Summary</h4>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-xs md:text-sm">
                       <div className="p-2 bg-white dark:bg-[#101625]/40 rounded-lg border border-slate-200 dark:border-slate-800">
-                        <span className="text-[10px] text-slate-400 block">Total Spent</span>
+                        <span className="text-[10px] text-slate-400 block">{L('Total Spent')}</span>
                         <strong className="text-red-500">Rs. {formatCurrency(spent)}</strong>
                       </div>
                       <div className="p-2 bg-white dark:bg-[#101625]/40 rounded-lg border border-slate-200 dark:border-slate-800">
-                        <span className="text-[10px] text-slate-400 block">Total Earned</span>
+                        <span className="text-[10px] text-slate-400 block">{L('Total Earned')}</span>
                         <strong className="text-farm-600 dark:text-farm-400">Rs. {formatCurrency(earned)}</strong>
                       </div>
                       <div className="p-2 bg-white dark:bg-[#101625]/40 rounded-lg border border-slate-200 dark:border-slate-800">
-                        <span className="text-[10px] text-slate-400 block">Net Profit</span>
+                        <span className="text-[10px] text-slate-400 block">{L('Net Profit')}</span>
                         <strong className={net >= 0 ? "text-farm-600 dark:text-farm-400" : "text-red-500"}>
                           Rs. {formatCurrency(net)}
                         </strong>
@@ -5097,10 +5098,10 @@ function App() {
                   </div>
 
                   <div className="p-4 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 space-y-3">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">📊 Break-Even Yield Calculator</h4>
+                    <h4 className="muf-caption flex items-center gap-1">📊 Break-Even Yield Calculator</h4>
                     <div className="flex flex-col md:flex-row md:items-center gap-4 text-xs">
                       <div className="flex-1">
-                        <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">
+                        <label className="muf-label">
                           Market Price (Rs. per {selectedCrop.yield_unit || 'kg'})
                         </label>
                         <input 
@@ -5116,7 +5117,7 @@ function App() {
                         />
                       </div>
                       <div className="flex-1 flex flex-col justify-center">
-                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">Required Break-Even Yield</span>
+                        <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider block">{L('Required Break-Even Yield')}</span>
                         {marketPrice > 0 ? (
                           <div className="mt-1">
                             <strong className="text-sm font-black text-farm-600 dark:text-farm-400">
@@ -5132,14 +5133,14 @@ function App() {
                             )}
                           </div>
                         ) : (
-                          <span className="text-slate-400 italic mt-1 block">Enter a market price to calculate break-even yield.</span>
+                          <span className="text-slate-400 italic mt-1 block">{L('Enter a market price to calculate break-even yield.')}</span>
                         )}
                       </div>
                     </div>
                   </div>
 
                   <div className="p-4 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 space-y-3">
-                    <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">🕌 {L('Ushr Calculator (this crop)')}</h4>
+                    <h4 className="muf-caption flex items-center gap-1">🕌 {L('Ushr Calculator (this crop)')}</h4>
                     <p className="text-[11px] text-slate-500">
                       Ushr on this crop's harvest income of <span className="font-extrabold">Rs. {formatCurrency(earned)}</span>.
                       Pick the rate each time — the app only does the math; the ruling is your decision.
@@ -5163,7 +5164,7 @@ function App() {
                             <input
                               type="number" step="any" min="0"
                               className="w-24 bg-white dark:bg-[#1e293b] border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg px-3 py-1.5 text-xs outline-none focus:border-farm-500"
-                              placeholder="Custom %"
+                              placeholder={L('Custom %')}
                               value={chosen}
                               onChange={e => setUshrPcts({ ...ushrPcts, [selectedCrop._id]: e.target.value })}
                             />
@@ -5205,7 +5206,7 @@ function App() {
             {/* Complete Transaction History (admin-only: money data) */}
             {userRole === 'admin' && (
             <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 space-y-2">
-              <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">📜 Complete Ledger History</h4>
+              <h4 className="muf-caption flex items-center gap-1">📜 Complete Ledger History</h4>
               <div className="space-y-2 max-h-[30vh] overflow-y-auto pr-1">
                 {finance.filter(f => f.crop_id === selectedCrop._id).map(f => (
                   <div key={f._id} className="flex justify-between items-center text-xs p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-[#101625]/40 text-slate-800 dark:text-slate-100">
@@ -5219,7 +5220,7 @@ function App() {
                   </div>
                 ))}
                 {finance.filter(f => f.crop_id === selectedCrop._id).length === 0 && (
-                  <p className="text-center text-xs text-slate-400 italic py-4">No ledger transactions linked to this crop cycle.</p>
+                  <p className="text-center text-xs text-slate-400 italic py-4">{L('No ledger transactions linked to this crop cycle.')}</p>
                 )}
               </div>
             </div>
@@ -5233,7 +5234,7 @@ function App() {
               });
               return (
                 <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 space-y-2">
-                  <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">📋 Linked Care & Duty roster</h4>
+                  <h4 className="muf-caption flex items-center gap-1">📋 Linked Care & Duty roster</h4>
                   <div className="space-y-2 max-h-[25vh] overflow-y-auto pr-1">
                     {linkedTasks.map(t => (
                       <div key={t._id} className="flex justify-between items-center text-xs p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-[#101625]/40 text-slate-800 dark:text-slate-100">
@@ -5251,7 +5252,7 @@ function App() {
                       </div>
                     ))}
                     {linkedTasks.length === 0 && (
-                      <p className="text-center text-xs text-slate-400 italic py-4">No active care tasks linked to this crop name.</p>
+                      <p className="text-center text-xs text-slate-400 italic py-4">{L('No active care tasks linked to this crop name.')}</p>
                     )}
                   </div>
                 </div>
@@ -5260,7 +5261,7 @@ function App() {
 
             {userRole === 'admin' && selectedCrop.notes && (
               <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Additional Notes & Comments</p>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Additional Notes & Comments')}</p>
                 <p className="text-xs leading-relaxed font-medium text-slate-600 dark:text-slate-300 italic">"{selectedCrop.notes}"</p>
               </div>
             )}
@@ -5281,7 +5282,7 @@ function App() {
       <DetailModal
         open={modal === 'crops_planted'}
         onClose={closePopup}
-        title="Crop Inventory Sectors"
+        title={L('Crop Inventory Sectors')}
         subtitle={`${crops.length} Planted Crops`}
         icon={<Sprout size={16} />}
        size="small">
@@ -5295,12 +5296,12 @@ function App() {
                   <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30 uppercase">{c.status}</span>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-500">
-                  <p>Variety: <span className="font-semibold text-slate-700 dark:text-slate-300">{c.variety || 'N/A'}</span></p>
-                  <p>Plot: <span className="font-semibold text-slate-700 dark:text-slate-300">{c.field || 'N/A'}</span></p>
-                  <p>Planted: <span className="font-semibold text-slate-700 dark:text-slate-300">{c.plant_date || 'N/A'}</span></p>
+                  <p>{L('Variety:')} <span className="font-semibold text-slate-700 dark:text-slate-300">{c.variety || 'N/A'}</span></p>
+                  <p>{L('Plot:')} <span className="font-semibold text-slate-700 dark:text-slate-300">{c.field || 'N/A'}</span></p>
+                  <p>{L('Planted:')} <span className="font-semibold text-slate-700 dark:text-slate-300">{c.plant_date || 'N/A'}</span></p>
                   {userRole === 'admin' && (
                     <>
-                      <p>Yield: <span className="font-semibold text-slate-700 dark:text-slate-300">{c.yield_kg ? formatYield(toKg(c.yield_kg, c.yield_unit), c.yield_unit) : 'N/A'}</span></p>
+                      <p>{L('Yield:')} <span className="font-semibold text-slate-700 dark:text-slate-300">{c.yield_kg ? formatYield(toKg(c.yield_kg, c.yield_unit), c.yield_unit) : 'N/A'}</span></p>
                       <p>Seed Qty: <span className="font-semibold text-slate-700 dark:text-slate-300">{c.seed_quantity ? `${c.seed_quantity} ${c.seed_unit || 'kg'}` : '0 kg'}</span></p>
                       <p>Seed Cost: <span className="font-semibold text-slate-700 dark:text-slate-300">{c.seed_cost_per_unit ? `Rs. ${c.seed_cost_per_unit}/${c.seed_unit || 'kg'}` : 'N/A'}</span></p>
                     </>
@@ -5308,7 +5309,7 @@ function App() {
                 </div>
               </div>
             ))}
-            {crops.length === 0 && <p className="text-center text-xs text-slate-500 py-6">No crop logs available.</p>}
+            {crops.length === 0 && <p className="text-center text-xs text-slate-500 py-6">{L('No crop logs available.')}</p>}
           </div>
         </div>
       </DetailModal>
@@ -5324,7 +5325,7 @@ function App() {
         {selectedLedgerGroup && (
           <div className="space-y-4 text-slate-800 dark:text-slate-100">
             <div className="flex justify-between items-center p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
-              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Folder Net Balance</span>
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{L('Folder Net Balance')}</span>
               <strong className={`font-black text-base ${selectedLedgerGroup.net >= 0 ? 'text-farm-600 dark:text-farm-400' : 'text-red-500'}`}>
                 Rs. {formatCurrency(selectedLedgerGroup.net)}
               </strong>
@@ -5334,10 +5335,10 @@ function App() {
               <table className="muf-reflow w-full text-left border-collapse text-xs md:text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 dark:border-slate-800">
-                    <th className="px-4 py-3">Date</th>
-                    <th className="px-4 py-3">Description</th>
-                    <th className="px-4 py-3 text-right">Ledger Flow</th>
-                    {userRole === 'admin' && <th className="px-4 py-3 text-right">Actions</th>}
+                    <th className="px-4 py-3">{L('Date')}</th>
+                    <th className="px-4 py-3">{L('Description')}</th>
+                    <th className="px-4 py-3 text-right">{L('Ledger Flow')}</th>
+                    {userRole === 'admin' && <th className="px-4 py-3 text-right">{L('Actions')}</th>}
                   </tr>
                 </thead>
                 <tbody className={`divide-y ${
@@ -5367,12 +5368,12 @@ function App() {
                         </span>
                       </td>
                       {userRole === 'admin' && (
-                        <td data-label="Actions" className="px-4 py-4 text-right whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                        <td data-label={L('Actions')} className="px-4 py-4 text-right whitespace-nowrap" onClick={e => e.stopPropagation()}>
                           <div className="inline-flex gap-1 justify-end">
-                            <button onClick={() => { handleEditFinance(f); setSelectedLedgerGroup(null); }} className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-farm-500 rounded-lg cursor-pointer transition-colors" title="Edit Log" aria-label="Edit ledger entry">
+                            <button onClick={() => { handleEditFinance(f); setSelectedLedgerGroup(null); }} className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-farm-500 rounded-lg cursor-pointer transition-colors" title={L('Edit Log')} aria-label={L('Edit ledger entry')}>
                               <Edit3 size={14} />
                             </button>
-                            <button onClick={async () => { const removed = await handleDeleteFinance(f._id); if (removed) setSelectedLedgerGroup(null); }} className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-red-400 rounded-lg cursor-pointer transition-colors" title="Delete Log" aria-label="Delete ledger entry">
+                            <button onClick={async () => { const removed = await handleDeleteFinance(f._id); if (removed) setSelectedLedgerGroup(null); }} className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-red-400 rounded-lg cursor-pointer transition-colors" title={L('Delete Log')} aria-label={L('Delete ledger entry')}>
                               <Trash2 size={14} />
                             </button>
                           </div>
@@ -5382,7 +5383,7 @@ function App() {
                   ))}
                   {selectedLedgerGroup.transactions.length === 0 && (
                     <tr>
-                      <td colSpan={userRole === 'admin' ? 4 : 3} className="px-4 py-8 text-center text-slate-500 italic">No transactions in this folder.</td>
+                      <td colSpan={userRole === 'admin' ? 4 : 3} className="px-4 py-8 text-center text-slate-500 italic">{L('No transactions in this folder.')}</td>
                     </tr>
                   )}
                 </tbody>
@@ -5406,11 +5407,11 @@ function App() {
           {ledgerModalData.cardType !== 'profit' && ledgerModalData.cardType !== 'margin' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-center border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Revenue</p>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Total Revenue')}</p>
                 <h5 className="text-lg font-black text-farm-600 dark:text-farm-400">Rs. {formatCurrency(ledgerModalData.income)}</h5>
               </div>
               <div>
-                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Expenditures</p>
+                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Total Expenditures')}</p>
                 <h5 className="text-lg font-black text-red-400">Rs. {formatCurrency(ledgerModalData.expense)}</h5>
               </div>
             </div>
@@ -5422,17 +5423,17 @@ function App() {
               <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-wider">📐 Net Profit Equation</h4>
               <div className="flex flex-col md:flex-row items-center justify-center gap-2 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400">
                 <div className="p-3 bg-white dark:bg-[#101625]/60 rounded-xl border border-slate-200 dark:border-slate-800 min-w-[140px] shadow-xs">
-                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">Total Revenue</span>
+                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">{L('Total Revenue')}</span>
                   <strong className="text-farm-600 dark:text-farm-400 text-sm">Rs. {formatCurrency(ledgerModalData.income)}</strong>
                 </div>
                 <div className="text-xl font-bold font-mono">−</div>
                 <div className="p-3 bg-white dark:bg-[#101625]/60 rounded-xl border border-slate-200 dark:border-slate-800 min-w-[140px] shadow-xs">
-                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">Total Expenditures</span>
+                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">{L('Total Expenditures')}</span>
                   <strong className="text-red-500 text-sm">Rs. {formatCurrency(ledgerModalData.expense)}</strong>
                 </div>
                 <div className="text-xl font-bold font-mono">=</div>
                 <div className="p-3 bg-white dark:bg-[#101625]/60 rounded-xl border border-slate-200 dark:border-slate-800 min-w-[140px] shadow-xs">
-                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">Net Operating Profit</span>
+                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">{L('Net Operating Profit')}</span>
                   <strong className={`${ledgerModalData.netProfit >= 0 ? "text-farm-600 dark:text-farm-400" : "text-red-400"} text-sm`}>Rs. {formatCurrency(ledgerModalData.netProfit)}</strong>
                 </div>
               </div>
@@ -5446,17 +5447,17 @@ function App() {
               <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-wider">📐 Operating Margin Equation</h4>
               <div className="flex flex-col md:flex-row items-center justify-center gap-2 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400">
                 <div className="p-3 bg-white dark:bg-[#101625]/60 rounded-xl border border-slate-200 dark:border-slate-800 min-w-[140px] shadow-xs">
-                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">Net Profit</span>
+                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">{L('Net Profit')}</span>
                   <strong className={`${ledgerModalData.netProfit >= 0 ? "text-farm-600 dark:text-farm-400" : "text-red-400"} text-sm`}>Rs. {formatCurrency(ledgerModalData.netProfit)}</strong>
                 </div>
                 <div className="text-xl font-bold font-mono">÷</div>
                 <div className="p-3 bg-white dark:bg-[#101625]/60 rounded-xl border border-slate-200 dark:border-slate-800 min-w-[140px] shadow-xs">
-                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">Total Revenue</span>
+                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">{L('Total Revenue')}</span>
                   <strong className="text-farm-600 dark:text-farm-400 text-sm">Rs. {formatCurrency(ledgerModalData.income)}</strong>
                 </div>
                 <div className="text-xl font-bold font-mono">× 100 =</div>
                 <div className="p-3 bg-white dark:bg-[#101625]/60 rounded-xl border border-slate-200 dark:border-slate-800 min-w-[140px] shadow-xs">
-                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">Operating Margin (%)</span>
+                  <span className="text-[9px] uppercase tracking-wider block text-slate-400 mb-1">{L('Operating Margin (%)')}</span>
                   <strong className="text-farm-500 text-sm">
                     {ledgerModalData.income > 0 ? (((ledgerModalData.netProfit) / ledgerModalData.income) * 100).toFixed(1) : '0.0'}%
                   </strong>
@@ -5533,7 +5534,7 @@ function App() {
           )}
 
           {ledgerModalData.transactions.length === 0 && ledgerModalData.cardType !== 'profit' && ledgerModalData.cardType !== 'margin' && (
-            <p className="text-center text-xs text-slate-500 py-6">No transaction logs available.</p>
+            <p className="text-center text-xs text-slate-500 py-6">{L('No transaction logs available.')}</p>
           )}
         </div>
       </DetailModal>
@@ -5542,12 +5543,12 @@ function App() {
       <DetailModal
         open={modal === 'pending_duties'}
         onClose={closePopup}
-        title="Active Care & Duties"
+        title={L('Active Care & Duties')}
         subtitle={`${tasks.filter(t => t.status === 'Pending').length} Pending Tasks`}
         icon={<CheckSquare size={16} />}
        size="small">
         <div className="space-y-4">
-          <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">Active tasks assigned to your team:</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{L('Active tasks assigned to your team:')}</p>
           <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-1">
             {tasks.filter(t => t.status === 'Pending').map(t => (
               <div key={t._id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-slate-800 dark:text-slate-100">
@@ -5557,8 +5558,8 @@ function App() {
                 </div>
                 {t.notes && <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 mb-2.5">{t.notes}</p>}
                 <div className="flex justify-between items-center text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-2">
-                  <span>Assigned to: <strong className="text-slate-700 dark:text-slate-300">{t.assigned_to || 'General'}</strong></span>
-                  <span>Due: <strong className="text-slate-700 dark:text-slate-300">{t.due_date || 'N/A'}</strong></span>
+                  <span>{L('Assigned to:')} <strong className="text-slate-700 dark:text-slate-300">{t.assigned_to || 'General'}</strong></span>
+                  <span>{L('Due:')} <strong className="text-slate-700 dark:text-slate-300">{t.due_date || 'N/A'}</strong></span>
                 </div>
               </div>
             ))}
@@ -5573,8 +5574,8 @@ function App() {
       <DetailModal
         open={modal === 'notifications'}
         onClose={closePopup}
-        title="Active Farm Notifications"
-        subtitle="Real-time Operational Alerts"
+        title={L('Active Farm Notifications')}
+        subtitle={L('Real-time Operational Alerts')}
         icon={<Bell size={16} />}
        size="small">
         <div className="space-y-4 text-slate-800 dark:text-slate-100">
@@ -5592,7 +5593,7 @@ function App() {
                     notif.type === 'info' ? 'bg-blue-900/20 text-blue-600 border-blue-900/30' :
                     'bg-farm-900/20 text-farm-500 dark:text-farm-400 border-farm-900/30'
                   }`}>
-                    Alert
+                    {L('Alert')}
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">{notif.desc}</p>
@@ -5654,6 +5655,7 @@ function App() {
               ))}
             </div>
           )}
+          <MufDiaryMedia date={diaryDate} allowVoice />
         </div>
       </DetailModal>
 

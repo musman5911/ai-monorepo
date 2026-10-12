@@ -5,6 +5,7 @@ import { t } from '../i18n';
 import { todayStr } from '../utils/calculations';
 import DetailModal from '../muf-modal';
 import { useConfirm, notify } from '../muf-confirm';
+import { L } from '../i18n';
 
 interface IncubationModuleProps {
   lang: Lang;
@@ -135,13 +136,13 @@ export default function IncubationModule({
     const infertileN = parseInt(infertileEggs) || 0;
     const deadInShellN = parseInt(deadInShellEggs) || 0;
 
-    if (!set || set <= 0) return notify('Enter eggs set count', 'error');
+    if (!set || set <= 0) return notify(L('Enter eggs set count'), 'error');
     if ([hatchedN, brokenN, spoiledN, infertileN, deadInShellN].some((n) => n < 0)) {
-      return notify('Counts cannot be negative', 'error');
+      return notify(L('Counts cannot be negative'), 'error');
     }
     const accounted = hatchedN + brokenN + spoiledN + infertileN + deadInShellN;
     if (accounted > set) return notify(`Total accounted eggs (${accounted}) cannot exceed eggs set (${set}).`, 'error');
-    if (hatchDate && hatchDate < startDate) return notify('Hatch date cannot be before start date', 'error');
+    if (hatchDate && hatchDate < startDate) return notify(L('Hatch date cannot be before start date'), 'error');
 
     const payload = {
       startDate,
@@ -195,12 +196,12 @@ export default function IncubationModule({
 
   const handleDeleteFromDetail = async (record: IncubationRecord) => {
     const ok = await confirmAction({
-      title: 'Delete Incubation Record',
+      title: L('Delete Incubation Record'),
       message: record.flockTransferDate
         ? 'Delete this incubation record? Birds already added to flock will stay in the flock registry.'
         : 'Delete this incubation record?',
-      confirmLabel: 'Delete Record',
-      cancelLabel: 'Cancel',
+      confirmLabel: L('Delete Record'),
+      cancelLabel: L('Cancel'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -219,13 +220,13 @@ export default function IncubationModule({
     const pricePerBird = parseFloat(transferPricePerBird) || 0;
 
     if ([femaleCount, maleCount].some((value) => value < 0)) {
-      return notify('Bird counts cannot be negative', 'error');
+      return notify(L('Bird counts cannot be negative'), 'error');
     }
     if (femaleCount + maleCount !== transferRecord.hatched) {
       return notify(`Female + Male count must equal hatched chicks (${transferRecord.hatched}).`, 'info');
     }
     if (transferBreed === 'Custom' && !transferCustomBreed.trim()) {
-      return notify('Please enter a custom breed name.', 'error');
+      return notify(L('Please enter a custom breed name.'), 'error');
     }
 
     const prefix = transferNamePrefix.trim() || `Hatch ${transferRecord.id}`;
@@ -292,10 +293,10 @@ export default function IncubationModule({
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
-        <MetricCard label="Eggs Set" value={String(totals.totalSet)} accent="amber" />
-        <MetricCard label="Hatched" value={String(totals.totalHatched)} accent="emerald" />
-        <MetricCard label="Losses" value={String(totals.totalLosses)} accent="rose" helper="Broken + rotten + infertile + dead-in-shell" />
-        <MetricCard label="Open / Unaccounted" value={String(totals.totalRemaining)} accent="sky" helper="Still incubating or not finalized" />
+        <MetricCard label={L('Eggs Set')} value={String(totals.totalSet)} accent="amber" />
+        <MetricCard label={L('Hatched')} value={String(totals.totalHatched)} accent="emerald" />
+        <MetricCard label={L('Losses')} value={String(totals.totalLosses)} accent="rose" helper={L('Broken + rotten + infertile + dead-in-shell')} />
+        <MetricCard label={L('Open / Unaccounted')} value={String(totals.totalRemaining)} accent="sky" helper={L('Still incubating or not finalized')} />
         <MetricCard label="Avg Hatch Rate" value={`${totals.completedCount > 0 ? totals.avgCompletedRate.toFixed(0) : 0}%`} accent="violet" helper={totals.completedCount > 0 ? `${totals.completedCount} completed record(s)` : 'No completed records yet'} />
       </div>
 
@@ -306,24 +307,24 @@ export default function IncubationModule({
               <Plus className="w-4 h-4" /> {t(lang, 'add')}
             </h3>
             <div className="grid grid-cols-2 gap-2">
-              <input type="date" required value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
-              <input type="date" value={hatchDate} onChange={(e) => setHatchDate(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+              <input type="date" required value={startDate} onChange={(e) => setStartDate(e.target.value)} className="muf-field" />
+              <input type="date" value={hatchDate} onChange={(e) => setHatchDate(e.target.value)} className="muf-field" />
             </div>
-            <input type="number" min="1" required placeholder="Eggs set" value={eggsSet} onChange={(e) => setEggsSet(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <input type="number" min="1" required placeholder={L('Eggs set')} value={eggsSet} onChange={(e) => setEggsSet(e.target.value)} className="muf-field" />
             <div className="grid grid-cols-2 gap-2">
-              <input type="number" min="0" placeholder="Hatched chicks" value={hatched} onChange={(e) => setHatched(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
-              <input type="number" min="0" placeholder="Broken eggs" value={brokenEggs} onChange={(e) => setBrokenEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
-              <input type="number" min="0" placeholder="Rotten / kharab" value={spoiledEggs} onChange={(e) => setSpoiledEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
-              <input type="number" min="0" placeholder="Infertile" value={infertileEggs} onChange={(e) => setInfertileEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
-              <input type="number" min="0" placeholder="Dead in shell" value={deadInShellEggs} onChange={(e) => setDeadInShellEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 col-span-2" />
+              <input type="number" min="0" placeholder={L('Hatched chicks')} value={hatched} onChange={(e) => setHatched(e.target.value)} className="muf-field" />
+              <input type="number" min="0" placeholder={L('Broken eggs')} value={brokenEggs} onChange={(e) => setBrokenEggs(e.target.value)} className="muf-field" />
+              <input type="number" min="0" placeholder={L('Rotten / kharab')} value={spoiledEggs} onChange={(e) => setSpoiledEggs(e.target.value)} className="muf-field" />
+              <input type="number" min="0" placeholder={L('Infertile')} value={infertileEggs} onChange={(e) => setInfertileEggs(e.target.value)} className="muf-field" />
+              <input type="number" min="0" placeholder={L('Dead in shell')} value={deadInShellEggs} onChange={(e) => setDeadInShellEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 col-span-2" />
             </div>
-            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes (hatch quality, humidity issue, rotten eggs, etc.)" className="w-full px-3 py-2 border rounded-xl h-20 resize-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={L('Notes (hatch quality, humidity issue, rotten eggs, etc.)')} className="w-full px-3 py-2 border rounded-xl h-20 resize-none dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
             {formPreview.set > 0 && (
               <div className="p-3 rounded-xl border border-amber-100 bg-amber-50/70 dark:bg-amber-900/10 dark:border-amber-900 space-y-1 text-[11px] font-mono text-slate-700 dark:text-slate-300">
-                <div className="flex justify-between"><span>Accounted:</span><span className="font-bold">{formPreview.accounted} / {formPreview.set}</span></div>
-                <div className="flex justify-between"><span>Losses:</span><span className="font-bold">{formPreview.losses}</span></div>
-                <div className="flex justify-between"><span>Open / unaccounted:</span><span className="font-bold">{formPreview.remaining}</span></div>
-                <div className="flex justify-between border-t border-amber-100 dark:border-amber-900 pt-1 mt-1"><span>Hatch rate:</span><span className="font-bold text-emerald-700 dark:text-emerald-400">{formPreview.rate.toFixed(0)}%</span></div>
+                <div className="flex justify-between"><span>{L('Accounted:')}</span><span className="font-bold">{formPreview.accounted} / {formPreview.set}</span></div>
+                <div className="flex justify-between"><span>{L('Losses:')}</span><span className="font-bold">{formPreview.losses}</span></div>
+                <div className="flex justify-between"><span>{L('Open / unaccounted:')}</span><span className="font-bold">{formPreview.remaining}</span></div>
+                <div className="flex justify-between border-t border-amber-100 dark:border-amber-900 pt-1 mt-1"><span>{L('Hatch rate:')}</span><span className="font-bold text-emerald-700 dark:text-emerald-400">{formPreview.rate.toFixed(0)}%</span></div>
               </div>
             )}
             <div className="flex gap-2">
@@ -337,11 +338,11 @@ export default function IncubationModule({
             <table className="w-full text-xs text-left">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-800 text-3xs uppercase text-slate-500 dark:text-slate-400">
-                  <th className="p-3">Start</th>
-                  <th className="p-3">Hatch</th>
-                  <th className="p-3">Status</th>
-                  <th className="p-3">Set</th>
-                  <th className="p-3">Hatched</th>
+                  <th className="p-3">{L('Start')}</th>
+                  <th className="p-3">{L('Hatch')}</th>
+                  <th className="p-3">{L('Status')}</th>
+                  <th className="p-3">{L('Set')}</th>
+                  <th className="p-3">{L('Hatched')}</th>
                   <th className="p-3 sm:hidden text-right"></th>
                 </tr>
               </thead>
@@ -353,7 +354,7 @@ export default function IncubationModule({
                       key={record.id}
                       className="align-top cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40"
                       onClick={() => openRecordDetail(record)}
-                      title="View incubation details"
+                      title={L('View incubation details')}
                     >
                       <td className="p-3 font-mono whitespace-nowrap dark:text-slate-200">{record.startDate}</td>
                       <td className="p-3 font-mono whitespace-nowrap dark:text-slate-200">{record.hatchDate || '—'}</td>
@@ -364,7 +365,7 @@ export default function IncubationModule({
                     </tr>
                   );
                 })}
-                {records.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-slate-400 italic">No incubation records</td></tr>}
+                {records.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-slate-400 italic">{L('No incubation records')}</td></tr>}
               </tbody>
             </table>
           </div>
@@ -374,7 +375,7 @@ export default function IncubationModule({
       <DetailModal
         open={!!activeDetailRecord}
         onClose={() => setActiveDetailId(null)}
-        title="Incubation Record Details"
+        title={L('Incubation Record Details')}
         subtitle={activeDetailRecord ? `Record #${activeDetailRecord.id}` : undefined}
         icon={<Egg className="w-5 h-5" />}
         iconBg="bg-emerald-100 text-emerald-700"
@@ -388,18 +389,18 @@ export default function IncubationModule({
           return (
             <div className="space-y-4 text-sm">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <IncubationDetailTile label="Start Date" value={activeDetailRecord.startDate} />
-                <IncubationDetailTile label="Hatch Date" value={activeDetailRecord.hatchDate || '—'} />
+                <IncubationDetailTile label={L('Start Date')} value={activeDetailRecord.startDate} />
+                <IncubationDetailTile label={L('Hatch Date')} value={activeDetailRecord.hatchDate || '—'} />
                 <IncubationDetailTile label="Eggs Set" value={`${activeDetailRecord.eggsSet}`} />
                 <IncubationDetailTile label="Hatched" value={`${activeDetailRecord.hatched}`} />
                 <IncubationDetailTile label="Losses" value={`${losses.total}`} />
                 <IncubationDetailTile label="Open" value={`${open}`} />
                 <IncubationDetailTile label="Hatch Rate" value={activeDetailRecord.hatchDate ? `${hatchRate(activeDetailRecord).toFixed(0)}%` : 'In progress'} />
-                <IncubationDetailTile label="Status" value={status.label} />
+                <IncubationDetailTile label={L('Status')} value={status.label} />
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Loss Breakdown</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{L('Loss Breakdown')}</p>
                 <div className="mt-2 grid grid-cols-2 md:grid-cols-4 gap-2 text-xs font-mono text-slate-700">
                   <span>Broken: {losses.broken}</span>
                   <span>Spoiled: {losses.spoiled}</span>
@@ -409,7 +410,7 @@ export default function IncubationModule({
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Notes</p>
+                <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{L('Notes')}</p>
                 <p className="mt-1 text-sm text-slate-700">{activeDetailRecord.notes || 'No notes added.'}</p>
               </div>
 
@@ -424,9 +425,9 @@ export default function IncubationModule({
                   <button
                     type="button"
                     onClick={() => handleDeleteFromDetail(activeDetailRecord)}
-                    className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold text-xs hover:bg-rose-100"
+                    className="muf-btn muf-btn-danger"
                   >
-                    Delete Record
+                    {L('Delete Record')}
                   </button>
                 )}
                 {canChange && (
@@ -437,7 +438,7 @@ export default function IncubationModule({
                     }}
                     className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-700"
                   >
-                    Edit Record
+                    {L('Edit Record')}
                   </button>
                 )}
                 {canTransferRecord && (
@@ -446,9 +447,9 @@ export default function IncubationModule({
                     onClick={() => {
                       startTransfer(activeDetailRecord);
                     }}
-                    className="px-4 py-2 rounded-xl bg-emerald-600 text-white font-semibold text-xs hover:bg-emerald-700"
+                    className="px-4 py-2 rounded-xl bg-farm-600 text-white font-semibold text-xs hover:bg-farm-700"
                   >
-                    Add to Flock
+                    {L('Add to Flock')}
                   </button>
                 )}
               </div>
@@ -457,7 +458,7 @@ export default function IncubationModule({
         })()}
       </DetailModal>
 
-      <DetailModal open={editId !== null} onClose={resetForm} title="Edit Incubation Record" icon={<Pencil className="w-5 h-5" />} iconBg="bg-green-100 text-green-700" size="small">
+      <DetailModal open={editId !== null} onClose={resetForm} title={L('Edit Incubation Record')} icon={<Pencil className="w-5 h-5" />} iconBg="bg-green-100 text-green-700" size="small">
         <form onSubmit={handleSubmit} className="space-y-3 text-xs">
           {isTransferredRecord && (
             <div className="rounded-2xl border border-sky-100 bg-sky-50 px-3 py-2 text-[11px] text-sky-800">
@@ -465,21 +466,21 @@ export default function IncubationModule({
             </div>
           )}
           <div className="grid grid-cols-2 gap-2">
-            <input type="date" required disabled={isTransferredRecord} value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full px-3 py-2 border rounded-xl disabled:bg-slate-100 disabled:text-slate-400" />
-            <input type="date" disabled={isTransferredRecord} value={hatchDate} onChange={(e) => setHatchDate(e.target.value)} className="w-full px-3 py-2 border rounded-xl disabled:bg-slate-100 disabled:text-slate-400" />
+            <input type="date" required disabled={isTransferredRecord} value={startDate} onChange={(e) => setStartDate(e.target.value)} className="muf-field" />
+            <input type="date" disabled={isTransferredRecord} value={hatchDate} onChange={(e) => setHatchDate(e.target.value)} className="muf-field" />
           </div>
-          <input type="number" min="1" required disabled={isTransferredRecord} placeholder="Eggs set" value={eggsSet} onChange={(e) => setEggsSet(e.target.value)} className="w-full px-3 py-2 border rounded-xl disabled:bg-slate-100 disabled:text-slate-400" />
+          <input type="number" min="1" required disabled={isTransferredRecord} placeholder={L('Eggs set')} value={eggsSet} onChange={(e) => setEggsSet(e.target.value)} className="muf-field" />
           <div className="grid grid-cols-2 gap-2">
-            <input type="number" min="0" disabled={isTransferredRecord} placeholder="Hatched chicks" value={hatched} onChange={(e) => setHatched(e.target.value)} className="w-full px-3 py-2 border rounded-xl disabled:bg-slate-100 disabled:text-slate-400" />
-            <input type="number" min="0" disabled={isTransferredRecord} placeholder="Broken eggs" value={brokenEggs} onChange={(e) => setBrokenEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl disabled:bg-slate-100 disabled:text-slate-400" />
-            <input type="number" min="0" disabled={isTransferredRecord} placeholder="Rotten / kharab" value={spoiledEggs} onChange={(e) => setSpoiledEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl disabled:bg-slate-100 disabled:text-slate-400" />
-            <input type="number" min="0" disabled={isTransferredRecord} placeholder="Infertile" value={infertileEggs} onChange={(e) => setInfertileEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl disabled:bg-slate-100 disabled:text-slate-400" />
-            <input type="number" min="0" disabled={isTransferredRecord} placeholder="Dead in shell" value={deadInShellEggs} onChange={(e) => setDeadInShellEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl col-span-2 disabled:bg-slate-100 disabled:text-slate-400" />
+            <input type="number" min="0" disabled={isTransferredRecord} placeholder={L('Hatched chicks')} value={hatched} onChange={(e) => setHatched(e.target.value)} className="muf-field" />
+            <input type="number" min="0" disabled={isTransferredRecord} placeholder={L('Broken eggs')} value={brokenEggs} onChange={(e) => setBrokenEggs(e.target.value)} className="muf-field" />
+            <input type="number" min="0" disabled={isTransferredRecord} placeholder={L('Rotten / kharab')} value={spoiledEggs} onChange={(e) => setSpoiledEggs(e.target.value)} className="muf-field" />
+            <input type="number" min="0" disabled={isTransferredRecord} placeholder={L('Infertile')} value={infertileEggs} onChange={(e) => setInfertileEggs(e.target.value)} className="muf-field" />
+            <input type="number" min="0" disabled={isTransferredRecord} placeholder={L('Dead in shell')} value={deadInShellEggs} onChange={(e) => setDeadInShellEggs(e.target.value)} className="w-full px-3 py-2 border rounded-xl col-span-2 disabled:bg-slate-100 disabled:text-slate-400" />
           </div>
-          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Notes" className="w-full px-3 py-2 border rounded-xl h-20 resize-none" />
+          <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder={L('Notes')} className="w-full px-3 py-2 border rounded-xl h-20 resize-none" />
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={resetForm} className="px-4 py-2 border rounded-xl">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-green-700 text-white rounded-xl font-semibold hover:bg-green-800">Update Record</button>
+            <button type="button" onClick={resetForm} className="px-4 py-2 border rounded-xl">{L('Cancel')}</button>
+            <button type="submit" className="px-4 py-2 bg-green-700 text-white rounded-xl font-semibold hover:bg-green-800">{L('Update Record')}</button>
           </div>
         </form>
       </DetailModal>
@@ -487,7 +488,7 @@ export default function IncubationModule({
       <DetailModal
         open={transferRecordId !== null}
         onClose={resetTransferForm}
-        title="Add Hatched Chicks to Flock Registry"
+        title={L('Add Hatched Chicks to Flock Registry')}
         subtitle={transferRecord ? `Incubation #${transferRecord.id} · ${transferRecord.hatched} chick(s)` : undefined}
         icon={<BirdIcon className="w-5 h-5" />}
         iconBg="bg-emerald-100 text-emerald-700"
@@ -501,12 +502,12 @@ export default function IncubationModule({
           )}
 
           <div>
-            <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Bird Name Prefix</label>
+            <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Bird Name Prefix')}</label>
             <input
               type="text"
               value={transferNamePrefix}
               onChange={(e) => setTransferNamePrefix(e.target.value)}
-              placeholder="e.g. August Hatch"
+              placeholder={L('e.g. August Hatch')}
               className="w-full px-3 py-2 border rounded-xl"
             />
             <p className="mt-1 text-[10px] text-slate-400">Birds will be named automatically like “{transferNamePrefix || 'Hatch'} 01, 02...”</p>
@@ -546,25 +547,25 @@ export default function IncubationModule({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Breed / Type</label>
+              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Breed / Type')}</label>
               <select
                 value={transferBreed}
                 onChange={(e) => setTransferBreed(e.target.value as BirdBreed)}
                 className="w-full px-3 py-2 border rounded-xl"
               >
-                <option value="Desi">Desi</option>
-                <option value="Aseel">Aseel</option>
-                <option value="Rhode Island">Rhode Island</option>
-                <option value="Golden">Golden</option>
-                <option value="Misri">Misri</option>
-                <option value="Broiler">Broiler</option>
-                <option value="Layer">Layer</option>
-                <option value="Fayoumi">Fayoumi</option>
-                <option value="Custom">Custom</option>
+                <option value="Desi">{L('Desi')}</option>
+                <option value="Aseel">{L('Aseel')}</option>
+                <option value="Rhode Island">{L('Rhode Island')}</option>
+                <option value="Golden">{L('Golden')}</option>
+                <option value="Misri">{L('Misri')}</option>
+                <option value="Broiler">{L('Broiler')}</option>
+                <option value="Layer">{L('Layer')}</option>
+                <option value="Fayoumi">{L('Fayoumi')}</option>
+                <option value="Custom">{L('Custom')}</option>
               </select>
             </div>
             <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Cost per Chick (Rs)</label>
+              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Cost per Chick (Rs)')}</label>
               <input
                 type="number"
                 min="0"
@@ -594,8 +595,8 @@ export default function IncubationModule({
           </div>
 
           <div className="flex justify-end gap-2">
-            <button type="button" onClick={resetTransferForm} className="px-4 py-2 border rounded-xl">Cancel</button>
-            <button type="submit" className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-semibold hover:bg-emerald-700">Add Chicks</button>
+            <button type="button" onClick={resetTransferForm} className="px-4 py-2 border rounded-xl">{L('Cancel')}</button>
+            <button type="submit" className="px-4 py-2 bg-farm-600 text-white rounded-xl font-semibold hover:bg-farm-700">{L('Add Chicks')}</button>
           </div>
         </form>
       </DetailModal>

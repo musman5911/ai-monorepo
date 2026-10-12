@@ -45,6 +45,7 @@ import MufAdminReports from '../muf-admin-reports';
 import MufAdminGeneral from '../muf-admin-general';
 import { useConfirm } from '../muf-confirm';
 import { mufPopupBackdrop, mufPopupCard, mufPopupIcon, mufPopupCloseHover, mufPopupCloseTap } from '../muf-motion';
+import { L } from '../i18n';
 
 const KG_PER_MAUND = 40;
 const toKg = (value, unit) => {
@@ -776,11 +777,11 @@ export default function AdminMenu({
   // --- Delete User ---
   const handleDeleteUser = async (id) => {
     const ok = await confirm({
-      title: 'Delete Worker Account',
-      message: 'Are you sure you want to delete this worker account? They will lose access immediately.',
+      title: L('Delete Worker Account'),
+      message: L('Are you sure you want to delete this worker account? They will lose access immediately.'),
       tone: 'danger',
-      confirmLabel: 'Delete',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Delete'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -831,11 +832,11 @@ export default function AdminMenu({
     const file = e.target.files[0];
     if (!file) return;
     const ok = await confirm({
-      title: 'Restore Database',
-      message: 'Restore farm data from this file? Current records will be replaced (user accounts are kept).',
+      title: L('Restore Database'),
+      message: L('Restore farm data from this file? Current records will be replaced (user accounts are kept).'),
       tone: 'warning',
-      confirmLabel: 'Overwrite & Restore',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Overwrite & Restore'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     const reader = new FileReader();
@@ -936,7 +937,7 @@ export default function AdminMenu({
                   onSubmitEmail={(e) => { e.preventDefault(); handleUpdateEmail(); }}
                 >
                   {/* Farm Location (weather widget) */}
-                  <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title="Farm Location" subtitle="Set your farm coordinates for live weather">
+                  <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title={L('Farm Location')} subtitle={L('Set your farm coordinates for live weather')}>
                     <div className="space-y-3">
                       {farmLocCurrent && (
                         <p className="text-xs text-slate-500">
@@ -954,8 +955,8 @@ export default function AdminMenu({
                         placeholder="33.9943, 72.9106"
                         className="w-full px-3 py-2 text-sm font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-farm-500"
                       />
-                      <p className="text-[10px] text-slate-400">Enter latitude, longitude. City is auto-detected.</p>
-                      <MufAdminButton variant="secondary" size="md" onClick={() => handleSaveFarmLocation()}>Save Location</MufAdminButton>
+                      <p className="text-[10px] text-slate-400">{L('Enter latitude, longitude. City is auto-detected.')}</p>
+                      <MufAdminButton variant="secondary" size="md" onClick={() => handleSaveFarmLocation()}>{L('Save Location')}</MufAdminButton>
                     </div>
                   </MufAdminCard>
                 </MufAdminGeneral>
@@ -1005,17 +1006,17 @@ export default function AdminMenu({
                   {isAdmin ? (
                     <>
                     <form onSubmit={handleSaveAutomations} className="space-y-6">
-                      <MufAdminCard icon={<UserPlus className="w-5 h-5" />} title="Profile Avatar" subtitle="Upload a custom profile photo">
+                      <MufAdminCard icon={<UserPlus className="w-5 h-5" />} title={L('Profile Avatar')} subtitle={L('Upload a custom profile photo')}>
                         <div className="flex items-center gap-2 pb-2 border-b border-[#e6e6de] dark:border-[#203528]">
                           <div className="p-1.5 bg-farm-900/10 text-farm-600 dark:text-farm-400 rounded-lg">
                             <Clock size={14} />
                           </div>
                           <div>
-                            <h4 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider font-extrabold">Automated Alert Digests</h4>
-                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Configure scheduled automatic email reports.</p>
+                            <h4 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider font-extrabold">{L('Automated Alert Digests')}</h4>
+                            <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{L('Configure scheduled automatic email reports.')}</p>
                           </div>
                         </div>
-                        <p className="text-xs text-slate-500 leading-relaxed">Schedule automatic email reports.</p>
+                        <p className="text-xs text-slate-500 leading-relaxed">{L('Schedule automatic email reports.')}</p>
                         
                         {autoMsg && (
                           <div className={`p-3 rounded-lg text-xs border ${
@@ -1033,25 +1034,25 @@ export default function AdminMenu({
                             checked={autoSettings.cron_enabled}
                             onChange={e => setAutoSettings({...autoSettings, cron_enabled: e.target.checked})}
                           />
-                          <label htmlFor="cron_enabled" className="text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">Activate Scheduled Cronjob Engine</label>
+                          <label htmlFor="cron_enabled" className="text-xs font-bold text-slate-700 dark:text-slate-300 cursor-pointer">{L('Activate Scheduled Cronjob Engine')}</label>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Report Schedule Interval</label>
+                            <label className="muf-label">{L('Report Schedule Interval')}</label>
                             <select 
                               className="w-full bg-white dark:bg-[#1a2333] border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500 text-slate-900 dark:text-white font-medium cursor-pointer"
                               value={["0 8 * * *", "0 8 * * 0", "0 8 1 * *"].includes(autoSettings.schedule) ? autoSettings.schedule : "0 8 * * *"}
                               onChange={e => setAutoSettings({...autoSettings, schedule: e.target.value})}
                               disabled={!autoSettings.cron_enabled}
                             >
-                              <option value="0 8 * * *">Daily at 8:00 AM</option>
-                              <option value="0 8 * * 0">Weekly on Sunday at 8:00 AM</option>
-                              <option value="0 8 1 * *">Monthly on the 1st at 8:00 AM</option>
+                              <option value="0 8 * * *">{L('Daily at 8:00 AM')}</option>
+                              <option value="0 8 * * 0">{L('Weekly on Sunday at 8:00 AM')}</option>
+                              <option value="0 8 1 * *">{L('Monthly on the 1st at 8:00 AM')}</option>
                             </select>
                           </div>
                           <div>
-                            <label className="block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Recipient Alert Emails (Comma-separated for multiple) *</label>
+                            <label className="muf-label">Recipient Alert Emails (Comma-separated for multiple) *</label>
                             <input 
                               type="text"
                               required
@@ -1065,7 +1066,7 @@ export default function AdminMenu({
                         </div>
 
                         <div className="pt-2 space-y-2">
-                          <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Include Report Sections</p>
+                          <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{L('Include Report Sections')}</p>
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                             <label className="flex items-center gap-2 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#101625]/20 text-xs cursor-pointer select-none">
                               <input 
@@ -1073,7 +1074,7 @@ export default function AdminMenu({
                                 checked={autoSettings.alert_soil}
                                 onChange={e => setAutoSettings({...autoSettings, alert_soil: e.target.checked})}
                               />
-                              <span className="text-slate-700 dark:text-slate-300">Include Crops Register</span>
+                              <span className="text-slate-700 dark:text-slate-300">{L('Include Crops Register')}</span>
                             </label>
                             <label className="flex items-center gap-2 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#101625]/20 text-xs cursor-pointer select-none">
                               <input 
@@ -1081,7 +1082,7 @@ export default function AdminMenu({
                                 checked={autoSettings.alert_finance}
                                 onChange={e => setAutoSettings({...autoSettings, alert_finance: e.target.checked})}
                               />
-                              <span className="text-slate-700 dark:text-slate-300">Include Ledger Balances</span>
+                              <span className="text-slate-700 dark:text-slate-300">{L('Include Ledger Balances')}</span>
                             </label>
                             <label className="flex items-center gap-2 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#101625]/20 text-xs cursor-pointer select-none">
                               <input 
@@ -1089,7 +1090,7 @@ export default function AdminMenu({
                                 checked={autoSettings.alert_tasks}
                                 onChange={e => setAutoSettings({...autoSettings, alert_tasks: e.target.checked})}
                               />
-                              <span className="text-slate-700 dark:text-slate-300">Include Care Rosters</span>
+                              <span className="text-slate-700 dark:text-slate-300">{L('Include Care Rosters')}</span>
                             </label>
                           </div>
                         </div>
@@ -1150,7 +1151,7 @@ export default function AdminMenu({
                             <div className="space-y-3">
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 <div>
-                                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">Start Date</label>
+                                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">{L('Start Date')}</label>
                                   <input 
                                     type="date"
                                     className="w-full bg-slate-50 dark:bg-[#1a2333] border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-farm-500 text-slate-900 dark:text-white"
@@ -1159,7 +1160,7 @@ export default function AdminMenu({
                                   />
                                 </div>
                                 <div>
-                                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">End Date</label>
+                                  <label className="block text-[9px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">{L('End Date')}</label>
                                   <input 
                                     type="date"
                                     className="w-full bg-slate-50 dark:bg-[#1a2333] border border-slate-300 dark:border-slate-700 rounded-lg px-2.5 py-1.5 text-xs outline-none focus:border-farm-500 text-slate-900 dark:text-white"
@@ -1183,7 +1184,7 @@ export default function AdminMenu({
                                       }
                                     }}
                                   />
-                                  <span>Send All Fields & Datasets</span>
+                                  <span>{L('Send All Fields & Datasets')}</span>
                                 </label>
 
                                 {!dispatchAllFields && (
@@ -1194,7 +1195,7 @@ export default function AdminMenu({
                                         checked={dispatchIncludeCrops}
                                         onChange={e => setDispatchIncludeCrops(e.target.checked)}
                                       />
-                                      <span>Crops</span>
+                                      <span>{L('Crops')}</span>
                                     </label>
                                     <label className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#101625]/20 text-[10px] font-bold cursor-pointer select-none">
                                       <input 
@@ -1202,7 +1203,7 @@ export default function AdminMenu({
                                         checked={dispatchIncludeFinance}
                                         onChange={e => setDispatchIncludeFinance(e.target.checked)}
                                       />
-                                      <span>Finances</span>
+                                      <span>{L('Finances')}</span>
                                     </label>
                                     <label className="flex items-center gap-1.5 p-2 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-[#101625]/20 text-[10px] font-bold cursor-pointer select-none">
                                       <input 
@@ -1210,7 +1211,7 @@ export default function AdminMenu({
                                         checked={dispatchIncludeTasks}
                                         onChange={e => setDispatchIncludeTasks(e.target.checked)}
                                       />
-                                      <span>Tasks</span>
+                                      <span>{L('Tasks')}</span>
                                     </label>
                                   </div>
                                 )}
@@ -1223,7 +1224,7 @@ export default function AdminMenu({
                                 onClick={() => setShowDispatchPrompt(false)}
                                 className="px-4 py-2.5 min-h-11 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg cursor-pointer"
                               >
-                                Cancel
+                                {L('Cancel')}
                               </button>
                               <button
                                 type="button"
@@ -1242,7 +1243,7 @@ export default function AdminMenu({
                   ) : (
                     <div className="p-6 text-slate-500 flex items-center gap-3">
                       <ShieldCheck size={20} />
-                      <p className="text-xs font-medium">Cronjob automation and triggers configuration is restricted to Administrators.</p>
+                      <p className="text-xs font-medium">{L('Cronjob automation and triggers configuration is restricted to Administrators.')}</p>
                     </div>
                   )}
                 </div>
@@ -1256,7 +1257,7 @@ export default function AdminMenu({
                   <div className="space-y-4">
                     <div>
                       <p className="text-xs font-bold text-slate-800 dark:text-slate-200">💰 Crop-Specific Cycle Summary (Financial)</p>
-                      <p className="text-[11px] text-slate-500">Incomes, expenses and transaction logs only.</p>
+                      <p className="text-[11px] text-slate-500">{L('Incomes, expenses and transaction logs only.')}</p>
                     </div>
                     <ExportScopeWizard crops={crops} accent="finance" onExport={(scope) => handleExportPDF('finance', scope)} />
                     <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
@@ -1273,38 +1274,38 @@ export default function AdminMenu({
                 <div className="space-y-6 animate-fade-in">
                   {isAdmin ? (
                     <>
-                      <MufAdminCard icon={<Database className="w-5 h-5" />} title="Manual Backup" subtitle="Download or share your farm data">
+                      <MufAdminCard icon={<Database className="w-5 h-5" />} title={L('Manual Backup')} subtitle={L('Download or share your farm data')}>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                           <MufAdminButton variant="primary" size="md" icon={<Download className="w-5 h-5" />}
                             onClick={handleExportBackup}
                             className="flex-col h-24 py-4"
                           >
-                            <span>Download Backup</span>
-                            <span className="text-[10px] font-normal opacity-80">All data as .json file</span>
+                            <span>{L('Download Backup')}</span>
+                            <span className="text-[10px] font-normal opacity-80">{L('All data as .json file')}</span>
                           </MufAdminButton>
                           <MufAdminButton variant="success" size="md"
                             icon={<span className="text-xl">💬</span>}
                             onClick={handleShareBackup}
                             className="flex-col h-24 py-4"
                           >
-                            <span>Send via WhatsApp</span>
-                            <span className="text-[10px] font-normal opacity-80">Share backup file to a chat</span>
+                            <span>{L('Send via WhatsApp')}</span>
+                            <span className="text-[10px] font-normal opacity-80">{L('Share backup file to a chat')}</span>
                           </MufAdminButton>
                         </div>
                       </MufAdminCard>
 
-                      <MufAdminCard icon={<Upload className="w-5 h-5" />} title="Restore from File" subtitle="Upload a .json backup to restore data">
+                      <MufAdminCard icon={<Upload className="w-5 h-5" />} title={L('Restore from File')} subtitle={L('Upload a .json backup to restore data')}>
                         <div className="relative">
                           <input type="file" accept=".json" onChange={handleImportBackup} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
                           <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg p-6 flex flex-col items-center gap-2 hover:border-farm-500 hover:bg-farm-50/30 dark:hover:bg-farm-900/10 transition cursor-pointer">
                             <Upload className="w-8 h-8 text-purple-600" />
-                            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Choose JSON file...</p>
+                            <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{L('Choose JSON file...')}</p>
                             <p className="text-[10px] text-red-500 font-bold">⚠️ This will overwrite all current data</p>
                           </div>
                         </div>
                       </MufAdminCard>
 
-                      <MufAdminCard icon={<RefreshCw className="w-5 h-5" />} title="Automatic Monthly Backup" subtitle="System creates a backup once per month">
+                      <MufAdminCard icon={<RefreshCw className="w-5 h-5" />} title={L('Automatic Monthly Backup')} subtitle={L('System creates a backup once per month')}>
                         <p className="text-xs font-bold text-slate-700 dark:text-slate-200 mb-3">
                           {autoBackup?.exists
                             ? `Last auto backup: ${autoBackup.name}`
@@ -1315,11 +1316,11 @@ export default function AdminMenu({
                             disabled={!autoBackup?.exists}
                             onClick={async () => {
                               const ok = await confirm({
-                                title: 'Restore last automatic monthly backup',
+                                title: L('Restore last automatic monthly backup'),
                                 message: `Restore ${autoBackup?.name || 'the last backup'}? Current records will be replaced (user accounts are kept).`,
                                 tone: 'warning',
-                                confirmLabel: 'Restore snapshot',
-                                cancelLabel: 'Cancel'
+                                confirmLabel: L('Restore snapshot'),
+                                cancelLabel: L('Cancel')
                               });
                               if (!ok) return;
                               try {
@@ -1331,7 +1332,7 @@ export default function AdminMenu({
                               }
                             }}
                           >
-                            Restore from it
+                            {L('Restore from it')}
                           </MufAdminButton>
                         </div>
                       </MufAdminCard>
@@ -1339,7 +1340,7 @@ export default function AdminMenu({
                   ) : (
                     <div className="p-6 text-slate-500 flex items-center gap-3">
                       <ShieldCheck size={20} />
-                      <p className="text-xs font-medium">Backups are available to admins only.</p>
+                      <p className="text-xs font-medium">{L('Backups are available to admins only.')}</p>
                     </div>
                   )}
                 </div>

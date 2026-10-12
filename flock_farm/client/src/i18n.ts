@@ -45,7 +45,7 @@ const EN: Record<string, string> = {
   ledger: 'Financial Ledger',
   health: 'Health Portal',
   incubation: 'Incubation',
-  operations: 'Daily Ops',
+  operations: 'Diary',
   summary: 'Reports',
   labor: 'Labor',
   settings: 'Settings',

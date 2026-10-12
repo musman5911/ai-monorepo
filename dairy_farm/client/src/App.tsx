@@ -17,6 +17,7 @@ import {
   Bell,
   Users,
   ChevronDown,
+  Languages,
 } from "lucide-react";
 import { getToken, getRole, getUsername, clearAuth, api, syncOfflineQueue, offlineQueueCount } from "./api";
 import type { HealthRecord, AuthUser } from "./types";
@@ -230,7 +231,7 @@ export default function App() {
 
   if (!token) {
     return (
-      <Login onLogin={handleLogin} sessionNotice={sessionNotice} />
+      <Login onLogin={handleLogin} sessionNotice={sessionNotice} lang={lang} onToggleLang={toggleLang} />
     );
   }
 
@@ -292,8 +293,8 @@ export default function App() {
             alt="Usman Dairy Farm"
           />
           <div>
-            <h1>Usman Dairy Farm</h1>
-            <p>Farm Management System</p>
+            <h1>{L('Usman Dairy Farm')}</h1>
+            <p>{L('Farm Management System')}</p>
           </div>
         </a>
 
@@ -322,9 +323,18 @@ export default function App() {
           />
 
           <button
+            className="muf-icon-button"
+            onClick={() => setDiaryOpen(true)}
+            title={L("Diary")}
+            aria-label={L("Diary")}
+          >
+            <BookOpen size={19} />
+          </button>
+
+          <button
             className="muf-icon-button muf-notif-wrap"
-            title="Notifications"
-            aria-label="Notifications"
+            title={L('Notifications')}
+            aria-label={L('Notifications')}
             onClick={() => setNotifOpen(true)}
           >
             <Bell size={19} />
@@ -335,33 +345,24 @@ export default function App() {
 
           <button
             className="muf-icon-button"
-            onClick={() => setDiaryOpen(true)}
-            title={L("Diary")}
-            aria-label="Diary"
-          >
-            <BookOpen size={19} />
-          </button>
-
-          <button
-            className="muf-icon-button"
             onClick={toggleLang}
             title={lang === "en" ? L("Switch to Urdu") : lang === "ur" ? L("Switch to Roman Urdu") : L("Switch to English")}
-            aria-label="Switch language"
+            aria-label={L("Switch language")}
           >
-            <span className="text-[10px] font-bold">{lang === "en" ? "EN" : lang === "ur" ? "UR" : "Roman"}</span>
+            <Languages size={19} />
           </button>
 
           <button
             className="muf-icon-button"
             onClick={() => setDark((d) => !d)}
-            title={dark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            aria-label="Toggle theme"
+            title={dark ? L("Switch to Light Mode") : L("Switch to Dark Mode")}
+            aria-label={L("Toggle theme")}
           >
             {dark ? <Sun size={19} /> : <Moon size={19} /> }
           </button>
 
           {isAdmin ? (
-            <button className="muf-profile" onClick={() => setShowAdmin(true)} title="Open admin panel" aria-label="Open admin panel">
+            <button className="muf-profile" onClick={() => setShowAdmin(true)} title={L("Open admin panel")} aria-label={L("Open admin panel")}>
               <span className="muf-avatar">
                 {me?.avatarBase64 ? (
                   <img src={me.avatarBase64} className="object-cover rounded-full" alt={username || 'Admin'} />
@@ -369,11 +370,11 @@ export default function App() {
                   <Shield size={18} />
                 )}
               </span>
-              <span><strong>Welcome - {username || "Admin"}</strong><small>Administrator</small></span>
+              <span><strong>Welcome - {username || "Admin"}</strong><small>{L('Administrator')}</small></span>
               <ChevronDown size={17} />
             </button>
           ) : (
-            <button className="muf-profile" onClick={() => setProfileOpen(true)} title="My profile" aria-label="Open my profile">
+            <button className="muf-profile" onClick={() => setProfileOpen(true)} title={L("My profile")} aria-label={L("Open my profile")}>
               <span className="muf-avatar">
                 {me?.avatarBase64 ? (
                   <img src={me.avatarBase64} className="object-cover rounded-full" alt={username || 'Worker'} />
@@ -381,24 +382,24 @@ export default function App() {
                   <Users size={18} />
                 )}
               </span>
-              <span><strong>Welcome - {username || "Worker"}</strong><small>Worker</small></span>
+              <span><strong>Welcome - {username || "Worker"}</strong><small>{L('Worker')}</small></span>
             </button>
           )}
 
-          <button className="muf-icon-button muf-logout" onClick={handleLogout} title="Logout" aria-label="Logout">
+          <button className="muf-icon-button muf-logout" onClick={handleLogout} title={L("Logout")} aria-label={L("Logout")}>
             <LogOut size={18} />
           </button>
         </div>
       </header>
 
       {/* Tab Nav */}
-      <nav className="muf-top-nav" aria-label="Primary navigation">
+      <nav className="muf-top-nav" aria-label={L('Primary navigation')}>
         <div className="muf-top-nav-scroll">
           {visibleNav.map(({ id, label, icon: Icon }) => id === "expenses" ? (
             <div className="muf-nav-item muf-finance-nav-item relative" key={id}>
               <div className="flex items-center">
                 <button type="button" className={`muf-nav-link ${tab === id ? "active" : ""}`} onClick={() => { setTab(id); setFinanceMenuOpen(false); }}><Icon size={15}/><span>{label}</span></button>
-                <button type="button" aria-label="Open Finance sections" aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2" title="Finance sections"><ChevronDown size={14}/></button>
+                <button type="button" aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2" title={L('Finance sections')}><ChevronDown size={14}/></button>
               </div>
               {financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{label:'All expenses',value:''},{label:'Feed',value:'feed'},{label:'Medicine',value:'medicine'},{label:'Equipment',value:'equipment'},{label:'Labor',value:'labor'},{label:'Purchasing',value:'purchasing'},{label:'Other',value:'misc'}].map(item => <button key={item.label} type="button" onClick={() => { setFinanceCategory(item.value); setTab('expenses'); setFinanceMenuOpen(false); }} className={`block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800 ${financeCategory === item.value ? 'font-bold text-emerald-700 dark:text-emerald-400' : ''}`}>{item.label}</button>)}</div>}
             </div>
@@ -437,7 +438,7 @@ export default function App() {
             {tab === "labor" && isAdmin && <LaborTab />}
             {tab === "reports" && (isAdmin ? <ReportsTab /> : (
               <div className="p-8 text-center text-slate-500 text-sm">
-                Reports are available to admin accounts only.
+                {L('Reports are available to admin accounts only.')}
               </div>
             ))}
             {tab === "super_admin" && isAdmin && <SuperAdminTab />}
@@ -488,8 +489,8 @@ export default function App() {
       <DetailModal
         open={notifOpen}
         onClose={() => setNotifOpen(false)}
-        title="Active Farm Notifications"
-        subtitle="Real-time Operational Alerts"
+        title={L('Active Farm Notifications')}
+        subtitle={L('Real-time Operational Alerts')}
         icon={<Bell className="w-4 h-4" />}
         iconBg="bg-farm-100 text-farm-700 dark:bg-farm-900/40 dark:text-farm-300"
         size="small"
@@ -506,7 +507,7 @@ export default function App() {
                             ? "bg-red-900/20 text-red-600 border-red-900/30"
                             : "bg-amber-900/20 text-amber-600 border-amber-900/30"
                         }`}>
-                          Alert
+                          {L('Alert')}
                         </span>
                       </div>
                       <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">{notif.desc}</p>

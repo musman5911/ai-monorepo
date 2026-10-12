@@ -143,7 +143,7 @@ export default function SupplierLedger({ lang = 'en', suppliers, onChangeSupplie
             </span>
           )}
           {canDelete && (
-            <button onClick={() => setShowAdd(true)} className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg transition">
+            <button onClick={() => setShowAdd(true)} className="flex items-center gap-1 px-3 py-1.5 bg-farm-600 hover:bg-farm-700 text-white text-[11px] font-bold rounded-lg transition">
               <Plus className="w-3.5 h-3.5" /> {L('Supplier')}
             </button>
           )}
@@ -169,7 +169,7 @@ export default function SupplierLedger({ lang = 'en', suppliers, onChangeSupplie
           </div>
           <div className="flex justify-end gap-2 pt-1">
             <button type="button" onClick={() => setShowAdd(false)} className="px-4 py-2 border border-slate-200 text-slate-600 text-xs font-bold rounded-lg transition">{L('Cancel')}</button>
-            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition">{L('Save')}</button>
+            <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg transition">{L('Save')}</button>
           </div>
         </form>
       </DetailModal>
@@ -219,7 +219,7 @@ export default function SupplierLedger({ lang = 'en', suppliers, onChangeSupplie
 
             {khataOf.phone && (
               <button onClick={() => shareViaWhatsAppTo(khataOf.phone!, supplierHisabText(khataOf.name, khataRow, FARM_SIGNATURE))}
-                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition">
+                className="w-full flex items-center justify-center gap-1.5 px-3 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg transition">
                 <Share2 className="w-3.5 h-3.5" /> {L('Send hisab on WhatsApp')}
               </button>
             )}
@@ -236,7 +236,7 @@ export default function SupplierLedger({ lang = 'en', suppliers, onChangeSupplie
                 className="flex-1 min-w-[120px] px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs outline-none" />
               <input value={payNote} onChange={(e) => setPayNote(e.target.value)} placeholder={L('Note (optional)')}
                 className="flex-1 min-w-[120px] px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs outline-none" />
-              <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition">
+              <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg transition">
                 {L('Add payment')}
               </button>
             </form>

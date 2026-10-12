@@ -1,4 +1,5 @@
 import React from 'react';
+import { L } from '../i18n';
 
 interface LogoProps {
   className?: string;
@@ -13,7 +14,7 @@ export const MufMasterLogo: React.FC<LogoProps> = ({ className = '', size = 36 }
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={`inline-block shrink-0 ${className}`}
-    aria-label="Malik Usman Farms Master Logo"
+    aria-label={L('Malik Usman Farms Master Logo')}
   >
     {/* Shield Base */}
     <path
@@ -57,7 +58,7 @@ export const AgriFarmLogo: React.FC<LogoProps> = ({ className = '', size = 32 })
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={`inline-block shrink-0 ${className}`}
-    aria-label="MUF Agri Farm Logo"
+    aria-label={L('MUF Agri Farm Logo')}
   >
     {/* Hexagonal Agronomy Seal */}
     <polygon
@@ -98,7 +99,7 @@ export const DairyFarmLogo: React.FC<LogoProps> = ({ className = '', size = 32 }
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={`inline-block shrink-0 ${className}`}
-    aria-label="MUF Dairy Farm Logo"
+    aria-label={L('MUF Dairy Farm Logo')}
   >
     {/* Circular Farm Badge */}
     <circle cx="50" cy="50" r="44" fill="#1E3A8A" stroke="#38BDF8" strokeWidth="3.5" />
@@ -139,7 +140,7 @@ export const FlockFarmLogo: React.FC<LogoProps> = ({ className = '', size = 32 }
     fill="none"
     xmlns="http://www.w3.org/2000/svg"
     className={`inline-block shrink-0 ${className}`}
-    aria-label="MUF Flock Farm Logo"
+    aria-label={L('MUF Flock Farm Logo')}
   >
     {/* Octagonal Shield */}
     <polygon

@@ -3,6 +3,7 @@ import { FileText, Printer } from 'lucide-react';
 import { api } from '../api';
 import type { Cow, MilkEntry, Expense, Sale } from '../types';
 import { openPrintDocument } from '../muf-print';
+import { L } from '../i18n';
 
 /**
  * Official Farm Export Center's
@@ -200,13 +201,13 @@ export default function ExportCenter() {
           <FileText size={14} />
         </div>
         <div>
-          <h4 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">Official Farm Export Center</h4>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Generate and download PDF dairy reports.</p>
+          <h4 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">{L('Official Farm Export Center')}</h4>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{L('Generate and download PDF dairy reports.')}</p>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider shrink-0">Scope</label>
+        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider shrink-0">{L('Scope')}</label>
         <select
           value={scope}
           onChange={(e) => setScope(e.target.value)}

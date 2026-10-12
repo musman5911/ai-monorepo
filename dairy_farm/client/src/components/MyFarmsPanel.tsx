@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Globe2, RefreshCw, ExternalLink, AlertCircle, TrendingUp } from 'lucide-react';
+import { L } from '../i18n';
 
 /* muf shared "My Farms" panel — keep identical in all three farm apps
    (only STORAGE_KEY and SELF differ). Shows live numbers from the other
@@ -73,10 +74,10 @@ export default function MyFarmsPanel() {
           <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
             <Globe2 className="w-4 h-4 text-farm-600" /> My Farms
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">Live numbers from your other farms.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{L('Live numbers from your other farms.')}</p>
         </div>
         <div className="flex gap-2">
-          <button onClick={() => refresh()} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition" title="Refresh">
+          <button onClick={() => refresh()} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition" title={L('Refresh')}>
             <RefreshCw className="w-4 h-4" />
           </button>
           <button onClick={() => setEditing((v) => !v)} className="px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300 transition">
@@ -137,11 +138,11 @@ export default function MyFarmsPanel() {
             </div>
           ))}
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Shared farm key</label>
+            <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Shared farm key')}</label>
             <input
               value={cfg.key}
               onChange={(e) => setCfg({ ...cfg, key: e.target.value.trim() })}
-              placeholder="Same CROSS_FARM_KEY set on every farm"
+              placeholder={L('Same CROSS_FARM_KEY set on every farm')}
               className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 transition font-mono"
             />
           </div>
@@ -150,7 +151,7 @@ export default function MyFarmsPanel() {
       )}
 
       {!editing && peers.length === 0 && (
-        <div className="muf-panel p-6 text-center text-xs text-slate-500">Use Setup to add your other farms.</div>
+        <div className="muf-panel p-6 text-center text-xs text-slate-500">{L('Use Setup to add your other farms.')}</div>
       )}
 
       {/* Per-farm cards */}
@@ -169,7 +170,7 @@ export default function MyFarmsPanel() {
                     {p.data.alerts && p.data.alerts.count > 0 && (
                       <span className="px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[9px] font-bold">{p.data.alerts.count} ⚠</span>
                     )}
-                    <a href={p.url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-farm-600 transition" title="Open">
+                    <a href={p.url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-farm-600 transition" title={L('Open')}>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                   </div>

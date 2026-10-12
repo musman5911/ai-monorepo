@@ -64,7 +64,7 @@ export default function SupplierKhata({ canDelete = true }: { canDelete?: boolea
       confirmLabel: L('Delete'), tone: 'danger',
     });
     if (!ok) return;
-    try { await api.deleteSupplier(s._id); load(); } catch { notify('Failed', 'error'); }
+    try { await api.deleteSupplier(s._id); load(); } catch { notify(L('Failed'), 'error'); }
   };
 
   const addPayment = async (e: React.FormEvent) => {

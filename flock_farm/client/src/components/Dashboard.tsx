@@ -474,7 +474,7 @@ export default function Dashboard({
               `🥚 Eggs today: ${eggProduction.filter(e => e.date === today).reduce((a, e) => a + (e.totalEggsCollected || 0), 0)}\n` +
               `💰 Net: Rs ${(totalIncome - totalExpense).toLocaleString()}`
             )}
-            title="Share today's summary on WhatsApp"
+            title={L('Share today\'s summary on WhatsApp')}
             className="flex items-center gap-1.5 rounded-xl border border-farm-300 dark:border-farm-700 px-2.5 py-1.5 text-2xs font-bold text-farm-700 dark:text-farm-300 hover:bg-farm-50 dark:hover:bg-farm-900/30 transition"
           >
             <Share2 className="w-3.5 h-3.5" /> {L('Share')}
@@ -622,13 +622,13 @@ export default function Dashboard({
       <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
         className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-4">
         <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
-          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 font-display">Recent Operations</h4>
-          <button onClick={() => setModal('recentOps')} className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="Show all recent operations">
+          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 font-display">{L('Recent Operations')}</h4>
+          <button onClick={() => setModal('recentOps')} className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title={L('Show all recent operations')}>
             <Eye className="w-4 h-4" />
           </button>
         </div>
         {recentOps.length === 0 ? (
-          <p className="text-slate-400 dark:text-slate-500 py-4 text-center text-xs">No operations recorded yet.</p>
+          <p className="text-slate-400 dark:text-slate-500 py-4 text-center text-xs">{L('No operations recorded yet.')}</p>
         ) : (
           <div className="divide-y divide-slate-100 dark:divide-slate-700 text-xs">
             {recentOps.map((item, i) => (
@@ -736,14 +736,14 @@ export default function Dashboard({
       <DetailModal
         open={modal === 'recentOps'}
         onClose={closeModal}
-        title="Recent Operations"
+        title={L('Recent Operations')}
         subtitle={`${allRecentOps.length} latest entries`}
         icon={<Eye className="w-5 h-5" />}
         iconBg="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
         size="small"
       >
         {allRecentOps.length === 0 ? (
-          <p className="text-slate-400 dark:text-slate-500 py-8 text-center text-sm">No operations recorded yet.</p>
+          <p className="text-slate-400 dark:text-slate-500 py-8 text-center text-sm">{L('No operations recorded yet.')}</p>
         ) : (
           <div className="divide-y divide-slate-100 dark:divide-slate-700 text-xs">
             {allRecentOps.map((item, i) => (
@@ -816,11 +816,11 @@ export default function Dashboard({
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Bird</th>
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Breed/Gender</th>
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Date Died</th>
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Reason</th>
-                  <th className="py-2 font-semibold uppercase text-[10px]">Detail</th>
+                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Bird')}</th>
+                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Breed/Gender')}</th>
+                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Date Died')}</th>
+                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Reason')}</th>
+                  <th className="py-2 font-semibold uppercase text-[10px]">{L('Detail')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -849,19 +849,19 @@ export default function Dashboard({
         title="Financial Deficit" subtitle={`Current shortfall: ${formatRs(Math.abs(netProfitLoss))}`}
         icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
         <div className="grid grid-cols-2 gap-3 mb-5">
-          <MiniStat label="Total Income" value={formatRs(totalIncome)} color="emerald" />
-          <MiniStat label="Total Expenses" value={formatRs(totalExpense)} color="rose" />
-          <MiniStat label="Net Loss" value={formatRs(Math.abs(netProfitLoss))} color="rose" />
+          <MiniStat label={L('Total Income')} value={formatRs(totalIncome)} color="emerald" />
+          <MiniStat label={L('Total Expenses')} value={formatRs(totalExpense)} color="rose" />
+          <MiniStat label={L('Net Loss')} value={formatRs(Math.abs(netProfitLoss))} color="rose" />
           <MiniStat label="ROI" value={`${roiPercent.toFixed(1)}%`} color="rose" />
         </div>
-        <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2">Expense breakdown</h4>
+        <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2">{L('Expense breakdown')}</h4>
         <div className="space-y-2 text-xs">
-          <BarRow label="Birds" value={totalBirdPurchaseCost} total={totalExpense} color="bg-sky-500" />
-          <BarRow label="Feed" value={totalFeedCost} total={totalExpense} color="bg-amber-500" />
-          <BarRow label="Vaccinations" value={totalVaccCost} total={totalExpense} color="bg-teal-500" />
-          <BarRow label="Other" value={totalOtherCost} total={totalExpense} color="bg-rose-500" />
+          <BarRow label={L('Birds')} value={totalBirdPurchaseCost} total={totalExpense} color="bg-sky-500" />
+          <BarRow label={L('Feed')} value={totalFeedCost} total={totalExpense} color="bg-amber-500" />
+          <BarRow label={L('Vaccinations')} value={totalVaccCost} total={totalExpense} color="bg-teal-500" />
+          <BarRow label={L('Other')} value={totalOtherCost} total={totalExpense} color="bg-rose-500" />
         </div>
-        <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mt-5 mb-2">Largest expenses in range</h4>
+        <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mt-5 mb-2">{L('Largest expenses in range')}</h4>
         <div className="divide-y divide-slate-100 dark:divide-slate-700">
           {expenseLineItems.slice(0, 8).map((x, i) => (
             <div key={i} className="flex justify-between py-2 text-xs">
@@ -901,7 +901,7 @@ export default function Dashboard({
       </DetailModal>
 
       <DetailModal open={modal === 'feedRestock'} onClose={closeModal}
-        title="Feed Restock"
+        title={L('Feed Restock')}
         subtitle={feedStockRemainingKg !== null ? `~${Math.round(feedStockRemainingKg)} kg remaining` : `${feedRestockReminders.length} feed type${feedRestockReminders.length === 1 ? '' : 's'} need attention`}
         icon={<Package className="w-5 h-5" />} iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">
         {feedStockRemainingKg !== null ? (
@@ -926,7 +926,7 @@ export default function Dashboard({
                 <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{r.type}</p>
                 <p className="text-xs text-slate-500 dark:text-slate-400">Last purchase: {r.lastDate} · {r.daysSince} days ago</p>
               </div>
-              <span className="text-[10px] font-bold font-mono px-2 py-1 rounded bg-orange-600 text-white">RESTOCK</span>
+              <span className="text-[10px] font-bold font-mono px-2 py-1 rounded bg-orange-600 text-white">{L('RESTOCK')}</span>
             </div>
           ))}
           {feedStockRemainingKg !== null && feedRestockReminders.length === 0 && (
@@ -934,8 +934,8 @@ export default function Dashboard({
           )}
         </div>
         <div className="mt-4 flex justify-end gap-2">
-          <button onClick={() => { closeModal(); openQuickAction('feed'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">Log Feed Purchase</button>
-          <button onClick={() => { closeModal(); onNavigate('ledger'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200">Go to Ledger</button>
+          <button onClick={() => { closeModal(); openQuickAction('feed'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-farm-600 hover:bg-farm-700 text-white">{L('Log Feed Purchase')}</button>
+          <button onClick={() => { closeModal(); onNavigate('ledger'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200">{L('Go to Ledger')}</button>
         </div>
       </DetailModal>
 
@@ -943,9 +943,9 @@ export default function Dashboard({
         title="Total Income Breakdown" subtitle={`${formatRs(totalIncome)} · ${rangeLabel}`}
         icon={<Coins className="w-5 h-5" />} iconBg="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300" size="small">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
-          <MiniStat label="Egg income" value={formatRs(eggIncome)} color="emerald" />
-          <MiniStat label="Bird sale income" value={formatRs(birdIncome)} color="emerald" />
-          <MiniStat label="Credit sales" value={formatRs(customerIncome)} color="emerald" />
+          <MiniStat label={L('Egg income')} value={formatRs(eggIncome)} color="emerald" />
+          <MiniStat label={L('Bird sale income')} value={formatRs(birdIncome)} color="emerald" />
+          <MiniStat label={L('Credit sales')} value={formatRs(customerIncome)} color="emerald" />
         </div>
         {outstanding > 0 && (
           <div className="mb-3 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-xs text-amber-800 dark:text-amber-200">
@@ -959,10 +959,10 @@ export default function Dashboard({
         title="Total Expenses Breakdown" subtitle={`${formatRs(totalExpense)} · ${rangeLabel}`}
         icon={<ShoppingBag className="w-5 h-5" />} iconBg="bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300" size="small">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          <MiniStat label="Birds" value={formatRs(totalBirdPurchaseCost)} color="sky" />
-          <MiniStat label="Feed" value={formatRs(totalFeedCost)} color="amber" />
-          <MiniStat label="Vaccinations" value={formatRs(totalVaccCost)} color="teal" />
-          <MiniStat label="Other" value={formatRs(totalOtherCost)} color="rose" />
+          <MiniStat label={L('Birds')} value={formatRs(totalBirdPurchaseCost)} color="sky" />
+          <MiniStat label={L('Feed')} value={formatRs(totalFeedCost)} color="amber" />
+          <MiniStat label={L('Vaccinations')} value={formatRs(totalVaccCost)} color="teal" />
+          <MiniStat label={L('Other')} value={formatRs(totalOtherCost)} color="rose" />
         </div>
         <LineItemTable items={expenseLineItems} emptyMsg="No expenses recorded in this range." />
       </DetailModal>
@@ -972,8 +972,8 @@ export default function Dashboard({
         icon={netProfitLoss >= 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
         iconBg={netProfitLoss >= 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'}>
         <div className="grid grid-cols-2 gap-3 mb-5">
-          <MiniStat label="Income" value={formatRs(totalIncome)} color="emerald" />
-          <MiniStat label="Expenses" value={formatRs(totalExpense)} color="rose" />
+          <MiniStat label={L('Income')} value={formatRs(totalIncome)} color="emerald" />
+          <MiniStat label={L('Expenses')} value={formatRs(totalExpense)} color="rose" />
           <MiniStat label="Net" value={`${netProfitLoss >= 0 ? '+' : '-'}${formatRs(Math.abs(netProfitLoss))}`} color={netProfitLoss >= 0 ? 'emerald' : 'rose'} />
           <MiniStat label="ROI" value={`${roiPercent.toFixed(1)}%`} color={roiPercent >= 0 ? 'emerald' : 'rose'} />
         </div>
@@ -991,8 +991,8 @@ export default function Dashboard({
             {roiPercent >= 0 ? 'Profitable return' : 'Negative return — expenses exceed income'}</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <MiniStat label="Investment" value={formatRs(totalExpense)} color="violet" />
-          <MiniStat label="Net return" value={formatRs(netProfitLoss)} color={netProfitLoss >= 0 ? 'emerald' : 'rose'} />
+          <MiniStat label={L('Investment')} value={formatRs(totalExpense)} color="violet" />
+          <MiniStat label={L('Net return')} value={formatRs(netProfitLoss)} color={netProfitLoss >= 0 ? 'emerald' : 'rose'} />
         </div>
       </DetailModal>
 
@@ -1025,13 +1025,13 @@ export default function Dashboard({
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Name</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Breed</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Gender</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Status</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Age</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Bought</th>
-                    <th className="py-2 font-semibold uppercase text-[10px]">Last Vax</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Name')}</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Breed')}</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Gender')}</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Status')}</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Age')}</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Bought')}</th>
+                    <th className="py-2 font-semibold uppercase text-[10px]">{L('Last Vax')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -1073,11 +1073,11 @@ export default function Dashboard({
           <table className="w-full text-xs">
             <thead>
               <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Date</th>
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Collected</th>
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Sold</th>
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Home</th>
-                <th className="py-2 font-semibold uppercase text-[10px]">Broken</th>
+                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Date')}</th>
+                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Collected')}</th>
+                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Sold')}</th>
+                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Home')}</th>
+                <th className="py-2 font-semibold uppercase text-[10px]">{L('Broken')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -1121,8 +1121,8 @@ export default function Dashboard({
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">cost to produce 1 egg</p>
         </div>
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <MiniStat label="Sale price" value={formatRs(settings.defaultPricePerEgg)} color={costPerEggValue <= settings.defaultPricePerEgg ? 'emerald' : 'rose'} />
-          <MiniStat label="Margin/egg" value={formatRs(settings.defaultPricePerEgg - costPerEggValue)} color={settings.defaultPricePerEgg >= costPerEggValue ? 'emerald' : 'rose'} />
+          <MiniStat label={L('Sale price')} value={formatRs(settings.defaultPricePerEgg)} color={costPerEggValue <= settings.defaultPricePerEgg ? 'emerald' : 'rose'} />
+          <MiniStat label={L('Margin/egg')} value={formatRs(settings.defaultPricePerEgg - costPerEggValue)} color={settings.defaultPricePerEgg >= costPerEggValue ? 'emerald' : 'rose'} />
         </div>
         <p className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
           All-in cost per egg = (bird purchases + feed + other ops + vaccinations) ÷ total eggs collected in range.
@@ -1139,7 +1139,7 @@ export default function Dashboard({
         </div>
         <div className="grid grid-cols-2 gap-3">
           <MiniStat label="Active birds" value={`${activeBirdsCount}`} color="slate" />
-          <MiniStat label="Total cost" value={formatRs(totalExpense)} color="fuchsia" />
+          <MiniStat label={L('Total cost')} value={formatRs(totalExpense)} color="fuchsia" />
         </div>
       </DetailModal>
 
@@ -1157,9 +1157,9 @@ export default function Dashboard({
 
       {(['feedToday', 'feedWeek', 'feedMonth'] as const).map((key) => {
         const cfg = {
-          feedToday: { title: 'Feed Purchased Today', icon: <Package className="w-5 h-5" />, bg: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300', value: feedKgToday, records: feedRecords.filter(f => f.date === today), sub: today },
+          feedToday: { title: L('Feed Purchased Today'), icon: <Package className="w-5 h-5" />, bg: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300', value: feedKgToday, records: feedRecords.filter(f => f.date === today), sub: today },
           feedWeek: { title: 'Feed Purchased This Week', icon: <Package className="w-5 h-5" />, bg: 'bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300', value: feedKgThisWeek, records: feedRecords.filter(f => f.date >= weekStart), sub: `${weekStart} → ${today}` },
-          feedMonth: { title: 'Feed Purchased This Month', icon: <Package className="w-5 h-5" />, bg: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300', value: feedKgThisMonth, records: feedRecords.filter(f => f.date.startsWith(monthPrefix)), sub: monthPrefix },
+          feedMonth: { title: L('Feed Purchased This Month'), icon: <Package className="w-5 h-5" />, bg: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300', value: feedKgThisMonth, records: feedRecords.filter(f => f.date.startsWith(monthPrefix)), sub: monthPrefix },
         }[key];
         const kgTotal = cfg.records.reduce((s, f) => s + f.quantityKg, 0);
         const rsTotal = cfg.records.reduce((s, f) => s + f.quantityKg * f.rateRsPerKg, 0);
@@ -1169,17 +1169,17 @@ export default function Dashboard({
             icon={cfg.icon} iconBg={cfg.bg} size="big">
             <div className="grid grid-cols-2 gap-3 mb-5">
               <MiniStat label="Total weight" value={`${kgTotal} kg`} color="slate" />
-              <MiniStat label="Total cost" value={formatRs(rsTotal)} color="emerald" />
+              <MiniStat label={L('Total cost')} value={formatRs(rsTotal)} color="emerald" />
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Date</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Type</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Qty (kg)</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Rate/kg</th>
-                    <th className="py-2 font-semibold uppercase text-[10px]">Total</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Date')}</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Type')}</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Qty (kg)')}</th>
+                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Rate/kg')}</th>
+                    <th className="py-2 font-semibold uppercase text-[10px]">{L('Total')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -1248,17 +1248,17 @@ export default function Dashboard({
             </div>
             <div className="grid grid-cols-2 gap-2 text-xs">
               <InfoRow label="ID" value={`BRD-${String(b.id).padStart(3, '0')}`} />
-              <InfoRow label="Breed" value={breedLabel(b)} />
-              <InfoRow label="Gender" value={b.gender} />
-              <InfoRow label="Age" value={birdAge(b)} />
-              <InfoRow label="Bought" value={b.dateBought} />
+              <InfoRow label={L('Breed')} value={breedLabel(b)} />
+              <InfoRow label={L('Gender')} value={b.gender} />
+              <InfoRow label={L('Age')} value={birdAge(b)} />
+              <InfoRow label={L('Bought')} value={b.dateBought} />
               <InfoRow label="Price" value={`Rs ${b.price}`} />
-              <InfoRow label="Last Vax" value={b.lastVaccinationDate || '—'} />
+              <InfoRow label={L('Last Vax')} value={b.lastVaccinationDate || '—'} />
               {b.dateOfBirth && <InfoRow label="DOB" value={b.dateOfBirth} />}
-              {b.saleDate && <InfoRow label="Sold on" value={b.saleDate} />}
+              {b.saleDate && <InfoRow label={L('Sold on')} value={b.saleDate} />}
               {b.salePrice != null && <InfoRow label="Sale price" value={`Rs ${b.salePrice}`} />}
-              {b.dateDied && <InfoRow label="Died" value={b.dateDied} />}
-              {b.deathReason && <InfoRow label="Cause" value={b.deathReason} />}
+              {b.dateDied && <InfoRow label={L('Died')} value={b.dateDied} />}
+              {b.deathReason && <InfoRow label={L('Cause')} value={b.deathReason} />}
             </div>
             {b.deathDetail && (
               <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl text-xs text-red-900 dark:text-red-200">
@@ -1428,9 +1428,9 @@ function LineItemTable({ items, emptyMsg }: { items: { date: string; label: stri
       <table className="w-full text-xs">
         <thead>
           <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-            <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Date</th>
-            <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Description</th>
-            <th className="py-2 text-right font-semibold uppercase text-[10px]">Amount</th>
+            <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Date')}</th>
+            <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Description')}</th>
+            <th className="py-2 text-right font-semibold uppercase text-[10px]">{L('Amount')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-slate-700">

@@ -233,7 +233,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
         <section className="muf-panel p-4 space-y-4">
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-sm font-bold flex items-center gap-2 text-slate-700 dark:text-slate-200"><HardHat className="w-4 h-4" /> {L('Workers')}</h3>
-            <button type="button" onClick={() => setShowAddWorkerModal(true)} className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+            <button type="button" onClick={() => setShowAddWorkerModal(true)} className="px-3 py-1.5 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
               <Plus className="w-3.5 h-3.5" /> {L('Add worker')}
             </button>
           </div>
@@ -248,13 +248,13 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
                     {w.notes && <p className="text-[11px] text-slate-500">{w.notes}</p>}
                   </div>
                   <div className="flex items-center gap-1">
-                    <button type="button" onClick={() => setQrFor({ id: w.id, name: w.name })} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label="QR card" title="QR card">
+                    <button type="button" onClick={() => setQrFor({ id: w.id, name: w.name })} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label={L('QR card')} title={L('QR card')}>
                       <QrCode className="w-4 h-4" />
                     </button>
-                    <button type="button" onClick={() => { setEditingWorker(w); setEditWorkerForm({ name: w.name, dailyWage: String(w.dailyWage || ''), notes: w.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label="Edit worker" title="Edit worker">
+                    <button type="button" onClick={() => { setEditingWorker(w); setEditWorkerForm({ name: w.name, dailyWage: String(w.dailyWage || ''), notes: w.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label={L('Edit worker')} title={L('Edit worker')}>
                       <Pencil className="w-4 h-4" />
                     </button>
-                    <button type="button" onClick={() => handleDeleteWorker(w)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label="Remove worker">
+                    <button type="button" onClick={() => handleDeleteWorker(w)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label={L('Remove worker')}>
                       <Trash2 className="w-4 h-4" />
                     </button>
                   </div>
@@ -292,10 +292,10 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
                     <div key={a.id} className="flex items-center justify-between gap-2 mt-1.5 text-[11px] p-1.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                       <span className="text-slate-500">{a.date} · Rs. {a.amount.toLocaleString()}{a.notes ? ` · ${a.notes}` : ''}</span>
                       <span className="flex items-center gap-0.5">
-                        <button type="button" onClick={() => { setEditAdvId(a.id); setAdvanceFor(w.id); setAdvForm({ date: a.date, amount: String(a.amount), notes: a.notes || '' }); }} className="p-0.5 rounded text-amber-500 hover:text-emerald-600 transition" aria-label="Edit advance" title="Edit advance">
+                        <button type="button" onClick={() => { setEditAdvId(a.id); setAdvanceFor(w.id); setAdvForm({ date: a.date, amount: String(a.amount), notes: a.notes || '' }); }} className="p-0.5 rounded text-amber-500 hover:text-emerald-600 transition" aria-label={L('Edit advance')} title={L('Edit advance')}>
                           <Pencil className="w-3 h-3" />
                         </button>
-                        <button type="button" onClick={() => handleDeleteAdvance(a.id)} className="p-0.5 rounded text-amber-400 hover:text-red-500 transition" aria-label="Delete advance">
+                        <button type="button" onClick={() => handleDeleteAdvance(a.id)} className="p-0.5 rounded text-amber-400 hover:text-red-500 transition" aria-label={L('Delete advance')}>
                           <Trash2 className="w-3 h-3" />
                         </button>
                       </span>
@@ -311,7 +311,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
         <section className="muf-panel p-4 space-y-4">
           <div className="flex items-center justify-between gap-2">
             <h3 className="text-sm font-bold text-slate-700 dark:text-slate-200">{L('Mark attendance')}</h3>
-            <button type="button" onClick={() => setShowMarkAttModal(true)} className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+            <button type="button" onClick={() => setShowMarkAttModal(true)} className="px-3 py-1.5 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
               <Plus className="w-3.5 h-3.5" /> {L('Mark attendance')}
             </button>
           </div>
@@ -328,10 +328,10 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
                   </div>
                   {!row.posted && (
                     <span className="flex items-center gap-0.5">
-                      <button type="button" onClick={() => { setEditAtt(row); setEditAttForm({ date: row.date, dayType: row.dayType, notes: row.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label="Edit attendance" title="Edit attendance">
+                      <button type="button" onClick={() => { setEditAtt(row); setEditAttForm({ date: row.date, dayType: row.dayType, notes: row.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label={L('Edit attendance')} title={L('Edit attendance')}>
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
-                      <button type="button" onClick={() => handleDeleteAttendance(row.id)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label="Delete attendance">
+                      <button type="button" onClick={() => handleDeleteAttendance(row.id)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label={L('Delete attendance')}>
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </span>
@@ -358,7 +358,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
           type="button"
           disabled={unposted <= 0}
           onClick={handlePostMonth}
-          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition"
+          className="px-4 py-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition"
         >
           <CheckCircle2 className="w-4 h-4" /> {L('Post {month} to the ledger', { month: month })}
         </button>
@@ -381,7 +381,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setEditingWorker(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
-            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">{L('Save changes')}</button>
+            <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl">{L('Save changes')}</button>
           </div>
         </form>
       </DetailModal>
@@ -407,7 +407,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setEditAtt(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
-            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">{L('Save changes')}</button>
+            <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl">{L('Save changes')}</button>
           </div>
         </form>
       </DetailModal>
@@ -432,7 +432,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setShowAddWorkerModal(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
-            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> {L('Add worker')}</button>
+            <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> {L('Add worker')}</button>
           </div>
         </form>
       </DetailModal>
@@ -465,7 +465,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
           </div>
           <div className="flex justify-end gap-3 pt-2">
             <button type="button" onClick={() => setShowMarkAttModal(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
-            <button type="submit" className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl">{L('Save attendance')}</button>
+            <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl">{L('Save attendance')}</button>
           </div>
         </form>
       </DetailModal>

@@ -17,6 +17,8 @@ import {
   Sun,
   Users,
   HeartPulse,
+  BookOpen,
+  Languages,
 } from 'lucide-react';
 import { motion } from './muf-motion';
 
@@ -372,18 +374,18 @@ export default function App() {
   const handleAddBird = (newBird: Omit<Bird, 'id'>) => {
     if (!canManageStructure) return;
     setBirds([...birds, { ...newBird, id: nextId(birds) }]);
-    notify('Bird added successfully.', 'success');
+    notify(L('Bird added successfully.'), 'success');
   };
   // Update bird is allowed for both (marking sick/dead/sold, updating vax)
   const handleUpdateBird = (id: number, updatedBird: Bird) => {
     if (!canLogDaily) return;
     setBirds(birds.map((b) => (b.id === id ? updatedBird : b)));
-    notify('Bird updated successfully.', 'success');
+    notify(L('Bird updated successfully.'), 'success');
   };
   const handleDeleteBird = (id: number) => {
     if (!canDelete) return;
     setBirds((prev) => prev.filter((b) => b.id !== id));
-    notify('Bird deleted successfully.', 'success');
+    notify(L('Bird deleted successfully.'), 'success');
     setVaccinations((prev) => prev.filter((v) => v.birdId !== id));
   };
 
@@ -675,6 +677,7 @@ export default function App() {
       <LoginScreen
         lang={lang}
         onLoginSuccess={handleLoginSuccess}
+        onToggleLang={() => setLang(lang === 'en' ? 'ur' : lang === 'ur' ? 'roman' : 'en')}
       />
     );
   }
@@ -721,16 +724,16 @@ export default function App() {
           <button
             className="muf-icon-button"
             onClick={() => setDailyOpsOpen(true)}
-            title={L('Daily Operations')}
-            aria-label="Daily Operations"
+            title={L('Diary')}
+            aria-label={L('Diary')}
           >
-            <ClipboardList size={19} />
+            <BookOpen size={19} />
           </button>
 
           <button
             className="muf-icon-button muf-notif-wrap"
             title={L('Notifications')}
-            aria-label="Notifications"
+            aria-label={L('Notifications')}
             onClick={() => setNotifOpen(true)}
           >
             <Bell size={19} />
@@ -741,9 +744,18 @@ export default function App() {
 
           <button
             className="muf-icon-button"
+            onClick={() => setLang(lang === 'en' ? 'ur' : lang === 'ur' ? 'roman' : 'en')}
+            title={lang === 'en' ? L('Switch to Urdu') : lang === 'ur' ? L('Switch to Roman Urdu') : L('Switch to English')}
+            aria-label={L('Switch language')}
+          >
+            <Languages size={19} />
+          </button>
+
+          <button
+            className="muf-icon-button"
             onClick={() => setIsDark(!isDark)}
             title={isDark ? (L('Switch to Light Mode')) : (L('Switch to Dark Mode'))}
-            aria-label="Toggle theme"
+            aria-label={L('Toggle theme')}
           >
             {isDark ? <Sun size={19} /> : <Moon size={19} />}
           </button>
@@ -753,7 +765,7 @@ export default function App() {
               className="muf-profile"
               onClick={() => setAdminMenuOpen(true)}
               title={L('Admin panel')}
-              aria-label="Open admin panel"
+              aria-label={L('Open admin panel')}
             >
               <span className="muf-avatar">
                 {currentUser && typeof currentUser === 'object' && currentUser.avatarBase64 ? (
@@ -769,7 +781,7 @@ export default function App() {
               <ChevronDown size={17} />
             </button>
           ) : (
-            <button className="muf-profile" onClick={() => setProfileOpen(true)} title={L('My profile')} aria-label="Open my profile">
+            <button className="muf-profile" onClick={() => setProfileOpen(true)} title={L('My profile')} aria-label={L('Open my profile')}>
               <span className="muf-avatar">
                 {currentUser && typeof currentUser === 'object' && currentUser.avatarBase64 ? (
                   <img src={currentUser.avatarBase64} className="object-cover rounded-full" alt={currentUser.username} />
@@ -799,14 +811,14 @@ export default function App() {
               }
             }}
             title={t(lang, 'logout')}
-            aria-label="Logout"
+            aria-label={L('Logout')}
           >
             <LogOut size={18} />
           </button>
         </div>
       </header>
 
-      <nav className="muf-top-nav" aria-label="Primary navigation" id="tab-navigation">
+      <nav className="muf-top-nav" aria-label={L('Primary navigation')} id="tab-navigation">
         <div className="muf-top-nav-scroll">
           {navItems.map(({ id, label, icon: Icon }) => {
             const active = activeTab === id;
@@ -814,7 +826,7 @@ export default function App() {
               <div className={`muf-nav-item relative ${id === 'ledger' ? 'muf-finance-nav-item' : ''}`} key={id}>
                 <div className="flex items-center">
                   <button type="button" className={`muf-nav-link ${active ? 'active' : ''}`} onClick={() => { setActiveTab(id); setFinanceMenuOpen(false); }} id={`nav-${id}`}><Icon size={15} /><span>{label}</span></button>
-                  {id === 'ledger' && <button type="button" aria-label="Open Finance sections" aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
+                  {id === 'ledger' && <button type="button" aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
                 </div>
                 {id === 'ledger' && financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{label:'Feed',value:'feed'},{label:'Expenses',value:'expense'},{label:'Eggs',value:'egg'},{label:'Customers',value:'customers'},{label:'Suppliers',value:'suppliers'}].map(item => <button key={item.value} type="button" onClick={() => { setActiveTab('ledger'); setQuickOpenLedgerTab(item.value as 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers'); setFinanceMenuOpen(false); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800">{item.label}</button>)}</div>}
               </div>
@@ -847,7 +859,7 @@ export default function App() {
                 </div>
                 <button
                   onClick={() => setLoadVersion((v) => v + 1)}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold"
+                  className="px-4 py-2 rounded-xl bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold"
                 >
                   {L('Retry')}
                 </button>
@@ -1037,9 +1049,9 @@ export default function App() {
       <DetailModal
         open={dailyOpsOpen}
         onClose={() => setDailyOpsOpen(false)}
-        title={L('Daily Operations')}
-        subtitle={L('Checklist and diary notes')}
-        icon={<ClipboardList className="w-5 h-5" />}
+        title={L('Diary')}
+        subtitle={L('Notes, photos, voice and daily checklist')}
+        icon={<BookOpen className="w-5 h-5" />}
         iconBg="bg-indigo-100 text-indigo-700"
         size="small"
       >
@@ -1073,7 +1085,7 @@ export default function App() {
                     notif.type === 'warning' ? 'bg-amber-900/20 text-amber-600 border-amber-900/30' :
                     'bg-blue-900/20 text-blue-600 border-blue-900/30'
                   }`}>
-                    Alert
+                    {L('Alert')}
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">{notif.desc}</p>

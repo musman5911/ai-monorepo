@@ -126,7 +126,7 @@ export default function ReportsTab() {
     fetchData();
   }, []);
 
-  if (loading) return <div className="p-8 text-center text-slate-500">Loading reports...</div>;
+  if (loading) return <div className="p-8 text-center text-slate-500">{L('Loading reports...')}</div>;
 
   const currentRate = rate?.value || 0;
   const months = lastNMonths(12);
@@ -289,10 +289,10 @@ export default function ReportsTab() {
             onChange={e => setSelectedMonth(e.target.value)}
             className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm bg-white dark:bg-slate-950 outline-none"
           >
-            <optgroup label="Ranges">
+            <optgroup label={L('Ranges')}>
               {rangeOptions.map(r => <option key={r.key} value={r.key}>{r.label}</option>)}
             </optgroup>
-            <optgroup label="Months">
+            <optgroup label={L('Months')}>
               {monthOptions.map(m => <option key={m.key} value={m.key}>{m.label}</option>)}
             </optgroup>
           </select>
@@ -308,17 +308,17 @@ export default function ReportsTab() {
       <div className="bg-gradient-to-r from-farm-600 to-farm-700 rounded-xl p-5 text-white">
         <p className="text-xs font-medium opacity-80 uppercase tracking-wider">This Month — {monthLabel(thisMonth)}</p>
         <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mt-3">
-          <MiniStat label="Milk" value={fmtL(currentStats.milkL)} />
-          <MiniStat label="Milk Revenue" value={fmtPKR(currentStats.milkRevenue)} />
-          <MiniStat label="Expenses" value={fmtPKR(currentStats.totalExp)} />
-          <MiniStat label="Operating Profit" value={fmtPKR(currentStats.operatingProfit)} highlight={currentStats.operatingProfit >= 0} />
+          <MiniStat label={L('Milk')} value={fmtL(currentStats.milkL)} />
+          <MiniStat label={L('Milk Revenue')} value={fmtPKR(currentStats.milkRevenue)} />
+          <MiniStat label={L('Expenses')} value={fmtPKR(currentStats.totalExp)} />
+          <MiniStat label={L('Operating Profit')} value={fmtPKR(currentStats.operatingProfit)} highlight={currentStats.operatingProfit >= 0} />
           {currentStats.purchasingCost > 0 && (
-            <MiniStat label="Animal Purchases" value={fmtPKR(currentStats.purchasingCost)} />
+            <MiniStat label={L('Animal Purchases')} value={fmtPKR(currentStats.purchasingCost)} />
           )}
           {currentStats.saleIncome > 0 && (
-            <MiniStat label="Animal Sales" value={fmtPKR(currentStats.saleIncome)} />
+            <MiniStat label={L('Animal Sales')} value={fmtPKR(currentStats.saleIncome)} />
           )}
-          <MiniStat label="Total Profit" value={fmtPKR(currentStats.totalProfit)} highlight={currentStats.totalProfit >= 0} />
+          <MiniStat label={L('Total Profit')} value={fmtPKR(currentStats.totalProfit)} highlight={currentStats.totalProfit >= 0} />
         </div>
         <p className="text-[10px] opacity-70 mt-2">* Operating Profit = Milk Revenue − Operating Expenses (excl. Purchases) | Total Profit includes animal sales & purchases</p>
       </div>
@@ -328,17 +328,17 @@ export default function ReportsTab() {
         <div className="muf-panel p-5">
           <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-3">{rangeLabel} — Summary</h3>
           <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-            <MiniStatDark label="Milk" value={fmtL(selectedStats.milkL)} />
-            <MiniStatDark label="Milk Revenue" value={fmtPKR(selectedStats.milkRevenue)} />
-            <MiniStatDark label="Expenses" value={fmtPKR(selectedStats.totalExp)} />
-            <MiniStatDark label="Operating Profit" value={fmtPKR(selectedStats.operatingProfit)} positive={selectedStats.operatingProfit >= 0} />
+            <MiniStatDark label={L('Milk')} value={fmtL(selectedStats.milkL)} />
+            <MiniStatDark label={L('Milk Revenue')} value={fmtPKR(selectedStats.milkRevenue)} />
+            <MiniStatDark label={L('Expenses')} value={fmtPKR(selectedStats.totalExp)} />
+            <MiniStatDark label={L('Operating Profit')} value={fmtPKR(selectedStats.operatingProfit)} positive={selectedStats.operatingProfit >= 0} />
             {selectedStats.purchasingCost > 0 && (
-              <MiniStatDark label="Animal Purchases" value={fmtPKR(selectedStats.purchasingCost)} />
+              <MiniStatDark label={L('Animal Purchases')} value={fmtPKR(selectedStats.purchasingCost)} />
             )}
             {selectedStats.saleIncome > 0 && (
-              <MiniStatDark label="Animal Sales" value={fmtPKR(selectedStats.saleIncome)} />
+              <MiniStatDark label={L('Animal Sales')} value={fmtPKR(selectedStats.saleIncome)} />
             )}
-            <MiniStatDark label="Total Profit" value={fmtPKR(selectedStats.totalProfit)} positive={selectedStats.totalProfit >= 0} />
+            <MiniStatDark label={L('Total Profit')} value={fmtPKR(selectedStats.totalProfit)} positive={selectedStats.totalProfit >= 0} />
           </div>
         </div>
       )}
@@ -426,14 +426,14 @@ export default function ReportsTab() {
               })}
             </div>
           ) : (
-            <p className="text-sm text-slate-400">No expenses for this period</p>
+            <p className="text-sm text-slate-400">{L('No expenses for this period')}</p>
           )}
         </div>
 
         <div className="muf-panel p-5">
           <div className="mb-4">
-            <h3 className="font-semibold text-slate-800 dark:text-slate-100">Average Cost by Category</h3>
-            <p className="text-xs text-slate-400 mt-1">Direct costs exclude animal purchases and farm-wide expenses.</p>
+            <h3 className="font-semibold text-slate-800 dark:text-slate-100">{L('Average Cost by Category')}</h3>
+            <p className="text-xs text-slate-400 mt-1">{L('Direct costs exclude animal purchases and farm-wide expenses.')}</p>
           </div>
           <div className="space-y-3">
             {categoryStats.map(group => (
@@ -444,15 +444,15 @@ export default function ReportsTab() {
                 </div>
                 <div className="space-y-1 text-xs">
                   <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 dark:text-slate-400">Avg Cost / Animal</span>
+                    <span className="text-slate-500 dark:text-slate-400">{L('Avg Cost / Animal')}</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-100">{group.avgCost === null ? '-' : fmtPKR(group.avgCost)}</span>
                   </div>
                   <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 dark:text-slate-400">Avg Feed / Animal</span>
+                    <span className="text-slate-500 dark:text-slate-400">{L('Avg Feed / Animal')}</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-100">{group.avgFeed === null ? '-' : fmtPKR(group.avgFeed)}</span>
                   </div>
                   <div className="flex justify-between gap-3">
-                    <span className="text-slate-500 dark:text-slate-400">Avg Milk / Cow</span>
+                    <span className="text-slate-500 dark:text-slate-400">{L('Avg Milk / Cow')}</span>
                     <span className="font-semibold text-slate-800 dark:text-slate-100">{group.avgMilk === null ? '-' : fmtL(group.avgMilk)}</span>
                   </div>
                 </div>
@@ -469,7 +469,7 @@ export default function ReportsTab() {
           <p className="text-xs text-slate-400 mt-0.5">{costPerAnimal.length} animals · Farm-wide expenses: {fmtPKR(farmWideExpenses)}</p>
         </div>
         {costPerAnimal.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-8">No data for this period</p>
+          <p className="text-sm text-slate-400 text-center py-8">{L('No data for this period')}</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {costPerAnimal.map(cow => {
@@ -490,17 +490,17 @@ export default function ReportsTab() {
                   </div>
                   <div className="grid grid-cols-2 gap-1.5 text-[10px]">
                     {!isMale && (
-                      <div className="flex justify-between"><span className="text-slate-500">Milk</span><span className="font-bold text-slate-700 dark:text-slate-300">{fmt(cow.milkL)}L</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">{L('Milk')}</span><span className="font-bold text-slate-700 dark:text-slate-300">{fmt(cow.milkL)}L</span></div>
                     )}
                     {!isMale && (
-                      <div className="flex justify-between"><span className="text-slate-500">Revenue</span><span className="font-bold text-farm-600">{fmtPKR(cow.revenue)}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">{L('Revenue')}</span><span className="font-bold text-farm-600">{fmtPKR(cow.revenue)}</span></div>
                     )}
                     {cow.purchaseInMonth > 0 && (
-                      <div className="flex justify-between"><span className="text-slate-500">Purchase</span><span className="font-bold text-amber-600">{fmtPKR(cow.purchaseInMonth)}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">{L('Purchase')}</span><span className="font-bold text-amber-600">{fmtPKR(cow.purchaseInMonth)}</span></div>
                     )}
-                    <div className="flex justify-between"><span className="text-slate-500">Expenses</span><span className="font-bold text-red-500">{fmtPKR(cow.expenses)}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-500">{L('Expenses')}</span><span className="font-bold text-red-500">{fmtPKR(cow.expenses)}</span></div>
                     {cow.saleIncome > 0 && (
-                      <div className="flex justify-between"><span className="text-slate-500">Sales</span><span className="font-bold text-purple-600">{fmtPKR(cow.saleIncome)}</span></div>
+                      <div className="flex justify-between"><span className="text-slate-500">{L('Sales')}</span><span className="font-bold text-purple-600">{fmtPKR(cow.saleIncome)}</span></div>
                     )}
                     <div className="flex justify-between border-t border-slate-200 dark:border-slate-700 pt-1"><span className="text-slate-500 font-bold">Net</span><span className={`font-bold ${cow.net >= 0 ? 'text-farm-600' : 'text-red-500'}`}>{fmtPKR(cow.net)}</span></div>
                   </div>
@@ -511,9 +511,9 @@ export default function ReportsTab() {
         )}
         {/* Totals summary */}
         <div className="mt-4 p-3 rounded-lg bg-farm-50 dark:bg-farm-900/20 border border-farm-200 dark:border-farm-800 grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-          <div><p className="text-[10px] text-slate-400 uppercase">Total Milk</p><p className="font-bold text-slate-800 dark:text-slate-100">{fmt(costPerAnimal.reduce((a, c) => a + (c.gender !== 'male' ? c.milkL : 0), 0))} L</p></div>
-          <div><p className="text-[10px] text-slate-400 uppercase">Total Revenue</p><p className="font-bold text-farm-600">{fmtPKR(costPerAnimal.reduce((a, c) => a + (c.gender !== 'male' ? c.revenue : 0), 0))}</p></div>
-          <div><p className="text-[10px] text-slate-400 uppercase">Total Expenses</p><p className="font-bold text-red-500">{fmtPKR(costPerAnimal.reduce((a, c) => a + c.expenses, 0) + farmWideExpenses)}</p></div>
+          <div><p className="text-[10px] text-slate-400 uppercase">{L('Total Milk')}</p><p className="font-bold text-slate-800 dark:text-slate-100">{fmt(costPerAnimal.reduce((a, c) => a + (c.gender !== 'male' ? c.milkL : 0), 0))} L</p></div>
+          <div><p className="text-[10px] text-slate-400 uppercase">{L('Total Revenue')}</p><p className="font-bold text-farm-600">{fmtPKR(costPerAnimal.reduce((a, c) => a + (c.gender !== 'male' ? c.revenue : 0), 0))}</p></div>
+          <div><p className="text-[10px] text-slate-400 uppercase">{L('Total Expenses')}</p><p className="font-bold text-red-500">{fmtPKR(costPerAnimal.reduce((a, c) => a + c.expenses, 0) + farmWideExpenses)}</p></div>
           <div><p className="text-[10px] text-slate-400 uppercase">Total Net</p><p className={`font-bold ${costPerAnimal.reduce((a, c) => a + c.net, 0) - farmWideExpenses >= 0 ? 'text-farm-600' : 'text-red-500'}`}>{fmtPKR(costPerAnimal.reduce((a, c) => a + c.net, 0) - farmWideExpenses)}</p></div>
         </div>
       </div>
@@ -541,12 +541,12 @@ export default function ReportsTab() {
 
       {/* ── Export Reports ───────────────────────────────────── */}
       <div className="muf-panel p-5">
-        <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-1">Export Reports</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">Select date range and download PDF</p>
+        <h3 className="font-semibold text-slate-800 dark:text-slate-100 mb-1">{L('Export Reports')}</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{L('Select date range and download PDF')}</p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <ExportButton
-            label="Milk Report"
+            label={L('Milk Report')}
             color="stone"
             onGenerate={(rangeDays) => generateMilkReport({
               month: selectedMonth,
@@ -565,7 +565,7 @@ export default function ReportsTab() {
             })}
           />
           <ExportButton
-            label="Expense Report"
+            label={L('Expense Report')}
             color="stone"
             onGenerate={(rangeDays) => generateExpenseReport({
               month: selectedMonth,
@@ -583,7 +583,7 @@ export default function ReportsTab() {
             })}
           />
           <ExportButton
-            label="Monthly Summary"
+            label={L('Monthly Summary')}
             color="stone"
             onGenerate={(rangeDays) => generateSummaryReport({
               month: selectedMonth,
@@ -653,9 +653,9 @@ function ExportButton({ label, color: _color, onGenerate }: { label: string; col
         </div>
       </div>
       <DetailModal open={showConfirm} onClose={() => setShowConfirm(false)} title={`Download ${label}`} size="small">
-        <p className="text-sm text-stone-500 mb-4">Export data for <span className="font-medium">{rangeLabels[range]}</span>?</p>
+        <p className="text-sm text-stone-500 mb-4">{L('Export data for')} <span className="font-medium">{rangeLabels[range]}</span>?</p>
         <div className="flex justify-end gap-3">
-          <button onClick={() => setShowConfirm(false)} className="px-4 py-2 text-sm text-stone-600">Cancel</button>
+          <button onClick={() => setShowConfirm(false)} className="px-4 py-2 text-sm text-stone-600">{L('Cancel')}</button>
           <button onClick={() => { onGenerate(parseInt(range)); setShowConfirm(false); }} className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-sm font-medium rounded-lg flex items-center gap-2">
             <Download className="w-4 h-4" /> Download PDF
           </button>
@@ -696,7 +696,7 @@ function CowReportButton({ cows, rate, rateHistory, rateDate }: { cows: Cow[]; r
           value={selectedCow}
           onChange={e => setSelectedCow(e.target.value)}
         >
-          <option value="">Select Cow...</option>
+          <option value="">{L('Select Cow...')}</option>
           {cows.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
         </select>
         <div className="flex items-center gap-2">
@@ -721,12 +721,12 @@ function CowReportButton({ cows, rate, rateHistory, rateDate }: { cows: Cow[]; r
         </div>
       </div>
 
-      <DetailModal open={showConfirm} onClose={() => setShowConfirm(false)} title="Download Cow Report" size="small">
+      <DetailModal open={showConfirm} onClose={() => setShowConfirm(false)} title={L('Download Cow Report')} size="small">
         <p className="text-sm text-slate-500 mb-4">
           Export <span className="font-medium text-slate-700 dark:text-slate-300">{cows.find(c => c._id === selectedCow)?.name}</span> data for <span className="font-medium">{rangeLabel[range]}</span>?
         </p>
         <div className="flex justify-end gap-3">
-          <button onClick={() => setShowConfirm(false)} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800">Cancel</button>
+          <button onClick={() => setShowConfirm(false)} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800">{L('Cancel')}</button>
           <button onClick={confirmDownload} className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-medium rounded-lg flex items-center gap-2">
             <Download className="w-4 h-4" /> Download PDF
           </button>

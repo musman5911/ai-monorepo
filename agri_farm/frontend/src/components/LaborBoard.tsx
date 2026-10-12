@@ -128,12 +128,12 @@ export default function LaborBoard({
     try {
       await api.deleteLaborAdvance(id);
       await loadLabor();
-      notify('Advance removed.', 'success', undefined, {
+      notify(L('Advance removed.'), 'success', undefined, {
         label: 'Undo',
         fn: () => {
           api.addLaborAdvance({ laborer_id: adv.laborer_id, date: adv.date, amount: adv.amount, notes: adv.notes })
             .then(() => loadLabor())
-            .catch(() => notify('Undo failed — add the advance again.', 'error'));
+            .catch(() => notify(L('Undo failed — add the advance again.'), 'error'));
         },
       });
     } catch (err) {
@@ -238,11 +238,11 @@ export default function LaborBoard({
 
   const handleDeleteWorker = async (worker) => {
     const ok = await confirm({
-      title: 'Remove field worker',
+      title: L('Remove field worker'),
       message: `Remove ${worker.name} and their unposted attendance? This does not delete any app user.`,
       tone: 'danger',
-      confirmLabel: 'Remove',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Remove'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setBusy(true);
@@ -289,12 +289,12 @@ export default function LaborBoard({
     try {
       await api.deleteAttendance(id);
       await loadLabor();
-      notify('Attendance removed.', 'success', undefined, {
+      notify(L('Attendance removed.'), 'success', undefined, {
         label: 'Undo',
         fn: () => {
           api.upsertAttendance({ laborer_id: row.laborer_id, date: row.date, day_type: row.day_type, crop_id: row.crop_id || null, field: row.field, notes: row.notes })
             .then(() => loadLabor())
-            .catch(() => notify('Undo failed — mark the day again.', 'error'));
+            .catch(() => notify(L('Undo failed — mark the day again.'), 'error'));
         },
       });
     } catch (err) {
@@ -306,11 +306,11 @@ export default function LaborBoard({
 
   const handlePostMonth = async () => {
     const ok = await confirm({
-      title: 'Post month to Labor ledger',
+      title: L('Post month to Labor ledger'),
       message: `Post unposted ${month} attendance as one Labor expense of about Rs. ${formatCurrency(unpostedTotal)}?`,
       tone: 'warning',
-      confirmLabel: 'Post wages',
-      cancelLabel: 'Cancel'
+      confirmLabel: L('Post wages'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setBusy(true);
@@ -363,7 +363,7 @@ export default function LaborBoard({
             <form onSubmit={handleAddWorker} className="space-y-3">
               <div>
                 <label className={labelClass}>{L('Name')} *</label>
-                <input className={fieldClass} value={workerForm.name} onChange={e => setWorkerForm({ ...workerForm, name: e.target.value })} placeholder="e.g. Ali" />
+                <input className={fieldClass} value={workerForm.name} onChange={e => setWorkerForm({ ...workerForm, name: e.target.value })} placeholder={L('e.g. Ali')} />
               </div>
               <div>
                 <label className={labelClass}>{L('Daily wage (Rs.)')}</label>
@@ -371,7 +371,7 @@ export default function LaborBoard({
               </div>
               <div>
                 <label className={labelClass}>{L('Notes')}</label>
-                <input className={fieldClass} value={workerForm.notes} onChange={e => setWorkerForm({ ...workerForm, notes: e.target.value })} placeholder="Optional role" />
+                <input className={fieldClass} value={workerForm.notes} onChange={e => setWorkerForm({ ...workerForm, notes: e.target.value })} placeholder={L('Optional role')} />
               </div>
               <div className="flex justify-end gap-3 pt-2">
                 <button type="button" onClick={() => setShowWorkerForm(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
@@ -415,13 +415,13 @@ export default function LaborBoard({
                   </div>
                   {isAdmin && (
                     <div className="flex items-center gap-1">
-                      <button type="button" onClick={(e) => { e.stopPropagation(); openEditWorker(worker); }} className="text-slate-400 hover:text-farm-600" aria-label="Edit worker" title="Edit worker">
+                      <button type="button" onClick={(e) => { e.stopPropagation(); openEditWorker(worker); }} className="text-slate-400 hover:text-farm-600" aria-label={L('Edit worker')} title={L('Edit worker')}>
                         <Pencil size={14} />
                       </button>
-                      <button type="button" onClick={(e) => { e.stopPropagation(); setQrFor({ id: worker._id, name: worker.name }); }} className="text-slate-400 hover:text-emerald-600" aria-label="QR card" title="QR card">
+                      <button type="button" onClick={(e) => { e.stopPropagation(); setQrFor({ id: worker._id, name: worker.name }); }} className="text-slate-400 hover:text-emerald-600" aria-label={L('QR card')} title={L('QR card')}>
                         <QrCode size={15} />
                       </button>
-                      <button type="button" onClick={(e) => { e.stopPropagation(); handleDeleteWorker(worker); }} className="text-slate-400 hover:text-red-500" aria-label="Remove worker">
+                      <button type="button" onClick={(e) => { e.stopPropagation(); handleDeleteWorker(worker); }} className="text-slate-400 hover:text-red-500" aria-label={L('Remove worker')}>
                         <Trash2 size={15} />
                       </button>
                     </div>
@@ -444,10 +444,10 @@ export default function LaborBoard({
                       <div key={a._id} className="flex items-center justify-between gap-2 mt-1.5 text-[11px] p-1.5 bg-amber-50 dark:bg-amber-900/20 rounded-lg">
                         <span className="text-slate-500">{a.date} · Rs. {formatCurrency(a.amount)}{a.notes ? ` · ${a.notes}` : ''}</span>
                         <span className="flex items-center gap-1.5">
-                          <button type="button" onClick={(e) => { e.stopPropagation(); openEditAdvance(a); }} className="text-amber-500 hover:text-amber-700" aria-label="Edit advance" title="Edit advance">
+                          <button type="button" onClick={(e) => { e.stopPropagation(); openEditAdvance(a); }} className="text-amber-500 hover:text-amber-700" aria-label={L('Edit advance')} title={L('Edit advance')}>
                             <Pencil size={12} />
                           </button>
-                          <button type="button" onClick={(e) => { e.stopPropagation(); handleDeleteAdvance(a._id); }} className="text-amber-400 hover:text-red-500" aria-label="Delete advance">
+                          <button type="button" onClick={(e) => { e.stopPropagation(); handleDeleteAdvance(a._id); }} className="text-amber-400 hover:text-red-500" aria-label={L('Delete advance')}>
                             <Trash2 size={12} />
                           </button>
                         </span>
@@ -560,10 +560,10 @@ export default function LaborBoard({
                   </div>
                   {isAdmin && !row.posted && (
                     <span className="flex items-center gap-1.5">
-                      <button type="button" onClick={() => openEditAttendance(row)} className="text-slate-400 hover:text-farm-600" aria-label="Edit attendance" title="Edit attendance">
+                      <button type="button" onClick={() => openEditAttendance(row)} className="text-slate-400 hover:text-farm-600" aria-label={L('Edit attendance')} title={L('Edit attendance')}>
                         <Pencil size={13} />
                       </button>
-                      <button type="button" onClick={() => handleDeleteAttendance(row._id)} className="text-slate-400 hover:text-red-500" aria-label="Delete attendance">
+                      <button type="button" onClick={() => handleDeleteAttendance(row._id)} className="text-slate-400 hover:text-red-500" aria-label={L('Delete attendance')}>
                         <Trash2 size={14} />
                       </button>
                     </span>
