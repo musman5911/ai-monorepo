@@ -7,6 +7,7 @@ export const MUF_Z = {
   CONTENT: 100,    // floating content inside a page (chips, highlights)
   STICKY: 200,     // sticky navbars / headers
   DROPDOWN: 300,   // dropdowns, autocomplete, menus
+  FAB: 800,        // floating quick-action button (always BELOW popups)
   HUB: 900,        // admin hub shell (below popup chain so hub popups sit above it)
   POPUP: 1000,     // level-1 popup (DetailModal base)
   POPUP_STEP: 50,  // add per nesting level: 1000, 1050, 1100, 1150 ...

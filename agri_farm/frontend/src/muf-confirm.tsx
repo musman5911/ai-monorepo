@@ -1,9 +1,10 @@
 // muf shared confirm/prompt/toast provider — replaces native window dialogs in all three farm apps.
 // API: useConfirm() -> confirm({...}), usePromptInput() -> prompt({...}), notify(msg, tone).
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Info, ShieldAlert, KeyRound, CheckCircle2, XCircle } from 'lucide-react';
+import { AlertTriangle, Info, ShieldAlert, KeyRound, CheckCircle2, XCircle, X } from 'lucide-react';
 import DetailModal from './muf-modal';
 import { motion, AnimatePresence } from './muf-motion';
+import { L } from './i18n';
 
 type ConfirmTone = 'default' | 'danger' | 'warning';
 
@@ -51,7 +52,7 @@ export function usePromptInput() {
   return ctx;
 }
 
-type NoticeTone = 'success' | 'error' | 'info';
+type NoticeTone = 'success' | 'error' | 'warning' | 'info';
 interface NoticeItem {
   message: string;
   tone: NoticeTone;
@@ -114,15 +115,16 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
   useEffect(() => {
     if (!currentNotice) return;
     const hasAction = !!currentNotice.action;
-    const t = setTimeout(() => setNotices((q) => q.slice(1)), hasAction ? 6000 : 4000);
+    // Errors stay longer so they can be read; actions get a little extra time too.
+    const t = setTimeout(() => setNotices((q) => q.slice(1)), hasAction ? 6000 : currentNotice.tone === 'error' ? 8000 : 4000);
     return () => clearTimeout(t);
   }, [currentNotice]);
 
   const confirm = useCallback<ConfirmFn>((options) => {
     return new Promise((resolve) => {
       setPending({
-        confirmLabel: 'Confirm',
-        cancelLabel: 'Cancel',
+        confirmLabel: L('Confirm'),
+        cancelLabel: L('Cancel'),
         tone: 'default',
         ...options,
         resolve,
@@ -170,7 +172,7 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
       <DetailModal
         open={!!pending}
         onClose={() => close(false)}
-        title={pending?.title || 'Confirm'}
+        title={pending?.title || L('Confirm')}
         icon={toneConfig.icon}
         iconBg={toneConfig.iconBg}
         size="small"
@@ -183,17 +185,18 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
           <div className="flex flex-col-reverse sm:flex-row justify-end gap-2">
             <button
               type="button"
+              autoFocus={pending?.tone === 'danger' || pending?.tone === 'warning'}
               onClick={() => close(false)}
               className="w-full sm:w-auto px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200"
             >
-              {pending?.cancelLabel || 'Cancel'}
+              {pending?.cancelLabel || L('Cancel')}
             </button>
             <button
               type="button"
               onClick={() => close(true)}
               className={`w-full sm:w-auto px-4 py-2 rounded-xl text-sm font-semibold ${toneConfig.confirmBtn}`}
             >
-              {pending?.confirmLabel || 'Confirm'}
+              {pending?.confirmLabel || L('Confirm')}
             </button>
           </div>
         </div>
@@ -203,7 +206,7 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
       <DetailModal
         open={!!pendingPrompt}
         onClose={() => closePrompt(null)}
-        title={pendingPrompt?.title || 'Input required'}
+        title={pendingPrompt?.title || L('Input required')}
         icon={<KeyRound className="w-5 h-5" />}
         iconBg="bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
         size="small"
@@ -240,13 +243,13 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
               onClick={() => closePrompt(null)}
               className="w-full sm:w-auto px-4 py-2 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-semibold text-slate-700 dark:text-slate-200"
             >
-              {pendingPrompt?.cancelLabel || 'Cancel'}
+              {pendingPrompt?.cancelLabel || L('Cancel')}
             </button>
             <button
               type="submit"
               className="w-full sm:w-auto px-4 py-2 rounded-xl text-sm font-semibold bg-slate-800 hover:bg-slate-900 text-white dark:bg-slate-700 dark:hover:bg-slate-600"
             >
-              {pendingPrompt?.confirmLabel || 'OK'}
+              {pendingPrompt?.confirmLabel || L('OK')}
             </button>
           </div>
         </form>
@@ -261,20 +264,23 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 50, scale: 0.95 }}
             onClick={dismissNotice}
-            role="status"
+            role={currentNotice.tone === 'error' ? 'alert' : 'status'}
             aria-live={currentNotice.tone === 'error' ? 'assertive' : 'polite'}
             aria-atomic="true"
-            className={`fixed bottom-4 left-4 right-4 md:left-auto md:right-6 z-[var(--muf-z-toast)] p-4 rounded-xl shadow-2xl border text-xs md:text-sm font-bold flex items-start gap-3 max-w-sm w-auto cursor-pointer ${
+            className={`muf-toast fixed bottom-4 left-4 right-4 md:left-auto md:right-6 z-[var(--muf-z-toast)] p-4 rounded-xl shadow-2xl border text-xs md:text-sm font-bold flex items-start gap-3 max-w-sm w-auto cursor-pointer ${
               currentNotice.tone === 'error'
                 ? 'bg-red-50 dark:bg-red-950/90 border-red-200 dark:border-red-900/60 text-red-800 dark:text-red-200'
                 : currentNotice.tone === 'success'
                   ? 'bg-farm-50 dark:bg-farm-950/90 border-farm-200 dark:border-farm-900/60 text-farm-800 dark:text-farm-200'
+                  : currentNotice.tone === 'warning'
+                  ? 'bg-amber-50 dark:bg-amber-950/90 border-amber-200 dark:border-amber-900/60 text-amber-800 dark:text-amber-200'
                   : 'bg-sky-50 dark:bg-sky-950/90 border-sky-200 dark:border-sky-900/60 text-sky-800 dark:text-sky-200'
             }`}
           >
             <span className="shrink-0 mt-0.5">
               {currentNotice.tone === 'error' ? <XCircle className="w-4 h-4" />
                 : currentNotice.tone === 'success' ? <CheckCircle2 className="w-4 h-4" />
+                : currentNotice.tone === 'warning' ? <AlertTriangle className="w-4 h-4" />
                 : <Info className="w-4 h-4" />}
             </span>
             <span className="min-w-0 break-words flex-1">
@@ -290,6 +296,14 @@ export default function ConfirmProvider({ children }: { children: React.ReactNod
                 {currentNotice.action.label}
               </button>
             )}
+            <button
+              type="button"
+              onClick={(e) => { e.stopPropagation(); dismissNotice(); }}
+              className="muf-toast-close shrink-0"
+              aria-label={L('Close')}
+            >
+              <X className="w-4 h-4" />
+            </button>
           </motion.div>
         )}
       </AnimatePresence>

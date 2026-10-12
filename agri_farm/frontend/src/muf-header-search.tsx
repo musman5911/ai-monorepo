@@ -1,10 +1,11 @@
 // muf shared global search — one box, find anything (muf-search does the ranking).
 // Apps pass either pre-built `items` (prop-driven) or a lazy `loadItems` loader;
 // `onPick` routes the click (tab switch or detail popup — app-specific).
-import { useEffect, useRef, useState } from 'react';
-import { Search } from 'lucide-react';
+// Keyboard: ↓ / ↑ move through results, Enter opens the highlighted one, Esc closes.
+import { useEffect, useId, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { Search, X } from 'lucide-react';
 import { mufSearch, type MufSearchItem } from './muf-search';
-import { mufUr } from './muf-urdu';
+import { mufL } from './muf-urdu';
 
 interface MufHeaderSearchProps {
   lang: 'en' | 'ur' | 'roman';
@@ -17,10 +18,12 @@ interface MufHeaderSearchProps {
 }
 
 export default function HeaderSearch({ lang, items, loadItems, onPick }: MufHeaderSearchProps) {
-  const L = (en: string, ur?: string) => (lang === 'ur' ? (ur || mufUr(en)) : en);
+  const L = (en: string) => mufL(lang, en);
+  const listId = useId();
   const [open, setOpen] = useState(false);
   const [mobile, setMobile] = useState(false);
   const [query, setQuery] = useState('');
+  const [active, setActive] = useState(0);
   const [remoteItems, setRemoteItems] = useState<MufSearchItem[]>([]);
   const loaded = useRef(false);
   const boxRef = useRef<HTMLDivElement>(null);
@@ -34,50 +37,89 @@ export default function HeaderSearch({ lang, items, loadItems, onPick }: MufHead
   }
 
   useEffect(() => {
-    function onDoc(e: MouseEvent) {
-      if (boxRef.current && !boxRef.current.contains(e.target as Node)) setOpen(false);
+    function onDoc(e: Event) {
+      if (boxRef.current && !boxRef.current.contains(e.target as Node)) { setOpen(false); }
     }
     document.addEventListener('mousedown', onDoc);
-    return () => document.removeEventListener('mousedown', onDoc);
+    document.addEventListener('touchstart', onDoc, { passive: true });
+    return () => {
+      document.removeEventListener('mousedown', onDoc);
+      document.removeEventListener('touchstart', onDoc);
+    };
   }, []);
 
   const results = mufSearch(allItems, query);
+  const safeActive = Math.min(active, Math.max(0, results.length - 1));
+  const optionId = (i: number) => `${listId}-opt-${i}`;
 
-  function pick(item: MufSearchItem) {
+  function closeAll() {
     setOpen(false);
     setMobile(false);
     setQuery('');
+  }
+
+  function pick(item: MufSearchItem) {
+    closeAll();
     onPick(item);
   }
 
+  function onKeyDown(e: ReactKeyboardEvent) {
+    if (e.key === 'Escape') { e.preventDefault(); closeAll(); return; }
+    if (!results.length) return;
+    if (e.key === 'ArrowDown') { e.preventDefault(); setOpen(true); setActive((safeActive + 1) % results.length); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); setOpen(true); setActive((safeActive - 1 + results.length) % results.length); }
+    else if (e.key === 'Enter' && query) { e.preventDefault(); pick(results[safeActive]); }
+  }
+
   const resultsList = (
-    <>
-      {results.length === 0 && <p className="p-3 text-xs text-slate-400">{L('Nothing found.')}</p>}
-      {results.map((r) => (
-        <button key={`${r.type}-${r.id}`} onClick={() => pick(r)} className="w-full text-left px-3 py-2 text-xs hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center gap-2 transition">
-          <span>{r.emoji}</span>
-          <span className="font-semibold text-slate-700 dark:text-slate-200 truncate">{r.label}</span>
-          <span className="text-slate-400 truncate ml-auto">{r.sub}</span>
+    <div id={listId} role="listbox" aria-label={L('Search')}>
+      {results.length === 0 && <p className="muf-search-empty" role="status">{L('Nothing found.')}</p>}
+      {results.map((r, i) => (
+        <button
+          key={`${r.type}-${r.id}`}
+          id={optionId(i)}
+          role="option"
+          aria-selected={i === safeActive}
+          type="button"
+          tabIndex={-1}
+          onMouseEnter={() => setActive(i)}
+          onClick={() => pick(r)}
+          className={`muf-search-option ${i === safeActive ? 'is-active' : ''}`}
+        >
+          <span aria-hidden="true">{r.emoji}</span>
+          <span className="muf-search-option-label">{r.label}</span>
+          <span className="muf-search-option-sub">{r.sub}</span>
         </button>
       ))}
-    </>
+    </div>
   );
+
+  const comboProps = {
+    role: 'combobox' as const,
+    'aria-expanded': open && !!query,
+    'aria-controls': listId,
+    'aria-autocomplete': 'list' as const,
+    'aria-activedescendant': results.length && query ? optionId(safeActive) : undefined,
+  };
 
   return (
     <div ref={boxRef} className="relative">
       {/* Desktop: inline search box beside the theme toggle */}
-      <div className="hidden sm:flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 bg-white/70 dark:bg-slate-900/70">
-        <Search size={15} className="text-slate-400 shrink-0" />
+      <div className="muf-search-box hidden sm:flex">
+        <Search size={15} className="muf-search-icon" aria-hidden="true" />
         <input
+          {...comboProps}
           value={query}
           onFocus={() => { setOpen(true); ensureLoaded(); }}
-          onChange={(e) => { setQuery(e.target.value); setOpen(true); }}
-          placeholder={L('Search…')}
-          className="w-28 lg:w-40 bg-transparent outline-none text-xs text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
+          onChange={(e) => { setQuery(e.target.value); setActive(0); setOpen(true); }}
+          onKeyDown={onKeyDown}
+          placeholder={L('Search')}
+          aria-label={L('Search')}
+          className="muf-search-input"
         />
       </div>
       {open && query && (
-        <div className="hidden sm:block absolute right-0 mt-1.5 w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl shadow-lg overflow-hidden z-[300]">
+        <div className="muf-search-dropdown hidden sm:block">
           {resultsList}
         </div>
       )}
@@ -86,30 +128,36 @@ export default function HeaderSearch({ lang, items, loadItems, onPick }: MufHead
           Wrapped in a plain sm:hidden div — .muf-icon-button sets its own
           display and would override sm:hidden on the button itself. */}
       <div className="sm:hidden">
-      <button
-        type="button"
-        onClick={() => { setMobile(!mobile); setOpen(true); ensureLoaded(); }}
-        className="muf-icon-button"
-        aria-label={L('Search…')}
-      >
-        <Search size={17} />
-      </button>
-      {mobile && (
-        <div className="sm:hidden fixed left-2 right-2 top-16 z-[var(--muf-z-search)] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl overflow-hidden">
-          <div className="flex items-center gap-2 px-3 py-2.5 border-b border-slate-100 dark:border-slate-800">
-            <Search size={16} className="text-slate-400 shrink-0" />
-            <input
-              autoFocus
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder={L('Search…')}
-              className="flex-1 bg-transparent outline-none text-sm text-slate-700 dark:text-slate-200 placeholder:text-slate-400"
-            />
-            <button type="button" onClick={() => { setMobile(false); setQuery(''); }} className="text-slate-400 text-lg leading-none px-1" aria-label="Close">✕</button>
+        <button
+          type="button"
+          onClick={() => { setMobile(!mobile); setOpen(true); ensureLoaded(); }}
+          className="muf-icon-button"
+          aria-label={L('Search')}
+          aria-expanded={mobile}
+        >
+          <Search size={17} />
+        </button>
+        {mobile && (
+          <div className="muf-search-mobile sm:hidden">
+            <div className="muf-search-mobile-bar">
+              <Search size={16} className="muf-search-icon" aria-hidden="true" />
+              <input
+                {...comboProps}
+                autoFocus
+                value={query}
+                onChange={(e) => { setQuery(e.target.value); setActive(0); }}
+                onKeyDown={onKeyDown}
+                placeholder={L('Search')}
+                aria-label={L('Search')}
+                className="muf-search-input muf-search-input-mobile"
+              />
+              <button type="button" onClick={closeAll} className="muf-icon-plain" aria-label={L('Close')}>
+                <X size={16} />
+              </button>
+            </div>
+            {query && <div className="muf-search-mobile-list">{resultsList}</div>}
           </div>
-          {query && <div className="max-h-72 overflow-y-auto">{resultsList}</div>}
-        </div>
-      )}
+        )}
       </div>
     </div>
   );

@@ -8,6 +8,7 @@
 //   agri_farm/frontend/src/muf-worker-panel.tsx (byte-identical twin)
 import React from 'react';
 import { CheckCircle2, Clock } from 'lucide-react';
+import { L } from './i18n';
 
 export interface MufWorkerEntry {
   id: string;
@@ -38,12 +39,12 @@ export default function MufWorkerPanel({ appName, todayEntries, todayExpenses, t
       <div className="flex items-center justify-between gap-3">
         <div>
           <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            <Clock className="w-4 h-4 text-farm-600" /> My Today
+            <Clock className="w-4 h-4 text-farm-600" /> {L('My Today')}
           </h3>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{appName} Farm — your entries today</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{L('{app} Farm — your entries today', { app: appName })}</p>
         </div>
         <span className="px-2.5 py-1 rounded-full bg-farm-100 dark:bg-farm-900/30 text-farm-700 dark:text-farm-400 text-[10px] font-bold">
-          {totalToday} entries
+          {L('{n} entries', { n: totalToday })}
         </span>
       </div>
 
@@ -63,14 +64,14 @@ export default function MufWorkerPanel({ appName, todayEntries, todayExpenses, t
       {/* Today's entries */}
       <div className="muf-panel p-4">
         <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-2 flex items-center gap-1.5">
-          <CheckCircle2 className="w-3.5 h-3.5 text-farm-500" /> Production / Tasks ({todayEntries.length})
+          <CheckCircle2 className="w-3.5 h-3.5 text-farm-500" /> {L('Production / Tasks')} ({todayEntries.length})
         </h4>
         {todayEntries.length === 0 ? (
-          <p className="text-xs text-slate-400 py-3 text-center">No entries logged today yet.</p>
+          <p className="text-xs text-slate-400 py-3 text-center">{L('No entries logged today yet.')}</p>
         ) : (
           <div className="space-y-1.5 max-h-40 overflow-y-auto">
             {todayEntries.map(e => (
-              <div key={e.id} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-xs">
+              <div key={e.id} className="muf-row">
                 <span className="text-slate-700 dark:text-slate-200 font-medium truncate flex-1">{e.label}</span>
                 <span className="text-slate-400 text-[10px] shrink-0">{e.sub}</span>
               </div>
@@ -82,10 +83,10 @@ export default function MufWorkerPanel({ appName, todayEntries, todayExpenses, t
       {/* Today's expenses */}
       {todayExpenses.length > 0 && (
         <div className="muf-panel p-4">
-          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-2">💰 Expenses ({todayExpenses.length})</h4>
+          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-2">💰 {L('Expenses')} ({todayExpenses.length})</h4>
           <div className="space-y-1.5 max-h-40 overflow-y-auto">
             {todayExpenses.map(e => (
-              <div key={e.id} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-xs">
+              <div key={e.id} className="muf-row">
                 <span className="text-slate-700 dark:text-slate-200 font-medium truncate flex-1">{e.label}</span>
                 <span className="text-slate-400 text-[10px] shrink-0">{e.sub}</span>
               </div>
@@ -97,10 +98,10 @@ export default function MufWorkerPanel({ appName, todayEntries, todayExpenses, t
       {/* Today's health */}
       {todayHealth.length > 0 && (
         <div className="muf-panel p-4">
-          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-2">💊 Health ({todayHealth.length})</h4>
+          <h4 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-2">💊 {L('Health')} ({todayHealth.length})</h4>
           <div className="space-y-1.5 max-h-40 overflow-y-auto">
             {todayHealth.map(e => (
-              <div key={e.id} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-xs">
+              <div key={e.id} className="muf-row">
                 <span className="text-slate-700 dark:text-slate-200 font-medium truncate flex-1">{e.label}</span>
                 <span className="text-slate-400 text-[10px] shrink-0">{e.sub}</span>
               </div>

@@ -11,6 +11,7 @@ import React, { useState } from 'react';
 import { UserPlus, Users, Shield, ShieldCheck, UserRound, Pencil, Mail, Power, Trash2 } from 'lucide-react';
 import MufAdminCard from './muf-admin-card';
 import MufAdminButton from './muf-admin-button';
+import { L } from './i18n';
 
 export interface MufAdminUser {
   _id: string;
@@ -88,7 +89,7 @@ export default function MufAdminUsers({
   return (
     <div className="space-y-6">
       {/* ── Register New User ── */}
-      <MufAdminCard icon={<UserPlus className="w-5 h-5" />} title="Register New User" subtitle="Create admin and worker accounts for your farm team">
+      <MufAdminCard icon={<UserPlus className="w-5 h-5" />} title={L('Register New User')} subtitle={L('Create admin and worker accounts for your farm team')}>
         <div className="flex items-center justify-end gap-2 mb-3">
           <MufAdminButton variant={showForm ? 'secondary' : 'primary'} size="sm" icon={<UserPlus className="w-4 h-4" />}
             onClick={() => setShowForm(!showForm)}
@@ -100,12 +101,12 @@ export default function MufAdminUsers({
         {showForm && (
           <form onSubmit={handleCreate} className="space-y-3">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <input required value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder="Username" className={inputClass} />
+              <input required value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} placeholder={L('Username')} className={inputClass} />
               <input required type="password" minLength={minPasswordLength} value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} placeholder={`Password (min ${minPasswordLength})`} className={inputClass} />
-              <input value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} placeholder="Display name (optional)" className={inputClass} />
+              <input value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} placeholder={L('Display name (optional)')} className={inputClass} />
               <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className={inputClass}>
-                <option value="worker">Worker</option>
-                <option value="admin">Admin</option>
+                <option value="worker">{L('Worker')}</option>
+                <option value="admin">{L('Admin')}</option>
               </select>
               <input type="email" required={form.role === 'admin'} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder={form.role === 'admin' ? 'Email (required for admins)' : 'Email (optional)'} className="sm:col-span-2 w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 transition" />
             </div>
@@ -120,9 +121,9 @@ export default function MufAdminUsers({
       <MufAdminCard icon={<Users className="w-5 h-5" />} title={`Registered Users (${users.length})`} subtitle="Manage access levels and credentials">
         <div className="space-y-2">
           {usersLoading ? (
-            <div className="text-sm text-slate-500 py-8 text-center">Loading users...</div>
+            <div className="text-sm text-slate-500 py-8 text-center">{L('Loading users...')}</div>
           ) : users.length === 0 ? (
-            <div className="text-sm text-slate-500 py-8 text-center">No users found.</div>
+            <div className="text-sm text-slate-500 py-8 text-center">{L('No users found.')}</div>
           ) : (
             users.map((user) => (
               <div key={user._id} className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 ${user.active === false ? 'opacity-60' : ''}`}>
@@ -156,7 +157,7 @@ export default function MufAdminUsers({
                     <Pencil className="w-4 h-4" />
                   </button>
                   {onEditEmail && (
-                    <button onClick={() => onEditEmail(user)} title="Edit reset email" className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition">
+                    <button onClick={() => onEditEmail(user)} title={L('Edit reset email')} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 transition">
                       <Mail className="w-4 h-4" />
                     </button>
                   )}
@@ -165,7 +166,7 @@ export default function MufAdminUsers({
                       <Power className="w-4 h-4" />
                     </button>
                   )}
-                  <button onClick={() => onDelete?.(user)} disabled={user.username === currentUsername} title="Delete user" className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 disabled:opacity-30 transition">
+                  <button onClick={() => onDelete?.(user)} disabled={user.username === currentUsername} title={L('Delete user')} className="p-2 rounded-xl hover:bg-red-50 dark:hover:bg-red-900/30 text-red-500 disabled:opacity-30 transition">
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -173,14 +174,14 @@ export default function MufAdminUsers({
                 {/* Inline edit panel */}
                 {editId === user._id && (
                   <div className="w-full mt-1 p-4 rounded-xl border border-farm-200 dark:border-farm-800 bg-farm-50/60 dark:bg-farm-950/20 space-y-3">
-                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Edit Profile</p>
+                    <p className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{L('Edit Profile')}</p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <input value={editUsername} onChange={(e) => setEditUsername(e.target.value)} placeholder="Username" className={inputClass} />
+                      <input value={editUsername} onChange={(e) => setEditUsername(e.target.value)} placeholder={L('Username')} className={inputClass} />
                       <input type="password" value={editPassword} onChange={(e) => setEditPassword(e.target.value)} placeholder={`New password (optional, min ${minPasswordLength})`} className={inputClass} />
                       <input type="password" value={editAdminPw} onChange={(e) => setEditAdminPw(e.target.value)} placeholder="Enter your admin password to save" className={`sm:col-span-2 ${inputClass}`} />
                     </div>
                     <div className="flex gap-2 justify-end">
-                      <MufAdminButton variant="secondary" size="sm" onClick={cancelEdit}>Cancel</MufAdminButton>
+                      <MufAdminButton variant="secondary" size="sm" onClick={cancelEdit}>{L('Cancel')}</MufAdminButton>
                       <MufAdminButton variant="primary" size="sm" disabled={editBusy} onClick={() => handleSaveEdit(user)}>
                         {editBusy ? 'Saving…' : 'Save Changes'}
                       </MufAdminButton>

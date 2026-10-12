@@ -115,7 +115,7 @@ export default function TelegramPanel({ lang, adapter, blurbEn, alarm, cronPath 
           )}
 
           {/* generate code */}
-          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 space-y-2">
+          <div className="muf-panel-soft space-y-2">
             <p className="text-[11px] font-bold text-slate-500 uppercase">{L('Link a worker')}</p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               <select className={selectClass} value={selUser} onChange={(e) => setSelUser(e.target.value)}>
@@ -144,7 +144,7 @@ export default function TelegramPanel({ lang, adapter, blurbEn, alarm, cronPath 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <p className="text-[11px] font-bold text-slate-500 uppercase">{L('Linked')} ({status.links.length})</p>
-              <button onClick={load} className="text-slate-400 hover:text-slate-600" title="Refresh"><RefreshCw className="w-3.5 h-3.5" /></button>
+              <button onClick={load} className="text-slate-400 hover:text-slate-600" title={L('Refresh')}><RefreshCw className="w-3.5 h-3.5" /></button>
             </div>
             {status.links.length === 0 && <p className="text-xs text-slate-400 italic">{L('Nobody linked yet.')}</p>}
             {status.links.map((l) => (
@@ -157,7 +157,7 @@ export default function TelegramPanel({ lang, adapter, blurbEn, alarm, cronPath 
           </div>
 
           {/* evening auto-summary (+ production-drop alarm when provided) */}
-          <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl p-3 space-y-2">
+          <div className="muf-panel-soft space-y-2">
             <p className="text-[11px] font-bold text-slate-500 uppercase">{alarm ? L(alarm.titleEn) : L('Evening summary')}</p>
             <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-300 cursor-pointer">
               <input type="checkbox" className="w-4 h-4 accent-sky-600" checked={cfg?.dailySummary ?? true} onChange={(e) => cfg && setCfg({ ...cfg, dailySummary: e.target.checked })} />

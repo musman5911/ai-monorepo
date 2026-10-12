@@ -4,6 +4,7 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { X, ArrowLeft } from 'lucide-react';
 import { AnimatePresence, motion } from './muf-motion';
 import ModalPortal from './muf-portal';
+import { L } from './i18n';
 import { MUF_Z } from './muf-z';
 import { useBodyScrollLock } from './muf-scroll-lock';
 
@@ -32,6 +33,7 @@ export default function DetailModal({
   const modalId = useId();
   const closeRef = useRef(onClose);
   const [stackLevel, setStackLevel] = useState(0);
+  const cardRef = useRef<HTMLDivElement>(null);
   closeRef.current = onClose;
   useBodyScrollLock(open);
 
@@ -61,8 +63,21 @@ export default function DetailModal({
     };
   }, [open, modalId]);
 
-  if (!open) return null;
-const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]' : 'w-[calc(100vw-1rem)] sm:w-[min(90vw,42rem,100vh)]';
+  // Move focus into the dialog when it opens and give it back to the opener when it closes.
+  useEffect(() => {
+    if (!open) return;
+    const opener = document.activeElement as HTMLElement | null;
+    const t = window.setTimeout(() => {
+      const card = cardRef.current;
+      if (card && !card.contains(document.activeElement)) card.focus({ preventScroll: true });
+    }, 30);
+    return () => {
+      window.clearTimeout(t);
+      if (opener && document.contains(opener) && typeof opener.focus === 'function') opener.focus({ preventScroll: true });
+    };
+  }, [open]);
+
+  const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]' : 'w-[calc(100vw-1rem)] sm:w-[min(90vw,42rem,100vh)]';
   const alignCls = 'items-center';
   const computedZ = zIndex ?? (MUF_Z.POPUP + Math.max(0, stackLevel - 1) * MUF_Z.POPUP_STEP);
   const isChild = !!onBack;
@@ -72,6 +87,7 @@ const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]
       <AnimatePresence>
         {open && (
           <div
+            key={modalId}
             className={`ff-modal-host muf-overlay fixed inset-0 flex ${alignCls} justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto muf-scroll`}
             style={{ zIndex: computedZ }}
           >
@@ -90,6 +106,8 @@ const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 2 }}
               transition={{ type: 'spring', stiffness: 480, damping: 30, mass: 0.6 }}
+              ref={cardRef}
+              tabIndex={-1}
               role="dialog"
               aria-modal="true"
               aria-labelledby={`${modalId}-title`}
@@ -104,15 +122,15 @@ const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]
                 if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
                 else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
               }}
-              className={`relative pointer-events-auto my-2 sm:my-0 max-h-[88vh] sm:max-h-[86vh] ${widthCls} ${size === 'small' ? 'muf-pup-sm' : 'muf-pup-lg'} bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden ${isChild ? 'ring-2 ring-emerald-400/30' : ''}`}
+              className={`relative pointer-events-auto outline-none my-2 sm:my-0 max-h-[88vh] sm:max-h-[86vh] ${widthCls} ${size === 'small' ? 'muf-pup-sm' : 'muf-pup-lg'} bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden ${isChild ? 'ring-2 ring-emerald-400/30' : ''}`}
             >
               <div className="flex items-start sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-gradient-to-br from-slate-50 to-white/95 dark:from-slate-800 dark:to-slate-800/90 backdrop-blur" style={{ padding: 'var(--pup-head-pad)', gap: 'var(--pup-gap)' }}>
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">
                   {onBack && (
                     <button onClick={onBack}
                       className="shrink-0 min-w-11 min-h-11 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-                      title={backLabel || 'Back'}
-                      aria-label="Back">
+                      title={backLabel || L('Back')}
+                      aria-label={L('Back')}>
                       <ArrowLeft className="w-4 h-4" />
                     </button>
                   )}
@@ -137,7 +155,7 @@ const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]
                   whileHover={{ rotate: 90 }}
                   transition={{ duration: 0.15 }}
                   className="min-w-11 min-h-11 rounded-full hover:bg-slate-100 dark:hover:bg-slate-700 flex items-center justify-center text-slate-500 dark:text-slate-400 transition shrink-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500"
-                  aria-label="Close"
+                  aria-label={L('Close')}
                 >
                   <X className="w-5 h-5" />
                 </motion.button>

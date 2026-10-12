@@ -14,14 +14,16 @@
 // admin functionality — it only centralises the shared chrome (overlay,
 // header, tabs, scroll container) so the 3 apps look identical.
 //
-// DESIGN: The header (icon + title + close) stays pinned at the top. The
-// tab nav lives INSIDE the scrollable body so it scrolls away with the
-// content — tabs are not pinned/sticky. This gives more vertical room for
-// the form content once the user scrolls down.
-import React from 'react';
+// DESIGN: The header (icon + title + close) stays pinned at the top and the tab
+// strip stays pinned under it while the active section scrolls. The dialog
+// closes with Esc / the X button / a tap on the dark backdrop, locks the page
+// behind it, moves focus inside and gives focus back when it closes.
+import React, { useEffect, useId, useRef } from 'react';
 import { motion, modalSpring } from './muf-motion';
 import ModalPortal from './muf-portal';
 import { X } from 'lucide-react';
+import { L } from './i18n';
+import { useBodyScrollLock } from './muf-scroll-lock';
 
 export interface MufAdminSection {
   id: string;
@@ -60,6 +62,44 @@ export default function MufAdminShell({
   open, onClose, title, subtitle, icon,
   sections, activeSection, onSectionChange, children, headerActions,
 }: MufAdminShellProps) {
+  const titleId = useId();
+  const overlayRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef(onClose);
+  closeRef.current = onClose;
+
+  useBodyScrollLock(open);
+
+  useEffect(() => {
+    if (!open) return;
+    const opener = document.activeElement as HTMLElement | null;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      // Only the top-most popup reacts — a detail popup opened from here closes first.
+      const hosts = document.querySelectorAll('.ff-modal-host');
+      if (hosts.length && hosts[hosts.length - 1] !== overlayRef.current) return;
+      closeRef.current();
+    };
+    window.addEventListener('keydown', onKey);
+    const t = window.setTimeout(() => {
+      const card = cardRef.current;
+      if (card && !card.contains(document.activeElement)) card.focus({ preventScroll: true });
+    }, 30);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.clearTimeout(t);
+      if (opener && document.contains(opener) && typeof opener.focus === 'function') opener.focus({ preventScroll: true });
+    };
+  }, [open]);
+
+  // Keep the active tab visible in the horizontally scrolling tab strip.
+  useEffect(() => {
+    if (!open) return;
+    const el = tabsRef.current?.querySelector('.active') as HTMLElement | null;
+    if (el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }, [open, activeSection]);
+
   if (!open) return null;
 
   return (
@@ -71,9 +111,9 @@ export default function MufAdminShell({
         transition={{ duration: 0.18 }}
         className="ff-modal-host muf-popup-stage muf-overlay modal-overlay fixed top-0 left-0 w-screen z-[var(--muf-z-hub)] flex items-center justify-center p-4 sm:p-4 bg-black/75 backdrop-blur-xs"
         style={{ width: '100vw' }}
+        ref={overlayRef}
         onClick={onClose}
-        role="dialog"
-        aria-modal="true"
+        role="presentation"
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.97, y: 6 }}
@@ -81,6 +121,11 @@ export default function MufAdminShell({
           exit={{ opacity: 0, scale: 0.98, y: 2 }}
           transition={modalSpring}
           className="muf-admin-shell w-full max-w-4xl max-h-[88vh] sm:max-h-[88vh] bg-[#fffefb] dark:bg-[#0d1a11] border border-[#e6e6de] dark:border-[#203528] rounded-2xl sm:rounded-[20px] shadow-2xl shadow-black/30 flex flex-col overflow-hidden text-slate-800 dark:text-slate-100"
+          ref={cardRef}
+          tabIndex={-1}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby={titleId}
           onClick={(event) => event.stopPropagation()}
         >
           {/* Header — PINNED at top (icon + title + close) */}
@@ -95,7 +140,7 @@ export default function MufAdminShell({
                 {icon}
               </motion.div>
               <div className="min-w-0">
-                <h2 className="muf-pup-title font-black text-slate-800 dark:text-white truncate">{title}</h2>
+                <h2 id={titleId} className="muf-pup-title font-black text-slate-800 dark:text-white truncate">{title}</h2>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate">
                   {subtitle}
                 </p>
@@ -103,7 +148,7 @@ export default function MufAdminShell({
             </div>
             <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
               {headerActions}
-              <motion.button whileHover={{ rotate: 90 }} whileTap={{ scale: 0.9 }} onClick={onClose} className="w-9 h-9 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 transition">
+              <motion.button whileHover={{ rotate: 90 }} whileTap={{ scale: 0.9 }} onClick={onClose} aria-label={L('Close')} className="w-9 h-9 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 transition">
                 <X className="w-5 h-5" />
               </motion.button>
             </div>
@@ -119,7 +164,7 @@ export default function MufAdminShell({
           >
             {/* Tabs — horizontal scroll with a sticky surface for easy section switching. */}
             <div className="muf-top-nav muf-admin-tabs-inline muf-admin-tabs-sticky select-none px-3 sm:px-4">
-              <div className="muf-top-nav-scroll">
+              <div className="muf-top-nav-scroll" ref={tabsRef}>
                 {sections.map((tab) => {
                   const Icon = tab.icon;
                   const active = activeSection === tab.id;
@@ -144,8 +189,8 @@ export default function MufAdminShell({
             </div>
           </motion.div>
           <div className="muf-admin-footer shrink-0 flex items-center justify-between gap-3 px-4 sm:px-5 py-2.5 border-t border-[#e6e6de] dark:border-[#203528] text-[10px] text-slate-500 dark:text-slate-400">
-            <span className="font-bold tracking-wider uppercase">MUF · Farm Management</span>
-            <span>Settings &amp; administration</span>
+            <span className="font-bold tracking-wider uppercase">{L('Farm management')}</span>
+            <span>{L('Settings & administration')}</span>
           </div>
         </motion.div>
       </motion.div>

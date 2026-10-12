@@ -11,6 +11,7 @@ import { Shield, KeyRound, Mail, Send, Bell, BellOff } from 'lucide-react';
 import MufAdminCard from './muf-admin-card';
 import MufAdminButton from './muf-admin-button';
 import { loadNotifPrefs, saveNotifPrefs, requestNotifPermission, notifPermission, type MufNotifPrefs } from './muf-notifications';
+import { L } from './i18n';
 
 const inputClass = 'w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 transition text-slate-800 dark:text-slate-100 placeholder:text-slate-400';
 
@@ -79,10 +80,10 @@ export default function MufAdminGeneral({
     <div className="space-y-6">
       {/* ── Profile ── */}
       {avatarSlot && (
-        <MufAdminCard icon={<Shield className="w-5 h-5" />} title="Admin Profile" subtitle="Your account information">
+        <MufAdminCard icon={<Shield className="w-5 h-5" />} title={L('Admin Profile')} subtitle={L('Your account information')}>
           <div className="mb-4">
             <p className="text-base font-bold text-slate-800 dark:text-slate-100">{username}</p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">Administrator account</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{L('Administrator account')}</p>
             {email && <p className="text-xs font-mono text-slate-400 mt-1">{email}</p>}
           </div>
           {avatarSlot}
@@ -90,7 +91,7 @@ export default function MufAdminGeneral({
       )}
 
       {/* ── Change Password ── */}
-      <MufAdminCard icon={<KeyRound className="w-5 h-5" />} title="Change Password" subtitle="Update your access password">
+      <MufAdminCard icon={<KeyRound className="w-5 h-5" />} title={L('Change Password')} subtitle={L('Update your access password')}>
         <form onSubmit={onSubmitPassword} className="space-y-3">
           {pwMsg && (
             <div className={`p-3 rounded-lg text-xs border font-semibold ${
@@ -102,9 +103,9 @@ export default function MufAdminGeneral({
             </div>
           )}
           <input type="password" value={newPassword} onChange={(e) => onNewPasswordChange(e.target.value)}
-            placeholder="New password (min 8 characters)" className={inputClass} minLength={8} />
+            placeholder={L('New password (min 8 characters)')} className={inputClass} minLength={8} />
           <input type="password" value={currentPassword} onChange={(e) => onCurrentPasswordChange(e.target.value)}
-            placeholder="Current password" className={inputClass} />
+            placeholder={L('Current password')} className={inputClass} />
           <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
             <span className="flex-1 border-t border-slate-200 dark:border-slate-700" /> or verify by email <span className="flex-1 border-t border-slate-200 dark:border-slate-700" />
           </div>
@@ -124,7 +125,7 @@ export default function MufAdminGeneral({
       </MufAdminCard>
 
       {/* ── Change Email ── */}
-      <MufAdminCard icon={<Mail className="w-5 h-5" />} title="Change Email" subtitle="Update your email address">
+      <MufAdminCard icon={<Mail className="w-5 h-5" />} title={L('Change Email')} subtitle={L('Update your email address')}>
         <form onSubmit={onSubmitEmail} className="space-y-3">
           {emailMsg && (
             <div className={`p-3 rounded-lg text-xs border font-semibold ${
@@ -139,7 +140,7 @@ export default function MufAdminGeneral({
             Current: <span className="font-mono font-semibold">{currentEmail || 'not set'}</span>
           </p>
           <input type="email" value={newEmail} onChange={(e) => onNewEmailChange(e.target.value)}
-            placeholder="New email address" className={inputClass} />
+            placeholder={L('New email address')} className={inputClass} />
           <div className="flex gap-2">
             <input value={emailCode} onChange={(e) => onEmailCodeChange(e.target.value)}
               placeholder="6-digit emailed code" className={inputClass} maxLength={6} />
@@ -156,11 +157,11 @@ export default function MufAdminGeneral({
       </MufAdminCard>
 
       {/* ── Notification Preferences ── */}
-      <MufAdminCard icon={prefs.enabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />} title="Browser Notifications" subtitle="Get desktop alerts for important farm events">
+      <MufAdminCard icon={prefs.enabled ? <Bell className="w-5 h-5" /> : <BellOff className="w-5 h-5" />} title={L('Browser Notifications')} subtitle={L('Get desktop alerts for important farm events')}>
         <div className="space-y-3">
           {permission !== 'granted' && permission !== 'denied' && (
             <MufAdminButton type="button" variant="secondary" size="md" icon={<Bell className="w-4 h-4" />} onClick={handleRequestPermission}>
-              Enable Browser Notifications
+              {L('Enable Browser Notifications')}
             </MufAdminButton>
           )}
           {permission === 'denied' && (
@@ -169,7 +170,7 @@ export default function MufAdminGeneral({
           {permission === 'granted' && (
             <>
               <label className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50 cursor-pointer">
-                <span className="text-sm font-bold text-slate-700 dark:text-slate-200">Enable notifications</span>
+                <span className="text-sm font-bold text-slate-700 dark:text-slate-200">{L('Enable notifications')}</span>
                 <input type="checkbox" checked={prefs.enabled} onChange={(e) => updatePref('enabled', e.target.checked)} className="w-5 h-5 accent-farm-600" />
               </label>
               {prefs.enabled && (

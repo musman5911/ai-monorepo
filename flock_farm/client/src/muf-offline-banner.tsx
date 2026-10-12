@@ -70,7 +70,7 @@ export default function OfflineBanner({ pendingCount, lang, readQueue, onSync }:
             {readQueue && state.pending > 0 && (
               <div className="max-h-48 overflow-y-auto space-y-1.5">
                 {readQueue().slice(0, 20).map((item, i) => (
-                  <div key={i} className="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 text-xs">
+                  <div key={i} className="muf-row">
                     <span className={`px-1.5 py-0.5 rounded font-mono font-bold text-[10px] ${
                       item.method === 'POST' ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400' :
                       item.method === 'PUT' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :

@@ -6,10 +6,11 @@
 //   dairy_farm/client/src/muf-fab.tsx  (this file)
 //   flock_farm/client/src/muf-fab.tsx  (byte-identical twin)
 //   agri_farm/frontend/src/muf-fab.tsx (byte-identical twin)
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from './muf-motion';
 import { Plus, X } from 'lucide-react';
 import ModalPortal from './muf-portal';
+import { L } from './i18n';
 
 export interface MufFabAction {
   icon: React.ReactNode;
@@ -23,6 +24,12 @@ interface MufFabProps {
 
 export default function MufFab({ actions }: MufFabProps) {
   const [open, setOpen] = useState(false);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setOpen(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open]);
   if (actions.length === 0) return null;
 
   // Render through a body-level portal so the FAB's `position: fixed` is
@@ -41,14 +48,14 @@ export default function MufFab({ actions }: MufFabProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             transition={{ duration: 0.15 }}
-            className="fixed inset-0 z-[var(--muf-z-search)] bg-black/20 backdrop-blur-[1px] md:hidden"
+            className="fixed inset-0 z-[var(--muf-z-fab)] bg-black/20 backdrop-blur-[1px] md:hidden"
             onClick={() => setOpen(false)}
           />
         )}
       </AnimatePresence>
 
       {/* Action list — expands upward from the FAB */}
-      <div className="fixed bottom-5 right-5 z-[var(--muf-z-confirm)] flex flex-col items-end gap-2.5 pointer-events-none">
+      <div className="muf-fab-root fixed bottom-5 right-5 z-[var(--muf-z-fab)] flex flex-col items-end gap-2.5 pointer-events-none">
         <AnimatePresence>
           {open && actions.map((action, i) => (
             <motion.button
@@ -73,7 +80,8 @@ export default function MufFab({ actions }: MufFabProps) {
           whileTap={{ scale: 0.9 }}
           onClick={() => setOpen(o => !o)}
           className="w-14 h-14 rounded-full bg-gradient-to-br from-farm-500 to-farm-700 text-white shadow-xl flex items-center justify-center pointer-events-auto border-2 border-white/20"
-          aria-label={open ? 'Close quick actions' : 'Open quick actions'}
+          aria-label={open ? L('Close quick actions') : L('Open quick actions')}
+          aria-expanded={open}
         >
           <motion.div
             animate={{ rotate: open ? 45 : 0 }}

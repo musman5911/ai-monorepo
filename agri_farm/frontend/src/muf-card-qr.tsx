@@ -48,7 +48,7 @@ export default function MufCardQr({ open, onClose, kind, id, name }: MufCardQrPr
 
   function shareWa() {
     const msg = encodeURIComponent(`${name || 'Card'} — ${kindTitle}\n${url}`);
-    window.open(`https://wa.me/?text=${msg}`, '_blank');
+    window.open(`https://wa.me/?text=${msg}`, '_blank', 'noopener,noreferrer');
   }
 
   const btn = 'flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition disabled:opacity-60';

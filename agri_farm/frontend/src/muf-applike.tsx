@@ -56,6 +56,11 @@ export function initMufPullToRefresh(): () => void {
   };
 
   const onStart = (e: TouchEvent) => {
+    // Never reload while a popup is open or the finger starts on a form field —
+    // that would throw away whatever the person is typing.
+    const el = e.target as HTMLElement | null;
+    if (document.body.dataset.ffScrollY !== undefined) return;
+    if (el && typeof el.closest === 'function' && el.closest('[role="dialog"], input, textarea, select')) return;
     if (isScrolledDown(e.target)) return;
     startY = e.touches[0].clientY;
     lastDy = 0;
@@ -107,6 +112,10 @@ export function MufCountUpText({ text, duration = 750 }: { text: string; duratio
 
   useEffect(() => {
     if (doneRef.current === text) { setShown(text); return; }
+    // Respect "reduce motion": show the final number straight away.
+    if (typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setShown(text); doneRef.current = text; return;
+    }
     const m = String(text).match(/-?[\d,]+(?:\.\d+)?/);
     if (!m || m[0].replace(/[,\-]/g, '') === '') { setShown(text); doneRef.current = text; return; }
     const raw = m[0];
@@ -166,15 +175,26 @@ export function MufWhatsNew({ storageKey, version, lang = 'en', notes }: MufWhat
     setOpen(false);
   };
 
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
   if (!open) return null;
   const ur = lang === 'ur';
   const L = (en: string) => mufL(lang, en);
 
   return (
-    <div className="fixed inset-0 z-[var(--muf-z-whatsnew)] flex items-end sm:items-center justify-center p-3 sm:p-4" style={{ background: 'rgba(15,23,42,0.55)' }} onClick={close}>
+    <div className="muf-whatsnew-backdrop fixed inset-0 z-[var(--muf-z-whatsnew)] flex items-end sm:items-center justify-center p-3 sm:p-4" onClick={close}>
       <div
         className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-2xl p-5 muf-whatsnew-card"
         dir={ur ? 'rtl' : 'ltr'}
+        role="dialog"
+        aria-modal="true"
+        aria-label={L("What's new")}
         onClick={(e) => e.stopPropagation()}
       >
         <p className="text-lg font-black text-slate-800 dark:text-slate-100">

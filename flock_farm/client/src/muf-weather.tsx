@@ -9,6 +9,7 @@
 //   agri_farm/frontend/src/muf-weather.tsx (byte-identical twin)
 import React, { useEffect, useState } from 'react';
 import { CloudSun, CloudRain, CloudSnow, CloudFog, CloudLightning, Sun, MapPin, Leaf } from 'lucide-react';
+import { L } from './i18n';
 
 export interface MufWeatherData {
   temp: string;
@@ -122,8 +123,8 @@ export default function MufWeather({ tipGenerator, lat = 33.9943, lon = 72.9106,
     <section className="muf-panel">
       <div className="muf-panel-heading">
         <div>
-          <h3><CloudSun size={21} /> Live Weather & Farming Advice</h3>
-          <p>Local conditions and tailored guidance.</p>
+          <h3><CloudSun size={21} /> {L('Live Weather & Farming Advice')}</h3>
+          <p>{L('Local conditions and tailored guidance.')}</p>
         </div>
       </div>
       <div className="p-5 space-y-4">
@@ -143,16 +144,16 @@ export default function MufWeather({ tipGenerator, lat = 33.9943, lon = 72.9106,
         {(weather.humidity != null || weather.soilTemp != null || weather.wind != null || weather.rain24h > 0 || weather.rainProbability != null) && (
           <div className="flex flex-wrap gap-2 text-[10px] font-bold">
             {weather.soilTemp != null && (
-              <span className="px-2 py-1 rounded-lg border border-[#e6e6de] dark:border-[#203528] bg-white/60 dark:bg-[#101625]/40 text-slate-600 dark:text-slate-300">Soil {weather.soilTemp}°C</span>
+              <span className="muf-chip">Soil {weather.soilTemp}°C</span>
             )}
             {weather.humidity != null && (
-              <span className="px-2 py-1 rounded-lg border border-[#e6e6de] dark:border-[#203528] bg-white/60 dark:bg-[#101625]/40 text-slate-600 dark:text-slate-300">Humidity {weather.humidity}%</span>
+              <span className="muf-chip">Humidity {weather.humidity}%</span>
             )}
             {weather.wind != null && (
-              <span className="px-2 py-1 rounded-lg border border-[#e6e6de] dark:border-[#203528] bg-white/60 dark:bg-[#101625]/40 text-slate-600 dark:text-slate-300">Wind {weather.wind} km/h</span>
+              <span className="muf-chip">Wind {weather.wind} km/h</span>
             )}
             {weather.rain24h > 0 && (
-              <span className="px-2 py-1 rounded-lg border border-[#e6e6de] dark:border-[#203528] bg-white/60 dark:bg-[#101625]/40 text-slate-600 dark:text-slate-300">Rain ~{weather.rain24h.toFixed(1)}mm/24h</span>
+              <span className="muf-chip">Rain ~{weather.rain24h.toFixed(1)}mm/24h</span>
             )}
             {weather.rainProbability != null && (
               <span className="px-2 py-1 rounded-lg border border-blue-200 dark:border-blue-900/40 bg-blue-50/80 dark:bg-blue-950/30 text-blue-600 dark:text-blue-400">☁ {weather.rainProbability}% rain chance</span>

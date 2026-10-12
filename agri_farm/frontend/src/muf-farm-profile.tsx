@@ -46,7 +46,7 @@ export default function FarmProfileCard({ lang, storageKey, blurbEn, buildPdfDat
     <>
       <button
         onClick={() => setOpen(true)}
-        className="w-full flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0d1a11] hover:shadow-md transition-shadow text-left"
+        className="muf-card-link w-full flex items-center gap-3 p-4 text-left"
       >
         <span className="shrink-0 w-10 h-10 rounded-lg bg-farm-100 dark:bg-farm-900/30 text-farm-600 dark:text-farm-400 flex items-center justify-center">
           <FileText className="w-5 h-5" />

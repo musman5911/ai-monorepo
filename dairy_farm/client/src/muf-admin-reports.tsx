@@ -9,6 +9,7 @@
 import React from 'react';
 import { FileText, MessageCircle, Mail, Loader2 } from 'lucide-react';
 import MufAdminCard from './muf-admin-card';
+import { L } from './i18n';
 
 export interface MufReportButton {
   label: string;
@@ -58,11 +59,11 @@ export default function MufAdminReports({
     <div className="space-y-6">
       {/* ── Share Today's Summary (optional) ── */}
       {hasSummary && (
-        <MufAdminCard icon={<FileText className="w-5 h-5" />} title="Share Today's Summary" subtitle="Farm stats, alerts — send it out in one tap">
+        <MufAdminCard icon={<FileText className="w-5 h-5" />} title={L('Share Today\'s Summary')} subtitle={L('Farm stats, alerts — send it out in one tap')}>
           <div className="space-y-3">
             {summaryDateStr && (
               <div className="flex items-center justify-between gap-2">
-                <span className="text-xs text-slate-500 dark:text-slate-400">Today's farm snapshot</span>
+                <span className="text-xs text-slate-500 dark:text-slate-400">{L('Today\'s farm snapshot')}</span>
                 <span className="text-3xs font-mono text-slate-400 shrink-0">{summaryDateStr}</span>
               </div>
             )}
@@ -97,7 +98,7 @@ export default function MufAdminReports({
                 <Loader2 className="w-4 h-4 animate-spin" /> Loading summary...
               </div>
             ) : summaryLoadErr ? (
-              <p className="text-xs text-rose-500">Couldn't load today's summary from the server.</p>
+              <p className="text-xs text-rose-500">{L('Couldn\'t load today\'s summary from the server.')}</p>
             ) : summaryText ? (
               <pre className="max-h-56 overflow-auto text-[11px] leading-relaxed font-mono bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-slate-700 dark:text-slate-300 whitespace-pre-wrap">
 {summaryText}
@@ -109,7 +110,7 @@ export default function MufAdminReports({
 
       {/* ── Export Reports ── */}
       {reportButtons.length > 0 && (
-        <MufAdminCard icon={<FileText className="w-5 h-5" />} title="Export Reports" subtitle="Download PDF or CSV reports of your farm data">
+        <MufAdminCard icon={<FileText className="w-5 h-5" />} title={L('Export Reports')} subtitle={L('Download PDF or CSV reports of your farm data')}>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {reportButtons.map((btn, i) => (
               <ReportBtn key={i} onClick={btn.onClick} label={btn.label} light={btn.light} />
@@ -120,7 +121,7 @@ export default function MufAdminReports({
 
       {/* ── Export Center (app-specific) ── */}
       {children && (
-        <MufAdminCard icon={<FileText className="w-5 h-5" />} title="Export Center" subtitle="Full data export tools">
+        <MufAdminCard icon={<FileText className="w-5 h-5" />} title={L('Export Center')} subtitle={L('Full data export tools')}>
           {children}
         </MufAdminCard>
       )}
