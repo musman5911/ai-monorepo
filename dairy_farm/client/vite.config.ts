@@ -20,6 +20,18 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    chunkSizeWarningLimit: 1000
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        // Heavy vendor libraries in their own cached chunks, so a code change
+        // does not make farm workers re-download charts / PDF tools.
+        manualChunks: {
+          react: ['react', 'react-dom'],
+          icons: ['lucide-react'],
+          charts: ['recharts'],
+          pdf: ['jspdf', 'jspdf-autotable'],
+        },
+      },
+    },
   }
 });

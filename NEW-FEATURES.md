@@ -127,3 +127,8 @@ These changes are frontend-only. The existing backend summary endpoints remain t
 - Updated confirmed animal/expense/crop/ledger/liability/inventory/task deletions to remove the item from visible client state immediately, then refresh server data.
 - Improved large popup viewport sizing and overflow behavior across all three frontends.
 - No backend routes, schemas, or business calculations were intentionally changed.
+
+## Diary media (v2)
+- Every app's Diary popup now has **Photos** per date: tap *Take photo* / *Add photo*; pictures are shrunk on the phone (long side ≤ 1280 px, JPEG, quality lowered until ≈ 90 KB) and shown as thumbnails; tap one to view or delete. Max 10 photos per day.
+- Agri's Diary also gets **Voice notes** (max 5 per day). Dairy and flock keep their existing server-saved voice notes.
+- Stored in the browser (IndexedDB) on that device only — no backend change. Clearing browser data removes them.

@@ -16,6 +16,7 @@ export default defineConfig({
             { name: 'motion', test: /node_modules[\\/](framer-motion|motion-dom|motion-utils)[\\/]/ },
             { name: 'icons', test: /node_modules[\\/]lucide-react[\\/]/ },
             { name: 'http', test: /node_modules[\\/]axios[\\/]/ },
+            { name: 'pdf', test: /node_modules[\\/](jspdf|jspdf-autotable|fflate|fast-png|iobuffer)[\\/]/ },
           ],
         },
       },

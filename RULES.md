@@ -427,3 +427,14 @@ do not silently "fix" either side.*
 - The admin shell uses `max-w-4xl`, an `88vh` maximum height, a sticky tab strip, and a visible footer.
 - Screen-specific UI refinements are presentation-only; preserve all existing fields, actions, API requests, calculations, and access permissions.
 - `check-muf-sync.js` must describe the current canonical popup/admin dimensions rather than obsolete previous values.
+
+---
+
+## v2 additions (UI refinement round)
+
+- **Header (all three apps, same order):** Search · Diary · Notifications · **Language (icon only)** · Theme · Profile · Logout. Flock's language button lives in the header now (no longer inside Admin).
+- **Diary** is the same idea everywhere: notes by date, compressed photos, voice notes. Photos (and agri voice notes) are stored on the device in IndexedDB via `muf-diary-media.tsx`; notes / voice that already sync (dairy, flock) are unchanged.
+- **New shared twins** (byte-identical in all three apps, registered in `check-muf-sync.js`): `muf-diary-media.tsx`, `muf-a11y.ts`, `muf-login-lang.tsx`, `muf-worker-panel.tsx`.
+- **Styling lives in `muf-style.css`** (refinement layer at the bottom): tokens (`--muf-*`), `.muf-btn*`, `.muf-field*`, `.muf-label`, `.muf-caption`, `.muf-card`, `.muf-tile`, `.muf-row`, `.muf-chip`, search / toast / diary classes. Prefer these over long inline Tailwind strings.
+- **Every visible label goes through `L()`**; Urdu strings go in `muf-urdu.ts` only.
+- **Popups:** the FAB sits *under* popups (`--muf-z-fab: 800`). Toasts support a `warning` tone.

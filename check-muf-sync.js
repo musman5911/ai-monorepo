@@ -107,6 +107,10 @@ const TWINS = [
   ['muf-scroll-lock.ts',            'dairy_farm/client/src/muf-scroll-lock.ts',            'flock_farm/client/src/muf-scroll-lock.ts'],
   ['muf-card-qr.tsx',            'dairy_farm/client/src/muf-card-qr.tsx',            'flock_farm/client/src/muf-card-qr.tsx'],
   ['muf-entity-grid.tsx',        'dairy_farm/client/src/muf-entity-grid.tsx',        'flock_farm/client/src/muf-entity-grid.tsx'],
+  ['muf-diary-media.tsx',        'dairy_farm/client/src/muf-diary-media.tsx',        'flock_farm/client/src/muf-diary-media.tsx'],
+  ['muf-login-lang.tsx',        'dairy_farm/client/src/muf-login-lang.tsx',        'flock_farm/client/src/muf-login-lang.tsx'],
+  ['muf-a11y.ts',               'dairy_farm/client/src/muf-a11y.ts',               'flock_farm/client/src/muf-a11y.ts'],
+  ['muf-worker-panel.tsx',      'dairy_farm/client/src/muf-worker-panel.tsx',      'flock_farm/client/src/muf-worker-panel.tsx'],
 ];
 // muf-style.css must be byte-identical in ALL THREE apps (plain CSS, no TS/JS split)
 const cssA = read('dairy_farm/client/src/muf-style.css');
@@ -261,6 +265,8 @@ const FILES = {
   mufFarmProfile: { dairy: 'muf-farm-profile.tsx', flock: 'muf-farm-profile.tsx', agri: 'muf-farm-profile.tsx' },
   mufHeaderSearch: { dairy: 'muf-header-search.tsx', flock: 'muf-header-search.tsx', agri: 'muf-header-search.tsx' },
   mufTelegramPanel: { dairy: 'muf-telegram-panel.tsx', flock: 'muf-telegram-panel.tsx', agri: 'muf-telegram-panel.tsx' },
+  mufDiaryMedia: { dairy: 'muf-diary-media.tsx', flock: 'muf-diary-media.tsx', agri: 'muf-diary-media.tsx' },
+  mufA11y: { dairy: 'muf-a11y.ts', flock: 'muf-a11y.ts', agri: 'muf-a11y.ts' },
 };
 const INVARIANTS = [
   // [label, file-group, regex (first capture group compared)]
