@@ -129,7 +129,7 @@ export default function MufAdminShell({
           onClick={(event) => event.stopPropagation()}
         >
           {/* Header — PINNED at top (icon + title + close) */}
-          <div className="muf-admin-shell-header flex items-center justify-between shrink-0" style={{ padding: 'var(--pup-head-pad)', gap: 'var(--pup-gap)' }}>
+          <div className="muf-admin-shell-header flex items-center justify-between shrink-0">
             <div className="flex items-center gap-3 min-w-0">
               <motion.div
                 initial={{ scale: 0, rotate: -10 }}
