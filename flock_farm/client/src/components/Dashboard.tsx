@@ -28,6 +28,7 @@ import { udhaarSummary, daysSince, udhaarReminderText } from '../muf-khata';
 import { shareViaWhatsAppTo } from '../utils/share';
 import { customerBalance } from '../utils/calculations';
 import BirdAvatar, { breedLabel } from './BirdAvatar';
+import BirdDetailContent from './BirdDetailContent';
 import { shareViaWhatsApp } from '../utils/share';
 import { telegramAlerts } from '../api';
 import {mufWeekStart} from '../muf-date';
@@ -1005,22 +1006,22 @@ export default function Dashboard({
           activeFlockFilter === 'female'   ? activeBirds.filter(b => b.gender === 'Female') :
           activeFlockFilter === 'inactive' ? [...deadBirds, ...birds.filter(b => b.status === 'Sold')] :
           activeBirds;
-        const chip = (id: typeof activeFlockFilter, label: string, value: string | number, color: 'sky'|'slate') => (
-          <button onClick={() => setActiveFlockFilter(id)}
-            className={`text-left transition ${activeFlockFilter === id ? 'ring-2 ring-sky-400' : 'hover:scale-[1.02]'}`}>
-            <MiniStat label={label} value={`${value}`} color={color} />
+        const chip = (id: typeof activeFlockFilter, label: string, value: string | number) => (
+          <button key={id} type="button" onClick={() => setActiveFlockFilter(id)} aria-pressed={activeFlockFilter === id}
+            className={`muf-segmented-nav-button ${activeFlockFilter === id ? 'is-active' : ''}`}>
+            <span>{label}</span><span className="muf-segmented-nav-count">{value}</span>
           </button>
         );
         return (
           <DetailModal open={modal === 'activeBirds'} onClose={closeModal}
             title="Active Flock" subtitle={`${rangeLabel}`}
             icon={<Activity className="w-5 h-5" />} iconBg="bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300" size="big">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-              {chip('all',      'In Flock',   activeBirdsCount,      'sky')}
-              {chip('male',     'Males',      maleCount,            'slate')}
-              {chip('female',   'Females',    femaleCount,          'sky')}
-              {chip('inactive', 'Dead/Sold',  inactiveShown,        'slate')}
-            </div>
+            <nav className="muf-segmented-nav mb-5" aria-label={L('Filter birds')}>
+              {chip('all', L('In Flock'), activeBirdsCount)}
+              {chip('male', L('Males'), maleCount)}
+              {chip('female', L('Females'), femaleCount)}
+              {chip('inactive', L('Dead/Sold'), inactiveShown)}
+            </nav>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
@@ -1221,56 +1222,18 @@ export default function Dashboard({
         </div>
       </DetailModal>
 
-      {/* Bird Detail (from anywhere — with back button when opened from another modal) */}
+      {/* Shared rich MUF bird details, matching the Birds register popup. */}
       {(() => {
         const b = selectedBird;
         if (!b) return null;
         const isBack = !!parentModal;
-        const statusBadge =
-          b.status === 'Sick' ? { txt: 'Sick', cls: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300' } :
-          b.status === 'Dead' ? { txt: 'Dead', cls: 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300' } :
-          b.status === 'Sold' ? { txt: 'Sold', cls: 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300' } :
-          { txt: 'Active', cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' };
-        return (
-          <DetailModal
-            open={modal === 'birdDetail'}
-            onClose={closeModal}
-            onBack={isBack ? closeBirdDetail : undefined}
-            backLabel="Back"
-            title={b.name}
-            subtitle={`${breedLabel(b)} · ${b.gender} · ${birdAge(b)} old`}
-            icon={<BirdAvatar bird={b} size="sm" showBadge={false} />}
-            iconBg=""
-            size="small">
-            <div className="flex flex-col items-center text-center mb-4">
-              <BirdAvatar bird={b} size="lg" />
-              <span className={`mt-2 px-2 py-0.5 rounded-full text-2xs font-bold ${statusBadge.cls}`}>{statusBadge.txt}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <InfoRow label="ID" value={`BRD-${String(b.id).padStart(3, '0')}`} />
-              <InfoRow label={L('Breed')} value={breedLabel(b)} />
-              <InfoRow label={L('Gender')} value={b.gender} />
-              <InfoRow label={L('Age')} value={birdAge(b)} />
-              <InfoRow label={L('Bought')} value={b.dateBought} />
-              <InfoRow label="Price" value={`Rs ${b.price}`} />
-              <InfoRow label={L('Last Vax')} value={b.lastVaccinationDate || '—'} />
-              {b.dateOfBirth && <InfoRow label="DOB" value={b.dateOfBirth} />}
-              {b.saleDate && <InfoRow label={L('Sold on')} value={b.saleDate} />}
-              {b.salePrice != null && <InfoRow label="Sale price" value={`Rs ${b.salePrice}`} />}
-              {b.dateDied && <InfoRow label={L('Died')} value={b.dateDied} />}
-              {b.deathReason && <InfoRow label={L('Cause')} value={b.deathReason} />}
-            </div>
-            {b.deathDetail && (
-              <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl text-xs text-red-900 dark:text-red-200">
-                {b.deathDetail}
-              </div>
-            )}
-            <div className="mt-4 flex justify-end">
-              <button onClick={() => { closeModal(); onNavigate('flock', { editBirdId: b.id }); }}
-                className="text-xs font-bold px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white">Edit in Flock →</button>
-            </div>
-          </DetailModal>
-        );
+        const detailVaccinations = [...vaccinations.filter((record) => record.birdId === b.id)].sort((a, next) => next.date.localeCompare(a.date));
+        return <DetailModal open={modal === 'birdDetail'} onClose={closeModal} onBack={isBack ? closeBirdDetail : undefined}
+          backLabel="Back" title={b.name} subtitle={`${breedLabel(b)} · ${b.gender} · ${birdAge(b)} old`}
+          icon={<BirdAvatar bird={b} size="sm" showBadge={false} />} iconBg="" size="big">
+          <BirdDetailContent bird={b} detailVaccinations={detailVaccinations} vaccinationIntervalDays={settings.vaccinationIntervalDays} lang={lang}
+            canEdit canDelete={false} onEdit={() => { closeModal(); onNavigate('flock', { editBirdId: b.id }); }} />
+        </DetailModal>;
       })()}
 
       {/* Quick Actions FAB */}

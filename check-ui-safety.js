@@ -13,7 +13,7 @@ const fail = (message) => { failures.push(message); console.error(`  ✗ ${messa
 const read = (app, file) => fs.readFileSync(path.join(root, app.dir, file), 'utf8');
 
 console.log('\nMUF UI safety checks');
-for (const file of ['muf-modal.tsx', 'muf-confirm.tsx', 'muf-style.css', 'muf-diary.tsx']) {
+for (const file of ['muf-modal.tsx', 'muf-confirm.tsx', 'muf-style.css', 'muf-diary.tsx', 'muf-login.tsx']) {
   const values = apps.map((app) => read(app, file));
   if (values.every((value) => value === values[0])) pass(`${file} matches across all three apps`);
   else fail(`${file} differs between apps`);
@@ -62,6 +62,12 @@ for (const app of apps) {
       /\.muf-overlay :is\(input,\s*select,\s*textarea\)/.test(css)) {
     pass(`${app.name}: MUF dropdown tokens and popup field safeguards present`);
   } else fail(`${app.name}: MUF dropdown/popup style safeguards missing`);
+  if (/muf-login-screen/.test(css) && /muf-login-card/.test(css) && /muf-pup-card\\.muf-pup-width-sm/.test(css) && /muf-admin-shell-card\\[role="dialog"\\]/.test(css)) pass(`${app.name}: MUF login shell and inset mobile dialog sizing present`);
+  else fail(`${app.name}: MUF login/mobile dialog sizing styles missing`);
+  const loginRoute = app.name === 'dairy' ? read(app, 'components/Login.tsx') : app.name === 'flock' ? read(app, 'components/LoginScreen.tsx') : appSource;
+  if (/MufLoginScreen/.test(loginRoute) && /MufLoginPanel/.test(loginRoute) && /MufLoginBrand/.test(loginRoute)) pass(`${app.name}: auth UI uses shared MUF login components`);
+  else fail(`${app.name}: auth UI bypasses shared MUF login components`);
+
 }
 
 if (failures.length) {

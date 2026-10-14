@@ -184,6 +184,7 @@ not exist; anything in this list must exist in the apps marked.
 | `muf-image` | all 3 | gallery image compression (canvas → JPEG data-URL). Currently used by dairy (`CowDetailPopup.tsx` cow gallery, base64 storage); flock has the twin but its batch gallery uses server-side multer upload instead (different architecture, intentional); agri has the twin for parity + future gallery features — agri's current single-photo uploader (`components/ImageUploader.tsx` + `imageUtils.ts`) is a separate, richer helper with progress callbacks + size reporting, intentionally NOT a `muf` file |
 | `muf-khata` | dairy, flock | **domain-exception** — buyer/customer credit (udhaar) tracking; agri has no retail buyer credit |
 | `muf-labor` | all 3 | labor attendance + wage math |
+| `muf-login` | all 3 | shared responsive login frame, form panel and farm brand header |
 | `muf-modal` | all 3 | the popup shell (`DetailModal`) |
 | `muf-motion` | all 3 | motion/react re-export + spring presets |
 | `muf-offline-banner` | all 3 | "you are offline" banner |

@@ -109,6 +109,7 @@ const TWINS = [
   ['muf-entity-grid.tsx',        'dairy_farm/client/src/muf-entity-grid.tsx',        'flock_farm/client/src/muf-entity-grid.tsx'],
   ['muf-diary-media.tsx',        'dairy_farm/client/src/muf-diary-media.tsx',        'flock_farm/client/src/muf-diary-media.tsx'],
   ['muf-login-lang.tsx',        'dairy_farm/client/src/muf-login-lang.tsx',        'flock_farm/client/src/muf-login-lang.tsx'],
+  ['muf-login.tsx',              'dairy_farm/client/src/muf-login.tsx',              'flock_farm/client/src/muf-login.tsx'],
   ['muf-a11y.ts',               'dairy_farm/client/src/muf-a11y.ts',               'flock_farm/client/src/muf-a11y.ts'],
   ['muf-worker-panel.tsx',      'dairy_farm/client/src/muf-worker-panel.tsx',      'flock_farm/client/src/muf-worker-panel.tsx'],
 ];
@@ -127,6 +128,11 @@ if (cssA === null || cssB === null || cssC === null) {
   console.log(`  ❌ ${pad('muf-style.css (all 3)', 30)} dairy↔flock ${da} · dairy↔agri ${dc} differing line(s)`);
   failures++;
 }
+const loginA = read('dairy_farm/client/src/muf-login.tsx');
+const loginB = read('flock_farm/client/src/muf-login.tsx');
+const loginC = read('agri_farm/frontend/src/muf-login.tsx');
+if (loginA !== null && loginA === loginB && loginA === loginC) { console.log(`  ✅ ${pad('muf-login.tsx (all 3)', 30)} identical`); }
+else { console.log(`  ❌ ${pad('muf-login.tsx (all 3)', 30)} copies differ or missing`); failures++; }
 for (const [label, pa, pb] of TWINS) {
   const a = read(pa), b = read(pb);
   if (a === null || b === null) { console.log(`  ⚠️  ${pad(label, 30)} missing file`); failures++; continue; }

@@ -3,6 +3,7 @@ import { mufL } from '../muf-urdu';
 import { LogIn, AlertCircle, ArrowLeft, Check, Mail, UserPlus, Eye, EyeOff } from 'lucide-react';
 import { AnimatePresence, motion } from '../muf-motion';
 import MufLoginLang from '../muf-login-lang';
+import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from '../muf-login';
 import { Lang } from '../types';
 import {
   login, forgotPassword, resetPassword,
@@ -190,24 +191,12 @@ export default function LoginScreen({ lang, onLoginSuccess, onToggleLang }: Prop
   const isRtl = lang === 'ur';
 
   return (
-    <div className={`min-h-screen bg-[#faf9f6] dark:bg-[#070b13] flex flex-col justify-center items-center px-4 transition-colors ${isRtl ? 'rtl' : 'ltr'}`}>
+    <MufLoginScreen className={isRtl ? 'rtl' : 'ltr'} dir={isRtl ? 'rtl' : 'ltr'}>
       {onToggleLang && <MufLoginLang lang={lang} onToggle={onToggleLang} />}
-      <div className="bg-[#fcfbf9] dark:bg-[#0f172a] border border-[#e2dfdb] dark:border-slate-800 p-6 md:p-8 rounded-2xl w-full max-w-md my-8 shadow-2xl flex flex-col transition-all pulse-border-hover">
+      <MufLoginPanel className="pulse-border-hover">
         {view === 'login' && (
           <>
-            <div className="flex justify-center mb-4">
-              <img
-                src="/logo.png"
-                alt="Usman Flock Farm"
-                className="muf-login-logo"
-              />
-            </div>
-            <h2 className="muf-login-title">
-              {L('Usman Flock Farm')}
-            </h2>
-            <p className="muf-login-sub">
-              {L('Secure Sign-In Interface')}
-            </p>
+            <MufLoginBrand farmName="Usman Flock Farm" logoSrc="/logo.png" logoAlt="Usman Flock Farm" subtitle={L('Sign in to continue')} />
           </>
         )}
         <AnimatePresence mode="wait">
@@ -434,8 +423,8 @@ export default function LoginScreen({ lang, onLoginSuccess, onToggleLang }: Prop
               </motion.form>
             )}
         </AnimatePresence>
-      </div>
-    </div>
+      </MufLoginPanel>
+    </MufLoginScreen>
   );
 }
 

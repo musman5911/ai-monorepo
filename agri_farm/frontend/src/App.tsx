@@ -1,5 +1,6 @@
 import { SuperAdminTab } from './components/SuperAdminTab';
 import MufLoginLang from './muf-login-lang';
+import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from './muf-login';
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from './muf-motion';
@@ -2126,7 +2127,7 @@ function App() {
 
   // --- RENDER AUTHENTICATION & LOGIN ---
   if (!token) return (
-    <div className="min-h-screen bg-[#faf9f6] dark:bg-[#070b13] flex flex-col justify-center items-center px-4 transition-colors">
+    <MufLoginScreen>
       <MufLoginLang lang={lang} onToggle={toggleLang} />
       {alertMsg.text && (
         <div className={`mb-6 p-4 rounded-xl shadow-lg border text-sm max-w-sm w-full animate-fade-in ${
@@ -2141,20 +2142,8 @@ function App() {
       
       {/* ─── PANE 1: DEFAULT LOGIN SCREEN ─── */}
       {authMode === 'login' && (
-        <div className="bg-[#fcfbf9] dark:bg-[#0f172a] border border-[#e2dfdb] dark:border-slate-800 p-6 md:p-8 rounded-2xl w-full max-w-md my-8 shadow-2xl flex flex-col transition-all pulse-border-hover">
-          <div className="flex justify-center mb-4">
-            <img 
-              src="/logo.png" 
-              className="muf-login-logo" 
-              onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }}
-            />
-          </div>
-          <h2 className="muf-login-title">
-            {L('Usman Agri Farm')}
-          </h2>
-          <p className="muf-login-sub">
-            {L('Sign in to continue')}
-          </p>
+        <MufLoginPanel className="pulse-border-hover">
+          <MufLoginBrand farmName="Usman Agri Farm" logoSrc="/logo.png" logoAlt="Usman Agri Farm" fallbackSrc="/favicon.png" subtitle={L('Sign in to continue')} />
           
           <form onSubmit={handleAuthSubmit} className="space-y-4">
             <div>
@@ -2209,25 +2198,13 @@ function App() {
               Sign in
             </button>
           </form>
-        </div>
+        </MufLoginPanel>
       )}
 
       {/* ─── PANE 2: FIRST-TIME SETUP REGISTRATION (ADMIN CREATION) ─── */}
       {authMode === 'register' && (
-        <div className="bg-[#fcfbf9] dark:bg-[#0f172a] border border-[#e2dfdb] dark:border-slate-800 p-6 md:p-8 rounded-2xl w-full max-w-md my-8 shadow-2xl flex flex-col transition-all pulse-border-hover animate-fade-in">
-          <div className="flex justify-center mb-4">
-            <img 
-              src="/logo.png" 
-              className="muf-login-logo" 
-              onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }}
-            />
-          </div>
-          <h2 className="muf-login-title">
-            Usman Agri Farm — First-Time Setup
-          </h2>
-          <p className="muf-login-sub">
-            {L('First-time Administrative Setup')}
-          </p>
+        <MufLoginPanel className="pulse-border-hover animate-fade-in">
+          <MufLoginBrand farmName="Usman Agri Farm" logoSrc="/logo.png" logoAlt="Usman Agri Farm" fallbackSrc="/favicon.png" subtitle={L('First-time Administrative Setup')} />
           
           <form onSubmit={handleAuthSubmit} className="space-y-4">
             <div>
@@ -2305,25 +2282,13 @@ function App() {
               Initialize & Register Admin
             </button>
           </form>
-        </div>
+        </MufLoginPanel>
       )}
 
       {/* ─── PANE 3: FORGOT PASSWORD (REQUEST RESET CODE) ─── */}
       {authMode === 'forgot_send' && (
-        <div className="bg-[#fcfbf9] dark:bg-[#0f172a] border border-[#e2dfdb] dark:border-slate-800 p-6 md:p-8 rounded-2xl w-full max-w-md my-8 shadow-2xl flex flex-col transition-all pulse-border-hover animate-fade-in">
-          <div className="flex justify-center mb-4">
-            <img 
-              src="/logo.png" 
-              className="muf-login-logo" 
-              onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }}
-            />
-          </div>
-          <h2 className="muf-login-title">
-            {L('Admin Password Reset')}
-          </h2>
-          <p className="muf-login-sub">
-            {L('Send Verification Code')}
-          </p>
+        <MufLoginPanel className="pulse-border-hover animate-fade-in">
+          <MufLoginBrand farmName="Usman Agri Farm" logoSrc="/logo.png" logoAlt="Usman Agri Farm" fallbackSrc="/favicon.png" subtitle={L('Reset your password')} />
           
           <form onSubmit={handleForgotSendCode} className="space-y-4">
             <div>
@@ -2355,25 +2320,13 @@ function App() {
               {L('Back to Login')}
             </button>
           </form>
-        </div>
+        </MufLoginPanel>
       )}
 
       {/* ─── PANE 4: AUTHORIZE RESET PASSWORD WITH CODE ─── */}
       {authMode === 'forgot_reset' && (
-        <div className="bg-[#fcfbf9] dark:bg-[#0f172a] border border-[#e2dfdb] dark:border-slate-800 p-6 md:p-8 rounded-2xl w-full max-w-md my-8 shadow-2xl flex flex-col transition-all pulse-border-hover animate-fade-in">
-          <div className="flex justify-center mb-4">
-            <img 
-              src="/logo.png" 
-              className="muf-login-logo" 
-              onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }}
-            />
-          </div>
-          <h2 className="muf-login-title">
-            {L('Authorize Password Reset')}
-          </h2>
-          <p className="muf-login-sub">
-            {L('Input Reset Code')}
-          </p>
+        <MufLoginPanel className="pulse-border-hover animate-fade-in">
+          <MufLoginBrand farmName="Usman Agri Farm" logoSrc="/logo.png" logoAlt="Usman Agri Farm" fallbackSrc="/favicon.png" subtitle={L('Verify reset code')} />
           
           <form onSubmit={handleForgotResetPw} className="space-y-4">
             <div>
@@ -2429,9 +2382,9 @@ function App() {
               {L('Request New Code')}
             </button>
           </form>
-        </div>
+        </MufLoginPanel>
       )}
-    </div>
+    </MufLoginScreen>
   );
 
   // --- RENDER MAIN INTERFACE ---

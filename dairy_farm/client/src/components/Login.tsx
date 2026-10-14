@@ -6,6 +6,7 @@ import {
 } from 'lucide-react';
 import { api, saveAuth } from '../api';
 import MufLoginLang from '../muf-login-lang';
+import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from '../muf-login';
 import type { Lang } from '../i18n';
 import { L } from '../i18n';
 
@@ -155,7 +156,7 @@ export default function Login({
   const isFirstSetup = isSetup === false;
 
   return (
-    <div className="min-h-screen bg-[#faf9f6] dark:bg-[#070b13] flex flex-col justify-center items-center px-4 transition-colors">
+    <MufLoginScreen>
       {lang && onToggleLang && <MufLoginLang lang={lang} onToggle={onToggleLang} />}
       {error && (
         <div className="mb-6 p-4 rounded-xl shadow-lg border text-sm max-w-sm w-full bg-red-50 border-red-300 text-red-800 dark:bg-red-950/80 dark:border-red-500 dark:text-red-200">
@@ -174,20 +175,8 @@ export default function Login({
         </div>
       )}
 
-      <div className="bg-[#fcfbf9] dark:bg-[#0f172a] border border-[#e2dfdb] dark:border-slate-800 p-6 md:p-8 rounded-2xl w-full max-w-md my-8 shadow-2xl flex flex-col transition-all pulse-border-hover">
-        <div className="flex justify-center mb-4">
-          <img
-            src="/dairy-farm-logo-round-512.png"
-            alt="Usman Dairy Farm logo"
-            className="muf-login-logo"
-          />
-        </div>
-        <h2 className="muf-login-title">
-          {L('Usman Dairy Farm')}
-        </h2>
-        <p className="muf-login-sub">
-          {isFirstSetup ? 'Initial Setup' : 'Secure Sign-In Interface'}
-        </p>
+      <MufLoginPanel className="pulse-border-hover">
+        <MufLoginBrand farmName="Usman Dairy Farm" logoSrc="/dairy-farm-logo-round-512.png" logoAlt="Usman Dairy Farm logo" subtitle={isFirstSetup ? L('First-time setup') : L('Sign in to continue')} />
 
         <AnimatePresence mode="wait" initial={false}>
           {view === 'login' && (
@@ -234,7 +223,7 @@ export default function Login({
 
               <div>
                 <div className="flex justify-between items-center mb-1">
-                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{L('Access Password')}</label>
+                  <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{L('Password')}</label>
                   {!isFirstSetup && (
                     <button
                       type="button"
@@ -271,7 +260,7 @@ export default function Login({
                 disabled={loading}
                 className="w-full py-3 bg-farm-600 hover:bg-farm-700 text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-farm-500/10 flex items-center justify-center gap-2 cursor-pointer mt-2 disabled:opacity-60"
               >
-                {loading ? 'Processing...' : <><LogIn className="w-[18px] h-[18px]" />{isFirstSetup ? 'Complete Setup' : 'Access Console'}</>}
+                {loading ? 'Processing...' : <><LogIn className="w-[18px] h-[18px]" />{isFirstSetup ? L('Complete Setup') : L('Sign in')}</>}
               </button>
             </motion.form>
           )}
@@ -353,8 +342,8 @@ export default function Login({
             </motion.form>
           )}
         </AnimatePresence>
-      </div>
-    </div>
+      </MufLoginPanel>
+    </MufLoginScreen>
   );
 }
 
