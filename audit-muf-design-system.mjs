@@ -127,7 +127,7 @@ function collectFile(ts, sourceFile, project, absolutePath, source, popupRecords
   visit(sourceFile);
 }
 function count(text, regex) { return [...text.matchAll(regex)].length; }
-function auditComponentStyles(files) {
+function auditComponentStyles(files, ts) {
   const result = {
     jsxFiles: files.length, inlineStyleObjects: 0, inlineStyleVisualPropertyOccurrences: 0,
     hexLiteralOccurrences: 0, rgbHslLiteralOccurrences: 0, arbitraryColorClasses: 0,
@@ -136,23 +136,36 @@ function auditComponentStyles(files) {
   };
   for (const file of files) {
     const source = fs.readFileSync(file, 'utf8');
-    const inlineCount = count(source, /style\s*=\s*\{\s*\{/g);
-    result.inlineStyleObjects += inlineCount;
-    result.hexLiteralOccurrences += count(source, /#[0-9a-fA-F]{3,8}\b/g);
-    result.rgbHslLiteralOccurrences += count(source, /\b(?:rgb|rgba|hsl|hsla)\(/g);
-    result.arbitraryColorClasses += count(source, /\b(?:bg|text|border|ring|from|to|via)-\[(?:#|rgb|rgba|hsl|hsla|[a-zA-Z])/g);
-    result.arbitrarySpacingClasses += count(source, /\b(?:p[trblxy]?|m[trblxy]?|gap|space-[xy])-\[[^\]]+\]/g);
-    result.arbitraryFontClasses += count(source, /\b(?:text|leading|tracking)-\[(?:\d|\.)[^\]]+\]/g);
-    if (inlineCount) result.filesWithInlineStyles.push({ path: rel(file), count: inlineCount });
-    for (const property of STYLE_PROPERTIES) {
-      const escaped = property.replace(/[.*+?^$|()[\]{}\\]/g, '\\$&');
-      result.inlineStylePropertyOccurrences[property] = (result.inlineStylePropertyOccurrences[property] || 0) +
-        count(source, new RegExp('\\b' + escaped + '\\s*:', 'g'));
+    const kind = path.extname(file).toLowerCase() === '.jsx' ? ts.ScriptKind.JSX : ts.ScriptKind.TSX;
+    const parsed = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, kind);
+    let inlineCount = 0;
+    function visit(node) {
+      if (ts.isJsxOpeningElement(node) || ts.isJsxSelfClosingElement(node)) {
+        const styleAttribute = attr(ts, node, 'style');
+        if (styleAttribute && styleAttribute.initializer && ts.isJsxExpression(styleAttribute.initializer) &&
+            styleAttribute.initializer.expression && ts.isObjectLiteralExpression(styleAttribute.initializer.expression)) {
+          inlineCount++;
+          for (const property of styleAttribute.initializer.expression.properties) {
+            if (!ts.isPropertyAssignment(property) || !property.name) continue;
+            const name = property.name.getText(parsed).replace(/^['"]|['"]$/g, '');
+            if (STYLE_PROPERTIES.includes(name)) {
+              result.inlineStylePropertyOccurrences[name] = (result.inlineStylePropertyOccurrences[name] || 0) + 1;
+            }
+          }
+        }
+      }
+      ts.forEachChild(node, visit);
     }
+    visit(parsed);
+    result.inlineStyleObjects += inlineCount;
+    result.hexLiteralOccurrences += count(source, /#[0-9a-fA-F]{3,8}\\b/g);
+    result.rgbHslLiteralOccurrences += count(source, /\\b(?:rgb|rgba|hsl|hsla)\\(/g);
+    result.arbitraryColorClasses += count(source, /\\b(?:bg|text|border|ring|from|to|via)-\\[(?:#|rgb|rgba|hsl|hsla|[a-zA-Z])/g);
+    result.arbitrarySpacingClasses += count(source, /\\b(?:p[trblxy]?|m[trblxy]?|gap|space-[xy])-\\[[^\\]]+\\]/g);
+    result.arbitraryFontClasses += count(source, /\\b(?:text|leading|tracking)-\\[(?:\\d|\\.)[^\\]]+\\]/g);
+    if (inlineCount) result.filesWithInlineStyles.push({ path: rel(file), count: inlineCount });
   }
-  result.inlineStyleVisualPropertyOccurrences = Object.entries(result.inlineStylePropertyOccurrences)
-    .filter(([name]) => STYLE_PROPERTIES.includes(name))
-    .reduce((sum, [, value]) => sum + value, 0);
+  result.inlineStyleVisualPropertyOccurrences = Object.values(result.inlineStylePropertyOccurrences).reduce((sum, value) => sum + value, 0);
   result.filesWithInlineStyles.sort((a, b) => b.count - a.count || a.path.localeCompare(b.path));
   return result;
 }
@@ -239,7 +252,7 @@ function main() {
       portalCalls: jsxFiles.reduce((sum, file) => sum + count(fs.readFileSync(file, 'utf8'), /createPortal\s*\(/g), 0),
       inlineStyleObjects: jsxFiles.reduce((sum, file) => sum + count(fs.readFileSync(file, 'utf8'), /style\s*=\s*\{\s*\{/g), 0),
     };
-    componentStyles[project.name] = auditComponentStyles(jsxFiles);
+    componentStyles[project.name] = auditComponentStyles(jsxFiles, ts);
     cssStyles[project.name] = auditCss(cssFiles);
   }
 
