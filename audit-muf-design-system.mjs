@@ -158,11 +158,11 @@ function auditComponentStyles(files, ts) {
     }
     visit(parsed);
     result.inlineStyleObjects += inlineCount;
-    result.hexLiteralOccurrences += count(source, /#[0-9a-fA-F]{3,8}\\b/g);
-    result.rgbHslLiteralOccurrences += count(source, /\\b(?:rgb|rgba|hsl|hsla)\\(/g);
-    result.arbitraryColorClasses += count(source, /\\b(?:bg|text|border|ring|from|to|via)-\\[(?:#|rgb|rgba|hsl|hsla|[a-zA-Z])/g);
-    result.arbitrarySpacingClasses += count(source, /\\b(?:p[trblxy]?|m[trblxy]?|gap|space-[xy])-\\[[^\\]]+\\]/g);
-    result.arbitraryFontClasses += count(source, /\\b(?:text|leading|tracking)-\\[(?:\\d|\\.)[^\\]]+\\]/g);
+    result.hexLiteralOccurrences += count(source, /#[0-9a-fA-F]{3,8}\b/g);
+    result.rgbHslLiteralOccurrences += count(source, /\b(?:rgb|rgba|hsl|hsla)\(/g);
+    result.arbitraryColorClasses += count(source, /\b(?:bg|text|border|ring|from|to|via)-\[(?:#|rgb|rgba|hsl|hsla|[a-zA-Z])/g);
+    result.arbitrarySpacingClasses += count(source, /\b(?:p[trblxy]?|m[trblxy]?|gap|space-[xy])-\[[^\]]+\]/g);
+    result.arbitraryFontClasses += count(source, /\b(?:text|leading|tracking)-\[(?:\d|\.)[^\]]+\]/g);
     if (inlineCount) result.filesWithInlineStyles.push({ path: rel(file), count: inlineCount });
   }
   result.inlineStyleVisualPropertyOccurrences = Object.values(result.inlineStylePropertyOccurrences).reduce((sum, value) => sum + value, 0);
