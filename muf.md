@@ -42,6 +42,7 @@ and keeps its own domain-specific screens and business logic.
 ## Guardrails
 
 - Keep the existing `size="small" | "big"` popup API.
+- On mobile, detail popups, form sheets, and admin shells use the shared `--muf-popup-mobile-max-height: 70dvh` cap with internal scrolling for long content. Preserve the existing small/big width gutters.
 - Keep shared MUF twins byte-identical where the sync checker requires it.
 - UI-only changes must not alter backend behavior, APIs, schemas, calculations,
   authorization, existing feature behavior, or farm-specific workflows.
