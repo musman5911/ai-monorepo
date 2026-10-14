@@ -63,6 +63,7 @@ import MonthlySummary from './components/MonthlySummary';
 import IncubationModule from './components/IncubationModule';
 import DailyChecklist from './components/DailyChecklist';
 import DiaryNotes from './components/DiaryNotes';
+import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from './muf-diary';
 import BatchesTab from './components/BatchesTab';
 import LaborTab from './components/LaborTab';
 import HeaderSearch from './muf-header-search';
@@ -73,7 +74,7 @@ import LoginScreen from './components/LoginScreen';
 import SyncIndicator from './components/SyncIndicator';
 import DetailModal from './muf-modal';
 import { useConfirm, notify } from './muf-confirm';
-import { loadData, getToken, getStoredUser, fetchMe, logout as apiLogout, AuthUser, importAllBatchData, wipeAllBatchData, updateMe, changePassword, syncOfflineBuckets, offlineBucketCount, getFarmLocation, saveFarmLocation } from './api';
+import { loadData, getToken, getStoredUser, fetchMe, logout as apiLogout, AuthUser, importAllBatchData, wipeAllBatchData, updateMe, changePassword, syncOfflineBuckets, offlineBucketCount, getFarmLocation, saveFarmLocation, saveData, uploadImage } from './api';
 import type { FlockFarmBackup } from './reportExport';
 import AvatarUploader from './muf-avatar';
 import { useDebouncedSave, mergeSyncStatus } from './hooks/useDebouncedSave';
@@ -527,14 +528,22 @@ export default function App() {
     }
   };
 
-  const handleSaveDiary = (entry: DiaryEntry) => {
-    if (!canLogDaily) return;
-    const exists = diary.some((d) => d.date === entry.date);
-    if (exists) {
-      setDiary(diary.map((d) => (d.date === entry.date ? entry : d)));
-    } else {
-      setDiary([...diary, entry]);
-    }
+  const handleSaveDiary = async (entry: DiaryEntry) => {
+    if (!canLogDaily) throw new Error(L('You do not have permission to edit diary notes.'));
+    const entryId = entry.id || ('legacy-' + entry.date);
+    const existing = diary.filter((item) => !(entry.originalDate && entry.originalDate !== entry.date &&
+      item.date === entry.originalDate && (item.id || ('legacy-' + item.date)) === entryId));
+    const index = existing.findIndex((item) => (item.id || ('legacy-' + item.date)) === entryId);
+    const next = index >= 0 ? existing.map((item, i) => i === index ? entry : item) : [...existing, entry];
+    await saveData('diary', next);
+    setDiary(next);
+  };
+
+  const handleDeleteDiary = async (id: string, date: string) => {
+    if (!canLogDaily) throw new Error(L('You do not have permission to delete diary notes.'));
+    const next = diary.filter((item) => !((item.id || ('legacy-' + item.date)) === id && item.date === date));
+    await saveData('diary', next);
+    setDiary(next);
   };
 
   const [shouldOpenAddBirdModal, setShouldOpenAddBirdModal] = useState(false);
@@ -1055,9 +1064,30 @@ export default function App() {
         iconBg="bg-indigo-100 text-indigo-700"
         size="small"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <DailyChecklist lang={lang} entries={checklist} onSave={handleSaveChecklist} readOnly={!canLogDaily} />
-          <DiaryNotes lang={lang} entries={diary} onSave={handleSaveDiary} readOnly={!canLogDaily} />
+        <div className="space-y-5">
+          <MufDiary
+            entries={diary.map((entry) => ({ ...entry, id: entry.id || ('legacy-' + entry.date), photos: entry.photos || [] } as MufDiaryEntry))}
+            onSave={handleSaveDiary}
+            onDelete={handleDeleteDiary}
+            uploadPhoto={(file) => uploadImage(file, 'diary')}
+            readOnly={!canLogDaily}
+            entityOptions={[
+              ...birds.map((item) => ({ id: String(item.id), type: 'bird', label: item.name || L('Bird') })),
+              ...laborers.map((item) => ({ id: String(item.id), type: 'labor', label: item.name || L('Laborer') })),
+              ...customers.map((item) => ({ id: String(item.id), type: 'customer', label: item.name || L('Customer') })),
+            ]}
+            shareTargets={[
+              ...customers.map((item: any) => ({ id: String(item.id), type: 'customer', label: item.name || L('Customer'), phone: item.phone || item.mobile })),
+              ...laborers.map((item: any) => ({ id: String(item.id), type: 'labor', label: item.name || L('Laborer'), phone: item.phone || item.mobile })),
+            ]}
+          />
+          <details className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+            <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist and older diary editor')}</summary>
+            <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+              <DailyChecklist lang={lang} entries={checklist} onSave={handleSaveChecklist} readOnly={!canLogDaily} />
+              <DiaryNotes lang={lang} entries={diary} onSave={handleSaveDiary} readOnly={!canLogDaily} />
+            </div>
+          </details>
         </div>
       </DetailModal>
 

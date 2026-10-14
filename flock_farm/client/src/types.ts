@@ -135,11 +135,15 @@ export interface DailyChecklistEntry {
 }
 
 export interface DiaryEntry {
+  id?: string;
   date: string;
   note: string;
   // Optional short voice note (audio data-URL, max ~60s) — Urdu-friendly input.
   voiceBase64?: string;
   photos?: { id: string; date: string; data: string; bytes: number; createdAt: string }[];
+  linkedEntity?: { id: string; type: string; label: string } | null;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface GlobalSettings {

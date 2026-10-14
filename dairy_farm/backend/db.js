@@ -307,6 +307,8 @@ const DailyLogSchema = new mongoose.Schema({
     createdAt: String,
   }], default: [] },
   photos: { type: [{ id: String, date: String, data: String, bytes: Number, createdAt: String }], default: [] },
+  // Independent diary notes; daily checklist/log fields stay compatible.
+  diaryEntries: { type: [mongoose.Schema.Types.Mixed], default: [] },
 }, { timestamps: true });
 
 const SaleSchema = new mongoose.Schema({

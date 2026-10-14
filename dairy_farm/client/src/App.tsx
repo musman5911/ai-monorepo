@@ -35,6 +35,7 @@ import ExpensesTab from "./components/ExpensesTab";
 import HealthTab from "./components/HealthTab";
 import ReportsTab from "./components/ReportsTab";
 import DiaryTab from "./components/DiaryTab";
+import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from "./muf-diary";
 import LaborTab from "./components/LaborTab";
 import HeaderSearch from "./muf-header-search";
 import OfflineBanner from "./muf-offline-banner";
@@ -125,7 +126,66 @@ export default function App() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [diaryOpen, setDiaryOpen] = useState(false);
+  const [diaryEntries, setDiaryEntries] = useState<MufDiaryEntry[]>([]);
+  const [diaryEntityOptions, setDiaryEntityOptions] = useState<MufDiaryChoice[]>([]);
+  const [diaryShareTargets, setDiaryShareTargets] = useState<MufDiaryChoice[]>([]);
   const [me, setMe] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    if (!diaryOpen || !token) return;
+    let cancelled = false;
+    Promise.all([
+      api.getDiaryEntries().catch(() => ({ entries: [] })),
+      api.getCows({}).catch(() => []),
+      api.getBuyers().catch(() => []),
+      api.getLaborWorkers().catch(() => []),
+      api.getSuppliers().catch(() => []),
+    ]).then(([diaryResult, cows, buyers, workers, suppliers]) => {
+      if (cancelled) return;
+      setDiaryEntries(Array.isArray(diaryResult.entries) ? diaryResult.entries : []);
+      const entityOptions: MufDiaryChoice[] = [
+        ...(Array.isArray(cows) ? cows.map((x: any) => ({ id: String(x._id || x.id), type: 'animal', label: x.name || x.tagNo || x.tag || L('Animal') })) : []),
+        ...(Array.isArray(buyers) ? buyers.map((x: any) => ({ id: String(x._id || x.id), type: 'buyer', label: x.name || L('Buyer') })) : []),
+        ...(Array.isArray(workers) ? workers.map((x: any) => ({ id: String(x._id || x.id), type: 'labor', label: x.name || L('Laborer') })) : []),
+        ...(Array.isArray(suppliers) ? suppliers.map((x: any) => ({ id: String(x._id || x.id), type: 'dealer', label: x.name || L('Dealer') })) : []),
+      ].filter((x) => x.id && x.id !== 'undefined');
+      setDiaryEntityOptions(entityOptions);
+      setDiaryShareTargets([
+        ...(Array.isArray(buyers) ? buyers.map((x: any) => ({ id: String(x._id || x.id), type: 'buyer', label: x.name || L('Buyer'), phone: x.phone || x.mobile })) : []),
+        ...(Array.isArray(workers) ? workers.map((x: any) => ({ id: String(x._id || x.id), type: 'labor', label: x.name || L('Laborer'), phone: x.phone || x.mobile })) : []),
+        ...(Array.isArray(suppliers) ? suppliers.map((x: any) => ({ id: String(x._id || x.id), type: 'dealer', label: x.name || L('Dealer'), phone: x.phone || x.mobile })) : []),
+      ].filter((x) => x.id && x.id !== 'undefined'));
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [diaryOpen, token]);
+
+  const saveDiaryEntry = async (entry: MufDiaryEntry) => {
+    if (entry.originalDate && entry.originalDate !== entry.date) await deleteDiaryEntry(entry.id, entry.originalDate);
+    const current = await api.getDailyLog(entry.date);
+    let dayEntries: MufDiaryEntry[] = Array.isArray(current.diaryEntries) ? current.diaryEntries : [];
+    if (!dayEntries.length && (current.notes || current.photos?.length || current.voiceNotes?.length)) {
+      dayEntries = [{
+        id: 'legacy-' + entry.date, date: entry.date, note: current.notes || '',
+        photos: Array.isArray(current.photos) ? current.photos : [],
+        voiceBase64: Array.isArray(current.voiceNotes) && current.voiceNotes.length ? current.voiceNotes[0].base64 : undefined,
+      }];
+    }
+    dayEntries = dayEntries.filter((item) => item.id !== entry.id);
+    dayEntries.push(entry);
+    await api.saveDailyLog(entry.date, { diaryEntries: dayEntries, notes: '', photos: [], voiceNotes: [] });
+    setDiaryEntries((previous) => [...previous.filter((item) => item.date !== entry.date), ...dayEntries].sort((a, b) => b.date.localeCompare(a.date)));
+  };
+
+  const deleteDiaryEntry = async (id: string, date: string) => {
+    const current = await api.getDailyLog(date);
+    let dayEntries: MufDiaryEntry[] = Array.isArray(current.diaryEntries) ? current.diaryEntries : [];
+    if (!dayEntries.length && (current.notes || current.photos?.length || current.voiceNotes?.length)) {
+      dayEntries = [{ id: 'legacy-' + date, date, note: current.notes || '', photos: Array.isArray(current.photos) ? current.photos : [], voiceBase64: current.voiceNotes?.[0]?.base64 }];
+    }
+    dayEntries = dayEntries.filter((entry) => entry.id !== id);
+    await api.saveDailyLog(date, { diaryEntries: dayEntries, ...(id === 'legacy-' + date ? { notes: '', photos: [], voiceNotes: [] } : {}) });
+    setDiaryEntries((previous) => previous.filter((entry) => !(entry.date === date && entry.id === id)));
+  };
   const [healthAlerts, setHealthAlerts] = useState<HealthRecord[]>([]);
 
   // Load own profile (for the header avatar); refresh when the admin panel
@@ -482,7 +542,14 @@ export default function App() {
         iconBg="bg-indigo-100 text-indigo-700"
         size="big"
       >
-        <DiaryTab />
+        <div className="space-y-5">
+          <MufDiary entries={diaryEntries} onSave={saveDiaryEntry} onDelete={deleteDiaryEntry}
+            entityOptions={diaryEntityOptions} shareTargets={diaryShareTargets} />
+          <details className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+            <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist and existing daily log')}</summary>
+            <div className="mt-4"><DiaryTab /></div>
+          </details>
+        </div>
       </DetailModal>
 
       {/* Notifications popup */}

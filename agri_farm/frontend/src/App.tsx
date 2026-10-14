@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from './muf-motion';
 import * as api from './api';
 import DetailModal from './muf-modal';
-import MufDiaryMedia, { type DiaryPhoto } from './muf-diary-media';
+import MufDiary, { type MufDiaryEntry } from './muf-diary';
 import AdminMenu from './components/AdminMenu';
 import MufFab from './muf-fab';
 import MufWorkerPanel from './muf-worker-panel';
@@ -241,32 +241,75 @@ function App() {
   const [modal, setModal] = useState(null);
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
   const [diaryOpen, setDiaryOpen] = useState(false);
-  const [diaryEntries, setDiaryEntries] = useState(() => {
+  const [legacyDiaryEntries, setLegacyDiaryEntries] = useState(() => {
     try { return JSON.parse(localStorage.getItem('af_diary_entries') || '[]'); } catch { return []; }
   });
-  const [diaryDate, setDiaryDate] = useState(mufToday());
-  const [diaryNote, setDiaryNote] = useState('');
-  const [diaryPhotos, setDiaryPhotos] = useState<DiaryPhoto[]>([]);
+  const [diaryEntries, setDiaryEntries] = useState<MufDiaryEntry[]>([]);
 
   useEffect(() => {
     if (!diaryOpen) return;
     let cancelled = false;
-    setDiaryPhotos([]);
-    api.getDiaryMedia(diaryDate).then((response) => { if (!cancelled) setDiaryPhotos(Array.isArray(response.data?.photos) ? response.data.photos : []); }).catch(() => { if (!cancelled) setDiaryPhotos([]); });
+    api.getDiaryEntries().then((response) => {
+      if (cancelled) return;
+      const saved = Array.isArray(response.data?.entries) ? response.data.entries : [];
+      const seen = new Set(saved.map((entry) => entry.id || ('legacy-' + entry.date)));
+      const legacy = legacyDiaryEntries.filter((entry) => entry?.date && entry?.note && !seen.has('legacy-' + entry.date))
+        .map((entry) => ({ id: 'legacy-' + entry.date, date: entry.date, note: entry.note, photos: [] }));
+      setDiaryEntries([...saved, ...legacy].sort((a, b) => b.date.localeCompare(a.date)));
+      if (legacy.length) {
+        (async () => {
+          try {
+            const dates = [...new Set(legacy.map((entry) => entry.date))];
+            for (const date of dates) {
+              const response = await api.getDiaryMedia(date);
+              const data = response.data || {};
+              let dayEntries: MufDiaryEntry[] = Array.isArray(data.entries) ? data.entries : [];
+              if (!dayEntries.length && Array.isArray(data.photos) && data.photos.length) {
+                dayEntries.push({ id: 'legacy-photo-' + date, date, note: '', photos: data.photos });
+              }
+              for (const entry of legacy.filter((item) => item.date === date)) {
+                if (!dayEntries.some((item) => item.id === entry.id)) dayEntries.push(entry);
+              }
+              await api.saveDiaryMedia(date, [], dayEntries);
+            }
+            localStorage.removeItem('af_diary_entries');
+            setLegacyDiaryEntries([]);
+          } catch {
+            // Leave the local copy intact unless every legacy note was saved.
+          }
+        })();
+      }
+    }).catch(() => {});
     return () => { cancelled = true; };
-  }, [diaryDate, diaryOpen]);
+  }, [diaryOpen, legacyDiaryEntries]);
 
-  const saveDiaryEntry = (date, note) => {
-    const updated = diaryEntries.filter(e => e.date !== date);
-    if (note.trim()) updated.push({ date, note: note.trim() });
-    updated.sort((a, b) => b.date.localeCompare(a.date));
-    setDiaryEntries(updated);
-    localStorage.setItem('af_diary_entries', JSON.stringify(updated));
+  const saveDiaryEntry = async (entry: MufDiaryEntry) => {
+    if (entry.originalDate && entry.originalDate !== entry.date) await deleteDiaryEntry(entry.id, entry.originalDate);
+    const response = await api.getDiaryMedia(entry.date);
+    const data = response.data || {};
+    let dayEntries: MufDiaryEntry[] = Array.isArray(data.entries) ? data.entries : [];
+    const legacyPhotos = Array.isArray(data.photos) ? data.photos : [];
+    if (!dayEntries.length && legacyPhotos.length) dayEntries = [{ id: 'legacy-photo-' + entry.date, date: entry.date, note: '', photos: legacyPhotos }];
+    dayEntries = dayEntries.filter((item) => item.id !== entry.id);
+    dayEntries.push(entry);
+    const saved = await api.saveDiaryMedia(entry.date, [], dayEntries);
+    const normalized = Array.isArray(saved.data?.entries) ? saved.data.entries : dayEntries;
+    setDiaryEntries((previous) => [...previous.filter((item) => item.date !== entry.date), ...normalized].sort((a, b) => b.date.localeCompare(a.date)));
   };
-  const loadDiaryDate = (date) => {
-    setDiaryDate(date);
-    const found = diaryEntries.find(e => e.date === date);
-    setDiaryNote(found?.note || '');
+
+  const deleteDiaryEntry = async (id: string, date: string) => {
+    const legacyLeft = legacyDiaryEntries.filter((entry) => entry.date !== date);
+    if (legacyDiaryEntries.some((entry) => entry.date === date)) {
+      setLegacyDiaryEntries(legacyLeft);
+      try { localStorage.setItem('af_diary_entries', JSON.stringify(legacyLeft)); } catch { /* server copy remains authoritative */ }
+    }
+    const response = await api.getDiaryMedia(date);
+    const data = response.data || {};
+    let dayEntries: MufDiaryEntry[] = Array.isArray(data.entries) ? data.entries : [];
+    if (!dayEntries.length && Array.isArray(data.photos) && data.photos.length) dayEntries = [{ id: 'legacy-photo-' + date, date, note: '', photos: data.photos }];
+    dayEntries = dayEntries.filter((entry) => entry.id !== id);
+    await api.saveDiaryMedia(date, [], dayEntries);
+    setDiaryEntries((previous) => previous.filter((entry) => !(entry.date === date && entry.id === id)));
   };
 
   // Authentication & Password Recovery States
@@ -2398,7 +2441,7 @@ function App() {
               />
               <button
                 className="muf-icon-button"
-                onClick={() => { loadDiaryDate(mufToday()); setDiaryOpen(true); }}
+                onClick={() => setDiaryOpen(true)}
                 title={L('Diary')}
                 aria-label={L('Diary')}
               >
@@ -5618,57 +5661,23 @@ function App() {
         </div>
       </DetailModal>
 
-      {/* Diary popup (localStorage-based daily notes) */}
-      <DetailModal
-        open={diaryOpen}
-        onClose={() => setDiaryOpen(false)}
-        title={L('Diary')}
-        subtitle={L('Daily notes and observations')}
-        icon={<BookOpen size={16} />}
-        size="small"
-      >
-        <div className="space-y-4">
-          <div>
-            <label className="block text-[10px] font-bold text-slate-500 uppercase mb-1">{L('Date')}</label>
-            <input
-              type="date"
-              value={diaryDate}
-              onChange={(e) => loadDiaryDate(e.target.value)}
-              className="w-full text-xs px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
-            />
-          </div>
-          <textarea
-            value={diaryNote}
-            onChange={(e) => setDiaryNote(e.target.value)}
-            placeholder={L('Weather, observations, issues…')}
-            className="w-full text-xs px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg h-32 resize-none bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
-          />
-          <MufDiaryMedia date={diaryDate} photos={diaryPhotos} allowVoice onChange={async (next) => {
-            const response = await api.saveDiaryMedia(diaryDate, next);
-            setDiaryPhotos(Array.isArray(response.data?.photos) ? response.data.photos : next);
-          }} />
-          <button
-            onClick={() => { saveDiaryEntry(diaryDate, diaryNote); }}
-            className="w-full px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg"
-          >
-            {L('Save Note')}
-          </button>
-          {diaryEntries.length > 0 && (
-            <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-              <p className="text-[10px] font-bold text-slate-400 uppercase">{L('Recent Notes')}</p>
-              {diaryEntries.slice(0, 7).map((e) => (
-                <button
-                  key={e.date}
-                  onClick={() => loadDiaryDate(e.date)}
-                  className="w-full text-left p-2 rounded-lg bg-slate-50 dark:bg-slate-800/50 hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-                >
-                  <span className="font-mono text-[10px] text-slate-500">{e.date}</span>
-                  <p className="text-xs text-slate-700 dark:text-slate-200 truncate mt-0.5">{e.note}</p>
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
+      {/* Shared diary popup: entries, media, links and sharing */}
+      <DetailModal open={diaryOpen} onClose={() => setDiaryOpen(false)} title={L('Diary')}
+        subtitle={L('Daily notes and observations')} icon={<BookOpen size={16} />} size="big">
+        <MufDiary
+          entries={diaryEntries}
+          onSave={saveDiaryEntry}
+          onDelete={deleteDiaryEntry}
+          entityOptions={[
+            ...crops.map((item) => ({ id: String(item._id || item.id), type: 'crop', label: item.name || L('Crop') })),
+            ...laborers.map((item) => ({ id: String(item._id || item.id), type: 'labor', label: item.name || L('Laborer') })),
+            ...suppliers.map((item) => ({ id: String(item._id || item.id), type: 'dealer', label: item.name || item.company || L('Dealer') })),
+          ].filter((item) => item.id && item.id !== 'undefined')}
+          shareTargets={[
+            ...laborers.map((item) => ({ id: String(item._id || item.id), type: 'labor', label: item.name || L('Laborer'), phone: item.phone || item.mobile })),
+            ...suppliers.map((item) => ({ id: String(item._id || item.id), type: 'dealer', label: item.name || item.company || L('Dealer'), phone: item.phone || item.mobile })),
+          ].filter((item) => item.id && item.id !== 'undefined')}
+        />
       </DetailModal>
 
     </div>
