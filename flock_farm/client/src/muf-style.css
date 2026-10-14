@@ -3063,7 +3063,6 @@ textarea:disabled { cursor: not-allowed; }
   --muf-space-6: 1.5rem;
   --muf-control-height: 2.75rem;
   --muf-type-body: 0.875rem;
-  --muf-type-small: 0.8125rem;
   --muf-brand-primary: #16a34a;
   --muf-brand-primary-hover: #15803d;
   --muf-dropdown-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
@@ -3110,8 +3109,9 @@ textarea:disabled { cursor: not-allowed; }
   text-align: start;
   white-space: normal;
   overflow-wrap: break-word;
-  line-height: 1.35;
   font: inherit;
+  font-size: var(--muf-type-body);
+  line-height: 1.35;
   cursor: pointer;
 }
 .muf-finance-menu-item:hover {
