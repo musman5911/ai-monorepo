@@ -65,6 +65,10 @@ Status: source fix committed; must verify by scrolling the page on mobile and de
 
 The owner-provided `check-ui-safety.js` output showed a failure in the new root-class guard. The expression used double-escaped regex tokens, so it could not parse the JSX class or word boundary. This is a checker defect, not evidence that the app root has the wrong class. The guard is corrected in the follow-up commit; rerun the entire safety script before declaring it green.
 
+## Phase 3 styling batch 1 — primary accent token alignment
+
+The shared CSS now uses canonical MUF primary/hover variables for primary action, active top-nav state, text actions, detail buttons and the admin active underline. Existing red/amber/blue/status colors were not globally replaced. Three checks were added to `check-muf-sync.js` to guard the shared primary action, active-nav and detail-button token usage. Runtime visual confirmation remains pending.
+
 ## Priority findings
 
 ### P0 — finish test setup

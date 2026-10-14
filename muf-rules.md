@@ -24,7 +24,7 @@ This file is the detailed rulebook for shared MUF UI changes. RULES.md remains t
 - Danger: #dc2626.
 - Warning: #d97706.
 
-Selection highlight is primary green and selected text is white. Keep semantic status colors intact. The production application must not gain a general theme/color-picker setting from this work. The development-only editor may allow approved visual experiments.
+Primary action buttons, active primary navigation, text actions and detail buttons must reference the canonical primary/hover tokens instead of carrying separate hardcoded greens. Selection highlight is primary green and selected text is white. Keep semantic status colors intact. The production application must not gain a general theme/color-picker setting from this work. The development-only editor may allow approved visual experiments.
 
 ## Popup sizing
 

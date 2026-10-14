@@ -63,6 +63,9 @@ The detailed local reports are MUF_POPUP_INVENTORY.md, MUF_STYLE_AUDIT.md and MU
 
 ## Phase 3 — consolidate shared MUF styling
 
+**Batch 1 committed: canonical primary-action colors.** Shared primary action buttons, active top navigation, text actions, detail buttons and the admin active-tab underline now reference `--muf-color-primary` / `--muf-color-primary-hover`. `check-muf-sync.js` now enforces three primary-color invariants across all three stylesheets. This batch does not change spacing, dimensions, navigation behavior, or semantic status colors. Local sync checks/builds and browser appearance checks are pending for this commit.
+
+
 **Status: in progress; Dairy sticky-header regression fix committed, browser retest pending.**
 
 Latest fix commit: `83e8b24` (`Restore Dairy sticky header and navigation`).
