@@ -57,9 +57,9 @@ export default function DiaryTab({ checklistOnly = false }: DiaryTabProps) {
   }, [date]);
 
   // Combine checklist + notes into one payload for autosave
-  const payload = useMemo(() => checklistOnly ? { checklist } : ({ checklist, notes, voiceNotes, photos }), [checklistOnly, checklist, notes, voiceNotes, photos]);
+  const payload = useMemo(() => ({ checklist, notes, voiceNotes, photos }), [checklist, notes, voiceNotes, photos]);
 
-  const saveFn = useCallback((p: { checklist: ChecklistItem[]; notes?: string; voiceNotes?: VoiceNote[]; photos?: DiaryPhoto[] }) => {
+  const saveFn = useCallback((p: { checklist: ChecklistItem[]; notes: string; voiceNotes: VoiceNote[]; photos: DiaryPhoto[] }) => {
     return api.saveDailyLog(date, p);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);

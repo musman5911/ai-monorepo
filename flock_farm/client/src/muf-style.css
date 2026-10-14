@@ -2982,7 +2982,68 @@ textarea:disabled { cursor: not-allowed; }
   word-break: normal;
   overflow-wrap: normal;
 }
-.muf-main-content table :is(th, td),
+/* Tables marked muf-reflow use their existing data-label values as compact
+   mobile record cards instead of shrinking five columns into vertical letters. */
+@media (max-width: 640px) {
+  .muf-overlay table.muf-reflow,
+  .muf-main-content table.muf-reflow {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+    max-width: 100%;
+    border-collapse: separate;
+  }
+  .muf-overlay table.muf-reflow thead,
+  .muf-main-content table.muf-reflow thead { display: none; }
+  .muf-overlay table.muf-reflow tbody,
+  .muf-main-content table.muf-reflow tbody {
+    display: grid;
+    width: 100%;
+    gap: 8px;
+  }
+  .muf-overlay table.muf-reflow tr,
+  .muf-main-content table.muf-reflow tr {
+    display: block;
+    min-width: 0;
+    padding: 5px 9px;
+    border: 1px solid var(--muf-line);
+    border-radius: var(--muf-radius-lg);
+    background: var(--muf-surface);
+  }
+  .muf-overlay table.muf-reflow td,
+  .muf-main-content table.muf-reflow td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+    padding: 7px 2px !important;
+    border: 0 !important;
+    text-align: right;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+  .muf-overlay table.muf-reflow td::before,
+  .muf-main-content table.muf-reflow td::before {
+    content: attr(data-label);
+    flex: 0 0 36%;
+    min-width: 0;
+    color: var(--muf-ink-soft);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.35;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  .muf-overlay table.muf-reflow td[colspan],
+  .muf-main-content table.muf-reflow td[colspan] {
+    justify-content: center;
+    text-align: center;
+  }
+  .muf-overlay table.muf-reflow td[colspan]::before,
+  .muf-main-content table.muf-reflow td[colspan]::before { content: none; }
+}
+.muf-main-content .overflow-x-auto table :is(th, td),
 .muf-admin-shell-card table :is(th, td) {
   word-break: normal;
   overflow-wrap: normal;

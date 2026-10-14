@@ -433,7 +433,7 @@ do not silently "fix" either side.*
 
 - Small detail popups use the shared `--muf-popup-small-width` token (28rem desktop maximum).
 - Big detail popups use `--muf-popup-big-width` (42rem desktop maximum) and the shared popup height token.
-- On phones, small popups use a 48px outer gutter and big popups use a 32px gutter; both size to content and cap at 82dvh instead of becoming full-screen panels.
+- On phones, small popups deduct 48px total from viewport width (24px each side); big popups deduct 32px total (16px each side). Both size to content and cap at 82dvh instead of becoming full-screen panels.
 - The admin shell uses the shared `muf-admin-shell-card` and `muf-admin-*` styles, a 56rem desktop maximum, an 88vh cap, a sticky tab strip, and a visible footer. On phones it uses a 32px outer gutter and an 82dvh height cap.
 - Screen-specific UI refinements are presentation-only; preserve all existing fields, actions, API requests, calculations, and access permissions.
 - `check-muf-sync.js` must describe the current canonical popup/admin dimensions rather than obsolete previous values.

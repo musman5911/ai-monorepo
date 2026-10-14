@@ -3588,7 +3588,7 @@ function App() {
                             <td className={`px-4 py-4 text-right font-black whitespace-nowrap ${isLow ? 'text-red-500 font-black' : 'text-slate-800 dark:text-slate-100'}`}>
                               {item.current_stock} {item.unit}
                             </td>
-                            <td className="px-4 py-4 text-right whitespace-nowrap">
+                            <td data-label={L('Actions')} className="px-4 py-4 text-right whitespace-nowrap">
                               <div className="inline-flex gap-1.5 justify-end">
                                 {userRole === 'admin' && (
                                 <button
