@@ -72,6 +72,18 @@ for (const app of apps) {
     pass(`${app.name}: header and primary navbar share a sticky MUF wrapper`);
   } else fail(`${app.name}: sticky header/navbar wrapper missing`);
 
+  // overflow-x:hidden on the app root can make it the nearest scroll container.
+  // Then viewport scrolling never reaches the sticky chrome. Dairy uses clip to
+  // contain horizontal paint overflow without establishing a scrolling ancestor.
+  if (app.name === 'dairy') {
+    const rootClass = appSource.match(/<div\\s+className="([^"]*)"\\s+id="app-root"/)?.[1] || '';
+    if (/\\boverflow-x-clip\\b/.test(rootClass) && !/\\boverflow-x-hidden\\b/.test(rootClass)) {
+      pass('dairy: app root clips horizontal overflow without disabling sticky chrome');
+    } else {
+      fail('dairy: app root overflow setting may disable viewport sticky positioning');
+    }
+  }
+
 }
 
 if (failures.length) {

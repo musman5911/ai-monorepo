@@ -350,7 +350,7 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-800 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden relative"
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-800 dark:text-slate-100 transition-colors duration-200 overflow-x-clip relative"
       id="app-root"
     >
       {/* Decorative background — one-shot fade-in, no loops */}
