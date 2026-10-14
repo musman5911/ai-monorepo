@@ -76,8 +76,8 @@ for (const app of apps) {
   // Then viewport scrolling never reaches the sticky chrome. Dairy uses clip to
   // contain horizontal paint overflow without establishing a scrolling ancestor.
   if (app.name === 'dairy') {
-    const rootClass = appSource.match(/<div\\s+className="([^"]*)"\\s+id="app-root"/)?.[1] || '';
-    if (/\\boverflow-x-clip\\b/.test(rootClass) && !/\\boverflow-x-hidden\\b/.test(rootClass)) {
+    const rootClass = appSource.match(/<div\s+className="([^"]*)"\s+id="app-root"/)?.[1] || '';
+    if (/\boverflow-x-clip\b/.test(rootClass) && !/\boverflow-x-hidden\b/.test(rootClass)) {
       pass('dairy: app root clips horizontal overflow without disabling sticky chrome');
     } else {
       fail('dairy: app root overflow setting may disable viewport sticky positioning');

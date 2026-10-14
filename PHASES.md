@@ -65,7 +65,9 @@ The detailed local reports are MUF_POPUP_INVENTORY.md, MUF_STYLE_AUDIT.md and MU
 
 **Status: in progress; Dairy sticky-header regression fix committed, browser retest pending.**
 
-Latest fix commit: `83e8b24` (`Restore Dairy sticky header and navigation`). In `dairy_farm/client/src/App.tsx`, the `#app-root` class changed from `overflow-x-hidden` to `overflow-x-clip`. The hidden overflow value can establish an unintended scrolling ancestor and prevent the viewport from driving `position: sticky`; clipping keeps horizontal paint overflow contained without creating that scroll container. `check-ui-safety.js` now checks that Dairy's root retains the safe clipping class.
+Latest fix commit: `83e8b24` (`Restore Dairy sticky header and navigation`).
+
+The owner-provided UI-safety output caught a false failure in the new root-class guard. The guard used double-escaped `\s` and `\b` patterns, preventing it from reading the JSX class correctly. The checker expression is corrected in the next commit; rerun the safety script locally. In `dairy_farm/client/src/App.tsx`, the `#app-root` class changed from `overflow-x-hidden` to `overflow-x-clip`. The hidden overflow value can establish an unintended scrolling ancestor and prevent the viewport from driving `position: sticky`; clipping keeps horizontal paint overflow contained without creating that scroll container. `check-ui-safety.js` now checks that Dairy's root retains the safe clipping class.
 
 No backend paths, business logic, APIs, permissions or features were changed. The source-level fix and checker update are committed; local browser and build results after this commit have not yet been observed.
 
