@@ -59,7 +59,7 @@ for (const app of apps) {
     pass(`${app.name}: Finance dropdown uses an accessible body portal`);
   } else fail(`${app.name}: Finance dropdown portal/accessibility contract missing`);
   if (/\.muf-finance-menu\s*\{/.test(css) && /--muf-space-2/.test(css) &&
-      /\.muf-overlay :is\(input,select,textarea\)/.test(css)) {
+      /\.muf-overlay :is\(input,\s*select,\s*textarea\)/.test(css)) {
     pass(`${app.name}: MUF dropdown tokens and popup field safeguards present`);
   } else fail(`${app.name}: MUF dropdown/popup style safeguards missing`);
 }
