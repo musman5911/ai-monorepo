@@ -2,11 +2,11 @@
 
 Last updated: 2026-10-14  
 Working branch: arena/20261014-muf-mobile-popups  
-Current documentation baseline before this refresh: 95b3d66
+Current documentation baseline before this refresh: a2702ee
 
 ## Overall status
 
-- Validation scripts: passed in the owner-provided terminal output after commit a510265.
+- Validation scripts and all three frontend builds were last confirmed by the owner after `95b3d66`; the later connector-created source batches have source-level assertions only and still need local script/build verification.
 - Frontend builds: Dairy, Flock and Agri each reported a successful build in that same output.
 - Popup source inventory: the owner-provided audit output after `95b3d66` confirmed 139 DetailModal call sites and zero missing size props: 96 small, 39 big, four intentional dynamic wrappers and zero unsupported literals.
 - Root Vitest suite: not run. npm test could not find the root Vitest executable, and npm ls vitest showed an empty installed dependency tree. The root package manifest and lockfile do declare Vitest.
@@ -75,7 +75,9 @@ The local reports are `.audit-output/MUF_POPUP_INVENTORY.md`, `.audit-output/MUF
 
 **Validation for batch 3:** The owner reported the audit, MUF sync check, UI-safety check and all three frontend builds passing after this commit. Browser review is deliberately deferred to Phase 5, after the implementation phases are complete.
 
-**Batch 4 in the current work: compact mobile popup tokenization.** The mobile .muf-popup-stage now owns scoped tokens for its compact type scale, headings, stage/card sizing, field metrics, labels and action dimensions. Existing literal values are moved into custom properties without changing their values. The tokenized stylesheet is applied identically to all three apps. One earlier duplicate .muf-pup-sm, .muf-pup-lg min-width/wrapping rule is removed because an identical later rule remains in the cascade. Three MUF sync invariants guard the new token definitions and consumers. Source transformation checks verify all 23 tokens have a definition and a use. Full repository checks/builds could not be run from this connector-only session and are not claimed as passing for batch 4; browser review remains deferred to Phase 5.
+**Batch 4 committed in `a2702ee`: compact mobile popup tokenization.** The mobile .muf-popup-stage now owns scoped tokens for its compact type scale, headings, stage/card sizing, field metrics, labels and action dimensions. Existing literal values are moved into custom properties without changing their values. The tokenized stylesheet is applied identically to all three apps. One earlier duplicate .muf-pup-sm, .muf-pup-lg min-width/wrapping rule is removed because an identical later rule remains in the cascade. Three MUF sync invariants guard the new token definitions and consumers. Source transformation checks verify all 23 tokens have a definition and a use. Source-level token definition/consumer checks passed before commit; repository checks/builds were not run in this connector-only session and are not claimed as passing for batch 4. Browser review remains deferred to Phase 5.
+
+**Batch 5 in the current work: shared popup form rhythm and field sizing.** Seven `--muf-ui-*` tokens centralize the existing popup form gaps, label line heights, standard/mobile field font sizes and field minimum height. The matching popup form and overlay selectors now use those tokens with their previous values preserved. Three additional sync invariants guard the canonical gap, field height and mobile field font tokens. Source transformation assertions passed; full repo scripts/builds remain pending, and browser review is deferred to Phase 5.
 
 ### Earlier popup sizing foundation
 

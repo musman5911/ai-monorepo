@@ -35,14 +35,14 @@ The following counts were calculated from the current shared stylesheet and are 
 
 | Metric | Current count |
 |---|---:|
-| Stylesheet source characters | 142,096 |
-| Lines | 3,340 |
+| Stylesheet source characters | 142,619 |
+| Lines | 3,347 |
 | Hex color literal occurrences | 385 |
 | RGB/HSL literal occurrences | 135 |
 | !important declaration occurrences | 628 |
-| Fixed-unit dimension declaration matches | 970 |
-| Distinct --muf-* variable names | 114 |
-| Selector-block matches | 1,131 |
+| Fixed-unit dimension declaration matches | 968 |
+| Distinct --muf-* variable names | 121 |
+| Selector-block matches | 991 |
 | Selector names appearing in multiple blocks | 126 |
 | Most repeated selector name | 19 blocks |
 
@@ -94,6 +94,10 @@ One earlier duplicate .muf-pup-sm, .muf-pup-lg rule that only set min-width: 0 a
 
 The available connector session cannot run the complete repository scripts or the three local builds, and those results are not marked as passing here. Browser review remains deferred to Phase 5 after the implementation phases are finished.
 
+## Phase 3 styling batch 5 — shared popup form rhythm and field sizing
+
+Seven shared `--muf-ui-*` tokens centralize the existing large/mobile form gaps, label line heights, default/mobile popup input font sizes, and field minimum height. Only matching shared popup selectors were changed, and every custom property resolves to the same value as the literal it replaces. Three synchronization invariants guard the canonical form gap, field height and mobile field font size. Source transformation assertions passed; the full repository checks/builds are not run from this connector-only environment and are not marked as passed. Browser review stays deferred to Phase 5.
+
 ## Priority findings
 
 ### P0 — finish test setup
@@ -119,7 +123,8 @@ After shared component styles stabilize, build editing-x-projetcs.tsx with Puck 
 ## Validation history and limitations
 
 - Owner-provided validation after `95b3d66`: `node --check audit-muf-design-system.mjs`, `node audit-muf-design-system.mjs`, `node check-muf-sync.js`, `node check-ui-safety.js` and `build-all.bat` passed; the scanner showed 139 DetailModal calls and zero missing sizes.
-- Current compact-popup token batch: source transformation assertions passed for token-definition/usage coverage and shared stylesheet content. Full repository scripts/builds were not executable from this connector-only working environment and are NOT claimed as passing for this batch.
+- Compact popup tokenization (`a2702ee`): source transformation assertions passed for token definition/use coverage; the full repository scripts/builds were not executable from the connector-only environment and are not claimed as passing.
+- Shared popup form rhythm tokenization (current batch): source assertions confirmed all seven variables are defined and used with existing values preserved. Repository scripts/builds remain pending for this batch.
 - Root Vitest suite: NOT RUN; the earlier owner-provided output showed the root Vitest executable was not installed.
 - Browser verification: intentionally deferred to Phase 5 until all planned implementation phases are complete.
 

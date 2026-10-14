@@ -2088,6 +2088,13 @@ html, body {
   --muf-ui-border: rgba(148, 163, 184, .24);
   --muf-ui-focus: var(--muf-color-success);
   --muf-ui-shadow-soft: 0 5px 18px rgba(15, 23, 42, .045);
+  --muf-ui-popup-form-gap: 1rem;
+  --muf-ui-popup-form-gap-mobile: .8rem;
+  --muf-ui-popup-label-line-height: 1.35;
+  --muf-ui-overlay-popup-label-line-height: 1.4;
+  --muf-ui-popup-field-font-size: 14px;
+  --muf-ui-popup-field-font-size-mobile: 16px;
+  --muf-ui-popup-field-min-height: 38px;
 }
 
 .muf-main-content {
@@ -2196,18 +2203,18 @@ html, body {
 }
 
 .muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form label {
-  line-height: 1.4;
+  line-height: var(--muf-ui-overlay-popup-label-line-height);
 }
 
 .muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
   box-sizing: border-box;
   min-width: 0;
   max-width: 100%;
-  font-size: 14px;
+  font-size: var(--muf-ui-popup-field-font-size);
 }
 
 .muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form :is(input:not([type="checkbox"]):not([type="radio"]), select) {
-  min-height: 38px;
+  min-height: var(--muf-ui-popup-field-min-height);
 }
 
 .muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form button {
@@ -2229,7 +2236,7 @@ html, body {
     max-height: 88dvh !important;
   }
   .muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
-    font-size: 16px;
+    font-size: var(--muf-ui-popup-field-font-size-mobile);
   }
 }
 
@@ -2428,15 +2435,15 @@ html, body {
 
 /* MUF interaction polish — compact, readable entity/forms popups (visual only). */
 .muf-pup-sm, .muf-pup-lg { min-width: 0; overflow-wrap: anywhere; }
-.muf-pup-sm form, .muf-pup-lg form { gap: 1rem; }
-.muf-pup-sm form label, .muf-pup-lg form label { line-height: 1.35; }
+.muf-pup-sm form, .muf-pup-lg form { gap: var(--muf-ui-popup-form-gap); }
+.muf-pup-sm form label, .muf-pup-lg form label { line-height: var(--muf-ui-popup-label-line-height); }
 .muf-pup-sm form input, .muf-pup-sm form select, .muf-pup-sm form textarea,
 .muf-pup-lg form input, .muf-pup-lg form select, .muf-pup-lg form textarea { min-width: 0; max-width: 100%; }
 .muf-pup-lg .grid { min-width: 0; }
 .muf-pup-lg :is(h3,h4) { letter-spacing: -.01em; }
 @media (max-width: 640px) {
   .muf-pup-sm, .muf-pup-lg { border-radius: 1.1rem !important; }
-  .muf-pup-sm form, .muf-pup-lg form { gap: .8rem; }
+  .muf-pup-sm form, .muf-pup-lg form { gap: var(--muf-ui-popup-form-gap-mobile); }
   .muf-pup-lg .grid { grid-template-columns: minmax(0, 1fr) !important; }
 }
 /* Superadmin workspace sizing guard — harmless in projects without this view. */
