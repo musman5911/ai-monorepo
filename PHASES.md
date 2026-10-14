@@ -46,7 +46,7 @@ Owner-provided results after pulling a510265:
 
 ## Phase 2 — popup and styling inventory
 
-**Status: popup call-site summary completed; detailed styling report still needs review.**
+**Status: base inventory completed; improved size classification committed, regenerated local report pending.**
 
 The local command node audit-muf-design-system.mjs completed and wrote reports under .audit-output. Summary:
 
@@ -57,7 +57,7 @@ The local command node audit-muf-design-system.mjs completed and wrote reports u
 | Flock | 69 | 45 | 13 | 11 | 3 |
 | Total | 139 | 90 | 35 | 14 | 7 |
 
-The scanner found zero custom dialog-role nodes. The seven fixed-overlay candidates must be reviewed by hand. They are not confirmed defects and should not automatically be migrated. Inspect the fourteen unspecified DetailModal sizes at their call sites before deciding whether to set an explicit size.
+The initial scan found zero custom dialog-role nodes and seven fixed-overlay candidates. The candidates require manual review and are not confirmed defects. The initial size summary grouped fourteen call sites as unspecified because the scanner did not separate missing props from dynamic expressions. The audit tool now classifies missing sizes, dynamic expressions, and unsupported literals separately; regenerate the local reports and use the revised split before assigning sizes.
 
 The detailed local reports are MUF_POPUP_INVENTORY.md, MUF_STYLE_AUDIT.md and MUF_UI_AUDIT.json inside .audit-output. The directory is ignored by Git.
 

@@ -7,7 +7,7 @@ Scope: frontend popup inventory, shared CSS and MUF consistency. This is a stati
 ## Executive findings
 
 - 139 direct DetailModal call sites were reported by the audit script across the three apps.
-- Fourteen call sites omit or do not statically resolve to an explicit small/big size. Inspect each use before assigning one.
+- The initial scanner grouped fourteen call sites as unspecified, mixing missing `size` props with dynamic expressions or nonstandard values. The scanner now separates missing sizes, dynamic expressions, and unsupported literals; the exact split awaits a fresh local audit run. Do not rewrite dynamic call sites without inspecting their usage.
 - The scanner reported seven custom fixed-overlay candidates. These need manual classification and are not automatically defects.
 - All three copies of muf-style.css are byte-identical.
 - The shared CSS has a large cascade history. Consolidation should be incremental and backed by checks/browser review, not a delete-all-duplicates exercise.
@@ -77,7 +77,7 @@ The owner ran node check-muf-sync.js and node check-ui-safety.js successfully. b
 
 ### P1 — complete the popup inventory review
 
-Review the fourteen unspecified-size call sites and the seven fixed-overlay candidates. Keep custom interactions when needed; migrate only where the shared shell can preserve behavior.
+Regenerate the inventory with the improved scanner, then review missing-size and dynamic-size call sites separately. Review the seven fixed-overlay candidates and keep specialized interactions where required; migrate only where the shared shell can preserve behavior.
 
 ### P1 — remove competing popup-size declarations safely
 
