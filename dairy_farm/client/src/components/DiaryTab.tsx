@@ -7,8 +7,8 @@ import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, type VoiceRec
 import type { ChecklistItem } from '../types';
 import { useDebouncedSave } from '../useDebouncedSave';
 import SaveIndicator from './SaveIndicator';
+import MufDiaryMedia, { type DiaryPhoto } from '../muf-diary-media';
 import { todayStr, shiftDate } from '../utils/date';
-import MufDiaryMedia from '../muf-diary-media';
 
 const DEFAULT_CHECKLIST: Omit<ChecklistItem, 'done'>[] = [
   { id: 'morning-milking', text: 'Morning milking done' },
@@ -31,6 +31,7 @@ export default function DiaryTab() {
   const [newItemText, setNewItemText] = useState('');
   interface VoiceNote { id: string; base64: string; createdAt: string; }
   const [voiceNotes, setVoiceNotes] = useState<VoiceNote[]>([]);
+  const [photos, setPhotos] = useState<DiaryPhoto[]>([]);
   const [recorder, setRecorder] = useState<VoiceRecorder | null>(null);
   const [recording, setRecording] = useState(false);
 
@@ -47,15 +48,16 @@ export default function DiaryTab() {
       }
       setNotes(log.notes || '');
       setVoiceNotes(log.voiceNotes || []);
+      setPhotos(log.photos || []);
       setLoading(false);
     }).catch(() => setLoading(false));
     return () => { cancelled = true; };
   }, [date]);
 
   // Combine checklist + notes into one payload for autosave
-  const payload = useMemo(() => ({ checklist, notes, voiceNotes }), [checklist, notes, voiceNotes]);
+  const payload = useMemo(() => ({ checklist, notes, voiceNotes, photos }), [checklist, notes, voiceNotes, photos]);
 
-  const saveFn = useCallback((p: { checklist: ChecklistItem[]; notes: string; voiceNotes: VoiceNote[] }) => {
+  const saveFn = useCallback((p: { checklist: ChecklistItem[]; notes: string; voiceNotes: VoiceNote[]; photos: DiaryPhoto[] }) => {
     return api.saveDailyLog(date, p);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
@@ -211,6 +213,7 @@ export default function DiaryTab() {
               className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100 resize-none"
             />
             <p className="text-[11px] text-slate-400 mt-2">{L('Saves automatically as you type.')}</p>
+            <MufDiaryMedia date={date} photos={photos} onChange={setPhotos} />
 
             {/* ── Voice notes (Urdu-friendly) — record instead of typing ── */}
             <div className="mt-4 border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2">
@@ -239,7 +242,6 @@ export default function DiaryTab() {
           </div>
         </div>
       )}
-      <MufDiaryMedia date={date} />
     </div>
   );
 }

@@ -1,10 +1,10 @@
 import { SuperAdminTab } from './components/SuperAdminTab';
-import MufDiaryMedia from './muf-diary-media';
 import MufLoginLang from './muf-login-lang';
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from './muf-motion';
 import * as api from './api';
 import DetailModal from './muf-modal';
+import MufDiaryMedia, { type DiaryPhoto } from './muf-diary-media';
 import AdminMenu from './components/AdminMenu';
 import MufFab from './muf-fab';
 import MufWorkerPanel from './muf-worker-panel';
@@ -246,6 +246,15 @@ function App() {
   });
   const [diaryDate, setDiaryDate] = useState(mufToday());
   const [diaryNote, setDiaryNote] = useState('');
+  const [diaryPhotos, setDiaryPhotos] = useState<DiaryPhoto[]>([]);
+
+  useEffect(() => {
+    if (!diaryOpen) return;
+    let cancelled = false;
+    setDiaryPhotos([]);
+    api.getDiaryMedia(diaryDate).then((response) => { if (!cancelled) setDiaryPhotos(Array.isArray(response.data?.photos) ? response.data.photos : []); }).catch(() => { if (!cancelled) setDiaryPhotos([]); });
+    return () => { cancelled = true; };
+  }, [diaryDate, diaryOpen]);
 
   const saveDiaryEntry = (date, note) => {
     const updated = diaryEntries.filter(e => e.date !== date);
@@ -5634,6 +5643,10 @@ function App() {
             placeholder={L('Weather, observations, issues…')}
             className="w-full text-xs px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-lg h-32 resize-none bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-100"
           />
+          <MufDiaryMedia date={diaryDate} photos={diaryPhotos} allowVoice onChange={async (next) => {
+            const response = await api.saveDiaryMedia(diaryDate, next);
+            setDiaryPhotos(Array.isArray(response.data?.photos) ? response.data.photos : next);
+          }} />
           <button
             onClick={() => { saveDiaryEntry(diaryDate, diaryNote); }}
             className="w-full px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg"
@@ -5655,7 +5668,6 @@ function App() {
               ))}
             </div>
           )}
-          <MufDiaryMedia date={diaryDate} allowVoice />
         </div>
       </DetailModal>
 

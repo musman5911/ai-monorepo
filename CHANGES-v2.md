@@ -4,7 +4,7 @@ No backend file, API call, handler or data shape was changed. Frontend only.
 
 ## Requested
 - Language **icon** in all three headers; flock's moved out of Admin into the header.
-- **Diary** in all three (flock's "Daily Operations" button/tab is now "Diary"; its checklist + notes are still inside). Photos per date (compressed) added everywhere, voice notes added to agri.
+- **Diary** in all three (flock's "Daily Operations" button/tab is now "Diary"; its checklist + notes are still inside). Photos per date (compressed, saved in the database) added everywhere, device-only voice notes added to agri.
 - Hard-coded styling moved into `muf-style.css`: ~287 long class strings replaced by named classes.
 
 ## Audit fixes
@@ -22,3 +22,12 @@ No backend file, API call, handler or data shape was changed. Frontend only.
 - True lazy-loading of PDF tools (would change call sites).
 - Backdrop tap still closes forms (could lose typing).
 - Unused files kept (per "no removal"): `muf-admin-field`, `FarmLogos`, `muf-form-overlay` (dairy/flock), `muf-farmbook` (dairy), `muf-weather` / `muf-voice` / `muf-image` (agri; voice now used).
+
+## Combined branch (`ui-v2-combined`): UI v2 + database diary photos
+This branch merges `ui-v2-full` with the `audit/ui-v2-merge` work (database-backed diary photos).
+- **One diary photo component** (`muf-diary-media.tsx`, identical in all three apps): the database save logic from the audit branch with the v2 look. Agri keeps device-only voice notes (`allowVoice`).
+- **Accessibility helper:** the v2 `muf-a11y.ts` is kept (it includes everything the audit version did, plus keyboard cards and login hints).
+- **Two backend fixes found while testing the audit branch's code** (no new features):
+  - `flock_farm/backend/routes/data.js`: the cleanup function was renamed to `cleanupOrphanedImages` but one call still used the old name, so saving birds or diary entries would throw after the write. The call now uses the new name.
+  - `agri_farm/backend/routes/diary-media.js`: `findOneAndUpdate` does not exist in the in-memory demo database (500 error on photo save). It now uses `updateOne` with `upsert`, which works on real MongoDB and in demo mode.
+- Tested end to end against all three backends in demo mode: save, reload, validation (non-JPEG, 11 photos, bad date), notes-only saves keep photos, flock upload / serve / orphan cleanup.

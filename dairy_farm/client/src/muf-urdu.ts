@@ -1766,6 +1766,13 @@ export const MUF_URDU: Record<string, string> = {
   'Expense deleted successfully.': 'خرچہ حذف ہو گیا۔',
   'Finance sections': 'مالی حصے',
   'Open Finance sections': 'مالی حصے کھولیں',
+  // database diary photos
+  'Photos added to the diary.': 'تصاویر ڈائری میں شامل ہو گئیں۔',
+  'Could not delete the photo.': 'تصویر حذف نہیں ہو سکی۔',
+  'Diary photos': 'ڈائری کی تصاویر',
+  'This photo is too large even after compression. Try a smaller image.': 'چھوٹی کرنے کے بعد بھی یہ تصویر بہت بڑی ہے۔ کوئی چھوٹی تصویر آزمائیں۔',
+  'Voice notes are saved on this phone only.': 'آواز کے نوٹ صرف اسی فون میں محفوظ ہوتے ہیں۔',
+  'Photos are made small and saved with your farm records, so they show on other devices too.': 'تصاویر چھوٹی کر کے آپ کے فارم ریکارڈ کے ساتھ محفوظ ہوتی ہیں، اس لیے دوسرے ڈیوائس پر بھی نظر آتی ہیں۔',
 };
 
 /** Exact Urdu template for a term, or undefined when the term is not in the dictionary. */

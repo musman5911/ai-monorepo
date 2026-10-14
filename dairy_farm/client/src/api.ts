@@ -286,7 +286,7 @@ export const api = {
 
   // Daily Log (checklist + diary notes)
   getDailyLog: (date: string) => req(`/dailylog/${date}`),
-  saveDailyLog: (date: string, data: { checklist?: object[]; notes?: string }) =>
+  saveDailyLog: (date: string, data: { checklist?: object[]; notes?: string; voiceNotes?: object[]; photos?: object[] }) =>
     req(`/dailylog/${date}`, { method: 'PUT', body: JSON.stringify(data) }),
 
   // Sales (animals sold — tracked as income)

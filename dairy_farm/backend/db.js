@@ -306,6 +306,7 @@ const DailyLogSchema = new mongoose.Schema({
     base64: String,
     createdAt: String,
   }], default: [] },
+  photos: { type: [{ id: String, date: String, data: String, bytes: Number, createdAt: String }], default: [] },
 }, { timestamps: true });
 
 const SaleSchema = new mongoose.Schema({

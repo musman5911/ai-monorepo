@@ -1,8 +1,13 @@
-// muf-diary-media — photos + voice notes for the Diary, saved per date.
-// Photos are shrunk on the phone before saving (long side <= 1280px, JPEG,
-// quality lowered step by step until the picture is about 90 KB or less), so a
-// 4 MB camera photo becomes roughly 2% of its size. Everything is stored in the
-// browser's IndexedDB on this device (no server call, no backend change).
+// muf-diary-media — photos (+ optional voice notes) for the Diary, saved per date.
+//
+// PHOTOS are shrunk on the phone before saving (long side <= 1280px, JPEG, quality
+// lowered step by step until the picture is about 90 KB; hard limit 160 KB) and are
+// then saved through the host app's own save call (`onChange`), so they live with
+// the farm records in the database and show on every device:
+//   • agri  → /diary-media/:date      • dairy → daily log (`photos`)
+//   • flock → MongoDB Image store; `uploadPhoto` returns an /api/images/<id> path.
+// VOICE NOTES (`allowVoice`, used by agri which has no server voice notes) are kept
+// on this device only (IndexedDB).
 //
 // TWIN FILES (byte-identical):
 //   agri_farm/frontend/src/muf-diary-media.tsx
@@ -15,25 +20,24 @@ import DetailModal from './muf-modal';
 import { notify, useConfirm } from './muf-confirm';
 import { isVoiceSupported, startVoiceRecording, type VoiceRecorder } from './muf-voice';
 
-type MediaKind = 'photo' | 'voice';
-interface MediaItem {
+export interface DiaryPhoto {
   id: string;
   date: string;
-  kind: MediaKind;
-  data: string;      // data-URL (compressed JPEG or audio)
-  thumb?: string;    // small preview for photos
-  bytes: number;     // stored size
-  origBytes?: number; // original photo size (to show how much was saved)
+  /** data:image/jpeg;base64,… (agri, dairy) or an /api/images/<id> path (flock). */
+  data: string;
+  bytes: number;
   createdAt: string;
 }
 
-const DB_NAME = 'muf-diary-media';
-const STORE = 'items';
 export const DIARY_MAX_PHOTOS_PER_DAY = 10;
 export const DIARY_MAX_VOICE_PER_DAY = 5;
 const TARGET_PHOTO_BYTES = 90 * 1024;
+const MAX_PHOTO_BYTES = 160 * 1024; // the servers reject anything bigger
 
-/* ───────────── tiny IndexedDB helpers ───────────── */
+/* ───────────── voice notes: tiny IndexedDB store (device only) ───────────── */
+interface VoiceItem { id: string; date: string; data: string; bytes: number; createdAt: string; }
+const DB_NAME = 'muf-diary-media';
+const STORE = 'items';
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     if (typeof indexedDB === 'undefined') { reject(new Error('Storage is not available in this browser')); return; }
@@ -41,33 +45,32 @@ function openDb(): Promise<IDBDatabase> {
     req.onupgradeneeded = () => {
       const db = req.result;
       if (!db.objectStoreNames.contains(STORE)) {
-        const store = db.createObjectStore(STORE, { keyPath: 'id' });
-        store.createIndex('date', 'date', { unique: false });
+        db.createObjectStore(STORE, { keyPath: 'id' }).createIndex('date', 'date', { unique: false });
       }
     };
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error || new Error('Could not open storage'));
   });
 }
-async function listByDate(date: string): Promise<MediaItem[]> {
+async function listVoice(date: string): Promise<VoiceItem[]> {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const req = db.transaction(STORE, 'readonly').objectStore(STORE).index('date').getAll(date);
-    req.onsuccess = () => resolve((req.result as MediaItem[]).sort((a, b) => a.createdAt.localeCompare(b.createdAt)));
+    req.onsuccess = () => resolve(((req.result as (VoiceItem & { kind?: string })[]).filter((i) => (i.kind ?? 'voice') === 'voice')).sort((a, b) => a.createdAt.localeCompare(b.createdAt)));
     req.onerror = () => reject(req.error);
   });
 }
-async function putItem(item: MediaItem): Promise<void> {
+async function putVoice(item: VoiceItem): Promise<void> {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite');
-    tx.objectStore(STORE).put(item);
+    tx.objectStore(STORE).put({ ...item, kind: 'voice' });
     tx.oncomplete = () => resolve();
     tx.onerror = () => reject(tx.error || new Error('Could not save'));
     tx.onabort = () => reject(tx.error || new Error('Storage is full'));
   });
 }
-async function deleteItem(id: string): Promise<void> {
+async function deleteVoice(id: string): Promise<void> {
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE, 'readwrite');
@@ -103,8 +106,8 @@ function drawJpeg(img: HTMLImageElement, maxSide: number, quality: number): stri
 }
 const dataUrlBytes = (u: string) => Math.round((u.length - u.indexOf(',') - 1) * 0.75);
 
-/** Shrinks a photo until it is <= ~90 KB (side and quality are lowered together). */
-export async function compressDiaryPhoto(file: File): Promise<{ data: string; thumb: string; bytes: number }> {
+/** Shrinks a photo to about 90 KB (side and quality are lowered together). */
+export async function compressDiaryPhoto(file: File): Promise<{ data: string; bytes: number }> {
   const img = await loadImage(file);
   const steps: [number, number][] = [[1280, 0.72], [1100, 0.62], [960, 0.55], [800, 0.48], [640, 0.42], [480, 0.38]];
   let data = '';
@@ -112,59 +115,81 @@ export async function compressDiaryPhoto(file: File): Promise<{ data: string; th
     data = drawJpeg(img, side, q);
     if (dataUrlBytes(data) <= TARGET_PHOTO_BYTES) break;
   }
-  return { data, thumb: drawJpeg(img, 220, 0.6), bytes: dataUrlBytes(data) };
+  if (dataUrlBytes(data) > MAX_PHOTO_BYTES) throw new Error(L('This photo is too large even after compression. Try a smaller image.'));
+  return { data, bytes: dataUrlBytes(data) };
 }
 
 const fmtBytes = (n: number) => (n >= 1048576 ? `${(n / 1048576).toFixed(1)} MB` : `${Math.max(1, Math.round(n / 1024))} KB`);
-const newId = () => `dm-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+const newId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
 interface Props {
   /** YYYY-MM-DD of the diary day being edited. */
   date: string;
+  /** Photos currently saved for this day (comes from the app's own data). */
+  photos: DiaryPhoto[];
+  /** Called with the full new list; throw to report a save failure. */
+  onChange: (next: DiaryPhoto[]) => void | Promise<void>;
   /** false = view only. */
   canEdit?: boolean;
-  /** Show voice notes too (apps that already keep voice notes on the server pass false). */
+  /** Optional: upload the file yourself and return its URL (flock). Otherwise the photo is shrunk and embedded. */
+  uploadPhoto?: (file: File) => Promise<string>;
+  /** Also show device-only voice notes (apps without server voice notes pass true). */
   allowVoice?: boolean;
 }
 
-export default function MufDiaryMedia({ date, canEdit = true, allowVoice = false }: Props) {
+export default function MufDiaryMedia({ date, photos, onChange, canEdit = true, uploadPhoto, allowVoice = false }: Props) {
   const confirm = useConfirm();
-  const [items, setItems] = useState<MediaItem[]>([]);
+  const [current, setCurrent] = useState<DiaryPhoto[]>(photos);
   const [busy, setBusy] = useState(false);
-  const [viewing, setViewing] = useState<MediaItem | null>(null);
+  const [viewing, setViewing] = useState<DiaryPhoto | null>(null);
+  const [voices, setVoices] = useState<VoiceItem[]>([]);
   const [recorder, setRecorder] = useState<VoiceRecorder | null>(null);
   const [recording, setRecording] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
   const camRef = useRef<HTMLInputElement>(null);
 
-  const refresh = useCallback(async () => {
-    try { setItems(await listByDate(date)); } catch { setItems([]); }
-  }, [date]);
-  useEffect(() => { void refresh(); }, [refresh]);
-  useEffect(() => () => { recorder?.cancel(); }, [recorder]);
+  useEffect(() => setCurrent(photos), [photos]);
 
-  const photos = items.filter((i) => i.kind === 'photo');
-  const voices = items.filter((i) => i.kind === 'voice');
+  const refreshVoice = useCallback(async () => {
+    if (!allowVoice) return;
+    try { setVoices(await listVoice(date)); } catch { setVoices([]); }
+  }, [date, allowVoice]);
+  useEffect(() => { void refreshVoice(); }, [refreshVoice]);
+  useEffect(() => () => { recorder?.cancel(); }, [recorder]);
 
   async function addFiles(files: FileList | null) {
     if (!files || !files.length) return;
     setBusy(true);
-    let room = DIARY_MAX_PHOTOS_PER_DAY - photos.length;
     try {
+      const next = [...current];
       for (const file of Array.from(files)) {
-        if (room <= 0) { notify(L('Only {n} photos can be saved for one day.', { n: DIARY_MAX_PHOTOS_PER_DAY }), 'info'); break; }
-        const out = await compressDiaryPhoto(file);
-        await putItem({ id: newId(), date, kind: 'photo', data: out.data, thumb: out.thumb, bytes: out.bytes, origBytes: file.size, createdAt: new Date().toISOString() });
-        room -= 1;
-        notify(L('Photo saved ({from} → {to})', { from: fmtBytes(file.size), to: fmtBytes(out.bytes) }), 'success');
+        if (next.length >= DIARY_MAX_PHOTOS_PER_DAY) { notify(L('Only {n} photos can be saved for one day.', { n: DIARY_MAX_PHOTOS_PER_DAY }), 'info'); break; }
+        if (!file.type.startsWith('image/')) continue;
+        const out = uploadPhoto ? { data: await uploadPhoto(file), bytes: file.size } : await compressDiaryPhoto(file);
+        next.push({ id: newId('diary-photo'), date, data: out.data, bytes: out.bytes, createdAt: new Date().toISOString() });
       }
+      await onChange(next);
+      setCurrent(next);
+      notify(L('Photos added to the diary.'), 'success');
     } catch (err) {
       notify(err instanceof Error ? err.message : L('Could not save the photo.'), 'error');
     } finally {
       setBusy(false);
       if (fileRef.current) fileRef.current.value = '';
       if (camRef.current) camRef.current.value = '';
-      void refresh();
+    }
+  }
+
+  async function removePhoto(photo: DiaryPhoto) {
+    const ok = await confirm({ title: L('Delete photo'), message: L('This cannot be undone.'), confirmLabel: L('Delete'), cancelLabel: L('Cancel'), tone: 'danger' });
+    if (!ok) return;
+    const next = current.filter((p) => p.id !== photo.id);
+    try {
+      await onChange(next);
+      setCurrent(next);
+      setViewing(null);
+    } catch (err) {
+      notify(err instanceof Error ? err.message : L('Could not delete the photo.'), 'error');
     }
   }
 
@@ -172,14 +197,14 @@ export default function MufDiaryMedia({ date, canEdit = true, allowVoice = false
     if (recording && recorder) {
       try {
         const data = await recorder.stop();
-        await putItem({ id: newId(), date, kind: 'voice', data, bytes: dataUrlBytes(data), createdAt: new Date().toISOString() });
+        await putVoice({ id: newId('dv'), date, data, bytes: dataUrlBytes(data), createdAt: new Date().toISOString() });
         notify(L('Voice note saved.'), 'success');
       } catch (err) {
         notify(err instanceof Error ? err.message : L('Recording failed'), 'error');
       } finally {
         setRecorder(null);
         setRecording(false);
-        void refresh();
+        void refreshVoice();
       }
       return;
     }
@@ -194,30 +219,25 @@ export default function MufDiaryMedia({ date, canEdit = true, allowVoice = false
     }
   }
 
-  async function remove(item: MediaItem) {
-    const ok = await confirm({
-      title: item.kind === 'photo' ? L('Delete photo') : L('Delete voice note'),
-      message: L('This cannot be undone.'),
-      confirmLabel: L('Delete'),
-      cancelLabel: L('Cancel'),
-      tone: 'danger',
-    });
+  async function removeVoice(item: VoiceItem) {
+    const ok = await confirm({ title: L('Delete voice note'), message: L('This cannot be undone.'), confirmLabel: L('Delete'), cancelLabel: L('Cancel'), tone: 'danger' });
     if (!ok) return;
-    try { await deleteItem(item.id); } catch { /* ignore */ }
-    setViewing(null);
-    void refresh();
+    try { await deleteVoice(item.id); } catch { /* ignore */ }
+    void refreshVoice();
   }
 
+  const full = current.length >= DIARY_MAX_PHOTOS_PER_DAY;
+
   return (
-    <section className="muf-diary-media" aria-label={L('Photos')}>
+    <section className="muf-diary-media" aria-label={L('Diary photos')}>
       <div className="muf-diary-media-head">
-        <h4>{L('Photos')} <span className="muf-diary-count">{photos.length}/{DIARY_MAX_PHOTOS_PER_DAY}</span></h4>
+        <h4>{L('Photos')} <span className="muf-diary-count">{current.length}/{DIARY_MAX_PHOTOS_PER_DAY}</span></h4>
         {canEdit && (
           <div className="muf-diary-media-actions">
-            <button type="button" className="muf-btn muf-btn-soft" disabled={busy} onClick={() => camRef.current?.click()}>
+            <button type="button" className="muf-btn muf-btn-soft" disabled={busy || full} onClick={() => camRef.current?.click()}>
               <Camera size={14} /> {L('Take photo')}
             </button>
-            <button type="button" className="muf-btn muf-btn-soft" disabled={busy} onClick={() => fileRef.current?.click()}>
+            <button type="button" className="muf-btn muf-btn-soft" disabled={busy || full} onClick={() => fileRef.current?.click()}>
               <ImagePlus size={14} /> {L('Add photo')}
             </button>
           </div>
@@ -226,13 +246,13 @@ export default function MufDiaryMedia({ date, canEdit = true, allowVoice = false
       <input ref={camRef} type="file" accept="image/*" capture="environment" hidden onChange={(e) => void addFiles(e.target.files)} />
       <input ref={fileRef} type="file" accept="image/*" multiple hidden onChange={(e) => void addFiles(e.target.files)} />
 
-      {photos.length === 0 ? (
+      {current.length === 0 ? (
         <p className="muf-diary-empty">{L('No photos for this day yet.')}</p>
       ) : (
         <div className="muf-diary-grid">
-          {photos.map((p) => (
+          {current.map((p) => (
             <button key={p.id} type="button" className="muf-diary-thumb" onClick={() => setViewing(p)} aria-label={L('Open photo')}>
-              <img src={p.thumb || p.data} alt="" loading="lazy" />
+              <img src={p.data} alt="" loading="lazy" />
             </button>
           ))}
         </div>
@@ -257,7 +277,7 @@ export default function MufDiaryMedia({ date, canEdit = true, allowVoice = false
                   <Volume2 size={14} aria-hidden="true" />
                   <audio controls src={v.data} preload="none" />
                   {canEdit && (
-                    <button type="button" className="muf-icon-plain" onClick={() => void remove(v)} aria-label={L('Delete voice note')}>
+                    <button type="button" className="muf-icon-plain" onClick={() => void removeVoice(v)} aria-label={L('Delete voice note')}>
                       <Trash2 size={14} />
                     </button>
                   )}
@@ -265,20 +285,19 @@ export default function MufDiaryMedia({ date, canEdit = true, allowVoice = false
               ))}
             </ul>
           )}
+          <p className="muf-diary-hint">{L('Voice notes are saved on this phone only.')}</p>
         </div>
       )}
 
-      <p className="muf-diary-hint">{L('Photos are made small and saved on this phone only.')}</p>
+      <p className="muf-diary-hint">{L('Photos are made small and saved with your farm records, so they show on other devices too.')}</p>
 
       <DetailModal open={!!viewing} onClose={() => setViewing(null)} title={L('Photo')} subtitle={date} size="small">
         {viewing && (
           <div className="muf-diary-viewer">
             <img src={viewing.data} alt={L('Diary photo')} />
-            <p className="muf-diary-hint">
-              {viewing.origBytes ? L('Saved as {to} (original {from})', { to: fmtBytes(viewing.bytes), from: fmtBytes(viewing.origBytes) }) : fmtBytes(viewing.bytes)}
-            </p>
+            <p className="muf-diary-hint">{fmtBytes(viewing.bytes)}</p>
             {canEdit && (
-              <button type="button" className="muf-btn muf-btn-danger" onClick={() => void remove(viewing)}>
+              <button type="button" className="muf-btn muf-btn-danger" onClick={() => void removePhoto(viewing)}>
                 <Trash2 size={14} /> {L('Delete photo')}
               </button>
             )}

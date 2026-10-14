@@ -433,7 +433,7 @@ do not silently "fix" either side.*
 ## v2 additions (UI refinement round)
 
 - **Header (all three apps, same order):** Search · Diary · Notifications · **Language (icon only)** · Theme · Profile · Logout. Flock's language button lives in the header now (no longer inside Admin).
-- **Diary** is the same idea everywhere: notes by date, compressed photos, voice notes. Photos (and agri voice notes) are stored on the device in IndexedDB via `muf-diary-media.tsx`; notes / voice that already sync (dairy, flock) are unchanged.
+- **Diary** is the same idea everywhere: notes by date, compressed photos, voice notes. Photos are saved with the farm records in the database (agri `/diary-media`, dairy daily log, flock Image store) through `muf-diary-media.tsx`; agri voice notes stay on the device; dairy / flock voice notes are unchanged.
 - **New shared twins** (byte-identical in all three apps, registered in `check-muf-sync.js`): `muf-diary-media.tsx`, `muf-a11y.ts`, `muf-login-lang.tsx`, `muf-worker-panel.tsx`.
 - **Styling lives in `muf-style.css`** (refinement layer at the bottom): tokens (`--muf-*`), `.muf-btn*`, `.muf-field*`, `.muf-label`, `.muf-caption`, `.muf-card`, `.muf-tile`, `.muf-row`, `.muf-chip`, search / toast / diary classes. Prefer these over long inline Tailwind strings.
 - **Every visible label goes through `L()`**; Urdu strings go in `muf-urdu.ts` only.

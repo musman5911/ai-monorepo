@@ -139,6 +139,7 @@ export interface DiaryEntry {
   note: string;
   // Optional short voice note (audio data-URL, max ~60s) — Urdu-friendly input.
   voiceBase64?: string;
+  photos?: { id: string; date: string; data: string; bytes: number; createdAt: string }[];
 }
 
 export interface GlobalSettings {
