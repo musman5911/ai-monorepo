@@ -330,7 +330,7 @@ const INVARIANTS = [
   ['motion: single re-export',      'mufMotion',   /export \{ motion, AnimatePresence \} from ('motion\/react')/],
   ['motion: modal spring 480/30',   'mufMotion',   /stiffness: (480), damping: 30, mass: 0\.6/],
   ['motion: reduced-motion gate',   'mufMotion',   /function (prefersReducedMotion)/],
-  ['modal: muf-overlay class',      'detailModal', /(muf-overlay) fixed inset-0 flex/],
+  ['modal: muf-overlay class',      'detailModal', /(muf-overlay)(?:\s+muf-popup-overlay)?\s+fixed inset-0 flex/],
   ['modal: ESC top-most close',     'detailModal', /dataset\.topModal/],
   ['modal: body scroll lock',       'detailModal', /useBodyScrollLock\(open\)/],
   ['confirm: prompt support',       'confirm',     /function (usePromptInput)/],

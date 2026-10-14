@@ -3050,3 +3050,122 @@ textarea:disabled { cursor: not-allowed; }
 }
 
 /* End of canonical MUF mobile/popup refinement layer. */
+
+/* --------------------------------------------------------------------------
+   MUF SEMANTIC TOKENS + FINANCE DROPDOWN / MOBILE POPUP SAFEGUARDS
+   Presentation only. Keep byte-identical in dairy, flock and agri.
+   -------------------------------------------------------------------------- */
+:root {
+  --muf-space-1: 0.25rem;
+  --muf-space-2: 0.5rem;
+  --muf-space-3: 0.75rem;
+  --muf-space-4: 1rem;
+  --muf-space-6: 1.5rem;
+  --muf-control-height: 2.75rem;
+  --muf-type-body: 0.875rem;
+  --muf-type-small: 0.8125rem;
+  --muf-brand-primary: #16a34a;
+  --muf-brand-primary-hover: #15803d;
+  --muf-dropdown-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+}
+.dark {
+  --muf-brand-primary-hover: #4ade80;
+  --muf-dropdown-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+}
+
+/* This menu is portalled to document.body so nav overflow cannot clip it. */
+.muf-finance-menu {
+  position: fixed;
+  z-index: calc(var(--muf-z-dropdown) + 1);
+  box-sizing: border-box;
+  width: min(13rem, calc(100vw - 1rem));
+  min-width: min(11rem, calc(100vw - 1rem));
+  max-width: calc(100vw - 1rem);
+  max-height: min(70vh, 26rem);
+  max-height: min(70dvh, 26rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--muf-space-1);
+  border: 1px solid var(--muf-line);
+  border-radius: var(--muf-radius-md);
+  background: var(--muf-surface);
+  color: var(--muf-ink);
+  box-shadow: var(--muf-dropdown-shadow);
+  isolation: isolate;
+}
+.muf-finance-menu-item {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--muf-control-height);
+  box-sizing: border-box;
+  padding: var(--muf-space-2) var(--muf-space-3);
+  border: 0;
+  border-radius: var(--muf-radius-sm);
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-height: 1.35;
+  font: inherit;
+  cursor: pointer;
+}
+.muf-finance-menu-item:hover {
+  background: var(--muf-primary-soft);
+}
+.dark .muf-finance-menu-item:hover {
+  background: rgba(74, 222, 128, 0.12);
+}
+.muf-finance-menu-item.is-active {
+  color: var(--muf-brand-primary);
+  font-weight: 800;
+}
+.dark .muf-finance-menu-item.is-active {
+  color: var(--muf-brand-primary-hover);
+}
+.muf-finance-menu-item:focus-visible {
+  outline: 2px solid var(--muf-brand-primary);
+  outline-offset: -2px;
+}
+
+/* Prevent nested layout tracks from forcing controls/labels narrower than text.
+   Wide table wrappers remain scrollable, preserving actual column widths. */
+.muf-overlay :is(.flex, .grid) > * {
+  min-width: 0;
+}
+.muf-overlay :is(input, select, textarea) {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+.muf-overlay :is(label, p, h1, h2, h3, h4, th, td) {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+.muf-overlay .overflow-x-auto {
+  max-width: 100%;
+  overflow-x: auto !important;
+  overscroll-behavior-x: contain;
+}
+.muf-overlay .overflow-x-auto table :is(th, td) {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+@media (max-width: 640px) {
+  .muf-overlay :is(input, select, textarea) {
+    font-size: 16px !important;
+  }
+  .muf-overlay .muf-pup-card,
+  .muf-overlay .muf-pup-width-sm,
+  .muf-overlay .muf-pup-width-lg,
+  .muf-overlay .muf-admin-shell-card {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: calc(100vw - 1rem);
+  }
+}
+

@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
 import { motion, AnimatePresence, prefersReducedMotion } from './muf-motion';
 import {
   CalendarHeart,
@@ -80,15 +81,60 @@ export default function App() {
   );
   const [tab, setTab] = useState<Tab>("dashboard");
   const [financeMenuOpen, setFinanceMenuOpen] = useState(false);
-  // Close Finance menu when the user clicks anywhere outside its navbar item.
+  const financeMenuAnchorRef = useRef<HTMLDivElement | null>(null);
+  const financeMenuTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const [financeMenuPosition, setFinanceMenuPosition] = useState({ top: 8, left: 8 });
+
+  const toggleFinanceMenu = () => {
+    if (financeMenuOpen) {
+      setFinanceMenuOpen(false);
+      return;
+    }
+    const anchor = financeMenuAnchorRef.current?.getBoundingClientRect();
+    const menuWidth = Math.min(208, Math.max(0, window.innerWidth - 16));
+    const maxMenuHeight = Math.min(window.innerHeight * 0.7, 416);
+    if (anchor) {
+      setFinanceMenuPosition({
+        top: Math.max(8, Math.min(anchor.bottom + 8, window.innerHeight - maxMenuHeight - 8)),
+        left: Math.max(8, Math.min(anchor.left, window.innerWidth - menuWidth - 8)),
+      });
+    }
+    setFinanceMenuOpen(true);
+  };
+
+  // Body portal escapes the horizontally scrolling navigation and its clipping.
+  // Keep outside-pointer, Escape, resize and page-scroll dismissal consistent.
   useEffect(() => {
     if (!financeMenuOpen) return;
     const closeOnOutsidePointer = (event: PointerEvent) => {
       const target = event.target;
-      if (target instanceof Element && !target.closest('.muf-finance-nav-item')) setFinanceMenuOpen(false);
+      if (target instanceof Element &&
+        !target.closest('.muf-finance-nav-item') &&
+        !target.closest('.muf-finance-menu')) {
+        setFinanceMenuOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setFinanceMenuOpen(false);
+      financeMenuTriggerRef.current?.focus({ preventScroll: true });
+    };
+    const closeOnScroll = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest('.muf-finance-menu')) return;
+      setFinanceMenuOpen(false);
     };
     document.addEventListener('pointerdown', closeOnOutsidePointer);
-    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+    document.addEventListener('keydown', closeOnEscape);
+    window.addEventListener('resize', closeOnScroll);
+    window.addEventListener('scroll', closeOnScroll, true);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer);
+      document.removeEventListener('keydown', closeOnEscape);
+      window.removeEventListener('resize', closeOnScroll);
+      window.removeEventListener('scroll', closeOnScroll, true);
+    };
   }, [financeMenuOpen]);
   const [financeCategory, setFinanceCategory] = useState('');
   const [lang, setLangState] = useState<Lang>(getLang());
@@ -456,12 +502,21 @@ export default function App() {
       <nav className="muf-top-nav" aria-label={L('Primary navigation')}>
         <div className="muf-top-nav-scroll">
           {visibleNav.map(({ id, label, icon: Icon }) => id === "expenses" ? (
-            <div className="muf-nav-item muf-finance-nav-item relative" key={id}>
+            <div className="muf-nav-item muf-finance-nav-item relative" ref={financeMenuAnchorRef} key={id}>
               <div className="flex items-center">
                 <button type="button" className={`muf-nav-link ${tab === id ? "active" : ""}`} onClick={() => { setTab(id); setFinanceMenuOpen(false); }}><Icon size={15}/><span>{label}</span></button>
-                <button type="button" aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2" title={L('Finance sections')}><ChevronDown size={14}/></button>
+                <button type="button" ref={financeMenuTriggerRef} aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} aria-controls="muf-finance-menu" onClick={toggleFinanceMenu} className="muf-nav-link !px-2" title={L('Finance sections')}><ChevronDown size={14}/></button>
               </div>
-              {financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{label:'All expenses',value:''},{label:'Feed',value:'feed'},{label:'Medicine',value:'medicine'},{label:'Equipment',value:'equipment'},{label:'Labor',value:'labor'},{label:'Purchasing',value:'purchasing'},{label:'Other',value:'misc'}].map(item => <button key={item.label} type="button" onClick={() => { setFinanceCategory(item.value); setTab('expenses'); setFinanceMenuOpen(false); }} className={`block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800 ${financeCategory === item.value ? 'font-bold text-emerald-700 dark:text-emerald-400' : ''}`}>{item.label}</button>)}</div>}
+              {financeMenuOpen && createPortal(
+                <div
+                  id="muf-finance-menu"
+                  className="muf-finance-menu"
+                  role="group"
+                  aria-label={L('Finance sections')}
+                  style={financeMenuPosition}
+                >{[{label:'All expenses',value:''},{label:'Feed',value:'feed'},{label:'Medicine',value:'medicine'},{label:'Equipment',value:'equipment'},{label:'Labor',value:'labor'},{label:'Purchasing',value:'purchasing'},{label:'Other',value:'misc'}].map(item => <button key={item.label} type="button" onClick={() => { setFinanceCategory(item.value); setTab('expenses'); setFinanceMenuOpen(false); }} className={`muf-finance-menu-item ${financeCategory === item.value ? 'is-active' : ''}`}>{item.label}</button>)}</div>,
+                document.body
+              )}
             </div>
           ) : <div className="muf-nav-item" key={id}><button type="button" className={`muf-nav-link ${tab === id ? "active" : ""}`} onClick={() => setTab(id)}><Icon size={15}/><span>{label}</span></button></div>)}
         </div>

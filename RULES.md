@@ -314,6 +314,28 @@ summary keeps working.
   explicitly requested.
 - **Global search** lives in the header beside the theme toggle, `muf`-based.
 - **Everything must work on both PC and mobile.**
+- **Centralize repeated visual decisions.** A useful rule is: if the same
+  color, spacing, radius, shadow, control size, type scale, z-index or motion
+  value appears in three or more places, centralize it as a semantic
+  `--muf-*` token or reusable `.muf-*` class in `muf-style.css` rather than
+  copying literals across components. Keep the shared stylesheet byte-identical
+  across all three apps.
+- **Keep semantic meanings distinct.** Do not replace status colors, chart
+  series, validation states or data-driven dimensions with the primary color
+  merely to eliminate a literal. Centralize shared meanings, not unrelated
+  exceptions.
+- **Mobile popup text must stay readable.** Flex/grid children and form fields
+  must be able to shrink within the card without forcing labels into narrow
+  columns. Prefer normal word wrapping; do not squeeze entire tables until
+  headings render one letter per line. Wide tables must scroll horizontally or
+  use the existing `muf-reflow` card layout.
+- **Dropdowns must not be clipped by scroll containers.** Menus opened from
+  the horizontally scrolling top navigation use a body-level portal, remain
+  within the viewport, close on outside pointer and Escape, and keep readable
+  touch targets.
+- **UI-only repairs must stay UI-only.** Do not change API calls, data models,
+  business calculations, role visibility or existing features while fixing
+  appearance. Do not remove admin functionality or Monthly Summary PDF export.
 - Where a design reference is needed: `agri_farm` is the parent/reference
   design, the popup-shell reference is `flock_farm`, the admin-popup layout
   base is `agri_farm`, and the mobile popup values are canonical from `flock`.

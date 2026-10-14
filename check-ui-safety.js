@@ -21,6 +21,7 @@ for (const file of ['muf-modal.tsx', 'muf-confirm.tsx', 'muf-style.css', 'muf-di
 
 for (const app of apps) {
   const modal = read(app, 'muf-modal.tsx');
+  const appSource = read(app, 'App.tsx');
   const confirm = read(app, 'muf-confirm.tsx');
   const css = read(app, 'muf-style.css');
   const qr = read(app, 'components/QrWaybillModal.tsx');
@@ -53,6 +54,14 @@ for (const app of apps) {
   else fail(`${app.name}: QR receipt native alert remains`);
   if (/prefers-reduced-motion:\s*reduce/.test(css) && /max-width:\s*640px/.test(css)) pass(`${app.name}: responsive and reduced-motion styles present`);
   else fail(`${app.name}: responsive/reduced-motion styles missing`);
+  if (/createPortal\(/.test(appSource) && /financeMenuAnchorRef/.test(appSource) &&
+      /aria-controls="muf-finance-menu"/.test(appSource) && /className="muf-finance-menu"/.test(appSource)) {
+    pass(`${app.name}: Finance dropdown uses an accessible body portal`);
+  } else fail(`${app.name}: Finance dropdown portal/accessibility contract missing`);
+  if (/\.muf-finance-menu\s*\{/.test(css) && /--muf-space-2/.test(css) &&
+      /\.muf-overlay :is\(input,select,textarea\)/.test(css)) {
+    pass(`${app.name}: MUF dropdown tokens and popup field safeguards present`);
+  } else fail(`${app.name}: MUF dropdown/popup style safeguards missing`);
 }
 
 if (failures.length) {

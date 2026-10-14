@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { mufL } from './muf-urdu';
 import {
   Home,
@@ -625,15 +626,60 @@ export default function App() {
   }, [isLoaded, birds, settings, feedRecords, eggProduction, lang]);
   const [quickOpenLedgerTab, setQuickOpenLedgerTab] = useState<'feed' | 'expense' | 'egg' | 'customers' | 'suppliers' | null>(null);
   const [financeMenuOpen, setFinanceMenuOpen] = useState(false);
-  // Close Finance menu when the user clicks anywhere outside its navbar item.
+  const financeMenuAnchorRef = useRef<HTMLDivElement | null>(null);
+  const financeMenuTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const [financeMenuPosition, setFinanceMenuPosition] = useState({ top: 8, left: 8 });
+
+  const toggleFinanceMenu = () => {
+    if (financeMenuOpen) {
+      setFinanceMenuOpen(false);
+      return;
+    }
+    const anchor = financeMenuAnchorRef.current?.getBoundingClientRect();
+    const menuWidth = Math.min(208, Math.max(0, window.innerWidth - 16));
+    const maxMenuHeight = Math.min(window.innerHeight * 0.7, 416);
+    if (anchor) {
+      setFinanceMenuPosition({
+        top: Math.max(8, Math.min(anchor.bottom + 8, window.innerHeight - maxMenuHeight - 8)),
+        left: Math.max(8, Math.min(anchor.left, window.innerWidth - menuWidth - 8)),
+      });
+    }
+    setFinanceMenuOpen(true);
+  };
+
+  // Body portal escapes the horizontally scrolling navigation and its clipping.
+  // Keep outside-pointer, Escape, resize and page-scroll dismissal consistent.
   useEffect(() => {
     if (!financeMenuOpen) return;
     const closeOnOutsidePointer = (event: PointerEvent) => {
       const target = event.target;
-      if (target instanceof Element && !target.closest('.muf-finance-nav-item')) setFinanceMenuOpen(false);
+      if (target instanceof Element &&
+        !target.closest('.muf-finance-nav-item') &&
+        !target.closest('.muf-finance-menu')) {
+        setFinanceMenuOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setFinanceMenuOpen(false);
+      financeMenuTriggerRef.current?.focus({ preventScroll: true });
+    };
+    const closeOnScroll = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest('.muf-finance-menu')) return;
+      setFinanceMenuOpen(false);
     };
     document.addEventListener('pointerdown', closeOnOutsidePointer);
-    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+    document.addEventListener('keydown', closeOnEscape);
+    window.addEventListener('resize', closeOnScroll);
+    window.addEventListener('scroll', closeOnScroll, true);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer);
+      document.removeEventListener('keydown', closeOnEscape);
+      window.removeEventListener('resize', closeOnScroll);
+      window.removeEventListener('scroll', closeOnScroll, true);
+    };
   }, [financeMenuOpen]);
 
   const handleQuickAction = (actionType: 'bird' | 'egg' | 'expense' | 'feed') => {
@@ -831,12 +877,21 @@ export default function App() {
           {navItems.map(({ id, label, icon: Icon }) => {
             const active = activeTab === id;
             return (
-              <div className={`muf-nav-item relative ${id === 'ledger' ? 'muf-finance-nav-item' : ''}`} key={id}>
+              <div className={`muf-nav-item relative ${id === 'ledger' ? 'muf-finance-nav-item' : ''}`} ref={id === 'ledger' ? financeMenuAnchorRef : undefined} key={id}>
                 <div className="flex items-center">
                   <button type="button" className={`muf-nav-link ${active ? 'active' : ''}`} onClick={() => { setActiveTab(id); setFinanceMenuOpen(false); }} id={`nav-${id}`}><Icon size={15} /><span>{label}</span></button>
-                  {id === 'ledger' && <button type="button" aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
+                  {id === 'ledger' && <button type="button" ref={financeMenuTriggerRef} aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} aria-controls="muf-finance-menu" onClick={toggleFinanceMenu} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
                 </div>
-                {id === 'ledger' && financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{label:'Feed',value:'feed'},{label:'Expenses',value:'expense'},{label:'Eggs',value:'egg'},{label:'Customers',value:'customers'},{label:'Suppliers',value:'suppliers'}].map(item => <button key={item.value} type="button" onClick={() => { setActiveTab('ledger'); setQuickOpenLedgerTab(item.value as 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers'); setFinanceMenuOpen(false); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800">{item.label}</button>)}</div>}
+                {id === 'ledger' && financeMenuOpen && createPortal(
+                <div
+                  id="muf-finance-menu"
+                  className="muf-finance-menu"
+                  role="group"
+                  aria-label={L('Finance sections')}
+                  style={financeMenuPosition}
+                >{[{label:'Feed',value:'feed'},{label:'Expenses',value:'expense'},{label:'Eggs',value:'egg'},{label:'Customers',value:'customers'},{label:'Suppliers',value:'suppliers'}].map(item => <button key={item.value} type="button" onClick={() => { setActiveTab('ledger'); setQuickOpenLedgerTab(item.value as 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers'); setFinanceMenuOpen(false); }} className="muf-finance-menu-item">{item.label}</button>)}</div>,
+                document.body
+              )}
               </div>
             );
           })}

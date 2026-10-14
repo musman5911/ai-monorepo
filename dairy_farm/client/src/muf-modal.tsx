@@ -164,7 +164,7 @@ export default function DetailModal({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.25, delay: 0.08 }}
-                className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain muf-scroll bg-white dark:bg-slate-900 dark:text-slate-200" style={{ padding: 'var(--pup-body-pad)', paddingBottom: 'max(1rem, env(safe-area-inset-bottom))', scrollbarGutter: 'stable' }}
+                className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain muf-scroll bg-white dark:bg-slate-900 dark:text-slate-200" style={{ padding: 'var(--pup-body-pad)', paddingBottom: 'max(var(--muf-space-4), env(safe-area-inset-bottom))', scrollbarGutter: 'stable' }}
               >
                 {children}
               </motion.div>
