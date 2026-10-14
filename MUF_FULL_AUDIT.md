@@ -57,6 +57,12 @@ The generated local MUF_STYLE_AUDIT.md contains the detailed per-project compone
 - Detail popups, form sheets and admin shells use the shared 70dvh mobile height cap. Longer content must scroll inside its popup.
 - Keep semantic warning, danger, success, chart and domain-status colors where they carry a different meaning.
 
+## Sticky header regression found after browser review
+
+The owner reported that Dairy's sticky header/navigation did not stay fixed on both mobile and desktop, while the other browser checks passed. Source inspection found `overflow-x-hidden` on Dairy's `#app-root`; unlike Flock's root, that class can establish an unwanted scroll container for sticky descendants. Commit `83e8b24` changes only this frontend class to `overflow-x-clip` and adds a Dairy-specific guard in `check-ui-safety.js`.
+
+Status: source fix committed; must verify by scrolling the page on mobile and desktop, and rerun the UI safety check and all three builds locally. Do not mark the runtime regression resolved until those checks are observed.
+
 ## Priority findings
 
 ### P0 — finish test setup

@@ -65,6 +65,10 @@ Centralize repeated visual decisions in MUF tokens/classes instead of repeating 
 - Dropdown menus must not be clipped by a horizontal scroll container. Keep their existing portal, outside-click and Escape behavior.
 - Existing custom overlays may be necessary for specialized image, QR or domain-specific behavior. Review each one before migrating it.
 
+Sticky layout rule:
+
+- Keep the shared `.muf-sticky-chrome` wrapper in normal document flow and sticky relative to the viewport. Avoid setting `overflow-x-hidden` or another scrolling overflow on an ancestor of sticky chrome unless the ancestor is intentionally the scroll container. Prefer `overflow-x-clip` for horizontal paint containment when supported by the project's browser targets, and verify mobile plus desktop scrolling in a real browser.
+
 ## 6. Accessibility and copy
 
 - Use the app's MUF confirmation/notification system, not browser-native alert, confirm or prompt.
