@@ -285,6 +285,8 @@ const INVARIANTS = [
   ['primary action uses canonical tokens', 'mufStyle', /\.muf-primary-action\s*\{[^}]*background:\s*linear-gradient\(135deg,\s*(var\(--muf-color-primary\)),\s*var\(--muf-color-primary-hover\)\)/],
   ['active navigation uses canonical tokens', 'mufStyle', /\.muf-nav-link\.active\s*\{[^}]*background:\s*linear-gradient\(135deg,\s*var\(--muf-color-primary\),\s*(var\(--muf-color-primary-hover\))\)/],
   ['detail action uses canonical tokens', 'mufStyle', /\.muf-detail-btn\s*\{[^}]*background:\s*(var\(--muf-color-primary\))/],
+  ['focus ring uses semantic success token', 'mufStyle', /--muf-ui-focus:\s*(var\(--muf-color-success\))/],
+  ['popup focus outline uses shared token', 'mufStyle', /\.muf-pup-sm textarea:focus-visible,[^}]*outline:\s*2px solid (var\(--muf-ui-focus\))/],
   ['photo viewer z-index token',    'mufStyle',    /--muf-z-photo: (1450)/],
   ['Notes MUF root class',          'mufDiary',    /className="(muf-notes)"/],
   ['scale: small title 0.875rem', 'mufStyle', /muf-pup-sm \{[^}]*--pup-title: (0\.875rem)/],

@@ -21,6 +21,8 @@ const PROJECTS = [
 ];
 const POPUP_SUFFIX = /(Modal|Popup|Dialog|Overlay|Sheet|Drawer|Lightbox)$/i;
 const EXPLICIT_POPUPS = new Set(['DetailModal', 'QrWaybillModal', 'CowDetailPopup', 'BirdDetailPopup']);
+/* Lucide icon suffixes can resemble popup types; this is an icon, not a modal. */
+const NON_POPUP_COMPONENTS = new Set(['FileSpreadsheet']);
 const STYLE_PROPERTIES = [
   'margin', 'marginTop', 'marginRight', 'marginBottom', 'marginLeft',
   'padding', 'paddingTop', 'paddingRight', 'paddingBottom', 'paddingLeft',
@@ -113,11 +115,13 @@ function collectFile(ts, sourceFile, project, absolutePath, source, popupRecords
       const tag = node.tagName.getText(sourceFile);
       const role = cleanExpression(attrText(ts, attr(ts, node, 'role'), sourceFile));
       const className = attrText(ts, attr(ts, node, 'className'), sourceFile);
-      const overlayClass = /(?:fixed\s+inset-0|inset-0\s+fixed|fixed\s+top-0\s+right-0\s+bottom-0\s+left-0)/.test(className);
+      const overlayClass = /(?:fixed\s+inset-0|inset-0\s+fixed|fixed\s+top-0\s+right-0\s+bottom-0\s+left-0)/.test(className) &&
+        !/\bpointer-events-none\b/.test(className);
       const hasDialogRole = role === 'dialog';
       const nativeDialog = tag.toLowerCase() === 'dialog';
       const directMufModal = tag === 'DetailModal';
-      const customPopupComponent = POPUP_SUFFIX.test(tag) || EXPLICIT_POPUPS.has(tag);
+      const customPopupComponent = !NON_POPUP_COMPONENTS.has(tag) &&
+        (POPUP_SUFFIX.test(tag) || EXPLICIT_POPUPS.has(tag));
       const sizeAttribute = attr(ts, node, 'size');
       const hasSpreadAttributes = node.attributes.properties.some((property) => ts.isJsxSpreadAttribute(property));
       const classifiedSize = classifyPopupSize(ts, sizeAttribute, sourceFile, hasSpreadAttributes);
@@ -348,7 +352,8 @@ function main() {
     '- DetailModal call sites are component uses, not unique visual designs or simultaneous open popups.',
     '- Size classification distinguishes a missing size prop, a dynamic expression, and a nonstandard literal. Dynamic expressions must be reviewed before being changed; they are not automatically defects.',
     '- Shared MUF shell implementation is included in the record data but excluded from custom-overlay candidate totals.',
-    '- Overlay candidates require a human review before migration to ensure dropdowns, camera/gallery viewers, and specialized flows keep their behavior.',
+    '- Decorative fixed full-screen layers with pointer-events-none are excluded from overlay candidates; specialized QR workflows and image/receipt lightboxes remain candidates for review.',
+    '- Popup suffix matching excludes known icon components such as FileSpreadsheet, whose name happens to end in "Sheet".',
     '- Inline style-object counts only cover JSX style={{ ... }} expressions in scanned TSX/JSX source.',
     '', '## TypeScript JSX parser diagnostics', '',
     parserIssues.length ? table(['File', 'Line', 'Parser message'], parserIssues.map((item) => [item.path, item.line, item.message])) : 'No TypeScript JSX parse diagnostics found.',

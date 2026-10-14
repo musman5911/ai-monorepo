@@ -46,56 +46,45 @@ Owner-provided results after pulling a510265:
 
 ## Phase 2 — popup and styling inventory
 
-**Status: audit scanner repaired and size classification hardened; refreshed local report pending.**
+**Status: source review completed; explicit size cleanup committed in this batch; regenerate and recheck the report after pulling.**
 
-The owner ran `node audit-muf-design-system.mjs` after commit `9088ac9`, and it failed to parse because two interpretation-note entries were accidentally joined by a malformed string. This batch repairs that syntax. It also distinguishes an absent `size` prop from boolean/empty invalid values and treats an absent direct prop on a JSX node with `{...props}` as dynamic, not definitely missing. The refreshed `.audit-output` report still needs to be generated against the local checkout after pulling this commit.
+The owner ran the repaired scanner on commit `8096d93`. It found 139 DetailModal call sites and no TypeScript JSX parser diagnostics:
 
-The table below records the first inventory only. Its `Unspecified` column mixes missing props, dynamic expressions and unsupported literals; do not treat it as a confirmed defect count. Summary:
+| App | DetailModal calls | Small | Big | Missing size | Dynamic size | Unsupported literal | Fixed-overlay candidates |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Agri | 35 | 21 | 13 | 0 | 1 | 0 | 1 |
+| Dairy | 35 | 24 | 9 | 0 | 2 | 0 | 3 |
+| Flock | 69 | 45 | 13 | 10 | 1 | 0 | 3 |
+| Total | 139 | 90 | 35 | 10 | 4 | 0 | 7 |
 
-| App | DetailModal calls | Small | Big | Unspecified | Custom overlay candidates |
-|---|---:|---:|---:|---:|---:|
-| Agri | 35 | 21 | 13 | 1 | 1 |
-| Dairy | 35 | 24 | 9 | 2 | 3 |
-| Flock | 69 | 45 | 13 | 11 | 3 |
-| Total | 139 | 90 | 35 | 14 | 7 |
+The ten missing sizes were all in Flock: eight dashboard detail popups and the bird add/edit forms. Source review assigned `big` to Financial Deficit, Feed Restock, Add Bird, and Edit Bird because they contain longer lists or multi-field forms. The remaining six dashboard metric popups now explicitly use `small`, preserving their previous default. No data flow or business logic changed. The next local scan should report zero missing sizes.
 
-The initial scan found zero custom dialog-role nodes and seven fixed-overlay candidates. The candidates require manual review and are not confirmed defects. The initial size summary grouped fourteen call sites as unspecified because the scanner did not separate missing props from dynamic expressions. The audit tool now classifies missing sizes, dynamic expressions, and unsupported literals separately; regenerate the local reports and use the revised split before assigning sizes.
+The four dynamic sizes are intentional wrappers: the shared FormOverlay component in each app forwards its `size` prop, and Dairy's local Dashboard Popup wrapper forwards its optional size (which defaults to small). These should remain dynamic rather than be replaced with hardcoded values.
 
-The detailed local reports are MUF_POPUP_INVENTORY.md, MUF_STYLE_AUDIT.md and MUF_UI_AUDIT.json inside .audit-output. The directory is ignored by Git.
+The initial seven fixed-overlay candidates included one decorative Dairy background layer with `pointer-events-none`; the scanner now excludes such noninteractive decorative layers. The six real specialized overlays are the three QR Waybill workflows, the Dairy cow-gallery lightbox, the Flock batch-gallery lightbox, and the Flock receipt-photo lightbox. Preserve these specialized interactions rather than forcing them into the shared dialog shell without a behavior-equivalence review. The scanner also excludes the Lucide `FileSpreadsheet` icon from popup-suffix matches.
+
+The local reports are `.audit-output/MUF_POPUP_INVENTORY.md`, `.audit-output/MUF_STYLE_AUDIT.md` and `.audit-output/MUF_UI_AUDIT.json`. They are ignored by Git and must be regenerated locally after this commit.
 
 ## Phase 3 — consolidate shared MUF styling
 
-**Batch 1 committed: canonical primary-action colors.** Shared primary action buttons, active top navigation, text actions, detail buttons and the admin active-tab underline now reference `--muf-color-primary` / `--muf-color-primary-hover`. `check-muf-sync.js` now enforces three primary-color invariants across all three stylesheets. This batch does not change spacing, dimensions, navigation behavior, or semantic status colors. The owner subsequently reported the browser checklist passed after `ea0dbcb`.
+**Batch 1 committed: canonical primary-action colors.** Shared primary action buttons, active top navigation, text actions, detail buttons and the admin active-tab underline now reference `--muf-color-primary` / `--muf-color-primary-hover`. The owner reported the browser checklist passed after `ea0dbcb`.
 
-**Batch 2 in this commit: exact duplicate CSS rule consolidation.** Across the three byte-identical `muf-style.css` twins, removed three earlier copies of the same admin-popup tab-nav override and one earlier copy each of the scrollbar, nav-link baseline, and main-table width rules. The final copy of each rule remains, so the effective final declarations are retained. This is source cleanup only; fresh sync/safety checks, builds, and browser verification for this batch remain pending.
+**Batch 2 committed: exact duplicate CSS rule consolidation.** Removed six redundant blocks from each shared stylesheet while retaining the final copy of each rule: three earlier admin-popup tab-nav overrides and earlier copies of the scrollbar, nav-link baseline and main-table width rules. The owner then confirmed the audit script, sync check, UI-safety check and all three project builds passed on commit `8096d93`.
 
+**Batch 3 in this commit: explicit popup sizing and focus-token consolidation.** The reviewed Flock popup call sites now declare a size explicitly; complex lists and add/edit forms use `big`, while compact dashboard metrics use `small`. Four focus-outline declarations now use `var(--muf-ui-focus)`, which aliases the existing `--muf-color-success` value (`#16a34a`), so the rendered color is unchanged. The sync checker now guards both token usage and the popup focus outline. The audit also excludes a decorative background and a false-positive icon suffix from the popup inventory.
 
-**Status: prior sticky-header and popup browser checks passed per owner; current CSS cleanup needs a fresh retest.**
+**Validation for batch 3 is pending.** After pulling, rerun the audit, sync and UI-safety checks and all three builds. Browser-check the four newly widened popups and focus rings before marking this batch fully complete.
 
-Latest fix commit: `83e8b24` (`Restore Dairy sticky header and navigation`).
+### Earlier popup sizing foundation
 
-The owner-provided UI-safety output caught a false failure in the new root-class guard. The guard used double-escaped `\s` and `\b` patterns, preventing it from reading the JSX class correctly. The checker expression is corrected in the next commit; rerun the safety script locally. In `dairy_farm/client/src/App.tsx`, the `#app-root` class changed from `overflow-x-hidden` to `overflow-x-clip`. The hidden overflow value can establish an unintended scrolling ancestor and prevent the viewport from driving `position: sticky`; clipping keeps horizontal paint overflow contained without creating that scroll container. `check-ui-safety.js` now checks that Dairy's root retains the safe clipping class.
+The shared mobile DetailModal, form sheet and admin shells use the canonical 70dvh maximum-height token; existing width gutters, inner scrolling, top-modal Escape handling, focus semantics and safe-area behavior must remain intact. Do not delete remaining repeated selectors or `!important` declarations solely to reduce their counts.
 
-No backend paths, business logic, APIs, permissions or features were changed. The source-level fix and checker update are committed; local browser and build results after this commit have not yet been observed.
+### Next work
 
-
-
-**Status: in progress.**
-
-Completed in commit a510265:
-
-- Aligned mobile form-sheet maximum height to the shared 70dvh token.
-- Replaced older admin-shell height overrides with the shared token plus a viewport safety margin.
-- Added a form-sheet height invariant to check-muf-sync.js.
-- Documented the rule in muf.md at the time of the commit; this documentation is being reorganized into muf-.md and muf-rules.md.
-
-Next tasks:
-
-1. Review the generated per-project TSX/HTML style findings.
-2. Prioritize repeated popup padding, heading/body type, forms, buttons, cards and responsive selectors.
-3. Consolidate duplicates carefully; a repeated CSS selector or !important declaration is not automatically safe to delete.
-4. Align documentation with the existing canonical color token roles.
-5. After each batch, run both MUF checks and all three frontend builds, then inspect affected pages in the browser.
+1. Regenerate the popup inventory and confirm zero missing `size` props among direct DetailModal uses.
+2. Use the detailed style audit to pick one narrow shared CSS consolidation batch at a time.
+3. Keep all three `muf-style.css` copies byte-identical.
+4. After each batch, run both MUF checks and all three frontend builds, then inspect affected pages in the browser.
 
 ## Phase 4 — development-only visual workbench
 

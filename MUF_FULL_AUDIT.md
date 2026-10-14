@@ -7,23 +7,27 @@ Scope: frontend popup inventory, shared CSS and MUF consistency. This is a stati
 ## Executive findings
 
 - 139 direct DetailModal call sites were reported by the audit script across the three apps.
-- The initial scanner grouped fourteen call sites as unspecified, mixing missing `size` props with dynamic expressions or nonstandard values. The scanner now separates missing sizes, dynamic expressions, and unsupported literals; the exact split awaits a fresh local audit run. Do not rewrite dynamic call sites without inspecting their usage.
-- The scanner reported seven custom fixed-overlay candidates. These need manual classification and are not automatically defects.
-- The first run of the revised size classifier failed because the generated interpretation-note strings contained a syntax error. This commit repairs the report text and separates missing props, dynamic expressions (including possible spread props) and unsupported literals. The exact refreshed split still depends on rerunning the audit against the local checkout.
+- The repaired scanner run on `8096d93` found ten missing size props, all in Flock, plus four intentional dynamic wrapper calls and no unsupported literals. This batch adds explicit sizes to those ten call sites; regenerate the report after pulling to verify the expected zero-missing result.
+- The supplied inventory initially reported seven fixed-overlay candidates. Source review found one decorative noninteractive background (now excluded) and six legitimate specialized overlays: three QR Waybill workflows and three gallery/receipt image lightboxes. Preserve these unless a shared-shell migration proves behavior-equivalent.
+- The audit syntax repair is verified in the owner's terminal; the latest supplied report showed no JSX parser diagnostics. This batch also excludes the false-positive `FileSpreadsheet` icon suffix and decorative fixed backgrounds from popup candidate counts.
 - All three copies of muf-style.css are byte-identical.
 - The shared CSS has a large cascade history. Consolidation should be incremental and backed by checks/browser review, not a delete-all-duplicates exercise.
 - The root Vitest test suite has not run on the owner's machine because the root Vitest executable is not installed, although the dependency is listed in the root package manifest and lockfile.
 
 ## Popup call-site inventory
 
-| App | DetailModal calls | Small | Big | Unspecified | Fixed-overlay candidates | Custom dialog-role nodes |
-|---|---:|---:|---:|---:|---:|---:|
-| Agri | 35 | 21 | 13 | 1 | 1 | 0 |
-| Dairy | 35 | 24 | 9 | 2 | 3 | 0 |
-| Flock | 69 | 45 | 13 | 11 | 3 | 0 |
-| Total | 139 | 90 | 35 | 14 | 7 | 0 |
+The owner-provided report generated on commit `8096d93` counted 139 direct DetailModal call sites and no TypeScript JSX parser diagnostics:
 
-These are JSX source call-site counts. They are not counts of unique visual designs or simultaneously open dialogs. The audit tool also reports other popup-like components, admin shell/menu calls, portal calls and inline style-object candidates in the local JSON report. A custom overlay may be a gallery, QR view, lightbox or other specialized interface; inspect its purpose before changing it.
+| App | DetailModal calls | Small | Big | Missing size | Dynamic size | Unsupported literal | Fixed-overlay candidates (initial scan) |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Agri | 35 | 21 | 13 | 0 | 1 | 0 | 1 |
+| Dairy | 35 | 24 | 9 | 0 | 2 | 0 | 3 |
+| Flock | 69 | 45 | 13 | 10 | 1 | 0 | 3 |
+| Total | 139 | 90 | 35 | 10 | 4 | 0 | 7 |
+
+After reviewing the ten missing-size Flock call sites, this commit assigns `big` to Financial Deficit, Feed Restock and the two bird add/edit forms, and explicit `small` sizes to the six compact dashboard metric popups. These are presentation-only changes. Regenerate the ignored local report after pulling to confirm the updated classification.
+
+The four dynamic-size calls are deliberate wrappers: one FormOverlay size-forwarder in each app and the local Popup wrapper in Dairy Dashboard. Keep these dynamic. The original seven overlay candidates included one Dairy decorative background with `pointer-events-none`; it is now excluded. The six real specialized overlays are the three QR Waybill flows and the Dairy cow-gallery, Flock batch-gallery and Flock receipt-photo lightboxes. The scanner also excludes `FileSpreadsheet`, a Lucide icon whose name triggered the generic `Sheet` suffix rule.
 
 ## Shared stylesheet source metrics
 
@@ -31,9 +35,9 @@ The following counts were calculated from the current shared stylesheet and are 
 
 | Metric | Current count |
 |---|---:|
-| Stylesheet source characters | 140,394 |
+| Stylesheet source characters | 140,459 |
 | Lines | 3,322 |
-| Hex color literal occurrences | 390 |
+| Hex color literal occurrences | 385 |
 | RGB/HSL literal occurrences | 135 |
 | !important declaration occurrences | 628 |
 | Fixed-unit dimension declaration matches | 980 |
@@ -76,15 +80,21 @@ Six redundant rule blocks were removed from each shared stylesheet copy, retaini
 
 Updated source-pattern metrics after cleanup: 140,394 characters, 3,322 lines, 390 hex literals, 135 RGB/HSL literals, 628 `!important` declarations, 980 fixed-unit dimension matches, 91 MUF variable names, 1,132 selector-block matches and 126 repeated selector names. These remain pattern counts, not direct quality scores. The local audit rerun, sync/safety scripts, builds and browser smoke check are pending for this batch.
 
+## Phase 3 styling batch 3 — explicit popup sizes and semantic focus token
+
+The ten missing-size Flock call sites from the owner's inventory were reviewed in context. Financial Deficit, Feed Restock, Add Bird and Edit Bird use the shared `big` size because they contain longer lists or multi-field forms; the remaining six compact dashboard metric popups explicitly use `small`, matching the DetailModal default. These are presentation-only changes.
+
+Four focus-ring rules now use `var(--muf-ui-focus)`, and that token aliases `var(--muf-color-success)`, preserving the prior `#16a34a` rendered color. Two MUF invariants guard the shared focus token and popup outline usage. The audit scanner excludes pointer-events-none decorative backgrounds and the false-positive `FileSpreadsheet` icon suffix. Sync checks, builds and browser review for this new batch must be run after pulling.
+
 ## Priority findings
 
 ### P0 — finish test setup
 
 The owner ran node check-muf-sync.js and node check-ui-safety.js successfully. build-all.bat reported successful builds for all three apps. npm test could not start: 'vitest' is not recognized, and npm ls vitest showed an empty installed dependency tree. The root manifest and lockfile do list Vitest. Install/restore root dependencies and rerun tests before claiming the test suite passes.
 
-### P1 — complete the popup inventory review
+### P1 — popup inventory review
 
-Regenerate the inventory with the improved scanner, then review missing-size and dynamic-size call sites separately. Review the seven fixed-overlay candidates and keep specialized interactions where required; migrate only where the shared shell can preserve behavior.
+The owner ran the revised inventory and supplied `MUF_POPUP_INVENTORY.md`. The ten missing Flock sizes and overlay candidates were reviewed at source level; this commit makes missing sizes explicit and corrects known scanner false positives. Re-run the audit to verify the refreshed inventory. Keep the four wrapper-driven dynamic sizes and six specialized overlays unchanged.
 
 ### P1 — remove competing popup-size declarations safely
 
@@ -100,13 +110,15 @@ After shared component styles stabilize, build editing-x-projetcs.tsx with Puck 
 
 ## Validation history and limitations
 
-Most recent owner-provided output, after pulling commit a510265:
+Owner-provided validation after pulling commit `8096d93`:
 
-- node check-muf-sync.js: PASS, including the 70dvh and form-overlay height invariant.
-- node check-ui-safety.js: PASS for the listed shared popup and UI safety invariants.
-- build-all.bat: Dairy, Flock and Agri all reported Build successful.
-- npm test: NOT RUN; the command could not find the root Vitest executable.
-- Browser verification of the new form-sheet/admin cap: PENDING.
+- `node --check audit-muf-design-system.mjs`: PASS.
+- `node audit-muf-design-system.mjs`: PASS; report output listed 139 DetailModal calls and no JSX parser diagnostics.
+- `node check-muf-sync.js`: PASS, including shared CSS parity and popup/color invariants.
+- `node check-ui-safety.js`: PASS for the listed shared popup and UI safety invariants.
+- `build-all.bat`: Dairy, Flock and Agri all reported Build successful.
+- Root Vitest suite: NOT RUN; its executable was not installed in the earlier owner-provided state.
+- Browser verification of this new explicit-size/focus-token batch: PENDING.
 
 ## Maintainer rule
 

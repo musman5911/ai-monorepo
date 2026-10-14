@@ -765,6 +765,7 @@ export default function FlockRegister({
         subtitle={L('Register new bird acquisition records')}
         icon={<BirdIcon className="w-5 h-5" />}
         iconBg="bg-farm-100 text-farm-700"
+        size="big"
       >
         <form onSubmit={handleAddSubmit} className="space-y-4">
           {birdFormFields}
@@ -783,6 +784,7 @@ export default function FlockRegister({
         subtitle={selectedBird ? `Modify ${selectedBird.name} — price, status, or details` : undefined}
         icon={<Pencil className="w-5 h-5" />}
         iconBg="bg-farm-100 text-farm-700"
+        size="big"
       >
         <form onSubmit={handleEditSubmit} className="space-y-4">
           {birdFormFields}

@@ -848,7 +848,7 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'deficit'} onClose={closeModal}
         title="Financial Deficit" subtitle={`Current shortfall: ${formatRs(Math.abs(netProfitLoss))}`}
-        icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+        icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" size="big">
         <div className="grid grid-cols-2 gap-3 mb-5">
           <MiniStat label={L('Total Income')} value={formatRs(totalIncome)} color="emerald" />
           <MiniStat label={L('Total Expenses')} value={formatRs(totalExpense)} color="rose" />
@@ -904,7 +904,7 @@ export default function Dashboard({
       <DetailModal open={modal === 'feedRestock'} onClose={closeModal}
         title={L('Feed Restock')}
         subtitle={feedStockRemainingKg !== null ? `~${Math.round(feedStockRemainingKg)} kg remaining` : `${feedRestockReminders.length} feed type${feedRestockReminders.length === 1 ? '' : 's'} need attention`}
-        icon={<Package className="w-5 h-5" />} iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">
+        icon={<Package className="w-5 h-5" />} iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300" size="big">
         {feedStockRemainingKg !== null ? (
           <div className="p-3 mb-3 rounded-xl bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900">
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
@@ -971,7 +971,7 @@ export default function Dashboard({
       <DetailModal open={modal === 'net'} onClose={closeModal}
         title="Net Profit / Loss" subtitle={`${netProfitLoss >= 0 ? 'Profitable' : 'Running at a loss'} · ${rangeLabel}`}
         icon={netProfitLoss >= 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
-        iconBg={netProfitLoss >= 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'}>
+        iconBg={netProfitLoss >= 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'} size="small">
         <div className="grid grid-cols-2 gap-3 mb-5">
           <MiniStat label={L('Income')} value={formatRs(totalIncome)} color="emerald" />
           <MiniStat label={L('Expenses')} value={formatRs(totalExpense)} color="rose" />
@@ -985,7 +985,7 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'roi'} onClose={closeModal}
         title="Return on Investment" subtitle={`${roiPercent.toFixed(1)}% · ${rangeLabel}`}
-        icon={<Percent className="w-5 h-5" />} iconBg="bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300">
+        icon={<Percent className="w-5 h-5" />} iconBg="bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300" size="small">
         <div className="text-center py-6">
           <div className={`text-5xl font-black font-mono ${roiPercent >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>{roiPercent.toFixed(1)}%</div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
@@ -1098,7 +1098,7 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'eggEfficiency'} onClose={closeModal}
         title="Egg Production Efficiency" subtitle={`${avgEggsPerHenPerDay.toFixed(2)} eggs/hen/day · ${rangeLabel}`}
-        icon={<Egg className="w-5 h-5" />} iconBg="bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300">
+        icon={<Egg className="w-5 h-5" />} iconBg="bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300" size="small">
         <div className="text-center py-4">
           <div className="text-5xl font-black font-mono text-teal-600 dark:text-teal-400">{avgEggsPerHenPerDay.toFixed(2)}</div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">eggs per hen per day</p>
@@ -1116,7 +1116,7 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'costEgg'} onClose={closeModal}
         title="Cost Per Egg" subtitle={`${formatRs(costPerEggValue)} · ${rangeLabel}`}
-        icon={<Coins className="w-5 h-5" />} iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">
+        icon={<Coins className="w-5 h-5" />} iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300" size="small">
         <div className="text-center py-4">
           <div className="text-5xl font-black font-mono text-orange-600 dark:text-orange-400">{formatRs(costPerEggValue)}</div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">cost to produce 1 egg</p>
@@ -1133,7 +1133,7 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'costBird'} onClose={closeModal}
         title="Cost Per Bird" subtitle={`${formatRs(costPerBirdValue)} · ${rangeLabel}`}
-        icon={<DollarSign className="w-5 h-5" />} iconBg="bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950 dark:text-fuchsia-300">
+        icon={<DollarSign className="w-5 h-5" />} iconBg="bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950 dark:text-fuchsia-300" size="small">
         <div className="text-center py-4">
           <div className="text-5xl font-black font-mono text-fuchsia-600 dark:text-fuchsia-400">{formatRs(costPerBirdValue)}</div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">cost per active bird</p>
@@ -1146,7 +1146,7 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'feedPerBird'} onClose={closeModal}
         title="Feed Per Bird (This Month)" subtitle={`${feedKgPerBird.toFixed(1)} kg/bird · ${monthPrefix}`}
-        icon={<Package className="w-5 h-5" />} iconBg="bg-lime-100 text-lime-700 dark:bg-lime-950 dark:text-lime-300">
+        icon={<Package className="w-5 h-5" />} iconBg="bg-lime-100 text-lime-700 dark:bg-lime-950 dark:text-lime-300" size="small">
         <div className="text-center py-4">
           <div className="text-5xl font-black font-mono text-lime-600 dark:text-lime-400">{feedKgPerBird.toFixed(1)}<span className="text-2xl text-lime-500"> kg</span></div>
         </div>

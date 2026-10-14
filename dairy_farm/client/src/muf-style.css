@@ -1625,7 +1625,7 @@ html, body {
   transition: color .16s ease, background-color .16s ease, box-shadow .16s ease;
 }
 .muf-admin-shell .muf-nav-link:focus-visible {
-  outline: 2px solid #16a34a;
+  outline: 2px solid var(--muf-ui-focus);
   outline-offset: -2px;
 }
 .muf-admin-shell .muf-nav-link.active {
@@ -1959,7 +1959,7 @@ html, body {
 .muf-pup-sm input:focus-visible, .muf-pup-lg input:focus-visible,
 .muf-pup-sm select:focus-visible, .muf-pup-lg select:focus-visible,
 .muf-pup-sm textarea:focus-visible, .muf-pup-lg textarea:focus-visible {
-  outline: 2px solid #16a34a; outline-offset: 2px;
+  outline: 2px solid var(--muf-ui-focus); outline-offset: 2px;
 }
 .muf-main-content table { max-width: 100%; }
 .muf-main-content th, .muf-main-content td { overflow-wrap: anywhere; }
@@ -1997,7 +1997,7 @@ html, body {
 .muf-cow-pnl-compact { min-width: 0; }
 .muf-cow-pnl-compact img { display: block; }
 .muf-cow-pnl-compact button { border-radius: 14px; }
-.muf-cow-pnl-compact button:focus-visible { outline: 2px solid #16a34a; outline-offset: 3px; }
+.muf-cow-pnl-compact button:focus-visible { outline: 2px solid var(--muf-ui-focus); outline-offset: 3px; }
 
 /* Unified health workspaces: clearer section hierarchy and more compact records. */
 .muf-health-redesign .muf-page-hero { border: 1px solid rgba(148, 163, 184, .22); border-radius: 20px; padding: clamp(14px, 2.2vw, 22px); background: linear-gradient(120deg, rgba(16, 185, 129, .08), rgba(255, 255, 255, .86) 58%, rgba(251, 191, 36, .08)); box-shadow: 0 8px 24px rgba(15, 23, 42, .035); }
@@ -2024,7 +2024,7 @@ html, body {
 .muf-milk-redesign table thead th { white-space: nowrap; }
 .muf-milk-redesign table tbody tr { transition: background-color .14s ease; }
 .muf-milk-redesign input, .muf-milk-redesign select { max-width: 100%; }
-.muf-milk-redesign .muf-panel button:focus-visible { outline: 2px solid #16a34a; outline-offset: 2px; }
+.muf-milk-redesign .muf-panel button:focus-visible { outline: 2px solid var(--muf-ui-focus); outline-offset: 2px; }
 .muf-popup-stage .muf-milk-redesign table th, .muf-popup-stage .muf-milk-redesign table td { padding: 9px 10px; }
 
 /* Superadmin is intentionally consistent across all three standalone apps. */
@@ -2063,7 +2063,7 @@ html, body {
   --muf-ui-radius-card: 18px;
   --muf-ui-radius-control: 10px;
   --muf-ui-border: rgba(148, 163, 184, .24);
-  --muf-ui-focus: #16a34a;
+  --muf-ui-focus: var(--muf-color-success);
   --muf-ui-shadow-soft: 0 5px 18px rgba(15, 23, 42, .045);
 }
 
