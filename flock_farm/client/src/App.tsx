@@ -528,7 +528,7 @@ export default function App() {
     }
   };
 
-  const handleSaveDiary = async (entry: DiaryEntry) => {
+  const handleSaveDiary = async (entry: MufDiaryEntry) => {
     if (!canLogDaily) throw new Error(L('You do not have permission to edit diary notes.'));
     const entryId = entry.id || ('legacy-' + entry.date);
     const existing = diary.filter((item) => !(entry.originalDate && entry.originalDate !== entry.date &&

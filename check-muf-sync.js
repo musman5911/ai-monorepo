@@ -280,7 +280,7 @@ const INVARIANTS = [
   ['popup width small (MUF token)', 'detailModal', /size === 'small'.{0,10}(muf-pup-width-sm)/],
   ['popup width big (MUF token)',   'detailModal', /: '(muf-pup-width-lg)'/],
   ['popup max height (MUF card)',   'detailModal', /(muf-pup-card)/],
-  ['popup mobile height token',     'mufStyle',    /--muf-popup-mobile-max-height: (82dvh)/],
+  ['popup mobile height token',     'mufStyle',    /--muf-popup-mobile-max-height: (70dvh)/],
   ['photo viewer z-index token',    'mufStyle',    /--muf-z-photo: (1450)/],
   ['Notes MUF root class',          'mufDiary',    /className="(muf-notes)"/],
   ['scale: small title 0.875rem', 'mufStyle', /muf-pup-sm \{[^}]*--pup-title: (0\.875rem)/],
