@@ -5385,8 +5385,8 @@ function App() {
         icon={<Database size={16} />}
        size="big">
         {selectedLedgerGroup && (
-          <div className="space-y-4 text-slate-800 dark:text-slate-100">
-            <div className="flex justify-between items-center p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
+          <div className="muf-ledger-group-content space-y-3 sm:space-y-4 text-slate-800 dark:text-slate-100">
+            <div className="muf-ledger-net-balance flex justify-between items-center p-3 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40">
               <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">{L('Folder Net Balance')}</span>
               <strong className={`font-black text-base ${selectedLedgerGroup.net >= 0 ? 'text-farm-600 dark:text-farm-400' : 'text-red-500'}`}>
                 Rs. {formatCurrency(selectedLedgerGroup.net)}
@@ -5394,7 +5394,7 @@ function App() {
             </div>
 
             <div className="overflow-x-auto">
-              <table className="muf-reflow w-full text-left border-collapse text-xs md:text-sm">
+              <table className="muf-reflow muf-ledger-records w-full text-left border-collapse text-xs md:text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 dark:border-slate-800">
                     <th className="px-4 py-3">{L('Date')}</th>
@@ -5414,12 +5414,14 @@ function App() {
                       }}
                       className="hover:bg-slate-100/40 dark:hover:bg-slate-900/30 transition-colors cursor-pointer"
                     >
-                      <td className="px-4 py-4 text-slate-500 whitespace-nowrap">{f.date}</td>
-                      <td className="px-4 py-4">
-                        <div className="font-extrabold text-slate-800 dark:text-slate-100">{f.receipt_base64 ? '📷 ' : ''}{f.category}</div>
-                        {f.notes && <div className="text-[11px] text-slate-500 dark:text-slate-400 max-w-[220px] break-words mt-0.5">{f.notes}</div>}
+                      <td data-label={L('Date')} className="px-2 sm:px-4 py-2 sm:py-4 text-slate-500 whitespace-nowrap">{f.date}</td>
+                      <td data-label={L('Description')} className="px-2 sm:px-4 py-2 sm:py-4">
+                        <div className="muf-ledger-description min-w-0">
+                          <div className="font-extrabold text-slate-800 dark:text-slate-100">{f.receipt_base64 ? '📷 ' : ''}{f.category}</div>
+                          {f.notes && <div className="text-[11px] text-slate-500 dark:text-slate-400 break-words mt-0.5">{f.notes}</div>}
+                        </div>
                       </td>
-                      <td className="px-4 py-4 text-right whitespace-nowrap">
+                      <td data-label={L('Ledger Flow')} className="px-2 sm:px-4 py-2 sm:py-4 text-right whitespace-nowrap">
                         <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase border ${
                           f.type === 'expense' 
                             ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400' 
@@ -5430,7 +5432,7 @@ function App() {
                         </span>
                       </td>
                       {userRole === 'admin' && (
-                        <td data-label={L('Actions')} className="px-4 py-4 text-right whitespace-nowrap" onClick={e => e.stopPropagation()}>
+                        <td data-label={L('Actions')} className="px-2 sm:px-4 py-2 sm:py-4 text-right whitespace-nowrap" onClick={e => e.stopPropagation()}>
                           <div className="inline-flex gap-1 justify-end">
                             <button onClick={() => { handleEditFinance(f); setSelectedLedgerGroup(null); }} className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-farm-500 rounded-lg cursor-pointer transition-colors" title={L('Edit Log')} aria-label={L('Edit ledger entry')}>
                               <Edit3 size={14} />

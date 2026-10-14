@@ -2728,7 +2728,7 @@ body[data-ff-scroll-y] .muf-fab-root { display: none; }
   --muf-popup-small-width: min(92vw, 28rem);
   --muf-popup-big-width: min(94vw, 42rem, 100vh);
   --muf-popup-max-height: min(86vh, 720px);
-  --muf-popup-mobile-max-height: 82dvh;
+  --muf-popup-mobile-max-height: 70dvh;
   --muf-popup-mobile-gutter: 16px;
   --muf-admin-surface: #fffefb;
   --muf-admin-border: #e6e6de;
@@ -3216,4 +3216,102 @@ textarea:disabled { cursor: not-allowed; }
   position: relative !important;
   top: auto !important;
   z-index: 1 !important;
+}
+
+/* MUF canonical color roles, shared by Agri, Dairy and Flock. */
+:root {
+  --muf-color-primary: #136334;
+  --muf-color-primary-hover: #105229;
+  --muf-color-success: #16a34a;
+  --muf-color-page: #f8fafc;
+  --muf-color-surface: #fffefb;
+  --muf-color-surface-alt: #f1f5f9;
+  --muf-color-text: #1e293b;
+  --muf-color-text-muted: #64748b;
+  --muf-color-border: #e6e6de;
+  --muf-color-danger: #dc2626;
+  --muf-color-warning: #d97706;
+  --muf-primary: var(--muf-color-primary);
+  --muf-primary-hover: var(--muf-color-primary-hover);
+  --muf-brand-primary: var(--muf-color-primary);
+  --muf-brand-primary-hover: var(--muf-color-primary-hover);
+  --muf-green: var(--muf-color-primary);
+  --muf-green-2: var(--muf-color-success);
+  --muf-green-dark: var(--muf-color-primary-hover);
+  --muf-ink: var(--muf-color-text);
+  --muf-ink-soft: var(--muf-color-text-muted);
+  --muf-line: var(--muf-color-border);
+  --muf-surface: var(--muf-color-surface);
+  --muf-surface-alt: var(--muf-color-surface-alt);
+  --muf-danger: var(--muf-color-danger);
+}
+.dark {
+  --muf-color-page: #070b13;
+  --muf-color-surface: #0d1a11;
+  --muf-color-surface-alt: #0f172a;
+  --muf-color-text: #e2e8f0;
+  --muf-color-text-muted: #94a3b8;
+  --muf-color-border: #203528;
+  --muf-field-bg: #1e293b;
+  --muf-field-line: #334155;
+}
+::selection { background: var(--muf-color-primary, #136334); color: #fff; }
+::-moz-selection { background: var(--muf-color-primary, #136334); color: #fff; }
+.dark ::selection,
+.dark ::-moz-selection { background: var(--muf-color-primary, #136334); color: #fff; }
+
+/* All small/big/admin popups share the 70% mobile height cap. Keep width gutters. */
+@media (max-width: 640px) {
+  :root { --muf-popup-mobile-max-height: 70dvh; }
+  .muf-overlay .muf-pup-card {
+    box-sizing: border-box;
+    max-height: var(--muf-popup-mobile-max-height) !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .muf-overlay .muf-pup-card.muf-pup-width-sm {
+    width: calc(100vw - 48px) !important;
+    max-width: calc(100vw - 48px) !important;
+  }
+  .muf-overlay .muf-pup-card.muf-pup-width-lg {
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+  .muf-overlay .muf-admin-shell-card[role="dialog"] {
+    box-sizing: border-box !important;
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+    max-height: min(70dvh, calc(100dvh - 24px)) !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .muf-overlay .muf-pup-card.muf-pup-sm {
+    --pup-head-pad: 9px;
+    --pup-body-pad: 10px;
+    --pup-gap: 6px;
+    --pup-icon: 28px;
+  }
+  .muf-overlay .muf-pup-card.muf-pup-lg {
+    --pup-head-pad: 9px;
+    --pup-body-pad: 12px;
+    --pup-gap: 6px;
+    --pup-icon: 28px;
+  }
+  .muf-overlay .muf-ledger-group-content { gap: 8px !important; }
+  .muf-overlay .muf-ledger-net-balance { gap: 8px; padding: 10px !important; }
+  .muf-overlay .muf-ledger-net-balance > span { font-size: 10px; letter-spacing: .06em; }
+  .muf-overlay .muf-ledger-net-balance > strong { font-size: 15px; text-align: right; }
+  .muf-overlay table.muf-ledger-records tbody { gap: 6px; }
+  .muf-overlay table.muf-ledger-records tr { padding: 5px 8px; }
+  .muf-overlay table.muf-ledger-records td { gap: 8px; padding: 4px 1px !important; line-height: 1.3; }
+  .muf-overlay table.muf-ledger-records td::before { flex-basis: 29%; font-size: 9px; }
+  .muf-overlay table.muf-ledger-records .muf-ledger-description {
+    display: block; width: 100%; max-width: 100%; text-align: right; overflow-wrap: anywhere;
+  }
+  .muf-overlay table.muf-ledger-records .muf-ledger-description > div + div { margin-top: 2px !important; }
+}
+@media (max-width: 380px) {
+  .muf-overlay .muf-pup-card.muf-pup-width-sm { width: calc(100vw - 40px) !important; max-width: calc(100vw - 40px) !important; }
+  .muf-overlay .muf-pup-card.muf-pup-width-lg { width: calc(100vw - 24px) !important; max-width: calc(100vw - 24px) !important; }
+  .muf-overlay .muf-admin-shell-card[role="dialog"] { width: calc(100vw - 24px) !important; max-width: calc(100vw - 24px) !important; }
 }
