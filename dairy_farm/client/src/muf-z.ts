@@ -12,6 +12,7 @@ export const MUF_Z = {
   POPUP: 1000,     // level-1 popup (DetailModal base)
   POPUP_STEP: 50,  // add per nesting level: 1000, 1050, 1100, 1150 ...
   SEARCH: 1400,    // full-screen / sheet search overlay
+  PHOTO: 1450,     // MUF photo viewer, above popups and search but below confirms
   CONFIRM: 1500,   // confirm + prompt dialogs
   TOAST: 1600,     // notify / sync toasts (always visible)
   WHATSNEW: 1700,  // What's New overlay

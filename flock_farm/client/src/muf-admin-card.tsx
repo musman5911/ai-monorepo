@@ -21,19 +21,19 @@ export default function MufAdminCard({
   icon, title, subtitle, children, className = '',
 }: MufAdminCardProps) {
   return (
-    <div className={`muf-admin-card bg-white dark:bg-slate-900/70 border border-slate-200/90 dark:border-slate-700/80 rounded-2xl overflow-hidden shadow-sm shadow-slate-900/[0.04] dark:shadow-black/20 transition-colors ${className}`}>
-      <div className="flex items-center gap-3 px-4 py-3.5 border-b border-slate-100 dark:border-slate-700/80 bg-gradient-to-r from-slate-50 to-white dark:from-slate-900 dark:to-slate-900/70">
+    <div className={`muf-admin-card overflow-hidden transition-colors ${className}`}>
+      <div className="muf-admin-card-head">
         {icon && (
-          <span className="text-farm-600 dark:text-emerald-400 shrink-0 rounded-xl bg-farm-50 dark:bg-emerald-950/40 p-2">{icon}</span>
+          <span className="muf-admin-card-icon">{icon}</span>
         )}
         <div className="min-w-0">
-          <h3 className="text-sm font-extrabold tracking-tight text-slate-900 dark:text-slate-50 truncate">{title}</h3>
+          <h3 className="muf-admin-card-title truncate">{title}</h3>
           {subtitle && (
-            <p className="text-xs leading-snug text-slate-500 dark:text-slate-400 truncate">{subtitle}</p>
+            <p className="muf-admin-card-subtitle truncate">{subtitle}</p>
           )}
         </div>
       </div>
-      <div className="p-4 sm:p-5 space-y-1">
+      <div className="muf-admin-card-body">
         {children}
       </div>
     </div>

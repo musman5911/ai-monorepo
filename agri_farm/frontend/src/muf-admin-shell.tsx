@@ -109,8 +109,8 @@ export default function MufAdminShell({
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         transition={{ duration: 0.18 }}
-        className="ff-modal-host muf-popup-stage muf-overlay modal-overlay fixed top-0 left-0 w-screen z-[var(--muf-z-hub)] flex items-center justify-center p-4 sm:p-4 bg-black/75 backdrop-blur-xs"
-        style={{ width: '100vw' }}
+        className="ff-modal-host muf-popup-stage muf-overlay muf-admin-backdrop modal-overlay fixed inset-0 z-[var(--muf-z-hub)] flex items-center justify-center"
+        
         ref={overlayRef}
         onClick={onClose}
         role="presentation"
@@ -120,7 +120,7 @@ export default function MufAdminShell({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.98, y: 2 }}
           transition={modalSpring}
-          className="muf-admin-shell w-full max-w-4xl max-h-[88vh] sm:max-h-[88vh] bg-[#fffefb] dark:bg-[#0d1a11] border border-[#e6e6de] dark:border-[#203528] rounded-2xl sm:rounded-[20px] shadow-2xl shadow-black/30 flex flex-col overflow-hidden text-slate-800 dark:text-slate-100"
+          className="muf-admin-shell muf-admin-shell-card flex flex-col overflow-hidden"
           ref={cardRef}
           tabIndex={-1}
           role="dialog"
@@ -129,26 +129,26 @@ export default function MufAdminShell({
           onClick={(event) => event.stopPropagation()}
         >
           {/* Header — PINNED at top (icon + title + close) */}
-          <div className="muf-admin-header flex items-center justify-between border-b border-[#e6e6de] dark:border-[#203528] shrink-0" style={{ padding: 'var(--pup-head-pad)', gap: 'var(--pup-gap)' }}>
+          <div className="muf-admin-shell-header flex items-center justify-between shrink-0" style={{ padding: 'var(--pup-head-pad)', gap: 'var(--pup-gap)' }}>
             <div className="flex items-center gap-3 min-w-0">
               <motion.div
                 initial={{ scale: 0, rotate: -10 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ type: 'spring', stiffness: 400, damping: 18, delay: 0.06 }}
-                className="p-2 w-10 h-10 bg-farm-900/20 text-farm-600 dark:text-farm-400 rounded-xl flex items-center justify-center shrink-0"
+                className="muf-admin-shell-icon shrink-0"
               >
                 {icon}
               </motion.div>
               <div className="min-w-0">
-                <h2 id={titleId} className="muf-pup-title font-black text-slate-800 dark:text-white truncate">{title}</h2>
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest mt-0.5 truncate">
+                <h2 id={titleId} className="muf-pup-title muf-admin-shell-title truncate">{title}</h2>
+                <p className="muf-admin-shell-subtitle truncate">
                   {subtitle}
                 </p>
               </div>
             </div>
             <div className="flex items-center gap-0.5 sm:gap-1 shrink-0">
               {headerActions}
-              <motion.button whileHover={{ rotate: 90 }} whileTap={{ scale: 0.9 }} onClick={onClose} aria-label={L('Close')} className="w-9 h-9 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 transition">
+              <motion.button whileHover={{ rotate: 90 }} whileTap={{ scale: 0.9 }} onClick={onClose} aria-label={L('Close')} className="muf-admin-shell-close transition">
                 <X className="w-5 h-5" />
               </motion.button>
             </div>
@@ -184,11 +184,11 @@ export default function MufAdminShell({
             </div>
 
             {/* Section content */}
-            <div className="p-4 sm:p-5 muf-admin-content">
+            <div className="muf-admin-content">
               {children}
             </div>
           </motion.div>
-          <div className="muf-admin-footer shrink-0 flex items-center justify-between gap-3 px-4 sm:px-5 py-2.5 border-t border-[#e6e6de] dark:border-[#203528] text-[10px] text-slate-500 dark:text-slate-400">
+          <div className="muf-admin-footer shrink-0 flex items-center justify-between gap-3">
             <span className="font-bold tracking-wider uppercase">{L('Farm management')}</span>
             <span>{L('Settings & administration')}</span>
           </div>

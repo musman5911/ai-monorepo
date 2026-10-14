@@ -77,7 +77,7 @@ export default function DetailModal({
     };
   }, [open]);
 
-  const widthCls = size === 'small' ? 'w-[calc(100vw-2rem)] sm:w-[min(92vw,28rem)]' : 'w-[calc(100vw-1rem)] sm:w-[min(90vw,42rem,100vh)]';
+  const widthCls = size === 'small' ? 'muf-pup-width-sm' : 'muf-pup-width-lg';
   const alignCls = 'items-center';
   const computedZ = zIndex ?? (MUF_Z.POPUP + Math.max(0, stackLevel - 1) * MUF_Z.POPUP_STEP);
   const isChild = !!onBack;
@@ -88,7 +88,7 @@ export default function DetailModal({
         {open && (
           <div
             key={modalId}
-            className={`ff-modal-host muf-overlay fixed inset-0 flex ${alignCls} justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto muf-scroll`}
+            className={`ff-modal-host muf-overlay muf-popup-overlay fixed inset-0 flex ${alignCls} justify-center pointer-events-none overflow-y-auto muf-scroll`}
             style={{ zIndex: computedZ }}
           >
             {/* Backdrop: when this is a child modal (on top of another modal), darken a little more so layering is obvious */}
@@ -122,7 +122,7 @@ export default function DetailModal({
                 if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
                 else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
               }}
-              className={`relative pointer-events-auto outline-none my-2 sm:my-0 max-h-[88vh] sm:max-h-[86vh] ${widthCls} ${size === 'small' ? 'muf-pup-sm' : 'muf-pup-lg'} bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden ${isChild ? 'ring-2 ring-emerald-400/30' : ''}`}
+              className={`muf-pup-card relative pointer-events-auto outline-none my-2 sm:my-0 ${widthCls} ${size === 'small' ? 'muf-pup-sm' : 'muf-pup-lg'} bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl shadow-2xl border border-slate-200 dark:border-slate-800 flex flex-col overflow-hidden ${isChild ? 'ring-2 ring-emerald-400/30' : ''}`}
             >
               <div className="flex items-start sm:items-center justify-between border-b border-slate-100 dark:border-slate-800 bg-gradient-to-br from-slate-50 to-white/95 dark:from-slate-800 dark:to-slate-800/90 backdrop-blur" style={{ padding: 'var(--pup-head-pad)', gap: 'var(--pup-gap)' }}>
                 <div className="flex items-center gap-2 sm:gap-3 min-w-0">

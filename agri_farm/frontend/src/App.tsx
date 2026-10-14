@@ -2442,8 +2442,8 @@ function App() {
               <button
                 className="muf-icon-button"
                 onClick={() => setDiaryOpen(true)}
-                title={L('Diary')}
-                aria-label={L('Diary')}
+                title={L('Notes')}
+                aria-label={L('Notes')}
               >
                 <BookOpen size={19}/>
               </button>
@@ -5662,7 +5662,7 @@ function App() {
       </DetailModal>
 
       {/* Shared diary popup: entries, media, links and sharing */}
-      <DetailModal open={diaryOpen} onClose={() => setDiaryOpen(false)} title={L('Diary')}
+      <DetailModal open={diaryOpen} onClose={() => setDiaryOpen(false)} title={L('Notes')}
         subtitle={L('Daily notes and observations')} icon={<BookOpen size={16} />} size="big">
         <MufDiary
           entries={diaryEntries}

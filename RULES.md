@@ -174,6 +174,7 @@ not exist; anything in this list must exist in the apps marked.
 | `muf-compare` | all 3 | month-over-month helpers (`pctChange`, `trendArrow`, `sameMonthLastYearKey`) |
 | `muf-confirm` | all 3 | styled replacement for `alert` / `confirm` / `prompt` |
 | `muf-date` | all 3 | local-timezone day helpers (`mufToday`, `mufMonth`, `mufShiftDays`) |
+| `muf-diary` | all 3 | shared Notes list, editor, viewer, image viewer and MUF styling |
 | `muf-entity-grid` | all 3 | responsive grid view for entities (cows, birds, crops) |
 | `muf-farm-profile` | all 3 | "My Farms" cross-farm summary card |
 | `muf-farmbook` | all 3 | printable farm book PDF |
@@ -202,7 +203,7 @@ not exist; anything in this list must exist in the apps marked.
 | `muf-z` | all 3 | z-index hierarchy constants |
 | `muf-zakat` | all 3 | zakat + ushr statement PDF |
 
-**Frontend totals:** 34 files in dairy+flock, 32 in agri. The 3 deltas are
+**Frontend totals:** 35 files in dairy+flock, 33 in agri. The 3 deltas are
 all documented above (`muf-avatar`, `muf-feedstock`, `muf-khata` are
 domain-exceptions — animal-specific concerns that don't apply to crops).
 `muf-voice` was previously a feature-gap but the twin file now exists in
@@ -405,6 +406,14 @@ do not silently "fix" either side.*
 - Popup changes must preserve the existing small/big size API and shared MUF
   component interfaces. Test Escape, backdrop clicks, nested dialogs, scrolling,
   focus behavior, and mobile keyboard/viewport conditions.
+- `muf-diary.tsx` is a shared MUF twin and MUST stay byte-identical in all 3 apps.
+  Register it in `check-muf-sync.js` and `check-ui-safety.js`.
+- Popup tables MUST keep column headings readable on phones. Use a horizontal
+  scroll area with non-collapsing headings, or a compact record/card list with
+  detail content in a popup. Never allow headings to wrap one character per line.
+- Prefer MUF design tokens/classes for popup widths, heights, padding, spacing,
+  text scale, colors, controls and stacking. Avoid per-screen overrides when a
+  shared MUF rule can solve the same problem.
 - Shared MUF twins must be changed together in all three apps. Run both
   `node check-muf-sync.js` and `node check-ui-safety.js` after shared UI changes.
 - Use MUF notifications rather than browser-native `alert`, `confirm`, or
@@ -422,9 +431,10 @@ do not silently "fix" either side.*
 
 ## 14. Current popup sizing and screen refinement
 
-- Small detail popup width remains `28rem` at desktop breakpoints.
-- Big detail popups use a `42rem` desktop maximum and a viewport-height cap to avoid oversized wide forms on short desktop screens.
-- The admin shell uses `max-w-4xl`, an `88vh` maximum height, a sticky tab strip, and a visible footer.
+- Small detail popups use the shared `--muf-popup-small-width` token (28rem desktop maximum).
+- Big detail popups use `--muf-popup-big-width` (42rem desktop maximum) and the shared popup height token.
+- On phones, small popups use a 48px outer gutter and big popups use a 32px gutter; both size to content and cap at 82dvh instead of becoming full-screen panels.
+- The admin shell uses the shared `muf-admin-shell-card` and `muf-admin-*` styles, a 56rem desktop maximum, an 88vh cap, a sticky tab strip, and a visible footer. On phones it uses a 32px outer gutter and an 82dvh height cap.
 - Screen-specific UI refinements are presentation-only; preserve all existing fields, actions, API requests, calculations, and access permissions.
 - `check-muf-sync.js` must describe the current canonical popup/admin dimensions rather than obsolete previous values.
 

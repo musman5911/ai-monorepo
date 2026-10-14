@@ -37,7 +37,7 @@ interface MufAdminUsersProps {
   onDelete: (user: MufAdminUser) => Promise<void> | void;
 }
 
-const inputClass = 'w-full px-3 py-2 text-sm bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 transition text-slate-800 dark:text-slate-100 placeholder:text-slate-400';
+const inputClass = 'muf-field muf-admin-user-field w-full outline-none transition';
 
 export default function MufAdminUsers({
   users, usersLoading, currentUsername, minPasswordLength = 8,
@@ -129,7 +129,7 @@ export default function MufAdminUsers({
               <div key={user._id} className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 ${user.active === false ? 'opacity-60' : ''}`}>
                 {/* Left: Avatar + info */}
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${user.role === 'admin' ? 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}>
+                  <div className={`muf-admin-user-avatar shrink-0 ${user.role === 'admin' ? 'is-admin' : ''}`}>
                     {user.role === 'admin' ? <Shield className="w-4 h-4" /> : <UserRound className="w-4 h-4" />}
                   </div>
                   <div className="min-w-0">

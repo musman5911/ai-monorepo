@@ -385,8 +385,8 @@ export default function App() {
           <button
             className="muf-icon-button"
             onClick={() => setDiaryOpen(true)}
-            title={L("Diary")}
-            aria-label={L("Diary")}
+            title={L("Notes")}
+            aria-label={L("Notes")}
           >
             <BookOpen size={19} />
           </button>
@@ -536,7 +536,7 @@ export default function App() {
       <DetailModal
         open={diaryOpen}
         onClose={() => setDiaryOpen(false)}
-        title={L("Diary")}
+        title={L("Notes")}
         subtitle={L("Daily checklist and notes")}
         icon={<BookOpen className="w-5 h-5" />}
         iconBg="bg-indigo-100 text-indigo-700"
@@ -546,8 +546,8 @@ export default function App() {
           <MufDiary entries={diaryEntries} onSave={saveDiaryEntry} onDelete={deleteDiaryEntry}
             entityOptions={diaryEntityOptions} shareTargets={diaryShareTargets} />
           <details className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
-            <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist and existing daily log')}</summary>
-            <div className="mt-4"><DiaryTab /></div>
+            <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist')}</summary>
+            <div className="mt-4"><DiaryTab checklistOnly /></div>
           </details>
         </div>
       </DetailModal>

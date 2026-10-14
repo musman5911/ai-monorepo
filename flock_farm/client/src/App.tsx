@@ -62,7 +62,6 @@ import HealthPortal from './components/HealthPortal';
 import MonthlySummary from './components/MonthlySummary';
 import IncubationModule from './components/IncubationModule';
 import DailyChecklist from './components/DailyChecklist';
-import DiaryNotes from './components/DiaryNotes';
 import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from './muf-diary';
 import BatchesTab from './components/BatchesTab';
 import LaborTab from './components/LaborTab';
@@ -733,8 +732,8 @@ export default function App() {
           <button
             className="muf-icon-button"
             onClick={() => setDailyOpsOpen(true)}
-            title={L('Diary')}
-            aria-label={L('Diary')}
+            title={L('Notes')}
+            aria-label={L('Notes')}
           >
             <BookOpen size={19} />
           </button>
@@ -1058,7 +1057,7 @@ export default function App() {
       <DetailModal
         open={dailyOpsOpen}
         onClose={() => setDailyOpsOpen(false)}
-        title={L('Diary')}
+        title={L('Notes')}
         subtitle={L('Notes, photos, voice and daily checklist')}
         icon={<BookOpen className="w-5 h-5" />}
         iconBg="bg-indigo-100 text-indigo-700"
@@ -1082,10 +1081,9 @@ export default function App() {
             ]}
           />
           <details className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
-            <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist and older diary editor')}</summary>
-            <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+            <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist')}</summary>
+            <div className="mt-4">
               <DailyChecklist lang={lang} entries={checklist} onSave={handleSaveChecklist} readOnly={!canLogDaily} />
-              <DiaryNotes lang={lang} entries={diary} onSave={handleSaveDiary} readOnly={!canLogDaily} />
             </div>
           </details>
         </div>

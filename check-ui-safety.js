@@ -13,7 +13,7 @@ const fail = (message) => { failures.push(message); console.error(`  ✗ ${messa
 const read = (app, file) => fs.readFileSync(path.join(root, app.dir, file), 'utf8');
 
 console.log('\nMUF UI safety checks');
-for (const file of ['muf-modal.tsx', 'muf-confirm.tsx', 'muf-style.css']) {
+for (const file of ['muf-modal.tsx', 'muf-confirm.tsx', 'muf-style.css', 'muf-diary.tsx']) {
   const values = apps.map((app) => read(app, file));
   if (values.every((value) => value === values[0])) pass(`${file} matches across all three apps`);
   else fail(`${file} differs between apps`);

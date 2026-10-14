@@ -23,7 +23,9 @@ function newItemId(): string {
   return 'item-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-export default function DiaryTab() {
+interface DiaryTabProps { checklistOnly?: boolean; }
+
+export default function DiaryTab({ checklistOnly = false }: DiaryTabProps) {
   const [date, setDate] = useState(todayStr());
   const [loading, setLoading] = useState(true);
   const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
@@ -55,9 +57,9 @@ export default function DiaryTab() {
   }, [date]);
 
   // Combine checklist + notes into one payload for autosave
-  const payload = useMemo(() => ({ checklist, notes, voiceNotes, photos }), [checklist, notes, voiceNotes, photos]);
+  const payload = useMemo(() => checklistOnly ? { checklist } : ({ checklist, notes, voiceNotes, photos }), [checklistOnly, checklist, notes, voiceNotes, photos]);
 
-  const saveFn = useCallback((p: { checklist: ChecklistItem[]; notes: string; voiceNotes: VoiceNote[]; photos: DiaryPhoto[] }) => {
+  const saveFn = useCallback((p: { checklist: ChecklistItem[]; notes?: string; voiceNotes?: VoiceNote[]; photos?: DiaryPhoto[] }) => {
     return api.saveDailyLog(date, p);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
@@ -151,7 +153,7 @@ export default function DiaryTab() {
       {loading ? (
         <div className="text-center text-slate-400 py-12">{L('Loading...')}</div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className={`grid grid-cols-1 gap-4 ${checklistOnly ? '' : 'lg:grid-cols-2 lg:gap-6'}`}>
           {/* Checklist */}
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
@@ -202,7 +204,9 @@ export default function DiaryTab() {
             </div>
           </div>
 
-          {/* Notes / Diary */}
+          {!checklistOnly && (
+          <>
+          {/* Legacy Notes editor remains available in the original tab only. */}
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
             <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4">{L('Notes / Diary')}</h3>
             <textarea
@@ -240,6 +244,8 @@ export default function DiaryTab() {
               )}
             </div>
           </div>
+          </>
+          )}
         </div>
       )}
     </div>
