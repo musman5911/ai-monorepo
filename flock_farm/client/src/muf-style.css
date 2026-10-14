@@ -540,12 +540,7 @@
 }
 
 
-/* Admin popup: tab nav should NOT be sticky — it scrolls with content */
-.muf-popup-stage .muf-top-nav {
-  position: relative !important;
-  top: auto !important;
-  z-index: auto !important;
-}
+
 
 @media (max-width: 640px) {
   /* Establish perfect, robust, unified mobile layout & stacking contexts */
@@ -962,12 +957,7 @@
 }
 
 
-/* Admin popup: tab nav should NOT be sticky — it scrolls with content */
-.muf-popup-stage .muf-top-nav {
-  position: relative !important;
-  top: auto !important;
-  z-index: auto !important;
-}
+
 
 @media (max-width: 640px) {
   .muf-header {
@@ -1061,12 +1051,7 @@
    (loaded last so it wins over earlier mobile overrides).
    ─────────────────────────────────────────────────────────── */
 
-/* Admin popup: tab nav should NOT be sticky — it scrolls with content */
-.muf-popup-stage .muf-top-nav {
-  position: relative !important;
-  top: auto !important;
-  z-index: auto !important;
-}
+
 
 @media (max-width: 640px) {
   body, .muf-app, .muf-main-content {
@@ -1698,15 +1683,15 @@ html, body {
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
 }
-.muf-top-nav-scroll::-webkit-scrollbar { display: none; }
-.muf-nav-link { flex: 0 0 auto; white-space: nowrap; }
+
+
 .muf-main-content img,
 .muf-admin-shell img,
 .muf-popup-stage img { max-width: 100%; }
 .muf-main-content svg,
 .muf-admin-shell svg,
 .muf-popup-stage svg { flex-shrink: 0; }
-.muf-main-content table { max-width: 100%; }
+
 .muf-main-content .overflow-x-auto table { min-width: max-content; }
 .muf-main-content .overflow-x-auto,
 .muf-admin-shell .overflow-x-auto { overscroll-behavior-x: contain; }

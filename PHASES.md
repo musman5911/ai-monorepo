@@ -46,9 +46,11 @@ Owner-provided results after pulling a510265:
 
 ## Phase 2 — popup and styling inventory
 
-**Status: base inventory completed; improved size classification committed, regenerated local report pending.**
+**Status: audit scanner repaired and size classification hardened; refreshed local report pending.**
 
-The local command node audit-muf-design-system.mjs completed and wrote reports under .audit-output. Summary:
+The owner ran `node audit-muf-design-system.mjs` after commit `9088ac9`, and it failed to parse because two interpretation-note entries were accidentally joined by a malformed string. This batch repairs that syntax. It also distinguishes an absent `size` prop from boolean/empty invalid values and treats an absent direct prop on a JSX node with `{...props}` as dynamic, not definitely missing. The refreshed `.audit-output` report still needs to be generated against the local checkout after pulling this commit.
+
+The table below records the first inventory only. Its `Unspecified` column mixes missing props, dynamic expressions and unsupported literals; do not treat it as a confirmed defect count. Summary:
 
 | App | DetailModal calls | Small | Big | Unspecified | Custom overlay candidates |
 |---|---:|---:|---:|---:|---:|
@@ -63,10 +65,12 @@ The detailed local reports are MUF_POPUP_INVENTORY.md, MUF_STYLE_AUDIT.md and MU
 
 ## Phase 3 — consolidate shared MUF styling
 
-**Batch 1 committed: canonical primary-action colors.** Shared primary action buttons, active top navigation, text actions, detail buttons and the admin active-tab underline now reference `--muf-color-primary` / `--muf-color-primary-hover`. `check-muf-sync.js` now enforces three primary-color invariants across all three stylesheets. This batch does not change spacing, dimensions, navigation behavior, or semantic status colors. Local sync checks/builds and browser appearance checks are pending for this commit.
+**Batch 1 committed: canonical primary-action colors.** Shared primary action buttons, active top navigation, text actions, detail buttons and the admin active-tab underline now reference `--muf-color-primary` / `--muf-color-primary-hover`. `check-muf-sync.js` now enforces three primary-color invariants across all three stylesheets. This batch does not change spacing, dimensions, navigation behavior, or semantic status colors. The owner subsequently reported the browser checklist passed after `ea0dbcb`.
+
+**Batch 2 in this commit: exact duplicate CSS rule consolidation.** Across the three byte-identical `muf-style.css` twins, removed three earlier copies of the same admin-popup tab-nav override and one earlier copy each of the scrollbar, nav-link baseline, and main-table width rules. The final copy of each rule remains, so the effective final declarations are retained. This is source cleanup only; fresh sync/safety checks, builds, and browser verification for this batch remain pending.
 
 
-**Status: in progress; Dairy sticky-header regression fix committed, browser retest pending.**
+**Status: prior sticky-header and popup browser checks passed per owner; current CSS cleanup needs a fresh retest.**
 
 Latest fix commit: `83e8b24` (`Restore Dairy sticky header and navigation`).
 

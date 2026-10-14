@@ -68,11 +68,16 @@ function cleanExpression(value) {
   return String(value || '').replace(/^\{\s*/, '').replace(/\s*\}$/, '').replace(/^['"]|['"]$/g, '').replace(/\s+/g, ' ').trim();
 }
 
-function classifyPopupSize(ts, attribute, sourceFile) {
-  if (!attribute || !attribute.initializer) return { kind: 'missing', value: 'unspecified' };
+function classifyPopupSize(ts, attribute, sourceFile, hasSpreadAttributes = false) {
+  if (!attribute) {
+    return hasSpreadAttributes
+      ? { kind: 'dynamic', value: '(size may be provided by spread attributes)' }
+      : { kind: 'missing', value: '(missing size prop)' };
+  }
+  if (!attribute.initializer) return { kind: 'unsupported-literal', value: '(boolean prop without a value)' };
   let expression = attribute.initializer;
   if (ts.isJsxExpression(expression)) {
-    if (!expression.expression) return { kind: 'missing', value: 'unspecified' };
+    if (!expression.expression) return { kind: 'unsupported-literal', value: '(empty expression)' };
     expression = expression.expression;
   }
   while (ts.isParenthesizedExpression(expression) ||
@@ -114,7 +119,8 @@ function collectFile(ts, sourceFile, project, absolutePath, source, popupRecords
       const directMufModal = tag === 'DetailModal';
       const customPopupComponent = POPUP_SUFFIX.test(tag) || EXPLICIT_POPUPS.has(tag);
       const sizeAttribute = attr(ts, node, 'size');
-      const classifiedSize = classifyPopupSize(ts, sizeAttribute, sourceFile);
+      const hasSpreadAttributes = node.attributes.properties.some((property) => ts.isJsxSpreadAttribute(property));
+      const classifiedSize = classifyPopupSize(ts, sizeAttribute, sourceFile, hasSpreadAttributes);
       const size = classifiedSize.value;
       const sizeKind = classifiedSize.kind;
       const title = cleanExpression(attrText(ts, attr(ts, node, 'title'), sourceFile));
@@ -339,8 +345,8 @@ function main() {
     '', '## Other popup-like components and custom overlay candidates', '',
     table(['Project', 'File', 'Line', 'Element/component', 'Detected signal'], otherRows),
     '', '## Interpretation notes', '',
-    '- DetailModal call sites are component uses, not unique visual designs or simultaneous open popups.
-    '- Size classification distinguishes a missing size prop, a dynamic expression, and a nonstandard literal. Dynamic expressions must be reviewed before being changed; they are not automatically defects.'',
+    '- DetailModal call sites are component uses, not unique visual designs or simultaneous open popups.',
+    '- Size classification distinguishes a missing size prop, a dynamic expression, and a nonstandard literal. Dynamic expressions must be reviewed before being changed; they are not automatically defects.',
     '- Shared MUF shell implementation is included in the record data but excluded from custom-overlay candidate totals.',
     '- Overlay candidates require a human review before migration to ensure dropdowns, camera/gallery viewers, and specialized flows keep their behavior.',
     '- Inline style-object counts only cover JSX style={{ ... }} expressions in scanned TSX/JSX source.',

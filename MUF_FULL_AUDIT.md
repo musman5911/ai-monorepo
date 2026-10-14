@@ -9,6 +9,7 @@ Scope: frontend popup inventory, shared CSS and MUF consistency. This is a stati
 - 139 direct DetailModal call sites were reported by the audit script across the three apps.
 - The initial scanner grouped fourteen call sites as unspecified, mixing missing `size` props with dynamic expressions or nonstandard values. The scanner now separates missing sizes, dynamic expressions, and unsupported literals; the exact split awaits a fresh local audit run. Do not rewrite dynamic call sites without inspecting their usage.
 - The scanner reported seven custom fixed-overlay candidates. These need manual classification and are not automatically defects.
+- The first run of the revised size classifier failed because the generated interpretation-note strings contained a syntax error. This commit repairs the report text and separates missing props, dynamic expressions (including possible spread props) and unsupported literals. The exact refreshed split still depends on rerunning the audit against the local checkout.
 - All three copies of muf-style.css are byte-identical.
 - The shared CSS has a large cascade history. Consolidation should be incremental and backed by checks/browser review, not a delete-all-duplicates exercise.
 - The root Vitest test suite has not run on the owner's machine because the root Vitest executable is not installed, although the dependency is listed in the root package manifest and lockfile.
@@ -30,16 +31,16 @@ The following counts were calculated from the current shared stylesheet and are 
 
 | Metric | Current count |
 |---|---:|
-| Stylesheet source characters | 140,850 |
-| Lines | 3,336 |
-| Hex color literal occurrences | 401 |
+| Stylesheet source characters | 140,394 |
+| Lines | 3,322 |
+| Hex color literal occurrences | 390 |
 | RGB/HSL literal occurrences | 135 |
-| !important declaration occurrences | 637 |
-| Fixed-unit dimension declaration matches | 981 |
+| !important declaration occurrences | 628 |
+| Fixed-unit dimension declaration matches | 980 |
 | Distinct --muf-* variable names | 91 |
-| Selector-block matches | 1,137 |
-| Selector names appearing in multiple blocks | 127 |
-| Most repeated selector name | 20 blocks |
+| Selector-block matches | 1,132 |
+| Selector names appearing in multiple blocks | 126 |
+| Most repeated selector name | 19 blocks |
 
 The three stylesheet copies are currently byte-identical. Selector and literal counts use regular-expression scanning; comments, intentional responsive overrides, browser compatibility and semantic status colors can contribute to them. They do not establish that every repeated declaration should be removed.
 
@@ -68,6 +69,12 @@ The owner-provided `check-ui-safety.js` output showed a failure in the new root-
 ## Phase 3 styling batch 1 — primary accent token alignment
 
 The shared CSS now uses canonical MUF primary/hover variables for primary action, active top-nav state, text actions, detail buttons and the admin active underline. Existing red/amber/blue/status colors were not globally replaced. Three checks were added to `check-muf-sync.js` to guard the shared primary action, active-nav and detail-button token usage. Runtime visual confirmation remains pending.
+
+## Phase 3 styling batch 2 — duplicate rule cleanup
+
+Six redundant rule blocks were removed from each shared stylesheet copy, retaining the final copy in the cascade: three earlier copies of the identical `.muf-popup-stage .muf-top-nav` positioning override, plus earlier copies of the `.muf-top-nav-scroll::-webkit-scrollbar`, `.muf-nav-link` baseline, and `.muf-main-content table` width rules. The three stylesheet files were identical before this change and receive the same updated content blob.
+
+Updated source-pattern metrics after cleanup: 140,394 characters, 3,322 lines, 390 hex literals, 135 RGB/HSL literals, 628 `!important` declarations, 980 fixed-unit dimension matches, 91 MUF variable names, 1,132 selector-block matches and 126 repeated selector names. These remain pattern counts, not direct quality scores. The local audit rerun, sync/safety scripts, builds and browser smoke check are pending for this batch.
 
 ## Priority findings
 
