@@ -3198,3 +3198,22 @@ textarea:disabled { cursor: not-allowed; }
  .muf-overlay .muf-admin-shell-card[role=dialog]{box-sizing:border-box!important;width:calc(100vw - 32px)!important;max-width:calc(100vw - 32px)!important;height:auto!important;min-height:0!important;max-height:min(82dvh,calc(100dvh - 24px))!important;flex:0 1 auto;border-radius:var(--muf-radius-lg,14px)!important}
 }
 @media(max-width:380px){.muf-overlay .muf-pup-card.muf-pup-width-sm{width:calc(100vw - 40px)!important;max-width:calc(100vw - 40px)!important}.muf-overlay .muf-pup-card.muf-pup-width-lg{width:calc(100vw - 24px)!important;max-width:calc(100vw - 24px)!important}.muf-overlay .muf-admin-shell-card[role=dialog]{width:calc(100vw - 24px)!important;max-width:calc(100vw - 24px)!important}}
+
+/* Keep the app header and primary tab bar together as one sticky region.
+   Children stay in normal flow so mobile header height/safe-area is measured naturally. */
+.muf-sticky-chrome {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  isolation: isolate;
+}
+.muf-sticky-chrome > .muf-header {
+  position: relative !important;
+  top: auto !important;
+  z-index: 2 !important;
+}
+.muf-sticky-chrome > .muf-top-nav {
+  position: relative !important;
+  top: auto !important;
+  z-index: 1 !important;
+}

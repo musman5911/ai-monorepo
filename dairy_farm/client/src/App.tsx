@@ -391,7 +391,8 @@ export default function App() {
   'Farm profile PDF for buyers — in the reports section',
   'More Urdu across the whole app',
 ]} />
-      <header className="muf-header">
+      <div className="muf-sticky-chrome">
+<header className="muf-header">
         <a href="/" target="_self" className="muf-header-brand cursor-pointer hover:opacity-90 transition-opacity">
           <img
             src="/dairy-farm-logo-round-512.png"
@@ -521,6 +522,7 @@ export default function App() {
           ) : <div className="muf-nav-item" key={id}><button type="button" className={`muf-nav-link ${tab === id ? "active" : ""}`} onClick={() => setTab(id)}><Icon size={15}/><span>{label}</span></button></div>)}
         </div>
       </nav>
+</div>
 
       {/* Content */}
       <div className="flex-1 w-full p-3 sm:p-5 relative z-10">

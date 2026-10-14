@@ -751,7 +751,8 @@ export default function App() {
   'Farm profile PDF for buyers — in the reports section',
   'More Urdu across the whole app',
 ]} />
-      <header className="muf-header">
+      <div className="muf-sticky-chrome">
+<header className="muf-header">
         <div className="muf-header-brand cursor-pointer hover:opacity-90 transition-opacity">
           <img src="/flock-farm-logo-round-192.png" className="muf-brand-logo" alt="Usman Flock Farm" />
           <div>
@@ -897,6 +898,7 @@ export default function App() {
           })}
         </div>
       </nav>
+</div>
 
       <div className="w-full p-3 sm:p-6 flex-1 flex flex-col gap-4 md:gap-6">
         <motion.main

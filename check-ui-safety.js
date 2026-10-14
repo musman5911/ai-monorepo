@@ -67,6 +67,10 @@ for (const app of apps) {
   const loginRoute = app.name === 'dairy' ? read(app, 'components/Login.tsx') : app.name === 'flock' ? read(app, 'components/LoginScreen.tsx') : appSource;
   if (/MufLoginScreen/.test(loginRoute) && /MufLoginPanel/.test(loginRoute) && /MufLoginBrand/.test(loginRoute)) pass(`${app.name}: auth UI uses shared MUF login components`);
   else fail(`${app.name}: auth UI bypasses shared MUF login components`);
+  if (/className="muf-sticky-chrome"/.test(appSource) && /<header className="muf-header"/.test(appSource) &&
+      /<nav className="muf-top-nav"/.test(appSource) && /.muf-sticky-chrome\s*\{[^}]*position:\s*sticky/s.test(css)) {
+    pass(`${app.name}: header and primary navbar share a sticky MUF wrapper`);
+  } else fail(`${app.name}: sticky header/navbar wrapper missing`);
 
 }
 

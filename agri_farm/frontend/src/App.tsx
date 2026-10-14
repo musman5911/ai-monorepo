@@ -2411,7 +2411,8 @@ function App() {
   'Farm profile PDF for buyers — in the reports section',
   'More Urdu across the whole app',
 ]} />
-          <header className="muf-header">
+          <div className="muf-sticky-chrome">
+<header className="muf-header">
             <div className="muf-header-brand cursor-pointer hover:opacity-90 transition-opacity" onClick={() => navigateTo('dashboard', 'dashboard')}>
               <img src="/logo.png" className="muf-brand-logo" onError={(e) => { e.target.onerror = null; e.target.src = "/favicon.png"; }} alt="Usman Agri Farm" />
               <div>
@@ -2524,6 +2525,7 @@ function App() {
               ))}
             </div>
           </nav>
+</div>
 
           <div className="muf-body-frame">
             <main id="main-content" className="muf-main-content" tabIndex={-1}>
