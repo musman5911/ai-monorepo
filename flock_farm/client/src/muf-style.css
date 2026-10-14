@@ -1127,30 +1127,53 @@
 @media (max-width: 640px) {
   /* Stage: slimmer margins around the card */
   .muf-popup-stage {
-    padding: 10px !important;
+    --muf-popup-mobile-stage-padding: 10px;
+    --muf-popup-mobile-card-radius: 13px;
+    --muf-popup-mobile-card-max-height: 84vh;
+    --muf-popup-mobile-text-2xl: 16px;
+    --muf-popup-mobile-text-xl: 15px;
+    --muf-popup-mobile-text-lg: 14px;
+    --muf-popup-mobile-text-base: 12.5px;
+    --muf-popup-mobile-text-sm: 11.5px;
+    --muf-popup-mobile-text-xs: 10.5px;
+    --muf-popup-mobile-text-11px: 10px;
+    --muf-popup-mobile-text-10px: 9px;
+    --muf-popup-mobile-text-9px: 8.5px;
+    --muf-popup-mobile-heading-3: 13px;
+    --muf-popup-mobile-heading-4: 12px;
+    --muf-popup-mobile-heading-5: 13.5px;
+    --muf-popup-mobile-action-height: 36px;
+    --muf-popup-mobile-compact-action-size: 30px;
+    --muf-popup-mobile-field-font-size: 13px;
+    --muf-popup-mobile-field-min-height: 36px;
+    --muf-popup-mobile-field-padding: 7px 9px;
+    --muf-popup-mobile-field-radius: 7px;
+    --muf-popup-mobile-label-font-size: 10px;
+    --muf-popup-mobile-label-gap: 2px;
+    padding: var(--muf-popup-mobile-stage-padding) !important;
   }
 
   /* Popup card itself: tighter radius + a bit more usable height */
   .muf-popup-stage > .relative.w-full {
-    border-radius: 13px !important;
-    max-height: 84vh !important;
+    border-radius: var(--muf-popup-mobile-card-radius) !important;
+    max-height: var(--muf-popup-mobile-card-max-height) !important;
   }
 
   /* ── Typography scale inside popups (Tailwind text classes) ── */
-  .muf-popup-stage .text-2xl { font-size: 16px !important; }
-  .muf-popup-stage .text-xl  { font-size: 15px !important; }
-  .muf-popup-stage .text-lg  { font-size: 14px !important; }
-  .muf-popup-stage .text-base { font-size: 12.5px !important; }
-  .muf-popup-stage .text-sm  { font-size: 11.5px !important; }
-  .muf-popup-stage .text-xs  { font-size: 10.5px !important; }
-  .muf-popup-stage .text-\[11px\] { font-size: 10px !important; }
-  .muf-popup-stage .text-\[10px\] { font-size: 9px !important; }
-  .muf-popup-stage .text-\[9px\]  { font-size: 8.5px !important; }
+  .muf-popup-stage .text-2xl { font-size: var(--muf-popup-mobile-text-2xl) !important; }
+  .muf-popup-stage .text-xl  { font-size: var(--muf-popup-mobile-text-xl) !important; }
+  .muf-popup-stage .text-lg  { font-size: var(--muf-popup-mobile-text-lg) !important; }
+  .muf-popup-stage .text-base { font-size: var(--muf-popup-mobile-text-base) !important; }
+  .muf-popup-stage .text-sm  { font-size: var(--muf-popup-mobile-text-sm) !important; }
+  .muf-popup-stage .text-xs  { font-size: var(--muf-popup-mobile-text-xs) !important; }
+  .muf-popup-stage .text-\[11px\] { font-size: var(--muf-popup-mobile-text-11px) !important; }
+  .muf-popup-stage .text-\[10px\] { font-size: var(--muf-popup-mobile-text-10px) !important; }
+  .muf-popup-stage .text-\[9px\]  { font-size: var(--muf-popup-mobile-text-9px) !important; }
 
   /* Headings (modal titles, section titles) */
-  .muf-popup-stage h3 { font-size: 13px !important; line-height: 1.3 !important; }
-  .muf-popup-stage h4 { font-size: 12px !important; }
-  .muf-popup-stage h5 { font-size: 13.5px !important; }
+  .muf-popup-stage h3 { font-size: var(--muf-popup-mobile-heading-3) !important; line-height: 1.3 !important; }
+  .muf-popup-stage h4 { font-size: var(--muf-popup-mobile-heading-4) !important; }
+  .muf-popup-stage h5 { font-size: var(--muf-popup-mobile-heading-5) !important; }
   .muf-popup-stage p  { line-height: 1.35 !important; }
 
   /* ── Icons: shrink the larger lucide icons inside popups ── */
@@ -1195,23 +1218,23 @@
   .muf-popup-stage .gap-2 { gap: 6px !important; }
 
   /* ── Buttons: smaller tap targets inside popups ── */
-  .muf-popup-stage .min-h-11 { min-height: 36px !important; }
-  .muf-popup-stage .min-h-10 { min-height: 30px !important; }
-  .muf-popup-stage .min-w-10 { min-width: 30px !important; }
+  .muf-popup-stage .min-h-11 { min-height: var(--muf-popup-mobile-action-height) !important; }
+  .muf-popup-stage .min-h-10 { min-height: var(--muf-popup-mobile-compact-action-size) !important; }
+  .muf-popup-stage .min-w-10 { min-width: var(--muf-popup-mobile-compact-action-size) !important; }
 
   /* ── Form fields inside popup forms ── */
   .muf-popup-stage input,
   .muf-popup-stage select,
   .muf-popup-stage textarea {
-    font-size: 13px !important;
-    min-height: 36px !important;
-    padding: 7px 9px !important;
-    border-radius: 7px !important;
+    font-size: var(--muf-popup-mobile-field-font-size) !important;
+    min-height: var(--muf-popup-mobile-field-min-height) !important;
+    padding: var(--muf-popup-mobile-field-padding) !important;
+    border-radius: var(--muf-popup-mobile-field-radius) !important;
   }
   .muf-popup-stage textarea { min-height: 56px !important; }
   .muf-popup-stage label {
-    font-size: 10px !important;
-    margin-bottom: 2px !important;
+    font-size: var(--muf-popup-mobile-label-font-size) !important;
+    margin-bottom: var(--muf-popup-mobile-label-gap) !important;
   }
 
   /* ── Rounded corners: slightly tighter inner boxes ── */
@@ -2113,11 +2136,6 @@ html, body {
 .muf-pup-lg :is(input, select, textarea, button, a, [role="button"], summary):focus-visible {
   outline: 2px solid var(--muf-ui-focus);
   outline-offset: 2px;
-}
-
-.muf-pup-sm, .muf-pup-lg {
-  min-width: 0;
-  overflow-wrap: anywhere;
 }
 
 .muf-pup-sm :is(input, select, textarea),

@@ -2,15 +2,15 @@
 
 Last updated: 2026-10-14  
 Working branch: arena/20261014-muf-mobile-popups  
-Current documentation baseline before this refresh: a510265
+Current documentation baseline before this refresh: 95b3d66
 
 ## Overall status
 
 - Validation scripts: passed in the owner-provided terminal output after commit a510265.
 - Frontend builds: Dairy, Flock and Agri each reported a successful build in that same output.
-- Popup source inventory: generated locally; 139 DetailModal call sites counted.
+- Popup source inventory: the owner-provided audit output after `95b3d66` confirmed 139 DetailModal call sites and zero missing size props: 96 small, 39 big, four intentional dynamic wrappers and zero unsupported literals.
 - Root Vitest suite: not run. npm test could not find the root Vitest executable, and npm ls vitest showed an empty installed dependency tree. The root package manifest and lockfile do declare Vitest.
-- Latest 70dvh form/admin sizing changes: source committed and static checks passed; browser verification for the newest form-sheet adjustment remains pending.
+- Browser verification is intentionally deferred until Phase 5, after the owner requested that all implementation phases be completed first.
 - Backend, business-logic and feature scope: unchanged by this MUF round.
 
 ## Completed foundations
@@ -36,7 +36,7 @@ Current documentation baseline before this refresh: a510265
 
 **Status: passed for the two MUF checks and three local builds; root tests remain unverified.**
 
-Owner-provided results after pulling a510265:
+Owner-provided results after pulling `95b3d66`:
 
 - node check-muf-sync.js: all MUF checks passed.
 - node check-ui-safety.js: all listed UI safety checks passed.
@@ -46,18 +46,18 @@ Owner-provided results after pulling a510265:
 
 ## Phase 2 — popup and styling inventory
 
-**Status: source review completed; explicit size cleanup committed in this batch; regenerate and recheck the report after pulling.**
+**Status: source review and popup inventory completed; zero missing size props confirmed by the owner after `95b3d66`.**
 
-The owner ran the repaired scanner on commit `8096d93`. It found 139 DetailModal call sites and no TypeScript JSX parser diagnostics:
+The owner reran the repaired scanner after `95b3d66`; the reported inventory confirmed 139 DetailModal call sites, zero missing sizes and no TypeScript JSX parser diagnostics:
 
 | App | DetailModal calls | Small | Big | Missing size | Dynamic size | Unsupported literal | Fixed-overlay candidates |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | Agri | 35 | 21 | 13 | 0 | 1 | 0 | 1 |
-| Dairy | 35 | 24 | 9 | 0 | 2 | 0 | 3 |
-| Flock | 69 | 45 | 13 | 10 | 1 | 0 | 3 |
-| Total | 139 | 90 | 35 | 10 | 4 | 0 | 7 |
+| Dairy | 35 | 24 | 9 | 0 | 2 | 0 | 2 |
+| Flock | 69 | 51 | 17 | 0 | 1 | 0 | 3 |
+| Total | 139 | 96 | 39 | 0 | 4 | 0 | 6 |
 
-The ten missing sizes were all in Flock: eight dashboard detail popups and the bird add/edit forms. Source review assigned `big` to Financial Deficit, Feed Restock, Add Bird, and Edit Bird because they contain longer lists or multi-field forms. The remaining six dashboard metric popups now explicitly use `small`, preserving their previous default. No data flow or business logic changed. The next local scan should report zero missing sizes.
+The ten formerly missing sizes were all in Flock: eight dashboard detail popups and the bird add/edit forms. Source review assigned `big` to Financial Deficit, Feed Restock, Add Bird, and Edit Bird because they contain longer lists or multi-field forms. The owner's post-commit audit confirmed zero missing sizes. No data flow or business logic changed.
 
 The four dynamic sizes are intentional wrappers: the shared FormOverlay component in each app forwards its `size` prop, and Dairy's local Dashboard Popup wrapper forwards its optional size (which defaults to small). These should remain dynamic rather than be replaced with hardcoded values.
 
@@ -71,9 +71,11 @@ The local reports are `.audit-output/MUF_POPUP_INVENTORY.md`, `.audit-output/MUF
 
 **Batch 2 committed: exact duplicate CSS rule consolidation.** Removed six redundant blocks from each shared stylesheet while retaining the final copy of each rule: three earlier admin-popup tab-nav overrides and earlier copies of the scrollbar, nav-link baseline and main-table width rules. The owner then confirmed the audit script, sync check, UI-safety check and all three project builds passed on commit `8096d93`.
 
-**Batch 3 in this commit: explicit popup sizing and focus-token consolidation.** The reviewed Flock popup call sites now declare a size explicitly; complex lists and add/edit forms use `big`, while compact dashboard metrics use `small`. Four focus-outline declarations now use `var(--muf-ui-focus)`, which aliases the existing `--muf-color-success` value (`#16a34a`), so the rendered color is unchanged. The sync checker now guards both token usage and the popup focus outline. The audit also excludes a decorative background and a false-positive icon suffix from the popup inventory.
+**Batch 3 committed in `95b3d66`: explicit popup sizing and focus-token consolidation.** The reviewed Flock popup call sites now declare a size explicitly; complex lists and add/edit forms use `big`, while compact dashboard metrics use `small`. Four focus-outline declarations now use `var(--muf-ui-focus)`, which aliases the existing `--muf-color-success` value (`#16a34a`), so the rendered color is unchanged. The sync checker guards both token usage and the popup focus outline. The audit also excludes a decorative background and a false-positive icon suffix from the popup inventory.
 
-**Validation for batch 3 is pending.** After pulling, rerun the audit, sync and UI-safety checks and all three builds. Browser-check the four newly widened popups and focus rings before marking this batch fully complete.
+**Validation for batch 3:** The owner reported the audit, MUF sync check, UI-safety check and all three frontend builds passing after this commit. Browser review is deliberately deferred to Phase 5, after the implementation phases are complete.
+
+**Batch 4 in the current work: compact mobile popup tokenization.** The mobile .muf-popup-stage now owns scoped tokens for its compact type scale, headings, stage/card sizing, field metrics, labels and action dimensions. Existing literal values are moved into custom properties without changing their values. The tokenized stylesheet is applied identically to all three apps. One earlier duplicate .muf-pup-sm, .muf-pup-lg min-width/wrapping rule is removed because an identical later rule remains in the cascade. Three MUF sync invariants guard the new token definitions and consumers. Source transformation checks verify all 23 tokens have a definition and a use. Full repository checks/builds could not be run from this connector-only session and are not claimed as passing for batch 4; browser review remains deferred to Phase 5.
 
 ### Earlier popup sizing foundation
 
@@ -82,9 +84,9 @@ The shared mobile DetailModal, form sheet and admin shells use the canonical 70d
 ### Next work
 
 1. Regenerate the popup inventory and confirm zero missing `size` props among direct DetailModal uses.
-2. Use the detailed style audit to pick one narrow shared CSS consolidation batch at a time.
+2. Use the detailed style audit to pick one narrow shared CSS consolidation batch at a time, preserving responsive and semantic overrides.
 3. Keep all three `muf-style.css` copies byte-identical.
-4. After each batch, run both MUF checks and all three frontend builds, then inspect affected pages in the browser.
+4. Run the MUF checks, UI-safety check, popup/style audit and all three frontend builds for each batch. Defer manual browser review until Phase 5, as requested.
 
 ## Phase 4 — development-only visual workbench
 
@@ -108,9 +110,9 @@ Verify all three apps at 360/390px phone widths, 768px tablet, 1024px compact de
 - Finance filters, farm-specific permissions, diary/media, and Monthly Summary PDF export.
 - Production builds exclude all editor UI.
 
-## Browser checklist for the most recent popup work
+## Phase 5 browser checklist (deferred until implementation phases are complete)
 
-1. Open Agri (localhost:8000), Dairy (localhost:3000) and Flock (localhost:3001).
+1. After Phases 3 and 4 are implemented, open Agri (localhost:8000), Dairy (localhost:3000) and Flock (localhost:3001).
 2. At phone width, open one small and one big DetailModal with short and long content. Check width gutters and the 70dvh cap.
 3. Open a form sheet and an admin popup. Confirm the shell stays under the cap and the content can scroll without losing footer actions.
 4. Scroll the page and verify the sticky header/navbar do not cover page content or overlays.
