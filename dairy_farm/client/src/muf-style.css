@@ -3142,7 +3142,7 @@ textarea:disabled { cursor: not-allowed; }
   min-width: 0;
   max-width: 100%;
 }
-.muf-overlay :is(label, p, h1, h2, h3, h4, th, td) {
+.muf-overlay :is(div, span, label, p, h1, h2, h3, h4, th, td) {
   word-break: normal;
   overflow-wrap: break-word;
 }
