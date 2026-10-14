@@ -3315,3 +3315,20 @@ textarea:disabled { cursor: not-allowed; }
   .muf-overlay .muf-pup-card.muf-pup-width-lg { width: calc(100vw - 24px) !important; max-width: calc(100vw - 24px) !important; }
   .muf-overlay .muf-admin-shell-card[role="dialog"] { width: calc(100vw - 24px) !important; max-width: calc(100vw - 24px) !important; }
 }
+
+/* Keep the aliases on the dark-theme element mapped to the same canonical roles. */
+.dark {
+  --muf-primary: var(--muf-color-primary);
+  --muf-primary-hover: var(--muf-color-primary-hover);
+  --muf-brand-primary: var(--muf-color-primary);
+  --muf-brand-primary-hover: var(--muf-color-primary-hover);
+  --muf-green: var(--muf-color-primary);
+  --muf-green-2: var(--muf-color-success);
+  --muf-green-dark: var(--muf-color-primary-hover);
+  --muf-ink: var(--muf-color-text);
+  --muf-ink-soft: var(--muf-color-text-muted);
+  --muf-line: var(--muf-color-border);
+  --muf-surface: var(--muf-color-surface);
+  --muf-surface-alt: var(--muf-color-surface-alt);
+  --muf-danger: var(--muf-color-danger);
+}
