@@ -62,7 +62,7 @@ for (const app of apps) {
       /\.muf-overlay :is\(input,\s*select,\s*textarea\)/.test(css)) {
     pass(`${app.name}: MUF dropdown tokens and popup field safeguards present`);
   } else fail(`${app.name}: MUF dropdown/popup style safeguards missing`);
-  if (/muf-login-screen/.test(css) && /muf-login-card/.test(css) && /muf-pup-card\\.muf-pup-width-sm/.test(css) && /muf-admin-shell-card\\[role="dialog"\\]/.test(css)) pass(`${app.name}: MUF login shell and inset mobile dialog sizing present`);
+  if (/muf-login-screen/.test(css) && /muf-login-card/.test(css) && /muf-pup-card\.muf-pup-width-sm/.test(css) && /muf-admin-shell-card\[role="dialog"\]/.test(css)) pass(`${app.name}: MUF login shell and inset mobile dialog sizing present`);
   else fail(`${app.name}: MUF login/mobile dialog sizing styles missing`);
   const loginRoute = app.name === 'dairy' ? read(app, 'components/Login.tsx') : app.name === 'flock' ? read(app, 'components/LoginScreen.tsx') : appSource;
   if (/MufLoginScreen/.test(loginRoute) && /MufLoginPanel/.test(loginRoute) && /MufLoginBrand/.test(loginRoute)) pass(`${app.name}: auth UI uses shared MUF login components`);
