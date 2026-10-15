@@ -13,6 +13,7 @@ import {
   Filter,
   Trash2,
   Edit2,
+  Eye,
   X,
   Banknote,
   LayoutGrid,
@@ -67,6 +68,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
     note: ''
   });
   const [receiptBase64, setReceiptBase64] = useState('');
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [viewReceipt, setViewReceipt] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
 
@@ -147,21 +149,24 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string): Promise<boolean> => {
     const ok = await confirmAction({
       title: L('Delete Expense'),
       message: L('Are you sure you want to delete this expense?'),
       confirmLabel: L('Delete'),
       tone: 'danger',
     });
-    if (!ok) return;
+    if (!ok) return false;
     try {
       await api.deleteExpense(id);
       setExpenses(prev => prev.filter(exp => exp._id !== id));
+      setSelectedExpense(current => current?._id === id ? null : current);
       notify(L('Expense deleted successfully.'), 'success');
       void fetchData();
+      return true;
     } catch (error) {
       notify(L('Failed to delete expense'), 'error');
+      return false;
     }
   };
 
@@ -461,18 +466,17 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                 <th className="px-6 py-4 font-medium">{L('Type')}</th>
                 <th className="px-6 py-4 font-medium">{L('Amount')}</th>
                 <th className="px-6 py-4 font-medium">{L('Cow')}</th>
-                <th className="px-6 py-4 font-medium">{L('Note')}</th>
-                {isAdmin && <th className="px-6 py-4 font-medium text-right">{L('Actions')}</th>}
+                <th className="px-6 py-4 font-medium text-right">{L('Details / Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {loading ? (
                 <tr>
-                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-slate-400">{L('Loading expenses...')}</td>
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">{L('Loading expenses...')}</td>
                 </tr>
               ) : expenses.length === 0 ? (
                 <tr>
-                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-slate-400">{L('No expenses found')}</td>
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">{L('No expenses found')}</td>
                 </tr>
               ) : expenses.map(expense => (
                 <tr key={expense._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
@@ -490,39 +494,41 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                   <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
                     {expense.cowId ? cows.find(c => c._id === expense.cowId)?.name || 'Unknown' : 'Farm-wide'}
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 max-w-xs truncate">
-                    <span className="inline-flex items-center gap-2">
-                      {expense.receiptBase64 && (
-                        <img
-                          src={expense.receiptBase64}
-                          alt="Receipt"
-                          className="w-8 h-8 rounded-md object-cover border border-slate-200 dark:border-slate-700 cursor-pointer shrink-0 hover:scale-105 transition-transform"
-                          onClick={() => setViewReceipt(expense.receiptBase64!)}
-                        />
-                      )}
-                      {expense.note || '-'}{expense.feedKg ? <span className="ml-1 text-[10px] font-bold text-farm-600">· {expense.feedKg} kg</span> : null}{expense.supplierId ? <span className="ml-1 text-[10px] font-bold text-amber-600">· {suppliers.find(sup => sup._id === expense.supplierId)?.name || 'Supplier'}</span> : null}
-                    </span>
-                  </td>
-                  {isAdmin && (
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end space-x-2">
-                        <button 
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        title={L('View expense details')}
+                        aria-label={L('View expense details')}
+                        onClick={() => setSelectedExpense(expense)}
+                        className="p-1.5 text-slate-400 hover:text-farm-600 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          title={L('Edit expense')}
+                          aria-label={L('Edit expense')}
                           onClick={() => handleEdit(expense)}
                           className="p-1.5 text-slate-400 hover:text-farm-600 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        {canDelete && (
-                          <button 
-                            onClick={() => handleDelete(expense._id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  )}
+                      )}
+                      {canDelete && (
+                        <button
+                          type="button"
+                          title={L('Delete expense')}
+                          aria-label={L('Delete expense')}
+                          onClick={() => handleDelete(expense._id)}
+                          className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -555,22 +561,95 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                     </div>
                   </div>
                   <div className="muf-entity-stats">
-                    <span><Calendar className="w-3 h-3"/> <span>{expense.note || '-'}</span></span>
-                    {expense.feedKg && <span><Coins className="w-3 h-3"/> <span>{expense.feedKg} kg</span></span>}
-                    {expense.supplierId && <span><Users className="w-3 h-3"/> <span>{suppliers.find(s => s._id === expense.supplierId)?.name || 'Supplier'}</span></span>}
+                    <span><Calendar className="w-3 h-3"/> <span>{formatDate(expense.date)}</span></span>
+                    <span className="text-[11px] text-slate-400">{L('Open details to view notes, supplier and receipt information.')}</span>
                   </div>
-                  {isAdmin && (
-                    <div className="muf-entity-actions">
-                      <button onClick={() => handleEdit(expense)} className="muf-mini-icon"><Edit2 className="w-3.5 h-3.5"/></button>
-                      {canDelete && <button onClick={() => handleDelete(expense._id)} className="muf-mini-icon text-red-500"><Trash2 className="w-3.5 h-3.5"/></button>}
-                    </div>
-                  )}
+                  <div className="muf-entity-actions">
+                    <button type="button" onClick={() => setSelectedExpense(expense)} className="muf-mini-icon" title={L('View details')} aria-label={L('View details')}><Eye className="w-3.5 h-3.5"/></button>
+                    {isAdmin && <button type="button" onClick={() => handleEdit(expense)} className="muf-mini-icon" title={L('Edit expense')} aria-label={L('Edit expense')}><Edit2 className="w-3.5 h-3.5"/></button>}
+                    {canDelete && <button type="button" onClick={() => handleDelete(expense._id)} className="muf-mini-icon text-red-500" title={L('Delete expense')} aria-label={L('Delete expense')}><Trash2 className="w-3.5 h-3.5"/></button>}
+                  </div>
                 </div>
               </article>
             );
           })}
         </div>
       )}
+
+      {/* Summary-first expense detail: the table/grid stay compact; supporting data is opened on demand. */}
+      <DetailModal
+        open={!!selectedExpense}
+        onClose={() => setSelectedExpense(null)}
+        title={L('Expense Details')}
+        subtitle={selectedExpense ? `${formatDate(selectedExpense.date)} · ${L(selectedExpense.type)}` : undefined}
+        icon={<Banknote className="w-5 h-5" />}
+        iconBg="bg-farm-100 text-farm-700"
+        size="small"
+      >
+        {selectedExpense && (() => {
+          const cow = selectedExpense.cowId ? cows.find(item => item._id === selectedExpense.cowId) : null;
+          const supplier = selectedExpense.supplierId ? suppliers.find(item => item._id === selectedExpense.supplierId) : null;
+          return (
+            <div className="space-y-4 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="muf-kpi-card">
+                  <small>{L('Date')}</small>
+                  <strong>{formatDate(selectedExpense.date)}</strong>
+                </div>
+                <div className="muf-kpi-card">
+                  <small>{L('Type')}</small>
+                  <strong><span className={`inline-flex px-2 py-1 rounded-full text-[10px] font-bold uppercase ${typeStyles[selectedExpense.type]}`}>{L(selectedExpense.type)}</span></strong>
+                </div>
+                <div className="muf-kpi-card col-span-2">
+                  <small>{L('Amount')}</small>
+                  <strong>₨ {selectedExpense.amount.toLocaleString()}</strong>
+                </div>
+                <div className="muf-kpi-card">
+                  <small>{L('Cow')}</small>
+                  <strong>{cow?.name || (selectedExpense.cowId ? L('Unknown') : L('Farm-wide'))}</strong>
+                </div>
+                <div className="muf-kpi-card">
+                  <small>{L('Feed quantity')}</small>
+                  <strong>{selectedExpense.feedKg ? `${selectedExpense.feedKg} kg` : '—'}</strong>
+                </div>
+              </div>
+              {supplier && (
+                <div className="rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50 dark:bg-amber-950/20 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">{L('Supplier')}</p>
+                  <p className="mt-1 font-semibold text-slate-800 dark:text-slate-100">{supplier.name}</p>
+                  {supplier.phone && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{supplier.phone}</p>}
+                </div>
+              )}
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{L('Note')}</p>
+                <p className="mt-1 whitespace-pre-wrap break-words text-slate-700 dark:text-slate-200">{selectedExpense.note?.trim() || L('No notes added.')}</p>
+              </div>
+              {selectedExpense.receiptBase64 && (
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">{L('Receipt Photo')}</p>
+                  <button type="button" onClick={() => setViewReceipt(selectedExpense.receiptBase64!)} className="block w-full rounded-xl overflow-hidden bg-white dark:bg-slate-950" aria-label={L('Open receipt photo')}>
+                    <img src={selectedExpense.receiptBase64} alt={L('Receipt')} className="w-full max-h-56 object-contain" />
+                  </button>
+                </div>
+              )}
+              {(isAdmin || canDelete) && (
+                <div className="flex flex-wrap justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                  {isAdmin && (
+                    <button type="button" onClick={() => { setSelectedExpense(null); handleEdit(selectedExpense); }} className="muf-btn muf-btn-primary">
+                      <Edit2 className="w-3.5 h-3.5" /> {L('Edit Expense')}
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button type="button" onClick={async () => { const deleted = await handleDelete(selectedExpense._id); if (deleted) setSelectedExpense(null); }} className="muf-btn muf-btn-danger">
+                      <Trash2 className="w-3.5 h-3.5" /> {L('Delete Expense')}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })()}
+      </DetailModal>
 
       {/* Receipt photo lightbox */}
       {/* canDelete = real admin (App passes isAdmin there); workers keep logging expenses but the khata stays admin-only */}
