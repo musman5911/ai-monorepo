@@ -10,7 +10,8 @@ Working branch: arena/20261014-muf-mobile-popups
 - **Popup inventory baseline:** the owner-provided audit after `95b3d66` reported 139 direct DetailModal call sites, zero missing sizes, 96 small, 39 big, four intentional dynamic wrappers and zero unsupported literals.
 - **Workbench:** a native, dependency-free visual editor is available through the Dairy Vite development server at `http://localhost:5000/__muf-workbench`. A focused source-safety check is included as `check-muf-workbench.js`.
 - **Important integration trade-off:** the original Puck-based direction was replaced by the custom MUF builder so the current workstream could preserve the package manifests and lockfiles. `@puckeditor/core` is not integrated. The workbench still supplies a local canvas, inspector, drag/reorder, undo/redo, device presets, baseline comparison, browser-local drafts and CSS/JSON export. This deviation is documented rather than described as a Puck integration.
-- **Local validation:** prior checks/builds were reported by the owner after `95b3d66`, but were not rerun after the later connector-created source batches. The current source changes need a local type-checked build and check-script run.
+- **Source assertions:** 19/19 connector-side assertions against the current branch files passed, covering workbench isolation and features plus stylesheet parity. These assertions are not the same as running `node check-muf-workbench.js` from the repo checkout.
+- **Local validation:** prior checks/builds were reported by the owner after `95b3d66`, but were not rerun after later source batches. The current code still needs local type-checked builds and check-script execution.
 - **Root Vitest:** not verified. The previously supplied output showed the root Vitest executable was not installed even though the root manifest and lockfile declare it.
 - **Browser regression:** intentionally left for the final phase, as the owner requested.
 - No backend code, API contracts, business calculations, permissions, database schemas or farm workflows were changed in this workstream.
@@ -72,7 +73,7 @@ Open the workbench only with the Dairy client Vite server running: from `dairy_f
 
 Puck is not bundled. The workstream has kept dependency manifests and lockfiles untouched; consequently the workbench is a custom MUF builder, not Puck. A future Puck-library integration would need explicit approval to add and lock the required frontend dependency and then pass local builds.
 
-The development route is not referenced from the normal `main.tsx` or `App.tsx` entry points. The workbench has no application API client and never publishes design changes. Exported files must be reviewed and applied manually.
+The development route is not referenced from the normal `main.tsx` or `App.tsx` entry points. The workbench has no application API client and never publishes design changes. Exported files must be reviewed and applied manually. Connector-side source assertions passed 19/19 against the current branch files; the actual CLI guard and type-checked build have not run locally.
 
 ## Phase 5 — final validation and browser regression
 
