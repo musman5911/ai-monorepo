@@ -40,7 +40,7 @@ As of the source review on 2026-10-15:
 - Form sheets and admin shells were aligned with the shared height token in commit a510265.
 - On 2026-10-15, the owner reran local checks at parent commit `378deab`: UI safety, the workbench guard (18/18), audit syntax/execution, and all three app builds passed. The sync checker exposed a stale selector regex, and Vitest ran 33 tests with one failure caused by an obsolete exact-phrase assertion. Commit `6ab2011` fixes both and requires a local rerun.
 - The audit reported 139 DetailModal call sites across the three apps, with zero missing sizes and zero unsupported size literals.
-- `npm ci` reported four audit findings (1 moderate, 1 high, 2 critical); inspect them with `npm audit` before changing dependency versions.
+- Root `npm ci` reported four audit findings: `@vitest/mocker` (moderate), `source-map-js` (high), `tinypool` (two critical). As of 2026-10-15, documented fixed versions are Vitest 4.1.11+, `source-map-js` 1.2.2+, and `tinypool` 2.1.2+. Lockfile regeneration and re-validation remain open.
 - A development-only custom MUF workbench is implemented in the Dairy Vite client at /__muf-workbench; see MUF_WORKBENCH_AUDIT.md for its constraints and validation status.
 - The workbench is dependency-free, not a Puck integration, because package manifests and lockfiles were kept unchanged in this workstream.
 

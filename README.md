@@ -43,7 +43,7 @@ Run `node check-muf-workbench.js` from the monorepo root to run the workbench so
 
 The owner ran the full local checks on 2026-10-15 at parent commit `378deab`: the workbench guard passed 18/18 checks; UI safety checks passed; the audit syntax check and audit command completed; and `build-all.bat` built all three apps successfully. The sync checker reported one stale small-title selector pattern, and `npm test` ran 33 tests with 32 passing and one failure because a smoke test expected the old literal phrase `No PRs`. Commit `6ab2011` repairs those two issues by recognizing the shared `.muf-pup-sm, .muf-pup-lg` selector and asserting the actual no-pull-request rule. Pull this follow-up and rerun the checks before treating them as verified.
 
-`npm ci` also reported four dependency audit findings (one moderate, one high and two critical). The output provided did not identify affected packages/advisories, so run `npm audit` and review the details before applying dependency updates. Do not use `npm audit fix --force` as a blind cleanup step.
+`npm ci` reported four findings: `@vitest/mocker` (moderate), `source-map-js` (high) and `tinypool` (two critical). As of 2026-10-15, the advisory fixes identified are Vitest 4.1.11+, `source-map-js` 1.2.2+ and `tinypool` 2.1.2+. No dependency or lockfile change is committed yet; regenerate the lockfile with npm and rerun audit/tests/builds. Do not use `npm audit fix --force` blindly.
 
 ## Documentation map
 

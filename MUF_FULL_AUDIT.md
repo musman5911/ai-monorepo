@@ -159,7 +159,7 @@ The owner ran the following checks from the Windows checkout:
 - `build-all.bat`: Dairy, Flock and Agri all built successfully.
 - `node check-muf-sync.js`: reported one mismatch, the small-popup title scale. The CSS intentionally groups `.muf-pup-sm` and `.muf-pup-lg` in one shared rule; the checker incorrectly required a standalone `.muf-pup-sm { }` block.
 - `npm test`: 32/33 tests passed. The sole failure required the literal `No PRs`, while `RULES.md` already expressed the intended policy as “do not open pull requests as a substitute for the repository's established workflow.”
-- `npm ci`: reported four dependency audit findings (one moderate, one high, two critical). The provided output did not identify package names or advisories.
+- `npm ci`: reported four dependency audit findings (one moderate, one high, two critical). Advisory mapping and verified patched versions are documented under **Dependency audit (OPEN)** below; no dependency/lockfile change has been made.
 
 ### Fixes committed
 
@@ -172,7 +172,7 @@ A connector-side validation pass evaluated 19 assertions against retrieved branc
 ### Still pending
 
 - Rerun `npm run check-workbench`, `node check-muf-sync.js`, `node check-ui-safety.js`, both audit commands, `build-all.bat` and `npm test` after pulling the latest documentation commit.
-- Run `npm audit` to inspect the four reported dependency findings before deciding on safe updates. Avoid `npm audit fix --force` without reviewing breaking-change impact.
+- Fix the four audit findings through npm dependency resolution (Vitest 4.1.11+, `source-map-js` 1.2.2+, `tinypool` 2.1.2+), regenerate the root lockfile, then rerun `npm audit`, `npm test` and all three app builds. The lockfile update is still open; see the advisory links under **Dependency audit (OPEN)** near the top. Do not use `npm audit fix --force` blindly.
 - Runtime workbench interaction in a browser.
 - Final three-app visual/browser regression.
 
