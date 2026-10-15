@@ -133,9 +133,9 @@ After shared component styles stabilize, build editing-x-projetcs.tsx with Puck 
 Update this audit whenever the popup inventory, CSS metrics, validation baseline or implementation priorities materially change. Every reported result must be sourced from actual command output or source inspection.
 
 
-## Phase 3 styling batch 4 — shared popup chrome tokens
+## Phase 3 Batch 6 — shared popup chrome tokens
 
-The three shared stylesheet copies were updated together to remove repeated declarations for popup title, subtitle, header padding, inter-item gap and icon size. Those values now live in one combined small/large popup rule; small and large popups retain their separate section-heading size, body-text size and body padding. This is a declaration-level consolidation only, with the prior values preserved.
+The three shared stylesheet copies were updated to remove repeated declarations for popup title, subtitle, header padding, inter-item gap and icon size. Those values now live in one combined small/large popup rule; small and large popups retain their separate section-heading size, body-text size and body padding. This is a declaration-level consolidation only, with the prior values preserved.
 
 Validation status for this batch: the same source change is present in all three CSS twins (their blob SHAs match), with the CSS and documentation writes recorded as sequential commits. Local MUF sync/safety checks and builds must be rerun. Browser regression is intentionally deferred until all implementation phases are finished, per the owner's workflow instruction.
 
@@ -149,3 +149,6 @@ The first workbench iteration is committed on the assigned branch:
 Puck integration remains incomplete because `@measured/puck` is not present in the repository dependencies. Package manifests and lockfiles were left unchanged. The custom inspector is a dependency-free first iteration, not a substitute falsely labeled as a completed Puck integration.
 
 Validation status: this connector session cannot run the Windows build/check scripts. The new TSX and Vite middleware still require local type/build verification. No browser results are claimed; browser regression remains deferred until all implementation phases are finished.
+
+
+Workbench follow-up commit `0ab5851` improves the preview so popup size and compact/comfortable density affect the canvas and exported CSS. This remains source-inspected only; the local TypeScript/build checks have not been run in this session.
