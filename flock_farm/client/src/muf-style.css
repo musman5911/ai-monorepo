@@ -1264,28 +1264,24 @@
    "COMPACT MOBILE POPUPS" block above still wins (size there
    only controls width).
    ============================================================ */
-.muf-pup-sm {
+/* Shared popup chrome tokens are declared once; only body density varies by size. */
+.muf-pup-sm, .muf-pup-lg {
   --pup-title: 0.875rem;
   --pup-sub: 0.7rem;
-  --pup-head: 0.8125rem;
-  --pup-text: 0.75rem;
   --pup-head-pad: 12px;
-  --pup-body-pad: 14px;
   --pup-gap: 8px;
   --pup-icon: 32px;
 }
+.muf-pup-sm {
+  --pup-head: 0.8125rem;
+  --pup-text: 0.75rem;
+  --pup-body-pad: 14px;
+}
 .muf-pup-lg {
-  /* Header (title/sub/icon/padding/gap) is now IDENTICAL to small —
-     one heading language for every popup. Only body content
-     (--pup-head, --pup-text, --pup-body-pad) + width scale. */
-  --pup-title: 0.875rem;
-  --pup-sub: 0.7rem;
+  /* Larger popups keep the same header language but allow denser data sections. */
   --pup-head: 1rem;
   --pup-text: 0.8125rem;
-  --pup-head-pad: 12px;
   --pup-body-pad: 20px;
-  --pup-gap: 8px;
-  --pup-icon: 32px;
 }
 
 
