@@ -128,7 +128,7 @@ Verify all three apps at 360/390px phone widths, 768px tablet, 1024px compact de
 Update this phase tracker whenever a phase changes status. Include commit IDs, files changed, commands actually run and browser results. Never mark a test as passed unless its output was observed.
 
 
-## Phase 3 styling batch 4 — shared popup chrome tokens
+## Phase 3 Batch 6 — shared popup chrome tokens
 
 **Implementation committed; local validation pending.** The identical muf-style.css copies now declare the shared popup title, subtitle, header padding, gap and icon tokens once for both small and large popups. Only the intentionally size-specific section-heading scale, body text scale and body padding remain in their individual rules. This is a source consolidation intended to preserve computed styles exactly; it does not change popup sizing, responsive rules, behavior or content.
 
@@ -138,3 +138,6 @@ The user has explicitly deferred all browser checks until every implementation p
 ## Workbench implementation note
 
 The first development-only workbench files are committed on the assigned branch: `dairy_farm/client/src/editing-x-projetcs.tsx` and the dev-only route in `dairy_farm/client/vite.config.ts`. The GitHub connector environment used for these edits cannot run the local Windows validation scripts or builds, so none are marked as passed here. The owner will do browser regression only after the implementation phases finish.
+
+
+**Batch 6 committed in `25a9488`–`c269fd5`: shared popup chrome tokens.** The identical stylesheet copies now declare popup title, subtitle, header padding, gap and icon tokens once for both small and large shells. The size-specific section-heading scale, body-text scale and body padding remain separate. The later documentation commits record the change and validation limits. The three CSS copies have matching blob SHAs. Local sync/safety scripts and builds still need to run; browser review remains deferred.
