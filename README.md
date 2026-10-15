@@ -29,6 +29,10 @@ From the repository root, run these in order after pulling the working branch:
 
 Run the design audit with `node audit-muf-design-system.mjs`. It writes local reports to `.audit-output`, which is intentionally ignored by Git.
 
+## Latest UI implementation status (2026-10-15)
+
+The current branch adds summary-first popup drill-downs to Dairy Expenses, Dairy Health and Dairy Milk History, and Agri ledger/report/dashboard lists. The Dairy and Agri login shells now declare Urdu RTL direction consistently with Flock. See `PHASES.md` and `MUF_FULL_AUDIT.md` for the implementation commit list and validation boundary. The last owner-reported local build/test pass predates these source commits, so pull this branch and rerun the checks before using it as a verified build. Browser regression remains deferred until implementation is complete.
+
 ## Development-only MUF workbench
 
 The component preview builder is exposed by the Dairy Vite development server only. From `dairy_farm/client`, run `npm run dev`, then open `http://localhost:5000/__muf-workbench`. The editor uses sample content, saves drafts in the browser, and exports reviewable CSS/JSON files. It does not call farm APIs or apply styles automatically.

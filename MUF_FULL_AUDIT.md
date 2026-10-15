@@ -5,6 +5,22 @@ Working branch: `arena/20261014-muf-mobile-popups`
 
 This document records source findings, implementation batches, and validation evidence. A GitHub source read or source-pattern assertion is not a substitute for a local TypeScript build or browser session.
 
+## Implementation updates from the current continuation (2026-10-15)
+
+These UI source commits follow the last owner-reported passing local checks at `25c12dc`. They have been pushed to this branch, but **the new source state has not yet had a local TypeScript/build/test run**.
+
+- `5d845cd` — Dairy Expenses: summary-first expense rows and a child details popup for supplier, notes, feed quantity, and receipt.
+- `2c256df` — Agri Ledger: transaction summaries drill into the existing ledger-entry popup; removed a duplicate modal size attribute.
+- `85cf298` and `89b1e86` — Dairy Health: compact parent list/grid, retained full description/medicine/vet/notes in the child popup, and guarded row/action keyboard/click behavior.
+- `b11a34c` — Dairy and Agri login shells now declare the same Urdu RTL direction as Flock; authentication flows were not changed.
+- `726e532` and `6d47983` — Dairy Milk History has a read-only detail popup for milk quantities, saleable quantity, buyer and milk-quality fields; removed an unused import.
+- `581093d` — Agri nested ledger/category/month popups preserve their parent context when a detail child closes.
+- `a9599f1` and `6532ef1` — Agri dashboard crop/task/finance summaries and crop inventory summaries open the appropriate existing detail popup.
+
+Source-level assertions run during these edits passed. These assertions only validate authored source patterns and do **not** prove TypeScript correctness or runtime behavior. The browser pass remains deferred until implementation is complete, as requested. Flock Active Birds compact tabs/shared bird detail and mobile admin viewport sizing were already present in the branch and were not redundantly rewritten.
+
+**Still open:** run the validation commands below against the current pulled head; review and resolve the reported npm audit issues only through a compatible npm lockfile update; then perform the final three-app browser regression. Do not mark build, dependency remediation or browser results complete before they are actually observed.
+
 ## Executive findings
 
 - The last owner-provided popup inventory after `95b3d66` showed 139 direct DetailModal call sites, with zero missing sizes: 96 small, 39 big, four deliberate dynamic wrappers, and zero unsupported size literals.

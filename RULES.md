@@ -60,6 +60,9 @@ Centralize repeated visual decisions in MUF tokens/classes instead of repeating 
 - Preserve the existing mobile width gutters: small is viewport width minus 48px, big is viewport width minus 32px; at widths of 380px or less, the intended gutters become 40px and 24px respectively.
 - On mobile, detail popups, form sheets and admin shells use the shared --muf-popup-mobile-max-height: 70dvh cap. Admin sizing also respects its viewport safety margin.
 - Let long popup content scroll inside the popup. Avoid making short popups full-screen by default.
+- For data-heavy parent lists/cards, keep the parent summary concise and put long notes, receipts, and secondary fields in the existing detail child popup rather than repeating them inline.
+- Summary rows/cards that open child popups must be keyboard reachable and have an accessible label. Nested action buttons must stop click propagation; keyboard row handlers must ignore events originating from nested controls.
+- When a child popup is opened from an existing popup, preserve and restore the actual parent context using the shared popup stack. Keep this to presentation/navigation state; do not change farm calculations, APIs, permissions, or business workflows.
 - Keep labels, dates, amounts and action buttons readable. Do not squeeze table headings into one-character-per-line columns; use the existing horizontal-scroll or reflow patterns.
 - Preserve dialog semantics, labelled titles, focus handling, Escape/top-most-modal behavior, backdrop handling, scroll locking, safe-area padding and reduced-motion support.
 - Dropdown menus must not be clipped by a horizontal scroll container. Keep their existing portal, outside-click and Escape behavior.

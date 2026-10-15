@@ -45,3 +45,8 @@ As of the source review on 2026-10-15:
 - The workbench is dependency-free, not a Puck integration, because package manifests and lockfiles were kept unchanged in this workstream.
 
 See muf-rules.md for enforceable UI rules, MUF_FULL_AUDIT.md for findings, MUF_WORKBENCH_AUDIT.md for editor scope, and PHASES.md for phase status. Rerun the repaired sync checker, root test suite and build/audit commands after pulling the current follow-up. Browser regression remains pending.
+
+
+## Latest continuation status (2026-10-15)
+
+The current branch includes summary-first record detail flows for Dairy expenses, health records and milk history; summary-first Agri ledger/report/dashboard drill-downs; parent restoration for nested Agri popups; and consistent login-shell RTL direction across all three apps. No backend source, auth handler, database schema or farm calculation was changed in these source commits. The latest owner-reported local validations predate this continuation; local tests/builds and the final browser regression must be rerun before this source state is considered verified. See `PHASES.md` and `MUF_FULL_AUDIT.md` for the exact commit list and remaining acceptance checks.
