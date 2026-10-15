@@ -66,17 +66,28 @@ const initialDesign: Design = {
   ]
 };
 const cloneDesign = (value: Design): Design => ({ blocks: value.blocks.map(block => ({ ...block })) });
-const isKind = (value: unknown): value is Kind => typeof value === 'string' && value in kindLabels;
+const isKind = (value: unknown): value is Kind =>
+  typeof value === 'string' && Object.prototype.hasOwnProperty.call(kindLabels, value);
 const isDesign = (value: unknown): value is Design => {
   if (!value || typeof value !== 'object' || !Array.isArray((value as Design).blocks)) return false;
-  return (value as Design).blocks.every(block =>
-    block && typeof block.id === 'string' && isKind(block.kind) &&
-    typeof block.title === 'string' && typeof block.body === 'string' &&
-    ['small', 'large'].includes(block.size) &&
-    ['comfortable', 'compact'].includes(block.density) &&
-    ['surface', 'surface-alt', 'primary'].includes(block.surface) &&
-    ['primary', 'success', 'warning', 'danger'].includes(block.accent)
-  );
+  const blocks = (value as Design).blocks;
+  if (blocks.length > 100) return false;
+  return blocks.every((candidate: unknown) => {
+    if (!candidate || typeof candidate !== 'object') return false;
+    const block = candidate as Partial<Block>;
+    return typeof block.id === 'string' && block.id.length <= 120 && isKind(block.kind) &&
+      typeof block.title === 'string' && block.title.length <= 500 &&
+      typeof block.subtitle === 'string' && block.subtitle.length <= 500 &&
+      typeof block.body === 'string' && block.body.length <= 5000 &&
+      (block.size === 'small' || block.size === 'large') &&
+      (block.density === 'comfortable' || block.density === 'compact') &&
+      (block.surface === 'surface' || block.surface === 'surface-alt' || block.surface === 'primary') &&
+      (block.accent === 'primary' || block.accent === 'success' || block.accent === 'warning' || block.accent === 'danger') &&
+      typeof block.radius === 'number' && Number.isFinite(block.radius) && block.radius >= 0 && block.radius <= 32 &&
+      typeof block.padding === 'number' && Number.isFinite(block.padding) && block.padding >= 8 && block.padding <= 32 &&
+      typeof block.gap === 'number' && Number.isFinite(block.gap) && block.gap >= 4 && block.gap <= 24 &&
+      typeof block.fontSize === 'number' && Number.isFinite(block.fontSize) && block.fontSize >= 11 && block.fontSize <= 22;
+  });
 };
 const safeLoadDraft = (): Design => {
   try {
