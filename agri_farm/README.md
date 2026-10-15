@@ -16,4 +16,4 @@ Shared visual components and tokens live in frontend/src/muf-*. Keep the shared 
 
 Current MUF task restrictions: no backend edits, no business-logic edits, and no feature removals. Do not alter API behavior, calculations or permissions during styling.
 
-See ../README.md for commands, ../RULES.md for non-negotiable rules, ../muf-.md for the design-system overview, ../muf-rules.md for popup/style rules, ../MUF_FULL_AUDIT.md for audit findings and ../PHASES.md for work status.
+See ../README.md for commands, ../RULES.md for non-negotiable rules, ../MUF_OVERVIEW.md for the design-system overview, ../muf-rules.md for popup/style rules, ../MUF_FULL_AUDIT.md for audit findings and ../PHASES.md for work status.
