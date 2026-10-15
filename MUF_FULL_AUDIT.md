@@ -8,8 +8,8 @@ This document records source findings, implementation batches, and validation ev
 ## Executive findings
 
 - The last owner-provided popup inventory after `95b3d66` showed 139 direct DetailModal call sites, with zero missing sizes: 96 small, 39 big, four deliberate dynamic wrappers, and zero unsupported size literals.
-- The current shared `muf-style.css` copies have identical blob SHA `6e8bc53ddff8dc1ba9294d608963b0e18c48355f` across Agri, Dairy and Flock.
-- Shared CSS work was extended by batches for mobile popup tokens, popup form rhythm, and shared popup chrome tokens. The latest source was reviewed via GitHub. Later batches were not locally rebuilt in this session.
+- The current shared `muf-style.css` copies have identical blob SHA `76a95ddee233e03ee1b17013271d009ae85f5308` across Agri, Dairy and Flock.
+- Shared CSS work includes mobile popup tokens, popup form rhythm, shared popup chrome, and base action/card dimension tokens. The latest source was reviewed via GitHub. Later batches were not locally rebuilt in this session.
 - A development-only MUF workbench now exists in the Dairy Vite client. The source contains a component palette/inspector, ordering and duplication controls, undo/redo, responsive previews, a baseline comparison, local drafts, and CSS/JSON export.
 - The workbench is a custom dependency-free implementation. The planned Puck-library integration was intentionally not added because the package manifests and lockfiles remained outside the authorized change scope. This is a documented plan adaptation, not a claim that Puck was integrated.
 - `check-muf-workbench.js` was added to guard editor isolation and the local-only/export-only design. It still needs to be run from the local monorepo checkout.
@@ -167,3 +167,16 @@ The connector session cannot execute the repository's Windows scripts/builds, an
 ## Follow-through
 
 Run the Phase 5 validation list in `PHASES.md` from the working branch and then do the browser checklist the owner reserved for the final phase. Keep the current lockfiles and all backend/business logic untouched.
+
+
+## Phase 3 Batch 7 — shared action and card dimensions
+
+The three shared CSS copies were updated identically to centralize 28 existing values for primary-action default/small/mobile sizing and shadow, compact detail/record/icon button sizing, record/icon button colors, KPI card spacing/radius/hover shadow, panel radius, and crop/entity card radius/shadows. Existing values were moved into custom properties and retained as `var(..., fallback)` values at consuming declarations. The batch deliberately did not remove unrelated responsive overrides or semantic colors.
+
+Source assertions executed against the retrieved branch files:
+- All three stylesheet contents and blob SHAs match.
+- All 28 new token definitions occur once and each has a consumer.
+- Targeted primary/compact actions and KPI/crop/entity card rules use the tokens.
+- CSS braces, parentheses, brackets, strings and comments are balanced under a source scanner.
+
+Status: 9/9 CSS source assertions passed. This is not a full CSS parser, local command execution or proof of computed-style parity. Local MUF sync/safety/audit scripts, type-checked builds, and final browser review are still required. Latest shared CSS blob SHA: `76a95ddee233e03ee1b17013271d009ae85f5308`.
