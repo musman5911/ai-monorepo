@@ -140,6 +140,10 @@ After `95b3d66`, the owner reported passing:
 
 Those results predate the newest CSS and workbench edits.
 
+### Source assertions executed against current branch content
+
+A connector-side validation pass evaluated 19 assertions against retrieved current source files. All 19 passed, including the three stylesheet blob hashes, explicit Vite route matching, no API client/network request in the workbench, CSS/JSON export controls, draft validation, responsive/dark preview and editor isolation. This was not an execution of the committed Node checker from the repository checkout.
+
 ### Reviewed from branch source during this audit
 
 - The three shared stylesheet files have matching blob SHA values.
