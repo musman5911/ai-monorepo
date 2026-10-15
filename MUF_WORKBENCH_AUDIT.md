@@ -57,7 +57,7 @@ This check does not replace TypeScript checking, the three frontend builds, `che
 Corrected during the implementation sequence:
 - A malformed compact-padding conditional expression in the preview style.
 - Multiple independent draft reads during initial state setup.
-- Weak persisted-design validation; the loader now verifies supported component/enum values, text lengths, numeric ranges and a 100-block maximum.
+- Weak persisted-design validation; the loader now verifies supported component/enum values, unique/non-empty IDs, text lengths, numeric ranges and a 100-block maximum.
 - Custom CSS-variable style typing for the preview styles.
 - Array.map callback argument mismatch in canvas rendering.
 - Dark-mode preview token and foreground contrast behavior.
