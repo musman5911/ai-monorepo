@@ -8,7 +8,7 @@ import { calcRevenueWithHistory, saleableMilkLiters } from '../utils/rates';
 import { todayStr, shiftDate as shiftDateLocal, formatDate } from '../utils/date';
 import {
   Save, Trash2, History, List, Plus,
-  ChevronLeft, ChevronRight, Calendar, Baby, Loader2, Edit2
+  ChevronLeft, ChevronRight, Calendar, Baby, Loader2, Edit2, Eye
 } from 'lucide-react';
 import DetailModal from '../muf-modal';
 
@@ -37,6 +37,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
 
   const [dailyEntries, setDailyEntries] = useState<Record<string, { morning: string; evening: string; calfMilk: string; buyerId: string; existingId?: string }>>({});
   const [showEntryPopup, setShowEntryPopup] = useState(false);
+  const [selectedHistoryRecord, setSelectedHistoryRecord] = useState<MilkEntry | null>(null);
   const [editRecord, setEditRecord] = useState<MilkEntry | null>(null);
   const [editForm, setEditForm] = useState({ cowId: '', date: '', morning: '', evening: '', calfMilk: '' });
 
@@ -385,7 +386,20 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
                   ) : historyByCow.length === 0 ? (
                     <tr><td colSpan={canDelete ? 7 : 6} className="px-5 py-12 text-center text-slate-400">No records for {monthLabel(historyMonth)}</td></tr>
                   ) : historyByCow.map(record => (
-                    <tr key={record._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 text-sm">
+                    <tr
+                      key={record._id}
+                      onClick={() => setSelectedHistoryRecord(record)}
+                      onKeyDown={event => {
+                        if (event.target !== event.currentTarget) return;
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          setSelectedHistoryRecord(record);
+                        }
+                      }}
+                      tabIndex={0}
+                      aria-label={L('Open milk record details')}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 text-sm cursor-pointer"
+                    >
                       <td className="px-5 py-3 text-slate-500">{formatDate(record.date)}</td>
                       <td className="px-5 py-3 font-medium text-slate-800 dark:text-slate-100">{cowMap[record.cowId] || 'Unknown'}</td>
                       <td className="px-5 py-3 text-slate-600 dark:text-slate-400">{fmt(record.morning)} L</td>
@@ -394,10 +408,10 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
                       <td className="px-5 py-3 font-semibold text-farm-600">{fmt(record.morning + record.evening)} L</td>
                       {canDelete && (
                         <td className="px-5 py-3 text-right">
-                          <button onClick={() => openEdit(record)} className="p-1.5 text-slate-400 hover:text-farm-600" title={L('Edit record')}>
+                          <button type="button" onClick={event => { event.stopPropagation(); openEdit(record); }} className="p-1.5 text-slate-400 hover:text-farm-600" title={L('Edit record')} aria-label={L('Edit milk record')}>
                             <Edit2 className="h-4 w-4" />
                           </button>
-                          <button onClick={() => handleDelete(record._id)} className="p-1.5 text-slate-400 hover:text-red-500">
+                          <button type="button" onClick={event => { event.stopPropagation(); handleDelete(record._id); }} className="p-1.5 text-slate-400 hover:text-red-500" title={L('Delete record')} aria-label={L('Delete milk record')}>
                             <Trash2 className="h-4 w-4" />
                           </button>
                         </td>
@@ -410,6 +424,81 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
           </div>
         </div>
       )}
+
+      {/* ── Read-only history detail ───────────── */}
+      <DetailModal
+        open={!!selectedHistoryRecord}
+        onClose={() => setSelectedHistoryRecord(null)}
+        title={L('Milk Record Details')}
+        subtitle={selectedHistoryRecord ? formatDate(selectedHistoryRecord.date) : undefined}
+        icon={<History className="w-5 h-5" />}
+        iconBg="bg-farm-100 text-farm-700"
+        size="small"
+      >
+        {selectedHistoryRecord && (() => {
+          const cow = cows.find(item => item._id === selectedHistoryRecord.cowId);
+          const buyer = selectedHistoryRecord.buyerId ? buyers.find(item => item._id === selectedHistoryRecord.buyerId) : null;
+          const total = (selectedHistoryRecord.morning || 0) + (selectedHistoryRecord.evening || 0);
+          const saleable = saleableMilkLiters(selectedHistoryRecord);
+          return (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="muf-tile">
+                  <p className="muf-caption">{L('Cow')}</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{cow?.name || L('Unknown')}</p>
+                  {cow?.breed && <p className="text-[11px] text-slate-500 mt-0.5">{cow.breed}</p>}
+                </div>
+                <div className="muf-tile">
+                  <p className="muf-caption">{L('Date')}</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{formatDate(selectedHistoryRecord.date)}</p>
+                </div>
+                <div className="muf-tile">
+                  <p className="muf-caption">{L('Morning milk')}</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{fmtL(selectedHistoryRecord.morning)}</p>
+                </div>
+                <div className="muf-tile">
+                  <p className="muf-caption">{L('Evening milk')}</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{fmtL(selectedHistoryRecord.evening)}</p>
+                </div>
+                <div className="muf-tile">
+                  <p className="muf-caption">{L('Calf milk')}</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{fmtL(selectedHistoryRecord.calfMilk || 0)}</p>
+                </div>
+                <div className="muf-tile">
+                  <p className="muf-caption">{L('Saleable milk')}</p>
+                  <p className="font-bold text-emerald-600 dark:text-emerald-400">{fmtL(saleable)}</p>
+                </div>
+                <div className="muf-tile">
+                  <p className="muf-caption">{L('Total milk')}</p>
+                  <p className="font-bold text-farm-600 dark:text-farm-400">{fmtL(total)}</p>
+                </div>
+                <div className="muf-tile">
+                  <p className="muf-caption">{L('Buyer')}</p>
+                  <p className="font-bold text-slate-800 dark:text-slate-100">{buyer?.name || L('Default rate')}</p>
+                  {buyer?.defaultRate != null && <p className="text-[11px] text-slate-500 mt-0.5">₨ {fmt(buyer.defaultRate)} / L</p>}
+                </div>
+                {(selectedHistoryRecord.fatPercent != null || selectedHistoryRecord.snfPercent != null) && (
+                  <div className="muf-tile col-span-2">
+                    <p className="muf-caption">{L('Quality')}</p>
+                    <p className="font-bold text-slate-800 dark:text-slate-100">
+                      {selectedHistoryRecord.fatPercent != null ? `Fat ${selectedHistoryRecord.fatPercent}%` : ''}
+                      {selectedHistoryRecord.fatPercent != null && selectedHistoryRecord.snfPercent != null ? ' · ' : ''}
+                      {selectedHistoryRecord.snfPercent != null ? `SNF ${selectedHistoryRecord.snfPercent}%` : ''}
+                    </p>
+                  </div>
+                )}
+              </div>
+              {canDelete && (
+                <div className="flex justify-end gap-2 border-t border-slate-100 dark:border-slate-800 pt-3">
+                  <button type="button" onClick={() => { const record = selectedHistoryRecord; setSelectedHistoryRecord(null); openEdit(record); }} className="muf-btn muf-btn-primary">
+                    <Edit2 className="w-3.5 h-3.5" /> {L('Edit record')}
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+      </DetailModal>
 
       {/* ── Edit milk record ─────────────────── */}
       <DetailModal open={!!editRecord} onClose={() => setEditRecord(null)} title={L('Edit Milk Record')}
