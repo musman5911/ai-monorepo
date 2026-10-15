@@ -1037,7 +1037,19 @@ export default function Dashboard({
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                   {shownBirds.map(b => (
-                    <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer" onClick={() => openBirdDetail(b, 'activeBirds')}>
+                    <tr
+                      key={b.id}
+                      tabIndex={0}
+                      aria-label={L('Open bird details') + ': ' + b.name}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-emerald-500"
+                      onClick={() => openBirdDetail(b, 'activeBirds')}
+                      onKeyDown={(event) => {
+                        if (event.target !== event.currentTarget) return;
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          openBirdDetail(b, 'activeBirds');
+                        }
+                      }}>
                       <td className="py-2 pr-3 font-semibold text-slate-800 dark:text-slate-100">{b.name}</td>
                       <td className="py-2 pr-3 text-slate-600 dark:text-slate-300">{breedLabel(b)}</td>
                       <td className="py-2 pr-3">{b.gender === 'Male' ? '♂' : '♀'}</td>
