@@ -161,6 +161,19 @@ The owner ran the following checks from the Windows checkout:
 - `npm test`: 32/33 tests passed. The sole failure required the literal `No PRs`, while `RULES.md` already expressed the intended policy as “do not open pull requests as a substitute for the repository's established workflow.”
 - `npm ci`: reported four dependency audit findings (one moderate, one high, two critical). Advisory mapping and verified patched versions are documented under **Dependency audit (OPEN)** below; no dependency/lockfile change has been made.
 
+### Owner follow-up validation at `25c12dc` (2026-10-15)
+
+After the earlier checker/test mismatch listed above, the owner reported pulling the later source/docs commit and rerunning validation successfully:
+
+- `node check-muf-sync.js`: passed.
+- `npm test`: 33/33 passed.
+- `npm run check-workbench`: all 18 source-safety checks passed.
+- `node check-ui-safety.js`: passed.
+- `node --check audit-muf-design-system.mjs` and `node audit-muf-design-system.mjs`: passed/completed; the audit reported zero missing or unsupported modal sizes.
+- `build-all.bat`: Dairy, Flock and Agri all built successfully.
+
+That owner run was against `25c12dc`, before the summary-first UI source changes documented near the top of this file. The six new popup regression tests and the new app changes have **not** been run locally yet; the earlier 33/33 result must not be presented as validation of the current head.
+
 ### Fixes committed
 
 Commit `6ab2011` changes the sync invariant to check the real grouped popup selector and its shared `--pup-title: 0.875rem` token. It updates the smoke test to assert the no-pull-request rule rather than the stale exact phrase. The source/test changes are pushed; rerun local commands after pulling before treating these checks as green.
@@ -169,10 +182,19 @@ Commit `6ab2011` changes the sync invariant to check the real grouped popup sele
 
 A connector-side validation pass evaluated 19 assertions against retrieved branch source files. All 19 passed, including stylesheet parity, explicit Vite route matching, absence of API client/network code in the workbench, CSS/JSON export controls, draft validation, responsive/dark preview and editor isolation. Source inspection is not a local runtime or build.
 
+### Dependency audit (OPEN)
+
+The reported audit total is four findings: `@vitest/mocker` (moderate), `source-map-js` (high) and `tinypool` (two critical findings). Root `package.json` still declares `vitest: ^3.0.0`.
+
+- The Vitest `@vitest/mocker` advisory identifies **Vitest 4.1.11** as the patched stable release for the redirect-mock path-traversal issue; Vitest 3.x is not maintained for this issue: https://github.com/vitest-dev/vitest/security/advisories/GHSA-82fw-gwwq-j7x9
+- `source-map-js` is fixed from **1.2.2**: https://github.com/advisories/GHSA-68fv-2mgg-jv7q
+- `tinypool` must be **2.1.2 or later** to cover both reported prototype-pollution advisories: https://github.com/tinylibs/tinypool/security/advisories/GHSA-5gmw-xhrv-c9v3 and https://github.com/advisories/GHSA-85c8-ppgw-ccpr
+
+No dependency or lockfile edits were made during this source-only continuation. Resolve the major-version transition using npm on a working checkout, regenerate the root `package-lock.json`, verify the resolved transitive versions, then run `npm audit`, `npm test` and all app builds. Do not change package-lock version records by hand and do not use `npm audit fix --force` blindly.
+
 ### Still pending
 
-- Rerun `npm run check-workbench`, `node check-muf-sync.js`, `node check-ui-safety.js`, both audit commands, `build-all.bat` and `npm test` after pulling the latest documentation commit.
-- Fix the four audit findings through npm dependency resolution (Vitest 4.1.11+, `source-map-js` 1.2.2+, `tinypool` 2.1.2+), regenerate the root lockfile, then rerun `npm audit`, `npm test` and all three app builds. The lockfile update is still open; see the advisory links under **Dependency audit (OPEN)** near the top. Do not use `npm audit fix --force` blindly.
+- Rerun `npm run check-workbench`, `node check-muf-sync.js`, `node check-ui-safety.js`, both audit commands, `build-all.bat` and `npm test` after pulling the latest branch head.
 - Runtime workbench interaction in a browser.
 - Final three-app visual/browser regression.
 
