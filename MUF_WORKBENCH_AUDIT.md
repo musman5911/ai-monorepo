@@ -64,6 +64,6 @@ Corrected during the implementation sequence:
 
 ## Validation status
 
-**Source review only for the latest workbench version.** The GitHub connector showed the editor module imports its isolated stylesheet, the dev route is in Vite's `configureServer` hook, and the main app entry files do not import the editor. The focused safety guard has been added, but the local Node command, type-checked builds, and real browser interaction have not been executed in this session.
+**Source assertions: 19/19 passed against the current branch files.** The checks covered the editor mount, draft validation, history, editing controls, CSS/JSON export, responsive and dark preview, exact Vite dev route, lack of API clients, editor/stylesheet isolation and shared CSS hashes. This is connector-side source validation, not the execution of `node check-muf-workbench.js` from the repository checkout. The local Node command, type-checked builds, and real browser interaction have not been executed in this session.
 
 The owner asked to defer browser testing until implementation is complete. Run the source guard and full local validation from the working branch before starting that final browser pass.
