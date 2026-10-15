@@ -19,8 +19,9 @@ From the repository root, run these in order after pulling the working branch:
 1. git pull --ff-only origin arena/20261014-muf-mobile-popups
 2. node check-muf-sync.js
 3. node check-ui-safety.js
-4. build-all.bat
-5. start-all.bat
+4. npm run check-workbench
+5. build-all.bat
+6. start-all.bat
 
 Run the design audit with `node audit-muf-design-system.mjs`. It writes local reports to `.audit-output`, which is intentionally ignored by Git.
 
