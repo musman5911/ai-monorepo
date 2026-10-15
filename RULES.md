@@ -95,7 +95,7 @@ Run from the monorepo root:
 
 - node check-muf-sync.js
 - node check-ui-safety.js
-- node check-muf-workbench.js
+- node check-muf-workbench.js (also available as `npm run check-workbench`)
 - node --check audit-muf-design-system.mjs
 - node audit-muf-design-system.mjs
 - build-all.bat
