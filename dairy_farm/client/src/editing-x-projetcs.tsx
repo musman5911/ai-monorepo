@@ -73,10 +73,13 @@ const isDesign = (value: unknown): value is Design => {
   if (!value || typeof value !== 'object' || !Array.isArray((value as Design).blocks)) return false;
   const blocks = (value as Design).blocks;
   if (blocks.length > 100) return false;
+  const ids = new Set<string>();
   return blocks.every((candidate: unknown) => {
     if (!candidate || typeof candidate !== 'object') return false;
     const block = candidate as Partial<Block>;
-    return typeof block.id === 'string' && block.id.length <= 120 && isKind(block.kind) &&
+    if (typeof block.id !== 'string' || block.id.length === 0 || block.id.length > 120 || ids.has(block.id)) return false;
+    ids.add(block.id);
+    return isKind(block.kind) &&
       typeof block.title === 'string' && block.title.length <= 500 &&
       typeof block.subtitle === 'string' && block.subtitle.length <= 500 &&
       typeof block.body === 'string' && block.body.length <= 5000 &&
