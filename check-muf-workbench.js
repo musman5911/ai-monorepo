@@ -33,7 +33,7 @@ const main = read(mainPath);
 const app = read(appPath);
 const packageJson = JSON.parse(read('dairy_farm/client/package.json'));
 
-check(workbench.includes("createRoot(document.getElementById('muf-workbench-root'))"), 'workbench has a dedicated mount point');
+check(workbench.includes("document.getElementById('muf-workbench-root')") && workbench.includes('if (mount) createRoot(mount)'), 'workbench has a dedicated mount point');
 check(workbench.includes('localStorage') && workbench.includes('muf-visual-workbench-draft-v2'), 'drafts use a namespaced browser-local key');
 check(workbench.includes('undo') && workbench.includes('redo'), 'undo/redo controls are present');
 check(workbench.includes('Export CSS') && workbench.includes('Export JSON'), 'CSS and JSON export controls are present');
