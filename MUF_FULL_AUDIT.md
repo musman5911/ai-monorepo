@@ -1,22 +1,24 @@
-# MUF Design-System Audit
+# MUF Design-System Full Audit
 
-Audit snapshot: 2026-10-14  
-Branch: arena/20261014-muf-mobile-popups  
-Scope: frontend popup inventory, shared CSS and MUF consistency. This is a static source audit, not a claim that every runtime layout has been manually inspected.
+Audit snapshot: 2026-10-15  
+Working branch: `arena/20261014-muf-mobile-popups`
+
+This document records source findings, implementation batches, and validation evidence. A GitHub source read or source-pattern assertion is not a substitute for a local TypeScript build or browser session.
 
 ## Executive findings
 
-- 139 direct DetailModal call sites were reported by the audit script across the three apps.
-- The owner-provided audit output after `95b3d66` confirms zero missing size props across 139 DetailModal call sites (96 small, 39 big, four intentional dynamic wrapper calls and no unsupported literals).
-- The current scanner reports six fixed-overlay candidates: three QR Waybill workflows and three gallery/receipt image lightboxes. A previously counted decorative noninteractive background is excluded. Preserve the specialized overlays unless a shared-shell migration proves behavior-equivalent.
-- The audit syntax repair is verified in the owner's terminal; the latest supplied report showed no JSX parser diagnostics. This batch also excludes the false-positive `FileSpreadsheet` icon suffix and decorative fixed backgrounds from popup candidate counts.
-- All three copies of muf-style.css are byte-identical.
-- The shared CSS has a large cascade history. Consolidation should be incremental and backed by checks/browser review, not a delete-all-duplicates exercise.
-- The root Vitest test suite has not run on the owner's machine because the root Vitest executable is not installed, although the dependency is listed in the root package manifest and lockfile.
+- The last owner-provided popup inventory after `95b3d66` showed 139 direct DetailModal call sites, with zero missing sizes: 96 small, 39 big, four deliberate dynamic wrappers, and zero unsupported size literals.
+- The current shared `muf-style.css` copies have identical blob SHA `6e8bc53ddff8dc1ba9294d608963b0e18c48355f` across Agri, Dairy and Flock.
+- Shared CSS work was extended by batches for mobile popup tokens, popup form rhythm, and shared popup chrome tokens. The latest source was reviewed via GitHub. Later batches were not locally rebuilt in this session.
+- A development-only MUF workbench now exists in the Dairy Vite client. The source contains a component palette/inspector, ordering and duplication controls, undo/redo, responsive previews, a baseline comparison, local drafts, and CSS/JSON export.
+- The workbench is a custom dependency-free implementation. The planned Puck-library integration was intentionally not added because the package manifests and lockfiles remained outside the authorized change scope. This is a documented plan adaptation, not a claim that Puck was integrated.
+- `check-muf-workbench.js` was added to guard editor isolation and the local-only/export-only design. It still needs to be run from the local monorepo checkout.
+- No backend code, API behavior, business calculations, permissions, database schema or farm-specific workflows were edited.
+- The user requested browser review only after implementation work; runtime browser results remain intentionally unreported.
 
-## Popup call-site inventory
+## Popup call-site inventory baseline
 
-The owner-provided report generated after `95b3d66` counted 139 direct DetailModal call sites, zero missing size props and no TypeScript JSX parser diagnostics:
+The owner-provided scan after `95b3d66`:
 
 | App | DetailModal calls | Small | Big | Missing size | Dynamic size | Unsupported literal | Fixed-overlay candidates |
 |---|---:|---:|---:|---:|---:|---:|---:|
@@ -25,130 +27,139 @@ The owner-provided report generated after `95b3d66` counted 139 direct DetailMod
 | Flock | 69 | 51 | 17 | 0 | 1 | 0 | 3 |
 | Total | 139 | 96 | 39 | 0 | 4 | 0 | 6 |
 
-The ten formerly missing-size Flock call sites are now explicit: `big` for Financial Deficit, Feed Restock, Add Bird and Edit Bird; `small` for the six compact dashboard metric popups. The owner-provided post-commit audit confirmed zero missing sizes. These are presentation-only changes.
+The four dynamic size entries intentionally forward props from the shared FormOverlay components and Dairy's local dashboard Popup wrapper. They should remain dynamic. The ten previously missing Flock sizes were explicitly classified: `big` for Financial Deficit, Feed Restock, Log New Bird and Edit Bird Profile; `small` for six compact KPI/detail popups.
 
-The four dynamic-size calls are deliberate wrappers: one FormOverlay size-forwarder in each app and the local Popup wrapper in Dairy Dashboard. Keep these dynamic. The original seven overlay candidates included one Dairy decorative background with `pointer-events-none`; it is now excluded. The six real specialized overlays are the three QR Waybill flows and the Dairy cow-gallery, Flock batch-gallery and Flock receipt-photo lightboxes. The scanner also excludes `FileSpreadsheet`, a Lucide icon whose name triggered the generic `Sheet` suffix rule.
+Six fixed custom overlays were retained: three QR Waybill flows, Dairy cow-gallery lightbox, Flock batch-gallery lightbox and Flock receipt-photo lightbox. The scanner excludes the Dairy decorative pointer-events-none background and the Lucide `FileSpreadsheet` icon false positive.
 
-## Shared stylesheet source metrics
+**Fresh inventory still required:** the detailed report in `.audit-output` is ignored by Git and should be regenerated locally after the latest source batch to confirm the exact current count.
 
-The following counts were calculated from the current shared stylesheet and are pattern counts, not defect counts:
+## Shared stylesheet metrics
 
-| Metric | Current count |
+The following metrics were recomputed from the latest Dairy stylesheet source retrieved from the branch. They are rough regular-expression counts, not lint findings or quality scores.
+
+| Metric | Count |
 |---|---:|
-| Stylesheet source characters | 142,619 |
-| Lines | 3,347 |
-| Hex color literal occurrences | 385 |
-| RGB/HSL literal occurrences | 135 |
-| !important declaration occurrences | 628 |
-| Fixed-unit dimension declaration matches | 968 |
-| Distinct --muf-* variable names | 121 |
-| Selector-block matches | 991 |
-| Selector names appearing in multiple blocks | 126 |
-| Most repeated selector name | 19 blocks |
+| Source characters | 142,516 |
+| Lines | 3,343 |
+| Hex color occurrences | 385 |
+| RGB/HSL function occurrences | 135 |
+| `!important` occurrences | 628 |
+| Fixed-dimension declaration matches | 825 |
+| Distinct `--muf-*` variable names | 126 |
+| Selector-block pattern matches | 1,141 |
 
-The three stylesheet copies are currently byte-identical. Selector and literal counts use regular-expression scanning; comments, intentional responsive overrides, browser compatibility and semantic status colors can contribute to them. They do not establish that every repeated declaration should be removed.
+The three shared CSS blob SHAs were queried and matched exactly. Pattern totals can include intentional responsive overrides, compatibility rules, comments or semantic status colors. Do not remove a rule just to reduce a count.
 
-The generated local MUF_STYLE_AUDIT.md contains the detailed per-project component-source and HTML counts, inline-style locations and highest-count files. That report remains under the ignored .audit-output folder on the owner machine. The terminal summary shared for this audit did not include those detailed component tables, so this committed summary deliberately does not invent them.
+## Canonical decisions to preserve
 
-## Canonical visual decisions
+- Primary: `--muf-color-primary` = `#136334`.
+- Primary hover: `--muf-color-primary-hover` = `#105229`.
+- Success/focus green: `#16a34a`.
+- Text selection: green background with white selected text.
+- Popup desktop widths: small 28rem, big 42rem, subject to viewport constraints.
+- Existing phone width gutters remain: small viewport minus 48px and big viewport minus 32px; the <=380px rules use 40px and 24px deductions respectively.
+- Popup/form/admin mobile height cap: `--muf-popup-mobile-max-height: 70dvh`.
+- Long popup contents scroll inside their shells; short content should not force full-screen height.
+- Preserve meaningfully different success, warning, danger, chart and domain-state colors.
+- Preserve sticky header behavior, dropdown portals, focus management, top-most dialog Escape behavior, backdrop behavior, scroll locking, safe-area padding, RTL wrapping and reduced-motion support.
 
-- Primary token: #136334.
-- Primary hover: #105229.
-- Success green: #16a34a.
-- Text selection: primary green background with white selected text.
-- Small popup desktop maximum: 28rem.
-- Big popup desktop maximum: 42rem, subject to existing viewport constraints.
-- On mobile, small width is viewport minus 48px and big width is viewport minus 32px. At 380px or less, their intended deductions are 40px and 24px respectively.
-- Detail popups, form sheets and admin shells use the shared 70dvh mobile height cap. Longer content must scroll inside its popup.
-- Keep semantic warning, danger, success, chart and domain-status colors where they carry a different meaning.
+## Shared CSS implementation history
 
-## Sticky header regression found after browser review
+### Batch 1 — primary-action token alignment
 
-The owner reported that Dairy's sticky header/navigation did not stay fixed on both mobile and desktop, while the other browser checks passed. Source inspection found `overflow-x-hidden` on Dairy's `#app-root`; unlike Flock's root, that class can establish an unwanted scroll container for sticky descendants. Commit `83e8b24` changes only this frontend class to `overflow-x-clip` and adds a Dairy-specific guard in `check-ui-safety.js`.
+Moved shared primary/hover styles for primary actions, navigation and detail actions to canonical tokens without globally changing semantic state colors. The owner reported browser confirmation after `ea0dbcb`.
 
-Status: source fix committed; must verify by scrolling the page on mobile and desktop, and rerun the UI safety check and all three builds locally. Do not mark the runtime regression resolved until those checks are observed.
+### Batch 2 — duplicate rule cleanup
 
-The owner-provided `check-ui-safety.js` output showed a failure in the new root-class guard. The expression used double-escaped regex tokens, so it could not parse the JSX class or word boundary. This is a checker defect, not evidence that the app root has the wrong class. The guard is corrected in the follow-up commit; rerun the entire safety script before declaring it green.
+Removed exact duplicate CSS rule blocks while leaving the final cascade copy. The owner reported the MUF audit, sync/safety checks and all three builds passed after `8096d93`.
 
-## Phase 3 styling batch 1 — primary accent token alignment
+### Batch 3 — popup sizes and focus token
 
-The shared CSS now uses canonical MUF primary/hover variables for primary action, active top-nav state, text actions, detail buttons and the admin active underline. Existing red/amber/blue/status colors were not globally replaced. Three checks were added to `check-muf-sync.js` to guard the shared primary action, active-nav and detail-button token usage. Runtime visual confirmation remains pending.
+Made the ten missing Flock popup size props explicit, excluded two scanner false-positive categories and centralized focus-ring color through `--muf-ui-focus` mapped to the existing success green. The owner reported audit, sync/safety checks and all three builds passed after `95b3d66`.
 
-## Phase 3 styling batch 2 — duplicate rule cleanup
+### Batch 4 — mobile popup tokenization
 
-Six redundant rule blocks were removed from each shared stylesheet copy, retaining the final copy in the cascade: three earlier copies of the identical `.muf-popup-stage .muf-top-nav` positioning override, plus earlier copies of the `.muf-top-nav-scroll::-webkit-scrollbar`, `.muf-nav-link` baseline, and `.muf-main-content table` width rules. The three stylesheet files were identical before this change and receive the same updated content blob.
+Moved existing mobile popup sizing, typography, labels, actions and field measurements into scoped `--muf-popup-stage` tokens while preserving source values. Source-level token definition/use assertions were supplied previously; local scripts/builds must be rerun after this batch.
 
-Updated source-pattern metrics after cleanup: 140,394 characters, 3,322 lines, 390 hex literals, 135 RGB/HSL literals, 628 `!important` declarations, 980 fixed-unit dimension matches, 91 MUF variable names, 1,132 selector-block matches and 126 repeated selector names. These remain pattern counts, not direct quality scores. The local audit rerun, sync/safety scripts, builds and browser smoke check are pending for this batch.
+### Batch 5 — popup form rhythm
 
-## Phase 3 styling batch 3 — explicit popup sizes and semantic focus token
+Centralized the existing form gaps, label line heights, input fonts and field minimum height behind shared `--muf-ui-*` tokens. Source-level value-preservation assertions were supplied previously; local scripts/builds must be rerun.
 
-The ten missing-size Flock call sites from the owner's inventory were reviewed in context. Financial Deficit, Feed Restock, Add Bird and Edit Bird use the shared `big` size because they contain longer lists or multi-field forms; the remaining six compact dashboard metric popups explicitly use `small`, matching the DetailModal default. These are presentation-only changes.
+### Batch 6 — common popup chrome
 
-Four focus-ring rules now use `var(--muf-ui-focus)`, and that token aliases `var(--muf-color-success)`, preserving the prior `#16a34a` rendered color. Two MUF invariants guard the shared focus token and popup outline usage. The audit scanner excludes pointer-events-none decorative backgrounds and the false-positive `FileSpreadsheet` icon suffix. The owner reported sync checks and builds passing for the source batch; browser review is intentionally deferred to Phase 5.
+The three CSS twins were updated together to declare popup title, subtitle, heading padding, inter-item gap and icon size once for small and large popup shells. Size-specific heading/body text and body padding remain separate. Values were preserved by the transformation. The resulting three CSS blob SHAs match exactly.
 
-## Phase 3 styling batch 4 — scoped compact-popup tokens
+## Development workbench
 
-The compact mobile popup block now declares 23 component-scoped tokens for stage padding and card bounds, typography and headings, compact action dimensions, form-control sizing and label spacing. Existing numeric values were moved unchanged into custom properties, so the source intends to preserve current rendering while providing one place to tune the compact popup scale. The token scope is .muf-popup-stage within the existing max-width 640px rule; no desktop styles or semantic colors were changed.
+### Files and access
 
-One earlier duplicate .muf-pup-sm, .muf-pup-lg rule that only set min-width: 0 and overflow-wrap: anywhere was removed while the equivalent later rule was retained. Three new shared-style invariants guard the compact stage spacing token, typography token and form-field token consumers. Source-level transformation checks confirmed each of the 23 tokens has a definition and a consumer and that the three stylesheet copies can be synchronized using the same canonical content.
+- `dairy_farm/client/src/editing-x-projetcs.tsx`: local visual builder.
+- `dairy_farm/client/src/muf-workbench.css`: isolated editor styles, responsive layout and preview themes.
+- `dairy_farm/client/vite.config.ts`: explicit Vite development middleware for `/__muf-workbench`.
+- `check-muf-workbench.js`: source-only assertions that the editor route is development middleware, the main app entry points do not import it, and the editor has no application API client.
 
-The available connector session cannot run the complete repository scripts or the three local builds, and those results are not marked as passing here. Browser review remains deferred to Phase 5 after the implementation phases are finished.
+Run `npm run dev` from `dairy_farm/client`, then open `http://localhost:5000/__muf-workbench`. Do not use the production application URLs as the workbench endpoint.
 
-## Phase 3 styling batch 5 — shared popup form rhythm and field sizing
+### Features implemented
 
-Seven shared `--muf-ui-*` tokens centralize the existing large/mobile form gaps, label line heights, default/mobile popup input font sizes, and field minimum height. Only matching shared popup selectors were changed, and every custom property resolves to the same value as the literal it replaces. Three synchronization invariants guard the canonical form gap, field height and mobile field font size. Source transformation assertions passed; the full repository checks/builds are not run from this connector-only environment and are not marked as passed. Browser review stays deferred to Phase 5.
+- Component palette and canvas layers for popup, heading, card, button and form samples.
+- Selection and inspector for text, size, density, surface, accent, radius, padding, gap and font size.
+- Add, delete, duplicate, drag/drop and move-up/down operations.
+- Undo/redo toolbar and keyboard shortcuts.
+- Phone (360px), tablet (768px) and desktop (1120px) viewport presets, light/dark preview and saved-baseline comparison.
+- Browser-local drafts with schema/range validation; no API or remote data integration.
+- CSS and JSON files exported for review only. Exports never patch production source automatically.
+- Responsive editor UI, visible keyboard focus and reduced-motion handling.
 
-## Priority findings
+### Scope and limitations
 
-### P0 — finish test setup
+The editor is not imported by `main.tsx` or the production `App.tsx`; the entry point is served only from Vite's `configureServer` hook. The editor is not a production design editor and has no publish/save-to-server action. Its sample data is static demonstration content and must never be confused with farm data.
 
-The owner ran node check-muf-sync.js and node check-ui-safety.js successfully. build-all.bat reported successful builds for all three apps. npm test could not start: 'vitest' is not recognized, and npm ls vitest showed an empty installed dependency tree. The root manifest and lockfile do list Vitest. Install/restore root dependencies and rerun tests before claiming the test suite passes.
+The project plan originally named Puck. Puck was not installed or integrated because this workstream kept package manifests and lockfiles unchanged. The dependency-free custom MUF editor is the implemented substitute. It does not claim API-level compatibility with Puck.
 
-### P1 — popup inventory review
+### Source review improvements in the latest commits
 
-The owner ran the revised inventory and supplied `MUF_POPUP_INVENTORY.md`. The ten missing Flock sizes and overlay candidates were reviewed at source level; this commit makes missing sizes explicit and corrects known scanner false positives. Re-run the audit to verify the refreshed inventory. Keep the four wrapper-driven dynamic sizes and six specialized overlays unchanged.
+- Corrected a popup preview padding ternary syntax error.
+- Loaded one draft snapshot for the initial design, history baseline and selection, avoiding mismatched generated IDs.
+- Validated persisted draft structure, string lengths, numeric ranges and a maximum of 100 canvas blocks before use.
+- Typed CSS custom properties through a dedicated `WorkbenchStyle` type.
+- Ensured array renderers pass only the expected callback arguments.
+- Scoped dark preview token values and surface-aware foreground color.
+- Kept style export manual and reviewable.
 
-### P1 — remove competing popup-size declarations safely
+## Validation history and present limits
 
-Commit a510265 aligns form sheets and admin-shell rules with the shared 70dvh token and adds an invariant for the form-sheet rule. The owner's subsequent output confirms both MUF checks and all three frontend builds pass. The newest form-sheet behavior still requires browser confirmation.
+### Previously reported by the owner
 
-### P2 — consolidate repeated styling in batches
+After `95b3d66`, the owner reported passing:
+- `node --check audit-muf-design-system.mjs`
+- `node audit-muf-design-system.mjs`
+- `node check-muf-sync.js`
+- `node check-ui-safety.js`
+- `build-all.bat` for Dairy, Flock and Agri
 
-Start with popup padding and typography, shared fields, buttons, cards and repeated responsive selectors. Centralize decisions that are genuinely shared. Do not change domain calculations, API behavior, permissions, translations or feature availability as a side effect.
+Those results predate the newest CSS and workbench edits.
 
-### P3 — implement the development-only visual workbench
+### Reviewed from branch source during this audit
 
-After shared component styles stabilize, build editing-x-projetcs.tsx with Puck as a starting point and a custom inspector. Keep local browser drafts, undo/redo, responsive previews and CSS/token export. Do not expose it in production or give it access to backend/business logic.
+- The three shared stylesheet files have matching blob SHA values.
+- The development route is declared under Vite `configureServer`.
+- The dedicated editor stylesheet is imported by the editor module.
+- The regular app entry files do not import the editor module.
+- The workbench source has local draft validation, no API client/network call, CSS/JSON export and device presets.
+- The workbench TSX and stylesheet have been source-reviewed and corrected; that does not equal a TypeScript compiler run.
 
-## Validation history and limitations
+### Not run or not verified in this session
 
-- Owner-provided validation after `95b3d66`: `node --check audit-muf-design-system.mjs`, `node audit-muf-design-system.mjs`, `node check-muf-sync.js`, `node check-ui-safety.js` and `build-all.bat` passed; the scanner showed 139 DetailModal calls and zero missing sizes.
-- Compact popup tokenization (`a2702ee`): source transformation assertions passed for token definition/use coverage; the full repository scripts/builds were not executable from the connector-only environment and are not claimed as passing.
-- Shared popup form rhythm tokenization (current batch): source assertions confirmed all seven variables are defined and used with existing values preserved. Repository scripts/builds remain pending for this batch.
-- Root Vitest suite: NOT RUN; the earlier owner-provided output showed the root Vitest executable was not installed.
-- Browser verification: intentionally deferred to Phase 5 until all planned implementation phases are complete.
+- `node check-muf-workbench.js` through the local Node runtime.
+- `node check-muf-sync.js`, `node check-ui-safety.js` and fresh `node audit-muf-design-system.mjs` after the latest commits.
+- The three type-checked frontend builds.
+- Root Vitest suite.
+- Runtime workbench browser check.
+- Final three-app visual/browser regression.
 
-## Maintainer rule
+The connector session cannot execute the repository's Windows scripts/builds, and a local clone could not be obtained because shell network access was unavailable. These items are reported as pending, not passed.
 
-Update this audit whenever the popup inventory, CSS metrics, validation baseline or implementation priorities materially change. Every reported result must be sourced from actual command output or source inspection.
+## Follow-through
 
-
-## Phase 3 Batch 6 — shared popup chrome tokens
-
-The three shared stylesheet copies were updated to remove repeated declarations for popup title, subtitle, header padding, inter-item gap and icon size. Those values now live in one combined small/large popup rule; small and large popups retain their separate section-heading size, body-text size and body padding. This is a declaration-level consolidation only, with the prior values preserved.
-
-Validation status for this batch: the same source change is present in all three CSS twins (their blob SHAs match), with the CSS and documentation writes recorded as sequential commits. Local MUF sync/safety checks and builds must be rerun. Browser regression is intentionally deferred until all implementation phases are finished, per the owner's workflow instruction.
-
-
-## Phase 4 workbench implementation snapshot
-
-The first workbench iteration is committed on the assigned branch:
-- `dairy_farm/client/src/editing-x-projetcs.tsx`: schema-driven preview and inspector for popup shells, headings, cards, buttons and forms; device-width presets; undo/redo; baseline comparison; local draft persistence; CSS and JSON export.
-- `dairy_farm/client/vite.config.ts`: a development-server-only `/__muf-workbench` route. The workbench is not imported by the production application entry point, and no backend, business logic, permissions or app data flow is modified.
-
-Puck integration remains incomplete because `@measured/puck` is not present in the repository dependencies. Package manifests and lockfiles were left unchanged. The custom inspector is a dependency-free first iteration, not a substitute falsely labeled as a completed Puck integration.
-
-Validation status: this connector session cannot run the Windows build/check scripts. The new TSX and Vite middleware still require local type/build verification. No browser results are claimed; browser regression remains deferred until all implementation phases are finished.
-
-
-Workbench follow-up commit `0ab5851` improves the preview so popup size and compact/comfortable density affect the canvas and exported CSS. This remains source-inspected only; the local TypeScript/build checks have not been run in this session.
+Run the Phase 5 validation list in `PHASES.md` from the working branch and then do the browser checklist the owner reserved for the final phase. Keep the current lockfiles and all backend/business logic untouched.
