@@ -338,11 +338,11 @@ function MUFVisualWorkbench() {
             </div>
           </div>
           <div className="muf-wb-viewport">
-            <div className="muf-wb-device" style={{ '--muf-wb-device-width': `${deviceWidth[device]}px` } as React.CSSProperties}>
+            <div className="muf-wb-device" style={{ '--muf-wb-device-width': `${deviceWidth[device]}px` } as WorkbenchStyle}>
               <div className="muf-wb-device__label">{device} preview · {deviceWidth[device]}px</div>
               <div className="muf-wb-canvas">{design.blocks.map((block, index) => renderBlock(block, index))}</div>
             </div>
-            {compare && <div className="muf-wb-device muf-wb-device--baseline" style={{ '--muf-wb-device-width': `${deviceWidth[device]}px` } as React.CSSProperties}>
+            {compare && <div className="muf-wb-device muf-wb-device--baseline" style={{ '--muf-wb-device-width': `${deviceWidth[device]}px` } as WorkbenchStyle}>
               <div className="muf-wb-device__label">baseline</div><div className="muf-wb-canvas">{baseline.blocks.map((block, index) => renderBlock(block, index, true))}</div>
             </div>}
           </div>
