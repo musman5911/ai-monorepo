@@ -124,3 +124,10 @@ Verify all three apps at 360/390px phone widths, 768px tablet, 1024px compact de
 ## Updating this file
 
 Update this phase tracker whenever a phase changes status. Include commit IDs, files changed, commands actually run and browser results. Never mark a test as passed unless its output was observed.
+
+
+## Phase 3 styling batch 4 — shared popup chrome tokens
+
+**Implementation committed; local validation pending.** The identical muf-style.css copies now declare the shared popup title, subtitle, header padding, gap and icon tokens once for both small and large popups. Only the intentionally size-specific section-heading scale, body text scale and body padding remain in their individual rules. This is a source consolidation intended to preserve computed styles exactly; it does not change popup sizing, responsive rules, behavior or content.
+
+The user has explicitly deferred all browser checks until every implementation phase is complete. Continue the remaining source/audit/workbench phases without requesting interim browser checks, then run the full browser regression checklist at the end. Script and build validation remains part of each implementation batch where the local environment is available.
