@@ -12,7 +12,7 @@ This document records source findings, implementation batches, and validation ev
 - Shared CSS work includes mobile popup tokens, popup form rhythm, shared popup chrome, and base action/card dimension tokens. The latest source was reviewed via GitHub. Later batches were not locally rebuilt in this session.
 - A development-only MUF workbench now exists in the Dairy Vite client. The source contains a component palette/inspector, ordering and duplication controls, undo/redo, responsive previews, a baseline comparison, local drafts, and CSS/JSON export.
 - The workbench is a custom dependency-free implementation. The planned Puck-library integration was intentionally not added because the package manifests and lockfiles remained outside the authorized change scope. This is a documented plan adaptation, not a claim that Puck was integrated.
-- `check-muf-workbench.js` was added to guard editor isolation and the local-only/export-only design. It still needs to be run from the local monorepo checkout.
+- `check-muf-workbench.js` was added to guard editor isolation and the local-only/export-only design; the root `npm run check-workbench` alias invokes it. Both need local execution after pulling.
 - No backend code, API behavior, business calculations, permissions, database schema or farm-specific workflows were edited.
 - The user requested browser review only after implementation work; runtime browser results remain intentionally unreported.
 
@@ -180,3 +180,6 @@ Source assertions executed against the retrieved branch files:
 - CSS braces, parentheses, brackets, strings and comments are balanced under a source scanner.
 
 Status: 9/9 CSS source assertions passed. This is not a full CSS parser, local command execution or proof of computed-style parity. Local MUF sync/safety/audit scripts, type-checked builds, and final browser review are still required. Latest shared CSS blob SHA: `76a95ddee233e03ee1b17013271d009ae85f5308`.
+
+
+The root `package.json` now exposes `npm run check-workbench` as an alias for `node check-muf-workbench.js`; no dependency was added and no package-lock was modified. The shared `check-muf-sync.js` now has eight additional invariants for the new primary-action, compact-action, KPI, panel, entity-card and record-action tokens. All eight expressions matched the current stylesheet source in connector-side checks; the full sync command still must be run locally.
