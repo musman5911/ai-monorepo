@@ -44,12 +44,21 @@ Primary action buttons, active primary navigation, text actions and detail butto
 - Avoid nested scroll traps. Keep popup content scrollable without preventing access to footer actions.
 - Menus anchored in horizontally scrolling navigation must retain body-level portal behavior and remain inside the viewport.
 
+## Development-only workbench
+
+- The current visual builder lives in `dairy_farm/client/src/editing-x-projetcs.tsx`; its styles are isolated in `muf-workbench.css`.
+- It is served through the Dairy Vite development-only route `/__muf-workbench`, not from the normal app entry point.
+- Preview examples are placeholder content. Do not connect it to farm API responses or make it a data editor.
+- Browser-local drafts and file exports are allowed; writing to production source automatically is not.
+- This is a custom MUF editor, not a Puck integration. Keep dependencies and lockfiles untouched under the current task scope.
+- Run `node check-muf-workbench.js`, `node check-muf-sync.js`, `node check-ui-safety.js` and the three frontend builds after changing the editor or shared design system.
+
 ## Safe migration pattern
 
 1. Find repeated styles using the audit report.
 2. Decide whether the style is shared or domain-specific.
 3. Add/update the canonical token or class.
 4. Update all applicable MUF twins atomically.
-5. Run check-muf-sync.js, check-ui-safety.js and build-all.bat.
+5. Run check-muf-sync.js, check-ui-safety.js, check-muf-workbench.js and build-all.bat.
 6. Open all three apps and verify the affected screen on phone and desktop, then dark mode.
 7. Update PHASES.md and MUF_FULL_AUDIT.md with the change and actual validation results.
