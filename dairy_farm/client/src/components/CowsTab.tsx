@@ -438,7 +438,21 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
                   const mother = cow.motherId ? cows.find(c => c._id === cow.motherId) : null;
                   const isMale = cow.gender === 'male';
                   return (
-                    <tr key={cow._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors cursor-pointer" onClick={() => setDetailCowId(cow._id)}>
+                    <tr
+                      key={cow._id}
+                      onClick={() => setDetailCowId(cow._id)}
+                      onKeyDown={event => {
+                        if (event.target !== event.currentTarget) return;
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          setDetailCowId(cow._id);
+                        }
+                      }}
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`${L('Open cow details')}: ${cow.name}`}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 transition-colors cursor-pointer"
+                    >
                       <td className="px-5 py-3">
                         <div className="flex items-center gap-2">
                           <CowImg src={cow.image} name={cow.name} />
