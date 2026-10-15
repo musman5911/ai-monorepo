@@ -794,8 +794,6 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
 
       {/* ── Popups ──────────────────────────────── */}
       <AnimatePresence>
-      {selectedCowId && <CowDetailPopup key="cow-detail" cowId={selectedCowId} rate={data.rate?.value || 0} rateHistory={rateHistory} rateDate={data.rate?.date || ''} isAdmin={isAdmin} onClose={() => setSelectedCowId(null)} />}
-
       {showDropPopup && dropAlert && (
         <Popup key="drop-alarm" title={L('Milk production alarm')} onClose={() => setShowDropPopup(false)}>
           <div className="space-y-3 text-xs">
@@ -1059,7 +1057,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               const second = topList[1];
               const lead = i === 0 && second ? p.milk - second.milk : 0;
               return (
-                <div key={p.cow!._id} className={`p-4 rounded-lg ${i === 0 ? 'bg-farm-50 dark:bg-farm-900/20 border border-farm-200 dark:border-farm-800' : 'bg-slate-50 dark:bg-slate-800/50'}`}>
+                <button type="button" key={p.cow!._id} onClick={() => setSelectedCowId(p.cow!._id)} aria-label={`${L('Open cow details')}: ${p.cow!.name}`} className={`w-full p-4 rounded-lg text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 transition-colors ${i === 0 ? 'bg-farm-50 dark:bg-farm-900/20 border border-farm-200 dark:border-farm-800 hover:border-farm-400' : 'bg-slate-50 dark:bg-slate-800/50 hover:ring-1 hover:ring-farm-300'}`}>
                   <div className="flex items-center gap-3">
                     <span className="text-2xl font-bold text-slate-300 dark:text-slate-600">#{i + 1}</span>
                     <CowImg src={p.cow!.image} name={p.cow!.name} size="w-12 h-12" />
@@ -1075,7 +1073,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                   {i === 0 && lead > 0 && (
                     <p className="text-[10px] text-farm-600 mt-2 ml-14">🏆 Leading by {fmt(lead)}L over #2</p>
                   )}
-                </div>
+                </button>
               );
             })}
             {topList.length === 0 && <p className="text-xs text-slate-400 text-center py-4">{L('No milk data in this range')}</p>}
@@ -1091,7 +1089,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
         const row = (c: (typeof pnlCows)[number], i: number, tone: 'good' | 'bad') => {
           const net = pnlMode === 'lifetime' ? c.lifetimeNet : c.runningNet;
           return (
-            <div key={c._id} className={`min-w-0 rounded-xl border p-3 ${tone === 'good' ? 'border-farm-200 bg-farm-50/80 dark:border-farm-900 dark:bg-farm-900/20' : 'border-red-200 bg-red-50/80 dark:border-red-900 dark:bg-red-900/10'}`}>
+            <button type="button" key={c._id} onClick={() => setSelectedCowId(c._id)} aria-label={`${L('Open cow details')}: ${c.name}`} className={`w-full min-w-0 rounded-xl border p-3 text-left cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 transition-colors ${tone === 'good' ? 'border-farm-200 bg-farm-50/80 dark:border-farm-900 dark:bg-farm-900/20 hover:border-farm-400' : 'border-red-200 bg-red-50/80 dark:border-red-900 dark:bg-red-900/10 hover:border-red-400'}`}>
               <div className="flex min-w-0 items-center gap-2">
                 <span className={`text-xs font-black ${tone === 'good' ? 'text-farm-500 dark:text-farm-400' : 'text-red-500 dark:text-red-400'}`}>#{i + 1}</span>
                 <CowImg src={c.image} name={c.name} size="w-9 h-9" />
@@ -1102,7 +1100,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               </div>
               <p className="mt-2 truncate text-[9px] text-slate-500 dark:text-slate-400">Milk {fmtPKR(c.milkRevenue)}{c.saleRevenue > 0 ? ` · Sale ${fmtPKR(c.saleRevenue)}` : ''}</p>
               <p className="truncate text-[9px] text-slate-500 dark:text-slate-400">Cost {fmtPKR(c.opExpenses + (pnlMode === 'lifetime' ? c.purchasePrice : 0))}</p>
-            </div>
+            </button>
           );
         };
         return (
@@ -1136,6 +1134,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
         </Popup>
         );
       })()}
+      {selectedCowId && <CowDetailPopup key="cow-detail" cowId={selectedCowId} rate={data.rate?.value || 0} rateHistory={rateHistory} rateDate={data.rate?.date || ''} isAdmin={isAdmin} onClose={() => setSelectedCowId(null)} />}
       </AnimatePresence>
 
       {/* Quick Actions FAB */}
