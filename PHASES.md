@@ -2,7 +2,7 @@
 
 Last updated: 2026-10-15  
 Working branch: arena/20261014-muf-mobile-popups  
-Last source change reviewed: `a3da9116d3546942fc1d839f56cd7fe15c79fbcd`
+Last source/validation wiring commit reviewed: `e519cc6a6d8b96c469cb42c92a8483dc0d956271`
 
 ## Overall status
 
@@ -11,7 +11,7 @@ Last source change reviewed: `a3da9116d3546942fc1d839f56cd7fe15c79fbcd`
 - **Popup inventory baseline:** the owner-provided audit after `95b3d66` reported 139 direct DetailModal call sites, zero missing sizes, 96 small, 39 big, four intentional dynamic wrappers and zero unsupported literals.
 - **Workbench:** a native, dependency-free visual editor is available through the Dairy Vite development server at `http://localhost:5000/__muf-workbench`. A focused source-safety check is included as `check-muf-workbench.js`.
 - **Important integration trade-off:** the original Puck-based direction was replaced by the custom MUF builder so the current workstream could preserve the package manifests and lockfiles. `@puckeditor/core` is not integrated. The workbench still supplies a local canvas, inspector, drag/reorder, undo/redo, device presets, baseline comparison, browser-local drafts and CSS/JSON export. This deviation is documented rather than described as a Puck integration.
-- **Source assertions:** 19/19 connector-side workbench/source-parity assertions passed. A separate 9/9 CSS-token source check also passed after the latest CSS batch, covering exact twin parity, unique token definitions and uses, and balanced CSS braces/parentheses/brackets. These are source assertions, not local CLI/build runs.
+- **Source assertions:** 19/19 connector-side workbench/source-parity assertions passed. A separate 9/9 CSS-token source check passed after the latest CSS batch, covering exact twin parity, unique token definitions and uses, and balanced CSS delimiters. All eight new `check-muf-sync.js` action/card invariants were then individually matched against the current CSS. These are source assertions, not local CLI/build runs.
 - **Local validation:** prior checks/builds were reported by the owner after `95b3d66`, but were not rerun after later source batches. The current code still needs local type-checked builds and check-script execution.
 - **Root Vitest:** not verified. The previously supplied output showed the root Vitest executable was not installed even though the root manifest and lockfile declare it.
 - **Browser regression:** intentionally left for the final phase, as the owner requested.
@@ -56,7 +56,7 @@ The six reviewed specialized overlays are the three QR Waybill flows and the Dai
 - **Batch 4:** centralized the mobile compact-popup scale with scoped tokens, retaining the prior values.
 - **Batch 5:** tokenized shared popup form gaps, label line heights, field font sizes and minimum height without changing their values.
 - **Batch 6:** centralized common title, subtitle, header padding, gap and icon tokens shared by small and large popups; the size-specific body/heading scales remain separate.
-- **Batch 7:** tokenized primary-action sizing/shadow, compact action sizing, KPI card spacing/radius/shadow, panel radius, shared crop/entity card radius/shadows and record/icon action colors. Existing values are kept as token definitions/fallbacks; responsive overrides outside the targeted declarations remain untouched.
+- **Batch 7:** tokenized primary-action sizing/shadow, compact action sizing, KPI card spacing/radius/shadow, panel radius, shared crop/entity card radius/shadows and record/icon action colors. Existing values are kept as token definitions/fallbacks; responsive overrides outside the targeted declarations remain untouched. Eight targeted `check-muf-sync.js` invariants now guard the action/card token definition and consumption.
 - **Source assertions after batch 7:** 9/9 passed. All 28 new core tokens are defined once and have consumers; all three stylesheet copies have matching content/hash; CSS delimiter balancing passed. Local scripts, type-checked builds and runtime checks for batches 4-7 still need to be rerun. No CSS pattern-count reduction alone is treated as proof of quality.
 
 Latest inspected shared stylesheet metrics after batch 7: 144,983 characters, 3,375 lines, 389 hex color literals, 139 RGB/HSL occurrences, 628 `!important` declarations, 834 fixed-dimension pattern matches, 154 distinct `--muf-*` names and 1,142 selector-block pattern matches. These are search-pattern counts, not defect counts.
@@ -82,7 +82,7 @@ The development route is not referenced from the normal `main.tsx` or `App.tsx` 
 **Status: deferred until implementation is complete and local check/build results are available. Browser review remains for the owner.**
 
 Run from the monorepo root after pulling this branch:
-1. `node check-muf-workbench.js`
+1. `npm run check-workbench` (or `node check-muf-workbench.js`)
 2. `node check-muf-sync.js`
 3. `node check-ui-safety.js`
 4. `node --check audit-muf-design-system.mjs`
