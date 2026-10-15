@@ -96,7 +96,7 @@ The shared mobile DetailModal, form sheet and admin shells use the canonical 70d
 
 Target file: `dairy_farm/client/src/editing-x-projetcs.tsx`.
 
-The first component-first workbench iteration includes popup/heading/card/button/form previews, an inspector for approved visual properties, phone/tablet/desktop sizing, undo/redo, baseline comparison, browser-local draft storage, and CSS/JSON export. It is exposed only by the Dairy Vite development server at `/__muf-workbench`; the editor module is not imported by the production app entry point, and the route is implemented through Vite's `configureServer` hook.
+The first component-first workbench iteration includes popup/heading/card/button/form previews, an inspector for approved visual properties, phone/tablet/desktop sizing, undo/redo, baseline comparison, browser-local draft storage, and CSS/JSON export. It is exposed only by the Dairy Vite development server at `http://localhost:5000/__muf-workbench` (run `npm run dev` from `dairy_farm/client`); it is not available from the built-app/backend URLs. The editor module is not imported by the production app entry point, and the route is implemented through Vite's `configureServer` hook.
 
 Puck itself is **not integrated yet**: `@measured/puck` is absent from the repository dependencies. Package manifests and lockfiles were intentionally left untouched rather than introducing an incomplete dependency install. The current schema-based inspector is a dependency-free first iteration, not a claim that the Puck milestone is complete.
 
