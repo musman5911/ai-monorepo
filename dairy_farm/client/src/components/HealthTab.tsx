@@ -10,6 +10,7 @@ import {
   Filter,
   Trash2,
   Edit2,
+  Eye,
   X,
   Stethoscope,
   AlertCircle,
@@ -440,24 +441,34 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 <th className="px-6 py-4 font-medium">{L('Date')}</th>
                 <th className="px-6 py-4 font-medium">{L('Cow')}</th>
                 <th className="px-6 py-4 font-medium">{L('Type')}</th>
-                <th className="px-6 py-4 font-medium">{L('Description')}</th>
-                <th className="px-6 py-4 font-medium">{L('Medicine/Vet')}</th>
                 <th className="px-6 py-4 font-medium">{L('Next Due')}</th>
                 <th className="px-6 py-4 font-medium">{L('Cost')}</th>
-                {isAdmin && <th className="px-6 py-4 font-medium text-right">{L('Actions')}</th>}
+                <th className="px-6 py-4 font-medium text-right">{L('Details / Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {loading ? (
                 <tr>
-                  <td colSpan={isAdmin ? 8 : 7} className="px-6 py-8 text-center text-slate-400">{L('Loading records...')}</td>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400">{L('Loading records...')}</td>
                 </tr>
               ) : records.length === 0 ? (
                 <tr>
-                  <td colSpan={isAdmin ? 8 : 7} className="px-6 py-8 text-center text-slate-400">{L('No records found')}</td>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400">{L('No records found')}</td>
                 </tr>
               ) : records.map(record => (
-                <tr key={record._id} onClick={() => setSelectedRecord(record)} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors text-sm cursor-pointer">
+                <tr
+                  key={record._id}
+                  onClick={() => setSelectedRecord(record)}
+                  onKeyDown={event => {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      setSelectedRecord(record);
+                    }
+                  }}
+                  tabIndex={0}
+                  aria-label={L('Open health record details')}
+                  className="hover:bg-slate-50 dark:hover:bg-slate-800/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 transition-colors text-sm cursor-pointer"
+                >
                   <td className="px-6 py-4 text-slate-800 dark:text-slate-200 whitespace-nowrap">
                     {formatDate(record.date)}
                   </td>
@@ -469,13 +480,6 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                       {record.type}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400 max-w-xs truncate">
-                    {record.description}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-slate-700 dark:text-slate-300">{record.medicine || '-'}</div>
-                    <div className="text-xs text-slate-500">{record.vet}</div>
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {record.nextDueDate ? (
                       <span className={isOverdue(record.nextDueDate) ? 'text-red-500 font-medium' : 'text-slate-600 dark:text-slate-400'}>
@@ -486,26 +490,41 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                   <td className="px-6 py-4 text-slate-800 dark:text-slate-200">
                     {record.cost ? `₨ ${record.cost.toLocaleString()}` : '-'}
                   </td>
-                  {isAdmin && (
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end space-x-2">
-                        <button 
-                          onClick={() => handleEdit(record)}
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        title={L('View health record details')}
+                        aria-label={L('View health record details')}
+                        onClick={event => { event.stopPropagation(); setSelectedRecord(record); }}
+                        className="p-1.5 text-slate-400 hover:text-farm-600 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          title={L('Edit health record')}
+                          aria-label={L('Edit health record')}
+                          onClick={event => { event.stopPropagation(); handleEdit(record); }}
                           className="p-1.5 text-slate-400 hover:text-farm-600 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        {canDelete && (
-                          <button 
-                            onClick={() => handleDelete(record._id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  )}
+                      )}
+                      {isAdmin && canDelete && (
+                        <button
+                          type="button"
+                          title={L('Delete health record')}
+                          aria-label={L('Delete health record')}
+                          onClick={event => { event.stopPropagation(); handleDelete(record._id); }}
+                          className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -524,7 +543,20 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
           ) : records.map(rec => {
             const cow = cows.find(c => c._id === rec.cowId);
             return (
-              <article key={rec._id} className="muf-entity-card" onClick={() => setSelectedRecord(rec)}>
+              <article
+              key={rec._id}
+              className="muf-entity-card cursor-pointer"
+              role="button"
+              tabIndex={0}
+              aria-label={L('Open health record details')}
+              onClick={() => setSelectedRecord(rec)}
+              onKeyDown={event => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setSelectedRecord(rec);
+                }
+              }}
+            >
                 <div className={cow?.image ? "muf-entity-photo" : "muf-entity-photo muf-entity-photo-noimg"} style={cow?.image ? { backgroundImage: `url(${cow.image})` } : undefined}>
                   {cow?.image ? <img src={cow.image} alt="" /> : <span className="muf-entity-emoji">🐄</span>}
                   <span className="muf-entity-status" data-tone={rec.type === 'vaccination' ? 'good' : rec.type === 'treatment' ? 'warn' : 'muted'}>{rec.type}</span>
@@ -539,8 +571,9 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                     <span className="muf-entity-chip">{rec.cost ? `₨${rec.cost}` : '-'}</span>
                   </div>
                   <div className="muf-entity-stats">
-                    <span><Calendar className="w-3 h-3"/> <span>{rec.description || '-'}</span></span>
+                    <span><Calendar className="w-3 h-3"/> <span>{L('Health record')} · {formatDate(rec.date)}</span></span>
                     {rec.nextDueDate && <span><CalendarDays className="w-3 h-3"/> <span>Next: {formatDate(rec.nextDueDate)}</span></span>}
+                    <span className="text-[10px] font-semibold text-farm-600 dark:text-farm-400">{L('Tap for details')}</span>
                   </div>
                   {isAdmin && (
                     <div className="muf-entity-actions">
