@@ -472,6 +472,8 @@ function App() {
     if (selectedFinance) current.selectedFinance = selectedFinance;
     if (selectedTask) current.selectedTask = selectedTask;
     if (selectedLedgerGroup) current.selectedLedgerGroup = selectedLedgerGroup;
+    if (selectedMonthRow) current.selectedMonthRow = selectedMonthRow;
+    if (selectedExpenseCategory) current.selectedExpenseCategory = selectedExpenseCategory;
     if (modal) current.modal = modal;
 
     if (Object.keys(current).length > 0) {
@@ -491,6 +493,7 @@ function App() {
     setSelectedTask(null);
     setSelectedLedgerGroup(null);
     setSelectedMonthRow(null);
+    setSelectedExpenseCategory(null);
     setModal(null);
 
     if (popupStack.length > 0) {
@@ -501,6 +504,8 @@ function App() {
       if (prev.selectedFinance) setSelectedFinance(prev.selectedFinance);
       if (prev.selectedTask) setSelectedTask(prev.selectedTask);
       if (prev.selectedLedgerGroup) setSelectedLedgerGroup(prev.selectedLedgerGroup);
+      if (prev.selectedMonthRow) setSelectedMonthRow(prev.selectedMonthRow);
+      if (prev.selectedExpenseCategory) setSelectedExpenseCategory(prev.selectedExpenseCategory);
       if (prev.modal) setModal(prev.modal);
     }
   };
@@ -4945,10 +4950,16 @@ function App() {
               <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Crops Planted / Monitored in {selectedMonthRow[0]}</p>
               <div className="max-h-36 overflow-y-auto space-y-2 pr-1 text-xs">
                 {crops.filter(c => (reportsCropFilter === 'all' || c._id === reportsCropFilter) && String(c.plant_date || '').startsWith(selectedMonthRow[0].slice(0, 7))).map(c => (
-                  <div key={c._id} className="p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 flex justify-between items-center">
-                    <span className="font-bold">{c.name} ({c.variety || 'Standard'})</span>
-                    <span className="text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30">{c.status}</span>
-                  </div>
+                  <button
+                    type="button"
+                    key={c._id}
+                    onClick={() => openPopup('selectedCrop', c)}
+                    aria-label={`${L('Open crop profile')}: ${c.name}`}
+                    className="w-full p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 hover:border-farm-400 dark:hover:border-farm-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 flex justify-between items-center gap-3 text-left transition-colors"
+                  >
+                    <span className="font-bold min-w-0 break-words">{c.name} ({c.variety || 'Standard'})</span>
+                    <span className="shrink-0 text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30">{c.status}</span>
+                  </button>
                 ))}
                 {crops.filter(c => (reportsCropFilter === 'all' || c._id === reportsCropFilter) && String(c.plant_date || '').startsWith(selectedMonthRow[0].slice(0, 7))).length === 0 && (
                   <p className="text-slate-500 italic py-2">{L('No new crop cycle registrations logged in this month.')}</p>
@@ -4972,14 +4983,23 @@ function App() {
             <p className="text-xs text-slate-500 dark:text-slate-400">All direct outlays and ledger transactions matching this expenditure category{reportsCropFilter !== 'all' ? ` (filtered by crop)` : ''}:</p>
             <div className="max-h-[300px] overflow-y-auto space-y-2.5 pr-1 text-xs">
               {filteredPeriodFinance.filter(f => f.type === 'expense' && f.category === selectedExpenseCategory.category).map(f => (
-                <div key={f._id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 space-y-2">
-                  <div className="flex justify-between items-center">
+                <button
+                  type="button"
+                  key={f._id}
+                  onClick={() => openPopup('selectedFinance', f)}
+                  aria-label={`${L('Open ledger entry')}: ${f.category}, ${f.date}`}
+                  className="w-full p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 hover:border-farm-300 dark:hover:border-farm-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 text-left transition-colors space-y-2"
+                >
+                  <div className="flex justify-between items-center gap-3">
                     <span className="font-extrabold text-slate-800 dark:text-white">{f.date}</span>
-                    <span className="font-black text-red-500 dark:text-red-400">Rs. {formatCurrency(f.amount)}</span>
+                    <span className="font-black text-red-500 dark:text-red-400 whitespace-nowrap">Rs. {formatCurrency(f.amount)}</span>
                   </div>
-                  {f.notes && <p className="text-slate-500 leading-relaxed font-semibold italic">"{f.notes}"</p>}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-slate-600 dark:text-slate-300">{f.category}</span>
+                    <span className="text-[10px] text-slate-400">{L('Open full details')} →</span>
+                  </div>
                   <p className="text-[10px] text-slate-400">Crop sector: {crops.find(c => c._id === f.crop_id)?.name || 'Farm-wide'}</p>
-                </div>
+                </button>
               ))}
               {filteredPeriodFinance.filter(f => f.type === 'expense' && f.category === selectedExpenseCategory.category).length === 0 && (
                 <p className="text-center text-xs text-slate-500 italic py-4">No expense logs in this category for the selected crop filter.</p>
