@@ -86,7 +86,7 @@
   position: relative; display: grid; align-content: start; justify-items: stretch; gap: var(--muf-wb-gap, 10px);
   width: min(100%, var(--muf-wb-max-width, 100%)); min-width: 0; margin-inline: auto; padding: var(--muf-wb-padding, 18px);
   border: 1px solid var(--muf-wb-accent, var(--muf-wb-line)); border-radius: var(--muf-wb-radius, 16px);
-  background: var(--muf-wb-surface, var(--muf-wb-card)); color: var(--muf-wb-ink);
+  background: var(--muf-wb-surface, var(--muf-wb-card)); color: var(--muf-wb-text, var(--muf-wb-ink));
   font-size: var(--muf-wb-font-size, 14px); overflow-wrap: anywhere; cursor: grab;
   box-shadow: 0 2px 8px rgba(15, 23, 42, .04);
 }
