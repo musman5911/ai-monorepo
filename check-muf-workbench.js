@@ -44,7 +44,7 @@ const collect = (dir) => {
 collect(sourceRoot);
 const strayReferences = sourceFiles.filter((file) => {
   const relative = path.relative(root, file).split(path.sep).join('/');
-  return relative !== workbenchPath && /editing-x-projetcs|muf-workbench\\.css/.test(fs.readFileSync(file, 'utf8'));
+  return relative !== workbenchPath && /editing-x-projetcs|muf-workbench\.css/.test(fs.readFileSync(file, 'utf8'));
 });
 
 check(workbench.includes("document.getElementById('muf-workbench-root')") && workbench.includes('if (mount) createRoot(mount)'), 'workbench has a dedicated mount point');
