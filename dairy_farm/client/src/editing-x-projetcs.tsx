@@ -112,7 +112,7 @@ function MUFVisualWorkbench() {
   const [selectedId, setSelectedId] = useState<string>(initialDesignState.blocks[0]?.id || '');
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [device, setDevice] = useState<Device>('phone');
-  const [baseline, setBaseline] = useState<Design>(() => cloneDesign(safeLoadDraft()));
+  const [baseline, setBaseline] = useState<Design>(() => cloneDesign(initialDesignState));
   const [compare, setCompare] = useState(false);
   const [darkPreview, setDarkPreview] = useState(false);
   const [notice, setNotice] = useState('Changes stay in this browser until you export them.');
