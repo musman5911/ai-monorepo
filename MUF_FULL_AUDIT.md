@@ -39,14 +39,14 @@ The following metrics were recomputed from the latest Dairy stylesheet source re
 
 | Metric | Count |
 |---|---:|
-| Source characters | 142,516 |
-| Lines | 3,343 |
-| Hex color occurrences | 385 |
-| RGB/HSL function occurrences | 135 |
+| Source characters | 144,983 |
+| Lines | 3,375 |
+| Hex color occurrences | 389 |
+| RGB/HSL function occurrences | 139 |
 | `!important` occurrences | 628 |
-| Fixed-dimension declaration matches | 825 |
-| Distinct `--muf-*` variable names | 126 |
-| Selector-block pattern matches | 1,141 |
+| Fixed-dimension declaration matches | 834 |
+| Distinct `--muf-*` variable names | 154 |
+| Selector-block pattern matches | 1,142 |
 
 The three shared CSS blob SHAs were queried and matched exactly. Pattern totals can include intentional responsive overrides, compatibility rules, comments or semantic status colors. Do not remove a rule just to reduce a count.
 
