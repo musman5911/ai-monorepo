@@ -2,7 +2,7 @@
 
 Last updated: 2026-10-15  
 Working branch: arena/20261014-muf-mobile-popups  
-Last source/validation wiring commit reviewed: `e519cc6a6d8b96c469cb42c92a8483dc0d956271`
+Last owner-tested source head before checker/test repair: `378deabe66ccbf3c65ae6b384dd0d1da932bdca6`. Checker/test fix commit: `6ab2011e58ece34e4ce6720d41787e98aa1a96be`.
 
 ## Overall status
 
@@ -12,15 +12,16 @@ Last source/validation wiring commit reviewed: `e519cc6a6d8b96c469cb42c92a8483dc
 - **Workbench:** a native, dependency-free visual editor is available through the Dairy Vite development server at `http://localhost:5000/__muf-workbench`. A focused source-safety check is included as `check-muf-workbench.js`.
 - **Important integration trade-off:** the original Puck-based direction was replaced by the custom MUF builder so the current workstream could preserve the package manifests and lockfiles. `@puckeditor/core` is not integrated. The workbench still supplies a local canvas, inspector, drag/reorder, undo/redo, device presets, baseline comparison, browser-local drafts and CSS/JSON export. This deviation is documented rather than described as a Puck integration.
 - **Source assertions:** 19/19 connector-side workbench/source-parity assertions passed. A separate 9/9 CSS-token source check passed after the latest CSS batch, covering exact twin parity, unique token definitions and uses, and balanced CSS delimiters. All eight new `check-muf-sync.js` action/card invariants were then individually matched against the current CSS. These are source assertions, not local CLI/build runs.
-- **Local validation:** prior checks/builds were reported by the owner after `95b3d66`, but were not rerun after later source batches. The current code still needs local type-checked builds and check-script execution.
-- **Root Vitest:** not verified. The previously supplied output showed the root Vitest executable was not installed even though the root manifest and lockfile declare it.
+- **Owner-run local validation (2026-10-15, parent `378deab`):** `npm run check-workbench` passed 18/18; `node check-ui-safety.js` passed; `node --check audit-muf-design-system.mjs` and `node audit-muf-design-system.mjs` completed; `build-all.bat` passed for all three apps. `node check-muf-sync.js` had one false negative from its small-title selector regex, and `npm test` had 32/33 passing because the no-PR test asserted obsolete wording. Commit `6ab2011` repairs both checks; rerun locally after pulling before marking them green.
+- **Dependency audit:** `npm ci` reported four findings (1 moderate, 1 high, 2 critical). Run `npm audit` to identify exact packages/advisories before considering dependency updates.
+- **Browser regression:** intentionally left for the final phase, as the owner requested.
 - **Browser regression:** intentionally left for the final phase, as the owner requested.
 - No backend code, API contracts, business calculations, permissions, database schemas or farm workflows were changed in this workstream.
 - **Documentation cleanup:** all ten remaining Markdown files were reviewed; renamed the unclear `muf-.md` to `MUF_OVERVIEW.md`, updated its four README references and removed the obsolete old path. Other Markdown files remain because each has a distinct role; no duplicate documentation was deleted.
 
 ## Phase 1 — validation baseline
 
-**Status: historical baseline passed; rerun required after later source changes.**
+**Status: baseline and a new local validation run are recorded; checker/test repairs are committed and require rerun.**
 
 Owner-provided results after commit `95b3d66`:
 - `node --check audit-muf-design-system.mjs`: passed.
@@ -30,11 +31,11 @@ Owner-provided results after commit `95b3d66`:
 - `build-all.bat`: Dairy, Flock and Agri builds passed at that baseline.
 - `npm test`: did not run because the root Vitest executable was missing. This is an unrun test suite, not a failing test result.
 
-Those results apply to the source state the owner tested, not automatically to subsequent commits.
+Those results apply to the source state the owner tested, not automatically to subsequent commits. On 2026-10-15 the owner ran the current parent `378deab`: workbench guard 18/18 passed; UI safety, audit syntax/audit execution and all three app builds passed; the sync command had one stale selector-regex mismatch; and root Vitest ran with 32/33 passing because its no-PR assertion still expected the literal `No PRs`. Commit `6ab2011` repairs the selector invariant and assertion; rerun the affected checks after pulling.
 
 ## Phase 2 — popup and styling inventory
 
-**Status: source inventory completed; rerun the report after the newest branch changes.**
+**Status: source inventory rerun by the owner at `378deab`; popup sizes remain explicit, with zero missing sizes and zero unsupported literals. The follow-up checker fix does not change popup CSS.**
 
 The owner-provided report generated after `95b3d66` counted:
 
@@ -58,7 +59,7 @@ The six reviewed specialized overlays are the three QR Waybill flows and the Dai
 - **Batch 5:** tokenized shared popup form gaps, label line heights, field font sizes and minimum height without changing their values.
 - **Batch 6:** centralized common title, subtitle, header padding, gap and icon tokens shared by small and large popups; the size-specific body/heading scales remain separate.
 - **Batch 7:** tokenized primary-action sizing/shadow, compact action sizing, KPI card spacing/radius/shadow, panel radius, shared crop/entity card radius/shadows and record/icon action colors. Existing values are kept as token definitions/fallbacks; responsive overrides outside the targeted declarations remain untouched. Eight targeted `check-muf-sync.js` invariants now guard the action/card token definition and consumption.
-- **Source assertions after batch 7:** 9/9 passed. All 28 new core tokens are defined once and have consumers; all three stylesheet copies have matching content/hash; CSS delimiter balancing passed. Local scripts, type-checked builds and runtime checks for batches 4-7 still need to be rerun. No CSS pattern-count reduction alone is treated as proof of quality.
+- **Source assertions after batch 7:** 9/9 passed. All 28 new core tokens are defined once and have consumers; all three stylesheet copies have matching content/hash; CSS delimiter balancing passed. On parent `378deab`, the owner ran safety/audit scripts and all three builds successfully; the sync checker had one stale selector-pattern mismatch fixed in `6ab2011`. No CSS pattern-count reduction alone is treated as proof of quality. Rerun sync/test checks after pulling; final browser review is still required.
 
 Latest inspected shared stylesheet metrics after batch 7: 144,983 characters, 3,375 lines, 389 hex color literals, 139 RGB/HSL occurrences, 628 `!important` declarations, 834 fixed-dimension pattern matches, 154 distinct `--muf-*` names and 1,142 selector-block pattern matches. These are search-pattern counts, not defect counts.
 
@@ -76,11 +77,11 @@ Open the workbench only with the Dairy client Vite server running: from `dairy_f
 
 Puck is not bundled. The workstream has kept dependency manifests and lockfiles untouched; consequently the workbench is a custom MUF builder, not Puck. A future Puck-library integration would need explicit approval to add and lock the required frontend dependency and then pass local builds.
 
-The development route is not referenced from the normal `main.tsx` or `App.tsx` entry points. The workbench has no application API client and never publishes design changes. Exported files must be reviewed and applied manually. Connector-side source assertions passed 19/19 against the current branch files; the actual CLI guard and type-checked build have not run locally.
+The development route is not referenced from the normal `main.tsx` or `App.tsx` entry points. The workbench has no application API client and never publishes design changes. Exported files must be reviewed and applied manually. Connector-side source assertions passed 19/19, and the owner reported the local guard passed 18/18 and all three app builds passed at parent `378deab`. Browser interaction remains unverified.
 
 ## Phase 5 — final validation and browser regression
 
-**Status: deferred until implementation is complete and local check/build results are available. Browser review remains for the owner.**
+**Status: implementation and initial local build/check pass are complete apart from the two checker/test mismatches fixed in `6ab2011`. Rerun the validation list after pulling; browser review remains for the owner.**
 
 Run from the monorepo root after pulling this branch:
 1. `npm run check-workbench` (or `node check-muf-workbench.js`)
@@ -89,7 +90,7 @@ Run from the monorepo root after pulling this branch:
 4. `node --check audit-muf-design-system.mjs`
 5. `node audit-muf-design-system.mjs`
 6. `build-all.bat`
-7. `npm test` only after the root dependencies are installed; do not alter lockfiles just to mask the absent Vitest executable.
+7. `npm test` after root dependencies are installed with `npm ci`; confirm the repaired no-PR assertion passes.
 
 Then perform the owner's browser pass at 360/390px phone widths, 768px tablet, 1024px compact desktop and 1440px wide desktop across Agri, Dairy and Flock. Cover popup sizes/long content, forms, admin shells, inner scroll, sticky navigation, nested modal Escape/backdrop behavior, focus, selection highlight, Urdu/RTL wrapping, light/dark themes, finance filters and Monthly Summary PDF export. Confirm that the workbench route is not served by the production app build.
 

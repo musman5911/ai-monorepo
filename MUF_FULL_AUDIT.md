@@ -129,41 +129,35 @@ The project plan originally named Puck. Puck was not installed or integrated bec
 
 ## Validation history and present limits
 
-### Previously reported by the owner
+### Owner-run local validation on 2026-10-15 (parent commit `378deab`)
 
-After `95b3d66`, the owner reported passing:
-- `node --check audit-muf-design-system.mjs`
-- `node audit-muf-design-system.mjs`
-- `node check-muf-sync.js`
-- `node check-ui-safety.js`
-- `build-all.bat` for Dairy, Flock and Agri
+The owner ran the following checks from the Windows checkout:
 
-Those results predate the newest CSS and workbench edits.
+- `npm run check-workbench`: passed all 18 source-safety checks.
+- `node check-ui-safety.js`: all MUF UI safety checks passed.
+- `node --check audit-muf-design-system.mjs`: passed.
+- `node audit-muf-design-system.mjs`: completed and reported Agri 35, Dairy 35 and Flock 69 DetailModal calls, with zero missing sizes and zero unsupported size literals.
+- `build-all.bat`: Dairy, Flock and Agri all built successfully.
+- `node check-muf-sync.js`: reported one mismatch, the small-popup title scale. The CSS intentionally groups `.muf-pup-sm` and `.muf-pup-lg` in one shared rule; the checker incorrectly required a standalone `.muf-pup-sm { }` block.
+- `npm test`: 32/33 tests passed. The sole failure required the literal `No PRs`, while `RULES.md` already expressed the intended policy as “do not open pull requests as a substitute for the repository's established workflow.”
+- `npm ci`: reported four dependency audit findings (one moderate, one high, two critical). The provided output did not identify package names or advisories.
 
-### Source assertions executed against current branch content
+### Fixes committed
 
-A connector-side validation pass evaluated 19 assertions against retrieved current source files. All 19 passed, including the three stylesheet blob hashes, explicit Vite route matching, no API client/network request in the workbench, CSS/JSON export controls, draft validation, responsive/dark preview and editor isolation. This was not an execution of the committed Node checker from the repository checkout.
+Commit `6ab2011` changes the sync invariant to check the real grouped popup selector and its shared `--pup-title: 0.875rem` token. It updates the smoke test to assert the no-pull-request rule rather than the stale exact phrase. The source/test changes are pushed; rerun local commands after pulling before treating these checks as green.
 
-### Reviewed from branch source during this audit
+### Connector-side source assertions
 
-- The three shared stylesheet files have matching blob SHA values.
-- The development route is declared under Vite `configureServer`.
-- The dedicated editor stylesheet is imported by the editor module.
-- The regular app entry files do not import the editor module.
-- The workbench source has local draft validation, no API client/network call, CSS/JSON export and device presets.
-- The workbench TSX and stylesheet have been source-reviewed and corrected; that does not equal a TypeScript compiler run.
+A connector-side validation pass evaluated 19 assertions against retrieved branch source files. All 19 passed, including stylesheet parity, explicit Vite route matching, absence of API client/network code in the workbench, CSS/JSON export controls, draft validation, responsive/dark preview and editor isolation. Source inspection is not a local runtime or build.
 
-### Not run or not verified in this session
+### Still pending
 
-- `node check-muf-workbench.js` through the local Node runtime.
-- `node check-muf-sync.js`, `node check-ui-safety.js` and fresh `node audit-muf-design-system.mjs` after the latest commits.
-- The three type-checked frontend builds.
-- Root Vitest suite.
-- Runtime workbench browser check.
+- Rerun `npm run check-workbench`, `node check-muf-sync.js`, `node check-ui-safety.js`, both audit commands, `build-all.bat` and `npm test` after pulling the latest documentation commit.
+- Run `npm audit` to inspect the four reported dependency findings before deciding on safe updates. Avoid `npm audit fix --force` without reviewing breaking-change impact.
+- Runtime workbench interaction in a browser.
 - Final three-app visual/browser regression.
 
-The connector session cannot execute the repository's Windows scripts/builds, and a local clone could not be obtained because shell network access was unavailable. These items are reported as pending, not passed.
-
+The GitHub connector can update and inspect repository sources, but cannot execute the owner's Windows scripts or run a real browser session in that checkout. Local and browser results are recorded only when supplied by the owner; source-only checks are not marked as runtime passes.
 ## Follow-through
 
 Run the Phase 5 validation list in `PHASES.md` from the working branch and then do the browser checklist the owner reserved for the final phase. Keep the current lockfiles and all backend/business logic untouched.
@@ -179,10 +173,10 @@ Source assertions executed against the retrieved branch files:
 - Targeted primary/compact actions and KPI/crop/entity card rules use the tokens.
 - CSS braces, parentheses, brackets, strings and comments are balanced under a source scanner.
 
-Status: 9/9 CSS source assertions passed. This is not a full CSS parser, local command execution or proof of computed-style parity. Local MUF sync/safety/audit scripts, type-checked builds, and final browser review are still required. Latest shared CSS blob SHA: `76a95ddee233e03ee1b17013271d009ae85f5308`.
+Status: 9/9 CSS source assertions passed. The owner subsequently reported that safety/audit checks and all three builds passed at parent `378deab`; the sync checker had one grouped-selector mismatch, repaired in `6ab2011`. This is not a full CSS parser or proof of computed-style parity. Rerun checks after pulling and complete final browser review. Latest shared CSS blob SHA: `76a95ddee233e03ee1b17013271d009ae85f5308`.
 
 
-The root `package.json` now exposes `npm run check-workbench` as an alias for `node check-muf-workbench.js`; no dependency was added and no package-lock was modified. The shared `check-muf-sync.js` now has eight additional invariants for the new primary-action, compact-action, KPI, panel, entity-card and record-action tokens. All eight expressions matched the current stylesheet source in connector-side checks; the full sync command still must be run locally.
+The root `package.json` exposes `npm run check-workbench` as an alias for `node check-muf-workbench.js`; no dependency or package-lock was added. The shared `check-muf-sync.js` has eight additional action/card invariants. The owner ran the full script at parent `378deab`; those invariants matched, while the old small-title selector invariant failed and is fixed in `6ab2011`.
 
 
 ## Documentation cleanup

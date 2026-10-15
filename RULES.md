@@ -99,8 +99,9 @@ Run from the monorepo root:
 - node --check audit-muf-design-system.mjs
 - node audit-muf-design-system.mjs
 - build-all.bat
+- npm test (after installing the root dependencies with `npm ci`)
 
-The audit reports are written under .audit-output and are local-only. Use npm test for the root Vitest suite after confirming root dependencies are installed. A successful Vite-only fallback is not equivalent to a full type-checked build; read build output rather than relying only on the final success banner.
+The audit reports are written under .audit-output and are local-only. Use npm test for the root Vitest suite after confirming root dependencies are installed. A successful Vite-only fallback is not equivalent to a full type-checked build; read build output rather than relying only on the final success banner. Keep tests aligned with the intended behavior/policy instead of obsolete exact wording. Keep source-checker patterns aligned with actual CSS selector structure, including valid grouped selectors.
 
 Browser review must cover Agri, Dairy and Flock on phone, tablet and desktop; short and long small/big popups; forms and admin shells; inner popup scrolling; sticky header/navigation; light/dark mode; text selection; nested popup close behavior; forms; permissions; finance views and PDF export.
 

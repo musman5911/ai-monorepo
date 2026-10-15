@@ -66,6 +66,4 @@ Corrected during the implementation sequence:
 
 ## Validation status
 
-**Source assertions: 19/19 passed against the current branch files.** The checks covered the editor mount, draft validation, history, editing controls, CSS/JSON export, responsive and dark preview, exact Vite dev route, lack of API clients, editor/stylesheet isolation and shared CSS hashes. This is connector-side source validation, not the execution of `node check-muf-workbench.js` from the repository checkout. The local Node command, type-checked builds, and real browser interaction have not been executed in this session.
-
-The owner asked to defer browser testing until implementation is complete. Run the source guard and full local validation from the working branch before starting that final browser pass.
+**Source assertions: 19/19 passed against the branch files.** On 2026-10-15, the owner reported `npm run check-workbench` passed 18/18, UI safety checks passed, both audit commands completed successfully, and all three apps built at parent `378deab`. Two separate checks were not fully green at that parent: the sync checker had a stale CSS selector regex, and `npm test` had 32/33 passing because a smoke test expected old wording. Commit `6ab2011` repairs both. Pull the latest branch and rerun the checks before marking them verified. Real browser interaction and cross-app visual regression remain deferred to the final pass.

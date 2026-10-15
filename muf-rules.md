@@ -62,3 +62,10 @@ Primary action buttons, active primary navigation, text actions and detail butto
 5. Run check-muf-sync.js, check-ui-safety.js, check-muf-workbench.js and build-all.bat.
 6. Open all three apps and verify the affected screen on phone and desktop, then dark mode.
 7. Update PHASES.md and MUF_FULL_AUDIT.md with the change and actual validation results.
+
+
+## Validation checks should follow source intent
+
+- Prefer checks that assert behavior or a stable semantic contract over brittle exact wording that can drift while the policy remains unchanged.
+- CSS invariants must reflect valid selector grouping and the actual shared declaration structure. A selector intentionally grouped with another selector is not missing merely because it has no standalone rule block.
+- Record source-only inspection, local command results and browser verification separately. Do not label a test as passing until it has been run against the relevant commit.

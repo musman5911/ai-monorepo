@@ -17,11 +17,15 @@ The URLs above are the local URLs printed by start-all.bat. The command starts s
 From the repository root, run these in order after pulling the working branch:
 
 1. git pull --ff-only origin arena/20261014-muf-mobile-popups
-2. node check-muf-sync.js
-3. node check-ui-safety.js
-4. npm run check-workbench
-5. build-all.bat
-6. start-all.bat
+2. npm ci
+3. node check-muf-sync.js
+4. node check-ui-safety.js
+5. npm run check-workbench
+6. node --check audit-muf-design-system.mjs
+7. node audit-muf-design-system.mjs
+8. build-all.bat
+9. npm test
+10. start-all.bat
 
 Run the design audit with `node audit-muf-design-system.mjs`. It writes local reports to `.audit-output`, which is intentionally ignored by Git.
 
@@ -31,7 +35,11 @@ The component preview builder is exposed by the Dairy Vite development server on
 
 Run `node check-muf-workbench.js` from the monorepo root to run the workbench source-safety guard. This guard complements rather than replaces the TypeScript build, MUF synchronization/UI-safety checks, or browser review. The workbench is a dependency-free custom MUF builder; the Puck package is not installed in this workstream.
 
-The root test command is npm test. At the last recorded check it could not start because npm ls vitest reported an empty installed dependency tree, although Vitest is declared in the root package manifest and lockfile. This means the test suite has not run; it is not a failing test result.
+## Latest local validation report
+
+The owner ran the full local checks on 2026-10-15 at parent commit `378deab`: the workbench guard passed 18/18 checks; UI safety checks passed; the audit syntax check and audit command completed; and `build-all.bat` built all three apps successfully. The sync checker reported one stale small-title selector pattern, and `npm test` ran 33 tests with 32 passing and one failure because a smoke test expected the old literal phrase `No PRs`. Commit `6ab2011` repairs those two issues by recognizing the shared `.muf-pup-sm, .muf-pup-lg` selector and asserting the actual no-pull-request rule. Pull this follow-up and rerun the checks before treating them as verified.
+
+`npm ci` also reported four dependency audit findings (one moderate, one high and two critical). The output provided did not identify affected packages/advisories, so run `npm audit` and review the details before applying dependency updates. Do not use `npm audit fix --force` as a blind cleanup step.
 
 ## Documentation map
 

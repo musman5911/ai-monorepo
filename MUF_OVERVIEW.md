@@ -38,10 +38,10 @@ As of the source review on 2026-10-15:
 
 - The shared 70dvh mobile height invariant passes.
 - Form sheets and admin shells were aligned with the shared height token in commit a510265.
-- The repository owner reported both MUF check scripts and all three frontend builds passing after pulling that change.
-- The audit tool was run locally and reported 139 DetailModal call sites across the three apps.
-- The root Vitest command has not run successfully because Vitest is declared but not present in the root installed dependency tree.
+- On 2026-10-15, the owner reran local checks at parent commit `378deab`: UI safety, the workbench guard (18/18), audit syntax/execution, and all three app builds passed. The sync checker exposed a stale selector regex, and Vitest ran 33 tests with one failure caused by an obsolete exact-phrase assertion. Commit `6ab2011` fixes both and requires a local rerun.
+- The audit reported 139 DetailModal call sites across the three apps, with zero missing sizes and zero unsupported size literals.
+- `npm ci` reported four audit findings (1 moderate, 1 high, 2 critical); inspect them with `npm audit` before changing dependency versions.
 - A development-only custom MUF workbench is implemented in the Dairy Vite client at /__muf-workbench; see MUF_WORKBENCH_AUDIT.md for its constraints and validation status.
 - The workbench is dependency-free, not a Puck integration, because package manifests and lockfiles were kept unchanged in this workstream.
 
-See muf-rules.md for enforceable UI rules, MUF_FULL_AUDIT.md for findings, MUF_WORKBENCH_AUDIT.md for editor scope, and PHASES.md for phase status. Builds/check scripts still need to be rerun locally after the newest source changes.
+See muf-rules.md for enforceable UI rules, MUF_FULL_AUDIT.md for findings, MUF_WORKBENCH_AUDIT.md for editor scope, and PHASES.md for phase status. Rerun the repaired sync checker, root test suite and build/audit commands after pulling the current follow-up. Browser regression remains pending.
