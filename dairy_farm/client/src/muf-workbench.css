@@ -107,8 +107,7 @@
 .muf-workbench .muf-wb-export { display: grid; gap: 8px; }
 .muf-wb-export pre { min-width: 0; max-height: 280px; overflow: auto; margin: 0; padding: 12px; border-radius: 9px; background: var(--muf-wb-soft); color: inherit; font: 11px/1.6 ui-monospace, SFMono-Regular, Consolas, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
 .muf-wb-notice { margin: 0; font-size: 12px; font-weight: 750; }
-.muf-workbench--dark { --muf-wb-page: #0b1220; --muf-wb-card: #111c2e; --muf-wb-ink: #e5edf7; --muf-wb-muted: #aab9cc; --muf-wb-line: #334155; --muf-wb-soft: #172337; color-scheme: dark; }
-.muf-workbench--dark .muf-wb-sample { color: var(--muf-wb-ink); }
+.muf-workbench--dark { --muf-wb-page: #0b1220; --muf-wb-card: #111c2e; --muf-wb-ink: #e5edf7; --muf-wb-muted: #aab9cc; --muf-wb-line: #334155; --muf-wb-soft: #172337; --muf-color-surface: #111c2e; --muf-color-surface-alt: #172337; --muf-color-text: #e5edf7; --muf-color-border: #334155; color-scheme: dark; }
 @media (max-width: 1000px) {
   .muf-wb-columns { grid-template-columns: minmax(240px, 290px) minmax(0, 1fr); }
   .muf-workbench .muf-wb-panel, .muf-workbench .muf-wb-topbar { padding: 12px; }
