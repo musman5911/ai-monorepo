@@ -2,171 +2,345 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import './muf-style.css';
+import './muf-workbench.css';
 
 /**
- * Development-only MUF visual workbench. It edits a constrained style schema,
- * never application data or production source. Drafts stay in this browser;
- * exports are reviewable CSS/token patches and are never auto-applied.
+ * Development-only MUF visual builder. This local editor is deliberately
+ * data-free: it previews approved visual primitives and exports reviewable
+ * files. It never writes application source, APIs, or production styles.
  */
 type Kind = 'popup' | 'heading' | 'card' | 'button' | 'form';
-type Spec = {
+type Density = 'comfortable' | 'compact';
+type Surface = 'surface' | 'surface-alt' | 'primary';
+type Accent = 'primary' | 'success' | 'warning' | 'danger';
+type Block = {
+  id: string;
   kind: Kind;
   title: string;
   subtitle: string;
   body: string;
   size: 'small' | 'large';
-  density: 'comfortable' | 'compact';
-  surface: 'surface' | 'surface-alt' | 'primary';
+  density: Density;
+  surface: Surface;
   radius: number;
   padding: number;
   gap: number;
   fontSize: number;
-  accent: 'primary' | 'success' | 'warning' | 'danger';
+  accent: Accent;
 };
-type Snapshot = { label: string; spec: Spec };
-const initial: Spec = {
-  kind: 'popup', title: 'Popup preview', subtitle: 'MUF shared component', body: 'Use real app data in production. This workbench contains only sample preview text.', size: 'large',
-  density: 'comfortable', surface: 'surface', radius: 16, padding: 18, gap: 10, fontSize: 14, accent: 'primary'
+type Design = { blocks: Block[] };
+type Device = 'phone' | 'tablet' | 'desktop';
+
+const draftKey = 'muf-visual-workbench-draft-v2';
+const kindLabels: Record<Kind, string> = {
+  popup: 'Popup shell', heading: 'Heading', card: 'Card', button: 'Button', form: 'Form'
 };
-const accentTokens: Record<Spec['accent'], string> = {
-  primary: 'var(--muf-color-primary)', success: 'var(--muf-color-success)',
-  warning: 'var(--muf-color-warning)', danger: 'var(--muf-color-danger)'
-};
-const surfaceTokens: Record<Spec['surface'], string> = {
+const surfaceTokens: Record<Surface, string> = {
   surface: 'var(--muf-color-surface, #fffefb)',
   'surface-alt': 'var(--muf-color-surface-alt, #f1f5f9)',
   primary: 'var(--muf-color-primary, #136334)'
 };
-const clone = (s: Spec): Spec => ({ ...s });
-const draftKey = 'muf-visual-workbench-draft-v1';
+const accentTokens: Record<Accent, string> = {
+  primary: 'var(--muf-color-primary, #136334)',
+  success: 'var(--muf-color-success, #16a34a)',
+  warning: 'var(--muf-color-warning, #d97706)',
+  danger: 'var(--muf-color-danger, #dc2626)'
+};
+let idCounter = 0;
+const newId = (kind: Kind) => `${kind}-${Date.now().toString(36)}-${(++idCounter).toString(36)}`;
+const makeBlock = (kind: Kind): Block => ({
+  id: newId(kind), kind,
+  title: kind === 'popup' ? 'Popup preview' : kindLabels[kind],
+  subtitle: 'MUF shared component',
+  body: 'Sample preview content only. This workbench never loads or changes live farm data.',
+  size: kind === 'popup' ? 'large' : 'small',
+  density: 'comfortable', surface: kind === 'button' ? 'primary' : 'surface',
+  radius: 16, padding: 18, gap: 10, fontSize: 14, accent: 'primary'
+});
+const initialDesign: Design = {
+  blocks: [
+    { ...makeBlock('heading'), title: 'Component preview', subtitle: 'A small MUF design canvas', body: '' },
+    makeBlock('popup'),
+    { ...makeBlock('card'), title: 'Summary card', body: 'Edit the visual properties in the inspector. Data here is sample content.' },
+    { ...makeBlock('button'), title: 'Save changes', body: 'Preview action only. No application action is connected.' }
+  ]
+};
+const cloneDesign = (value: Design): Design => ({ blocks: value.blocks.map(block => ({ ...block })) });
+const isKind = (value: unknown): value is Kind => typeof value === 'string' && value in kindLabels;
+const isDesign = (value: unknown): value is Design => {
+  if (!value || typeof value !== 'object' || !Array.isArray((value as Design).blocks)) return false;
+  return (value as Design).blocks.every(block =>
+    block && typeof block.id === 'string' && isKind(block.kind) &&
+    typeof block.title === 'string' && typeof block.body === 'string' &&
+    ['small', 'large'].includes(block.size) &&
+    ['comfortable', 'compact'].includes(block.density) &&
+    ['surface', 'surface-alt', 'primary'].includes(block.surface) &&
+    ['primary', 'success', 'warning', 'danger'].includes(block.accent)
+  );
+};
+const safeLoadDraft = (): Design => {
+  try {
+    const saved = localStorage.getItem(draftKey);
+    if (!saved) return cloneDesign(initialDesign);
+    const parsed: unknown = JSON.parse(saved);
+    return isDesign(parsed) ? cloneDesign(parsed) : cloneDesign(initialDesign);
+  } catch {
+    return cloneDesign(initialDesign);
+  }
+};
 
 function MUFVisualWorkbench() {
-  const [spec, setSpec] = useState<Spec>(() => {
-    try { const raw = localStorage.getItem(draftKey); return raw ? { ...initial, ...JSON.parse(raw) } : clone(initial); }
-    catch { return clone(initial); }
-  });
-  const [history, setHistory] = useState<Spec[]>([clone(spec)]);
+  const [design, setDesign] = useState<Design>(safeLoadDraft);
+  const [history, setHistory] = useState<Design[]>(() => [safeLoadDraft()]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const [device, setDevice] = useState<'phone' | 'tablet' | 'desktop'>('phone');
+  const [selectedId, setSelectedId] = useState<string>(() => safeLoadDraft().blocks[0]?.id || '');
+  const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [device, setDevice] = useState<Device>('phone');
+  const [baseline, setBaseline] = useState<Design>(() => cloneDesign(safeLoadDraft()));
   const [compare, setCompare] = useState(false);
-  const [baseline, setBaseline] = useState<Spec>(() => clone(initial));
-  const [notice, setNotice] = useState('Draft stays local until you export it.');
-  const update = (patch: Partial<Spec>) => {
-    const next = { ...spec, ...patch };
-    setSpec(next);
-    setHistory((old) => [...old.slice(0, historyIndex + 1), clone(next)].slice(-60));
-    setHistoryIndex((old) => Math.min(old + 1, 59));
+  const [darkPreview, setDarkPreview] = useState(false);
+  const [notice, setNotice] = useState('Changes stay in this browser until you export them.');
+
+  const selected = design.blocks.find(block => block.id === selectedId) || design.blocks[0];
+  const commitDesign = (next: Design) => {
+    setDesign(next);
+    setHistory(old => [...old.slice(0, historyIndex + 1), cloneDesign(next)].slice(-60));
+    setHistoryIndex(old => Math.min(old + 1, 59));
+    if (!next.blocks.some(block => block.id === selectedId)) setSelectedId(next.blocks[0]?.id || '');
+  };
+  const updateSelected = (patch: Partial<Block>) => {
+    if (!selected) return;
+    commitDesign({ blocks: design.blocks.map(block => block.id === selected.id ? { ...block, ...patch } : block) });
   };
   const undo = () => {
     if (historyIndex <= 0) return;
-    const nextIndex = historyIndex - 1;
-    setHistoryIndex(nextIndex); setSpec(clone(history[nextIndex]));
+    const index = historyIndex - 1;
+    setHistoryIndex(index); setDesign(cloneDesign(history[index]));
+    setSelectedId(history[index].blocks[0]?.id || '');
   };
   const redo = () => {
     if (historyIndex >= history.length - 1) return;
-    const nextIndex = historyIndex + 1;
-    setHistoryIndex(nextIndex); setSpec(clone(history[nextIndex]));
+    const index = historyIndex + 1;
+    setHistoryIndex(index); setDesign(cloneDesign(history[index]));
+    setSelectedId(history[index].blocks[0]?.id || '');
   };
-  useEffect(() => { try { localStorage.setItem(draftKey, JSON.stringify(spec)); } catch { /* Private browsing may block storage. */ } }, [spec]);
-  const css = useMemo(() => {
-    const className = 'muf-workbench-preview';
-    const padding = spec.density === 'compact' ? Math.max(8, Math.round(spec.padding * 0.75)) : spec.padding;
-    const gap = spec.density === 'compact' ? Math.max(4, Math.round(spec.gap * 0.75)) : spec.gap;
-    const width = spec.kind === 'popup' ? (spec.size === 'small' ? '28rem' : '42rem') : '100%';
-    return `/* Review this patch before applying it to muf-style.css. */\n.${className} {\n  width: min(100%, ${width});\n  border-radius: ${spec.radius}px;\n  padding: ${padding}px;\n  gap: ${gap}px;\n  font-size: ${spec.fontSize}px;\n  background: ${surfaceTokens[spec.surface]};\n  border-color: ${accentTokens[spec.accent]};\n}\n`;
-  }, [spec]);
-  const saveDraft = () => { try { localStorage.setItem(draftKey, JSON.stringify(spec)); setNotice('Draft saved in this browser.'); } catch { setNotice('Browser storage is unavailable; use Export CSS instead.'); } };
-  const exportCss = () => {
-    const blob = new Blob([css], { type: 'text/css;charset=utf-8' });
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      const typing = !!target && (target.isContentEditable || /^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName));
+      if (typing || !(event.ctrlKey || event.metaKey)) return;
+      if (event.key.toLowerCase() === 'z' && !event.shiftKey) { event.preventDefault(); undo(); }
+      else if (event.key.toLowerCase() === 'y' || (event.key.toLowerCase() === 'z' && event.shiftKey)) { event.preventDefault(); redo(); }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  });
+  useEffect(() => {
+    try { localStorage.setItem(draftKey, JSON.stringify(design)); }
+    catch { /* Browser storage may be disabled; explicit export remains available. */ }
+  }, [design]);
+
+  const addBlock = (kind: Kind) => {
+    const block = makeBlock(kind);
+    const next = { blocks: [...design.blocks, block] };
+    commitDesign(next); setSelectedId(block.id); setNotice(`${kindLabels[kind]} added to the local canvas.`);
+  };
+  const removeSelected = () => {
+    if (!selected) return;
+    const next = { blocks: design.blocks.filter(block => block.id !== selected.id) };
+    commitDesign(next);
+    setSelectedId(next.blocks[Math.max(0, design.blocks.findIndex(block => block.id === selected.id) - 1)]?.id || next.blocks[0]?.id || '');
+  };
+  const duplicateSelected = () => {
+    if (!selected) return;
+    const copy = { ...selected, id: newId(selected.kind), title: `${selected.title} copy` };
+    const index = design.blocks.findIndex(block => block.id === selected.id);
+    const next = [...design.blocks]; next.splice(index + 1, 0, copy);
+    commitDesign({ blocks: next }); setSelectedId(copy.id);
+  };
+  const moveBlock = (id: string, offset: number) => {
+    const from = design.blocks.findIndex(block => block.id === id);
+    const to = from + offset;
+    if (from < 0 || to < 0 || to >= design.blocks.length) return;
+    const next = [...design.blocks]; const [item] = next.splice(from, 1); next.splice(to, 0, item);
+    commitDesign({ blocks: next });
+  };
+  const moveBlockBefore = (movingId: string, targetId: string) => {
+    if (movingId === targetId) return;
+    const next = [...design.blocks];
+    const from = next.findIndex(block => block.id === movingId);
+    const target = next.findIndex(block => block.id === targetId);
+    if (from < 0 || target < 0) return;
+    const [item] = next.splice(from, 1);
+    const insertion = next.findIndex(block => block.id === targetId);
+    next.splice(insertion, 0, item);
+    commitDesign({ blocks: next }); setNotice('Canvas order updated.');
+  };
+  const saveDraft = () => {
+    try { localStorage.setItem(draftKey, JSON.stringify(design)); setNotice('Design saved in this browser.'); }
+    catch { setNotice('Browser storage is unavailable. Use Export JSON instead.'); }
+  };
+  const download = (filename: string, type: string, contents: string) => {
+    const blob = new Blob([contents], { type });
     const url = URL.createObjectURL(blob);
-    const link = document.createElement('a'); link.href = url; link.download = 'muf-workbench-patch.css'; link.click();
-    URL.revokeObjectURL(url); setNotice('CSS patch exported. Nothing was applied automatically.');
+    const link = document.createElement('a');
+    link.href = url; link.download = filename; link.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 0);
   };
   const exportJson = () => {
-    const blob = new Blob([JSON.stringify({ version: 1, kind: spec.kind, spec }, null, 2)], { type: 'application/json;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a'); link.href = url; link.download = 'muf-workbench-draft.json'; link.click();
-    URL.revokeObjectURL(url); setNotice('Design draft exported as JSON.');
+    download('muf-workbench-design.json', 'application/json;charset=utf-8', JSON.stringify({ version: 2, source: 'muf-visual-workbench', design }, null, 2));
+    setNotice('Design JSON exported. It was not applied to the app.');
   };
-  const preview = (value: Spec, label?: string) => {
-    const cardStyle: React.CSSProperties = {
-      boxSizing: 'border-box', width: '100%', maxWidth: value.kind === 'popup' ? (value.size === 'small' ? '28rem' : '42rem') : '100%', minWidth: 0,
-      padding: value.density === 'compact' ? Math.max(8, Math.round(value.padding * 0.75)) : value.padding,
-      display: 'flex', flexDirection: 'column', gap: value.density === 'compact' ? Math.max(4, Math.round(value.gap * 0.75)) : value.gap, borderRadius: value.radius, alignSelf: 'center',
-      border: `1px solid ${accentTokens[value.accent]}`, background: surfaceTokens[value.surface],
-      color: value.surface === 'primary' ? '#ffffff' : 'var(--muf-color-text, #1e293b)',
-      fontSize: value.fontSize, boxShadow: 'var(--muf-shadow, 0 12px 32px rgba(15,23,42,.12))',
-      overflowWrap: 'anywhere'
-    };
-    return <section key={label || value.kind} style={cardStyle} aria-label={label || 'Component preview'}>
-      {label && <small style={{ opacity: .65, fontWeight: 800, letterSpacing: '.08em' }}>{label}</small>}
-      {(value.kind === 'popup' || value.kind === 'heading') && <header style={{ borderBottom: '1px solid var(--muf-color-border, #e6e6de)', paddingBottom: value.gap, display: 'flex', flexDirection: 'column', gap: 4 }}>
-        <strong style={{ fontSize: value.fontSize + 3, lineHeight: 1.25 }}>{value.title}</strong>
-        {value.kind === 'popup' && <span style={{ opacity: .7, fontSize: Math.max(11, value.fontSize - 2) }}>{value.subtitle}</span>}
+  const css = useMemo(() => {
+    const escapeComment = (value: string) => value.replace(/[*\\/]/g, '').slice(0, 80);
+    return [
+      '/* Review this MUF design patch before applying it. Export never changes production files. */',
+      ...design.blocks.map((block, index) => {
+        const pad = block.density === 'compact' ? Math.max(8, Math.round(block.padding * 0.75)) : block.padding;
+        const gap = block.density === 'compact' ? Math.max(4, Math.round(block.gap * 0.75)) : block.gap;
+        const width = block.kind === 'popup' ? (block.size === 'small' ? '28rem' : '42rem') : '100%';
+        return `.muf-workbench-block--${index + 1} {\n` +
+          `  width: min(100%, ${width});\n  box-sizing: border-box;\n  border: 1px solid ${accentTokens[block.accent]};\n` +
+          `  border-radius: ${block.radius}px;\n  padding: ${pad}px;\n  gap: ${gap}px;\n  font-size: ${block.fontSize}px;\n` +
+          `  background: ${surfaceTokens[block.surface]};\n  overflow-wrap: anywhere;\n}\n/* ${escapeComment(block.title)} */`;
+      })
+    ].join('\n\n');
+  }, [design]);
+  const exportCss = () => {
+    download('muf-workbench-style-patch.css', 'text/css;charset=utf-8', css);
+    setNotice('CSS patch exported for review. No production stylesheet changed.');
+  };
+  const previewStyle = (block: Block): React.CSSProperties => ({
+    '--muf-wb-radius': `${block.radius}px`,
+    '--muf-wb-padding': `${block.density === 'compact' ? Math.max(8, Math.round(block.padding * 0.75) : block.padding}px`,
+    '--muf-wb-gap': `${block.density === 'compact' ? Math.max(4, Math.round(block.gap * 0.75)) : block.gap}px`,
+    '--muf-wb-font-size': `${block.fontSize}px`,
+    '--muf-wb-surface': surfaceTokens[block.surface],
+    '--muf-wb-accent': accentTokens[block.accent],
+    '--muf-wb-max-width': block.kind === 'popup' ? (block.size === 'small' ? '28rem' : '42rem') : '100%'
+  } as React.CSSProperties);
+  const renderBlock = (block: Block, index: number, isBaseline = false) => (
+    <section
+      key={`${isBaseline ? 'baseline-' : ''}${block.id}`}
+      className={`muf-wb-sample ${block.kind === 'button' ? 'muf-wb-sample--button' : ''} ${!isBaseline && selectedId === block.id ? 'is-selected' : ''}`}
+      style={previewStyle(block)}
+      aria-label={`${kindLabels[block.kind]} preview`}
+      onClick={!isBaseline ? () => setSelectedId(block.id) : undefined}
+      role={!isBaseline ? 'button' : undefined}
+      tabIndex={!isBaseline ? 0 : undefined}
+      onKeyDown={!isBaseline ? event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setSelectedId(block.id); } } : undefined}
+      draggable={!isBaseline}
+      onDragStart={!isBaseline ? () => setDraggingId(block.id) : undefined}
+      onDragOver={!isBaseline ? event => event.preventDefault() : undefined}
+      onDrop={!isBaseline ? event => { event.preventDefault(); if (draggingId) moveBlockBefore(draggingId, block.id); setDraggingId(null); } : undefined}
+      onDragEnd={!isBaseline ? () => setDraggingId(null) : undefined}
+    >
+      <div className="muf-wb-sample__meta">
+        <span>{kindLabels[block.kind]}</span>
+        {block.kind === 'popup' && <span>{block.size === 'large' ? 'Large shell' : 'Small shell'}</span>}
+        <span>{block.density}</span>
+      </div>
+      {(block.kind === 'popup' || block.kind === 'heading') && <header className="muf-wb-sample__heading">
+        <strong>{block.title}</strong>
+        {block.kind === 'popup' && <span>{block.subtitle}</span>}
       </header>}
-      {value.kind === 'card' && <strong>{value.title}</strong>}
-      {(value.kind === 'popup' || value.kind === 'card' || value.kind === 'form') && <p style={{ margin: 0, lineHeight: 1.5 }}>{value.body}</p>}
-      {value.kind === 'form' && <div style={{ display: 'grid', gap: 6 }}>
-        <label style={{ fontSize: 12 }}>Sample field</label><input aria-label="Sample field" placeholder="Preview only" style={{ width: '100%', boxSizing: 'border-box', minHeight: 36, padding: 8, borderRadius: 8, border: '1px solid var(--muf-color-border, #e6e6de)', background: 'var(--muf-color-surface, #fffefb)', color: 'var(--muf-color-text, #1e293b)' }} />
+      {block.kind === 'card' && <strong className="muf-wb-sample__title">{block.title}</strong>}
+      {(block.kind === 'popup' || block.kind === 'card' || block.kind === 'form') && <p className="muf-wb-sample__body">{block.body}</p>}
+      {block.kind === 'form' && <label className="muf-wb-sample__field">Sample field<input placeholder="Preview only" aria-label="Preview-only form field" /></label>}
+      {block.kind === 'button' && <button className="muf-wb-sample__action" type="button" onClick={event => { event.stopPropagation(); setNotice('Preview-only button clicked. No application action was executed.'); }}>{block.title || 'Preview action'}</button>}
+      {!isBaseline && <div className="muf-wb-sample__reorder">
+        <button type="button" aria-label="Move component up" disabled={index === 0} onClick={event => { event.stopPropagation(); moveBlock(block.id, -1); }}>↑</button>
+        <button type="button" aria-label="Move component down" disabled={index === design.blocks.length - 1} onClick={event => { event.stopPropagation(); moveBlock(block.id, 1); }}>↓</button>
       </div>}
-      {value.kind === 'button' && <button type="button" className="muf-primary-action" style={{ alignSelf: 'flex-start', background: accentTokens[value.accent] }} onClick={() => setNotice('Preview button only. No application action was run.')}>Preview action</button>}
-      {value.kind !== 'button' && <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <span style={{ borderRadius: 999, padding: '4px 8px', fontSize: 11, background: 'var(--muf-color-surface-alt, #f1f5f9)' }}>{value.size === 'large' ? 'Large shell' : 'Small shell'}</span>
-        <span style={{ borderRadius: 999, padding: '4px 8px', fontSize: 11, background: 'var(--muf-color-surface-alt, #f1f5f9)' }}>{value.density} density</span>
-      </div>}
-    </section>;
-  };
-  const deviceWidth = device === 'phone' ? 360 : device === 'tablet' ? 768 : 1120;
-  return <main style={{ minHeight: '100dvh', background: 'var(--muf-color-page, #f8fafc)', color: 'var(--muf-color-text, #1e293b)', padding: 16, fontFamily: 'inherit' }}>
-    <div style={{ maxWidth: 1440, margin: '0 auto', display: 'grid', gap: 16 }}>
-      <header className="muf-panel" style={{ padding: 18, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-        <div><p style={{ margin: 0, color: 'var(--muf-color-primary)', fontWeight: 800, fontSize: 11, letterSpacing: '.1em' }}>MUF DESIGN SYSTEM / DEV TOOL</p><h1 style={{ margin: '6px 0', fontSize: 24 }}>Visual workbench</h1><p style={{ margin: 0, opacity: .7, fontSize: 13 }}>Preview-only components. No APIs, business data, or production styles are changed.</p></div>
-        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-          <button className="muf-detail-btn" style={{ flex: '0 0 auto', padding: '8px 12px' }} onClick={undo} disabled={historyIndex <= 0}>Undo</button>
-          <button className="muf-detail-btn" style={{ flex: '0 0 auto', padding: '8px 12px' }} onClick={redo} disabled={historyIndex >= history.length - 1}>Redo</button>
-          <button className="muf-primary-action" style={{ minHeight: 36 }} onClick={saveDraft}>Save draft</button>
-          <button className="muf-primary-action" style={{ minHeight: 36 }} onClick={exportCss}>Export CSS</button>
-          <button className="muf-primary-action" style={{ minHeight: 36 }} onClick={exportJson}>Export JSON</button>
+    </section>
+  );
+  const deviceWidth: Record<Device, number> = { phone: 360, tablet: 768, desktop: 1120 };
+
+  return <main className={`muf-workbench ${darkPreview ? 'muf-workbench--dark' : ''}`}>
+    <div className="muf-wb-layout">
+      <header className="muf-wb-topbar muf-panel">
+        <div>
+          <p className="muf-wb-eyebrow">MU F DESIGN SYSTEM / DEVELOPMENT TOOL</p>
+          <h1>Visual workbench</h1>
+          <p className="muf-wb-subtext">A local canvas for approved MUF primitives. Nothing here writes to production.</p>
+        </div>
+        <div className="muf-wb-toolbar">
+          <button className="muf-wb-button muf-wb-button--quiet" onClick={undo} disabled={historyIndex <= 0}>Undo</button>
+          <button className="muf-wb-button muf-wb-button--quiet" onClick={redo} disabled={historyIndex >= history.length - 1}>Redo</button>
+          <button className="muf-wb-button" onClick={saveDraft}>Save draft</button>
+          <button className="muf-wb-button" onClick={exportCss}>Export CSS</button>
+          <button className="muf-wb-button" onClick={exportJson}>Export JSON</button>
         </div>
       </header>
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(260px, 340px) minmax(0, 1fr)', gap: 16, alignItems: 'start' }}>
-        <aside className="muf-panel" style={{ padding: 16, display: 'grid', gap: 12 }}>
-          <h2 style={{ margin: 0, fontSize: 16 }}>Inspector</h2>
-          <label style={{ display: 'grid', gap: 5, fontSize: 12 }}>Component type
-            <select value={spec.kind} onChange={e => update({ kind: e.target.value as Kind })}><option value="popup">Popup shell</option><option value="heading">Heading</option><option value="card">Card</option><option value="button">Button</option><option value="form">Form</option></select>
-          </label>
-          <label style={{ display: 'grid', gap: 5, fontSize: 12 }}>Title<input value={spec.title} onChange={e => update({ title: e.target.value })} /></label>
-          <label style={{ display: 'grid', gap: 5, fontSize: 12 }}>Subtitle<input value={spec.subtitle} onChange={e => update({ subtitle: e.target.value })} /></label>
-          <label style={{ display: 'grid', gap: 5, fontSize: 12 }}>Sample body<textarea rows={3} value={spec.body} onChange={e => update({ body: e.target.value })} /></label>
-          <label style={{ display: 'grid', gap: 5, fontSize: 12 }}>Shell size<select value={spec.size} onChange={e => update({ size: e.target.value as Spec['size'] })}><option value="small">Small</option><option value="large">Large</option></select></label>
-          <label style={{ display: 'grid', gap: 5, fontSize: 12 }}>Density<select value={spec.density} onChange={e => update({ density: e.target.value as Spec['density'] })}><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>
-          <label style={{ display: 'grid', gap: 5, fontSize: 12 }}>Surface<select value={spec.surface} onChange={e => update({ surface: e.target.value as Spec['surface'] })}><option value="surface">Surface</option><option value="surface-alt">Alternate surface</option><option value="primary">Primary</option></select></label>
-          <label style={{ display: 'grid', gap: 5, fontSize: 12 }}>Accent<select value={spec.accent} onChange={e => update({ accent: e.target.value as Spec['accent'] })}><option value="primary">Primary</option><option value="success">Success</option><option value="warning">Warning</option><option value="danger">Danger</option></select></label>
-          {([
-            ['radius', 'Corner radius', 0, 32, 1], ['padding', 'Padding', 8, 32, 2],
-            ['gap', 'Gap', 4, 24, 1], ['fontSize', 'Font size', 11, 22, 1]
-          ] as const).map(([key, label, min, max, step]) => <label key={key} style={{ display: 'grid', gap: 5, fontSize: 12 }}>{label}: {spec[key]}{key === 'fontSize' ? 'px' : 'px'}<input type="range" min={min} max={max} step={step} value={spec[key]} onChange={e => update({ [key]: Number(e.target.value) } as Partial<Spec>)} /></label>)}
-          <button className="muf-detail-btn" style={{ padding: 10 }} onClick={() => { setBaseline(clone(spec)); setNotice('Comparison baseline updated.'); }}>Set comparison baseline</button>
-        </aside>
-        <section style={{ minWidth: 0, display: 'grid', gap: 12 }}>
-          <div className="muf-panel" style={{ padding: 12, display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <strong style={{ fontSize: 13, marginRight: 8 }}>Preview viewport</strong>
-            {(['phone', 'tablet', 'desktop'] as const).map(v => <button key={v} className="muf-detail-btn" style={{ flex: '0 0 auto', padding: '7px 10px', opacity: device === v ? 1 : .65 }} onClick={() => setDevice(v)}>{v}</button>)}
-            <label style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 6, fontSize: 12 }}><input type="checkbox" checked={compare} onChange={e => setCompare(e.target.checked)} />Compare baseline</label>
+
+      <div className="muf-wb-columns">
+        <aside className="muf-panel muf-wb-panel">
+          <h2>Component library</h2>
+          <p className="muf-wb-subtext">Add a preview block to the canvas.</p>
+          <div className="muf-wb-palette">
+            {(['popup', 'heading', 'card', 'button', 'form'] as const).map(kind =>
+              <button key={kind} className="muf-wb-button muf-wb-button--outline" onClick={() => addBlock(kind)}>+ {kindLabels[kind]}</button>
+            )}
           </div>
-          <div style={{ display: 'flex', justifyContent: 'center', padding: 12, minWidth: 0, background: 'var(--muf-color-surface-alt, #f1f5f9)', border: '1px solid var(--muf-color-border, #e6e6de)', borderRadius: 16 }}>
-            <div style={{ width: '100%', maxWidth: deviceWidth, minWidth: 0, display: 'grid', gridTemplateColumns: compare ? 'repeat(2,minmax(0,1fr))' : 'minmax(0,1fr)', gap: 12, alignItems: 'start', transition: 'max-width .15s ease' }}>
-              {preview(spec, 'CURRENT DESIGN')}{compare && preview(baseline, 'BASELINE')}
+          <div className="muf-wb-divider" />
+          <div className="muf-wb-section-title"><h2>Canvas structure</h2><span>{design.blocks.length} blocks</span></div>
+          <div className="muf-wb-layer-list">
+            {design.blocks.map((block, index) => <button key={block.id} className={`muf-wb-layer ${selected?.id === block.id ? 'is-active' : ''}`} onClick={() => setSelectedId(block.id)}>
+              <span className="muf-wb-layer-index">{index + 1}</span><span className="muf-wb-layer-name"><strong>{block.title || kindLabels[block.kind]}</strong><small>{kindLabels[block.kind]}</small></span>
+            </button>)}
+            {design.blocks.length === 0 && <p className="muf-wb-subtext">Canvas empty. Add a component above.</p>}
+          </div>
+          {selected && <>
+            <div className="muf-wb-divider" />
+            <div className="muf-wb-section-title"><h2>Inspector</h2><span>{kindLabels[selected.kind]}</span></div>
+            <label className="muf-wb-field">Title<input value={selected.title} onChange={event => updateSelected({ title: event.target.value })} /></label>
+            <label className="muf-wb-field">Subtitle<input value={selected.subtitle} onChange={event => updateSelected({ subtitle: event.target.value })} /></label>
+            <label className="muf-wb-field">Sample body<textarea rows={3} value={selected.body} onChange={event => updateSelected({ body: event.target.value })} /></label>
+            <div className="muf-wb-field-grid">
+              <label className="muf-wb-field">Popup size<select value={selected.size} onChange={event => updateSelected({ size: event.target.value as Block['size'] })}><option value="small">Small</option><option value="large">Large</option></select></label>
+              <label className="muf-wb-field">Density<select value={selected.density} onChange={event => updateSelected({ density: event.target.value as Density })}><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label>
+              <label className="muf-wb-field">Surface<select value={selected.surface} onChange={event => updateSelected({ surface: event.target.value as Surface })}><option value="surface">Surface</option><option value="surface-alt">Alternate</option><option value="primary">Primary</option></select></label>
+              <label className="muf-wb-field">Accent<select value={selected.accent} onChange={event => updateSelected({ accent: event.target.value as Accent })}><option value="primary">Primary</option><option value="success">Success</option><option value="warning">Warning</option><option value="danger">Danger</option></select></label>
+            </div>
+            {([
+              ['radius', 'Corner radius', 0, 32, 1], ['padding', 'Padding', 8, 32, 2],
+              ['gap', 'Gap', 4, 24, 1], ['fontSize', 'Font size', 11, 22, 1]
+            ] as const).map(([key, label, min, max, step]) => <label key={key} className="muf-wb-field muf-wb-range">{label}<output>{selected[key]}px</output><input type="range" min={min} max={max} step={step} value={selected[key]} onChange={event => updateSelected({ [key]: Number(event.target.value) } as Partial<Block>)} /></label>)}
+            <div className="muf-wb-toolbar">
+              <button className="muf-wb-button muf-wb-button--quiet" onClick={duplicateSelected}>Duplicate</button>
+              <button className="muf-wb-button muf-wb-button--danger" onClick={removeSelected}>Remove</button>
+            </div>
+          </>}
+        </aside>
+
+        <section className="muf-wb-workspace">
+          <div className="muf-panel muf-wb-devicebar">
+            <strong>Responsive preview</strong>
+            <div className="muf-wb-toolbar">
+              {(['phone', 'tablet', 'desktop'] as const).map(value => <button key={value} className={`muf-wb-button ${device === value ? '' : 'muf-wb-button--quiet'}`} onClick={() => setDevice(value)}>{value}</button>)}
+              <button className="muf-wb-button muf-wb-button--quiet" onClick={() => setDarkPreview(value => !value)}>{darkPreview ? 'Light preview' : 'Dark preview'}</button>
+              <label className="muf-wb-check"><input type="checkbox" checked={compare} onChange={event => setCompare(event.target.checked)} /> Compare</label>
+              <button className="muf-wb-button muf-wb-button--quiet" onClick={() => { setBaseline(cloneDesign(design)); setNotice('Comparison baseline updated.'); }}>Set baseline</button>
             </div>
           </div>
-          <section className="muf-panel" style={{ padding: 16, display: 'grid', gap: 8 }}>
-            <h2 style={{ margin: 0, fontSize: 15 }}>Export preview</h2><pre style={{ margin: 0, whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', fontSize: 12, padding: 12, borderRadius: 10, background: 'var(--muf-color-surface-alt, #f1f5f9)' }}>{css}</pre>
-            <p role="status" aria-live="polite" style={{ margin: 0, fontSize: 12, opacity: .8 }}>{notice}</p>
+          <div className="muf-wb-viewport">
+            <div className="muf-wb-device" style={{ '--muf-wb-device-width': `${deviceWidth[device]}px` } as React.CSSProperties}>
+              <div className="muf-wb-device__label">{device} preview · {deviceWidth[device]}px</div>
+              <div className="muf-wb-canvas">{design.blocks.map(renderBlock)}</div>
+            </div>
+            {compare && <div className="muf-wb-device muf-wb-device--baseline" style={{ '--muf-wb-device-width': `${deviceWidth[device]}px` } as React.CSSProperties}>
+              <div className="muf-wb-device__label">baseline</div><div className="muf-wb-canvas">{baseline.blocks.map((block, index) => renderBlock(block, index, true))}</div>
+            </div>}
+          </div>
+          <section className="muf-panel muf-wb-export">
+            <div className="muf-wb-section-title"><h2>Export preview</h2><span>Manual review required</span></div>
+            <pre>{css}</pre>
+            <p role="status" aria-live="polite" className="muf-wb-notice">{notice}</p>
+            <p className="muf-wb-subtext">Keyboard shortcuts: Ctrl/⌘+Z undo · Ctrl/⌘+Y or Shift+Z redo. Exports are files only; they are never automatically applied.</p>
           </section>
         </section>
       </div>
     </div>
-    <style>{`@media(max-width:760px){main>div>div{grid-template-columns:minmax(0,1fr)!important}.muf-panel input:not([type=range]),.muf-panel select,.muf-panel textarea{box-sizing:border-box;width:100%;min-width:0}.muf-panel button{max-width:100%}} .muf-panel input,.muf-panel select,.muf-panel textarea{border:1px solid var(--muf-color-border,#e6e6de);border-radius:8px;padding:8px;background:var(--muf-color-surface,#fffefb);color:inherit;font:inherit}.muf-panel input[type=range],.muf-panel input[type=checkbox]{width:auto}.muf-panel button:focus-visible{outline:2px solid var(--muf-ui-focus);outline-offset:2px}`}</style>
   </main>;
 }
 
