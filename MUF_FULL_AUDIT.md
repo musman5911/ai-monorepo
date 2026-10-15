@@ -138,3 +138,14 @@ Update this audit whenever the popup inventory, CSS metrics, validation baseline
 The three shared stylesheet copies were updated together to remove repeated declarations for popup title, subtitle, header padding, inter-item gap and icon size. Those values now live in one combined small/large popup rule; small and large popups retain their separate section-heading size, body-text size and body padding. This is a declaration-level consolidation only, with the prior values preserved.
 
 Validation status for this batch: source edits are committed together across all three CSS twins; local MUF sync/safety checks and builds must be rerun. Browser regression is intentionally deferred until all implementation phases are finished, per the owner's workflow instruction.
+
+
+## Phase 4 workbench implementation snapshot
+
+The first workbench iteration is committed on the assigned branch:
+- `dairy_farm/client/src/editing-x-projetcs.tsx`: schema-driven preview and inspector for popup shells, headings, cards, buttons and forms; device-width presets; undo/redo; baseline comparison; local draft persistence; CSS and JSON export.
+- `dairy_farm/client/vite.config.ts`: a development-server-only `/__muf-workbench` route. The workbench is not imported by the production application entry point, and no backend, business logic, permissions or app data flow is modified.
+
+Puck integration remains incomplete because `@measured/puck` is not present in the repository dependencies. Package manifests and lockfiles were left unchanged. The custom inspector is a dependency-free first iteration, not a substitute falsely labeled as a completed Puck integration.
+
+Validation status: this connector session cannot run the Windows build/check scripts. The new TSX and Vite middleware still require local type/build verification. No browser results are claimed; browser regression remains deferred until all implementation phases are finished.
