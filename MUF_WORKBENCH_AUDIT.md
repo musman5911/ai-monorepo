@@ -45,7 +45,7 @@ This is a dev-server route, not an API/backend endpoint. Do not deploy a dev ser
 Run from the repository root:
 
 ```cmd
-node check-muf-workbench.js
+npm run check-workbench (or `node check-muf-workbench.js`)
 ```
 
 The guard checks the dedicated mount, local draft key, history/export controls, component operations, responsive presets, absence of API clients, editor-only style import, reduced-motion styles, explicit Vite development route, production-entry isolation and unchanged Puck dependency state.
