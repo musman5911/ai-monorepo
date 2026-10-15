@@ -70,7 +70,10 @@ function MUFVisualWorkbench() {
   useEffect(() => { try { localStorage.setItem(draftKey, JSON.stringify(spec)); } catch { /* Private browsing may block storage. */ } }, [spec]);
   const css = useMemo(() => {
     const className = 'muf-workbench-preview';
-    return `/* Review this patch before applying it to muf-style.css. */\n.${className} {\n  border-radius: ${spec.radius}px;\n  padding: ${spec.padding}px;\n  gap: ${spec.gap}px;\n  font-size: ${spec.fontSize}px;\n  background: ${surfaceTokens[spec.surface]};\n  border-color: ${accentTokens[spec.accent]};\n}\n`;
+    const padding = spec.density === 'compact' ? Math.max(8, Math.round(spec.padding * 0.75)) : spec.padding;
+    const gap = spec.density === 'compact' ? Math.max(4, Math.round(spec.gap * 0.75)) : spec.gap;
+    const width = spec.kind === 'popup' ? (spec.size === 'small' ? '28rem' : '42rem') : '100%';
+    return `/* Review this patch before applying it to muf-style.css. */\n.${className} {\n  width: min(100%, ${width});\n  border-radius: ${spec.radius}px;\n  padding: ${padding}px;\n  gap: ${gap}px;\n  font-size: ${spec.fontSize}px;\n  background: ${surfaceTokens[spec.surface]};\n  border-color: ${accentTokens[spec.accent]};\n}\n`;
   }, [spec]);
   const saveDraft = () => { try { localStorage.setItem(draftKey, JSON.stringify(spec)); setNotice('Draft saved in this browser.'); } catch { setNotice('Browser storage is unavailable; use Export CSS instead.'); } };
   const exportCss = () => {
@@ -87,8 +90,9 @@ function MUFVisualWorkbench() {
   };
   const preview = (value: Spec, label?: string) => {
     const cardStyle: React.CSSProperties = {
-      boxSizing: 'border-box', width: '100%', minWidth: 0, padding: value.padding,
-      display: 'flex', flexDirection: 'column', gap: value.gap, borderRadius: value.radius,
+      boxSizing: 'border-box', width: '100%', maxWidth: value.kind === 'popup' ? (value.size === 'small' ? '28rem' : '42rem') : '100%', minWidth: 0,
+      padding: value.density === 'compact' ? Math.max(8, Math.round(value.padding * 0.75)) : value.padding,
+      display: 'flex', flexDirection: 'column', gap: value.density === 'compact' ? Math.max(4, Math.round(value.gap * 0.75)) : value.gap, borderRadius: value.radius, alignSelf: 'center',
       border: `1px solid ${accentTokens[value.accent]}`, background: surfaceTokens[value.surface],
       color: value.surface === 'primary' ? '#ffffff' : 'var(--muf-color-text, #1e293b)',
       fontSize: value.fontSize, boxShadow: 'var(--muf-shadow, 0 12px 32px rgba(15,23,42,.12))',
@@ -116,7 +120,7 @@ function MUFVisualWorkbench() {
   return <main style={{ minHeight: '100dvh', background: 'var(--muf-color-page, #f8fafc)', color: 'var(--muf-color-text, #1e293b)', padding: 16, fontFamily: 'inherit' }}>
     <div style={{ maxWidth: 1440, margin: '0 auto', display: 'grid', gap: 16 }}>
       <header className="muf-panel" style={{ padding: 18, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-        <div><p style={{ margin: 0, color: 'var(--muf-color-primary)', fontWeight: 800, fontSize: 11, letterSpacing: '.1em' }}>MU F DESIGN SYSTEM / DEV TOOL</p><h1 style={{ margin: '6px 0', fontSize: 24 }}>Visual workbench</h1><p style={{ margin: 0, opacity: .7, fontSize: 13 }}>Preview-only components. No APIs, business data, or production styles are changed.</p></div>
+        <div><p style={{ margin: 0, color: 'var(--muf-color-primary)', fontWeight: 800, fontSize: 11, letterSpacing: '.1em' }}>MUF DESIGN SYSTEM / DEV TOOL</p><h1 style={{ margin: '6px 0', fontSize: 24 }}>Visual workbench</h1><p style={{ margin: 0, opacity: .7, fontSize: 13 }}>Preview-only components. No APIs, business data, or production styles are changed.</p></div>
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button className="muf-detail-btn" style={{ flex: '0 0 auto', padding: '8px 12px' }} onClick={undo} disabled={historyIndex <= 0}>Undo</button>
           <button className="muf-detail-btn" style={{ flex: '0 0 auto', padding: '8px 12px' }} onClick={redo} disabled={historyIndex >= history.length - 1}>Redo</button>
