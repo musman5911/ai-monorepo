@@ -5408,17 +5408,24 @@ function App() {
                 }`}>
                   {selectedLedgerGroup.transactions.map(f => (
                     <tr 
-                      key={f._id} 
-                      onClick={() => {
-                        openPopup('selectedFinance', f);
+                      key={f._id}
+                      onClick={() => openPopup('selectedFinance', f)}
+                      onKeyDown={event => {
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          openPopup('selectedFinance', f);
+                        }
                       }}
-                      className="hover:bg-slate-100/40 dark:hover:bg-slate-900/30 transition-colors cursor-pointer"
+                      tabIndex={0}
+                      role="button"
+                      aria-label={`Open ledger entry: ${f.category}`}
+                      className="hover:bg-slate-100/40 dark:hover:bg-slate-900/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 cursor-pointer transition-colors"
                     >
                       <td data-label={L('Date')} className="px-2 sm:px-4 py-2 sm:py-4 text-slate-500 whitespace-nowrap">{f.date}</td>
                       <td data-label={L('Description')} className="px-2 sm:px-4 py-2 sm:py-4">
                         <div className="muf-ledger-description min-w-0">
                           <div className="font-extrabold text-slate-800 dark:text-slate-100">{f.receipt_base64 ? '📷 ' : ''}{f.category}</div>
-                          {f.notes && <div className="text-[11px] text-slate-500 dark:text-slate-400 break-words mt-0.5">{f.notes}</div>}
+                          <div className="text-[10px] text-slate-400 mt-0.5">{L('Open entry for notes, receipt and full details')}</div>
                         </div>
                       </td>
                       <td data-label={L('Ledger Flow')} className="px-2 sm:px-4 py-2 sm:py-4 text-right whitespace-nowrap">
@@ -5461,11 +5468,10 @@ function App() {
       <DetailModal
         open={modal === 'ledger_profit'}
         onClose={closePopup}
-        size="big"
         title={ledgerModalData.title}
         subtitle={`Net Profit: Rs. ${formatCurrency(ledgerModalData.netProfit)}`}
         icon={<Coins size={16} />}
-       size="big">
+        size="big">
         <div className="space-y-4">
           {/* Default KPI Headers (Only show for non-profit/non-margin cardTypes) */}
           {ledgerModalData.cardType !== 'profit' && ledgerModalData.cardType !== 'margin' && (
@@ -5583,7 +5589,20 @@ function App() {
               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider block">📜 Recent Transaction Ledger Logs</h4>
               <div className="space-y-2.5 max-h-[40vh] overflow-y-auto pr-1">
                 {ledgerModalData.transactions.map(f => (
-                  <div key={f._id} className="flex justify-between items-center text-xs p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 text-slate-800 dark:text-slate-100">
+                  <div
+                    key={f._id}
+                    role="button"
+                    tabIndex={0}
+                    aria-label={`Open ledger entry: ${f.category}`}
+                    onClick={() => openPopup('selectedFinance', f)}
+                    onKeyDown={event => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        openPopup('selectedFinance', f);
+                      }
+                    }}
+                    className="flex justify-between items-center text-xs p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 text-slate-800 dark:text-slate-100 cursor-pointer hover:border-farm-300 dark:hover:border-farm-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 transition-colors"
+                  >
                     <div>
                       <p className="font-bold text-slate-800 dark:text-white">{f.category}</p>
                       <p className="text-[10px] text-slate-500 dark:text-slate-400">{f.date}</p>
