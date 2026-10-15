@@ -95,8 +95,10 @@ Run from the monorepo root:
 
 - node check-muf-sync.js
 - node check-ui-safety.js
-- build-all.bat
+- node check-muf-workbench.js
+- node --check audit-muf-design-system.mjs
 - node audit-muf-design-system.mjs
+- build-all.bat
 
 The audit reports are written under .audit-output and are local-only. Use npm test for the root Vitest suite after confirming root dependencies are installed. A successful Vite-only fallback is not equivalent to a full type-checked build; read build output rather than relying only on the final success banner.
 
