@@ -183,3 +183,8 @@ Status: 9/9 CSS source assertions passed. This is not a full CSS parser, local c
 
 
 The root `package.json` now exposes `npm run check-workbench` as an alias for `node check-muf-workbench.js`; no dependency was added and no package-lock was modified. The shared `check-muf-sync.js` now has eight additional invariants for the new primary-action, compact-action, KPI, panel, entity-card and record-action tokens. All eight expressions matched the current stylesheet source in connector-side checks; the full sync command still must be run locally.
+
+
+## Documentation cleanup
+
+Reviewed the branch's ten Markdown files: `README.md`, `RULES.md`, `PHASES.md`, `MUF_FULL_AUDIT.md`, `MUF_WORKBENCH_AUDIT.md`, `MUF_OVERVIEW.md`, `muf-rules.md`, and the three app-specific README files. Renamed the unclear legacy filename `muf-.md` to `MUF_OVERVIEW.md`, updated the root README and all three app README references, then removed the old path. The current tree contains no references to `muf-.md`. The remaining Markdown files have distinct uses, so no other document was deleted just to lower the file count.
