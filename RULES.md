@@ -78,14 +78,16 @@ Sticky layout rule:
 
 ## 7. Development-only visual editor
 
-The planned editor is editing-x-projetcs.tsx, using Puck as a starting point and a custom inspector for supported MUF components.
+The current editor is a custom, dependency-free MUF workbench at `dairy_farm/client/src/editing-x-projetcs.tsx`, with isolated styles in `muf-workbench.css` and a Vite development-only route at `/__muf-workbench`.
 
-- Start with MUF popup shells, headings, cards, buttons and form fields; expand after that base is stable.
-- Select/edit only an allowlisted set of visual components and properties.
-- Keep drafts in the local development browser.
-- Support undo/redo, responsive previews and reviewable CSS/token export.
-- Never edit business logic, data operations, permissions or backend code from the editor.
-- Exclude the editor from production builds. A design draft must not automatically become a production change.
+- Keep the editor accessible only through the Dairy Vite development server, not through an app/backend route or production entry point.
+- Start with allowlisted MUF popup shells, headings, cards, buttons and forms; do not expose application components that mutate live farm data.
+- Keep drafts local to the browser and validate loaded draft structure and property ranges.
+- Support add/select/reorder/duplicate/delete, undo/redo, responsive previews, baseline comparison and reviewable CSS/JSON export.
+- Never edit business logic, data operations, permissions, API behavior, or backend code from the editor.
+- Exports must never auto-apply to production source. Apply them manually after review and cross-app parity checks.
+- The current workstream leaves package manifests and lockfiles untouched; do not add Puck or other dependencies without explicit approval for the required frontend manifest/lockfile updates. The current native builder is not Puck.
+- Run `node check-muf-workbench.js` after changes to editor source/route/styles. It supplements, not replaces, local builds and browser review.
 
 ## 8. Validation and browser checks
 
