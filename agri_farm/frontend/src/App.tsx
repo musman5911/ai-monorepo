@@ -2127,7 +2127,7 @@ function App() {
 
   // --- RENDER AUTHENTICATION & LOGIN ---
   if (!token) return (
-    <MufLoginScreen>
+    <MufLoginScreen className={lang === 'ur' ? 'rtl' : 'ltr'} dir={lang === 'ur' ? 'rtl' : 'ltr'}>
       <MufLoginLang lang={lang} onToggle={toggleLang} />
       {alertMsg.text && (
         <div className={`mb-6 p-4 rounded-xl shadow-lg border text-sm max-w-sm w-full animate-fade-in ${

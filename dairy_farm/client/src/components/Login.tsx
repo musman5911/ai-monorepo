@@ -154,9 +154,10 @@ export default function Login({
   }
 
   const isFirstSetup = isSetup === false;
+  const isRtl = lang === 'ur';
 
   return (
-    <MufLoginScreen>
+    <MufLoginScreen className={isRtl ? 'rtl' : 'ltr'} dir={isRtl ? 'rtl' : 'ltr'}>
       {lang && onToggleLang && <MufLoginLang lang={lang} onToggle={onToggleLang} />}
       {error && (
         <div className="mb-6 p-4 rounded-xl shadow-lg border text-sm max-w-sm w-full bg-red-50 border-red-300 text-red-800 dark:bg-red-950/80 dark:border-red-500 dark:text-red-200">
