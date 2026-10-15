@@ -14,6 +14,9 @@ These UI source commits follow the last owner-reported passing local checks at `
 - `726e532` and `6d47983` — Dairy Milk History has a read-only detail popup for milk quantities, saleable quantity, buyer and milk-quality fields; removed an unused import.
 - `581093d` — Agri nested ledger/category/month popups preserve their parent context when a detail child closes.
 - `a9599f1` and `6532ef1` — Agri dashboard crop/task/finance summaries and crop inventory summaries open the appropriate existing detail popup.
+- `41e3e54` — Dairy Dashboard Top Producers and Cow P&L summaries open the existing cow-detail popup, rendered above the parent ranking popup so closing details returns to the same range/list.
+- `a1b2e7e` — Dairy Cows table rows are keyboard reachable and ignore Enter/Space events originating from nested action buttons.
+- `450c7b1` — added six Vitest source-contract regression tests for expense/health/milk detail popups, Agri popup-stack restoration, dashboard cow drill-downs and cow-row keyboard behavior. **These new tests have not yet been executed locally.**
 
 Source-level assertions run during these edits passed. These assertions only validate authored source patterns and do **not** prove TypeScript correctness or runtime behavior. The browser pass remains deferred until implementation is complete, as requested. Flock Active Birds compact tabs/shared bird detail and mobile admin viewport sizing were already present in the branch and were not redundantly rewritten.
 

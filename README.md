@@ -31,7 +31,7 @@ Run the design audit with `node audit-muf-design-system.mjs`. It writes local re
 
 ## Latest UI implementation status (2026-10-15)
 
-The current branch adds summary-first popup drill-downs to Dairy Expenses, Dairy Health and Dairy Milk History, and Agri ledger/report/dashboard lists. The Dairy and Agri login shells now declare Urdu RTL direction consistently with Flock. See `PHASES.md` and `MUF_FULL_AUDIT.md` for the implementation commit list and validation boundary. The last owner-reported local build/test pass predates these source commits, so pull this branch and rerun the checks before using it as a verified build. Browser regression remains deferred until implementation is complete.
+The current branch adds summary-first popup drill-downs to Dairy Expenses, Dairy Health, Dairy Milk History, Dairy dashboard cow rankings, Agri ledger/report/dashboard lists, and accessible keyboard entry into cow details. The Dairy and Agri login shells now declare Urdu RTL direction consistently with Flock. Six new Vitest source-contract regression checks cover these patterns but have not yet been run. See `PHASES.md` and `MUF_FULL_AUDIT.md` for the implementation commit list and validation boundary. The last owner-reported local build/test pass predates these source commits, so pull this branch and rerun the checks before using it as a verified build. Browser regression remains deferred until implementation is complete.
 
 ## Development-only MUF workbench
 
