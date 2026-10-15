@@ -38,7 +38,7 @@ const collect = (dir) => {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) collect(full);
-    else if (/\\.(tsx?|jsx?)$/.test(entry.name)) sourceFiles.push(full);
+    else if (/\.(tsx?|jsx?)$/.test(entry.name)) sourceFiles.push(full);
   }
 };
 collect(sourceRoot);
