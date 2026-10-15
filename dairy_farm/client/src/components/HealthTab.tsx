@@ -460,6 +460,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                   key={record._id}
                   onClick={() => setSelectedRecord(record)}
                   onKeyDown={event => {
+                    if (event.target !== event.currentTarget) return;
                     if (event.key === 'Enter' || event.key === ' ') {
                       event.preventDefault();
                       setSelectedRecord(record);
@@ -551,6 +552,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
               aria-label={L('Open health record details')}
               onClick={() => setSelectedRecord(rec)}
               onKeyDown={event => {
+                if (event.target !== event.currentTarget) return;
                 if (event.key === 'Enter' || event.key === ' ') {
                   event.preventDefault();
                   setSelectedRecord(rec);
