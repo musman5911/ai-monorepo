@@ -24,6 +24,11 @@ Source-level assertions run during these edits passed. These assertions only val
 
 Last owner-tested source head before checker/test repair: `378deabe66ccbf3c65ae6b384dd0d1da932bdca6`. Checker/test fix commit: `6ab2011e58ece34e4ce6720d41787e98aa1a96be`.
 
+
+- `0d78ac2` — Active Birds rows now support Enter/Space activation, accessible names and visible keyboard focus while continuing to open the existing shared bird-detail popup and return to the parent list.
+- `4f33f2d` — added two source-contract tests for Active Birds keyboard/detail behavior and the bounded mobile Admin shell with internal scrolling. These tests have **not** been run locally yet.
+- Source review confirms the Flock Admin shell already uses the shared mobile height cap and internal scrolling. The four compact Active Birds filter controls and shared bird-detail popup were already implemented; no duplicate rewrite was needed.
+
 ## Overall status
 
 - **Implementation work:** the shared popup-token consolidation and the custom development-only MUF workbench are committed on the working branch.
