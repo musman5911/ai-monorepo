@@ -5391,24 +5391,23 @@ function App() {
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Below is a breakdown of all crop segments currently registerized inside the farm database:</p>
           <div className="grid grid-cols-1 gap-3 max-h-[50vh] overflow-y-auto pr-1">
             {crops.map(c => (
-              <div key={c._id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-slate-800 dark:text-slate-100">
-                <div className="flex justify-between items-center mb-2">
+              <button
+                type="button"
+                key={c._id}
+                onClick={() => openPopup('selectedCrop', c)}
+                aria-label={`${L('Open crop profile')}: ${c.name}`}
+                className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-left text-slate-800 dark:text-slate-100 hover:border-farm-400 dark:hover:border-farm-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 transition-colors"
+              >
+                <div className="flex justify-between items-start gap-3 mb-2">
                   <span className="font-extrabold text-slate-800 dark:text-white">{c.name}</span>
-                  <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30 uppercase">{c.status}</span>
+                  <span className="shrink-0 text-[10px] font-bold px-2 py-0.5 rounded bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30 uppercase">{c.status}</span>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-500">
-                  <p>{L('Variety:')} <span className="font-semibold text-slate-700 dark:text-slate-300">{c.variety || 'N/A'}</span></p>
-                  <p>{L('Plot:')} <span className="font-semibold text-slate-700 dark:text-slate-300">{c.field || 'N/A'}</span></p>
-                  <p>{L('Planted:')} <span className="font-semibold text-slate-700 dark:text-slate-300">{c.plant_date || 'N/A'}</span></p>
-                  {userRole === 'admin' && (
-                    <>
-                      <p>{L('Yield:')} <span className="font-semibold text-slate-700 dark:text-slate-300">{c.yield_kg ? formatYield(toKg(c.yield_kg, c.yield_unit), c.yield_unit) : 'N/A'}</span></p>
-                      <p>Seed Qty: <span className="font-semibold text-slate-700 dark:text-slate-300">{c.seed_quantity ? `${c.seed_quantity} ${c.seed_unit || 'kg'}` : '0 kg'}</span></p>
-                      <p>Seed Cost: <span className="font-semibold text-slate-700 dark:text-slate-300">{c.seed_cost_per_unit ? `Rs. ${c.seed_cost_per_unit}/${c.seed_unit || 'kg'}` : 'N/A'}</span></p>
-                    </>
-                  )}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
+                  <span>{L('Variety:')} <strong className="text-slate-700 dark:text-slate-300">{c.variety || 'N/A'}</strong></span>
+                  <span>{L('Plot:')} <strong className="text-slate-700 dark:text-slate-300">{c.field || 'N/A'}</strong></span>
+                  <span>{L('Open crop profile for planting, yield and seed details')} →</span>
                 </div>
-              </div>
+              </button>
             ))}
             {crops.length === 0 && <p className="text-center text-xs text-slate-500 py-6">{L('No crop logs available.')}</p>}
           </div>
