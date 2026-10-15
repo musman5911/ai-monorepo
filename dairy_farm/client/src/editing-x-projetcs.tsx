@@ -217,6 +217,7 @@ function MUFVisualWorkbench() {
     '--muf-wb-gap': `${block.density === 'compact' ? Math.max(4, Math.round(block.gap * 0.75)) : block.gap}px`,
     '--muf-wb-font-size': `${block.fontSize}px`,
     '--muf-wb-surface': surfaceTokens[block.surface],
+    '--muf-wb-text': block.surface === 'primary' ? '#ffffff' : (darkPreview ? '#e5edf7' : 'var(--muf-color-text, #1e293b)'),
     '--muf-wb-accent': accentTokens[block.accent],
     '--muf-wb-max-width': block.kind === 'popup' ? (block.size === 'small' ? '28rem' : '42rem') : '100%'
   } as React.CSSProperties);
@@ -327,7 +328,7 @@ function MUFVisualWorkbench() {
           <div className="muf-wb-viewport">
             <div className="muf-wb-device" style={{ '--muf-wb-device-width': `${deviceWidth[device]}px` } as React.CSSProperties}>
               <div className="muf-wb-device__label">{device} preview · {deviceWidth[device]}px</div>
-              <div className="muf-wb-canvas">{design.blocks.map(renderBlock)}</div>
+              <div className="muf-wb-canvas">{design.blocks.map((block, index) => renderBlock(block, index))}</div>
             </div>
             {compare && <div className="muf-wb-device muf-wb-device--baseline" style={{ '--muf-wb-device-width': `${deviceWidth[device]}px` } as React.CSSProperties}>
               <div className="muf-wb-device__label">baseline</div><div className="muf-wb-canvas">{baseline.blocks.map((block, index) => renderBlock(block, index, true))}</div>
