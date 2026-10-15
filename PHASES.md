@@ -1,7 +1,8 @@
 # MUF Work Phases and Status
 
 Last updated: 2026-10-15  
-Working branch: arena/20261014-muf-mobile-popups
+Working branch: arena/20261014-muf-mobile-popups  
+Last source change reviewed: `08a00dc9bc59aaab5330b98becccbbc829deaa73`
 
 ## Overall status
 
