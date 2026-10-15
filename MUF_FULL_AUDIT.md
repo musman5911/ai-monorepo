@@ -24,6 +24,11 @@ Source-level assertions run during these edits passed. These assertions only val
 
 **Still open:** run the validation commands below against the current pulled head; review and resolve the reported npm audit issues only through a compatible npm lockfile update; then perform the final three-app browser regression. Do not mark build, dependency remediation or browser results complete before they are actually observed.
 
+
+- `0d78ac2` — Active Birds rows now support Enter/Space activation, accessible names and visible keyboard focus while continuing to open the existing shared bird-detail popup and return to the parent list.
+- `4f33f2d` — added two source-contract tests for Active Birds keyboard/detail behavior and the bounded mobile Admin shell with internal scrolling. These tests have **not** been run locally yet.
+- Source review confirms the Flock Admin shell already uses the shared mobile height cap and internal scrolling. The four compact Active Birds filter controls and shared bird-detail popup were already implemented; no duplicate rewrite was needed.
+
 ## Executive findings
 
 - The last owner-provided popup inventory after `95b3d66` showed 139 direct DetailModal call sites, with zero missing sizes: 96 small, 39 big, four deliberate dynamic wrappers, and zero unsupported size literals.
