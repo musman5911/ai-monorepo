@@ -34,13 +34,14 @@ MUF is the shared visual and component layer for the three farm-management apps.
 
 ## Current implementation snapshot
 
-As of the documentation refresh based on commit a510265:
+As of the source review on 2026-10-15:
 
 - The shared 70dvh mobile height invariant passes.
 - Form sheets and admin shells were aligned with the shared height token in commit a510265.
 - The repository owner reported both MUF check scripts and all three frontend builds passing after pulling that change.
 - The audit tool was run locally and reported 139 DetailModal call sites across the three apps.
 - The root Vitest command has not run successfully because Vitest is declared but not present in the root installed dependency tree.
-- The visual editor has not been implemented yet.
+- A development-only custom MUF workbench is implemented in the Dairy Vite client at /__muf-workbench; see MUF_WORKBENCH_AUDIT.md for its constraints and validation status.
+- The workbench is dependency-free, not a Puck integration, because package manifests and lockfiles were kept unchanged in this workstream.
 
-See muf-rules.md for enforceable UI rules, MUF_FULL_AUDIT.md for findings, and PHASES.md for current and planned work.
+See muf-rules.md for enforceable UI rules, MUF_FULL_AUDIT.md for findings, MUF_WORKBENCH_AUDIT.md for editor scope, and PHASES.md for phase status. Builds/check scripts still need to be rerun locally after the newest source changes.
