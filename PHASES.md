@@ -88,17 +88,19 @@ The shared mobile DetailModal, form sheet and admin shells use the canonical 70d
 1. Regenerate the popup inventory and confirm zero missing `size` props among direct DetailModal uses.
 2. Use the detailed style audit to pick one narrow shared CSS consolidation batch at a time, preserving responsive and semantic overrides.
 3. Keep all three `muf-style.css` copies byte-identical.
-4. Run the MUF checks, UI-safety check, popup/style audit and all three frontend builds for each batch. Defer manual browser review until Phase 5, as requested.
+4. Run the MUF checks, UI-safety check, popup/style audit and all three frontend builds for each batch. Defer manual browser review until all implementation phases are complete, as requested.
 
 ## Phase 4 — development-only visual workbench
 
-**Status: planned, not implemented.**
+**Status: first implementation committed; validation and editor integration remain pending.**
 
-Target file: editing-x-projetcs.tsx.
+Target file: `dairy_farm/client/src/editing-x-projetcs.tsx`.
 
-The agreed direction is Puck plus a custom MUF inspector. Start with approved MUF component types: popup shells, headings, cards, buttons and forms. The editor should support selecting components, editing approved visual properties, phone/tablet/desktop preview, undo/redo, side-by-side comparison, local browser drafts and exportable CSS/token patches.
+The first component-first workbench iteration includes popup/heading/card/button/form previews, an inspector for approved visual properties, phone/tablet/desktop sizing, undo/redo, baseline comparison, browser-local draft storage, and CSS/JSON export. It is exposed only by the Dairy Vite development server at `/__muf-workbench`; the editor module is not imported by the production app entry point, and the route is implemented through Vite's `configureServer` hook.
 
-Keep the editor development-only. It must not edit APIs, backend files, data operations, calculations, permissions or business behavior. Drafts must not automatically become production styling. Expand into more complex app regions only after the component-first version proves stable.
+Puck itself is **not integrated yet**: `@measured/puck` is absent from the repository dependencies. Package manifests and lockfiles were intentionally left untouched rather than introducing an incomplete dependency install. The current schema-based inspector is a dependency-free first iteration, not a claim that the Puck milestone is complete.
+
+The editor must not edit APIs, backend files, data operations, calculations, permissions or business behavior. Drafts must never automatically become production styling. Continue the remaining Puck/integration and validation work before marking this phase complete.
 
 ## Phase 5 — regression and browser verification
 
@@ -131,3 +133,8 @@ Update this phase tracker whenever a phase changes status. Include commit IDs, f
 **Implementation committed; local validation pending.** The identical muf-style.css copies now declare the shared popup title, subtitle, header padding, gap and icon tokens once for both small and large popups. Only the intentionally size-specific section-heading scale, body text scale and body padding remain in their individual rules. This is a source consolidation intended to preserve computed styles exactly; it does not change popup sizing, responsive rules, behavior or content.
 
 The user has explicitly deferred all browser checks until every implementation phase is complete. Continue the remaining source/audit/workbench phases without requesting interim browser checks, then run the full browser regression checklist at the end. Script and build validation remains part of each implementation batch where the local environment is available.
+
+
+## Workbench implementation note
+
+The first development-only workbench files are committed on the assigned branch: `dairy_farm/client/src/editing-x-projetcs.tsx` and the dev-only route in `dairy_farm/client/vite.config.ts`. The GitHub connector environment used for these edits cannot run the local Windows validation scripts or builds, so none are marked as passed here. The owner will do browser regression only after the implementation phases finish.
