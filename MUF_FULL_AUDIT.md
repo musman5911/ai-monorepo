@@ -137,7 +137,7 @@ Update this audit whenever the popup inventory, CSS metrics, validation baseline
 
 The three shared stylesheet copies were updated together to remove repeated declarations for popup title, subtitle, header padding, inter-item gap and icon size. Those values now live in one combined small/large popup rule; small and large popups retain their separate section-heading size, body-text size and body padding. This is a declaration-level consolidation only, with the prior values preserved.
 
-Validation status for this batch: source edits are committed together across all three CSS twins; local MUF sync/safety checks and builds must be rerun. Browser regression is intentionally deferred until all implementation phases are finished, per the owner's workflow instruction.
+Validation status for this batch: the same source change is present in all three CSS twins (their blob SHAs match), with the CSS and documentation writes recorded as sequential commits. Local MUF sync/safety checks and builds must be rerun. Browser regression is intentionally deferred until all implementation phases are finished, per the owner's workflow instruction.
 
 
 ## Phase 4 workbench implementation snapshot
