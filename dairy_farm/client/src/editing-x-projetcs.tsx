@@ -240,9 +240,6 @@ function MUFVisualWorkbench() {
       style={previewStyle(block)}
       aria-label={`${kindLabels[block.kind]} preview`}
       onClick={!isBaseline ? () => setSelectedId(block.id) : undefined}
-      role={!isBaseline ? 'button' : undefined}
-      tabIndex={!isBaseline ? 0 : undefined}
-      onKeyDown={!isBaseline ? event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); setSelectedId(block.id); } } : undefined}
       draggable={!isBaseline}
       onDragStart={!isBaseline ? () => setDraggingId(block.id) : undefined}
       onDragOver={!isBaseline ? event => event.preventDefault() : undefined}
