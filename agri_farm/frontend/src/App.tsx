@@ -2828,17 +2828,24 @@ function App() {
                   {dashCrops.length === 0 ? (
                     <p className="text-slate-500 text-xs text-center py-8">{L('No crops currently registered.')}</p>
                   ) : dashCrops.map(c => (
-                    <div key={c._id} className={`flex justify-between items-center p-3 rounded-xl border ${
-                      isDark ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50 border-slate-200'
-                    }`}>
-                      <div>
+                    <button
+                      type="button"
+                      key={c._id}
+                      onClick={() => openPopup('selectedCrop', c)}
+                      aria-label={`${L('Open crop profile')}: ${c.name}`}
+                      className={`w-full flex justify-between items-center gap-3 p-3 rounded-xl border text-left transition-colors hover:border-farm-400 dark:hover:border-farm-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 ${
+                        isDark ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <div className="min-w-0">
                         <p className="text-xs font-bold">{c.name}</p>
                         <p className="text-[10px] text-slate-500 dark:text-slate-400">Plot sector: {c.field || 'General'}</p>
+                        <p className="text-[10px] text-slate-400">{L('Open profile for full crop details')}</p>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase shrink-0 ${
                         c.status === 'Growing' ? 'bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30' : 'bg-indigo-950 text-indigo-400 border border-indigo-900/30'
                       }`}>{c.status}</span>
-                    </div>
+                    </button>
                   ))}
                   <button type="button" onClick={() => { setShowPlantedSectorsModal(false); navigateTo('crops'); }} className="w-full mt-3 px-3 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl">{L('Open Crop Manager')} →</button>
                 </div>
@@ -2858,20 +2865,27 @@ function App() {
                   {dashTasks.filter(t => t.status !== 'Completed').length === 0 ? (
                     <p className="text-slate-500 text-xs text-center py-8">{L('Care roster is clean.')}</p>
                   ) : dashTasks.filter(t => t.status !== 'Completed').map(t => (
-                    <div key={t._id} className={`flex justify-between items-center p-3 rounded-xl border ${
-                      isDark ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50 border-slate-200'
-                    }`}>
-                      <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      key={t._id}
+                      onClick={() => openPopup('selectedTask', t)}
+                      aria-label={`${L('Open task details')}: ${t.title}`}
+                      className={`w-full flex justify-between items-center gap-3 p-3 rounded-xl border text-left transition-colors hover:border-farm-400 dark:hover:border-farm-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 ${
+                        isDark ? 'bg-slate-900/40 border-slate-800' : 'bg-slate-50 border-slate-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
                         <Circle size={14} className="text-slate-500 dark:text-slate-400 shrink-0" />
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-xs font-bold">{t.title}</p>
                           <p className="text-[10px] text-slate-500 dark:text-slate-400">Assigned: {t.assigned_to || 'General'}</p>
+                          <p className="text-[10px] text-slate-400">{L('Open task for due date, crew and notes')}</p>
                         </div>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase ${
+                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase shrink-0 ${
                         t.priority === 'High' ? 'bg-red-950 text-red-400 border border-red-900/20' : 'bg-slate-800 text-slate-500 dark:text-slate-400'
                       }`}>{t.priority}</span>
-                    </div>
+                    </button>
                   ))}
                   <button type="button" onClick={() => { setShowCareRosterModal(false); navigateTo('tasks'); }} className="w-full mt-3 px-3 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl">{L('Open Care Board')} →</button>
                 </div>
@@ -2892,36 +2906,41 @@ function App() {
                     <p className="text-slate-500 text-xs text-center py-8">{L('No activities recorded yet.')}</p>
                   )}
                   {dashTasks.map(t => (
-                    <div className="flex justify-between items-center p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40" key={t._id}>
-                      <div className="flex items-center gap-3">
-                        <span className="w-8 h-8 rounded-full flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30">
+                    <button type="button" key={t._id} onClick={() => openPopup('selectedTask', t)}
+                      aria-label={`${L('Open task details')}: ${t.title}`}
+                      className="w-full flex justify-between items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-left transition-colors hover:border-farm-400 dark:hover:border-farm-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="w-8 h-8 rounded-full flex items-center justify-center bg-emerald-50 dark:bg-emerald-950/20 text-emerald-600 dark:text-emerald-400 border border-emerald-100 dark:border-emerald-900/30 shrink-0">
                           <Sprout size={14}/>
                         </span>
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-xs font-bold">{t.title}</p>
                           <p className="text-[10px] text-slate-500">{t.due_date || 'Ongoing care'}</p>
                         </div>
                       </div>
-                      <span className="px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30">{t.status || 'Pending'}</span>
-                    </div>
+                      <span className="shrink-0 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30">{t.status || 'Pending'}</span>
+                    </button>
                   ))}
                   {dashFinance.map(f => (
-                    <div className="flex justify-between items-center p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40" key={f._id}>
-                      <div className="flex items-center gap-3">
-                        <span className="w-8 h-8 rounded-full flex items-center justify-center bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30">
+                    <button type="button" key={f._id} onClick={() => openPopup('selectedFinance', f)}
+                      aria-label={`${L('Open ledger entry')}: ${f.category}, ${f.date || ''}`}
+                      className="w-full flex justify-between items-center gap-3 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-left transition-colors hover:border-farm-400 dark:hover:border-farm-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="w-8 h-8 rounded-full flex items-center justify-center bg-purple-50 dark:bg-purple-950/20 text-purple-600 dark:text-purple-400 border border-purple-100 dark:border-purple-900/30 shrink-0">
                           <Coins size={14}/>
                         </span>
-                        <div>
+                        <div className="min-w-0">
                           <p className="text-xs font-bold">{f.category}</p>
                           <p className="text-[10px] text-slate-500">{f.date || 'Ledger entry'}</p>
+                          <p className="text-[10px] text-slate-400">{L('Open entry for amount, crop, notes and receipt')}</p>
                         </div>
                       </div>
-                      <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase border ${
+                      <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase border ${
                         f.type === 'expense'
                           ? 'bg-red-50 dark:bg-red-950/20 border-red-200 dark:border-red-900/30 text-red-600'
                           : 'bg-emerald-50 dark:bg-emerald-950/20 border-emerald-200 dark:border-emerald-900/30 text-emerald-600'
                       }`}>{f.type}</span>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </DetailModal>
@@ -5654,17 +5673,23 @@ function App() {
           <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{L('Active tasks assigned to your team:')}</p>
           <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-1">
             {tasks.filter(t => t.status === 'Pending').map(t => (
-              <div key={t._id} className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-slate-800 dark:text-slate-100">
-                <div className="flex justify-between items-start mb-2">
+              <button
+                type="button"
+                key={t._id}
+                onClick={() => openPopup('selectedTask', t)}
+                aria-label={`${L('Open task details')}: ${t.title}`}
+                className="w-full p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 text-left text-slate-800 dark:text-slate-100 hover:border-farm-400 dark:hover:border-farm-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 transition-colors"
+              >
+                <div className="flex justify-between items-start gap-3 mb-2">
                   <span className="font-extrabold text-slate-800 dark:text-white">{t.title}</span>
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-900/20 uppercase">{t.priority} Priority</span>
+                  <span className="shrink-0 text-[9px] font-bold px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-900/20 uppercase">{t.priority} Priority</span>
                 </div>
-                {t.notes && <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 mb-2.5">{t.notes}</p>}
-                <div className="flex justify-between items-center text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-200 dark:border-slate-800 pt-2">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500 dark:text-slate-400">
                   <span>{L('Assigned to:')} <strong className="text-slate-700 dark:text-slate-300">{t.assigned_to || 'General'}</strong></span>
                   <span>{L('Due:')} <strong className="text-slate-700 dark:text-slate-300">{t.due_date || 'N/A'}</strong></span>
+                  <span>{L('Open task for notes and full details')} →</span>
                 </div>
-              </div>
+              </button>
             ))}
             {tasks.filter(t => t.status === 'Pending').length === 0 && (
               <p className="text-center text-xs text-slate-500 py-6">All tasks completed! Duty roster is clean.</p>
