@@ -8,7 +8,7 @@ import { calcRevenueWithHistory, saleableMilkLiters } from '../utils/rates';
 import { todayStr, shiftDate as shiftDateLocal, formatDate } from '../utils/date';
 import {
   Save, Trash2, History, List, Plus,
-  ChevronLeft, ChevronRight, Calendar, Baby, Loader2, Edit2, Eye
+  ChevronLeft, ChevronRight, Calendar, Baby, Loader2, Edit2
 } from 'lucide-react';
 import DetailModal from '../muf-modal';
 
