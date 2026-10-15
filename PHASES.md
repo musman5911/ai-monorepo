@@ -16,6 +16,7 @@ Last source/validation wiring commit reviewed: `e519cc6a6d8b96c469cb42c92a8483dc
 - **Root Vitest:** not verified. The previously supplied output showed the root Vitest executable was not installed even though the root manifest and lockfile declare it.
 - **Browser regression:** intentionally left for the final phase, as the owner requested.
 - No backend code, API contracts, business calculations, permissions, database schemas or farm workflows were changed in this workstream.
+- **Documentation cleanup:** all ten remaining Markdown files were reviewed; renamed the unclear `muf-.md` to `MUF_OVERVIEW.md`, updated its four README references and removed the obsolete old path. Other Markdown files remain because each has a distinct role; no duplicate documentation was deleted.
 
 ## Phase 1 — validation baseline
 
