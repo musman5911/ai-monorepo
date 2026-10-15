@@ -90,10 +90,11 @@ const safeLoadDraft = (): Design => {
 };
 
 function MUFVisualWorkbench() {
-  const [design, setDesign] = useState<Design>(safeLoadDraft);
-  const [history, setHistory] = useState<Design[]>(() => [safeLoadDraft()]);
+  const [initialDesignState] = useState<Design>(safeLoadDraft);
+  const [design, setDesign] = useState<Design>(() => cloneDesign(initialDesignState));
+  const [history, setHistory] = useState<Design[]>(() => [cloneDesign(initialDesignState)]);
   const [historyIndex, setHistoryIndex] = useState(0);
-  const [selectedId, setSelectedId] = useState<string>(() => safeLoadDraft().blocks[0]?.id || '');
+  const [selectedId, setSelectedId] = useState<string>(initialDesignState.blocks[0]?.id || '');
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [device, setDevice] = useState<Device>('phone');
   const [baseline, setBaseline] = useState<Design>(() => cloneDesign(safeLoadDraft()));
@@ -212,7 +213,7 @@ function MUFVisualWorkbench() {
   };
   const previewStyle = (block: Block): React.CSSProperties => ({
     '--muf-wb-radius': `${block.radius}px`,
-    '--muf-wb-padding': `${block.density === 'compact' ? Math.max(8, Math.round(block.padding * 0.75) : block.padding}px`,
+    '--muf-wb-padding': `${block.density === 'compact' ? Math.max(8, Math.round(block.padding * 0.75)) : block.padding}px`,
     '--muf-wb-gap': `${block.density === 'compact' ? Math.max(4, Math.round(block.gap * 0.75)) : block.gap}px`,
     '--muf-wb-font-size': `${block.fontSize}px`,
     '--muf-wb-surface': surfaceTokens[block.surface],
@@ -260,7 +261,7 @@ function MUFVisualWorkbench() {
     <div className="muf-wb-layout">
       <header className="muf-wb-topbar muf-panel">
         <div>
-          <p className="muf-wb-eyebrow">MU F DESIGN SYSTEM / DEVELOPMENT TOOL</p>
+          <p className="muf-wb-eyebrow">MUF DESIGN SYSTEM / DEVELOPMENT TOOL</p>
           <h1>Visual workbench</h1>
           <p className="muf-wb-subtext">A local canvas for approved MUF primitives. Nothing here writes to production.</p>
         </div>
