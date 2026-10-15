@@ -22,7 +22,13 @@ From the repository root, run these in order after pulling the working branch:
 4. build-all.bat
 5. start-all.bat
 
-Run the design audit with node audit-muf-design-system.mjs. It writes local reports to .audit-output, which is intentionally ignored by Git.
+Run the design audit with `node audit-muf-design-system.mjs`. It writes local reports to `.audit-output`, which is intentionally ignored by Git.
+
+## Development-only MUF workbench
+
+The component preview builder is exposed by the Dairy Vite development server only. From `dairy_farm/client`, run `npm run dev`, then open `http://localhost:5000/__muf-workbench`. The editor uses sample content, saves drafts in the browser, and exports reviewable CSS/JSON files. It does not call farm APIs or apply styles automatically.
+
+Run `node check-muf-workbench.js` from the monorepo root to run the workbench source-safety guard. This guard complements rather than replaces the TypeScript build, MUF synchronization/UI-safety checks, or browser review. The workbench is a dependency-free custom MUF builder; the Puck package is not installed in this workstream.
 
 The root test command is npm test. At the last recorded check it could not start because npm ls vitest reported an empty installed dependency tree, although Vitest is declared in the root package manifest and lockfile. This means the test suite has not run; it is not a failing test result.
 
@@ -31,7 +37,7 @@ The root test command is npm test. At the last recorded check it could not start
 - RULES.md: repository workflow, scope limits, safety requirements and validation.
 - muf-.md: MUF architecture, current design decisions and implementation status.
 - muf-rules.md: detailed rules for shared components, tokens, popups and editor safety.
-- MUF_FULL_AUDIT.md: popup counts, CSS source metrics, findings and known limits.
+- MUF_FULL_AUDIT.md: popup counts, CSS source metrics, workbench status, findings and known limits.\n- MUF_WORKBENCH_AUDIT.md: editor scope, safety design, features and validation limitations.
 - PHASES.md: completed work, current phase, remaining phases and acceptance criteria.
 - agri_farm/README.md, dairy_farm/README.md, flock_farm/README.md: app-specific orientation.
 
