@@ -30,6 +30,7 @@ type Block = {
 };
 type Design = { blocks: Block[] };
 type Device = 'phone' | 'tablet' | 'desktop';
+type WorkbenchStyle = React.CSSProperties & { [property: `--muf-wb-${string}`]: string | number | undefined };
 
 const draftKey = 'muf-visual-workbench-draft-v2';
 const kindLabels: Record<Kind, string> = {
@@ -222,7 +223,7 @@ function MUFVisualWorkbench() {
     download('muf-workbench-style-patch.css', 'text/css;charset=utf-8', css);
     setNotice('CSS patch exported for review. No production stylesheet changed.');
   };
-  const previewStyle = (block: Block): React.CSSProperties => ({
+  const previewStyle = (block: Block): WorkbenchStyle => ({
     '--muf-wb-radius': `${block.radius}px`,
     '--muf-wb-padding': `${block.density === 'compact' ? Math.max(8, Math.round(block.padding * 0.75)) : block.padding}px`,
     '--muf-wb-gap': `${block.density === 'compact' ? Math.max(4, Math.round(block.gap * 0.75)) : block.gap}px`,
@@ -231,7 +232,7 @@ function MUFVisualWorkbench() {
     '--muf-wb-text': block.surface === 'primary' ? '#ffffff' : (darkPreview ? '#e5edf7' : 'var(--muf-color-text, #1e293b)'),
     '--muf-wb-accent': accentTokens[block.accent],
     '--muf-wb-max-width': block.kind === 'popup' ? (block.size === 'small' ? '28rem' : '42rem') : '100%'
-  } as React.CSSProperties);
+  } as WorkbenchStyle);
   const renderBlock = (block: Block, index: number, isBaseline = false) => (
     <section
       key={`${isBaseline ? 'baseline-' : ''}${block.id}`}
