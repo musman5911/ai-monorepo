@@ -303,8 +303,8 @@ const INVARIANTS = [
   ['record action color consumes token', 'mufStyle', /\.muf-record-btn\s*\{[^}]*background:\s*(var\(--muf-core-action-record-bg,#f0f3f1\))/],
   ['photo viewer z-index token',    'mufStyle',    /--muf-z-photo: (1450)/],
   ['Notes MUF root class',          'mufDiary',    /className="(muf-notes)"/],
-  ['scale: small title 0.875rem', 'mufStyle', /muf-pup-sm \{[^}]*--pup-title: (0\.875rem)/],
-  ['scale: big title 0.875rem (unified header)', 'mufStyle', /muf-pup-lg \{[^}]*--pup-title: (0\.875rem)/],
+  // Both popup sizes intentionally share one CSS rule for the unified header scale.
+  ['scale: shared popup title 0.875rem', 'mufStyle', /\.muf-pup-sm\s*,\s*\.muf-pup-lg\s*\{[^}]*--pup-title:\s*(0\.875rem)/],
   ['popup body padding',            'detailModal', /(--pup-body-pad)/],
   ['popup rounding',                'detailModal', /(rounded-2xl sm:rounded-3xl)/],
   ['popup backdrop',                'detailModal', /(bg-black\/50)/],

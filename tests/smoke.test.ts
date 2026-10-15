@@ -41,7 +41,7 @@ describe('RULES.md', () => {
     const fs = require('fs');
     const path = require('path');
     const content = fs.readFileSync(path.resolve(__dirname, '../RULES.md'), 'utf8');
-    expect(content).toContain('No PRs');
+    expect(content).toMatch(/do not open pull requests/i);
   });
 });
 
