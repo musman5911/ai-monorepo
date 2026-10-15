@@ -131,4 +131,23 @@ describe('Summary-first detail popup contracts', () => {
     expect(source).toContain('event.target !== event.currentTarget');
     expect(source).toContain('e.stopPropagation(); handleEdit(cow)');
   });
+
+
+  it('Flock Active Birds rows open the shared detail popup by mouse and keyboard', () => {
+    const source = readSource('flock_farm/client/src/components/Dashboard.tsx');
+    expect(source).toContain("onClick={() => openBirdDetail(b, 'activeBirds')}");
+    expect(source).toContain("onKeyDown={(event) => {");
+    expect(source).toContain("event.key === 'Enter' || event.key === ' '");
+    expect(source).toContain("aria-label={L('Open bird details') + ': ' + b.name}");
+    expect(source).toContain("return <DetailModal open={modal === 'birdDetail'}");
+  });
+
+  it('Flock admin shell uses a bounded mobile viewport and internal scrolling', () => {
+    const shell = readSource('flock_farm/client/src/muf-admin-shell.tsx');
+    const styles = readSource('flock_farm/client/src/muf-style.css');
+    expect(shell).toContain('role="dialog"');
+    expect(shell).toContain('overflow-y-auto muf-scroll muf-admin-body');
+    expect(styles).toContain('.muf-admin-shell-card[role="dialog"]');
+    expect(styles).toContain('max-height: min(var(--muf-popup-mobile-max-height, 70dvh), calc(100dvh - 24px))');
+  });
 });
