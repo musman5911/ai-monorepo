@@ -36,7 +36,7 @@ The root test command is npm test. At the last recorded check it could not start
 ## Documentation map
 
 - RULES.md: repository workflow, scope limits, safety requirements and validation.
-- muf-.md: MUF architecture, current design decisions and implementation status.
+- MUF_OVERVIEW.md: MUF architecture, current design decisions and implementation status.
 - muf-rules.md: detailed rules for shared components, tokens, popups and editor safety.
 - MUF_FULL_AUDIT.md: popup counts, CSS source metrics, workbench status, findings and known limits.
 - MUF_WORKBENCH_AUDIT.md: editor scope, safety design, features and validation limitations.
