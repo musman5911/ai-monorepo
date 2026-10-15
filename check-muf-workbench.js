@@ -32,6 +32,20 @@ const vite = read(vitePath);
 const main = read(mainPath);
 const app = read(appPath);
 const packageJson = JSON.parse(read('dairy_farm/client/package.json'));
+const sourceRoot = path.join(root, 'dairy_farm/client/src');
+const sourceFiles = [];
+const collect = (dir) => {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) collect(full);
+    else if (/\\.(tsx?|jsx?)$/.test(entry.name)) sourceFiles.push(full);
+  }
+};
+collect(sourceRoot);
+const strayReferences = sourceFiles.filter((file) => {
+  const relative = path.relative(root, file).split(path.sep).join('/');
+  return relative !== workbenchPath && /editing-x-projetcs|muf-workbench\\.css/.test(fs.readFileSync(file, 'utf8'));
+});
 
 check(workbench.includes("document.getElementById('muf-workbench-root')") && workbench.includes('if (mount) createRoot(mount)'), 'workbench has a dedicated mount point');
 check(workbench.includes('localStorage') && workbench.includes('muf-visual-workbench-draft-v2'), 'drafts use a namespaced browser-local key');
@@ -48,6 +62,7 @@ check(vite.includes('name: \'muf-workbench-dev-route\'') && vite.includes('confi
 check(vite.includes("req.url?.split('?')[0] !== '/__muf-workbench'"), 'development route matches an explicit path only');
 check(vite.includes('/src/editing-x-projetcs.tsx') && vite.includes('Content-Type'), 'development route serves the dedicated editor HTML');
 check(!/editing-x-projetcs|muf-workbench\.css/.test(main + '\n' + app), 'workbench is not imported by the production app entry points');
+check(strayReferences.length === 0, `editor module and stylesheet are isolated from other app source files${strayReferences.length ? ': ' + strayReferences.join(', ') : ''}`);
 check(!/editing-x-projetcs|muf-workbench\.css/.test(packageJson.scripts?.build || ''), 'normal production build script does not explicitly invoke the workbench');
 check(!packageJson.dependencies?.['@puckeditor/core'] && !packageJson.devDependencies?.['@puckeditor/core'], 'no new Puck dependency was added to the app manifest');
 
