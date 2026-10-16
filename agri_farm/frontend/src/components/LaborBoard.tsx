@@ -685,10 +685,12 @@ export default function LaborBoard({
                 <p className="font-semibold text-slate-800 dark:text-slate-100">{selectedAttendance.field}</p>
               </div>
             )}
-            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
-              <p className="text-[10px] font-bold uppercase text-slate-500 mb-1">{L('Notes')}</p>
-              <p className="whitespace-pre-wrap break-words text-slate-700 dark:text-slate-200">{selectedAttendance.notes?.trim() || L('No notes recorded.')}</p>
-            </div>
+            {isAdmin && (
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+                <p className="text-[10px] font-bold uppercase text-slate-500 mb-1">{L('Notes')}</p>
+                <p className="whitespace-pre-wrap break-words text-slate-700 dark:text-slate-200">{selectedAttendance.notes?.trim() || L('No notes recorded.')}</p>
+              </div>
+            )}
           </div>
         )}
       </DetailModal>
