@@ -169,6 +169,9 @@ describe('Summary-first detail popup contracts', () => {
     expect(source).toContain("title={L('Attendance details')}");
     expect(source).toContain('selectedAttendance.field');
     expect(source).toContain('selectedAttendance.notes?.trim()');
+    const detailStart = source.indexOf("title={L('Attendance details')}");
+    const notesStart = source.indexOf('selectedAttendance.notes?.trim()', detailStart);
+    expect(source.lastIndexOf('{isAdmin && (', notesStart)).toBeGreaterThan(detailStart);
     expect(source).toContain("isAdmin && !row.posted");
     expect(source).toContain('type="button"');
     expect(source).toContain("aria-label={L('View attendance details') + ': ' + row.date + ' · ' + (worker?.name || L('Worker'))}");
