@@ -30,6 +30,7 @@ Last owner-tested source head before checker/test repair: `378deabe66ccbf3c65ae6
 - `0d78ac2` — Active Birds rows now support Enter/Space activation, accessible names and visible keyboard focus while continuing to open the existing shared bird-detail popup and return to the parent list.
 - `4f33f2d` — added two source-contract tests for Active Birds keyboard/detail behavior and the bounded mobile Admin shell with internal scrolling. These tests are included in the owner-reported 41/41 passing run at `64b6246`.
 - Source review confirms the Flock Admin shell already uses the shared mobile height cap and internal scrolling. The four compact Active Birds filter controls and shared bird-detail popup were already implemented; no duplicate rewrite was needed.
+- Agri labor worker summaries now use a labelled native button to open the existing detail popup and show a notes hint instead of expanding long notes in the card.
 
 ## Owner validation results and implementation continuation (2026-10-16)
 
@@ -47,7 +48,8 @@ These results apply to the local source head `64b6246`, not the follow-up commit
 - `0d78ac2` — keyboard access/focus for Flock Active Birds rows.
 - `1f9e70c` — remove unused Dairy expense icon imports surfaced by the successful build retry.
 - `f348674`, `c19c9a3`, `8be8057`, `7c92b09`, `8cd10e0`, `de402f8` — Dairy and Agri labor attendance summaries now open a compact detail popup. Full date/worker/day/status/notes context remains available in details; admin edit/delete actions remain permission-gated, and Agri attendance notes remain admin-only.
-- `be19e23`, `47f07fd`, `f27588b` — added two regression tests and strengthened the check for admin-only Agri attendance notes. These follow-up tests have not yet been executed locally.
+- `7c109c9` — made Agri field-worker summary activation keyboard accessible through a native button and replaced the long inline note with a hint; the existing detail popup keeps the full note.
+- `be19e23`, `47f07fd`, `f27588b`, `5fd05e3` — added two labor attendance regression tests, strengthened the admin-only Agri attendance-notes assertion, and guarded accessible Agri worker summaries. These follow-up tests have not yet been executed locally.
 
 **Current outstanding items:** pull and validate the new head; perform a compatible security dependency/lockfile upgrade and rerun tests/audit/build; then perform final browser regression after implementation finishes. Browser interaction testing remains intentionally deferred by owner request.
 
