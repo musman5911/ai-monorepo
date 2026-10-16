@@ -7,7 +7,7 @@ This document records source findings, implementation batches, and validation ev
 
 ## Implementation updates from the current continuation (2026-10-15)
 
-These UI source commits follow the last owner-reported passing local checks at `25c12dc`. They have been pushed to this branch, but **the new source state has not yet had a local TypeScript/build/test run**.
+These commits were included in owner-run local validation after pulling `64b6246` on 2026-10-16; the reported tests and all three app builds passed. Later 2026-10-16 follow-up commits are listed below and still need their own local test/build run.
 
 - `5d845cd` — Dairy Expenses: summary-first expense rows and a child details popup for supplier, notes, feed quantity, and receipt.
 - `2c256df` — Agri Ledger: transaction summaries drill into the existing ledger-entry popup; removed a duplicate modal size attribute.
@@ -18,15 +18,17 @@ These UI source commits follow the last owner-reported passing local checks at `
 - `a9599f1` and `6532ef1` — Agri dashboard crop/task/finance summaries and crop inventory summaries open the appropriate existing detail popup.
 - `41e3e54` — Dairy Dashboard Top Producers and Cow P&L summaries open the existing cow-detail popup, rendered above the parent ranking popup so closing details returns to the same range/list.
 - `a1b2e7e` — Dairy Cows table rows are keyboard reachable and ignore Enter/Space events originating from nested action buttons.
-- `450c7b1` — added six Vitest source-contract regression tests for expense/health/milk detail popups, Agri popup-stack restoration, dashboard cow drill-downs and cow-row keyboard behavior. **These new tests have not yet been executed locally.**
+- `450c7b1` — added six Vitest source-contract regression tests for expense/health/milk detail popups, Agri popup-stack restoration, dashboard cow drill-downs and cow-row keyboard behavior. The owner later reported 41/41 tests passing after pulling `64b6246`.
 
 Source-level assertions run during these edits passed. These assertions only validate authored source patterns and do **not** prove TypeScript correctness or runtime behavior. The browser pass remains deferred until implementation is complete, as requested. Flock Active Birds compact tabs/shared bird detail and mobile admin viewport sizing were already present in the branch and were not redundantly rewritten.
 
-**Still open:** run the validation commands below against the current pulled head; review and resolve the reported npm audit issues only through a compatible npm lockfile update; then perform the final three-app browser regression. Do not mark build, dependency remediation or browser results complete before they are actually observed.
+**Status update:** the owner ran the validation commands on `64b6246` on 2026-10-16; those results are summarized below. Re-run checks after the newer 2026-10-16 source commits, resolve the npm audit findings through a compatible regenerated lockfile, and perform the final three-app browser regression only after implementation is complete.
 
+
+## Follow-up source review after the owner validation
 
 - `0d78ac2` — Active Birds rows now support Enter/Space activation, accessible names and visible keyboard focus while continuing to open the existing shared bird-detail popup and return to the parent list.
-- `4f33f2d` — added two source-contract tests for Active Birds keyboard/detail behavior and the bounded mobile Admin shell with internal scrolling. These tests have **not** been run locally yet.
+- `4f33f2d` — added two source-contract tests for Active Birds keyboard/detail behavior and the bounded mobile Admin shell with internal scrolling. These tests are included in the owner-reported 41/41 passing run at `64b6246`.
 - Source review confirms the Flock Admin shell already uses the shared mobile height cap and internal scrolling. The four compact Active Birds filter controls and shared bird-detail popup were already implemented; no duplicate rewrite was needed.
 
 ## Owner validation results and implementation continuation (2026-10-16)
@@ -44,7 +46,7 @@ Owner-run local validation on the pulled source head `64b6246`:
 These results apply to the local source head `64b6246`, not the follow-up commits below. After that validation, the branch added:
 - `0d78ac2` — keyboard access/focus for Flock Active Birds rows.
 - `1f9e70c` — remove unused Dairy expense icon imports surfaced by the successful build retry.
-- `f348674`, `c19c9a3`, `8be8057`, `c19c9a3`, `8cd10e0`, `de402f8` — Dairy and Agri labor attendance summaries now open a compact detail popup. Full date/worker/day/status/notes context remains available in details; admin edit/delete actions remain permission-gated, and Agri attendance notes remain admin-only.
+- `f348674`, `c19c9a3`, `8be8057`, `7c92b09`, `8cd10e0`, `de402f8` — Dairy and Agri labor attendance summaries now open a compact detail popup. Full date/worker/day/status/notes context remains available in details; admin edit/delete actions remain permission-gated, and Agri attendance notes remain admin-only.
 - `be19e23`, `47f07fd`, `f27588b` — added two regression tests and strengthened the check for admin-only Agri attendance notes. These follow-up tests have not yet been executed locally.
 
 **Current outstanding items:** pull and validate the new head; perform a compatible security dependency/lockfile upgrade and rerun tests/audit/build; then perform final browser regression after implementation finishes. Browser interaction testing remains intentionally deferred by owner request.
