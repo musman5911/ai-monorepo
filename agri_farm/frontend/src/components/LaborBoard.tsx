@@ -32,6 +32,7 @@ export default function LaborBoard({
   const [advances, setAdvances] = useState([]);
   const [qrFor, setQrFor] = useState(null);
   const [detailFor, setDetailFor] = useState(null); // worker opened for detail popup
+  const [selectedAttendance, setSelectedAttendance] = useState(null); // attendance record opened for detail popup
   const [advanceFor, setAdvanceFor] = useState(null); // laborer _id with open advance form
   const [advForm, setAdvForm] = useState({ date: todayIso(), amount: '', notes: '' });
   const [editWorker, setEditWorker] = useState(null);
@@ -553,17 +554,31 @@ export default function LaborBoard({
               const worker = laborers.find(item => item._id === row.laborer_id);
               const crop = crops.find(item => item._id === row.crop_id);
               return (
-                <div key={row._id} className="flex justify-between items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
-                  <div>
-                    <p className="font-bold">{row.date} · {worker?.name || 'Worker'} · {row.day_type === 'half' ? 'Half' : 'Full'}</p>
-                    <p className="text-[10px] text-slate-500">{crop?.name || 'Farm-wide'}{row.field ? ` · ${row.field}` : ''}{row.posted ? ' · posted' : ''}</p>
+                <div
+                  key={row._id}
+                  role="button"
+                  tabIndex={0}
+                  aria-label={L('View attendance details') + ': ' + row.date + ' · ' + (worker?.name || L('Worker'))}
+                  onClick={() => setSelectedAttendance(row)}
+                  onKeyDown={(event) => {
+                    if (event.target !== event.currentTarget) return;
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      setSelectedAttendance(row);
+                    }
+                  }}
+                  className="flex justify-between items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs cursor-pointer hover:border-farm-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-farm-500"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="font-bold">{row.date} · {worker?.name || L('Worker')} · {row.day_type === 'half' ? L('Half') : L('Full')}</p>
+                    <p className="text-[10px] text-slate-500">{crop?.name || L('Farm-wide')}{row.field ? ` · ${row.field}` : ''} · {row.posted ? L('Posted to ledger') : L('Unposted')}</p>
                   </div>
                   {isAdmin && !row.posted && (
-                    <span className="flex items-center gap-1.5">
-                      <button type="button" onClick={() => openEditAttendance(row)} className="text-slate-400 hover:text-farm-600" aria-label={L('Edit attendance')} title={L('Edit attendance')}>
+                    <span className="flex items-center gap-1.5" onClick={(event) => event.stopPropagation()}>
+                      <button type="button" onClick={(event) => { event.stopPropagation(); openEditAttendance(row); }} className="text-slate-400 hover:text-farm-600" aria-label={L('Edit attendance')} title={L('Edit attendance')}>
                         <Pencil size={13} />
                       </button>
-                      <button type="button" onClick={() => handleDeleteAttendance(row._id)} className="text-slate-400 hover:text-red-500" aria-label={L('Delete attendance')}>
+                      <button type="button" onClick={(event) => { event.stopPropagation(); handleDeleteAttendance(row._id); }} className="text-slate-400 hover:text-red-500" aria-label={L('Delete attendance')}>
                         <Trash2 size={14} />
                       </button>
                     </span>
@@ -644,6 +659,49 @@ export default function LaborBoard({
         </section>
         </>
       )}
+      <DetailModal
+        open={!!selectedAttendance}
+        onClose={() => setSelectedAttendance(null)}
+        title={L('Attendance details')}
+        subtitle={selectedAttendance?.date || ''}
+        icon={<CheckCircle size={18} />}
+        iconBg="bg-farm-100 text-farm-700"
+        size="small"
+      >
+        {selectedAttendance && (
+          <div className="space-y-3 text-xs">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-2.5">
+                <p className="text-[10px] font-bold uppercase text-slate-500">{L('Worker')}</p>
+                <p className="font-bold text-slate-800 dark:text-slate-100">{laborers.find(item => item._id === selectedAttendance.laborer_id)?.name || L('Worker')}</p>
+              </div>
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-2.5">
+                <p className="text-[10px] font-bold uppercase text-slate-500">{L('Attendance')}</p>
+                <p className="font-bold text-slate-800 dark:text-slate-100">{selectedAttendance.day_type === 'half' ? L('Half day') : L('Full day')}</p>
+              </div>
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-2.5">
+                <p className="text-[10px] font-bold uppercase text-slate-500">{L('Crop')}</p>
+                <p className="font-bold text-slate-800 dark:text-slate-100">{crops.find(crop => crop._id === selectedAttendance.crop_id)?.name || L('Farm-wide')}</p>
+              </div>
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-2.5">
+                <p className="text-[10px] font-bold uppercase text-slate-500">{L('Status')}</p>
+                <p className="font-bold text-slate-800 dark:text-slate-100">{selectedAttendance.posted ? L('Posted to ledger') : L('Not posted')}</p>
+              </div>
+            </div>
+            {selectedAttendance.field && (
+              <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-2.5">
+                <p className="text-[10px] font-bold uppercase text-slate-500 mb-1">{L('Field')}</p>
+                <p className="font-semibold text-slate-800 dark:text-slate-100">{selectedAttendance.field}</p>
+              </div>
+            )}
+            <div className="rounded-lg border border-slate-200 dark:border-slate-700 p-3">
+              <p className="text-[10px] font-bold uppercase text-slate-500 mb-1">{L('Notes')}</p>
+              <p className="whitespace-pre-wrap break-words text-slate-700 dark:text-slate-200">{selectedAttendance.notes?.trim() || L('No notes recorded.')}</p>
+            </div>
+          </div>
+        )}
+      </DetailModal>
+      { /* Existing worker detail popup remains independent. */ }
       <DetailModal open={!!detailFor} onClose={() => setDetailFor(null)} title={detailFor ? detailFor.name : ''} icon={<HardHat size={20} />} iconBg="bg-farm-100 text-farm-700" size="small">
         {detailFor && (
           <div className="space-y-3 text-xs">
