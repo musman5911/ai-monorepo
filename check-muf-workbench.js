@@ -61,6 +61,7 @@ check(/prefers-reduced-motion:\s*reduce/.test(styles), 'workbench respects reduc
 check(vite.includes('name: \'muf-workbench-dev-route\'') && vite.includes('configureServer(server)'), 'workbench route is registered through Vite development middleware');
 check(vite.includes("req.url?.split('?')[0] !== '/__muf-workbench'"), 'development route matches an explicit path only');
 check(vite.includes('/src/editing-x-projetcs.tsx') && vite.includes('Content-Type'), 'development route serves the dedicated editor HTML');
+check(/await\\s+server\\.transformIndexHtml\\s*\\(/.test(vite) && /res\\.end\\(transformed\\)/.test(vite), 'custom workbench HTML passes through Vite HTML transforms before response');
 check(!/editing-x-projetcs|muf-workbench\.css/.test(main + '\n' + app), 'workbench is not imported by the production app entry points');
 check(strayReferences.length === 0, `editor module and stylesheet are isolated from other app source files${strayReferences.length ? ': ' + strayReferences.join(', ') : ''}`);
 check(!/editing-x-projetcs|muf-workbench\.css/.test(packageJson.scripts?.build || ''), 'normal production build script does not explicitly invoke the workbench');

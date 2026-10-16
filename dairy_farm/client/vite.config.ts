@@ -10,12 +10,37 @@ export default defineConfig({
     {
       name: 'muf-workbench-dev-route',
       configureServer(server) {
-        server.middlewares.use((req, res, next) => {
-          if (req.url?.split('?')[0] !== '/__muf-workbench') return next();
-          res.statusCode = 200;
-          res.setHeader('Content-Type', 'text/html; charset=utf-8');
-          res.setHeader('Cache-Control', 'no-store');
-          res.end('<!doctype html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>MUF Visual Workbench</title></head><body><div id="muf-workbench-root"></div><script type="module" src="/src/editing-x-projetcs.tsx"></script></body></html>');
+        server.middlewares.use(async (req, res, next) => {
+          if (req.url?.split('?')[0] !== '/__muf-workbench') {
+            return next();
+          }
+
+          const html = `<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MUF Visual Workbench</title>
+</head>
+<body>
+  <div id="muf-workbench-root"></div>
+  <script type="module" src="/src/editing-x-projetcs.tsx"></script>
+</body>
+</html>`;
+
+          try {
+            const transformed = await server.transformIndexHtml(
+              req.url || '/__muf-workbench',
+              html
+            );
+
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'text/html; charset=utf-8');
+            res.setHeader('Cache-Control', 'no-store');
+            res.end(transformed);
+          } catch (error) {
+            next(error instanceof Error ? error : new Error(String(error)));
+          }
         });
       },
     },
