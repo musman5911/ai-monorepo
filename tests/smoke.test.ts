@@ -72,7 +72,15 @@ describe('Monorepo structure', () => {
 function readSource(relativePath: string): string {
   const fs = require('fs');
   const path = require('path');
-  return fs.readFileSync(path.resolve(__dirname, '..', relativePath), 'utf8') as string;
+  const full = path.resolve(__dirname, '..', relativePath);
+  let text = fs.readFileSync(full, 'utf8') as string;
+  // muf-style.css is an entry that @imports ./muf/styles/*.css; read entry + parts as one stylesheet.
+  if (/muf-style\.css$/.test(relativePath)) {
+    for (const m of text.matchAll(/@import\s+'(\.\/[^']+\.css)';/g)) {
+      text += '\n' + fs.readFileSync(path.resolve(path.dirname(full), m[1]), 'utf8');
+    }
+  }
+  return text;
 }
 
 describe('Summary-first detail popup contracts', () => {
@@ -143,7 +151,7 @@ describe('Summary-first detail popup contracts', () => {
   });
 
   it('Flock admin shell uses a bounded mobile viewport and internal scrolling', () => {
-    const shell = readSource('flock_farm/client/src/muf-admin-shell.tsx');
+    const shell = readSource('flock_farm/client/src/muf/admin/muf-admin-shell.tsx');
     const styles = readSource('flock_farm/client/src/muf-style.css');
     expect(shell).toContain('role="dialog"');
     expect(shell).toContain('overflow-y-auto muf-scroll muf-admin-body');

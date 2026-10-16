@@ -52,10 +52,11 @@ These results apply to the local source head `64b6246`, not the follow-up commit
 - `dc92128` and `d95c8ba` — finalized the attendance/worker summary controls as native buttons with valid phrasing content, avoiding nested interactive descendants and invalid paragraph elements inside buttons.
 - `be19e23`, `47f07fd`, `f27588b`, `5fd05e3` — added two labor attendance regression tests, strengthened the admin-only Agri attendance-notes assertion, and guarded accessible Agri worker summaries. These follow-up tests have not yet been executed locally.
 
-**Current outstanding items:** pull and validate the new head; perform a compatible security dependency/lockfile upgrade and rerun tests/audit/build; then perform final browser regression after implementation finishes. Browser interaction testing remains intentionally deferred by owner request.
+**Current outstanding items:** pull the newest head (with phases 6 to 12 applied) and validate it; perform a compatible security dependency/lockfile upgrade and rerun tests/audit/build; then perform the final browser regression. Browser interaction testing remains intentionally deferred by owner request.
 
 ## Overall status
 
+- **Phases 6 to 12 (2026-10-16, applied on top of the newest head):** popup content primitives (`muf-pc-*`) and 131 popup class swaps, 48 safe color-token edits, merged duplicate popup CSS, nine components and the Urdu dictionary moved out of large files, the MUF modules grouped into `src/muf/` folders and the stylesheet split into ten ordered parts. Source-level evidence for every phase is recorded below; none of it has been browser-tested yet. Remaining open items are listed under Phase 12.
 - **Implementation work:** the shared popup-token consolidation and the custom development-only MUF workbench are committed on the working branch.
 - **Shared CSS parity:** the Agri, Dairy and Flock `muf-style.css` copies were inspected through GitHub; the three files have the same blob SHA and identical source content.
 - **Popup inventory baseline:** the owner-provided audit after `95b3d66` reported 139 direct DetailModal call sites, zero missing sizes, 96 small, 39 big, four intentional dynamic wrappers and zero unsupported literals.
@@ -147,6 +148,79 @@ Run from the monorepo root after pulling this branch:
 7. `npm test` after root dependencies are installed with `npm ci`; confirm the repaired no-PR assertion passes.
 
 Then perform the owner's browser pass at 360/390px phone widths, 768px tablet, 1024px compact desktop and 1440px wide desktop across Agri, Dairy and Flock. Cover popup sizes/long content, forms, admin shells, inner scroll, sticky navigation, nested modal Escape/backdrop behavior, focus, selection highlight, Urdu/RTL wrapping, light/dark themes, finance filters and Monthly Summary PDF export. Confirm that the workbench route is not served by the production app build.
+
+## Phase 6 — popup content primitives (muf-pc-*)
+
+**Status: CSS added to all three `muf-style.css` copies. Builds and source checks pass; browser check pending.**
+
+- Added 17 additive classes (labels, muted/faint/micro text, small title, ghost button, table head, form grid, actions row, between/inline rows, divided list) that reproduce the rendered result of Tailwind patterns repeated 10+ times in popup content.
+- Each class carries the rules that today hang off Tailwind class names: the desktop `.muf-pup-sm/.muf-pup-lg` scale (above 641px only), the admin-shell compact scale and forced dark colors (`.muf-popup-stage`), and the global rule that renders `text-[10px]` at 11px.
+- `text-3xs` and `text-2xs` are not defined anywhere (134 uses), so they never set a font size; their muf-pc twins also set none.
+- Six `check-muf-sync.js` invariants guard the classes. No backend, package or lockfile changes.
+
+## Phase 7 — popup content moved onto muf-pc-* classes
+
+**Status: 131 one-to-one class swaps applied on the 2026-10-16 head; builds pass; browser check pending (deferred by the owner).**
+
+- Exact `className` strings inside `<DetailModal>` bodies only: Agri 23, Dairy 39, Flock 69. This includes the child detail popups added in the 2026-10-16 commits. Elements with extra classes were left alone; no text, logic, handler or prop was touched.
+- Preserved couplings: desktop popup scale above 641px only; mobile compact scale and forced dark colors belong to the admin shell, not `DetailModal`; global `.text-[10px]` renders at 11px; Flock's app-specific dark safety net in `index.css` received two matching rules (Agri and Dairy have none).
+- Not migrated: input/field patterns, admin-shell content, anything outside `DetailModal`.
+- `check-ui-safety.js` fails if one of the 17 replaced patterns reappears inside a popup.
+
+## Phase 8 — hard-coded colors reviewed and safely tokenized
+
+**Status: two groups tokenized (48 class edits); the rest intentionally left; browser check pending.**
+
+- Survey: about 513 hex literals across TSX/TS; almost all sit in print/PDF/export HTML, SVG attributes, chart palettes, brand logos or avatar art, where CSS variables are unsafe or the color is intentional (`RULES.md`).
+- 22 pairs of `border-[#e6e6de] dark:border-[#203528]` became `border-[color:var(--muf-color-border)]` (Agri 16, Dairy 4, Flock 2); the token flips between exactly those two values in dark mode.
+- The WhatsApp green `#25D366` / `#1ebe5b` (16 uses) now reads `--muf-brand-whatsapp` / `--muf-brand-whatsapp-hover`, defined once in `muf-style.css`. Two sync invariants guard them.
+- Left alone: tokens that change in dark mode (`#1e293b`, `#64748b`, `#f1f5f9`), four dark-only border classes, dark surface shades without a light twin, all print/PDF/SVG/chart/logo colors.
+
+## Phase 9 — duplicate popup CSS merged, exact duplicate rules removed
+
+**Status: applied identically to all three `muf-style.css` copies; rule-by-rule equivalence verified; builds and checks pass; browser check pending.**
+
+- Merged 17 pairs of identical `.muf-pup-sm X` / `.muf-pup-lg X` desktop scale rules (text sizes, padding, spacing, gaps) into single selector-list rules. Small and big popups render through `ModalPortal`, so the two classes never match the same element and their relative order does not matter.
+- Removed 3 exact duplicate rules (same at-rule context, selector and declarations) by dropping the earlier copy; the later identical copy always wins, so the result is unchanged. Affected: `.muf-header-actions`, `.muf-brand-logo`, and the mobile profile-hide rule.
+- Left alone on purpose: the 12 rules that declare a property twice are `vh`/`dvh` and `hidden`/`clip` fallbacks; `::selection` and `::-moz-selection` stay separate because a combined list would be dropped by browsers that do not know one of them; every cross-selector `!important` stays, because removing it cannot be proven safe without a browser. The count is 632 `!important` declarations.
+- Verification: a PostCSS comparison found 0 lost and 0 new rule/declaration pairs before versus after, an identical at-rule structure, and only 4 duplicate copies removed. 43 tests, `check-muf-sync`, `check-ui-safety`, `check-workbench` and all three builds pass.
+
+## Phase 10 — large files split by verbatim moves
+
+**Status: 9 self-contained components and the Urdu dictionary moved without code changes; type-checks, checks, tests and builds pass; browser check pending.**
+
+- Moved verbatim into their own files (each keeps its exact code; only imports and an `export` keyword were added): Agri `ExportScopeWizard` and `parseCoordinates` (from `AdminMenu`), Dairy `StatCard` (from `Dashboard`), `ZakatCalculator` (from `ExpensesTab`), `ExportButton`, `CowReportButton` and `buildDairyProfileData` (from `ReportsTab`), Flock `StatCard` (from `Dashboard`), `MyProfileContent` (from `App`), `LogTable` (from `BatchesTab`) and `CodeInput` (from `LoginScreen`). About 640 lines moved. A script compared each moved declaration with the original; bodies match apart from the Phase 7 class swaps that were already applied inside two of them.
+- `muf-urdu.ts` (1,772-line dictionary) is split into six ordered parts, `muf-urdu-terms-1.ts` to `-6.ts`, assembled in the same order by `MUF_URDU`. A comparison of the old and new modules found the same 1,766 keys in the same order with equal values and unchanged helper functions. All three apps carry identical copies. `check-muf-sync.js` now compares the six parts as twins and reads the "Dashboard" term from part 1.
+- Not split on purpose: the main components (`App`, `Dashboard`, `AdminPanel`, `AdminMenu`, `FinancialLedger` and similar) are single closures over dozens of `useState` values, handlers and effects; only one pure inner helper exists in Agri `App.tsx`. Splitting them means passing state and handlers as props, which edits wiring rather than moving code, so it is held back until the browser regression pass can cover it.
+- Also left: `LineItemTable` in Flock `Dashboard` depends on `formatRs`, and Flock `ZakatSection` is not referenced anywhere (dead code left untouched).
+- Evidence: Dairy and Flock type-check with 0 errors; Agri has the same 1,056 existing type messages before and after (none new, and its build does not run `tsc`); `check-muf-sync`, `check-ui-safety`, `check-workbench`, the audit (Agri 36, Dairy 38, Flock 69 popups, 0 missing sizes), 43 of 43 tests and all three builds pass.
+
+## Phase 11 — MUF files organized into folders, stylesheet split into parts
+
+**Status: applied identically to all three apps; compiled CSS proven byte-identical; type-checks, checks, tests and builds pass; browser check pending.**
+
+- Stylesheet: `muf-style.css` (3,454 lines) is now a short entry that `@import`s ten ordered parts in `src/muf/styles/` (core layout, entity grid, layout/responsive, popups, density/footer/typography, micro-interactions, responsive repair, canonical UI, tokens and safeguards, popup content primitives). The parts are the old file cut at section boundaries, so their concatenation equals the original text. Compiled CSS from `vite build` before and after has the same MD5 in Agri, Dairy and Flock.
+- File moves: 55 MUF modules in Dairy and Flock and 53 in Agri moved from `src/` into `src/muf/core`, `admin`, `ui`, `data` and `domain` (file names unchanged). Every relative import, re-export, dynamic import and `import()` type in the apps was rewritten with the TypeScript parser (130, 141 and 96 specifiers). No re-export shims were needed.
+- Tooling updated to match: `check-muf-sync.js` (twin paths, file map, stylesheet read as entry plus parts), `check-ui-safety.js`, the audit script paths and the test files (imports and `readSource`). A deliberately injected violation was still caught by the scan rules after the move.
+- Docs updated: `MUF_OVERVIEW.md` has a file-layout table; `RULES.md`, `muf-rules.md` and the three app READMEs describe the stylesheet parts and folders.
+- Not changed: `muf-workbench.css` and `editing-x-projetcs.tsx` stay beside `main.tsx` (development-only, Dairy), backend `muf-*.mjs` files, and `utils/share.ts`.
+- Evidence: Dairy and Flock type-check with 0 errors, Agri has no unresolved imports and the same 1,056 existing type messages, `check-muf-sync`, `check-ui-safety`, `check-workbench`, the audit (Agri 36, Dairy 38, Flock 69 popups, 0 missing sizes), 43 of 43 tests and all three builds pass.
+
+## Phase 12 — final validation, documentation review and delivery
+
+**Status: final source-level validation passed on the combined result; browser regression is the only validation step not done.**
+
+- Final run on the combined result: `check-muf-sync`, `check-ui-safety`, `check-workbench` and the audit script pass; 43 of 43 tests pass (the root tests import packages from the app folders, so each app needs `npm ci` first); Dairy and Flock type-check with 0 errors, Agri has no unresolved imports and the same 1,056 existing type messages as before; all three production builds pass.
+- Styling equivalence evidence: Phases 6 to 8 only add classes or swap exact strings; Phase 9 was proven rule-by-rule with PostCSS (0 rules lost or added, 4 duplicate copies removed); the Phase 11 stylesheet split and file moves left the compiled CSS from `vite build` byte-identical in all three apps.
+- Safe-move evidence: moved components are textually identical to the originals (apart from Phase 7 class swaps already inside two of them) and the Urdu dictionary has the same 1,766 keys, order and values.
+- Still open, in priority order:
+  1. Browser regression on Agri, Dairy and Flock at 360, 390, 768, 1024 and 1440 px, light and dark. Highest value: popup labels, grey helper text, table headings and button rows (Phase 7), Flock dark popups, and the WhatsApp and border colors (Phase 8).
+  2. Security dependency upgrade (Vitest line and transitive packages) needs approval to change the root manifest and lockfile; it was not touched.
+  3. Puck remains unintegrated; the native workbench covers the planned editing features.
+  4. The roughly 630 cross-selector `!important` declarations were left alone because removing them cannot be proven safe without a browser.
+  5. The main components (`App`, `Dashboard`, `AdminPanel`, `FinancialLedger` and similar) are still single large closures; splitting them means passing state and handlers as props and should follow the browser pass, one tab at a time.
+  6. Cleanup in the owner's checkout: the stray `tatus --short` file and the local `flock_farm/backend/package-lock.json` change; the local `ExpensesTab.tsx` edit is the build script's import cleanup that the newest head already contains.
+- Not changed in phases 6 to 12: backend files, API contracts, business logic, package manifests and lockfiles, and any feature.
 
 ## Updating this file
 

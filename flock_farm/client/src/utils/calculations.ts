@@ -1,5 +1,5 @@
-import { mufDateStr, mufToday, mufMonthStart, mufShiftDays } from '../muf-date';
-import { feedRemainingKg } from '../muf-feedstock';
+import { mufDateStr, mufToday, mufMonthStart, mufShiftDays } from '../muf/data/muf-date';
+import { feedRemainingKg } from '../muf/domain/muf-feedstock';
 import {
   Bird,
   OtherExpense,

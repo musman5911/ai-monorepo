@@ -6,13 +6,13 @@ import type { Cow, MilkEntry, Expense, HealthRecord, RateHistory, CowLifetime, M
 import { fmt, fmtPKR, fmtL } from '../utils/format';
 import { calcRevenueWithHistory } from '../utils/rates';
 import { L } from '../i18n';
-import { mufStoryNet, mufVerdictText, mufDaysBetween } from '../muf-story';
+import { mufStoryNet, mufVerdictText, mufDaysBetween } from '../muf/data/muf-story';
 import { getLang } from '../i18n';
 import { todayStr, shiftDate } from '../utils/date';
-import DetailModal from '../muf-modal';
-import { useConfirm, notify } from '../muf-confirm';
-import { compressGalleryImage, GALLERY_MAX_PHOTOS } from '../muf-image';
-import { mufFmt } from '../muf-date';
+import DetailModal from '../muf/core/muf-modal';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
+import { compressGalleryImage, GALLERY_MAX_PHOTOS } from '../muf/data/muf-image';
+import { mufFmt } from '../muf/data/muf-date';
 
 interface CowSummary {
   cow: Cow;
@@ -276,7 +276,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                 )}
               </div>
               {(cow.gallery || []).length === 0 && !isAdmin && (
-                <p className="text-xs text-slate-400 italic">{L('No photos yet.')}</p>
+                <p className="muf-pc-faint">{L('No photos yet.')}</p>
               )}
             </div>
           </div>

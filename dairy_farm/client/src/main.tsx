@@ -3,8 +3,8 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import './muf-style.css';
 import App from './App';
-import ConfirmProvider from './muf-confirm';
-import { initMufA11y } from './muf-a11y';
+import ConfirmProvider from './muf/core/muf-confirm';
+import { initMufA11y } from './muf/core/muf-a11y';
 
 // PWA service worker — same system as the other Malik Usman Farms apps.
 if ('serviceWorker' in navigator) {

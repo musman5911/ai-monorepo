@@ -2,7 +2,7 @@ import { Bird, OtherExpense, FeedRecord, EggProduction, GlobalSettings, Vaccinat
   LaborWorker,
   LaborAttendanceEntry,
   LaborAdvanceEntry } from './types';
-import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave } from './muf-pdf';
+import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave } from './muf/data/muf-pdf';
 import { todayStr } from './utils/calculations';
 
 function escapeCsvCell(value: string | number): string {

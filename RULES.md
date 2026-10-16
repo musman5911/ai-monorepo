@@ -24,14 +24,14 @@ These rules govern changes to the Agri Farm, Dairy Farm, and Flock Farm monorepo
 ## 3. Shared MUF twins
 
 - MUF is the common visual/component layer. Shared files are copied across projects, so a shared edit must be applied to all required twins in the same commit.
-- Keep the three copies of muf-style.css byte-identical. Also preserve parity for shared modal, confirmation, diary, login, portal, scroll-lock, and other MUF twins enforced by the repository checks.
+- Keep the three copies of the MUF stylesheet byte-identical: the entry `src/muf-style.css` and every part in `src/muf/styles/`. The `@import` order in the entry is the cascade order, so do not reorder it. Also preserve parity for shared modal, confirmation, diary, login, portal, scroll-lock, and other MUF twins enforced by the repository checks.
 - Put farm-specific behavior in the app-specific component, not in a shared MUF file.
 - A shared visual change must not change API behavior, data storage, calculations, or permissions.
 - Do not delete source files merely because a simple text search cannot find their imports. Confirm the file is truly obsolete and not dynamically loaded, referenced by tooling, or reserved for an existing feature.
 
 ## 4. Colors and visual styling
 
-The canonical tokens currently present in muf-style.css are:
+The canonical tokens currently present in the MUF stylesheet (`muf-style.css` and `muf/styles/*.css`) are:
 
 | Role | Token/value |
 |---|---|

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { L } from '../i18n';
 import { api } from '../api';
-import { useConfirm, notify } from '../muf-confirm';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 import type { Buyer, Cow, MilkEntry, RateHistory } from '../types';
 import { fmt, fmtL, fmtPKR, monthKey, monthLabel, lastNMonths } from '../utils/format';
 import { calcRevenueWithHistory, saleableMilkLiters } from '../utils/rates';
@@ -10,7 +10,7 @@ import {
   Save, Trash2, History, List, Plus,
   ChevronLeft, ChevronRight, Calendar, Baby, Loader2, Edit2
 } from 'lucide-react';
-import DetailModal from '../muf-modal';
+import DetailModal from '../muf/core/muf-modal';
 
 interface MilkTabProps { isAdmin: boolean; canDelete?: boolean; }
 
@@ -255,7 +255,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
                   <th className="px-5 py-3 text-right">{L('Save')}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+              <tbody className="muf-pc-list">
                 {loading ? (
                   <tr><td colSpan={8} className="px-5 py-12 text-center text-slate-400">{L('Loading...')}</td></tr>
                 ) : eligibleCows.length === 0 ? (
@@ -528,7 +528,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
               <input type="number" min="0" step="0.1" className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950" value={editForm.calfMilk} onChange={e => setEditForm({ ...editForm, calfMilk: e.target.value })} />
             </div>
           </div>
-          <div className="flex justify-end gap-3 pt-2">
+          <div className="muf-pc-actions">
             <button type="button" onClick={() => setEditRecord(null)} className="px-4 py-2 text-sm text-slate-600 dark:text-slate-300">{L('Cancel')}</button>
             <button type="submit" disabled={saving === 'edit'} className="bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white rounded-lg px-5 py-2 text-sm font-medium">{L('Save Changes')}</button>
           </div>

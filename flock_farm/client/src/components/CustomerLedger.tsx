@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { shareViaWhatsAppTo, urduMonthLabel } from '../utils/share';
 import { Users, Pencil, AlertTriangle, Eye, QrCode, Plus } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
+import MufCardQr from '../muf/ui/muf-card-qr';
 import { Customer, CustomerSale, EggProduction, Lang } from '../types';
 import { t, L } from '../i18n';
 import { customerBalance, todayStr } from '../utils/calculations';
-import DetailModal from '../muf-modal';
-import { useConfirm, notify } from '../muf-confirm';
+import DetailModal from '../muf/core/muf-modal';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 
 interface CustomerLedgerProps {
   lang: Lang;
@@ -442,7 +442,7 @@ export default function CustomerLedger({
                   ];
                   shareViaWhatsAppTo(activeCustomer.phone, lines.join('\n'));
                 }}
-                className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1ebe5b] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-[color:var(--muf-brand-whatsapp)] hover:bg-[color:var(--muf-brand-whatsapp-hover)] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer"
               >
                 💬 {L('Send khata on WhatsApp')}
               </button>

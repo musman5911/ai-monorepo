@@ -8,8 +8,8 @@ import { CalendarHeart, Baby, Droplets, Flame, RefreshCw, Repeat } from 'lucide-
 import { api } from '../api';
 import { L } from '../i18n';
 import { Cow } from '../types';
-import { notify } from '../muf-confirm';
-import DetailModal from '../muf-modal';
+import { notify } from '../muf/core/muf-confirm';
+import DetailModal from '../muf/core/muf-modal';
 import CowDetailPopup from './CowDetailPopup';
 import type { RateHistory } from '../types';
 import { todayStr } from '../utils/date';

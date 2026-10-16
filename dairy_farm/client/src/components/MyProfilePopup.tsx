@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { KeyRound, UserRound } from 'lucide-react';
-import DetailModal from '../muf-modal';
-import AvatarUploader from '../muf-avatar';
+import DetailModal from '../muf/core/muf-modal';
+import AvatarUploader from '../muf/ui/muf-avatar';
 import { api } from '../api';
 import type { AuthUser } from '../types';
 import { L } from '../i18n';

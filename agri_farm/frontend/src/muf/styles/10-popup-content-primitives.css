@@ -1,0 +1,90 @@
+/* ============================================================
+   POPUP CONTENT PRIMITIVES (muf-pc-*)  — Phase 6, additive only
+   One class per Tailwind pattern that was repeated 10+ times in popup
+   content. Nothing uses these yet; Phase 7 swaps them in one popup at a
+   time. Each class reproduces the ORIGINAL rendered result, including
+   the rules that today hang off Tailwind class names:
+     - desktop popup scale  (.muf-pup-sm / .muf-pup-lg)
+     - mobile compact scale (.muf-popup-stage, <=640px)
+     - dark-mode colors     (.dark … popup stage / admin shell)
+   Colors read Tailwind's own theme variables so values stay identical.
+   NOTE: the global .text-[10px] rule renders 10px text at 11px, so the 10px-based
+   classes here use 11px.
+   NOTE: the old text-3xs / text-2xs utilities are not defined anywhere, so
+   they never set a font size; their muf-pc twins deliberately set none.
+   ============================================================ */
+.muf-pc-label { display: block; margin-bottom: 0.25rem; font-size: 0.75rem; line-height: calc(1 / 0.75); font-weight: 600; color: var(--color-slate-700, #334155); }
+.muf-pc-label-micro { display: block; margin-bottom: 0.25rem; font-size: 11px; font-weight: 700; text-transform: uppercase; color: var(--color-slate-500, #64748b); }
+.muf-pc-label-3xs { display: block; margin-bottom: 0.25rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-gray-400, #9ca3af); }
+.muf-pc-label-2xs-gray { display: block; margin-bottom: 0.25rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-gray-500, #6b7280); }
+.muf-pc-label-2xs-slate { display: block; margin-bottom: 0.25rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-slate-500, #64748b); }
+.muf-pc-muted { font-size: 0.75rem; line-height: calc(1 / 0.75); color: var(--color-slate-500, #64748b); }
+.muf-pc-faint { font-size: 0.75rem; line-height: calc(1 / 0.75); font-style: italic; color: var(--color-slate-400, #94a3b8); }
+.muf-pc-micro { font-size: 11px; color: var(--color-slate-400, #94a3b8); }
+.muf-pc-title-sm { font-size: 0.875rem; line-height: calc(1.25 / 0.875); font-weight: 700; color: var(--color-slate-700, #334155); }
+.muf-pc-btn-ghost { padding: 0.5rem 1rem; font-size: 0.875rem; line-height: calc(1.25 / 0.875); color: var(--color-slate-600, #475569); }
+.muf-pc-th { padding-block: 0.5rem; padding-right: 0.75rem; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+.muf-pc-form-grid { display: grid; grid-template-columns: repeat(1, minmax(0, 1fr)); gap: 0.75rem; }
+.muf-pc-actions { display: flex; justify-content: flex-end; gap: 0.75rem; padding-top: 0.5rem; }
+.muf-pc-between { display: flex; align-items: center; justify-content: space-between; }
+.muf-pc-inline { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem; }
+.muf-pc-list > :not(:last-child) { border-bottom: 1px solid var(--color-slate-100, #f1f5f9); }
+@media (min-width: 40rem) {
+  .muf-pc-form-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Desktop popup scale (mirrors the .text-sm / .gap-3 / .gap-2 rules; desktop only, like the originals) */
+@media (min-width: 641px) {
+  .muf-pup-sm .muf-pc-title-sm, .muf-pup-lg .muf-pc-title-sm,
+  .muf-pup-sm .muf-pc-btn-ghost, .muf-pup-lg .muf-pc-btn-ghost { font-size: 0.8125rem; }
+  .muf-pup-sm .muf-pc-form-grid, .muf-pup-lg .muf-pc-form-grid,
+  .muf-pup-sm .muf-pc-actions, .muf-pup-lg .muf-pc-actions { gap: 11px; }
+  .muf-pup-sm .muf-pc-inline, .muf-pup-lg .muf-pc-inline { gap: 8px; }
+}
+.muf-pup-lg .muf-pc-form-grid { min-width: 0; }
+
+/* Dark mode: Tailwind's own dark variants, as the old dark:text-* classes did */
+.dark .muf-pc-muted { color: var(--color-slate-400, #94a3b8); }
+.dark .muf-pc-title-sm { color: var(--color-slate-200, #e2e8f0); }
+.dark .muf-pc-list > :not(:last-child) { border-bottom-color: var(--color-slate-800, #1e293b); }
+
+@media (max-width: 640px) {
+  /* Same as the .muf-pup-* .flex min-width rule and the big-popup single-column grid rule */
+  .muf-pup-sm .muf-pc-actions, .muf-pup-lg .muf-pc-actions,
+  .muf-pup-sm .muf-pc-between, .muf-pup-lg .muf-pc-between,
+  .muf-pup-sm .muf-pc-inline, .muf-pup-lg .muf-pc-inline { min-width: 0; }
+  .muf-pup-lg .muf-pc-form-grid { grid-template-columns: minmax(0, 1fr) !important; }
+  /* Admin-shell compact scale (.muf-popup-stage is the admin shell; mirrors its .text-* / .gap-* rules) */
+  .muf-popup-stage .muf-pc-label,
+  .muf-popup-stage .muf-pc-muted,
+  .muf-popup-stage .muf-pc-faint { font-size: var(--muf-popup-mobile-text-xs, 10.5px) !important; }
+  .muf-popup-stage .muf-pc-title-sm,
+  .muf-popup-stage .muf-pc-btn-ghost { font-size: var(--muf-popup-mobile-text-sm, 11.5px) !important; }
+  .muf-popup-stage .muf-pc-label-micro,
+  .muf-popup-stage .muf-pc-micro,
+  .muf-popup-stage .muf-pc-th { font-size: var(--muf-popup-mobile-text-10px, 9px) !important; }
+  .muf-popup-stage .muf-pc-form-grid,
+  .muf-popup-stage .muf-pc-actions { gap: 8px !important; }
+  .muf-popup-stage .muf-pc-inline { gap: 6px !important; }
+}
+
+/* Dark mode inside popups / admin shells (mirrors the forced .text-slate-* colors) */
+.dark .muf-popup-stage .muf-pc-label,
+.dark .muf-popup-stage .muf-pc-title-sm,
+.dark .muf-admin-shell .muf-pc-label,
+.dark .muf-admin-shell .muf-pc-title-sm { color: #e5edf7 !important; }
+.dark .muf-popup-stage .muf-pc-label-micro,
+.dark .muf-admin-shell .muf-pc-label-micro,
+.dark .muf-popup-stage .muf-pc-label-2xs-slate,
+.dark .muf-popup-stage .muf-pc-muted,
+.dark .muf-popup-stage .muf-pc-btn-ghost,
+.dark .muf-admin-shell .muf-pc-label-2xs-slate,
+.dark .muf-admin-shell .muf-pc-muted,
+.dark .muf-admin-shell .muf-pc-btn-ghost { color: #aab9cc !important; }
+/* ===== end POPUP CONTENT PRIMITIVES ===== */
+
+/* Brand tokens (Phase 8): the WhatsApp action green was repeated as literal hex in eight components. */
+:root {
+  --muf-brand-whatsapp: #25D366;
+  --muf-brand-whatsapp-hover: #1ebe5b;
+}

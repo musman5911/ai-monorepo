@@ -1,51 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { mufToday, mufShiftDays } from '../muf-date';
-import TelegramPanel from '../muf-telegram-panel';
-import { 
-  X, 
-  Settings, 
-  Users, 
-  Database, 
-  Sun, 
-  Moon, 
-  UserPlus, 
-  Trash2, 
-  ShieldCheck, 
-  Lock, 
-  Check, 
-  Loader,
-  AlertTriangle,
-  Mail,
-  Clock,
-  FileText,
-  Printer,
-  Download,
-  Upload,
-  RefreshCw,
-  Bell,
-  Sparkles,
-  Send,
-  MapPin,
-  Globe2
-} from 'lucide-react';
-import { AnimatePresence, motion } from '../muf-motion';
+import { useState, useEffect, useRef } from 'react';
+import { mufToday, mufShiftDays } from '../muf/data/muf-date';
+import TelegramPanel from '../muf/ui/muf-telegram-panel';
+import { X, Settings, Users, Database, UserPlus, ShieldCheck, Check, Loader, Clock, FileText, Download, Upload, RefreshCw, Sparkles, Send, Globe2 } from 'lucide-react';
+import { AnimatePresence, motion } from '../muf/core/muf-motion';
 import * as api from '../api';
 import { getLang } from '../i18n';
-import ImageUploader from './ImageUploader';
-import AvatarUploader from '../muf-avatar';
-import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave, mufPdfCheckPage } from '../muf-pdf';
+import AvatarUploader from '../muf/ui/muf-avatar';
+import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave, mufPdfCheckPage } from '../muf/data/muf-pdf';
 import { shareBackupFile } from '../utils/share';
 import MyFarmsPanel from './MyFarmsPanel';
-import ModalPortal from '../muf-portal';
-import MufAdminShell from '../muf-admin-shell';
-import MufAdminCard from '../muf-admin-card';
-import MufAdminButton from '../muf-admin-button';
-import MufAdminUsers from '../muf-admin-users';
-import MufAdminReports from '../muf-admin-reports';
-import MufAdminGeneral from '../muf-admin-general';
-import { useConfirm } from '../muf-confirm';
-import { mufPopupBackdrop, mufPopupCard, mufPopupIcon, mufPopupCloseHover, mufPopupCloseTap } from '../muf-motion';
+import MufAdminShell from '../muf/admin/muf-admin-shell';
+import MufAdminCard from '../muf/admin/muf-admin-card';
+import MufAdminButton from '../muf/admin/muf-admin-button';
+import MufAdminUsers from '../muf/admin/muf-admin-users';
+import MufAdminReports from '../muf/admin/muf-admin-reports';
+import MufAdminGeneral from '../muf/admin/muf-admin-general';
+import { useConfirm } from '../muf/core/muf-confirm';
+import { mufPopupCard, mufPopupCloseHover, mufPopupCloseTap } from '../muf/core/muf-motion';
 import { L } from '../i18n';
+import { parseCoordinates } from './admin/adminHelpers';
+import { ExportScopeWizard } from './admin/ExportScopeWizard';
 
 const KG_PER_MAUND = 40;
 const toKg = (value, unit) => {
@@ -55,207 +29,6 @@ const toKg = (value, unit) => {
   if (u === 'ton') return val * KG_PER_MAUND * 25; // 25 * 40 = 1000
   return val; // already kg
 };
-
-// Parse a coordinate string into { lat, lon } decimal degrees.
-// Accepts DMS ("33°49'45.3\"N 72°48'56.1\"E", with or without the symbol chars)
-// or decimal ("33.82925, 72.81558" / "33.82925 72.81558"). Returns null if it
-// cannot be parsed or the values fall outside valid lat/lon ranges.
-const parseCoordinates = (input) => {
-  if (input == null) return null;
-  const s = String(input).trim();
-  if (!s) return null;
-
-  const isValid = (lat, lon) =>
-    !isNaN(lat) && !isNaN(lon) && lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180;
-
-  // 1) Decimal degrees: "lat, lon" or "lat lon" (optionally signed)
-  const dec = s.match(/^(-?\d+(?:\.\d+)?)\s*[,\s]\s*(-?\d+(?:\.\d+)?)$/);
-  if (dec) {
-    const lat = parseFloat(dec[1]);
-    const lon = parseFloat(dec[2]);
-    if (isValid(lat, lon)) return { lat, lon };
-  }
-
-  // 2) DMS: pairs of deg/min/sec/hemisphere, e.g. 33°49'45.3"N 72°48'56.1"E.
-  //    Symbols (° ' ") are optional — spaces alone are accepted too. The
-  //    trailing N/S/E/W letter disambiguates this from decimal form.
-  const dmsRe = /(\d+(?:\.\d+)?)\s*[°º]?\s*(\d+(?:\.\d+)?)\s*['′]?\s*(\d+(?:\.\d+)?)\s*["″]?\s*([NSEW])/gi;
-  const parts = [...s.matchAll(dmsRe)];
-  if (parts.length >= 2) {
-    const toDec = (p) => {
-      let v = parseFloat(p[1]) + parseFloat(p[2]) / 60 + parseFloat(p[3]) / 3600;
-      if (p[4].toUpperCase() === 'S' || p[4].toUpperCase() === 'W') v = -v;
-      return v;
-    };
-    let lat = null, lon = null;
-    for (const p of parts) {
-      const h = p[4].toUpperCase();
-      const d = toDec(p);
-      if (h === 'N' || h === 'S') lat = d;
-      else lon = d;
-    }
-    if (lat != null && lon != null && isValid(lat, lon)) return { lat, lon };
-  }
-
-  return null;
-};
-
-/**
- * Drill-down export wizard: Year → (whole year OR dig) → Season → (whole
- * season OR dig) → specific crops. Used by both the finance-focused and the
- * yield-focused report cards; only the onExport target differs.
- */
-function ExportScopeWizard({ crops = [], accent = 'finance', onExport }) {
-  const [year, setYear] = useState('');
-  const [step, setStep] = useState('year');        // 'year' | 'season' | 'crops'
-  const [season, setSeason] = useState('');
-  const [selectedIds, setSelectedIds] = useState([]);
-
-  const years = [...new Set(crops.map(c => c.crop_year).filter(Boolean))].sort().reverse();
-  const hasUnyeared = crops.some(c => !c.crop_year);
-  if (hasUnyeared) years.push('N/A');
-
-  const yearCrops = crops.filter(c => (c.crop_year || 'N/A') === year);
-  const seasonsInYear = [...new Set(yearCrops.map(c => c.season || 'Other'))];
-  // Keep a friendly, predictable order: Rabi, Kharif, then anything else
-  const orderedSeasons = ['Rabi', 'Kharif', ...seasonsInYear.filter(s => s !== 'Rabi' && s !== 'Kharif')]
-    .filter(s => seasonsInYear.includes(s));
-  const seasonCrops = yearCrops.filter(c => (c.season || 'Other') === season);
-
-  const emoji = accent === 'finance' ? '💰' : '🌾';
-  const noun = accent === 'finance' ? 'Financial' : 'Yield';
-
-  const btnPrimary = "px-3 py-1.5 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors disabled:opacity-50 disabled:cursor-not-allowed";
-  const btnGhost = "px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold rounded-lg flex items-center gap-1.5 cursor-pointer transition-colors";
-
-  const resetTo = (target) => {
-    if (target === 'year') { setStep('year'); setSeason(''); setSelectedIds([]); }
-    if (target === 'season') { setStep('season'); setSelectedIds([]); }
-  };
-
-  const toggleCrop = (id) => {
-    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
-  };
-
-  if (crops.length === 0) {
-    return <p className="text-xs text-slate-500 italic">No crop cycles registered yet. Seed or create crops to enable export.</p>;
-  }
-
-  return (
-    <div className="space-y-3">
-      {/* Breadcrumb of current drill path */}
-      <div className="flex flex-wrap items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-slate-500">
-        <button type="button" onClick={() => resetTo('year')} className={`px-2 py-0.5 rounded cursor-pointer ${step === 'year' ? 'bg-farm-600 text-white' : 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700'}`}>
-          1. Year{year ? `: ${year}` : ''}
-        </button>
-        <span>→</span>
-        <button type="button" disabled={step === 'year'} onClick={() => resetTo('season')} className={`px-2 py-0.5 rounded ${step === 'season' ? 'bg-farm-600 text-white' : step === 'crops' ? 'bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer' : 'opacity-40'}`}>
-          2. Season{season && step !== 'year' ? `: ${season}` : ''}
-        </button>
-        <span>→</span>
-        <span className={`px-2 py-0.5 rounded ${step === 'crops' ? 'bg-farm-600 text-white' : 'opacity-40'}`}>3. Crops</span>
-      </div>
-
-      {/* ── STEP 1: YEAR ── */}
-      {step === 'year' && (
-        <div className="space-y-2.5">
-          <div className="flex flex-wrap gap-2 items-center">
-            <select
-              value={year}
-              onChange={e => { setYear(e.target.value); setSeason(''); setSelectedIds([]); }}
-              className="bg-white dark:bg-[#1a2333] border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs outline-none focus:border-farm-500 text-slate-900 dark:text-white font-medium cursor-pointer"
-            >
-              <option value="">— Select Crop Year —</option>
-              {years.map(y => (
-                <option key={y} value={y}>{y === 'N/A' ? 'No Year Set (N/A)' : y}</option>
-              ))}
-            </select>
-            {year && (
-              <span className="text-[10px] text-slate-500 font-semibold">
-                {yearCrops.length} crop{yearCrops.length !== 1 ? 's' : ''} in {year}
-              </span>
-            )}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" disabled={!year || yearCrops.length === 0} onClick={() => onExport({ year })} className={btnPrimary}>
-              <Printer size={13} /> {emoji} Export Full Year {noun} PDF
-            </button>
-            <button type="button" disabled={!year || yearCrops.length === 0} onClick={() => setStep('season')} className={btnGhost}>
-              Dig into {year || 'Year'} →
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── STEP 2: SEASON ── */}
-      {step === 'season' && (
-        <div className="space-y-2.5">
-          <div className="flex flex-wrap gap-2 items-center">
-            {orderedSeasons.map(s => {
-              const count = yearCrops.filter(c => (c.season || 'Other') === s).length;
-              return (
-                <button
-                  key={s}
-                  type="button"
-                  onClick={() => { setSeason(s); setSelectedIds([]); }}
-                  className={`px-3 py-1.5 text-xs font-bold rounded-lg border cursor-pointer transition-colors ${
-                    season === s
-                      ? 'bg-farm-600 border-farm-600 text-white'
-                      : 'bg-white dark:bg-[#1a2333] border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-farm-500'
-                  }`}
-                >
-                  {s === 'Rabi' ? '❄️ Rabi' : s === 'Kharif' ? '☀️ Kharif' : s} ({count})
-                </button>
-              );
-            })}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => resetTo('year')} className={btnGhost}>← Back to Year</button>
-            <button type="button" disabled={!season || seasonCrops.length === 0} onClick={() => onExport({ year, season })} className={btnPrimary}>
-              <Printer size={13} /> {emoji} Export Full {season || 'Season'} {noun} PDF
-            </button>
-            <button type="button" disabled={!season || seasonCrops.length === 0} onClick={() => setStep('crops')} className={btnGhost}>
-              Dig into {season || 'Season'} →
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* ── STEP 3: CROPS ── */}
-      {step === 'crops' && (
-        <div className="space-y-2.5">
-          <div className="flex flex-wrap gap-2">
-            {seasonCrops.map(c => (
-              <label
-                key={c._id}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg border cursor-pointer transition-colors select-none ${
-                  selectedIds.includes(c._id)
-                    ? 'bg-farm-600 border-farm-600 text-white'
-                    : 'bg-white dark:bg-[#1a2333] border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:border-farm-500'
-                }`}
-              >
-                <input
-                  type="checkbox"
-                  className="hidden"
-                  checked={selectedIds.includes(c._id)}
-                  onChange={() => toggleCrop(c._id)}
-                />
-                {selectedIds.includes(c._id) ? <Check size={12} /> : null}
-                {c.name} ({c.field || 'Sector'})
-              </label>
-            ))}
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => resetTo('season')} className={btnGhost}>← Back to Season</button>
-            <button type="button" disabled={selectedIds.length === 0} onClick={() => onExport({ year, season, cropIds: selectedIds })} className={btnPrimary}>
-              <Printer size={13} /> {emoji} Export {selectedIds.length || ''} Selected Crop{selectedIds.length !== 1 ? 's' : ''} {noun} PDF
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
 
 export default function AdminMenu({
   open,
@@ -1007,7 +780,7 @@ export default function AdminMenu({
                     <>
                     <form onSubmit={handleSaveAutomations} className="space-y-6">
                       <MufAdminCard icon={<UserPlus className="w-5 h-5" />} title={L('Profile Avatar')} subtitle={L('Upload a custom profile photo')}>
-                        <div className="flex items-center gap-2 pb-2 border-b border-[#e6e6de] dark:border-[#203528]">
+                        <div className="flex items-center gap-2 pb-2 border-b border-[color:var(--muf-color-border)]">
                           <div className="p-1.5 bg-farm-900/10 text-farm-600 dark:text-farm-400 rounded-lg">
                             <Clock size={14} />
                           </div>

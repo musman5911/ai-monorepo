@@ -3,8 +3,8 @@ import { Egg, Plus, Pencil, Bird as BirdIcon, Eye } from 'lucide-react';
 import { Bird, BirdBreed, IncubationRecord, Lang } from '../types';
 import { t } from '../i18n';
 import { todayStr } from '../utils/calculations';
-import DetailModal from '../muf-modal';
-import { useConfirm, notify } from '../muf-confirm';
+import DetailModal from '../muf/core/muf-modal';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 import { L } from '../i18n';
 
 interface IncubationModuleProps {
@@ -502,7 +502,7 @@ export default function IncubationModule({
           )}
 
           <div>
-            <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Bird Name Prefix')}</label>
+            <label className="muf-pc-label-2xs-slate">{L('Bird Name Prefix')}</label>
             <input
               type="text"
               value={transferNamePrefix}
@@ -515,7 +515,7 @@ export default function IncubationModule({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Female Chicks *</label>
+              <label className="muf-pc-label-2xs-slate">Female Chicks *</label>
               <input
                 type="number"
                 min="0"
@@ -526,7 +526,7 @@ export default function IncubationModule({
               />
             </div>
             <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Male Chicks *</label>
+              <label className="muf-pc-label-2xs-slate">Male Chicks *</label>
               <input
                 type="number"
                 min="0"
@@ -547,7 +547,7 @@ export default function IncubationModule({
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Breed / Type')}</label>
+              <label className="muf-pc-label-2xs-slate">{L('Breed / Type')}</label>
               <select
                 value={transferBreed}
                 onChange={(e) => setTransferBreed(e.target.value as BirdBreed)}
@@ -565,7 +565,7 @@ export default function IncubationModule({
               </select>
             </div>
             <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Cost per Chick (Rs)')}</label>
+              <label className="muf-pc-label-2xs-slate">{L('Cost per Chick (Rs)')}</label>
               <input
                 type="number"
                 min="0"
@@ -579,7 +579,7 @@ export default function IncubationModule({
 
           {transferBreed === 'Custom' && (
             <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Custom Breed Name *</label>
+              <label className="muf-pc-label-2xs-slate">Custom Breed Name *</label>
               <input
                 type="text"
                 required

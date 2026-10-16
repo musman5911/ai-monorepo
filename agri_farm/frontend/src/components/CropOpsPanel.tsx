@@ -3,7 +3,7 @@ import { Camera, CalendarPlus, Trash2, Loader } from 'lucide-react';
 import * as api from '../api';
 import ImageUploader from './ImageUploader';
 
-import { mufToday } from '../muf-date';
+import { mufToday } from '../muf/data/muf-date';
 import { L } from '../i18n';
 
 const todayIso = () => mufToday();

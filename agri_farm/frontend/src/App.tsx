@@ -1,37 +1,37 @@
 import { SuperAdminTab } from './components/SuperAdminTab';
-import MufLoginLang from './muf-login-lang';
-import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from './muf-login';
+import MufLoginLang from './muf/ui/muf-login-lang';
+import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from './muf/ui/muf-login';
 import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { motion, AnimatePresence } from './muf-motion';
+import { motion, AnimatePresence } from './muf/core/muf-motion';
 import * as api from './api';
-import DetailModal from './muf-modal';
-import MufDiary, { type MufDiaryEntry } from './muf-diary';
+import DetailModal from './muf/core/muf-modal';
+import MufDiary, { type MufDiaryEntry } from './muf/ui/muf-diary';
 import AdminMenu from './components/AdminMenu';
-import MufFab from './muf-fab';
-import MufWorkerPanel from './muf-worker-panel';
+import MufFab from './muf/core/muf-fab';
+import MufWorkerPanel from './muf/ui/muf-worker-panel';
 import ImageUploader from './components/ImageUploader';
 import { L, getLang, setCurrentLang } from './i18n';
-import { openMufPrint, mufEsc } from './muf-print';
-import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave } from './muf-pdf';
-import { zakatStatementBody, ushrStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, USHR_RAIN_PCT, USHR_IRRIGATED_PCT, downloadZakatPdf, downloadUshrPdf } from './muf-zakat';
-import { downloadFarmBookPdf } from './muf-farmbook';
-import HeaderSearch from './muf-header-search';
-import OfflineBanner from './muf-offline-banner';
-import FarmProfileCard from './muf-farm-profile';
-import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf-applike';
-import { MufAreaChart } from './muf-charts';
-import { MufCountUpText } from './muf-applike';
-import { mufToday, mufMonth } from './muf-date';
-import { mufStoryNet, mufVerdictText, mufDaysBetween } from './muf-story';
-import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from './muf-compare';
-import FormOverlay from './muf-form-overlay';
+import { openMufPrint, mufEsc } from './muf/data/muf-print';
+import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave } from './muf/data/muf-pdf';
+import { zakatStatementBody, ushrStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, USHR_RAIN_PCT, USHR_IRRIGATED_PCT, downloadZakatPdf, downloadUshrPdf } from './muf/domain/muf-zakat';
+import { downloadFarmBookPdf } from './muf/domain/muf-farmbook';
+import HeaderSearch from './muf/ui/muf-header-search';
+import OfflineBanner from './muf/core/muf-offline-banner';
+import FarmProfileCard from './muf/ui/muf-farm-profile';
+import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf/core/muf-applike';
+import { MufAreaChart } from './muf/ui/muf-charts';
+import { MufCountUpText } from './muf/core/muf-applike';
+import { mufToday, mufMonth } from './muf/data/muf-date';
+import { mufStoryNet, mufVerdictText, mufDaysBetween } from './muf/data/muf-story';
+import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from './muf/data/muf-compare';
+import FormOverlay from './muf/core/muf-form-overlay';
 import CropOpsPanel from './components/CropOpsPanel';
 import LaborBoard from './components/LaborBoard';
 import LedgerBookForm from './components/LedgerBookForm';
 import SupplierKhata from './components/SupplierKhata';
-import { useConfirm } from './muf-confirm';
-import MufEntityGrid from './muf-entity-grid';
+import { useConfirm } from './muf/core/muf-confirm';
+import MufEntityGrid from './muf/ui/muf-entity-grid';
 import {
   getEmptyCropForm, getEmptyFinForm, getEmptyTaskForm,
   formatCurrency, cropImageMap, getCropImage, getCropProgress,
@@ -2571,7 +2571,7 @@ function App() {
               })()}
 
               {/* Dashboard Crop Filter Header */}
-              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4 border-[#e6e6de] dark:border-[#203528]">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b pb-4 border-[color:var(--muf-color-border)]">
                 <div>
                   <h2 className="text-base md:text-lg font-black text-slate-800 dark:text-white flex items-center gap-1.5"><LayoutDashboard size={20}/> {L('Dashboard')}</h2>
                   <p className="text-slate-500 text-xs">{L('Real-time indicators, operational financials, and scheduled crop cares.')}</p>
@@ -2663,7 +2663,7 @@ function App() {
 
               {/* ── This month vs last month (muf shared card) ── */}
               <button onClick={() => setShowCompare(true)} className="w-full text-left cursor-pointer">
-                <div className="bg-white dark:bg-[#0f172a] border border-[#e6e6de] dark:border-[#203528] rounded-2xl shadow-sm p-4 flex flex-wrap items-center gap-x-6 gap-y-2 hover:shadow-md transition-shadow">
+                <div className="bg-white dark:bg-[#0f172a] border border-[color:var(--muf-color-border)] rounded-2xl shadow-sm p-4 flex flex-wrap items-center gap-x-6 gap-y-2 hover:shadow-md transition-shadow">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{L('This month vs last month')}</span>
                   <span className="text-sm font-bold text-slate-700 dark:text-slate-200">
                     📈 Rs {cmp.curInc.toLocaleString()}{' '}
@@ -2696,7 +2696,7 @@ function App() {
               </button>
 
               {/* Income trend (muf-charts) */}
-              <div className="bg-white dark:bg-[#0f172a] border border-[#e6e6de] dark:border-[#203528] rounded-2xl shadow-sm p-4">
+              <div className="bg-white dark:bg-[#0f172a] border border-[color:var(--muf-color-border)] rounded-2xl shadow-sm p-4">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">📈 {L('Monthly Income Trend')}</span>
                 <div className="mt-2">
                   <MufAreaChart data={dashboardIncomeSeries} format={(v) => `Rs ${v.toLocaleString()}`} emptyText={L('No income entries yet')} />
@@ -2763,7 +2763,7 @@ function App() {
                     </div>
                   </div>
                   <div className="p-5 space-y-4">
-                    <div className="flex items-center justify-between p-4 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-amber-50/10 dark:bg-[#132017] shadow-xs">
+                    <div className="flex items-center justify-between p-4 rounded-xl border border-[color:var(--muf-color-border)] bg-amber-50/10 dark:bg-[#132017] shadow-xs">
                       <div className="flex items-center gap-3">
                         {(() => {
                           const { Icon, className } = WEATHER_ICON(weather.code);
@@ -2840,7 +2840,7 @@ function App() {
                       <div className="min-w-0">
                         <p className="text-xs font-bold">{c.name}</p>
                         <p className="text-[10px] text-slate-500 dark:text-slate-400">Plot sector: {c.field || 'General'}</p>
-                        <p className="text-[10px] text-slate-400">{L('Open profile for full crop details')}</p>
+                        <p className="muf-pc-micro">{L('Open profile for full crop details')}</p>
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase shrink-0 ${
                         c.status === 'Growing' ? 'bg-farm-900/20 text-farm-600 dark:text-farm-400 border border-farm-900/30' : 'bg-indigo-950 text-indigo-400 border border-indigo-900/30'
@@ -2879,7 +2879,7 @@ function App() {
                         <div className="min-w-0">
                           <p className="text-xs font-bold">{t.title}</p>
                           <p className="text-[10px] text-slate-500 dark:text-slate-400">Assigned: {t.assigned_to || 'General'}</p>
-                          <p className="text-[10px] text-slate-400">{L('Open task for due date, crew and notes')}</p>
+                          <p className="muf-pc-micro">{L('Open task for due date, crew and notes')}</p>
                         </div>
                       </div>
                       <span className={`px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase shrink-0 ${
@@ -2932,7 +2932,7 @@ function App() {
                         <div className="min-w-0">
                           <p className="text-xs font-bold">{f.category}</p>
                           <p className="text-[10px] text-slate-500">{f.date || 'Ledger entry'}</p>
-                          <p className="text-[10px] text-slate-400">{L('Open entry for amount, crop, notes and receipt')}</p>
+                          <p className="muf-pc-micro">{L('Open entry for amount, crop, notes and receipt')}</p>
                         </div>
                       </div>
                       <span className={`shrink-0 px-2 py-0.5 rounded-full text-[9px] font-extrabold uppercase border ${
@@ -3495,7 +3495,7 @@ function App() {
                                   <Sprout size={10} /> {linkedCrop.name}
                                 </span>
                               ) : (
-                                <span className="text-slate-500 dark:text-slate-400 text-xs">{L('Farm-wide')}</span>
+                                <span className="muf-pc-muted">{L('Farm-wide')}</span>
                               )}
                             </td>
                             <td data-label={L('Status')} className="px-4 py-4">
@@ -4815,7 +4815,7 @@ function App() {
         {selectedTask && (
           <div className="space-y-4 text-slate-800 dark:text-slate-100">
             {selectedTask.image_base64 && (
-              <div className="w-full h-44 rounded-xl overflow-hidden border border-[#e6e6de] dark:border-[#203528] shadow-xs">
+              <div className="w-full h-44 rounded-xl overflow-hidden border border-[color:var(--muf-color-border)] shadow-xs">
                 <img src={selectedTask.image_base64} className="w-full h-full object-cover" alt={selectedTask.title} />
               </div>
             )}
@@ -4999,7 +4999,7 @@ function App() {
        size="small">
         {selectedExpenseCategory && (
           <div className="space-y-4 text-slate-800 dark:text-slate-100">
-            <p className="text-xs text-slate-500 dark:text-slate-400">All direct outlays and ledger transactions matching this expenditure category{reportsCropFilter !== 'all' ? ` (filtered by crop)` : ''}:</p>
+            <p className="muf-pc-muted">All direct outlays and ledger transactions matching this expenditure category{reportsCropFilter !== 'all' ? ` (filtered by crop)` : ''}:</p>
             <div className="max-h-[300px] overflow-y-auto space-y-2.5 pr-1 text-xs">
               {filteredPeriodFinance.filter(f => f.type === 'expense' && f.category === selectedExpenseCategory.category).map(f => (
                 <button
@@ -5015,9 +5015,9 @@ function App() {
                   </div>
                   <div className="flex items-center justify-between gap-2">
                     <span className="text-slate-600 dark:text-slate-300">{f.category}</span>
-                    <span className="text-[10px] text-slate-400">{L('Open full details')} →</span>
+                    <span className="muf-pc-micro">{L('Open full details')} →</span>
                   </div>
-                  <p className="text-[10px] text-slate-400">Crop sector: {crops.find(c => c._id === f.crop_id)?.name || 'Farm-wide'}</p>
+                  <p className="muf-pc-micro">Crop sector: {crops.find(c => c._id === f.crop_id)?.name || 'Farm-wide'}</p>
                 </button>
               ))}
               {filteredPeriodFinance.filter(f => f.type === 'expense' && f.category === selectedExpenseCategory.category).length === 0 && (
@@ -5039,7 +5039,7 @@ function App() {
         {selectedCrop && (
           <div className="space-y-6 text-slate-800 dark:text-slate-100">
             {selectedCrop.image_base64 && (
-              <div className="w-full h-44 rounded-xl overflow-hidden border border-[#e6e6de] dark:border-[#203528] shadow-xs">
+              <div className="w-full h-44 rounded-xl overflow-hidden border border-[color:var(--muf-color-border)] shadow-xs">
                 <img src={selectedCrop.image_base64} className="w-full h-full object-cover" alt={selectedCrop.name} />
               </div>
             )}
@@ -5160,7 +5160,7 @@ function App() {
               const breakEvenYield = marketPrice > 0 ? (spent / marketPrice) : 0;
               return (
                 <div className="space-y-4">
-                  <div className="p-4 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 space-y-3">
+                  <div className="p-4 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/20 space-y-3">
                     <h4 className="muf-caption flex items-center gap-1">💰 Financial Cost-Benefit Summary</h4>
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-center text-xs md:text-sm">
                       <div className="p-2 bg-white dark:bg-[#101625]/40 rounded-lg border border-slate-200 dark:border-slate-800">
@@ -5198,7 +5198,7 @@ function App() {
                     })()}
                   </div>
 
-                  <div className="p-4 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 space-y-3">
+                  <div className="p-4 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/20 space-y-3">
                     <h4 className="muf-caption flex items-center gap-1">📊 Break-Even Yield Calculator</h4>
                     <div className="flex flex-col md:flex-row md:items-center gap-4 text-xs">
                       <div className="flex-1">
@@ -5228,7 +5228,7 @@ function App() {
                               You need to harvest at least <span className="font-extrabold">{breakEvenYield.toFixed(2)} {selectedCrop.yield_unit || 'kg'}</span> to break even at today's rate.
                             </p>
                             {selectedCrop.yield_unit && selectedCrop.yield_unit !== 'kg' && (
-                              <p className="text-[10px] text-slate-400">
+                              <p className="muf-pc-micro">
                                 (Equivalent to {toKg(breakEvenYield, selectedCrop.yield_unit).toFixed(2)} kg)
                               </p>
                             )}
@@ -5240,7 +5240,7 @@ function App() {
                     </div>
                   </div>
 
-                  <div className="p-4 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 space-y-3">
+                  <div className="p-4 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/20 space-y-3">
                     <h4 className="muf-caption flex items-center gap-1">🕌 {L('Ushr Calculator (this crop)')}</h4>
                     <p className="text-[11px] text-slate-500">
                       Ushr on this crop's harvest income of <span className="font-extrabold">Rs. {formatCurrency(earned)}</span>.
@@ -5527,7 +5527,7 @@ function App() {
 
           {/* Profit Formula layout */}
           {ledgerModalData.cardType === 'profit' && (
-            <div className="p-5 rounded-2xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 text-center space-y-4">
+            <div className="p-5 rounded-2xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/20 text-center space-y-4">
               <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-wider">📐 Net Profit Equation</h4>
               <div className="flex flex-col md:flex-row items-center justify-center gap-2 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400">
                 <div className="p-3 bg-white dark:bg-[#101625]/60 rounded-xl border border-slate-200 dark:border-slate-800 min-w-[140px] shadow-xs">
@@ -5551,7 +5551,7 @@ function App() {
 
           {/* Margin Formula layout */}
           {ledgerModalData.cardType === 'margin' && (
-            <div className="p-5 rounded-2xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 text-center space-y-4">
+            <div className="p-5 rounded-2xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/20 text-center space-y-4">
               <h4 className="text-[11px] font-black text-slate-500 uppercase tracking-wider">📐 Operating Margin Equation</h4>
               <div className="flex flex-col md:flex-row items-center justify-center gap-2 text-xs md:text-sm font-bold text-slate-500 dark:text-slate-400">
                 <div className="p-3 bg-white dark:bg-[#101625]/60 rounded-xl border border-slate-200 dark:border-slate-800 min-w-[140px] shadow-xs">
@@ -5577,7 +5577,7 @@ function App() {
 
           {/* Income source share breakdown */}
           {ledgerModalData.cardType === 'income' && ledgerModalData.breakdowns.length > 0 && (
-            <div className="p-4 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 space-y-3 shadow-xs">
+            <div className="p-4 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/20 space-y-3 shadow-xs">
               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider">🌾 Income Share by Source / Buyer</h4>
               <div className="space-y-2.5">
                 {ledgerModalData.breakdowns.map(b => {
@@ -5600,7 +5600,7 @@ function App() {
 
           {/* Expense category share breakdown */}
           {ledgerModalData.cardType === 'expense' && ledgerModalData.breakdowns.length > 0 && (
-            <div className="p-4 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/20 space-y-3 shadow-xs">
+            <div className="p-4 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/20 space-y-3 shadow-xs">
               <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider">🚜 Expenditure Share by Category</h4>
               <div className="space-y-2.5">
                 {ledgerModalData.breakdowns.map(b => {
@@ -5709,7 +5709,7 @@ function App() {
           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Below are the current real-time alerts and notices for Usman Agri Farm operations:</p>
           <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
             {realNotifications.map(notif => (
-              <div key={notif.id} className="p-3.5 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
+              <div key={notif.id} className="p-3.5 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
                 <div className="flex justify-between items-center">
                   <span className="font-extrabold text-xs text-slate-800 dark:text-white flex items-center gap-1.5">
                     {notif.title}

@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { mufL } from '../muf-urdu';
-import { mufMonthLabel } from '../muf-date';
+import { mufL } from '../muf/data/muf-urdu';
+import { mufMonthLabel } from '../muf/data/muf-date';
 import {
   Calendar,
   ChevronLeft,
@@ -55,13 +55,13 @@ import {
   exportExpensePDF,
   exportMonthlySummaryPDF,
 } from '../reportExport';
-import { openMufPrint } from '../muf-print';
-import { zakatStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, downloadZakatPdf } from '../muf-zakat';
-import FarmProfileCard from '../muf-farm-profile';
-import { downloadFarmBookPdf } from '../muf-farmbook';
-import {mufShiftMonth} from '../muf-date';
-import { MufAreaChart, MufBarChart, type MufChartPoint } from '../muf-charts';
-import DetailModal from '../muf-modal';
+import { openMufPrint } from '../muf/data/muf-print';
+import { zakatStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, downloadZakatPdf } from '../muf/domain/muf-zakat';
+import FarmProfileCard from '../muf/ui/muf-farm-profile';
+import { downloadFarmBookPdf } from '../muf/domain/muf-farmbook';
+import {mufShiftMonth} from '../muf/data/muf-date';
+import { MufAreaChart, MufBarChart, type MufChartPoint } from '../muf/ui/muf-charts';
+import DetailModal from '../muf/core/muf-modal';
 
 interface MonthlySummaryProps {
   birds: Bird[];
@@ -832,15 +832,15 @@ function ZakatSection({ lang = 'en', birds, otherExpenses, feedRecords, vaccinat
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Income')} ({year})</label>
+              <label className="muf-pc-label-micro">{L('Income')} ({year})</label>
               <input type="number" className={inputClass} value={incomeOverride === null ? autoIncome : incomeOverride} onChange={(e) => setIncomeOverride(e.target.value)} />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Expenses')} ({year})</label>
+              <label className="muf-pc-label-micro">{L('Expenses')} ({year})</label>
               <input type="number" className={inputClass} value={expenseOverride === null ? autoExpenses : expenseOverride} onChange={(e) => setExpenseOverride(e.target.value)} />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Rate %')}</label>
+              <label className="muf-pc-label-micro">{L('Rate %')}</label>
               <input type="number" step="any" min="0" className={inputClass} value={pct} onChange={(e) => setPct(e.target.value)} />
             </div>
             <div className="flex flex-col justify-end">

@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Wallet, FileDown, Plus, Trash2, Share2, QrCode, Pencil } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
-import DetailModal from '../muf-modal';
+import MufCardQr from '../muf/ui/muf-card-qr';
+import DetailModal from '../muf/core/muf-modal';
 import { api } from '../api';
-import { notify } from '../muf-confirm';
+import { notify } from '../muf/core/muf-confirm';
 import type { Buyer, BuyerPayment, MilkEntry, RateHistory } from '../types';
 import { fmtPKR, monthKey, monthLabel, lastNMonths } from '../utils/format';
 import { todayStr } from '../utils/date';
@@ -223,7 +223,7 @@ export default function BuyerKhata({ buyer, open, onClose, isAdmin, onFlash }: B
               ];
               shareViaWhatsAppTo(buyer.phone, lines.join('\n'));
             }}
-            className="flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1ebe5b] text-white px-3 py-2 rounded-xl text-xs font-semibold transition"
+            className="flex items-center gap-1.5 bg-[color:var(--muf-brand-whatsapp)] hover:bg-[color:var(--muf-brand-whatsapp-hover)] text-white px-3 py-2 rounded-xl text-xs font-semibold transition"
             title={L('Send this month\'s khata to the buyer on WhatsApp')}
           >
             <Share2 className="w-3.5 h-3.5" /> WhatsApp khata

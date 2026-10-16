@@ -1,27 +1,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { mufL } from './muf-urdu';
-import {
-  Home,
-  HardHat,
-  Bird as BirdIcon,
-  DollarSign,
-  BarChart2,
-  Egg,
-  ClipboardList,
-  Shield,
-  LogOut,
-  Package,
-  ChevronDown,
-  Bell,
-  Moon,
-  Sun,
-  Users,
-  HeartPulse,
-  BookOpen,
-  Languages,
-} from 'lucide-react';
-import { motion } from './muf-motion';
+import { Home, HardHat, Bird as BirdIcon, DollarSign, BarChart2, Egg, Shield, LogOut, Package, ChevronDown, Bell, Moon, Sun, Users, HeartPulse, BookOpen, Languages } from 'lucide-react';
+import { motion } from './muf/core/muf-motion';
 
 import {
   INITIAL_SETTINGS,
@@ -63,23 +43,23 @@ import HealthPortal from './components/HealthPortal';
 import MonthlySummary from './components/MonthlySummary';
 import IncubationModule from './components/IncubationModule';
 import DailyChecklist from './components/DailyChecklist';
-import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from './muf-diary';
+import MufDiary, { type MufDiaryEntry } from './muf/ui/muf-diary';
 import BatchesTab from './components/BatchesTab';
 import LaborTab from './components/LaborTab';
-import HeaderSearch from './muf-header-search';
-import OfflineBanner from './muf-offline-banner';
-import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf-applike';
+import HeaderSearch from './muf/ui/muf-header-search';
+import OfflineBanner from './muf/core/muf-offline-banner';
+import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf/core/muf-applike';
 import AdminMenu from './components/AdminMenu';
 import LoginScreen from './components/LoginScreen';
 import SyncIndicator from './components/SyncIndicator';
-import DetailModal from './muf-modal';
-import { useConfirm, notify } from './muf-confirm';
-import { loadData, getToken, getStoredUser, fetchMe, logout as apiLogout, AuthUser, importAllBatchData, wipeAllBatchData, updateMe, changePassword, syncOfflineBuckets, offlineBucketCount, getFarmLocation, saveFarmLocation, saveData, uploadImage } from './api';
+import DetailModal from './muf/core/muf-modal';
+import { useConfirm, notify } from './muf/core/muf-confirm';
+import { loadData, getToken, getStoredUser, fetchMe, logout as apiLogout, AuthUser, importAllBatchData, wipeAllBatchData, syncOfflineBuckets, offlineBucketCount, saveData, uploadImage } from './api';
 import type { FlockFarmBackup } from './reportExport';
-import AvatarUploader from './muf-avatar';
 import { useDebouncedSave, mergeSyncStatus } from './hooks/useDebouncedSave';
 import { t, L, getLang, setCurrentLang } from './i18n';
 import { todayStr, monthStartStr, daysAgoStr, diffDateOnlyDays, feedStockKg } from './utils/calculations';
+import { MyProfileContent } from './components/MyProfileContent';
 
 function nextId<T extends { id: number }>(items: T[]): number {
   return items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
@@ -1160,7 +1140,7 @@ export default function App() {
           </p>
           <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
             {notifications.map((notif) => (
-              <div key={notif.id} className="p-3.5 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
+              <div key={notif.id} className="p-3.5 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
                 <div className="flex justify-between items-center">
                   <span className="font-extrabold text-xs text-slate-800 dark:text-white flex items-center gap-1.5">
                     {notif.title}
@@ -1250,95 +1230,6 @@ export default function App() {
           <span>{isAdmin ? 'admin' : 'worker'}</span>
         </span>
       </footer>
-    </div>
-  );
-}
-
-// ─── My Profile (avatar + own password) — used from the header profile chip ──
-function MyProfileContent({
-  lang,
-  currentUser,
-  onUserUpdate,
-}: {
-  lang: Lang;
-  currentUser: AuthUser | null;
-  onUserUpdate: (u: AuthUser) => void;
-}) {
-  const L = (en: string, urOrVars?: string | Record<string, string | number | null>) => mufL(lang, en, urOrVars);
-  const [curPw, setCurPw] = useState('');
-  const [newPw, setNewPw] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-
-  const flash = (ok: boolean, text: string) => {
-    setMsg({ ok, text });
-    setTimeout(() => setMsg(null), 3000);
-  };
-
-  return (
-    <div className="space-y-5">
-      {msg && <p className={`text-xs font-bold ${msg.ok ? 'text-emerald-600' : 'text-rose-500'}`}>{msg.text}</p>}
-
-      <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/40">
-        <p className="text-2xs font-bold text-slate-500 uppercase tracking-wider mb-2">{L('Profile photo')}</p>
-        <AvatarUploader
-          lang={lang}
-          avatar={currentUser?.avatarBase64 || ''}
-          fallbackLetter={(currentUser?.username || 'U')[0]}
-          onSave={async (base64) => {
-            const updated = await updateMe({ avatarBase64: base64 });
-            onUserUpdate(updated);
-            flash(true, L('Avatar updated'));
-          }}
-          onRemove={async () => {
-            const updated = await updateMe({ avatarBase64: 'REMOVE_AVATAR' });
-            onUserUpdate(updated);
-            flash(true, L('Photo removed'));
-          }}
-        />
-      </div>
-
-      <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/40 space-y-2">
-        <p className="text-2xs font-bold text-slate-500 uppercase tracking-wider">{L('Change my password')}</p>
-        <input
-          type="password"
-          value={curPw}
-          onChange={(e) => setCurPw(e.target.value)}
-          placeholder={L('Current password')}
-          className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl font-mono"
-        />
-        <input
-          type="password"
-          value={newPw}
-          onChange={(e) => setNewPw(e.target.value)}
-          placeholder={L('New password (min 8)')}
-          className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl font-mono"
-        />
-        <button
-          type="button"
-          disabled={busy}
-          onClick={async () => {
-            if (!curPw || newPw.length < 8) {
-              flash(false, L('New password must be at least 8 characters'));
-              return;
-            }
-            setBusy(true);
-            try {
-              await changePassword(curPw, newPw);
-              setCurPw('');
-              setNewPw('');
-              flash(true, L('Password updated'));
-            } catch (err) {
-              flash(false, err instanceof Error ? err.message : L('Could not change password'));
-            } finally {
-              setBusy(false);
-            }
-          }}
-          className="text-xs font-bold px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white disabled:opacity-60"
-        >
-          {busy ? L('Updating…') : L('Update password')}
-        </button>
-      </div>
     </div>
   );
 }

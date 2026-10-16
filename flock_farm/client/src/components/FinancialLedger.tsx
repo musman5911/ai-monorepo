@@ -13,9 +13,9 @@ import {
 import { Bird, Customer, CustomerSale, EggProduction, ExpenseCategory, FeedRecord, FeedType, GlobalSettings, Lang, OtherExpense, Supplier, VaccinationRecord } from '../types';
 import { loadData } from '../api';
 import { todayStr } from '../utils/calculations';
-import DetailModal from '../muf-modal';
-import { compressToAvatar } from '../muf-avatar';
-import { useConfirm, notify } from '../muf-confirm';
+import DetailModal from '../muf/core/muf-modal';
+import { compressToAvatar } from '../muf/ui/muf-avatar';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 import CustomerLedger from './CustomerLedger';
 import SupplierLedger from './SupplierLedger';
 import { useLedgerTotals } from './ledger/useLedgerTotals';
@@ -445,7 +445,7 @@ export default function FinancialLedger({
           <DetailModal open={addModal === 'feed'} onClose={() => setAddModal(null)} title={L('Record Feed Purchase')} icon={<Plus className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700" size="small">
             <form onSubmit={handleFeedSubmit} className="space-y-3.5 text-xs text-gray-700">
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Purchase Date')}</label>
+                <label className="muf-pc-label-3xs">{L('Purchase Date')}</label>
                 <input 
                   type="date"
                   required
@@ -456,7 +456,7 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Feed Type')}</label>
+                <label className="muf-pc-label-3xs">{L('Feed Type')}</label>
                 <select 
                   value={feedType}
                   onChange={(e) => setFeedType(e.target.value as FeedType)}
@@ -475,7 +475,7 @@ export default function FinancialLedger({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Quantity (kg) *</label>
+                  <label className="muf-pc-label-3xs">Quantity (kg) *</label>
                   <input 
                     type="number"
                     step="0.01"
@@ -488,7 +488,7 @@ export default function FinancialLedger({
                   />
                 </div>
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Rate (Rs/kg) *</label>
+                  <label className="muf-pc-label-3xs">Rate (Rs/kg) *</label>
                   <input 
                     type="number"
                     step="0.01"
@@ -511,7 +511,7 @@ export default function FinancialLedger({
               )}
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Supplier — udhaar khata (optional)')}</label>
+                <label className="muf-pc-label-3xs">{L('Supplier — udhaar khata (optional)')}</label>
                 <select value={feedSupplier} onChange={(e) => setFeedSupplier(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl bg-white">
                   <option value="">{L('Cash / no supplier')}</option>
                   {suppliers.map((sup) => <option key={String(sup.id)} value={String(sup.id)}>{sup.name}</option>)}
@@ -519,7 +519,7 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Optional Notes')}</label>
+                <label className="muf-pc-label-3xs">{L('Optional Notes')}</label>
                 <textarea 
                   placeholder={L('Brand, seller, or quality details...')}
                   value={feedNotes}
@@ -637,7 +637,7 @@ export default function FinancialLedger({
           <DetailModal open={addModal === 'expense'} onClose={() => setAddModal(null)} title={L('Record Other Expense')} icon={<Plus className="w-5 h-5" />} iconBg="bg-rose-100 text-rose-700" size="small">
             <form onSubmit={handleExpenseSubmit} className="space-y-3.5 text-xs text-gray-700">
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Expense Date')}</label>
+                <label className="muf-pc-label-3xs">{L('Expense Date')}</label>
                 <input 
                   type="date"
                   required
@@ -648,7 +648,7 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Expense Detail (e.g. Jali Darwazy) *</label>
+                <label className="muf-pc-label-3xs">Expense Detail (e.g. Jali Darwazy) *</label>
                 <input 
                   type="text"
                   required
@@ -661,7 +661,7 @@ export default function FinancialLedger({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Category')}</label>
+                  <label className="muf-pc-label-3xs">{L('Category')}</label>
                   <select 
                     value={expCategory}
                     onChange={(e) => setExpCategory(e.target.value as ExpenseCategory)}
@@ -674,7 +674,7 @@ export default function FinancialLedger({
                   </select>
                 </div>
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Amount (Rs) *</label>
+                  <label className="muf-pc-label-3xs">Amount (Rs) *</label>
                   <input 
                     type="number"
                     min="1"
@@ -688,7 +688,7 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Supplier — udhaar khata (optional)')}</label>
+                <label className="muf-pc-label-3xs">{L('Supplier — udhaar khata (optional)')}</label>
                 <select value={expSupplier} onChange={(e) => setExpSupplier(e.target.value)} className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl bg-white">
                   <option value="">{L('Cash / no supplier')}</option>
                   {suppliers.map((sup) => <option key={String(sup.id)} value={String(sup.id)}>{sup.name}</option>)}
@@ -696,7 +696,7 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Optional Notes')}</label>
+                <label className="muf-pc-label-3xs">{L('Optional Notes')}</label>
                 <textarea 
                   placeholder={L('Detailed observations or descriptions...')}
                   value={expNotes}
@@ -706,7 +706,7 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Receipt Photo (Optional)')}</label>
+                <label className="muf-pc-label-3xs">{L('Receipt Photo (Optional)')}</label>
                 {expReceipt ? (
                   <div className="flex items-center gap-3">
                     <img src={expReceipt} alt="Receipt" className="w-12 h-12 rounded-lg object-cover border border-gray-200 cursor-pointer" onClick={() => setViewReceipt(expReceipt)} />
@@ -846,7 +846,7 @@ export default function FinancialLedger({
           <DetailModal open={addModal === 'egg'} onClose={() => setAddModal(null)} title={L('Log Daily Egg Collections')} icon={<Plus className="w-5 h-5" />} iconBg="bg-yellow-100 text-yellow-700" size="small">
             <form onSubmit={handleEggSubmit} className="space-y-3.5 text-xs text-gray-700">
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Collection Date')}</label>
+                <label className="muf-pc-label-3xs">{L('Collection Date')}</label>
                 <input 
                   type="date"
                   required
@@ -857,7 +857,7 @@ export default function FinancialLedger({
               </div>
 
               <div>
-                <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">Eggs Collected (Qty) *</label>
+                <label className="muf-pc-label-3xs">Eggs Collected (Qty) *</label>
                 <input 
                   type="number"
                   min="0"
@@ -871,7 +871,7 @@ export default function FinancialLedger({
 
               <div className="grid grid-cols-3 gap-2">
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Direct / Cash Sold')}</label>
+                  <label className="muf-pc-label-3xs">{L('Direct / Cash Sold')}</label>
                   <input 
                     type="number"
                     min="0"
@@ -882,7 +882,7 @@ export default function FinancialLedger({
                   />
                 </div>
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Home Use')}</label>
+                  <label className="muf-pc-label-3xs">{L('Home Use')}</label>
                   <input 
                     type="number"
                     min="0"
@@ -893,7 +893,7 @@ export default function FinancialLedger({
                   />
                 </div>
                 <div>
-                  <label className="block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1">{L('Broken')}</label>
+                  <label className="muf-pc-label-3xs">{L('Broken')}</label>
                   <input 
                     type="number"
                     min="0"

@@ -10,19 +10,28 @@ const apps = [
 const failures = [];
 const pass = (message) => console.log(`  ✓ ${message}`);
 const fail = (message) => { failures.push(message); console.error(`  ✗ ${message}`); };
-const read = (app, file) => fs.readFileSync(path.join(root, app.dir, file), 'utf8');
+const read = (app, file) => {
+  let text = fs.readFileSync(path.join(root, app.dir, file), 'utf8');
+  // muf-style.css is an entry that @imports ./muf/styles/*.css; read entry + parts as one stylesheet.
+  if (file === 'muf-style.css') {
+    for (const m of text.matchAll(/@import\s+'(\.\/[^']+\.css)';/g)) {
+      text += '\n' + fs.readFileSync(path.join(root, app.dir, m[1]), 'utf8');
+    }
+  }
+  return text;
+};
 
 console.log('\nMUF UI safety checks');
-for (const file of ['muf-modal.tsx', 'muf-confirm.tsx', 'muf-style.css', 'muf-diary.tsx', 'muf-login.tsx']) {
+for (const file of ['muf/core/muf-modal.tsx', 'muf/core/muf-confirm.tsx', 'muf-style.css', 'muf/ui/muf-diary.tsx', 'muf/ui/muf-login.tsx']) {
   const values = apps.map((app) => read(app, file));
   if (values.every((value) => value === values[0])) pass(`${file} matches across all three apps`);
   else fail(`${file} differs between apps`);
 }
 
 for (const app of apps) {
-  const modal = read(app, 'muf-modal.tsx');
+  const modal = read(app, 'muf/core/muf-modal.tsx');
   const appSource = read(app, 'App.tsx');
-  const confirm = read(app, 'muf-confirm.tsx');
+  const confirm = read(app, 'muf/core/muf-confirm.tsx');
   const css = read(app, 'muf-style.css');
   const qr = read(app, 'components/QrWaybillModal.tsx');
   const sourceRoot = path.join(root, app.dir);
@@ -84,6 +93,49 @@ for (const app of apps) {
     }
   }
 
+}
+
+// Phase 7 guard: Tailwind patterns that now have muf-pc-* classes must not reappear inside DetailModal bodies.
+const mufPcLegacy = [
+  'block text-xs font-semibold text-slate-700 mb-1',
+  'block text-[10px] font-bold text-slate-500 mb-1 uppercase',
+  'block text-3xs font-bold text-gray-400 uppercase tracking-wider mb-1',
+  'block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1',
+  'block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1',
+  'text-xs text-slate-500 dark:text-slate-400',
+  'text-slate-500 dark:text-slate-400 text-xs',
+  'text-xs text-slate-400 italic',
+  'text-[10px] text-slate-400',
+  'text-sm font-bold text-slate-700 dark:text-slate-200',
+  'px-4 py-2 text-sm text-slate-600',
+  'py-2 pr-3 font-semibold uppercase text-[10px]',
+  'grid grid-cols-1 sm:grid-cols-2 gap-3',
+  'flex justify-end gap-3 pt-2',
+  'flex items-center justify-between',
+  'flex items-center gap-2 flex-wrap',
+  'divide-y divide-slate-100 dark:divide-slate-800',
+];
+for (const app of apps) {
+  const walk = (dir) => fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {
+    const p = path.join(dir, e.name);
+    return e.isDirectory() ? (e.name === 'node_modules' ? [] : walk(p)) : (/\.tsx$/.test(e.name) && !/editing-x-projetcs|muf-modal/.test(e.name) ? [p] : []);
+  });
+  let leftovers = 0;
+  for (const file of walk(path.join(root, app.dir))) {
+    const text = fs.readFileSync(file, 'utf8');
+    let from = 0;
+    for (;;) {
+      const start = text.indexOf('<DetailModal', from);
+      if (start < 0) break;
+      let end = text.indexOf('</DetailModal>', start);
+      if (end < 0) break;
+      const body = text.slice(start, end);
+      for (const legacy of mufPcLegacy) if (body.includes(`className="${legacy}"`)) leftovers += 1;
+      from = end;
+    }
+  }
+  if (leftovers) fail(`${app.name}: ${leftovers} popup element(s) still use a Tailwind pattern that has a muf-pc-* class`);
+  else pass(`${app.name}: popup content uses muf-pc-* classes for the shared patterns`);
 }
 
 if (failures.length) {

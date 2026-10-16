@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle, Droplets, FileText, FlaskConical, HardHat, Leaf, Trash2 } from 'lucide-react';
 import * as api from '../api';
 import ImageUploader from './ImageUploader';
-import { useConfirm } from '../muf-confirm';
+import { useConfirm } from '../muf/core/muf-confirm';
 import { L } from '../i18n';
 
 const fieldClass = 'w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500';

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import { UserPlus, Trash2, Key, Check, X, Shield, User as UserIcon, ShieldCheck, Mail, Pencil, Send } from 'lucide-react';
 import { Lang } from '../types';
 import { AuthUser, listUsers, createUser, updateUser, deleteUser, changePassword, changePasswordWithCode, requestProfileCode } from '../api';
-import { usePromptInput, notify } from '../muf-confirm';
-import { useConfirm } from '../muf-confirm';
+import { usePromptInput, notify } from '../muf/core/muf-confirm';
+import { useConfirm } from '../muf/core/muf-confirm';
 
 interface Props {
   currentUser: AuthUser;

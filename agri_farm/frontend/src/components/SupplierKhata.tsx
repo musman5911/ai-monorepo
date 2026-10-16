@@ -5,13 +5,13 @@
 // text come from the muf-supplier twin (src/muf-supplier.js).
 import { useMemo, useState } from 'react';
 import { Store, Plus, Trash2, Share2, Wallet, QrCode, Pencil } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
-import DetailModal from '../muf-modal';
+import MufCardQr from '../muf/ui/muf-card-qr';
+import DetailModal from '../muf/core/muf-modal';
 import * as api from '../api';
 import { L } from '../i18n';
-import { useConfirm, notify } from '../muf-confirm';
-import { supplierBalances, supplierTotals, supplierHisabText } from '../muf-supplier';
-import {mufDateStr} from '../muf-date';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
+import { supplierBalances, supplierTotals, supplierHisabText } from '../muf/domain/muf-supplier';
+import {mufDateStr} from '../muf/data/muf-date';
 
 const FARM_SIGNATURE = '— Usman Agri Farm';
 

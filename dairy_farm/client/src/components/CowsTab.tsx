@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { L } from '../i18n';
-import { compressToAvatar } from '../muf-avatar';
+import { compressToAvatar } from '../muf/ui/muf-avatar';
 import { api } from '../api';
-import { useConfirm, notify } from '../muf-confirm';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 import type { Cow, CowStatus } from '../types';
 import { fmt, fmtPKR } from '../utils/format';
 import { todayStr } from '../utils/date';
@@ -11,11 +11,11 @@ import {
   CheckCircle2, Info, Tag, Activity, Banknote, Baby,
   Scale, CalendarDays, Eye, LayoutGrid, List, Clock, Droplets, User
 } from 'lucide-react';
-import DetailModal from '../muf-modal';
-import MufEntityGrid from '../muf-entity-grid';
-import MufFab from '../muf-fab';
+import DetailModal from '../muf/core/muf-modal';
+import MufEntityGrid from '../muf/ui/muf-entity-grid';
+import MufFab from '../muf/core/muf-fab';
 import CowDetailPopup from './CowDetailPopup';
-import {mufDateStr} from '../muf-date';
+import {mufDateStr} from '../muf/data/muf-date';
 
 interface CowsTabProps {
   isAdmin: boolean;
@@ -396,7 +396,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
             <Field label={L('Nursing Period (months)')} children={<input type="number" step="0.5" className="inp" value={calfForm.nursingMonths} onChange={e => setCalfForm({ ...calfForm, nursingMonths: parseFloat(e.target.value) || 2.5 })} />} />
             <div className="md:col-span-3"><Field label={L('Notes')} children={<textarea rows={2} className="inp" value={calfForm.notes} onChange={e => setCalfForm({ ...calfForm, notes: e.target.value })} />} /></div>
             <div className="md:col-span-3 flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setShowCalfForm(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+              <button type="button" onClick={() => setShowCalfForm(false)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
               <button type="submit" className="bg-pink-600 hover:bg-pink-700 text-white rounded-lg px-6 py-2 text-sm font-medium flex items-center gap-2"><Baby className="h-4 w-4" /> {L('Add Calf')}</button>
             </div>
           </form>
@@ -505,8 +505,8 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
             <Field label={L('Sale Price (₨) *')} children={<input required type="number" min="1" className="inp" value={saleForm.salePrice} onChange={e => setSaleForm({ ...saleForm, salePrice: e.target.value })} />} />
             <Field label={L('Buyer')} children={<input className="inp" value={saleForm.buyer} onChange={e => setSaleForm({ ...saleForm, buyer: e.target.value })} />} />
             <Field label={L('Notes')} children={<textarea rows={2} className="inp" value={saleForm.notes} onChange={e => setSaleForm({ ...saleForm, notes: e.target.value })} />} />
-            <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setSaleCow(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+            <div className="muf-pc-actions">
+              <button type="button" onClick={() => setSaleCow(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
               <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-6 py-2 text-sm font-medium flex items-center gap-2"><Banknote className="h-4 w-4" /> {L('Record Sale')}</button>
             </div>
           </form>

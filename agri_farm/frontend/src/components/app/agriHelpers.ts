@@ -6,8 +6,8 @@
 // own equivalents inlined in their Dashboards; if the three converge on
 // a shared shape, promote to a muf-* twin.
 
-import { mufToday, mufMonth } from '../../muf-date';
-import { sumMonth, pctChange, sameMonthLastYearKey } from '../../muf-compare';
+import { mufToday, mufMonth } from '../../muf/data/muf-date';
+import { sumMonth, pctChange, sameMonthLastYearKey } from '../../muf/data/muf-compare';
 
 // ─── Form factories ─────────────────────────────────────────────────────────
 

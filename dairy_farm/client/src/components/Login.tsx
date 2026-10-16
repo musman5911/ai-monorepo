@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { motion, AnimatePresence } from '../muf-motion';
+import { motion, AnimatePresence } from '../muf/core/muf-motion';
 import {
   Eye, EyeOff, AlertCircle, ArrowLeft,
   Mail, Check, LogIn,
 } from 'lucide-react';
 import { api, saveAuth } from '../api';
-import MufLoginLang from '../muf-login-lang';
-import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from '../muf-login';
+import MufLoginLang from '../muf/ui/muf-login-lang';
+import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from '../muf/ui/muf-login';
 import type { Lang } from '../i18n';
 import { L } from '../i18n';
 

@@ -1,0 +1,1057 @@
+/* ============================================================
+   MUF RESPONSIVE REPAIR — shared across Agri, Dairy and Flock.
+   Presentation only: no data flow, API, state or business logic.
+   ============================================================ */
+
+/* Avoid flex/grid children forcing horizontal overflow. */
+.muf-layout,
+.muf-body-frame,
+.muf-main-content,
+.muf-admin-shell,
+.muf-popup-stage,
+.muf-form-sheet,
+.muf-panel,
+.muf-panel-heading,
+.muf-page-hero,
+.muf-page-title,
+.muf-top-nav,
+.muf-top-nav-scroll {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.muf-top-nav-scroll {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  overflow-x: visible;
+  overflow-y: visible;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+
+.muf-main-content img,
+.muf-admin-shell img,
+.muf-popup-stage img { max-width: 100%; }
+.muf-main-content svg,
+.muf-admin-shell svg,
+.muf-popup-stage svg { flex-shrink: 0; }
+
+.muf-main-content .overflow-x-auto table { min-width: max-content; }
+.muf-main-content .overflow-x-auto,
+.muf-admin-shell .overflow-x-auto { overscroll-behavior-x: contain; }
+
+/* Admin sections keep a stable shell height when a tab has less content. */
+.muf-admin-shell {
+  width: min(100%, 56rem);
+  height: min(680px, 84dvh);
+  min-height: min(680px, 84dvh);
+  max-height: 84dvh !important;
+}
+.muf-admin-shell > .flex-1,
+.muf-admin-shell .overflow-y-auto { min-height: 0; }
+.muf-admin-shell .muf-top-nav-scroll { gap: 4px; }
+.muf-admin-shell .muf-nav-link { flex: 0 0 auto; }
+
+/* Large detail popups keep the same workspace when nested tabs contain less content. */
+.muf-pup-lg {
+  height: min(76dvh, 680px) !important;
+  min-height: min(76dvh, 680px) !important;
+  max-height: 86dvh !important;
+  width: min(94vw, 48rem);
+}
+.muf-pup-lg > .flex-1 { min-height: 0; }
+@media (max-width: 640px) {
+  .muf-pup-lg { height: min(76dvh, 540px) !important; min-height: min(76dvh, 540px) !important; width: calc(100vw - 16px) !important; }
+}
+
+/* Dark mode: repair low-contrast slate text and fixed-light surfaces within app surfaces. */
+.dark .muf-panel,
+.dark .muf-crop-card,
+.dark .muf-kpi-card,
+.dark .muf-admin-shell,
+.dark .muf-form-sheet,
+.dark .muf-pup-sm,
+.dark .muf-pup-lg {
+  background-color: #111c2e;
+  color: #e5edf7;
+  border-color: #334155;
+}
+.dark .muf-panel-heading,
+.dark .muf-admin-shell > .muf-top-nav,
+.dark .muf-admin-shell .muf-admin-tabs-inline {
+  background-color: #172337;
+  border-color: #334155;
+}
+.dark .muf-panel-heading h3,
+.dark .muf-crop-name h4,
+.dark .muf-crop-stats,
+.dark .muf-progress strong,
+.dark .muf-kpi-card strong,
+.dark .muf-page-title h2,
+.dark .muf-admin-shell .text-slate-900,
+.dark .muf-admin-shell .text-slate-800,
+.dark .muf-admin-shell .text-slate-700,
+.dark .muf-popup-stage .text-slate-900,
+.dark .muf-popup-stage .text-slate-800,
+.dark .muf-popup-stage .text-slate-700 {
+  color: #e5edf7 !important;
+}
+.dark .muf-panel-heading p,
+.dark .muf-crop-name p,
+.dark .muf-crop-stats .text-slate-500,
+.dark .muf-kpi-card small,
+.dark .muf-kpi-card p,
+.dark .muf-admin-shell .text-slate-500,
+.dark .muf-admin-shell .text-slate-600,
+.dark .muf-popup-stage .text-slate-500,
+.dark .muf-popup-stage .text-slate-600 {
+  color: #aab9cc !important;
+}
+.dark .muf-admin-shell .bg-white,
+.dark .muf-popup-stage .bg-white,
+.dark .muf-admin-shell .bg-slate-50,
+.dark .muf-popup-stage .bg-slate-50,
+.dark .muf-admin-shell .bg-slate-100,
+.dark .muf-popup-stage .bg-slate-100 {
+  background-color: #172337 !important;
+}
+.dark .muf-admin-shell input:not([type="checkbox"]):not([type="radio"]),
+.dark .muf-admin-shell select,
+.dark .muf-admin-shell textarea,
+.dark .muf-popup-stage input:not([type="checkbox"]):not([type="radio"]),
+.dark .muf-popup-stage select,
+.dark .muf-popup-stage textarea {
+  background-color: #0b1424 !important;
+  color: #e5edf7 !important;
+  border-color: #475569 !important;
+}
+.dark .muf-admin-shell input::placeholder,
+.dark .muf-admin-shell textarea::placeholder,
+.dark .muf-popup-stage input::placeholder,
+.dark .muf-popup-stage textarea::placeholder { color: #9aabc0 !important; opacity: 1; }
+.dark .muf-admin-shell .border-slate-100,
+.dark .muf-admin-shell .border-slate-200,
+.dark .muf-popup-stage .border-slate-100,
+.dark .muf-popup-stage .border-slate-200 { border-color: #334155 !important; }
+.dark .muf-main-content table thead th { background-color: #172337; color: #cbd5e1; }
+.dark .muf-main-content table tbody td { color: #dbe5f1; border-color: #334155; }
+
+@media (max-width: 1023px) {
+  /* Desktop zoom compensation must never leak onto tablet or mobile. */
+  body { zoom: 1 !important; }
+  html { font-size: 16px; }
+  .muf-layout { min-height: 100dvh; }
+  .muf-body-frame { min-height: calc(100dvh - 56px); }
+  .muf-main-content { padding: clamp(8px, 2vw, 18px); }
+  .muf-page-hero { gap: 10px; margin-bottom: 14px; }
+  .muf-kpi-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 145px), 1fr)); }
+  .muf-crop-grid,
+  .muf-entity-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); }
+  .muf-panel { border-radius: 14px; }
+  .muf-admin-shell { width: min(100%, 56rem); }
+}
+
+@media (max-width: 640px) {
+  .muf-header { gap: 6px; }
+  .muf-header-brand { min-width: 0; flex: 1 1 auto; gap: 6px; }
+  .muf-header-brand h1 { max-width: 42vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px !important; }
+  .muf-brand-logo { width: 30px !important; height: 30px !important; }
+  .muf-header-actions { flex: 0 0 auto; }
+  .muf-top-nav { max-width: 100vw; }
+  .muf-top-nav-scroll { max-width: 100%; gap: 4px !important; }
+  .muf-nav-link { min-height: 32px !important; height: 32px !important; padding: 0 9px !important; font-size: 11px !important; }
+  .muf-nav-link svg { width: 13px; height: 13px; }
+  .muf-page-hero { align-items: stretch !important; }
+  .muf-page-title { gap: 8px; }
+  .muf-page-title h2 { font-size: 17px !important; line-height: 1.2; }
+  .muf-page-title p { font-size: 11px !important; }
+  .muf-main-content { padding: 8px !important; }
+  .muf-panel-heading { align-items: flex-start; gap: 8px; padding: 9px 10px !important; }
+  .muf-panel-heading h3 { font-size: 13px !important; }
+  .muf-kpi-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 7px !important; }
+  .muf-kpi-card { min-width: 0; padding: 8px !important; }
+  .muf-kpi-card strong { font-size: clamp(13px, 4vw, 16px) !important; overflow-wrap: anywhere; }
+  .muf-crop-grid,
+  .muf-entity-grid { grid-template-columns: minmax(0, 1fr) !important; gap: 8px !important; padding: 8px !important; }
+  .muf-crop-card, .muf-kpi-card, .muf-panel { min-width: 0; }
+  .muf-main-content .overflow-x-auto { max-width: 100%; }
+
+  /* Fixed, predictable admin popup height across its inner tabs. */
+  .muf-popup-stage { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)) !important; }
+  .muf-admin-shell {
+    width: 100% !important;
+    height: min(84dvh, 720px) !important;
+    min-height: min(84dvh, 720px) !important;
+    max-height: 84dvh !important;
+    border-radius: 14px !important;
+  }
+  .muf-admin-shell > .flex-1 { min-height: 0 !important; }
+  .muf-admin-shell .muf-top-nav { max-width: 100%; }
+  .muf-admin-shell .muf-nav-link { min-height: 30px !important; height: 30px !important; padding: 0 8px !important; font-size: 10.5px !important; }
+  .muf-admin-shell .p-4,
+  .muf-admin-shell .sm\:p-6 { padding: 10px !important; }
+
+  .muf-pup-lg { height: min(76dvh, 540px) !important; min-height: min(76dvh, 540px) !important; }
+  .muf-pup-sm { max-width: calc(100vw - 16px) !important; }
+  .muf-overlay .relative.pointer-events-auto { max-width: calc(100vw - 16px); max-height: 88dvh; }
+  .muf-overlay .relative.pointer-events-auto.muf-pup-lg { min-height: min(76dvh, 540px); }
+  .muf-pup-title { font-size: 13px !important; }
+  .muf-pup-sub { font-size: 10px !important; }
+  .muf-pup-lg, .muf-pup-sm { --pup-body-pad: 10px; --pup-head-pad: 10px; --pup-gap: 6px; --pup-icon: 28px; }
+  .muf-admin-shell button, .muf-popup-stage button { max-width: 100%; }
+  .muf-admin-shell input,
+  .muf-admin-shell select,
+  .muf-admin-shell textarea,
+  .muf-popup-stage input,
+  .muf-popup-stage select,
+  .muf-popup-stage textarea { max-width: 100%; min-width: 0; }
+}
+
+@media (max-width: 380px) {
+  .muf-header-brand h1 { max-width: 34vw; font-size: 12px !important; }
+  .muf-header-actions .muf-icon-button,
+  .muf-header-actions .muf-profile,
+  .muf-header-actions .muf-logout { width: 28px !important; min-width: 28px !important; flex-basis: 28px !important; }
+  .muf-kpi-card { gap: 5px !important; }
+  .muf-kpi-icon { width: 25px !important; height: 25px !important; flex-basis: 25px !important; }
+  .muf-nav-link { padding-inline: 7px !important; }
+}
+
+/* QR waybill dialog: responsive sizing and dark-mode readability. */
+.fixed.inset-0.z-50 > .max-w-2xl {
+  width: min(100%, 42rem);
+  min-width: 0;
+  min-height: min(560px, 76dvh);
+  max-height: 90dvh;
+}
+.dark .fixed.inset-0.z-50 > .max-w-2xl {
+  background-color: #111c2e !important;
+  color: #e5edf7 !important;
+  border-color: #334155 !important;
+}
+.dark .fixed.inset-0.z-50 > .max-w-2xl .bg-white,
+.dark .fixed.inset-0.z-50 > .max-w-2xl .bg-slate-50,
+.dark .fixed.inset-0.z-50 > .max-w-2xl .bg-slate-100 {
+  background-color: #172337 !important;
+}
+.dark .fixed.inset-0.z-50 > .max-w-2xl .text-slate-900,
+.dark .fixed.inset-0.z-50 > .max-w-2xl .text-slate-800,
+.dark .fixed.inset-0.z-50 > .max-w-2xl .text-slate-700 {
+  color: #e5edf7 !important;
+}
+.dark .fixed.inset-0.z-50 > .max-w-2xl .text-slate-500,
+.dark .fixed.inset-0.z-50 > .max-w-2xl .text-slate-600 { color: #aab9cc !important; }
+.dark .fixed.inset-0.z-50 > .max-w-2xl input,
+.dark .fixed.inset-0.z-50 > .max-w-2xl select,
+.dark .fixed.inset-0.z-50 > .max-w-2xl textarea {
+  background-color: #0b1424 !important;
+  color: #e5edf7 !important;
+  border-color: #475569 !important;
+}
+@media (max-width: 640px) {
+  .fixed.inset-0.z-50 { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)) !important; }
+  .fixed.inset-0.z-50 > .max-w-2xl {
+    width: 100% !important;
+    min-height: min(76dvh, 540px) !important;
+    max-height: 88dvh !important;
+    border-radius: 13px !important;
+  }
+  .fixed.inset-0.z-50 > .max-w-2xl .grid-cols-2 { grid-template-columns: minmax(0, 1fr) !important; }
+  .fixed.inset-0.z-50 > .max-w-2xl .p-6 { padding: 10px !important; }
+  .fixed.inset-0.z-50 > .max-w-2xl .px-6 { padding-left: 10px !important; padding-right: 10px !important; }
+  .fixed.inset-0.z-50 > .max-w-2xl .text-2xl { font-size: 16px !important; }
+  .fixed.inset-0.z-50 > .max-w-2xl .text-xl { font-size: 15px !important; }
+  .fixed.inset-0.z-50 > .max-w-2xl button { min-height: 34px; }
+}
+
+
+
+/* Super Admin and finance dark-mode contrast repair. */
+.dark .muf-superadmin,
+.dark .muf-superadmin .bg-white { color: #e5edf7; }
+.dark .muf-superadmin .bg-white { background-color: #111c2e !important; border-color: #334155 !important; }
+.dark .muf-superadmin .text-slate-900,
+.dark .muf-superadmin .text-slate-800,
+.dark .muf-superadmin .text-slate-700 { color: #e5edf7 !important; }
+.dark .muf-superadmin .text-slate-600,
+.dark .muf-superadmin .text-slate-500,
+.dark .muf-superadmin .text-slate-400 { color: #aab9cc !important; }
+.dark .muf-superadmin .border-slate-100,
+.dark .muf-superadmin .border-slate-200,
+.dark .muf-superadmin .border-slate-300 { border-color: #334155 !important; }
+.dark .muf-superadmin .bg-slate-50,
+.dark .muf-superadmin .bg-slate-100 { background-color: #172337 !important; }
+.dark .muf-superadmin input,
+.dark .muf-superadmin select,
+.dark .muf-superadmin textarea { background-color: #0b1424 !important; color: #e5edf7 !important; border-color: #475569 !important; }
+.dark .muf-finance-surface .text-slate-900,
+.dark .muf-finance-surface .text-slate-800,
+.dark .muf-finance-surface .text-slate-700 { color: #e5edf7 !important; }
+.dark .muf-finance-surface .text-slate-600,
+.dark .muf-finance-surface .text-slate-500 { color: #aab9cc !important; }
+.dark .muf-finance-surface .bg-white,
+.dark .muf-finance-surface .bg-slate-50,
+.dark .muf-finance-surface .bg-slate-100 { background-color: #172337 !important; }
+.dark .muf-finance-surface [class*="border-slate-"] { border-color: #334155 !important; }
+
+
+/* MUF UI hardening: reliable touch targets, safe-area spacing and reduced-motion support. */
+.muf-overlay { padding-top: max(12px, env(safe-area-inset-top)); padding-bottom: max(12px, env(safe-area-inset-bottom)); }
+.muf-pup-sm, .muf-pup-lg { min-width: 0; overscroll-behavior: contain; }
+.muf-pup-sm button, .muf-pup-lg button { touch-action: manipulation; }
+.muf-pup-sm button:focus-visible, .muf-pup-lg button:focus-visible,
+.muf-pup-sm input:focus-visible, .muf-pup-lg input:focus-visible,
+.muf-pup-sm select:focus-visible, .muf-pup-lg select:focus-visible,
+.muf-pup-sm textarea:focus-visible, .muf-pup-lg textarea:focus-visible {
+  outline: 2px solid var(--muf-ui-focus); outline-offset: 2px;
+}
+.muf-main-content table { max-width: 100%; }
+.muf-main-content th, .muf-main-content td { overflow-wrap: anywhere; }
+@media (max-width: 640px) {
+  .muf-pup-sm, .muf-pup-lg { max-width: calc(100vw - 16px) !important; }
+  .muf-pup-sm .flex, .muf-pup-lg .flex { min-width: 0; }
+  .muf-pup-sm input, .muf-pup-sm select, .muf-pup-sm textarea,
+  .muf-pup-lg input, .muf-pup-lg select, .muf-pup-lg textarea { min-width: 0; max-width: 100%; }
+  .muf-main-content .overflow-x-auto { overscroll-behavior-x: contain; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .muf-entity-card, .muf-crop-card, .muf-main-content button { animation: none !important; transition-duration: 0.01ms !important; }
+}
+
+/* 2026-10 UI refinement: compact desktop dialogs and unified MUF admin workspace. */
+.muf-admin-shell { width: min(92vw, 56rem, 112vh); box-shadow: 0 28px 90px rgba(15, 23, 42, .22); }
+.muf-admin-header { background: linear-gradient(110deg, rgba(22, 101, 52, .07), transparent 58%); }
+.muf-admin-tabs-sticky { position: sticky; top: 0; z-index: 5; background: rgba(255, 254, 251, .96); border-bottom: 1px solid #e6e6de; backdrop-filter: blur(12px); }
+.dark .muf-admin-tabs-sticky { background: rgba(13, 26, 17, .96); border-color: #203528; }
+.muf-admin-tabs-sticky .muf-top-nav-scroll { padding-top: 8px; padding-bottom: 8px; }
+.muf-admin-content { min-width: 0; }
+.muf-admin-footer { background: rgba(248, 250, 247, .92); }
+.dark .muf-admin-footer { background: rgba(10, 22, 14, .96); }
+.muf-admin-shell .muf-admin-card, .muf-admin-shell .muf-panel { box-shadow: 0 1px 2px rgba(15, 23, 42, .035); }
+@media (min-width: 1024px) and (max-height: 820px) {
+  .muf-admin-shell { max-height: 86vh !important; }
+  .muf-admin-content { padding: 14px 18px !important; }
+}
+@media (max-width: 640px) {
+  .muf-admin-shell { width: calc(100vw - 16px) !important; max-height: 90dvh !important; }
+  .muf-admin-footer { padding: 8px 12px; }
+}
+
+/* Cow P&L now uses compact avatar rows instead of oversized animal tiles. */
+.muf-cow-pnl-compact { min-width: 0; }
+.muf-cow-pnl-compact img { display: block; }
+.muf-cow-pnl-compact button { border-radius: 14px; }
+.muf-cow-pnl-compact button:focus-visible { outline: 2px solid var(--muf-ui-focus); outline-offset: 3px; }
+
+/* Unified health workspaces: clearer section hierarchy and more compact records. */
+.muf-health-redesign .muf-page-hero { border: 1px solid rgba(148, 163, 184, .22); border-radius: 20px; padding: clamp(14px, 2.2vw, 22px); background: linear-gradient(120deg, rgba(16, 185, 129, .08), rgba(255, 255, 255, .86) 58%, rgba(251, 191, 36, .08)); box-shadow: 0 8px 24px rgba(15, 23, 42, .035); }
+.dark .muf-health-redesign .muf-page-hero { background: linear-gradient(120deg, rgba(16, 185, 129, .1), rgba(15, 23, 42, .75) 58%, rgba(251, 191, 36, .07)); border-color: #334155; }
+.muf-health-redesign .muf-kpi-card { border-radius: 17px; transition: transform .18s ease, box-shadow .18s ease; }
+.muf-health-redesign .muf-kpi-card:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(15, 23, 42, .07); }
+.muf-health-redesign .muf-panel { border-radius: 18px; }
+.muf-health-redesign table thead th { position: sticky; top: 0; z-index: 1; background: #f8fafc; }
+.dark .muf-health-redesign table thead th { background: #172337; }
+.muf-flock-health #health-portal-tab { min-width: 0; }
+.muf-flock-health .grid > .muf-panel { box-shadow: 0 8px 24px rgba(15, 23, 42, .035); }
+
+/* Incubation workspace: prominent progress summary, tidy form and readable log. */
+.muf-incubation-redesign .muf-incubation-heading { padding: 16px 18px; border-radius: 18px; border: 1px solid rgba(148, 163, 184, .22); background: linear-gradient(120deg, rgba(245, 158, 11, .10), rgba(255, 255, 255, .9) 58%, rgba(16, 185, 129, .07)); }
+.dark .muf-incubation-redesign .muf-incubation-heading { background: linear-gradient(120deg, rgba(245, 158, 11, .12), rgba(15, 23, 42, .86) 58%, rgba(16, 185, 129, .08)); border-color: #334155; }
+.muf-incubation-redesign .grid > form { border-radius: 18px; box-shadow: 0 10px 28px rgba(15, 23, 42, .045); }
+.muf-incubation-redesign .grid > div:has(table) { border-radius: 18px; box-shadow: 0 10px 28px rgba(15, 23, 42, .045); }
+.muf-incubation-redesign table thead th { position: sticky; top: 0; z-index: 1; }
+.muf-incubation-redesign tbody tr { transition: background-color .15s ease; }
+
+/* Milk entry and history: polished controls and dense, readable record tables. */
+.muf-milk-redesign .muf-panel { border-radius: 18px; }
+.muf-milk-redesign table { font-variant-numeric: tabular-nums; }
+.muf-milk-redesign table thead th { white-space: nowrap; }
+.muf-milk-redesign table tbody tr { transition: background-color .14s ease; }
+.muf-milk-redesign input, .muf-milk-redesign select { max-width: 100%; }
+.muf-milk-redesign .muf-panel button:focus-visible { outline: 2px solid var(--muf-ui-focus); outline-offset: 2px; }
+.muf-popup-stage .muf-milk-redesign table th, .muf-popup-stage .muf-milk-redesign table td { padding: 9px 10px; }
+
+/* Superadmin is intentionally consistent across all three standalone apps. */
+.muf-superadmin-page { width: 100%; }
+.muf-superadmin-page .muf-superadmin { min-width: 0; }
+.muf-superadmin-page .muf-superadmin > div:first-child { border-radius: 20px; padding: clamp(16px, 2.5vw, 26px); box-shadow: 0 12px 32px rgba(15, 23, 42, .10); }
+.muf-superadmin-page .muf-superadmin section { border-radius: 17px; transition: border-color .18s ease, box-shadow .18s ease; }
+.muf-superadmin-page .muf-superadmin section:hover { border-color: rgba(16, 185, 129, .45); box-shadow: 0 8px 22px rgba(15, 23, 42, .045); }
+.muf-superadmin-page .muf-superadmin button { min-height: 34px; }
+.muf-superadmin-page .muf-superadmin .grid { min-width: 0; }
+@media (max-width: 640px) {
+  .muf-health-redesign .muf-page-hero { align-items: flex-start; }
+  .muf-incubation-redesign .grid > form { padding: 14px; }
+  .muf-superadmin-page .muf-superadmin > div:first-child { align-items: flex-start; }
+}
+.muf-admin-shell .muf-admin-card { border-radius: 17px; border-color: rgba(148, 163, 184, .24); box-shadow: 0 8px 24px rgba(15, 23, 42, .045); }
+.muf-admin-shell .muf-admin-card > div:first-child { padding: 13px 16px; background: linear-gradient(105deg, rgba(22, 163, 74, .075), rgba(248, 250, 252, .82) 70%); }
+.dark .muf-admin-shell .muf-admin-card > div:first-child { background: linear-gradient(105deg, rgba(22, 163, 74, .12), rgba(15, 23, 42, .8) 70%); }
+.muf-admin-shell .muf-admin-card > div:last-child { padding: 15px; }
+.muf-milk-entry-popup { border: 1px solid rgba(148, 163, 184, .22); border-radius: 14px; }
+.muf-milk-entry-popup table thead { position: sticky; top: 0; z-index: 2; box-shadow: 0 1px 0 rgba(148, 163, 184, .18); }
+.muf-milk-entry-popup table th { padding: 10px 12px !important; font-size: 10px; letter-spacing: .045em; }
+.muf-milk-entry-popup table td { padding: 9px 10px !important; }
+.muf-milk-entry-popup table input, .muf-milk-entry-popup table select { min-width: 76px; border-radius: 9px; }
+.muf-milk-entry-popup table tbody tr:nth-child(even) { background: rgba(148, 163, 184, .045); }
+.dark .muf-milk-entry-popup table tbody tr:nth-child(even) { background: rgba(148, 163, 184, .055); }
+.muf-milk-edit-form label { display: block; margin-bottom: 6px; }
+.muf-milk-edit-form input, .muf-milk-edit-form select { min-height: 40px; border-radius: 11px; }
+@media (max-width: 700px) {
+  .muf-milk-edit-form .grid-cols-3 { grid-template-columns: minmax(0, 1fr) !important; }
+}
+/* 2026-10-10 UI audit — Phase 1: consistency and accessibility polish.
+   Visual-only rules shared byte-for-byte by Dairy, Flock, and Agri.
+   Do not add data, navigation, or business behavior in this block. */
+:root {
+  --muf-ui-radius-card: 18px;
+  --muf-ui-radius-control: 10px;
+  --muf-ui-border: rgba(148, 163, 184, .24);
+  --muf-ui-focus: var(--muf-color-success);
+  --muf-ui-shadow-soft: 0 5px 18px rgba(15, 23, 42, .045);
+  --muf-ui-popup-form-gap: 1rem;
+  --muf-ui-popup-form-gap-mobile: .8rem;
+  --muf-ui-popup-label-line-height: 1.35;
+  --muf-ui-overlay-popup-label-line-height: 1.4;
+  --muf-ui-popup-field-font-size: 14px;
+  --muf-ui-popup-field-font-size-mobile: 16px;
+  --muf-ui-popup-field-min-height: 38px;
+}
+
+.muf-main-content {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.muf-main-content :is(h1, h2, h3) {
+  text-wrap: pretty;
+}
+
+.muf-main-content :is(.muf-panel, .muf-kpi-card, .muf-entity-card, .muf-crop-card) {
+  min-width: 0;
+  border-color: var(--muf-ui-border);
+}
+
+.muf-main-content .muf-panel {
+  border-radius: var(--muf-ui-radius-card);
+}
+
+.muf-main-content .muf-panel-heading {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.muf-main-content .muf-panel-heading > :first-child {
+  min-width: 0;
+}
+
+.muf-main-content .overflow-x-auto {
+  max-width: 100%;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, .35) transparent;
+}
+
+.muf-main-content :is(input, select, textarea) {
+  max-width: 100%;
+  border-radius: var(--muf-ui-radius-control);
+}
+
+.muf-main-content :is(input, select, textarea):focus-visible,
+.muf-main-content :is(button, a, [role="button"], summary):focus-visible,
+.muf-admin-shell :is(input, select, textarea, button, a, [role="button"], summary):focus-visible,
+.muf-pup-sm :is(input, select, textarea, button, a, [role="button"], summary):focus-visible,
+.muf-pup-lg :is(input, select, textarea, button, a, [role="button"], summary):focus-visible {
+  outline: 2px solid var(--muf-ui-focus);
+  outline-offset: 2px;
+}
+
+.muf-pup-sm :is(input, select, textarea),
+.muf-pup-lg :is(input, select, textarea) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.muf-admin-shell :is(.muf-admin-card, .muf-panel) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.dark .muf-main-content .muf-panel,
+.dark .muf-main-content .muf-kpi-card,
+.dark .muf-main-content .muf-entity-card,
+.dark .muf-main-content .muf-crop-card {
+  border-color: rgba(100, 116, 139, .32);
+}
+
+@media (max-width: 640px) {
+  .muf-main-content .muf-panel-heading {
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .muf-main-content :is(input, select, textarea) {
+    min-width: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .muf-main-content *, .muf-admin-shell *, .muf-pup-sm *, .muf-pup-lg * {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}
+
+/* 2026-10-10 UI audit — Phase 2: popup and form refinement.
+   Presentation-only rules shared by Dairy, Flock, and Agri. */
+.muf-overlay .muf-pup-lg {
+  width: min(92vw, 42rem) !important;
+  max-width: min(92vw, 42rem) !important;
+  max-height: 84dvh !important;
+}
+
+.muf-overlay .muf-pup-sm,
+.muf-overlay .muf-pup-lg {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form,
+.muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form :is(.grid, .flex) {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form label {
+  line-height: var(--muf-ui-overlay-popup-label-line-height);
+}
+
+.muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+  font-size: var(--muf-ui-popup-field-font-size);
+}
+
+.muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form :is(input:not([type="checkbox"]):not([type="radio"]), select) {
+  min-height: var(--muf-ui-popup-field-min-height);
+}
+
+.muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form button {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+@media (min-width: 641px) {
+  .muf-overlay .muf-pup-lg > .flex-1 {
+    min-height: 0;
+    overscroll-behavior-y: contain;
+  }
+}
+
+@media (max-width: 640px) {
+  .muf-overlay .muf-pup-lg {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px) !important;
+    max-height: 88dvh !important;
+  }
+  .muf-overlay :is(.muf-pup-sm, .muf-pup-lg) form :is(input:not([type="checkbox"]):not([type="radio"]), select, textarea) {
+    font-size: var(--muf-ui-popup-field-font-size-mobile);
+  }
+}
+
+/* 2026-10-10 UI audit — Phase 3: dashboard information hierarchy.
+   Shared, presentation-only dashboard styles. Keep this block identical in all farms. */
+.muf-dashboard-workspace {
+  --muf-dashboard-section-gap: clamp(14px, 1.6vw, 22px);
+  min-width: 0;
+}
+
+.muf-dashboard-workspace > * {
+  min-width: 0;
+}
+
+.muf-dashboard-workspace .muf-kpi-card {
+  min-width: 0;
+  min-height: 104px;
+  padding: clamp(12px, 1.4vw, 18px);
+  border-radius: 17px;
+  box-shadow: 0 5px 18px rgba(15, 23, 42, .045);
+  transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.muf-dashboard-workspace .muf-kpi-card:hover {
+  border-color: rgba(22, 163, 74, .35);
+  box-shadow: 0 9px 24px rgba(15, 23, 42, .075);
+}
+
+.muf-dashboard-workspace .muf-kpi-card small {
+  line-height: 1.35;
+  text-wrap: pretty;
+}
+
+.muf-dashboard-workspace .muf-kpi-card strong {
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.muf-dashboard-workspace .muf-kpi-card p {
+  line-height: 1.4;
+}
+
+.muf-dashboard-workspace .muf-panel,
+.muf-dashboard-workspace > button > div,
+.muf-dashboard-workspace > div:has(> .muf-panel) {
+  min-width: 0;
+}
+
+.muf-dashboard-workspace :is(.muf-page-hero, .muf-panel-heading) {
+  gap: 12px;
+}
+
+.muf-dashboard-workspace :is(.overflow-x-auto, [class*="overflow-x-auto"]) {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .muf-dashboard-workspace .muf-kpi-card {
+    min-height: 86px;
+    padding: 11px;
+    gap: 9px;
+  }
+  .muf-dashboard-workspace .muf-kpi-card strong {
+    font-size: clamp(16px, 4.5vw, 22px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .muf-dashboard-workspace .muf-kpi-card,
+  .muf-dashboard-workspace .muf-kpi-card:hover {
+    transition: none;
+    transform: none;
+  }
+}
+
+
+/* 2026-10-10 UI audit — Phase 4: Admin and Superadmin presentation.
+   Scoped visual polish only. Keep this block byte-identical across farm apps. */
+.muf-admin-shell .muf-top-nav-scroll {
+  padding-inline: 8px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(100, 116, 139, .35) transparent;
+}
+
+.muf-admin-shell .muf-nav-link {
+  line-height: 1.25;
+  text-align: center;
+}
+
+.muf-admin-shell :is(.muf-admin-card, .muf-panel, section, article) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.muf-admin-shell :is(button, [role="button"]) {
+  line-height: 1.35;
+  white-space: normal;
+}
+
+.muf-superadmin,
+.muf-superadmin-page {
+  min-width: 0;
+  width: 100%;
+}
+
+.muf-superadmin > :first-child {
+  border-radius: 18px;
+  gap: clamp(12px, 2vw, 22px);
+}
+
+.muf-superadmin > :first-child h1 {
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+.muf-superadmin > :first-child p {
+  max-width: 72ch;
+  line-height: 1.5;
+}
+
+.muf-superadmin > :first-child button {
+  min-height: 38px;
+  justify-content: center;
+  white-space: normal;
+}
+
+.muf-superadmin > .grid > div,
+.muf-superadmin > .grid > section {
+  min-width: 0;
+  border-radius: 15px;
+  overflow-wrap: anywhere;
+}
+
+.muf-superadmin > .grid > div p:last-child {
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.muf-superadmin section button {
+  min-height: 32px;
+}
+
+.muf-superadmin section :is(h2, p, span) {
+  overflow-wrap: anywhere;
+}
+
+.muf-superadmin section .grid > div {
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, .12);
+}
+
+.muf-superadmin section .grid > div p:last-child {
+  font-variant-numeric: tabular-nums;
+  line-height: 1.35;
+}
+
+.muf-superadmin .animate-spin {
+  transform-origin: center;
+}
+
+.dark .muf-superadmin section .grid > div {
+  border-color: rgba(100, 116, 139, .22);
+}
+
+@media (max-width: 640px) {
+  .muf-superadmin,
+  .muf-superadmin-page {
+    gap: 14px;
+  }
+  .muf-superadmin > :first-child {
+    padding: 15px;
+    align-items: flex-start;
+  }
+  .muf-superadmin > :first-child > div:last-child {
+    width: 100%;
+  }
+  .muf-superadmin > :first-child > div:last-child button {
+    flex: 1 1 auto;
+  }
+  .muf-superadmin > .grid > div,
+  .muf-superadmin > .grid > section {
+    padding: 13px;
+  }
+  .muf-superadmin section .text-right {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .muf-superadmin .animate-fade-in,
+  .muf-superadmin .animate-spin {
+    animation: none !important;
+  }
+}
+
+/* MUF interaction polish — compact, readable entity/forms popups (visual only). */
+.muf-pup-sm, .muf-pup-lg { min-width: 0; overflow-wrap: anywhere; }
+.muf-pup-sm form, .muf-pup-lg form { gap: var(--muf-ui-popup-form-gap); }
+.muf-pup-sm form label, .muf-pup-lg form label { line-height: var(--muf-ui-popup-label-line-height); }
+.muf-pup-sm form input, .muf-pup-sm form select, .muf-pup-sm form textarea,
+.muf-pup-lg form input, .muf-pup-lg form select, .muf-pup-lg form textarea { min-width: 0; max-width: 100%; }
+.muf-pup-lg .grid { min-width: 0; }
+.muf-pup-lg :is(h3,h4) { letter-spacing: -.01em; }
+@media (max-width: 640px) {
+  .muf-pup-sm, .muf-pup-lg { border-radius: 1.1rem !important; }
+  .muf-pup-sm form, .muf-pup-lg form { gap: var(--muf-ui-popup-form-gap-mobile); }
+  .muf-pup-lg .grid { grid-template-columns: minmax(0, 1fr) !important; }
+}
+/* Superadmin workspace sizing guard — harmless in projects without this view. */
+.muf-superadmin-page { display: block; width: 100%; min-width: 0; min-height: 24rem; }
+.muf-superadmin-page .muf-superadmin { display: flex; flex-direction: column; gap: 1rem; min-height: 24rem; width: 100%; }
+.muf-superadmin-page .muf-superadmin > * { flex-shrink: 0; }
+
+
+/* MUF UI follow-up: detail/form popups should use the available viewport, not crop their content. */
+.muf-pup-lg {
+  height: auto !important;
+  min-height: 0 !important;
+  max-height: min(88dvh, 820px) !important;
+  width: min(94vw, 52rem);
+  display: flex;
+  flex-direction: column;
+}
+.muf-pup-lg > .flex-1,
+.muf-pup-lg .overflow-y-auto,
+.muf-pup-sm .overflow-y-auto { min-height: 0; overscroll-behavior: contain; }
+.muf-pup-lg img { max-width: 100%; }
+@media (max-width: 640px) {
+  .muf-pup-lg { width: calc(100vw - 16px) !important; max-height: 90dvh !important; }
+}
+
+
+/* Responsive popup polish: keep form actions visible and prevent nested scrollbars. */
+.muf-overlay { align-items: center; overscroll-behavior: contain; }
+.muf-overlay .ff-modal-host, .muf-overlay [role="dialog"] { min-width: 0; max-width: min(100%, 64rem); }
+.muf-overlay form { min-width: 0; }
+.muf-overlay input, .muf-overlay select, .muf-overlay textarea { min-width: 0; max-width: 100%; }
+@media (max-width: 640px) {
+  .muf-overlay { padding: .5rem !important; }
+  .muf-overlay [role="dialog"] { width: auto !important; max-width: calc(100vw - 1rem) !important; max-height: calc(100dvh - 1rem) !important; border-radius: 1rem !important; }
+  .muf-overlay [role="dialog"] button { max-width: 100%; }
+}
+
+
+/* Super Admin visual hierarchy */
+.muf-superadmin-page .muf-superadmin h1 { line-height: 1.15; letter-spacing: -.025em; }
+.muf-superadmin-page .muf-superadmin h2, .muf-superadmin-page .muf-superadmin h3 { letter-spacing: -.01em; }
+.muf-superadmin-page .muf-superadmin section { min-width: 0; overflow-wrap: anywhere; }
+
+
+/* Desktop zoom regression fix: modal/backdrop must span the complete visual viewport.
+   Keep centered dialog sizing untouched; only correct the fullscreen overlay layer. */
+@media (min-width: 1024px) {
+  .muf-overlay,
+  .muf-form-overlay,
+  .modal-overlay,
+  .ff-modal-host,
+  .fixed.inset-0,
+  [data-radix-dialog-overlay],
+  [data-state="open"][class*="overlay"] {
+    position: fixed !important;
+    left: 0 !important;
+    right: auto !important;
+    top: 0 !important;
+    bottom: auto !important;
+    width: 125vw !important;
+    max-width: none !important;
+    height: 125vh !important;
+    min-height: 125vh !important;
+    box-sizing: border-box !important;
+  }
+  @supports (height: 100dvh) {
+    .muf-overlay, .muf-form-overlay, .modal-overlay, .ff-modal-host,
+    .fixed.inset-0, [data-radix-dialog-overlay], [data-state="open"][class*="overlay"] {
+      height: 125dvh !important; min-height: 125dvh !important;
+    }
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   MUF refinement layer (v2) — shared by agri / dairy / flock (byte-identical).
+   Everything below replaces styling that used to be repeated inline in TSX:
+   tokens, buttons, fields, cards, search, toast, diary media, focus rings,
+   Urdu typography and reduced-motion. Presentation only.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+  --muf-primary: var(--color-farm-600, #136334);
+  --muf-primary-hover: var(--color-farm-700, #105229);
+  --muf-primary-soft: var(--color-farm-50, #ecf8f0);
+  --muf-ink: #1e293b;
+  --muf-ink-soft: #64748b;
+  --muf-line: #e6e6de;
+  --muf-surface: #ffffff;
+  --muf-surface-alt: #f8fafc;
+  --muf-danger: #dc2626;
+  --muf-field-bg: #f8fafc;
+  --muf-field-line: #cbd5e1;
+  --muf-radius-sm: 0.5rem;
+  --muf-radius-md: 0.75rem;
+  --muf-radius-lg: 1rem;
+  --muf-focus: 0 0 0 3px rgba(22, 163, 74, 0.35);
+  --muf-font-ur: "Noto Naskh Arabic", "Noto Nastaliq Urdu", "Jameel Noori Nastaleeq", "Segoe UI", Tahoma, sans-serif;
+}
+.dark {
+  --muf-ink: #e2e8f0;
+  --muf-ink-soft: #94a3b8;
+  --muf-line: #203528;
+  --muf-surface: #0d1a11;
+  --muf-surface-alt: #0f172a;
+  --muf-focus: 0 0 0 3px rgba(74, 222, 128, 0.4);
+  --muf-field-bg: #1e293b;
+  --muf-field-line: #334155;
+}
+
+/* ── Urdu typography: a real Urdu font + roomier lines (system fallback if offline) ── */
+html[lang="ur"] body { font-family: var(--muf-font-ur); line-height: 1.75; }
+html[lang="ur"] .font-mono, html[lang="ur"] .tabular-nums { font-family: ui-monospace, "JetBrains Mono", monospace; }
+
+/* ── Keyboard focus: one clear ring everywhere (mouse users do not see it) ── */
+:where(button, a, input, select, textarea, summary, [role="button"], [tabindex]):focus-visible {
+  outline: none;
+  box-shadow: var(--muf-focus);
+  border-radius: var(--muf-radius-sm);
+}
+:where(input, select, textarea):focus-visible { border-color: var(--muf-primary); }
+
+/* ── Smallest text: 9–11px labels were too small to read in the field ── */
+.text-\[9px\]  { font-size: 10.5px; }
+.text-\[10px\] { font-size: 11px; }
+.text-\[11px\] { font-size: 12px; }
+
+/* ── Phones: finger-size tap targets for icon-only buttons ── */
+@media (pointer: coarse) {
+  .muf-icon-button, .muf-icon-plain, .muf-toast-close { min-width: 40px; min-height: 40px; }
+}
+
+/* ── Clickable cards that are not <button>s: keyboard + hover affordance ── */
+[role="button"][tabindex]:not(button) { cursor: pointer; }
+.muf-kpi-card[role="button"]:hover { transform: none; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08); }
+
+/* ── Buttons ── */
+.muf-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+  min-height: 36px; padding: 0.45rem 0.9rem; border-radius: var(--muf-radius-md);
+  font-size: 12px; font-weight: 700; line-height: 1.2; cursor: pointer;
+  border: 1px solid transparent; transition: background-color .15s, border-color .15s, transform .1s;
+}
+.muf-btn:active { transform: scale(0.97); }
+.muf-btn:disabled { opacity: .55; cursor: not-allowed; }
+.muf-btn-primary { background: var(--muf-primary); color: #fff; }
+.muf-btn-primary:hover:not(:disabled) { background: var(--muf-primary-hover); }
+.muf-btn-soft { background: var(--muf-primary-soft); color: var(--muf-primary); border-color: rgba(22, 163, 74, 0.18); }
+.muf-btn-soft:hover:not(:disabled) { border-color: var(--muf-primary); }
+.dark .muf-btn-soft { background: rgba(22, 163, 74, 0.14); color: #86efac; }
+.muf-btn-danger { background: #fef2f2; color: var(--muf-danger); border-color: #fecaca; }
+.muf-btn-danger:hover:not(:disabled) { background: #fee2e2; }
+.dark .muf-btn-danger { background: rgba(220, 38, 38, 0.16); color: #fca5a5; border-color: rgba(220, 38, 38, 0.3); }
+.muf-icon-plain {
+  display: inline-flex; align-items: center; justify-content: center; padding: 0.35rem;
+  border-radius: 999px; color: var(--muf-ink-soft); background: transparent; cursor: pointer;
+}
+.muf-icon-plain:hover { background: rgba(100, 116, 139, 0.12); color: var(--muf-ink); }
+
+/* ── Form fields (replaces the long repeated inline input/select class strings) ── */
+.muf-field {
+  width: 100%; font-size: 12px; padding: 0.55rem 0.75rem; color: var(--muf-ink);
+  background: var(--muf-field-bg); border: 1px solid var(--muf-field-line); border-radius: var(--muf-radius-md);
+  transition: border-color .15s, box-shadow .15s;
+}
+select.muf-field { cursor: pointer; }
+.muf-field:disabled { background: #f1f5f9; color: #94a3b8; cursor: not-allowed; }
+.dark .muf-field:disabled { background: #111827; color: #64748b; }
+.muf-field-lg { padding: 0.75rem 1rem; font-size: 14px; }
+.muf-field-auto { width: auto; }
+.muf-field::placeholder { color: #94a3b8; }
+textarea.muf-field { resize: vertical; min-height: 5rem; }
+.muf-label { display: block; margin-bottom: 0.25rem; font-size: 10.5px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; color: var(--muf-ink-soft); }
+
+/* ── Cards ── */
+.muf-card {
+  background: var(--muf-surface); border: 1px solid var(--muf-line);
+  border-radius: var(--muf-radius-lg); box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+/* ── Global search (header) ── */
+.muf-search-box {
+  align-items: center; gap: 0.4rem; padding: 0.375rem 0.625rem; border-radius: var(--muf-radius-md);
+  border: 1px solid #e2e8f0; background: rgba(255, 255, 255, 0.7);
+}
+.dark .muf-search-box { border-color: #334155; background: rgba(15, 23, 42, 0.7); }
+.muf-search-box:focus-within { border-color: var(--muf-primary); box-shadow: var(--muf-focus); }
+.muf-search-icon { color: #94a3b8; flex-shrink: 0; }
+.muf-search-input { width: 7rem; background: transparent; outline: none; box-shadow: none !important; font-size: 12px; color: var(--muf-ink); }
+.muf-search-input::placeholder { color: #94a3b8; }
+@media (min-width: 1024px) { .muf-search-input { width: 10rem; } }
+.muf-search-input-mobile { flex: 1; width: auto; font-size: 14px; }
+.muf-search-dropdown, .muf-search-mobile {
+  background: var(--muf-surface); border: 1px solid #e2e8f0; overflow: hidden; z-index: var(--muf-z-search);
+}
+.dark .muf-search-dropdown, .dark .muf-search-mobile { border-color: #334155; background: #0f172a; }
+.muf-search-dropdown { position: absolute; right: 0; margin-top: 0.375rem; width: 16rem; border-radius: var(--muf-radius-md); box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14); max-height: 20rem; overflow-y: auto; }
+.muf-search-mobile { position: fixed; left: 0.5rem; right: 0.5rem; top: 4rem; border-radius: var(--muf-radius-lg); box-shadow: 0 20px 40px rgba(15, 23, 42, 0.25); }
+.muf-search-mobile-bar { display: flex; align-items: center; gap: 0.5rem; padding: 0.625rem 0.75rem; border-bottom: 1px solid #f1f5f9; }
+.dark .muf-search-mobile-bar { border-color: #1e293b; }
+.muf-search-mobile-list { max-height: 18rem; overflow-y: auto; }
+.muf-search-option { width: 100%; display: flex; align-items: center; gap: 0.5rem; text-align: left; padding: 0.5rem 0.75rem; font-size: 12px; transition: background-color .12s; }
+.muf-search-option.is-active, .muf-search-option:hover { background: var(--muf-primary-soft); }
+.dark .muf-search-option.is-active, .dark .muf-search-option:hover { background: rgba(22, 163, 74, 0.14); }
+.muf-search-option-label { font-weight: 700; color: var(--muf-ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.muf-search-option-sub { margin-left: auto; color: #94a3b8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.muf-search-empty { padding: 0.75rem; font-size: 12px; color: #94a3b8; }
+
+/* ── Toast: clear of the phone's home bar and of the floating + button ── */
+.muf-toast { bottom: max(1rem, env(safe-area-inset-bottom)); display: flex; align-items: flex-start; gap: 0.5rem; }
+@media (max-width: 767px) { .muf-toast { bottom: calc(5.5rem + env(safe-area-inset-bottom)); } }
+@media (min-width: 768px) { .muf-toast { right: 6rem; } }
+.muf-toast-close { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; opacity: .65; cursor: pointer; padding: 0.15rem; }
+.muf-toast-close:hover { opacity: 1; }
+
+/* ── Floating + button: sits under popups; hidden while a popup locks the page ── */
+body[data-ff-scroll-y] .muf-fab-root { display: none; }
+
+/* ── "What's new" backdrop ── */
+.muf-whatsnew-backdrop { background: rgba(15, 23, 42, 0.55); }
+
+/* ── Admin popup: soft fade at the edges of the scrolling tab strip ── */
+.muf-admin-tabs-sticky .muf-top-nav-scroll {
+  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 10px, #000 calc(100% - 26px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, #000 10px, #000 calc(100% - 26px), transparent 100%);
+}
+
+/* ── Login: language chip ── */
+.muf-login-lang {
+  position: fixed; top: 0.75rem; right: 0.75rem; z-index: 60; display: inline-flex; align-items: center; gap: 0.35rem;
+  padding: 0.4rem 0.7rem; border-radius: 999px; font-size: 11px; font-weight: 800; cursor: pointer;
+  background: rgba(255, 255, 255, 0.85); border: 1px solid var(--muf-line); color: var(--muf-ink);
+}
+.dark .muf-login-lang { background: rgba(13, 26, 17, 0.85); }
+
+/* ── Diary: photos + voice notes ── */
+.muf-diary-media { display: grid; gap: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--muf-line); }
+.muf-diary-media-head { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap; }
+.muf-diary-media-head h4 { font-size: 12px; font-weight: 800; color: var(--muf-ink); }
+.muf-diary-count { font-weight: 700; color: var(--muf-ink-soft); font-variant-numeric: tabular-nums; }
+.muf-diary-media-actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.muf-diary-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr)); gap: 0.5rem; }
+.muf-diary-thumb { aspect-ratio: 1; overflow: hidden; border-radius: var(--muf-radius-md); border: 1px solid var(--muf-line); background: var(--muf-surface-alt); padding: 0; cursor: pointer; }
+.muf-diary-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .2s; }
+.muf-diary-thumb:hover img { transform: scale(1.05); }
+.muf-diary-empty, .muf-diary-hint { font-size: 11px; color: var(--muf-ink-soft); }
+.muf-diary-voice { display: grid; gap: 0.5rem; }
+.muf-diary-voice-list { display: grid; gap: 0.4rem; list-style: none; padding: 0; margin: 0; }
+.muf-diary-voice-list li { display: flex; align-items: center; gap: 0.5rem; padding: 0.4rem 0.6rem; border-radius: var(--muf-radius-md); background: var(--muf-surface-alt); }
+.muf-diary-voice-list audio { flex: 1; min-width: 0; height: 32px; }
+.muf-diary-viewer { display: grid; gap: 0.75rem; justify-items: center; }
+.muf-diary-viewer img { max-width: 100%; max-height: 60vh; border-radius: var(--muf-radius-md); object-fit: contain; }
+
+/* ── Super Admin: use the farm brand instead of its own amber/indigo skin ── */
+.muf-superadmin .muf-superadmin-accent { color: var(--muf-primary); }
+
+/* ── Reduced motion: calm decorative animation, keep loading spinners turning ── */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin), *:not(.animate-spin)::before, *:not(.animate-spin)::after {
+    animation-duration: .01ms !important; animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important; scroll-behavior: auto !important;
+  }
+}
+
+
+/* ── Reusable building blocks (replace long repeated Tailwind class strings in TSX) ── */
+.muf-caption { font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--muf-ink-soft); }
+.muf-tile { padding: 0.75rem; border-radius: var(--muf-radius-sm); border: 1px solid #e2e8f0; background: var(--muf-surface-alt); }
+.dark .muf-tile { border-color: #1e293b; background: rgba(15, 23, 42, 0.4); }
+.muf-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.5rem; border-radius: var(--muf-radius-sm); background: #f8fafc; font-size: 12px; }
+.dark .muf-row { background: rgba(30, 41, 59, 0.5); }
+.muf-chip { padding: 0.25rem 0.5rem; border-radius: var(--muf-radius-sm); border: 1px solid var(--muf-line); background: rgba(255, 255, 255, 0.6); color: #475569; }
+.dark .muf-chip { background: rgba(16, 22, 37, 0.4); color: #cbd5e1; }
+.muf-card-link { border-radius: var(--muf-radius-md); border: 1px solid #e2e8f0; background: var(--muf-surface); transition: box-shadow .2s, border-color .2s; }
+.dark .muf-card-link { border-color: #1e293b; }
+.muf-card-link:hover { box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08); border-color: rgba(22, 163, 74, 0.35); }
+.muf-panel-soft { border-radius: var(--muf-radius-md); border: 1px solid #e2e8f0; background: var(--muf-surface-alt); padding: 0.75rem; }
+.dark .muf-panel-soft { border-color: #334155; background: rgba(30, 41, 59, 0.5); }
+
+/* ── Sign-in screens ── */
+.muf-login-logo { width: 5rem; height: 5rem; border-radius: 999px; object-fit: cover; border: 2px solid #e2e8f0; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12); flex-shrink: 0; }
+.dark .muf-login-logo { border-color: #1e293b; }
+.muf-login-title { text-align: center; color: #1e293b; font-size: 1.5rem; font-weight: 800; letter-spacing: -0.01em; margin-bottom: 0.25rem; }
+.dark .muf-login-title { color: var(--color-farm-400, #4ade80); }
+.muf-login-sub { text-align: center; color: var(--muf-ink-soft); font-size: 12px; margin-bottom: 2rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+
+

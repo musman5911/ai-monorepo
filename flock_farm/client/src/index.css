@@ -102,6 +102,11 @@ button:disabled,
   border-color: #1e293b !important;
 }
 
+/* Flock dark safety net, extended to the muf-pc popup-content classes so they match the
+   Tailwind slate-700 / slate-600 text they replaced (Agri and Dairy have no such net). */
+.dark .muf-pc-label { color: #cbd5e1 !important; }
+.dark .muf-pc-btn-ghost { color: #94a3b8 !important; }
+
 /* Dark-mode inputs that don't have explicit dark:bg */
 .dark input:not([class*="dark:bg"]),
 .dark select:not([class*="dark:bg"]),

@@ -20,6 +20,21 @@ MUF is the shared visual and component layer for the three farm-management apps.
 | muf-urdu.ts | Canonical shared UI Urdu helpers and dictionary |
 | muf-date.ts | Shared date display and farm-local date helpers |
 
+## File layout (Phase 11)
+
+Each app keeps its shared MUF code under `src/muf/`; the same folder layout exists in Agri, Dairy and Flock (Agri has no `muf-feedstock`/`muf-khata`).
+
+| Folder | What lives there |
+|---|---|
+| `muf/core/` | Popup and shell plumbing: modal, portal, confirm and toasts, scroll lock, motion, a11y, z-index, form overlay, notifications, offline banner, FAB, app-like behaviors |
+| `muf/admin/` | The admin shell and its cards, fields, buttons, users, general and reports panels |
+| `muf/ui/` | Shared visual components: avatar, QR card, charts, entity grid, header search, farm profile, diary, login, telegram and worker panels, weather |
+| `muf/data/` | Shared data and output helpers: date, Urdu dictionary (`muf-urdu.ts` plus six `muf-urdu-terms-N.ts` parts), search, offline, image, PDF, print, voice, profile, compare, story |
+| `muf/domain/` | Farm business helpers: zakat, labor, khata, feedstock, supplier, farm book |
+| `muf/styles/` | The shared stylesheet in ten ordered parts, imported by `src/muf-style.css` |
+
+Rules for new files: put a new shared MUF file in the matching folder, keep it identical across the apps, and add it to `check-muf-sync.js`. `check-muf-sync.js`, `check-ui-safety.js` and the tests read `muf-style.css` together with its parts as one stylesheet.
+
 ## Approved visual decisions
 
 - Primary color token: #136334.

@@ -4,7 +4,7 @@ import { Bird, Lang, VaccinationRecord } from '../types';
 import { L } from '../i18n';
 import BirdAvatar, { breedLabel } from './BirdAvatar';
 import { calculateCurrentAge } from './flock/birdUtils';
-import { mufStoryNet, mufVerdictText, mufDaysBetween } from '../muf-story';
+import { mufStoryNet, mufVerdictText, mufDaysBetween } from '../muf/data/muf-story';
 interface BirdDetailContentProps{bird:Bird;detailVaccinations:VaccinationRecord[];vaccinationIntervalDays:number;lang?:Lang;canEdit?:boolean;canDelete?:boolean;onEdit:()=>void;onDelete?:()=>void}
 export default function BirdDetailContent({bird,detailVaccinations,vaccinationIntervalDays,lang='en',canEdit=false,canDelete=false,onEdit,onDelete}:BirdDetailContentProps){
  const getVaccinationBadge=(lastVac:string|undefined)=>{if(!lastVac)return <span className="px-1.5 py-0.5 bg-amber-50 text-amber-700 border border-amber-200 text-3xs font-mono rounded-md">⚠ Unvaccinated</span>;const diffDays=Math.floor((new Date().getTime()-new Date(lastVac).getTime())/(1000*60*60*24));if(diffDays>vaccinationIntervalDays)return <span className="px-1.5 py-0.5 bg-red-50 text-red-700 border border-red-200 text-3xs font-mono rounded-md">🔴 Overdue</span>;if(diffDays>=vaccinationIntervalDays-7)return <span className="px-1.5 py-0.5 bg-yellow-50 text-yellow-700 border border-yellow-200 text-3xs font-mono rounded-md">🟡 Due Soon</span>;return <span className="px-1.5 py-0.5 bg-green-50 text-green-700 border border-green-200 text-3xs font-mono rounded-md">✅ OK</span>};

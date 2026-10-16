@@ -2,12 +2,12 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Plus, Trash2, ChevronLeft, ChevronRight, CalendarDays, Mic, Square } from 'lucide-react';
 import { api } from '../api';
 import { L } from '../i18n';
-import { notify } from '../muf-confirm';
-import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, type VoiceRecorder } from '../muf-voice';
+import { notify } from '../muf/core/muf-confirm';
+import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, type VoiceRecorder } from '../muf/data/muf-voice';
 import type { ChecklistItem } from '../types';
 import { useDebouncedSave } from '../useDebouncedSave';
 import SaveIndicator from './SaveIndicator';
-import MufDiaryMedia, { type DiaryPhoto } from '../muf-diary-media';
+import MufDiaryMedia, { type DiaryPhoto } from '../muf/ui/muf-diary-media';
 import { todayStr, shiftDate } from '../utils/date';
 
 const DEFAULT_CHECKLIST: Omit<ChecklistItem, 'done'>[] = [

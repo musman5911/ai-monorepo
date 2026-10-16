@@ -3,18 +3,18 @@
 // muf-labor twin so all three farm apps count days and wages identically.
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { HardHat, Plus, Trash2, Loader2, CheckCircle2, Banknote, QrCode, Pencil } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
+import MufCardQr from '../muf/ui/muf-card-qr';
 import { api } from '../api';
 import { L } from '../i18n';
-import { useConfirm, notify } from '../muf-confirm';
-import { workerSummary, unpostedTotal, unsettledAdvance, payoutAfterAdvances, type MufLaborWorker, type MufAttendanceRow, type MufAdvanceRow } from '../muf-labor';
-import DetailModal from '../muf-modal';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
+import { workerSummary, unpostedTotal, unsettledAdvance, payoutAfterAdvances, type MufLaborWorker, type MufAttendanceRow, type MufAdvanceRow } from '../muf/domain/muf-labor';
+import DetailModal from '../muf/core/muf-modal';
 
 interface LaborWorkerDoc { _id: string; name: string; dailyWage: number; notes?: string; }
 interface AttendanceDoc { _id: string; workerId: string; date: string; dayType: 'full' | 'half'; posted?: boolean; notes?: string; }
 interface AdvanceDoc { _id: string; workerId: string; date: string; amount: number; settled?: boolean; notes?: string; }
 
-import {mufToday, mufMonth} from '../muf-date';
+import {mufToday, mufMonth} from '../muf/data/muf-date';
 
 // Local-timezone today — toISOString() is UTC and gives yesterday before 5 AM PKT.
 const todayStr = () => mufToday();
@@ -416,8 +416,8 @@ export default function LaborTab() {
             <label className={labelClass}>{L('Notes')}</label>
             <input className={fieldClass} value={workerForm.notes} onChange={(e) => setWorkerForm({ ...workerForm, notes: e.target.value })} placeholder={L('Optional role')} />
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setShowWorkerForm(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+          <div className="muf-pc-actions">
+            <button type="button" onClick={() => setShowWorkerForm(false)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
             <button type="submit" disabled={busy} className="px-4 py-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 transition">
               {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />} {L('Add worker')}
             </button>
@@ -451,8 +451,8 @@ export default function LaborTab() {
             <label className={labelClass}>{L('Notes')}</label>
             <input className={fieldClass} value={markForm.notes} onChange={(e) => setMarkForm({ ...markForm, notes: e.target.value })} />
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setShowMarkForm(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+          <div className="muf-pc-actions">
+            <button type="button" onClick={() => setShowMarkForm(false)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
             <button type="submit" disabled={busy} className="px-4 py-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white text-xs font-bold rounded-lg transition">
               {L('Save attendance')}
             </button>
@@ -476,8 +476,8 @@ export default function LaborTab() {
             <label className={labelClass}>{L('Note')}</label>
             <input placeholder={L('Note')} value={advForm.notes} onChange={(e) => setAdvForm({ ...advForm, notes: e.target.value })} className={fieldClass} />
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setAdvanceFor(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+          <div className="muf-pc-actions">
+            <button type="button" onClick={() => setAdvanceFor(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
             <button type="button" disabled={busy || !advanceFor} onClick={() => advanceFor && handleGiveAdvance(advanceFor)} className="px-4 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-xs font-bold rounded-lg transition">
               {L('Save advance')}
             </button>
@@ -505,8 +505,8 @@ export default function LaborTab() {
             <label className={labelClass}>{L('Notes')}</label>
             <input className={fieldClass} value={editAttForm.notes} onChange={(e) => setEditAttForm({ ...editAttForm, notes: e.target.value })} />
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setEditAtt(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+          <div className="muf-pc-actions">
+            <button type="button" onClick={() => setEditAtt(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
             <button type="submit" disabled={busy} className="px-4 py-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white text-xs font-bold rounded-lg transition">{L('Save changes')}</button>
           </div>
         </form>
@@ -528,8 +528,8 @@ export default function LaborTab() {
             <label className={labelClass}>{L('Notes')}</label>
             <input className={fieldClass} value={editAdvForm.notes} onChange={(e) => setEditAdvForm({ ...editAdvForm, notes: e.target.value })} />
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setEditAdv(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+          <div className="muf-pc-actions">
+            <button type="button" onClick={() => setEditAdv(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
             <button type="submit" disabled={busy} className="px-4 py-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white text-xs font-bold rounded-lg transition">{L('Save changes')}</button>
           </div>
         </form>

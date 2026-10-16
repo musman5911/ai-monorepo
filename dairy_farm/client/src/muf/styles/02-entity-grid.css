@@ -1,0 +1,127 @@
+/* ============================================================
+   MUF ENTITY GRID — shared photo-card grid for registry screens
+   (cows / birds / crops / workers) in all three farm apps.
+   Same card physics as .muf-crop-card so every registry feels
+   identical: hover lift, entrance animation, status pill,
+   round icon overlapping the photo, stats rows, action row.
+   ============================================================ */
+.muf-entity-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:14px; }
+.muf-entity-card { min-width:0; overflow:hidden; border:1px solid #e5e7e0; border-radius:var(--muf-core-entity-radius,17px); background:#fff; box-shadow:var(--muf-core-entity-shadow,0 5px 16px rgba(29,54,36,.06)); animation:muf-card-in .38s both; transition:transform .22s ease,box-shadow .22s ease; cursor:pointer; }
+.muf-entity-card:hover { transform:translateY(-5px); box-shadow:var(--muf-core-entity-hover-shadow,0 16px 30px rgba(29,54,36,.13)); }
+.muf-entity-photo { height:132px; position:relative; background-size:cover; background-position:center; background-color:#eef3ee; display:grid; place-items:center; overflow:hidden; }
+.muf-entity-photo::after { content:""; position:absolute; inset:0; border-radius:15px; background:linear-gradient(180deg,rgba(0,0,0,.04),rgba(0,0,0,.13)); }
+.muf-entity-photo img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+.muf-entity-emoji { font-size:52px; position:relative; z-index:1; filter:drop-shadow(0 5px 12px rgba(0,0,0,.20)); }
+.muf-entity-photo-noimg { background:radial-gradient(120px 90px at 30% 20%, #e8f5e9 0%, transparent 60%), linear-gradient(160deg, #f2f8f2 0%, #e4efe4 100%); }
+.muf-entity-status { position:absolute; z-index:2; top:10px; right:10px; padding:5px 10px; border-radius:20px; font-size:10px; font-weight:800; box-shadow:0 3px 9px rgba(0,0,0,.13); background:#238743; color:#fff; }
+.muf-entity-status[data-tone="good"]  { background:#238743; color:#fff; }
+.muf-entity-status[data-tone="warn"]  { background:#f5a623; color:#fff; }
+.muf-entity-status[data-tone="bad"]   { background:#dc2626; color:#fff; }
+.muf-entity-status[data-tone="info"]  { background:#eef3f5; color:#245060; }
+.muf-entity-status[data-tone="muted"] { background:#94a3b8; color:#fff; }
+.muf-entity-round-icon { position:absolute; z-index:58; left:4px; bottom:4px; width:45px; height:45px; border-radius:50%; display:grid; place-items:center; color:#2d813f; background:#fffdf7; border:2px solid #fff; font-size:20px; box-shadow:0 5px 14px #1c36232e; }
+.muf-entity-body { padding:27px 14px 13px; }
+.muf-entity-name { display:flex; justify-content:space-between; gap:8px; align-items:flex-start; }
+.muf-entity-name h4 { margin:0; font-size:16px; color:#17251c; font-weight:800; }
+.muf-entity-name p { margin:2px 0 0; color:#6d7771; font-size:11px; }
+.muf-entity-chip { font-size:9px; color:#68726c; white-space:nowrap; }
+.muf-entity-stats { display:flex; flex-direction:column; gap:2px; margin:8px 0; font-size:10px; color:#25322b; }
+.muf-entity-stats span { display:flex; align-items:center; gap:4px; min-width:0; padding:1px 0; line-height:1.4; }
+.muf-entity-stats svg { color:#22733a; flex:0 0 auto; width:11px; height:11px; }
+.muf-entity-stats span > span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.muf-entity-progress { margin:10px 0 4px; }
+.muf-entity-progress > div:first-child { display:flex; justify-content:space-between; align-items:center; font-size:11px; color:#25322b; margin-bottom:5px; }
+.muf-entity-progress > div:first-child strong { font-weight:800; color:#1b3425; }
+.muf-entity-progress-track { height:6px; background:#e8efe8; border-radius:999px; overflow:hidden; }
+.muf-entity-progress-track > span { display:block; height:100%; background:linear-gradient(90deg,#238743,#2da557); border-radius:999px; transition:width .3s ease; }
+.muf-entity-actions { display:flex; gap:6px; margin-top:13px; }
+.muf-entity-actions .muf-detail-btn, .muf-entity-actions .muf-record-btn, .muf-entity-actions .muf-mini-icon { flex:1; }
+.muf-entity-empty { min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#65716b; padding:35px; background:#fff; border:1px dashed #d8ded8; border-radius:17px; }
+.muf-entity-empty > div { width:64px; height:64px; border-radius:20px; display:grid; place-items:center; background:#eaf5e6; color:#2c8140; margin-bottom:12px; }
+.muf-entity-empty h4 { margin:0; color:#1b3425; font-size:16px; }
+.muf-entity-empty p { max-width:430px; margin:7px 0 0; font-size:12px; }
+
+/* ── Grid / List view toggle (registry screens) ── */
+.muf-view-toggle { display:inline-flex; gap:2px; background:#eef1ee; border-radius:9px; padding:2px; }
+.muf-view-toggle button { border:0; background:transparent; border-radius:7px; padding:4px 9px; font-size:10px; font-weight:800; color:#5c6a60; cursor:pointer; display:flex; align-items:center; gap:5px; transition:background .15s ease,color .15s ease; }
+.muf-view-toggle button:hover { color:#1b3425; }
+.muf-view-toggle button.on { background:#fff; color:var(--muf-color-primary); box-shadow:0 2px 6px rgba(29,54,36,.12); }
+
+.muf-empty-crops { grid-column:1/-1; min-height:250px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; color:#65716b; padding:35px; }
+.muf-empty-crops > div { width:64px; height:64px; border-radius:20px; display:grid; place-items:center; background:#eaf5e6; color:#2c8140; margin-bottom:12px; }
+.muf-empty-crops h4 { margin:0; color:#1b3425; font-size:16px; }
+.muf-empty-crops p { max-width:430px; margin:7px 0 16px; font-size:12px; }
+
+.muf-lower-grid { display:grid; grid-template-columns:1.25fr .9fr; gap:15px; margin-top:16px; }
+@keyframes muf-card-in { from{opacity:0;transform:translateY(9px)} to{opacity:1;transform:none} }
+
+/* Give the remaining existing pages the same visual language without removing their controls. */
+.muf-main-content .space-y-6 > div:not(.muf-crop-manager),
+.muf-main-content .space-y-5 > div { border-radius:18px; }
+.muf-main-content table thead th { background:#f0f4ed; color:#607068; }
+.muf-main-content input,.muf-main-content select,.muf-main-content textarea { border-radius:10px !important; }
+.muf-main-content button { transition:transform .18s ease,box-shadow .18s ease,background .18s ease; }
+@media (hover: hover) {
+  .muf-main-content button:hover { transform:translateY(-1px); }
+}
+.muf-main-content button:focus-visible,
+.muf-nav-link:focus-visible,
+.muf-primary-action:focus-visible,
+.muf-detail-btn:focus-visible,
+.muf-record-btn:focus-visible,
+.muf-mini-icon:focus-visible,
+.muf-text-action:focus-visible {
+  outline: 2px solid #1d7d3d;
+  outline-offset: 2px;
+  transform: translateY(-1px);
+}
+
+@media (min-width: 768px) {
+  label {
+    font-size: 12px !important;
+  }
+}
+
+/* Dark mode keeps the Image 02 geometry but changes surfaces, not functionality. */
+.dark .muf-app { background:#07100a !important; color:#eaf1eb !important; }
+.dark .muf-layout { background:linear-gradient(#0a130c,#07100a); }
+.dark .muf-header { background:#0b160e; border-color:#1d3023; }
+
+.dark .muf-header-brand h1,.dark .muf-page-title h2 { color:#dcecdf; }
+.dark .muf-icon-button,.dark .muf-profile { background:#0f1d13; border-color:#29402f; color:#dcecdf; }
+.dark .muf-panel,.dark .muf-kpi-card,.dark .muf-crop-card,.dark .muf-entity-card { background:#0d1a11; border-color:#203528; color:#e7efe8; }
+.dark .muf-panel-heading { border-color:#1e3025; }
+.dark .muf-panel-heading h3,.dark .muf-kpi-card strong,.dark .muf-crop-name h4,.dark .muf-entity-name h4 { color:#e7efe8; }
+.dark .muf-crop-name p,.dark .muf-kpi-card small,.dark .muf-kpi-card p,.dark .muf-crop-stats,.dark .muf-page-title p,.dark .muf-entity-name p { color:#9aa79e; }
+.dark .muf-entity-stats span { background:transparent; }
+.dark .muf-entity-stats { color:#c4d2c7; }
+.dark .muf-entity-stats svg { color:#3ba85f; }
+.dark .muf-record-btn,.dark .muf-mini-icon { background:#14251a; color:#b7c7bc; }
+.dark .muf-progress-track { background:#253229; }
+.dark .muf-top-nav {
+  background: #092011 !important;
+  border-color: #1a3c22 !important;
+}
+.dark .muf-nav-link {
+  color: #bce0be;
+}
+.dark .muf-nav-link:hover {
+  color: #ffffff;
+  background: #11341a;
+  border-color: #1a4f27;
+}
+
+@media (max-width:1200px) {
+  .muf-kpi-grid { grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); }
+  .muf-crop-grid { grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); }
+}
+@media (max-width:900px) {
+  .muf-main-content { padding:20px 18px 28px; }
+  .muf-profile { min-width:0; width:42px; padding:4px; justify-content:center; }
+  .muf-profile > span:nth-child(2),.muf-profile > svg { display:none; }
+  .muf-kpi-grid { grid-template-columns:repeat(2,1fr); }
+  .muf-crop-grid { grid-template-columns:repeat(2,1fr); }
+  .muf-lower-grid { grid-template-columns:1fr; }
+}
+
+

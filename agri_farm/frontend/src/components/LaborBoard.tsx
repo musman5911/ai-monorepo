@@ -1,13 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { HardHat, Plus, Trash2, Loader, CheckCircle, Banknote, QrCode, Pencil, Share2 } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
+import MufCardQr from '../muf/ui/muf-card-qr';
 import * as api from '../api';
 import { L } from '../i18n';
-import { workerSummary, unpostedTotal as mufUnpostedTotal, unsettledAdvance, payoutAfterAdvances } from '../muf-labor';
+import { workerSummary, unpostedTotal as mufUnpostedTotal, unsettledAdvance, payoutAfterAdvances } from '../muf/domain/muf-labor';
 
-import { mufToday, mufMonth } from '../muf-date';
-import DetailModal from '../muf-modal';
-import { notify } from '../muf-confirm';
+import { mufToday, mufMonth } from '../muf/data/muf-date';
+import DetailModal from '../muf/core/muf-modal';
+import { notify } from '../muf/core/muf-confirm';
 
 const todayIso = () => mufToday();
 const monthIso = () => mufMonth();
@@ -374,8 +374,8 @@ export default function LaborBoard({
                 <label className={labelClass}>{L('Notes')}</label>
                 <input className={fieldClass} value={workerForm.notes} onChange={e => setWorkerForm({ ...workerForm, notes: e.target.value })} placeholder={L('Optional role')} />
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setShowWorkerForm(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+              <div className="muf-pc-actions">
+                <button type="button" onClick={() => setShowWorkerForm(false)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
                 <button type="submit" disabled={busy} className="px-3 py-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5">
                   {busy ? <Loader size={13} className="animate-spin" /> : <Plus size={13} />} {L('Add field worker')}
                 </button>
@@ -396,8 +396,8 @@ export default function LaborBoard({
                 <label className={labelClass}>{L('Notes')}</label>
                 <input className={fieldClass} value={editWorkerForm.notes} onChange={e => setEditWorkerForm({ ...editWorkerForm, notes: e.target.value })} />
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setEditWorker(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+              <div className="muf-pc-actions">
+                <button type="button" onClick={() => setEditWorker(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
                 <button type="button" disabled={busy} onClick={handleSaveWorkerEdit} className="px-3 py-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5">
                   {busy ? <Loader size={13} className="animate-spin" /> : <Pencil size={13} />} {L('Save changes')}
                 </button>
@@ -510,8 +510,8 @@ export default function LaborBoard({
                 <label className={labelClass}>{L('Notes')}</label>
                 <input className={fieldClass} value={markForm.notes} onChange={e => setMarkForm({ ...markForm, notes: e.target.value })} />
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setShowMarkForm(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+              <div className="muf-pc-actions">
+                <button type="button" onClick={() => setShowMarkForm(false)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
                 <button type="submit" disabled={busy} className="px-3 py-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white text-xs font-bold rounded-lg">
                   {L('Save attendance')}
                 </button>
@@ -545,8 +545,8 @@ export default function LaborBoard({
                 <label className={labelClass}>{L('Notes')}</label>
                 <input className={fieldClass} value={editAttForm.notes} onChange={e => setEditAttForm({ ...editAttForm, notes: e.target.value })} />
               </div>
-              <div className="flex justify-end gap-3 pt-2">
-                <button type="button" onClick={() => setEditAtt(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+              <div className="muf-pc-actions">
+                <button type="button" onClick={() => setEditAtt(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
                 <button type="button" disabled={busy} onClick={handleSaveAttEdit} className="px-3 py-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5">
                   {busy ? <Loader size={13} className="animate-spin" /> : <Pencil size={13} />} {L('Save changes')}
                 </button>
@@ -603,8 +603,8 @@ export default function LaborBoard({
               <label className={labelClass}>{L('Note')}</label>
               <input className={fieldClass} placeholder={L('Note')} value={advForm.notes} onChange={e => setAdvForm({ ...advForm, notes: e.target.value })} />
             </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setAdvanceFor(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+            <div className="muf-pc-actions">
+              <button type="button" onClick={() => setAdvanceFor(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
               <button type="button" disabled={busy || !advanceFor} onClick={() => advanceFor && handleGiveAdvance(advanceFor)} className="px-3 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-xs font-bold rounded-lg">
                 {L('Save advance')}
               </button>
@@ -626,8 +626,8 @@ export default function LaborBoard({
               <label className={labelClass}>{L('Note')}</label>
               <input className={fieldClass} value={editAdvForm.notes} onChange={e => setEditAdvForm({ ...editAdvForm, notes: e.target.value })} />
             </div>
-            <div className="flex justify-end gap-3 pt-2">
-              <button type="button" onClick={() => setEditAdvFor(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+            <div className="muf-pc-actions">
+              <button type="button" onClick={() => setEditAdvFor(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
               <button type="button" disabled={busy} onClick={handleSaveAdvanceEdit} className="px-3 py-2 bg-amber-500 hover:bg-amber-600 disabled:opacity-60 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5">
                 {busy ? <Loader size={13} className="animate-spin" /> : <Pencil size={13} />} {L('Save changes')}
               </button>

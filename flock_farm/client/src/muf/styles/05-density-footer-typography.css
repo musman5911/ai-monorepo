@@ -1,0 +1,145 @@
+/* ============================================================
+   DESKTOP DENSITY SCALE
+   The UI was designed mobile-first with fixed px sizing, which
+   renders oversized on computer screens. Scale the whole app
+   down on desktop viewports only — text, logo, cards, popups,
+   forms, everything shrinks uniformly. Mobile (<1024px) is
+   completely untouched.
+   ============================================================ */
+@media (min-width: 1024px) {
+  body {
+    zoom: 0.8;
+  }
+  /* ── MUF TYPE SCALE (identical in all 3 farm apps) ──
+     The 0.8 desktop zoom shrinks rem-based text; raising the root font
+     size scales every text/heading/control back up. Most UI text uses
+     text-sm/text-xs, so 20px root gives ~14px/12px effective on PCs. */
+  html {
+    font-size: 20px;
+  }
+  /* zoom shrinks vh-based heights; stretch shells back to fill the screen */
+  .muf-layout {
+    min-height: calc(100vh / 0.8);
+    min-height: calc(100dvh / 0.8);
+  }
+  .muf-body-frame {
+    min-height: calc((100vh / 0.8) - 78px);
+  }
+  /* zoom also shrinks vw/vh-sized fullscreen overlays — at 100vw/100dvh they
+     only cover 80% of the real screen. Stretch them back so every popup
+     backdrop covers the ENTIRE viewport. !important so it also beats the
+     w-screen utility and inline width styles. */
+  .muf-overlay,
+  .ff-modal-host,
+  .fixed.inset-0 {
+    height: calc(100vh / 0.8) !important;
+    height: calc(100dvh / 0.8) !important;
+  }
+  .muf-overlay,
+  .ff-modal-host {
+    width: calc(100vw / 0.8) !important;
+  }
+  .modal-overlay {
+    width: calc(100vw / 0.8) !important;
+    height: calc(100vh / 0.8) !important;
+    height: calc(100dvh / 0.8) !important;
+  }
+  /* min-h-screen pages (login) fill the real screen under zoom */
+  .min-h-screen {
+    min-height: calc(100vh / 0.8);
+    min-height: calc(100dvh / 0.8);
+  }
+}
+/* Large desktops have more room — slightly gentler scale */
+@media (min-width: 1800px) {
+  body {
+    zoom: 0.9;
+  }
+  /* MUF TYPE SCALE — gentler zoom, gentler boost (~15px/12.8px effective) */
+  html {
+    font-size: 19px;
+  }
+  .muf-layout {
+    min-height: calc(100vh / 0.9);
+    min-height: calc(100dvh / 0.9);
+  }
+  .muf-body-frame {
+    min-height: calc((100vh / 0.9) - 78px);
+  }
+  .muf-overlay,
+  .ff-modal-host,
+  .fixed.inset-0 {
+    height: calc(100vh / 0.9) !important;
+    height: calc(100dvh / 0.9) !important;
+  }
+  .modal-overlay {
+    width: calc(100vw / 0.9) !important;
+    height: calc(100vh / 0.9) !important;
+    height: calc(100dvh / 0.9) !important;
+  }
+  .min-h-screen {
+    min-height: calc(100vh / 0.9);
+    min-height: calc(100dvh / 0.9);
+  }
+}
+
+/* ============================================================
+   SHARED CROSS-FARM APP FOOTER (agri_farm / flock_farm / dairy_farm)
+   ============================================================ */
+.muf-app-footer {
+  flex: 0 0 auto;
+  width: 100%;
+  background: #fffdf7;
+  border-top: 1px solid #e9e4d8;
+  padding: 12px clamp(14px, 3vw, 38px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: #69736d;
+  font-weight: 600;
+}
+.muf-app-footer .muf-footer-brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #113b25;
+  font-weight: 800;
+}
+.muf-app-footer .muf-footer-meta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-transform: capitalize;
+  opacity: 0.85;
+}
+.dark .muf-app-footer {
+  background: #0b160e;
+  border-color: #1d3023;
+  color: #9aa79e;
+}
+.dark .muf-app-footer .muf-footer-brand {
+  color: #dcecdf;
+}
+@media (max-width: 600px) {
+  .muf-app-footer { justify-content: center; text-align: center; }
+}
+
+/* ============================================================
+   SHARED TYPOGRAPHY GUARD (parent design: Usman farms)
+   Header, navbar and footer always render in the parent font,
+   even if a child app uses a different display font elsewhere.
+   ============================================================ */
+.muf-header,
+.muf-header h1,
+.muf-header p,
+.muf-top-nav,
+.muf-nav-link,
+.muf-profile strong,
+.muf-profile small,
+.muf-app-footer {
+  font-family: 'Inter', ui-sans-serif, system-ui, 'Segoe UI', Roboto, sans-serif;
+}
+

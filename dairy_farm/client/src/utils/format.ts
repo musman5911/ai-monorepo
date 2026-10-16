@@ -1,4 +1,4 @@
-import {mufLastMonths} from '../muf-date';
+import {mufLastMonths} from '../muf/data/muf-date';
 /**
  * Number formatting utilities
  */

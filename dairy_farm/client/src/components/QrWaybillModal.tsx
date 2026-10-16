@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { notify } from '../muf-confirm';
+import { notify } from '../muf/core/muf-confirm';
 import { QrCode, CheckCircle2, Copy, Printer, X, ShieldCheck, Truck, RefreshCw } from './Icons';
 import { L } from '../i18n';
 

@@ -286,7 +286,7 @@ export const api = {
 
   // Daily Log (checklist + legacy daily notes) and independent Diary entries
   getDailyLog: (date: string) => req(`/dailylog/${date}`),
-  getDiaryEntries: (): Promise<{ entries: import('./muf-diary').MufDiaryEntry[] }> => req('/dailylog/entries'),
+  getDiaryEntries: (): Promise<{ entries: import('./muf/ui/muf-diary').MufDiaryEntry[] }> => req('/dailylog/entries'),
   saveDailyLog: (date: string, data: { checklist?: object[]; notes?: string; voiceNotes?: object[]; photos?: object[]; diaryEntries?: object[] }) =>
     req(`/dailylog/${date}`, { method: 'PUT', body: JSON.stringify(data) }),
 

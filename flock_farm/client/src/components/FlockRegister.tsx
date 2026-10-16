@@ -18,17 +18,17 @@ import {
   Trash2,
   User, DollarSign,
 } from 'lucide-react';
-import MufEntityGrid from '../muf-entity-grid';
-import MufFab from '../muf-fab';
+import MufEntityGrid from '../muf/ui/muf-entity-grid';
+import MufFab from '../muf/core/muf-fab';
 import { Bird, Gender, BirdStatus, DeathReason, BirdBreed, Lang, VaccinationRecord } from '../types';
 import BirdAvatar, { breedLabel } from './BirdAvatar';
 import { todayStr as localTodayStr, diffDateOnlyDays } from '../utils/calculations';
 import { calculateCurrentAge, sortBirdsForRegister, birdStatusTone } from './flock/birdUtils';
 import { uploadImage } from '../api';
-import DetailModal from '../muf-modal';
+import DetailModal from '../muf/core/muf-modal';
 import BirdDetailContent from './BirdDetailContent';
-import { mufStoryNet, mufVerdictText, mufDaysBetween } from '../muf-story';
-import { useConfirm, notify } from '../muf-confirm';
+import { mufStoryNet, mufVerdictText, mufDaysBetween } from '../muf/data/muf-story';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 
 function normalizePublicAssetPath(value: string) {
   const raw = value.trim();

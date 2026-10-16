@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { L } from '../i18n';
 import { api } from '../api';
-import { useConfirm, notify } from '../muf-confirm';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 import type { Cow, HealthRecord, HealthType } from '../types';
 import { todayStr, formatDate, isDateBeforeToday } from '../utils/date';
-import DetailModal from '../muf-modal';
+import DetailModal from '../muf/core/muf-modal';
 import {
   Plus,
   Filter,
@@ -254,7 +254,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
         icon={<Plus className="w-5 h-5" />} iconBg="bg-farm-100 text-farm-700" size="small">
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Cow *</label>
+                <label className="muf-pc-muted">Cow *</label>
                 <select
                   required
                   value={formData.cowId}
@@ -268,7 +268,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Date *</label>
+                <label className="muf-pc-muted">Date *</label>
                 <input
                   type="date"
                   required
@@ -278,7 +278,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Type *</label>
+                <label className="muf-pc-muted">Type *</label>
                 <select
                   required
                   value={formData.type}
@@ -293,7 +293,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 </select>
               </div>
               <div className="space-y-1 lg:col-span-2">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Description *</label>
+                <label className="muf-pc-muted">Description *</label>
                 <input
                   type="text"
                   required
@@ -304,7 +304,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Medicine')}</label>
+                <label className="muf-pc-muted">{L('Medicine')}</label>
                 <input
                   type="text"
                   value={formData.medicine}
@@ -313,7 +313,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Vet Name')}</label>
+                <label className="muf-pc-muted">{L('Vet Name')}</label>
                 <input
                   type="text"
                   value={formData.vet}
@@ -322,7 +322,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Next Due Date')}</label>
+                <label className="muf-pc-muted">{L('Next Due Date')}</label>
                 <input
                   type="date"
                   value={formData.nextDueDate}
@@ -331,7 +331,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Cost (₨)</label>
+                <label className="muf-pc-muted">Cost (₨)</label>
                 <input
                   type="number"
                   min="0"
@@ -341,7 +341,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 />
               </div>
               <div className="space-y-1 lg:col-span-3">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Notes')}</label>
+                <label className="muf-pc-muted">{L('Notes')}</label>
                 <textarea
                   value={formData.notes}
                   onChange={e => setFormData({ ...formData, notes: e.target.value })}

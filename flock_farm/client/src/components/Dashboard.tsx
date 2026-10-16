@@ -7,32 +7,32 @@ import {
 } from 'lucide-react';
 import { Bird, OtherExpense, FeedRecord, EggProduction, GlobalSettings, DateRange, Lang, DeathReason, Customer,
   CustomerSale, VaccinationRecord } from '../types';
-import { motion, cardSpring, wobbleSpring, staggerDelay, prefersReducedMotion } from '../muf-motion';
+import { motion, staggerDelay, prefersReducedMotion } from '../muf/core/muf-motion';
 import {
   costPerEgg, costPerBird, birdSaleIncome, inDateRange, eggSaleIncome,
   totalOutstandingReceivables, birdsActiveInRange, productionRate,
   todayStr as localTodayStr, diffDateOnlyDays, feedStockKg,
 } from '../utils/calculations';
 import { DateRangeFilter } from './LightChart';
-import { MufAreaChart } from '../muf-charts';
-import { MufCountUpText } from '../muf-applike';
-import { mufToday, mufShiftDays } from '../muf-date';
-import DetailModal from '../muf-modal';
-import MufWeather from '../muf-weather';
-import MufFab from '../muf-fab';
-import MufWorkerPanel from '../muf-worker-panel';
-import { loadNotifPrefs, fireNotif } from '../muf-notifications';
+import { MufAreaChart } from '../muf/ui/muf-charts';
+import { mufToday, mufShiftDays } from '../muf/data/muf-date';
+import DetailModal from '../muf/core/muf-modal';
+import MufWeather from '../muf/ui/muf-weather';
+import MufFab from '../muf/core/muf-fab';
+import MufWorkerPanel from '../muf/ui/muf-worker-panel';
+import { loadNotifPrefs, fireNotif } from '../muf/core/muf-notifications';
 import { getFarmLocation } from '../api';
-import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from '../muf-compare';
-import { udhaarSummary, daysSince, udhaarReminderText } from '../muf-khata';
+import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from '../muf/data/muf-compare';
+import { udhaarSummary, daysSince, udhaarReminderText } from '../muf/domain/muf-khata';
 import { shareViaWhatsAppTo } from '../utils/share';
 import { customerBalance } from '../utils/calculations';
 import BirdAvatar, { breedLabel } from './BirdAvatar';
 import BirdDetailContent from './BirdDetailContent';
 import { shareViaWhatsApp } from '../utils/share';
 import { telegramAlerts } from '../api';
-import {mufWeekStart} from '../muf-date';
+import {mufWeekStart} from '../muf/data/muf-date';
 import { useRecentOps, type OpItem } from './dashboard/useRecentOps';
+import { StatCard } from './dashboard/StatCard';
 
 interface DashboardProps {
   birds: Bird[];
@@ -393,7 +393,7 @@ export default function Dashboard({
               <p>• {L('Weather / heat stress')}</p>
               <p>• {L('Egg entry — was today recorded?')}</p>
             </div>
-            <p className="text-[10px] text-slate-400">{L('Alarm fires when today falls {v0}%+ below the 7-day average (set in the Telegram panel). The evening Telegram summary carries this alarm too.', { v0: dropAlert.threshold || 20 })}</p>
+            <p className="muf-pc-micro">{L('Alarm fires when today falls {v0}%+ below the 7-day average (set in the Telegram panel). The evening Telegram summary carries this alarm too.', { v0: dropAlert.threshold || 20 })}</p>
           </div>
         )}
       </DetailModal>
@@ -690,7 +690,7 @@ export default function Dashboard({
                 <div key={r.id} className="flex items-center justify-between gap-2 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-sm">
                   <div className="min-w-0">
                     <p className="font-bold text-slate-800 dark:text-slate-100 truncate">{r.name}</p>
-                    <p className="text-[10px] text-slate-400">
+                    <p className="muf-pc-micro">
                       {days === null ? (L('no payment yet')) : (L('last payment {days} days ago', { days: days }))}
                       {days !== null && days > 30 ? ' ⚠️' : ''}
                     </p>
@@ -817,10 +817,10 @@ export default function Dashboard({
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Bird')}</th>
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Breed/Gender')}</th>
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Date Died')}</th>
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Reason')}</th>
+                  <th className="muf-pc-th">{L('Bird')}</th>
+                  <th className="muf-pc-th">{L('Breed/Gender')}</th>
+                  <th className="muf-pc-th">{L('Date Died')}</th>
+                  <th className="muf-pc-th">{L('Reason')}</th>
                   <th className="py-2 font-semibold uppercase text-[10px]">{L('Detail')}</th>
                 </tr>
               </thead>
@@ -885,7 +885,7 @@ export default function Dashboard({
                 <Syringe className={`w-5 h-5 shrink-0 ${overdue ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{bird.name} · {breedLabel(bird)}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Last: {bird.lastVaccinationDate || 'never'}</p>
+                  <p className="muf-pc-muted">Last: {bird.lastVaccinationDate || 'never'}</p>
                 </div>
                 <span className={`text-[10px] font-bold font-mono px-2 py-1 rounded ${overdue ? 'bg-red-600 text-white' : 'bg-amber-600 text-white'}`}>
                   {daysUntilDue === null ? 'NEVER' : daysUntilDue < 0 ? `OVERDUE ${Math.abs(daysUntilDue)}d` : daysUntilDue === 0 ? 'TODAY' : `IN ${daysUntilDue}d`}
@@ -925,7 +925,7 @@ export default function Dashboard({
               <Package className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0" />
               <div className="flex-1">
                 <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{r.type}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Last purchase: {r.lastDate} · {r.daysSince} days ago</p>
+                <p className="muf-pc-muted">Last purchase: {r.lastDate} · {r.daysSince} days ago</p>
               </div>
               <span className="text-[10px] font-bold font-mono px-2 py-1 rounded bg-orange-600 text-white">{L('RESTOCK')}</span>
             </div>
@@ -1026,12 +1026,12 @@ export default function Dashboard({
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Name')}</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Breed')}</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Gender')}</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Status')}</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Age')}</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Bought')}</th>
+                    <th className="muf-pc-th">{L('Name')}</th>
+                    <th className="muf-pc-th">{L('Breed')}</th>
+                    <th className="muf-pc-th">{L('Gender')}</th>
+                    <th className="muf-pc-th">{L('Status')}</th>
+                    <th className="muf-pc-th">{L('Age')}</th>
+                    <th className="muf-pc-th">{L('Bought')}</th>
                     <th className="py-2 font-semibold uppercase text-[10px]">{L('Last Vax')}</th>
                   </tr>
                 </thead>
@@ -1086,10 +1086,10 @@ export default function Dashboard({
           <table className="w-full text-xs">
             <thead>
               <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Date')}</th>
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Collected')}</th>
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Sold')}</th>
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Home')}</th>
+                <th className="muf-pc-th">{L('Date')}</th>
+                <th className="muf-pc-th">{L('Collected')}</th>
+                <th className="muf-pc-th">{L('Sold')}</th>
+                <th className="muf-pc-th">{L('Home')}</th>
                 <th className="py-2 font-semibold uppercase text-[10px]">{L('Broken')}</th>
               </tr>
             </thead>
@@ -1188,10 +1188,10 @@ export default function Dashboard({
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Date')}</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Type')}</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Qty (kg)')}</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Rate/kg')}</th>
+                    <th className="muf-pc-th">{L('Date')}</th>
+                    <th className="muf-pc-th">{L('Type')}</th>
+                    <th className="muf-pc-th">{L('Qty (kg)')}</th>
+                    <th className="muf-pc-th">{L('Rate/kg')}</th>
                     <th className="py-2 font-semibold uppercase text-[10px]">{L('Total')}</th>
                   </tr>
                 </thead>
@@ -1270,58 +1270,6 @@ function StaggerItem({ index, children, className = '' }: { index: number; child
       className={className}
     >
       {children}
-    </motion.div>
-  );
-}
-
-// StatCard — vertical card with emerald icon, decorative blob, profit/loss tinting (dairy-style)
-interface StatCardProps {
-  label: string;
-  value: string;
-  icon: React.ElementType;
-  trend?: number;
-  trendUnit?: string;
-  subText?: string;
-  isNegative?: boolean;
-  isProfit?: boolean;
-}
-
-function StatCard({ label, value, icon: Icon, trend, trendUnit = '', subText, isNegative, isProfit }: StatCardProps) {
-  const isPositive = trend && trend > 0;
-  return (
-    <motion.div
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.97 }}
-      transition={cardSpring}
-      className={`group relative overflow-hidden rounded-2xl border bg-white/90 dark:bg-[#0d1a11]/90 p-4 shadow-sm backdrop-blur transition-colors duration-200 hover:shadow-xl ${
-      isProfit === true ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-900/10' :
-      isProfit === false ? 'border-rose-200 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-900/10' :
-      'border-slate-200 dark:border-[#203528] hover:border-emerald-300 dark:hover:border-emerald-700'
-    }`}>
-      <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-emerald-500/10 transition-transform duration-300 group-hover:scale-125" />
-      <Eye className="absolute right-3 bottom-3 w-3.5 h-3.5 text-emerald-500/70 opacity-0 group-hover:opacity-100 transition" />
-      <div className="relative flex justify-between items-start mb-4">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</span>
-        <motion.div
-          whileHover={{ rotate: -6, scale: 1.06 }}
-          transition={wobbleSpring}
-          className="rounded-xl bg-emerald-50 dark:bg-emerald-900/30 p-2 text-emerald-600 dark:text-emerald-300"
-        >
-          <Icon className="w-4 h-4" />
-        </motion.div>
-      </div>
-      <div className="relative">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <span className={`font-display text-2xl font-bold ${isNegative ? 'text-red-600 dark:text-red-400' : isProfit === true ? 'text-emerald-700 dark:text-emerald-400' : isProfit === false ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}><MufCountUpText text={String(value)} /></span>
-          {trend !== undefined && trend !== 0 && (
-            <div className={`flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ${isPositive ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'}`}>
-              {isPositive ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
-              {Math.abs(trend)}{trendUnit}
-            </div>
-          )}
-        </div>
-        {subText && <p className="text-[11px] text-slate-400 mt-1">{subText}</p>}
-      </div>
     </motion.div>
   );
 }

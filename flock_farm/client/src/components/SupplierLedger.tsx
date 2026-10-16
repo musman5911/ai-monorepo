@@ -4,16 +4,16 @@
 // forms; payments live in the 'supplierPayments' bucket. Shared math +
 // Urdu WhatsApp text come from the muf-supplier twin.
 import { useEffect, useMemo, useState } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import { Store, Plus, Trash2, Share2, Wallet, QrCode } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
-import DetailModal from '../muf-modal';
+import MufCardQr from '../muf/ui/muf-card-qr';
+import DetailModal from '../muf/core/muf-modal';
 import { loadData, saveData } from '../api';
-import { useConfirm, notify } from '../muf-confirm';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 import type { FeedRecord, OtherExpense, Supplier, SupplierPayment, Lang } from '../types';
 import { shareViaWhatsAppTo } from '../utils/share';
-import { supplierBalances, supplierTotals, supplierHisabText, type SupplierRow } from '../muf-supplier';
-import {mufDateStr} from '../muf-date';
+import { supplierBalances, supplierTotals, supplierHisabText, type SupplierRow } from '../muf/domain/muf-supplier';
+import {mufDateStr} from '../muf/data/muf-date';
 
 const FARM_SIGNATURE = '— Usman Flock Farm';
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mufCompact, mufNiceMax, mufSmoothPath } from '../dairy_farm/client/src/muf-charts';
+import { mufCompact, mufNiceMax, mufSmoothPath } from '../dairy_farm/client/src/muf/ui/muf-charts';
 
 describe('muf-charts helpers', () => {
   describe('mufCompact', () => {

@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence, prefersReducedMotion } from './muf-motion';
+import { motion, AnimatePresence, prefersReducedMotion } from './muf/core/muf-motion';
 import {
   CalendarHeart,
   Home,
@@ -25,7 +25,7 @@ import type { HealthRecord, AuthUser } from "./types";
 import MyProfilePopup from "./components/MyProfilePopup";
 import { todayStr } from "./utils/date";
 import { L, getLang, setCurrentLang, type Lang } from "./i18n";
-import { notify, useConfirm } from './muf-confirm';
+import { notify, useConfirm } from './muf/core/muf-confirm';
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import { SuperAdminTab } from "./components/SuperAdminTab";
@@ -36,13 +36,13 @@ import ExpensesTab from "./components/ExpensesTab";
 import HealthTab from "./components/HealthTab";
 import ReportsTab from "./components/ReportsTab";
 import DiaryTab from "./components/DiaryTab";
-import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from "./muf-diary";
+import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from "./muf/ui/muf-diary";
 import LaborTab from "./components/LaborTab";
-import HeaderSearch from "./muf-header-search";
-import OfflineBanner from "./muf-offline-banner";
-import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf-applike';
+import HeaderSearch from "./muf/ui/muf-header-search";
+import OfflineBanner from "./muf/core/muf-offline-banner";
+import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf/core/muf-applike';
 import AdminPanel from "./components/AdminPanel";
-import DetailModal from './muf-modal';
+import DetailModal from './muf/core/muf-modal';
 
 type Tab =
   | "dashboard"
@@ -621,7 +621,7 @@ export default function App() {
       >
         <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
                   {notifications.map((notif) => (
-                    <div key={notif.id} className="p-3.5 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
+                    <div key={notif.id} className="p-3.5 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
                       <div className="flex justify-between items-center">
                         <span className="font-extrabold text-xs text-slate-800 dark:text-white flex items-center gap-1.5">
                           {notif.title}

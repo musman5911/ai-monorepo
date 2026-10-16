@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { mufL } from '../muf-urdu';
-import { openPrintDocument } from '../muf-print';
+import { mufL } from '../muf/data/muf-urdu';
+import { openPrintDocument } from '../muf/data/muf-print';
 import { FileText, Printer } from 'lucide-react';
 import { listBatches } from '../api';
 import {

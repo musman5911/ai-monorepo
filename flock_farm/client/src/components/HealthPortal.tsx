@@ -14,8 +14,8 @@ import {
 } from 'lucide-react';
 import { Bird, DeathReason, VaccinationRecord, Lang } from '../types';
 import { todayStr, diffDateOnlyDays } from '../utils/calculations';
-import { useConfirm, notify } from '../muf-confirm';
-import DetailModal from '../muf-modal';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
+import DetailModal from '../muf/core/muf-modal';
 import { L } from '../i18n';
 
 interface HealthPortalProps {
@@ -585,7 +585,7 @@ export default function HealthPortal({
           <form onSubmit={handleEditVaccinationSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Bird *</label>
+                <label className="muf-pc-label-2xs-gray">Bird *</label>
                 <select value={editVaxForm.birdId} onChange={(e) => setEditVaxForm({ ...editVaxForm, birdId: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden">
                   <option value="">{L('Select bird')}</option>
@@ -593,30 +593,30 @@ export default function HealthPortal({
                 </select>
               </div>
               <div>
-                <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Date *</label>
+                <label className="muf-pc-label-2xs-gray">Date *</label>
                 <input type="date" required value={editVaxForm.date} onChange={(e) => setEditVaxForm({ ...editVaxForm, date: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
               </div>
             </div>
             <div>
-              <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Vaccine Name *</label>
+              <label className="muf-pc-label-2xs-gray">Vaccine Name *</label>
               <input type="text" required value={editVaxForm.vaccineName} onChange={(e) => setEditVaxForm({ ...editVaxForm, vaccineName: e.target.value })}
                 className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Dose')}</label>
+                <label className="muf-pc-label-2xs-gray">{L('Dose')}</label>
                 <input type="text" value={editVaxForm.dose} onChange={(e) => setEditVaxForm({ ...editVaxForm, dose: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
               </div>
               <div>
-                <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Cost (Rs)')}</label>
+                <label className="muf-pc-label-2xs-gray">{L('Cost (Rs)')}</label>
                 <input type="number" min="0" step="any" value={editVaxForm.cost} onChange={(e) => setEditVaxForm({ ...editVaxForm, cost: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
               </div>
             </div>
             <div>
-              <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">{L('Notes')}</label>
+              <label className="muf-pc-label-2xs-gray">{L('Notes')}</label>
               <textarea rows={2} value={editVaxForm.notes} onChange={(e) => setEditVaxForm({ ...editVaxForm, notes: e.target.value })}
                 className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
             </div>

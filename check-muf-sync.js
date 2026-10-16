@@ -17,7 +17,18 @@ const ROOT = __dirname;
 let failures = 0;
 
 function read(p) {
-  try { return fs.readFileSync(path.join(ROOT, p), 'utf8'); }
+  try {
+    let text = fs.readFileSync(path.join(ROOT, p), 'utf8');
+    // muf-style.css is an entry file that @imports ./muf/styles/*.css; read it as ONE
+    // stylesheet (entry + parts in import order) so every invariant keeps working.
+    if (/(^|\/)muf-style\.css$/.test(p)) {
+      const dir = path.dirname(p);
+      for (const m of text.matchAll(/@import\s+'(\.\/[^']+\.css)';/g)) {
+        text += '\n' + fs.readFileSync(path.join(ROOT, dir, m[1]), 'utf8');
+      }
+    }
+    return text;
+  }
   catch { return null; }
 }
 
@@ -74,44 +85,50 @@ function pad(s, n) { return (s + ' '.repeat(n)).slice(0, n); }
 console.log('\n━━ Twin files (dairy ↔ flock, must be identical after normalizing farm identity) ━━');
 const TWINS = [
   ['components/MyFarmsPanel.tsx',   'dairy_farm/client/src/components/MyFarmsPanel.tsx',   'flock_farm/client/src/components/MyFarmsPanel.tsx'],
-  ['muf-print.ts',                  'dairy_farm/client/src/muf-print.ts',                  'flock_farm/client/src/muf-print.ts'],
+  ['muf-print.ts',                  'dairy_farm/client/src/muf/data/muf-print.ts',                  'flock_farm/client/src/muf/data/muf-print.ts'],
   ['utils/share.ts',                'dairy_farm/client/src/utils/share.ts',                'flock_farm/client/src/utils/share.ts'],
-  ['muf-labor.ts',                  'dairy_farm/client/src/muf-labor.ts',                  'flock_farm/client/src/muf-labor.ts'],
-  ['muf-zakat.ts',                  'dairy_farm/client/src/muf-zakat.ts',                  'flock_farm/client/src/muf-zakat.ts'],
-  ['muf-pdf.ts',                    'dairy_farm/client/src/muf-pdf.ts',                    'flock_farm/client/src/muf-pdf.ts'],
-  ['muf-feedstock.ts',              'dairy_farm/client/src/muf-feedstock.ts',              'flock_farm/client/src/muf-feedstock.ts'],
-  ['muf-khata.ts',                  'dairy_farm/client/src/muf-khata.ts',                  'flock_farm/client/src/muf-khata.ts'],
-  ['muf-farmbook.ts',               'dairy_farm/client/src/muf-farmbook.ts',               'flock_farm/client/src/muf-farmbook.ts'],
-  ['muf-image.ts',                  'dairy_farm/client/src/muf-image.ts',                  'flock_farm/client/src/muf-image.ts'],
-  ['muf-voice.ts',                  'dairy_farm/client/src/muf-voice.ts',                  'flock_farm/client/src/muf-voice.ts'],
-  ['muf-urdu.ts',                   'dairy_farm/client/src/muf-urdu.ts',                   'flock_farm/client/src/muf-urdu.ts'],
-  ['muf-search.ts',                 'dairy_farm/client/src/muf-search.ts',                 'flock_farm/client/src/muf-search.ts'],
-  ['muf-offline.ts',                'dairy_farm/client/src/muf-offline.ts',                'flock_farm/client/src/muf-offline.ts'],
-  ['muf-charts.tsx',                'dairy_farm/client/src/muf-charts.tsx',                'flock_farm/client/src/muf-charts.tsx'],
-  ['muf-profile.ts',                'dairy_farm/client/src/muf-profile.ts',                'flock_farm/client/src/muf-profile.ts'],
-  ['muf-applike.tsx',               'dairy_farm/client/src/muf-applike.tsx',               'flock_farm/client/src/muf-applike.tsx'],
-  ['muf-date.ts',                   'dairy_farm/client/src/muf-date.ts',                   'flock_farm/client/src/muf-date.ts'],
-  ['muf-story.ts',                  'dairy_farm/client/src/muf-story.ts',                  'flock_farm/client/src/muf-story.ts'],
+  ['muf-labor.ts',                  'dairy_farm/client/src/muf/domain/muf-labor.ts',                  'flock_farm/client/src/muf/domain/muf-labor.ts'],
+  ['muf-zakat.ts',                  'dairy_farm/client/src/muf/domain/muf-zakat.ts',                  'flock_farm/client/src/muf/domain/muf-zakat.ts'],
+  ['muf-pdf.ts',                    'dairy_farm/client/src/muf/data/muf-pdf.ts',                    'flock_farm/client/src/muf/data/muf-pdf.ts'],
+  ['muf-feedstock.ts',              'dairy_farm/client/src/muf/domain/muf-feedstock.ts',              'flock_farm/client/src/muf/domain/muf-feedstock.ts'],
+  ['muf-khata.ts',                  'dairy_farm/client/src/muf/domain/muf-khata.ts',                  'flock_farm/client/src/muf/domain/muf-khata.ts'],
+  ['muf-farmbook.ts',               'dairy_farm/client/src/muf/domain/muf-farmbook.ts',               'flock_farm/client/src/muf/domain/muf-farmbook.ts'],
+  ['muf-image.ts',                  'dairy_farm/client/src/muf/data/muf-image.ts',                  'flock_farm/client/src/muf/data/muf-image.ts'],
+  ['muf-voice.ts',                  'dairy_farm/client/src/muf/data/muf-voice.ts',                  'flock_farm/client/src/muf/data/muf-voice.ts'],
+  ['muf-urdu.ts',                   'dairy_farm/client/src/muf/data/muf-urdu.ts',                   'flock_farm/client/src/muf/data/muf-urdu.ts'],
+  ['muf-urdu-terms-1.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-1.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-1.ts'],
+  ['muf-urdu-terms-2.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-2.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-2.ts'],
+  ['muf-urdu-terms-3.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-3.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-3.ts'],
+  ['muf-urdu-terms-4.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-4.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-4.ts'],
+  ['muf-urdu-terms-5.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-5.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-5.ts'],
+  ['muf-urdu-terms-6.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-6.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-6.ts'],
+  ['muf-search.ts',                 'dairy_farm/client/src/muf/data/muf-search.ts',                 'flock_farm/client/src/muf/data/muf-search.ts'],
+  ['muf-offline.ts',                'dairy_farm/client/src/muf/data/muf-offline.ts',                'flock_farm/client/src/muf/data/muf-offline.ts'],
+  ['muf-charts.tsx',                'dairy_farm/client/src/muf/ui/muf-charts.tsx',                'flock_farm/client/src/muf/ui/muf-charts.tsx'],
+  ['muf-profile.ts',                'dairy_farm/client/src/muf/data/muf-profile.ts',                'flock_farm/client/src/muf/data/muf-profile.ts'],
+  ['muf-applike.tsx',               'dairy_farm/client/src/muf/core/muf-applike.tsx',               'flock_farm/client/src/muf/core/muf-applike.tsx'],
+  ['muf-date.ts',                   'dairy_farm/client/src/muf/data/muf-date.ts',                   'flock_farm/client/src/muf/data/muf-date.ts'],
+  ['muf-story.ts',                  'dairy_farm/client/src/muf/data/muf-story.ts',                  'flock_farm/client/src/muf/data/muf-story.ts'],
   ['muf-telegram.mjs',              'dairy_farm/backend/muf-telegram.mjs',                 'flock_farm/backend/muf-telegram.mjs'],
-  ['muf-supplier.ts',               'dairy_farm/client/src/muf-supplier.ts',               'flock_farm/client/src/muf-supplier.ts'],
-  ['muf-motion.ts',                 'dairy_farm/client/src/muf-motion.ts',                 'flock_farm/client/src/muf-motion.ts'],
-  ['muf-modal.tsx',                 'dairy_farm/client/src/muf-modal.tsx',                 'flock_farm/client/src/muf-modal.tsx'],
-  ['muf-confirm.tsx',               'dairy_farm/client/src/muf-confirm.tsx',               'flock_farm/client/src/muf-confirm.tsx'],
-  ['muf-portal.tsx',                'dairy_farm/client/src/muf-portal.tsx',                'flock_farm/client/src/muf-portal.tsx'],
-  ['muf-offline-banner.tsx',      'dairy_farm/client/src/muf-offline-banner.tsx',      'flock_farm/client/src/muf-offline-banner.tsx'],
-  ['muf-avatar.tsx',              'dairy_farm/client/src/muf-avatar.tsx',              'flock_farm/client/src/muf-avatar.tsx'],
-  ['muf-farm-profile.tsx',        'dairy_farm/client/src/muf-farm-profile.tsx',        'flock_farm/client/src/muf-farm-profile.tsx'],
-  ['muf-header-search.tsx',       'dairy_farm/client/src/muf-header-search.tsx',       'flock_farm/client/src/muf-header-search.tsx'],
-  ['muf-telegram-panel.tsx',      'dairy_farm/client/src/muf-telegram-panel.tsx',      'flock_farm/client/src/muf-telegram-panel.tsx'],
-  ['muf-form-overlay.tsx',          'dairy_farm/client/src/muf-form-overlay.tsx',          'flock_farm/client/src/muf-form-overlay.tsx'],
-  ['muf-scroll-lock.ts',            'dairy_farm/client/src/muf-scroll-lock.ts',            'flock_farm/client/src/muf-scroll-lock.ts'],
-  ['muf-card-qr.tsx',            'dairy_farm/client/src/muf-card-qr.tsx',            'flock_farm/client/src/muf-card-qr.tsx'],
-  ['muf-entity-grid.tsx',        'dairy_farm/client/src/muf-entity-grid.tsx',        'flock_farm/client/src/muf-entity-grid.tsx'],
-  ['muf-diary-media.tsx',        'dairy_farm/client/src/muf-diary-media.tsx',        'flock_farm/client/src/muf-diary-media.tsx'],
-  ['muf-login-lang.tsx',        'dairy_farm/client/src/muf-login-lang.tsx',        'flock_farm/client/src/muf-login-lang.tsx'],
-  ['muf-login.tsx',              'dairy_farm/client/src/muf-login.tsx',              'flock_farm/client/src/muf-login.tsx'],
-  ['muf-a11y.ts',               'dairy_farm/client/src/muf-a11y.ts',               'flock_farm/client/src/muf-a11y.ts'],
-  ['muf-worker-panel.tsx',      'dairy_farm/client/src/muf-worker-panel.tsx',      'flock_farm/client/src/muf-worker-panel.tsx'],
+  ['muf-supplier.ts',               'dairy_farm/client/src/muf/domain/muf-supplier.ts',               'flock_farm/client/src/muf/domain/muf-supplier.ts'],
+  ['muf-motion.ts',                 'dairy_farm/client/src/muf/core/muf-motion.ts',                 'flock_farm/client/src/muf/core/muf-motion.ts'],
+  ['muf-modal.tsx',                 'dairy_farm/client/src/muf/core/muf-modal.tsx',                 'flock_farm/client/src/muf/core/muf-modal.tsx'],
+  ['muf-confirm.tsx',               'dairy_farm/client/src/muf/core/muf-confirm.tsx',               'flock_farm/client/src/muf/core/muf-confirm.tsx'],
+  ['muf-portal.tsx',                'dairy_farm/client/src/muf/core/muf-portal.tsx',                'flock_farm/client/src/muf/core/muf-portal.tsx'],
+  ['muf-offline-banner.tsx',      'dairy_farm/client/src/muf/core/muf-offline-banner.tsx',      'flock_farm/client/src/muf/core/muf-offline-banner.tsx'],
+  ['muf-avatar.tsx',              'dairy_farm/client/src/muf/ui/muf-avatar.tsx',              'flock_farm/client/src/muf/ui/muf-avatar.tsx'],
+  ['muf-farm-profile.tsx',        'dairy_farm/client/src/muf/ui/muf-farm-profile.tsx',        'flock_farm/client/src/muf/ui/muf-farm-profile.tsx'],
+  ['muf-header-search.tsx',       'dairy_farm/client/src/muf/ui/muf-header-search.tsx',       'flock_farm/client/src/muf/ui/muf-header-search.tsx'],
+  ['muf-telegram-panel.tsx',      'dairy_farm/client/src/muf/ui/muf-telegram-panel.tsx',      'flock_farm/client/src/muf/ui/muf-telegram-panel.tsx'],
+  ['muf-form-overlay.tsx',          'dairy_farm/client/src/muf/core/muf-form-overlay.tsx',          'flock_farm/client/src/muf/core/muf-form-overlay.tsx'],
+  ['muf-scroll-lock.ts',            'dairy_farm/client/src/muf/core/muf-scroll-lock.ts',            'flock_farm/client/src/muf/core/muf-scroll-lock.ts'],
+  ['muf-card-qr.tsx',            'dairy_farm/client/src/muf/ui/muf-card-qr.tsx',            'flock_farm/client/src/muf/ui/muf-card-qr.tsx'],
+  ['muf-entity-grid.tsx',        'dairy_farm/client/src/muf/ui/muf-entity-grid.tsx',        'flock_farm/client/src/muf/ui/muf-entity-grid.tsx'],
+  ['muf-diary-media.tsx',        'dairy_farm/client/src/muf/ui/muf-diary-media.tsx',        'flock_farm/client/src/muf/ui/muf-diary-media.tsx'],
+  ['muf-login-lang.tsx',        'dairy_farm/client/src/muf/ui/muf-login-lang.tsx',        'flock_farm/client/src/muf/ui/muf-login-lang.tsx'],
+  ['muf-login.tsx',              'dairy_farm/client/src/muf/ui/muf-login.tsx',              'flock_farm/client/src/muf/ui/muf-login.tsx'],
+  ['muf-a11y.ts',               'dairy_farm/client/src/muf/core/muf-a11y.ts',               'flock_farm/client/src/muf/core/muf-a11y.ts'],
+  ['muf-worker-panel.tsx',      'dairy_farm/client/src/muf/ui/muf-worker-panel.tsx',      'flock_farm/client/src/muf/ui/muf-worker-panel.tsx'],
 ];
 // muf-style.css must be byte-identical in ALL THREE apps (plain CSS, no TS/JS split)
 const cssA = read('dairy_farm/client/src/muf-style.css');
@@ -128,9 +145,9 @@ if (cssA === null || cssB === null || cssC === null) {
   console.log(`  ❌ ${pad('muf-style.css (all 3)', 30)} dairy↔flock ${da} · dairy↔agri ${dc} differing line(s)`);
   failures++;
 }
-const loginA = read('dairy_farm/client/src/muf-login.tsx');
-const loginB = read('flock_farm/client/src/muf-login.tsx');
-const loginC = read('agri_farm/frontend/src/muf-login.tsx');
+const loginA = read('dairy_farm/client/src/muf/ui/muf-login.tsx');
+const loginB = read('flock_farm/client/src/muf/ui/muf-login.tsx');
+const loginC = read('agri_farm/frontend/src/muf/ui/muf-login.tsx');
 if (loginA !== null && loginA === loginB && loginA === loginC) { console.log(`  ✅ ${pad('muf-login.tsx (all 3)', 30)} identical`); }
 else { console.log(`  ❌ ${pad('muf-login.tsx (all 3)', 30)} copies differ or missing`); failures++; }
 for (const [label, pa, pb] of TWINS) {
@@ -240,40 +257,41 @@ const APPS = {
   agri:  'agri_farm/frontend/src',
 };
 const FILES = {
-  detailModal: { dairy: 'muf-modal.tsx', flock: 'muf-modal.tsx', agri: 'muf-modal.tsx' },
-  adminShell:  { dairy: 'muf-admin-shell.tsx',  flock: 'muf-admin-shell.tsx',   agri: 'muf-admin-shell.tsx' },
-  confirm:     { dairy: 'muf-confirm.tsx', flock: 'muf-confirm.tsx', agri: 'muf-confirm.tsx' },
-  toastHome:   { dairy: 'muf-confirm.tsx', flock: 'muf-confirm.tsx', agri: 'muf-confirm.tsx' },
+  detailModal: { dairy: 'muf/core/muf-modal.tsx', flock: 'muf/core/muf-modal.tsx', agri: 'muf/core/muf-modal.tsx' },
+  adminShell:  { dairy: 'muf/admin/muf-admin-shell.tsx',  flock: 'muf/admin/muf-admin-shell.tsx',   agri: 'muf/admin/muf-admin-shell.tsx' },
+  confirm:     { dairy: 'muf/core/muf-confirm.tsx', flock: 'muf/core/muf-confirm.tsx', agri: 'muf/core/muf-confirm.tsx' },
+  toastHome:   { dairy: 'muf/core/muf-confirm.tsx', flock: 'muf/core/muf-confirm.tsx', agri: 'muf/core/muf-confirm.tsx' },
   mufStyle:    { dairy: 'muf-style.css', flock: 'muf-style.css', agri: 'muf-style.css' },
-  mufPrint:    { dairy: 'muf-print.ts',  flock: 'muf-print.ts',  agri: 'muf-print.ts' },
-  mufCompare:  { dairy: 'muf-compare.ts', flock: 'muf-compare.ts', agri: 'muf-compare.ts' },
+  mufPrint:    { dairy: 'muf/data/muf-print.ts',  flock: 'muf/data/muf-print.ts',  agri: 'muf/data/muf-print.ts' },
+  mufCompare:  { dairy: 'muf/data/muf-compare.ts', flock: 'muf/data/muf-compare.ts', agri: 'muf/data/muf-compare.ts' },
   share:       { dairy: 'utils/share.ts', flock: 'utils/share.ts', agri: 'utils/share.ts' },
-  mufLabor:    { dairy: 'muf-labor.ts', flock: 'muf-labor.ts', agri: 'muf-labor.ts' },
-  mufZakat:    { dairy: 'muf-zakat.ts', flock: 'muf-zakat.ts', agri: 'muf-zakat.ts' },
-  mufPdf:      { dairy: 'muf-pdf.ts', flock: 'muf-pdf.ts', agri: 'muf-pdf.ts' },
-  mufFarmbook: { dairy: 'muf-farmbook.ts', flock: 'muf-farmbook.ts', agri: 'muf-farmbook.ts' },
-  mufUrdu:     { dairy: 'muf-urdu.ts', flock: 'muf-urdu.ts', agri: 'muf-urdu.ts' },
-  mufSearch:   { dairy: 'muf-search.ts', flock: 'muf-search.ts', agri: 'muf-search.ts' },
-  mufOffline:  { dairy: 'muf-offline.ts', flock: 'muf-offline.ts', agri: 'muf-offline.ts' },
-  mufCharts:   { dairy: 'muf-charts.tsx', flock: 'muf-charts.tsx', agri: 'muf-charts.tsx' },
-  mufProfile:  { dairy: 'muf-profile.ts', flock: 'muf-profile.ts', agri: 'muf-profile.ts' },
-  mufApplike:  { dairy: 'muf-applike.tsx', flock: 'muf-applike.tsx', agri: 'muf-applike.tsx' },
-  mufDate:     { dairy: 'muf-date.ts', flock: 'muf-date.ts', agri: 'muf-date.ts' },
-  mufStory:    { dairy: 'muf-story.ts', flock: 'muf-story.ts', agri: 'muf-story.ts' },
+  mufLabor:    { dairy: 'muf/domain/muf-labor.ts', flock: 'muf/domain/muf-labor.ts', agri: 'muf/domain/muf-labor.ts' },
+  mufZakat:    { dairy: 'muf/domain/muf-zakat.ts', flock: 'muf/domain/muf-zakat.ts', agri: 'muf/domain/muf-zakat.ts' },
+  mufPdf:      { dairy: 'muf/data/muf-pdf.ts', flock: 'muf/data/muf-pdf.ts', agri: 'muf/data/muf-pdf.ts' },
+  mufFarmbook: { dairy: 'muf/domain/muf-farmbook.ts', flock: 'muf/domain/muf-farmbook.ts', agri: 'muf/domain/muf-farmbook.ts' },
+  mufUrdu:     { dairy: 'muf/data/muf-urdu.ts', flock: 'muf/data/muf-urdu.ts', agri: 'muf/data/muf-urdu.ts' },
+  mufUrduTerms1: { dairy: 'muf/data/muf-urdu-terms-1.ts', flock: 'muf/data/muf-urdu-terms-1.ts', agri: 'muf/data/muf-urdu-terms-1.ts' },
+  mufSearch:   { dairy: 'muf/data/muf-search.ts', flock: 'muf/data/muf-search.ts', agri: 'muf/data/muf-search.ts' },
+  mufOffline:  { dairy: 'muf/data/muf-offline.ts', flock: 'muf/data/muf-offline.ts', agri: 'muf/data/muf-offline.ts' },
+  mufCharts:   { dairy: 'muf/ui/muf-charts.tsx', flock: 'muf/ui/muf-charts.tsx', agri: 'muf/ui/muf-charts.tsx' },
+  mufProfile:  { dairy: 'muf/data/muf-profile.ts', flock: 'muf/data/muf-profile.ts', agri: 'muf/data/muf-profile.ts' },
+  mufApplike:  { dairy: 'muf/core/muf-applike.tsx', flock: 'muf/core/muf-applike.tsx', agri: 'muf/core/muf-applike.tsx' },
+  mufDate:     { dairy: 'muf/data/muf-date.ts', flock: 'muf/data/muf-date.ts', agri: 'muf/data/muf-date.ts' },
+  mufStory:    { dairy: 'muf/data/muf-story.ts', flock: 'muf/data/muf-story.ts', agri: 'muf/data/muf-story.ts' },
   mufTelegram: { dairy: '../../backend/muf-telegram.mjs', flock: '../../backend/muf-telegram.mjs', agri: '../../backend/muf-telegram.mjs' },
-  mufSupplier: { dairy: 'muf-supplier.ts', flock: 'muf-supplier.ts', agri: 'muf-supplier.ts' },
-  mufMotion:   { dairy: 'muf-motion.ts', flock: 'muf-motion.ts', agri: 'muf-motion.ts' },
-  mufPortal:   { dairy: 'muf-portal.tsx', flock: 'muf-portal.tsx', agri: 'muf-portal.tsx' },
-  mufFormOverlay: { dairy: 'muf-form-overlay.tsx', flock: 'muf-form-overlay.tsx', agri: 'muf-form-overlay.tsx' },
-  mufScrollLock: { dairy: 'muf-scroll-lock.ts', flock: 'muf-scroll-lock.ts', agri: 'muf-scroll-lock.ts' },
-  mufOfflineBanner: { dairy: 'muf-offline-banner.tsx', flock: 'muf-offline-banner.tsx', agri: 'muf-offline-banner.tsx' },
-  mufAvatar: { dairy: 'muf-avatar.tsx', flock: 'muf-avatar.tsx' },
-  mufFarmProfile: { dairy: 'muf-farm-profile.tsx', flock: 'muf-farm-profile.tsx', agri: 'muf-farm-profile.tsx' },
-  mufHeaderSearch: { dairy: 'muf-header-search.tsx', flock: 'muf-header-search.tsx', agri: 'muf-header-search.tsx' },
-  mufTelegramPanel: { dairy: 'muf-telegram-panel.tsx', flock: 'muf-telegram-panel.tsx', agri: 'muf-telegram-panel.tsx' },
-  mufDiaryMedia: { dairy: 'muf-diary-media.tsx', flock: 'muf-diary-media.tsx', agri: 'muf-diary-media.tsx' },
-  mufDiary: { dairy: 'muf-diary.tsx', flock: 'muf-diary.tsx', agri: 'muf-diary.tsx' },
-  mufA11y: { dairy: 'muf-a11y.ts', flock: 'muf-a11y.ts', agri: 'muf-a11y.ts' },
+  mufSupplier: { dairy: 'muf/domain/muf-supplier.ts', flock: 'muf/domain/muf-supplier.ts', agri: 'muf/domain/muf-supplier.ts' },
+  mufMotion:   { dairy: 'muf/core/muf-motion.ts', flock: 'muf/core/muf-motion.ts', agri: 'muf/core/muf-motion.ts' },
+  mufPortal:   { dairy: 'muf/core/muf-portal.tsx', flock: 'muf/core/muf-portal.tsx', agri: 'muf/core/muf-portal.tsx' },
+  mufFormOverlay: { dairy: 'muf/core/muf-form-overlay.tsx', flock: 'muf/core/muf-form-overlay.tsx', agri: 'muf/core/muf-form-overlay.tsx' },
+  mufScrollLock: { dairy: 'muf/core/muf-scroll-lock.ts', flock: 'muf/core/muf-scroll-lock.ts', agri: 'muf/core/muf-scroll-lock.ts' },
+  mufOfflineBanner: { dairy: 'muf/core/muf-offline-banner.tsx', flock: 'muf/core/muf-offline-banner.tsx', agri: 'muf/core/muf-offline-banner.tsx' },
+  mufAvatar: { dairy: 'muf/ui/muf-avatar.tsx', flock: 'muf/ui/muf-avatar.tsx' },
+  mufFarmProfile: { dairy: 'muf/ui/muf-farm-profile.tsx', flock: 'muf/ui/muf-farm-profile.tsx', agri: 'muf/ui/muf-farm-profile.tsx' },
+  mufHeaderSearch: { dairy: 'muf/ui/muf-header-search.tsx', flock: 'muf/ui/muf-header-search.tsx', agri: 'muf/ui/muf-header-search.tsx' },
+  mufTelegramPanel: { dairy: 'muf/ui/muf-telegram-panel.tsx', flock: 'muf/ui/muf-telegram-panel.tsx', agri: 'muf/ui/muf-telegram-panel.tsx' },
+  mufDiaryMedia: { dairy: 'muf/ui/muf-diary-media.tsx', flock: 'muf/ui/muf-diary-media.tsx', agri: 'muf/ui/muf-diary-media.tsx' },
+  mufDiary: { dairy: 'muf/ui/muf-diary.tsx', flock: 'muf/ui/muf-diary.tsx', agri: 'muf/ui/muf-diary.tsx' },
+  mufA11y: { dairy: 'muf/core/muf-a11y.ts', flock: 'muf/core/muf-a11y.ts', agri: 'muf/core/muf-a11y.ts' },
 };
 const INVARIANTS = [
   // [label, file-group, regex (first capture group compared)]
@@ -301,6 +319,14 @@ const INVARIANTS = [
   ['panel radius consumes token', 'mufStyle', /\.muf-panel\s*\{[^}]*border-radius:\s*(var\(--muf-core-panel-radius,20px\))/],
   ['entity card radius consumes token', 'mufStyle', /\.muf-entity-card\s*\{[^}]*border-radius:\s*(var\(--muf-core-entity-radius,17px\))/],
   ['record action color consumes token', 'mufStyle', /\.muf-record-btn\s*\{[^}]*background:\s*(var\(--muf-core-action-record-bg,#f0f3f1\))/],
+  ['popup content: label primitive',      'mufStyle', /\.muf-pc-label \{[^}]*(font-weight: 600)/],
+  ['popup content: muted text primitive', 'mufStyle', /\.muf-pc-muted \{[^}]*(font-size: 0\.75rem)/],
+  ['popup content: form grid primitive',  'mufStyle', /\.muf-pc-form-grid \{[^}]*(gap: 0\.75rem)/],
+  ['popup content: actions primitive',    'mufStyle', /\.muf-pc-actions \{[^}]*(justify-content: flex-end)/],
+  ['popup content: mobile scale hook',    'mufStyle', /\.muf-popup-stage \.muf-pc-label,[^}]*(var\(--muf-popup-mobile-text-xs,\s*10\.5px\))/],
+  ['popup content: dark popup hook',      'mufStyle', /\.dark \.muf-popup-stage \.muf-pc-label,[^}]*(#e5edf7)/],
+  ['brand token: WhatsApp green',        'mufStyle', /--muf-brand-whatsapp:\s*(#25D366)/],
+  ['brand token: WhatsApp hover',        'mufStyle', /--muf-brand-whatsapp-hover:\s*(#1ebe5b)/],
   ['photo viewer z-index token',    'mufStyle',    /--muf-z-photo: (1450)/],
   ['Notes MUF root class',          'mufDiary',    /className="(muf-notes)"/],
   // Both popup sizes intentionally share one CSS rule for the unified header scale.
@@ -336,7 +362,7 @@ const INVARIANTS = [
   ['labor: advance helper',         'mufLabor',    /function (payoutAfterAdvances)\(/],
   ['farmbook: download helper',     'mufFarmbook', /function (downloadFarmBookPdf)\(/],
   ['urdu: dictionary helper',       'mufUrdu',     /function (mufUr)\(/],
-  ['urdu: Dashboard term',          'mufUrdu',     /'Dashboard': '(ڈیش بورڈ)'/],
+  ['urdu: Dashboard term',          'mufUrduTerms1', /'Dashboard': '(ڈیش بورڈ)'/],
   ['search: ranking helper',        'mufSearch',   /function (mufSearch)\(/],
   ['offline: watch helper',         'mufOffline',  /function (watchOffline)\(/],
   ['charts: area chart component',  'mufCharts',   /function (MufAreaChart)\(/],
@@ -451,7 +477,7 @@ console.log('\n━━ muf-urdu shared helpers (all 3 apps) ━━');
 [['urdu: mufUr helper', /export function mufUr\(/],
  ['urdu: mufFill helper', /export function mufFill\(/],
  ['urdu: mufL helper', /export function mufL\(/]].forEach(([label, re]) => {
-  const ok3 = ['dairy_farm/client/src/muf-urdu.ts', 'flock_farm/client/src/muf-urdu.ts', 'agri_farm/frontend/src/muf-urdu.ts']
+  const ok3 = ['dairy_farm/client/src/muf/data/muf-urdu.ts', 'flock_farm/client/src/muf/data/muf-urdu.ts', 'agri_farm/frontend/src/muf/data/muf-urdu.ts']
     .every((p) => re.test(read(p)));
   if (ok3) console.log('  ✅ ' + pad(label, 36) + '(all 3)');
   else { console.log('  ❌ ' + pad(label, 36) + 'missing in at least one app'); failures++; }
@@ -557,9 +583,9 @@ for (const [label, re] of BACKEND_CHECKS) {
 // ─── 6. PDF TWIN HELPER: mufLastAutoTableY must exist in all 3 muf-pdf twins ─
 console.log('\n━━ muf-pdf: typed finalY helper present in all 3 apps ━━');
 const MUF_PDF_FILES = {
-  dairy: 'dairy_farm/client/src/muf-pdf.ts',
-  flock: 'flock_farm/client/src/muf-pdf.ts',
-  agri:  'agri_farm/frontend/src/muf-pdf.ts',
+  dairy: 'dairy_farm/client/src/muf/data/muf-pdf.ts',
+  flock: 'flock_farm/client/src/muf/data/muf-pdf.ts',
+  agri:  'agri_farm/frontend/src/muf/data/muf-pdf.ts',
 };
 const PDF_HELPER_CHECKS = [
   // The helper itself — single `any` escape hatch per TS twin.
@@ -596,9 +622,9 @@ scanRule('lastAutoTable only via mufLastAutoTableY helper', Object.entries(APPS)
 // ─── 7. muf-image twin parity: file must exist in all 3 apps ────────────────
 console.log('\n━━ muf-image twin present in all 3 apps ━━');
 const MUF_IMAGE_FILES = {
-  dairy: 'dairy_farm/client/src/muf-image.ts',
-  flock: 'flock_farm/client/src/muf-image.ts',
-  agri:  'agri_farm/frontend/src/muf-image.ts',
+  dairy: 'dairy_farm/client/src/muf/data/muf-image.ts',
+  flock: 'flock_farm/client/src/muf/data/muf-image.ts',
+  agri:  'agri_farm/frontend/src/muf/data/muf-image.ts',
 };
 const IMAGE_TWIN_CHECKS = [
   ['muf-image: compressGalleryImage exported', /export\s+function\s+(compressGalleryImage)\s*\(/],
@@ -623,9 +649,9 @@ for (const [label, re] of IMAGE_TWIN_CHECKS) {
 // ─── 8. muf-voice twin parity: file must exist in all 3 apps ────────────────
 console.log('\n━━ muf-voice twin present in all 3 apps ━━');
 const MUF_VOICE_FILES = {
-  dairy: 'dairy_farm/client/src/muf-voice.ts',
-  flock: 'flock_farm/client/src/muf-voice.ts',
-  agri:  'agri_farm/frontend/src/muf-voice.ts',
+  dairy: 'dairy_farm/client/src/muf/data/muf-voice.ts',
+  flock: 'flock_farm/client/src/muf/data/muf-voice.ts',
+  agri:  'agri_farm/frontend/src/muf/data/muf-voice.ts',
 };
 const VOICE_TWIN_CHECKS = [
   ['muf-voice: isVoiceSupported exported',  /export\s+function\s+(isVoiceSupported)\s*\(/],

@@ -253,3 +253,12 @@ The root `package.json` exposes `npm run check-workbench` as an alias for `node 
 ## Documentation cleanup
 
 Reviewed the branch's ten Markdown files: `README.md`, `RULES.md`, `PHASES.md`, `MUF_FULL_AUDIT.md`, `MUF_WORKBENCH_AUDIT.md`, `MUF_OVERVIEW.md`, `muf-rules.md`, and the three app-specific README files. Renamed the unclear legacy filename `muf-.md` to `MUF_OVERVIEW.md`, updated the root README and all three app README references, then removed the old path. The current tree contains no references to `muf-.md`. The remaining Markdown files have distinct uses, so no other document was deleted just to lower the file count.
+
+## Phases 6 to 12 continuation (2026-10-16)
+
+Applied on top of the newest head (the owner's `64b6246` run plus 22 newer commits). Full detail, evidence and open items are in `PHASES.md` (Phases 6 to 12).
+
+- **Styling:** 17 `muf-pc-*` popup content classes were added and 131 matching Tailwind class strings inside popups were swapped one-to-one, preserving the desktop scale, the admin-shell mobile scale and dark-mode rules that previously hung off Tailwind class names. Hard-coded colors were reviewed (about 513 literals, most in print/PDF/SVG/chart code where tokens cannot apply); only 22 border pairs and the WhatsApp green were tokenized. Duplicate small/big popup rules were merged and three exact duplicates removed, proven rule-by-rule with PostCSS.
+- **Structure:** nine components and the Urdu dictionary were moved verbatim out of large files; 55 MUF modules (53 in Agri) now live under `src/muf/core`, `admin`, `ui`, `data` and `domain`; `muf-style.css` is an entry that imports ten ordered parts from `src/muf/styles/`. The compiled stylesheet is byte-identical before and after the split and moves.
+- **Stylesheet metrics note:** the metrics above describe the old single `muf-style.css`; the same rules now live across the entry and its ten parts (the checks read them as one stylesheet).
+- **Open:** browser regression, the Vitest/lockfile dependency upgrade, Puck, cross-selector `!important` cleanup and splitting the main components (see `PHASES.md`, Phase 12).

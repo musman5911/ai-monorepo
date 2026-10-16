@@ -5,7 +5,7 @@ This file is the detailed rulebook for shared MUF UI changes. RULES.md remains t
 ## Shared-source rules
 
 1. Keep shared MUF twins synchronized in all applicable projects in the same commit.
-2. Keep all three muf-style.css copies byte-identical.
+2. Keep all three copies of the MUF stylesheet byte-identical (the `muf-style.css` entry and every file in `muf/styles/`; the entry's `@import` order is the cascade order).
 3. Prefer semantic --muf-* variables and reusable .muf-* classes for repeated presentation.
 4. Keep app-specific calculations and behaviors in app-specific components.
 5. Do not remove a component or style just because it appears unused in a static text search.

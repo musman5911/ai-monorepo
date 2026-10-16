@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import { BookOpen, Save, Mic, Square, Trash2 } from 'lucide-react';
-import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, VoiceRecorder } from '../muf-voice';
-import { notify } from '../muf-confirm';
+import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, VoiceRecorder } from '../muf/data/muf-voice';
+import { notify } from '../muf/core/muf-confirm';
 import { DiaryEntry, Lang } from '../types';
 import { t } from '../i18n';
 import { todayStr } from '../utils/calculations';
-import MufDiaryMedia, { type DiaryPhoto } from '../muf-diary-media';
+import MufDiaryMedia, { type DiaryPhoto } from '../muf/ui/muf-diary-media';
 import { uploadImage } from '../api';
 
 interface DiaryNotesProps {

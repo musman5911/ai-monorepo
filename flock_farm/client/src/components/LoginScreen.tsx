@@ -1,14 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import { LogIn, AlertCircle, ArrowLeft, Check, Mail, UserPlus, Eye, EyeOff } from 'lucide-react';
-import { AnimatePresence, motion } from '../muf-motion';
-import MufLoginLang from '../muf-login-lang';
-import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from '../muf-login';
+import { AnimatePresence, motion } from '../muf/core/muf-motion';
+import MufLoginLang from '../muf/ui/muf-login-lang';
+import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from '../muf/ui/muf-login';
 import { Lang } from '../types';
 import {
   login, forgotPassword, resetPassword,
   signupRequestCode, signupVerify, getCanSignup, getMailStatus,
 } from '../api';
+import { CodeInput } from './login/CodeInput';
 
 interface Props {
   lang: Lang;
@@ -461,34 +462,5 @@ function AlertBox({ type, text }: { type: 'err' | 'ok'; text: string }) {
       {type === 'err' ? <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" /> : <Check className="w-4 h-4 mt-0.5 shrink-0" />}
       <span>{text}</span>
     </motion.div>
-  );
-}
-
-function CodeInput({ value, refs, onChange, onKey }: {
-  value: string;
-  setter: (v: string) => void;
-  refs: React.MutableRefObject<(HTMLInputElement | null)[]>;
-  onChange: (idx: number, val: string) => void;
-  onKey: (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => void;
-}) {
-  const digits = value.split('');
-  while (digits.length < 6) digits.push('');
-  return (
-    <div className="flex justify-between gap-2">
-      {digits.map((d, i) => (
-        <input
-          key={i}
-          ref={(el) => { refs.current[i] = el; }}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
-          value={d}
-          onChange={(e) => onChange(i, e.target.value)}
-          onKeyDown={(e) => onKey(i, e)}
-          onFocus={(e) => e.target.select()}
-          className="w-12 h-14 text-center text-2xl font-bold font-mono border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:border-farm-400 focus:ring-2 focus:ring-farm-100 dark:focus:ring-farm-900/40 focus:outline-none transition"
-        />
-      ))}
-    </div>
   );
 }

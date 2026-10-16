@@ -5,15 +5,15 @@
 // math + the Urdu WhatsApp text come from the muf-supplier twin.
 import { useEffect, useMemo, useState } from 'react';
 import { Store, Plus, Trash2, Share2, Wallet, QrCode, Pencil } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
-import DetailModal from '../muf-modal';
+import MufCardQr from '../muf/ui/muf-card-qr';
+import DetailModal from '../muf/core/muf-modal';
 import { api } from '../api';
 import { L } from '../i18n';
-import { useConfirm, notify } from '../muf-confirm';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 import type { Supplier, SupplierPayment, Expense } from '../types';
 import { todayStr, formatDate } from '../utils/date';
 import { shareViaWhatsAppTo } from '../utils/share';
-import { supplierBalances, supplierTotals, supplierHisabText, type SupplierRow } from '../muf-supplier';
+import { supplierBalances, supplierTotals, supplierHisabText, type SupplierRow } from '../muf/domain/muf-supplier';
 
 const FARM_SIGNATURE = '— Usman Dairy Farm';
 

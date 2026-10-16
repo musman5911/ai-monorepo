@@ -7,23 +7,23 @@ import {
   Check, AlertCircle,
   FileText, RefreshCw, Globe2,
 } from 'lucide-react';
-import AvatarUploader from '../muf-avatar';
-import { useConfirm, usePromptInput, notify } from '../muf-confirm';
+import AvatarUploader from '../muf/ui/muf-avatar';
+import { useConfirm, usePromptInput, notify } from '../muf/core/muf-confirm';
 import ExportCenter from './ExportCenter';
 import MyFarmsPanel from './MyFarmsPanel';
 import BuyerKhata from './BuyerKhata';
 import { shareBackupFile, shareViaWhatsAppTo } from '../utils/share';
-import TelegramPanel from '../muf-telegram-panel';
-import MufAdminShell from '../muf-admin-shell';
-import MufAdminCard from '../muf-admin-card';
-import MufAdminButton from '../muf-admin-button';
-import MufAdminUsers from '../muf-admin-users';
-import MufAdminReports from '../muf-admin-reports';
-import MufAdminGeneral from '../muf-admin-general';
+import TelegramPanel from '../muf/ui/muf-telegram-panel';
+import MufAdminShell from '../muf/admin/muf-admin-shell';
+import MufAdminCard from '../muf/admin/muf-admin-card';
+import MufAdminButton from '../muf/admin/muf-admin-button';
+import MufAdminUsers from '../muf/admin/muf-admin-users';
+import MufAdminReports from '../muf/admin/muf-admin-reports';
+import MufAdminGeneral from '../muf/admin/muf-admin-general';
 import { api } from '../api';
 import type { AuthUser, Buyer, Rate, RateHistory, UserRole } from '../types';
 import { fmtPKR } from '../utils/format';
-import {mufToday} from '../muf-date';
+import {mufToday} from '../muf/data/muf-date';
 
 interface Props {
   username: string | null;

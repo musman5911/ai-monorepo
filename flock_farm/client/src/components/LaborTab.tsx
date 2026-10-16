@@ -4,12 +4,12 @@
 // Data lives in the 'laborers' + 'laborAttendance' buckets (admin-only write);
 // posting a month appends ONE labor expense to the normal expenses ledger.
 import React, { useMemo, useState } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import { HardHat, Plus, Trash2, CheckCircle2, QrCode, Pencil } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
-import DetailModal from '../muf-modal';
+import MufCardQr from '../muf/ui/muf-card-qr';
+import DetailModal from '../muf/core/muf-modal';
 import { Lang, LaborWorker, LaborAttendanceEntry, LaborAdvanceEntry, OtherExpense } from '../types';
-import { notify, useConfirm } from '../muf-confirm';
+import { notify, useConfirm } from '../muf/core/muf-confirm';
 import {
   workerSummary,
   unpostedTotal,
@@ -22,7 +22,7 @@ import {
   MufLaborWorker,
   MufAttendanceRow,
   MufAdvanceRow,
-} from '../muf-labor';
+} from '../muf/domain/muf-labor';
 
 interface LaborTabProps {
   lang: Lang;
@@ -35,7 +35,7 @@ interface LaborTabProps {
   onAddExpense: (expense: Omit<OtherExpense, 'id'>) => void;
 }
 
-import {mufToday, mufMonth} from '../muf-date';
+import {mufToday, mufMonth} from '../muf/data/muf-date';
 
 // Local-timezone today — toISOString() is UTC and gives yesterday before 5 AM PKT.
 const todayStr = () => mufToday();
@@ -379,8 +379,8 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
             <label className={labelClass}>{L('Notes')}</label>
             <input className={fieldClass} value={editWorkerForm.notes} onChange={(e) => setEditWorkerForm({ ...editWorkerForm, notes: e.target.value })} />
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setEditingWorker(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+          <div className="muf-pc-actions">
+            <button type="button" onClick={() => setEditingWorker(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
             <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl">{L('Save changes')}</button>
           </div>
         </form>
@@ -405,8 +405,8 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
             <label className={labelClass}>{L('Notes')}</label>
             <input className={fieldClass} value={editAttForm.notes} onChange={(e) => setEditAttForm({ ...editAttForm, notes: e.target.value })} />
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setEditAtt(null)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+          <div className="muf-pc-actions">
+            <button type="button" onClick={() => setEditAtt(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
             <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl">{L('Save changes')}</button>
           </div>
         </form>
@@ -430,8 +430,8 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
             <label className={labelClass}>{L('Notes')}</label>
             <input className={fieldClass} value={workerForm.notes} onChange={(e) => setWorkerForm({ ...workerForm, notes: e.target.value })} placeholder={L('Optional role')} />
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setShowAddWorkerModal(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+          <div className="muf-pc-actions">
+            <button type="button" onClick={() => setShowAddWorkerModal(false)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
             <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5"><Plus className="w-3.5 h-3.5" /> {L('Add worker')}</button>
           </div>
         </form>
@@ -463,8 +463,8 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
             <label className={labelClass}>{L('Notes')}</label>
             <input className={fieldClass} value={markForm.notes} onChange={(e) => setMarkForm({ ...markForm, notes: e.target.value })} />
           </div>
-          <div className="flex justify-end gap-3 pt-2">
-            <button type="button" onClick={() => setShowMarkAttModal(false)} className="px-4 py-2 text-sm text-slate-600">{L('Cancel')}</button>
+          <div className="muf-pc-actions">
+            <button type="button" onClick={() => setShowMarkAttModal(false)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
             <button type="submit" className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl">{L('Save attendance')}</button>
           </div>
         </form>

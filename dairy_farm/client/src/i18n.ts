@@ -21,7 +21,7 @@ export function setCurrentLang(lang: Lang): void {
   document.documentElement.lang = lang === 'ur' ? 'ur' : 'en';
 }
 
-import { mufL } from './muf-urdu';
+import { mufL } from './muf/data/muf-urdu';
 
 /**
  * Bilingual pick: L('Milk').

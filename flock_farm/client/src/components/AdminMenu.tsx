@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import {
   Shield, LogOut, X, AlertCircle, Check, Settings,
   Languages, Save, RotateCcw, AlertTriangle, RefreshCw,
   FileSpreadsheet, Download, Upload, Users, UserRound,
   Database, FileText, Send, Loader2, MessageCircle, Mail, Globe2,
 } from 'lucide-react';
-import { AnimatePresence, motion } from '../muf-motion';
+import { AnimatePresence, motion } from '../muf/core/muf-motion';
 import { Lang, GlobalSettings, Bird, OtherExpense, FeedRecord, EggProduction, VaccinationRecord, Customer, CustomerSale, IncubationRecord, DailyChecklistEntry, DiaryEntry, LaborWorker, LaborAttendanceEntry, LaborAdvanceEntry } from '../types';
 import {
   logout as apiLogout, changePassword, changePasswordWithCode, requestProfileCode, AuthUser, updateMe, getToken,
@@ -15,24 +15,24 @@ import {
   telegramStatus, telegramLinkCode, telegramUnlink, telegramSettings, telegramSaveSettings, telegramSendSummary, listUsers,
   createUser, updateUser, deleteUser,
 } from '../api';
-import AvatarUploader from '../muf-avatar';
+import AvatarUploader from '../muf/ui/muf-avatar';
 import MyFarmsPanel from './MyFarmsPanel';
-import TelegramPanel from '../muf-telegram-panel';
+import TelegramPanel from '../muf/ui/muf-telegram-panel';
 import { shareBackupFile } from '../utils/share';
 import ExportCenter from './ExportCenter';
 import { shareViaWhatsApp } from '../utils/share';
 import { todayStr as localTodayStr } from '../utils/calculations';
 import UserManagement from './UserManagement';
-import ModalPortal from '../muf-portal';
-import MufAdminShell from '../muf-admin-shell';
-import MufAdminCard from '../muf-admin-card';
-import MufAdminButton from '../muf-admin-button';
-import MufAdminUsers from '../muf-admin-users';
-import MufAdminReports from '../muf-admin-reports';
-import MufAdminGeneral from '../muf-admin-general';
+import ModalPortal from '../muf/core/muf-portal';
+import MufAdminShell from '../muf/admin/muf-admin-shell';
+import MufAdminCard from '../muf/admin/muf-admin-card';
+import MufAdminButton from '../muf/admin/muf-admin-button';
+import MufAdminUsers from '../muf/admin/muf-admin-users';
+import MufAdminReports from '../muf/admin/muf-admin-reports';
+import MufAdminGeneral from '../muf/admin/muf-admin-general';
 import { getFarmLocation, saveFarmLocation } from '../api';
-import { useConfirm, notify } from '../muf-confirm';
-import { useBodyScrollLock } from '../muf-scroll-lock';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
+import { useBodyScrollLock } from '../muf/core/muf-scroll-lock';
 import {
   exportEggPDF,
   exportExpensePDF,
@@ -43,7 +43,7 @@ import {
   parseBackupFile,
 } from '../reportExport';
 import type { FlockFarmBackup } from '../reportExport';
-import { mufToday } from '../muf-date';
+import { mufToday } from '../muf/data/muf-date';
 
 interface AdminMenuProps {
   open: boolean;

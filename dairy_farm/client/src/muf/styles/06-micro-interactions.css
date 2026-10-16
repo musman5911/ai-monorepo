@@ -1,0 +1,182 @@
+/* ================================================================
+   MUF MICRO-INTERACTIONS (shared across all 3 farm apps)
+   Same hover / click / transition / tab-entrance feel everywhere.
+   Only transform + opacity animate, 80-260ms, honors reduced motion.
+   ================================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  button,
+  [role="button"],
+  a.button,
+  .cursor-pointer {
+    transition: transform 90ms cubic-bezier(.2,.8,.2,1), box-shadow 120ms ease, background-color 120ms ease, color 120ms ease, border-color 120ms ease;
+    will-change: transform;
+  }
+  button:active,
+  [role="button"]:active {
+    transform: scale(0.97);
+  }
+  input, select, textarea {
+    transition: box-shadow 120ms ease, border-color 120ms ease, background-color 120ms ease;
+  }
+  /* Quick fade-in on tab mount for tab panels */
+  .tab-panel {
+    animation: muf-fade-up 180ms cubic-bezier(.2,.8,.2,1) backwards;
+  }
+  /* Lightweight stagger for the direct children of a tab panel */
+  .tab-panel > * {
+    animation: muf-fade-up 260ms cubic-bezier(.2,.8,.2,1) backwards;
+  }
+  .tab-panel > *:nth-child(1) { animation-delay: 0ms; }
+  .tab-panel > *:nth-child(2) { animation-delay: 35ms; }
+  .tab-panel > *:nth-child(3) { animation-delay: 70ms; }
+  .tab-panel > *:nth-child(4) { animation-delay: 100ms; }
+  .tab-panel > *:nth-child(5) { animation-delay: 130ms; }
+  .tab-panel > *:nth-child(6) { animation-delay: 155ms; }
+  .tab-panel > *:nth-child(n+7) { animation-delay: 175ms; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tab-panel, .tab-panel > *, main > * {
+    animation: none !important;
+    transition: none !important;
+  }
+  button:active, [role="button"]:active { transform: none !important; }
+}
+
+/* Full-width layout guard: content is edge-to-edge now, so any accidentally
+   wide child (table, chart) must scroll inside its own container instead of
+   widening the page — a page-level horizontal scrollbar would also stop
+   fixed modal overlays from visually covering everything. */
+html, body {
+  /* 'clip' cuts overflow WITHOUT creating a scroll container, so the sticky
+     .muf-header keeps working; 'hidden' is the fallback for old browsers. */
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+@keyframes muf-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes muf-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+/* ═══════════════════════════════════════════════════════════════
+   muf-dark — shared dark-mode palette & polish (identical block
+   in all three apps' muf-style.css; checked by check-muf-sync).
+   ═══════════════════════════════════════════════════════════════ */
+:root {
+  --muf-dark-bg: #0b1220;
+  --muf-dark-card: #0f172a;
+  --muf-dark-border: #263243;
+  --muf-dark-text: #e2e8f0;
+  --muf-dark-muted: #94a3b8;
+  --muf-dark-green: #34d399;
+}
+
+/* Readable placeholders (were too dim on dark cards) */
+.dark input::placeholder,
+.dark textarea::placeholder,
+.dark select:invalid { color: #64748b !important; opacity: 1; }
+
+/* Text selection uses the farm green in dark mode */
+.dark ::selection { background: rgba(52, 211, 153, 0.35); color: #f1f5f9; }
+
+/* Dark scrollbars instead of bright white tracks */
+.dark ::-webkit-scrollbar { width: 10px; height: 10px; }
+.dark ::-webkit-scrollbar-track { background: var(--muf-dark-bg); }
+.dark ::-webkit-scrollbar-thumb { background: var(--muf-dark-border); border-radius: 8px; }
+.dark ::-webkit-scrollbar-thumb:hover { background: #33415b; }
+.dark * { scrollbar-color: var(--muf-dark-border) var(--muf-dark-bg); }
+
+/* Native date / month / time / number pickers render dark */
+.dark input[type="date"],
+.dark input[type="month"],
+.dark input[type="time"],
+.dark input[type="datetime-local"],
+.dark input[type="number"],
+.dark select { color-scheme: dark; }
+
+/* Voice-note audio players blend into dark cards */
+.dark audio { filter: invert(0.85) hue-rotate(180deg); border-radius: 8px; }
+
+/* Disabled buttons stay visible (not near-black on black) */
+.dark button:disabled { opacity: 0.45; }
+
+/* Dividers that used pure black lines get a soft slate tone */
+.dark hr { border-color: var(--muf-dark-border); }
+/* ═══════════════════════════════════════════════════════════════
+   muf-applike — splash screen, pull-to-refresh, what's-new popup
+   (identical block in all three apps' muf-style.css).
+   ═══════════════════════════════════════════════════════════════ */
+#muf-splash { position:fixed; inset:0; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; background:#f6f8f4; transition:opacity .45s ease; }
+.dark #muf-splash { background:#07100a; }
+#muf-splash img { width:88px; height:88px; border-radius:50%; box-shadow:0 10px 30px rgba(22,101,52,.25); animation:muf-splash-pop .6s cubic-bezier(.34,1.56,.64,1) both; }
+#muf-splash p { margin:0; font-weight:800; font-size:15px; letter-spacing:.02em; color:#14532d; animation:muf-splash-fade .8s ease .15s both; }
+.dark #muf-splash p { color:#dcecdf; }
+#muf-splash::after { content:''; width:26px; height:26px; border-radius:50%; border:3px solid #bbf7d0; border-top-color:#16a34a; animation:muf-spin 1s linear infinite; }
+#muf-splash.muf-splash-hide { opacity:0; pointer-events:none; }
+@keyframes muf-splash-pop { from { transform:scale(.6); opacity:0; } to { transform:scale(1); opacity:1; } }
+@keyframes muf-splash-fade { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:none; } }
+@keyframes muf-spin { to { transform:rotate(360deg); } }
+
+.muf-ptr { position:fixed; top:8px; left:50%; z-index:1800; width:38px; height:38px; display:flex; align-items:center; justify-content:center; background:#ffffff; color:#16a34a; font-size:20px; font-weight:900; border-radius:50%; border:1px solid #e2e8f0; box-shadow:0 6px 18px rgba(15,23,42,.18); opacity:0; transform:translateX(-50%); pointer-events:none; transition:opacity .2s ease; }
+.dark .muf-ptr { background:#0f172a; border-color:#263243; color:#34d399; }
+.muf-ptr-ready { background:#16a34a !important; color:#ffffff !important; }
+.muf-ptr-spin { animation:muf-spin .7s linear infinite; }
+
+.muf-whatsnew-card { animation:muf-splash-fade .35s ease both; }
+
+
+/* MUF Admin Hub — visual-only refinement shared by all three farms. */
+.muf-admin-shell {
+  box-shadow: 0 28px 80px rgba(2, 6, 23, .28), 0 4px 14px rgba(2, 6, 23, .10);
+  isolation: isolate;
+}
+.muf-admin-shell > .muf-top-nav,
+.muf-admin-shell .muf-admin-tabs-inline {
+  background: rgba(248, 250, 252, .94);
+  border-bottom: 1px solid #e2e8f0;
+}
+.dark .muf-admin-shell > .muf-top-nav,
+.dark .muf-admin-shell .muf-admin-tabs-inline {
+  background: rgba(15, 23, 42, .92);
+  border-bottom-color: #263243;
+}
+.muf-admin-shell .muf-nav-link {
+  min-height: 40px;
+  gap: 8px;
+  padding: 10px 13px;
+  border-radius: 11px 11px 0 0;
+  font-weight: 700;
+  letter-spacing: .005em;
+  white-space: nowrap;
+  transition: color .16s ease, background-color .16s ease, box-shadow .16s ease;
+}
+.muf-admin-shell .muf-nav-link:focus-visible {
+  outline: 2px solid var(--muf-ui-focus);
+  outline-offset: -2px;
+}
+.muf-admin-shell .muf-nav-link.active {
+  box-shadow: inset 0 -2px 0 var(--muf-color-primary);
+}
+.muf-admin-shell input:not([type="checkbox"]):not([type="radio"]),
+.muf-admin-shell select,
+.muf-admin-shell textarea {
+  max-width: 100%;
+}
+.muf-admin-shell button {
+  -webkit-tap-highlight-color: transparent;
+}
+@media (max-width: 640px) {
+  .muf-admin-shell {
+    max-height: calc(100dvh - 16px) !important;
+    border-radius: 18px !important;
+  }
+  .muf-admin-shell .muf-nav-link {
+    min-height: 40px;
+    padding: 9px 11px;
+  }
+}
+
