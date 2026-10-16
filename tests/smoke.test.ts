@@ -163,8 +163,11 @@ describe('Summary-first detail popup contracts', () => {
     expect(source).toContain("!row.posted");
   });
 
-  it('Agri labor attendance detail retains crop/field/notes and admin-only row actions', () => {
+  it('Agri labor summaries are accessible, compact, and preserve admin-only actions', () => {
     const source = readSource('agri_farm/frontend/src/components/LaborBoard.tsx');
+    expect(source).toContain("aria-label={L('Open worker details') + ': ' + worker.name}");
+    expect(source).toContain('setDetailFor(worker)');
+    expect(source).toContain("L('View notes')");
     expect(source).toContain('setSelectedAttendance(row)');
     expect(source).toContain("title={L('Attendance details')}");
     expect(source).toContain('selectedAttendance.field');
