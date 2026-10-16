@@ -1,6 +1,6 @@
 # MUF Design-System Full Audit
 
-Audit snapshot: 2026-10-15  
+Audit snapshot: 2026-10-16  
 Working branch: `arena/20261014-muf-mobile-popups`
 
 This document records source findings, implementation batches, and validation evidence. A GitHub source read or source-pattern assertion is not a substitute for a local TypeScript build or browser session.
@@ -28,6 +28,26 @@ Source-level assertions run during these edits passed. These assertions only val
 - `0d78ac2` — Active Birds rows now support Enter/Space activation, accessible names and visible keyboard focus while continuing to open the existing shared bird-detail popup and return to the parent list.
 - `4f33f2d` — added two source-contract tests for Active Birds keyboard/detail behavior and the bounded mobile Admin shell with internal scrolling. These tests have **not** been run locally yet.
 - Source review confirms the Flock Admin shell already uses the shared mobile height cap and internal scrolling. The four compact Active Birds filter controls and shared bird-detail popup were already implemented; no duplicate rewrite was needed.
+
+## Owner validation results and implementation continuation (2026-10-16)
+
+Owner-run local validation on the pulled source head `64b6246`:
+- `npm test`: 4 files passed, 41/41 tests passed.
+- `node check-muf-sync.js`: passed; the three shared MUF CSS files and enforced twins matched.
+- `node check-ui-safety.js`: passed.
+- `npm run check-workbench`: passed 18/18 source safety checks.
+- `node --check audit-muf-design-system.mjs`: passed.
+- `node audit-muf-design-system.mjs`: completed. Agri: 35 DetailModal calls (21 small, 13 big, 0 missing, 1 dynamic); Dairy: 37 (26 small, 9 big, 0 missing, 2 dynamic); Flock: 69 (51 small, 17 big, 0 missing, 1 dynamic). No unsupported size literals.
+- `call build-all.bat`: all three applications built successfully. Dairy initially failed on unused `Coins` and `Users` imports in `ExpensesTab.tsx`; the script removed them and the retry passed. That exact cleanup was committed separately as `1f9e70c`.
+- `npm ci` reported four vulnerabilities (one moderate, one high, two critical) and flagged the `esbuild@0.28.2` install script for approval. The detailed `npm audit` output was not included in the owner's terminal capture, so dependency remediation remains open.
+
+These results apply to the local source head `64b6246`, not the follow-up commits below. After that validation, the branch added:
+- `0d78ac2` — keyboard access/focus for Flock Active Birds rows.
+- `1f9e70c` — remove unused Dairy expense icon imports surfaced by the successful build retry.
+- `f348674`, `c19c9a3`, `8be8057`, `c19c9a3`, `8cd10e0`, `de402f8` — Dairy and Agri labor attendance summaries now open a compact detail popup. Full date/worker/day/status/notes context remains available in details; admin edit/delete actions remain permission-gated, and Agri attendance notes remain admin-only.
+- `be19e23`, `47f07fd`, `f27588b` — added two regression tests and strengthened the check for admin-only Agri attendance notes. These follow-up tests have not yet been executed locally.
+
+**Current outstanding items:** pull and validate the new head; perform a compatible security dependency/lockfile upgrade and rerun tests/audit/build; then perform final browser regression after implementation finishes. Browser interaction testing remains intentionally deferred by owner request.
 
 ## Executive findings
 
