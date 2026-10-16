@@ -18,8 +18,6 @@ import {
   Banknote,
   LayoutGrid,
   Grid3x3,
-  Coins,
-  Users,
 } from 'lucide-react';
 import DetailModal from '../muf-modal';
 import { zakatStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, downloadZakatPdf } from '../muf-zakat';
