@@ -416,9 +416,9 @@ export default function LaborBoard({
                     title={L('Open details')}
                     className="min-w-0 flex-1 text-left rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-farm-500"
                   >
-                    <p className="text-sm font-black">{worker.name}</p>
-                    <p className="text-[11px] text-slate-500">Rs. {formatCurrency(worker.daily_wage || 0)} / {L('day')} · {worker.days || 0} {L('days this month')}</p>
-                    {worker.notes && <p className="text-[11px] text-slate-500">{L('View notes')}</p>}
+                    <span className="block text-sm font-black">{worker.name}</span>
+                    <span className="block text-[11px] text-slate-500">Rs. {formatCurrency(worker.daily_wage || 0)} / {L('day')} · {worker.days || 0} {L('days this month')}</span>
+                    {worker.notes && <span className="block text-[11px] text-slate-500">{L('View notes')}</span>}
                   </button>
                   {isAdmin && (
                     <div className="flex items-center gap-1">
@@ -567,8 +567,8 @@ export default function LaborBoard({
                     onClick={() => setSelectedAttendance(row)}
                     className="min-w-0 flex-1 text-left rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-farm-500"
                   >
-                    <p className="font-bold">{row.date} · {worker?.name || L('Worker')} · {row.day_type === 'half' ? L('Half') : L('Full')}</p>
-                    <p className="text-[10px] text-slate-500">{crop?.name || L('Farm-wide')}{row.field ? ` · ${row.field}` : ''} · {row.posted ? L('Posted to ledger') : L('Unposted')}</p>
+                    <span className="block font-bold">{row.date} · {worker?.name || L('Worker')} · {row.day_type === 'half' ? L('Half') : L('Full')}</span>
+                    <span className="block text-[10px] text-slate-500">{crop?.name || L('Farm-wide')}{row.field ? ` · ${row.field}` : ''} · {row.posted ? L('Posted to ledger') : L('Unposted')}</span>
                   </button>
                   {isAdmin && !row.posted && (
                     <span className="flex items-center gap-1.5">
