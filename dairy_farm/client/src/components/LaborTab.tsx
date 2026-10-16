@@ -317,31 +317,22 @@ export default function LaborTab() {
             {visibleRows.map((row) => {
               const worker = workers.find((w) => w._id === row.workerId);
               return (
-                <div
-                  key={row._id}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={L('View attendance details') + ': ' + row.date + ' · ' + (worker?.name || L('Worker'))}
-                  onClick={() => setSelectedAttendance(row)}
-                  onKeyDown={(event) => {
-                    if (event.target !== event.currentTarget) return;
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      setSelectedAttendance(row);
-                    }
-                  }}
-                  className="flex justify-between items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40 text-xs cursor-pointer hover:border-farm-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-farm-500"
-                >
-                  <div className="min-w-0 flex-1">
+                <div key={row._id} className="flex justify-between items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40 text-xs">
+                  <button
+                    type="button"
+                    aria-label={L('View attendance details') + ': ' + row.date + ' · ' + (worker?.name || L('Worker'))}
+                    onClick={() => setSelectedAttendance(row)}
+                    className="min-w-0 flex-1 text-left rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-farm-500"
+                  >
                     <p className="font-bold text-slate-700 dark:text-slate-200">{row.date} · {worker?.name || L('Worker')} · {row.dayType === 'half' ? L('Half') : L('Full')}</p>
                     <p className="text-[10px] text-slate-500">{row.posted ? L('Posted to expenses') : L('Unposted attendance')}{row.notes?.trim() ? ' · ' + L('View notes') : ''}</p>
-                  </div>
+                  </button>
                   {!row.posted && (
-                    <span className="flex items-center gap-0.5" onClick={(event) => event.stopPropagation()}>
-                      <button type="button" onClick={(event) => { event.stopPropagation(); setEditAtt(row); setEditAttForm({ date: row.date, dayType: row.dayType, notes: row.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-farm-600 transition" aria-label={L('Edit attendance')}>
+                    <span className="flex items-center gap-0.5">
+                      <button type="button" onClick={() => { setEditAtt(row); setEditAttForm({ date: row.date, dayType: row.dayType, notes: row.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-farm-600 transition" aria-label={L('Edit attendance')}>
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
-                      <button type="button" onClick={(event) => { event.stopPropagation(); handleDeleteAttendance(row._id); }} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label={L('Delete attendance')}>
+                      <button type="button" onClick={() => handleDeleteAttendance(row._id)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label={L('Delete attendance')}>
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     </span>
