@@ -334,7 +334,7 @@ export default function LaborTab() {
                 >
                   <div className="min-w-0 flex-1">
                     <p className="font-bold text-slate-700 dark:text-slate-200">{row.date} · {worker?.name || L('Worker')} · {row.dayType === 'half' ? L('Half') : L('Full')}</p>
-                    <p className="text-[10px] text-slate-500">{row.posted ? L('Posted to expenses') : L('Unposted attendance')}{row.notes?.trim() ? ' · ' + row.notes.trim() : ''}</p>
+                    <p className="text-[10px] text-slate-500">{row.posted ? L('Posted to expenses') : L('Unposted attendance')}{row.notes?.trim() ? ' · ' + L('View notes') : ''}</p>
                   </div>
                   {!row.posted && (
                     <span className="flex items-center gap-0.5" onClick={(event) => event.stopPropagation()}>
