@@ -157,8 +157,9 @@ describe('Summary-first detail popup contracts', () => {
     expect(source).toContain("title={L('Attendance details')}");
     expect(source).toContain('selectedAttendance.notes?.trim()');
     expect(source).toContain("L('View notes')");
-    expect(source).toContain("event.key === 'Enter' || event.key === ' '");
-    expect(source).toContain("event.stopPropagation(); handleDeleteAttendance(row._id)");
+    expect(source).toContain('type="button"');
+    expect(source).toContain("aria-label={L('View attendance details') + ': ' + row.date + ' · ' + (worker?.name || L('Worker'))}");
+    expect(source).toContain("handleDeleteAttendance(row._id)");
     expect(source).toContain("!row.posted");
   });
 
@@ -169,8 +170,9 @@ describe('Summary-first detail popup contracts', () => {
     expect(source).toContain('selectedAttendance.field');
     expect(source).toContain('selectedAttendance.notes?.trim()');
     expect(source).toContain("isAdmin && !row.posted");
-    expect(source).toContain("event.key === 'Enter' || event.key === ' '");
-    expect(source).toContain("event.stopPropagation(); handleDeleteAttendance(row._id)");
+    expect(source).toContain('type="button"');
+    expect(source).toContain("aria-label={L('View attendance details') + ': ' + row.date + ' · ' + (worker?.name || L('Worker'))}");
+    expect(source).toContain("handleDeleteAttendance(row._id)");
   });
 
 });
