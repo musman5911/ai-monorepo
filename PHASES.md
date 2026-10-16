@@ -49,6 +49,7 @@ These results apply to the local source head `64b6246`, not the follow-up commit
 - `1f9e70c` — remove unused Dairy expense icon imports surfaced by the successful build retry.
 - `f348674`, `c19c9a3`, `8be8057`, `7c92b09`, `8cd10e0`, `de402f8` — Dairy and Agri labor attendance summaries now open a compact detail popup. Full date/worker/day/status/notes context remains available in details; admin edit/delete actions remain permission-gated, and Agri attendance notes remain admin-only.
 - `7c109c9` — made Agri field-worker summary activation keyboard accessible through a native button and replaced the long inline note with a hint; the existing detail popup keeps the full note.
+- `dc92128` and `d95c8ba` — finalized the attendance/worker summary controls as native buttons with valid phrasing content, avoiding nested interactive descendants and invalid paragraph elements inside buttons.
 - `be19e23`, `47f07fd`, `f27588b`, `5fd05e3` — added two labor attendance regression tests, strengthened the admin-only Agri attendance-notes assertion, and guarded accessible Agri worker summaries. These follow-up tests have not yet been executed locally.
 
 **Current outstanding items:** pull and validate the new head; perform a compatible security dependency/lockfile upgrade and rerun tests/audit/build; then perform final browser regression after implementation finishes. Browser interaction testing remains intentionally deferred by owner request.
