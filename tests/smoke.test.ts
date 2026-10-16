@@ -150,4 +150,27 @@ describe('Summary-first detail popup contracts', () => {
     expect(styles).toContain('.muf-admin-shell-card[role="dialog"]');
     expect(styles).toContain('max-height: min(var(--muf-popup-mobile-max-height, 70dvh), calc(100dvh - 24px))');
   });
+
+  it('Dairy labor attendance rows show a compact summary and a full detail popup', () => {
+    const source = readSource('dairy_farm/client/src/components/LaborTab.tsx');
+    expect(source).toContain("setSelectedAttendance(row)");
+    expect(source).toContain("title={L('Attendance details')}");
+    expect(source).toContain('selectedAttendance.notes?.trim()');
+    expect(source).toContain("L('View notes')");
+    expect(source).toContain("event.key === 'Enter' || event.key === ' '");
+    expect(source).toContain("event.stopPropagation(); handleDeleteAttendance(row._id)");
+    expect(source).toContain("!row.posted");
+  });
+
+  it('Agri labor attendance detail retains crop/field/notes and admin-only row actions', () => {
+    const source = readSource('agri_farm/frontend/src/components/LaborBoard.tsx');
+    expect(source).toContain('setSelectedAttendance(row)');
+    expect(source).toContain("title={L('Attendance details')}");
+    expect(source).toContain('selectedAttendance.field');
+    expect(source).toContain('selectedAttendance.notes?.trim()');
+    expect(source).toContain("isAdmin && !row.posted");
+    expect(source).toContain("event.key === 'Enter' || event.key === ' '");
+    expect(source).toContain("event.stopPropagation(); handleDeleteAttendance(row._id)");
+  });
+
 });
