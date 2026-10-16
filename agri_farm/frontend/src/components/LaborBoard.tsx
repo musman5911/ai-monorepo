@@ -407,13 +407,19 @@ export default function LaborBoard({
           <div className="space-y-2">
             {summary.length === 0 && <p className="text-xs text-slate-400 italic">{L('No field workers yet.')}</p>}
             {summary.map(worker => (
-              <div key={worker._id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/30 cursor-pointer hover:border-farm-300 dark:hover:border-farm-700 transition" onClick={() => setDetailFor(worker)} title={L('Open details')}>
+              <div key={worker._id} className="p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/30 transition">
                 <div className="flex justify-between items-start gap-2">
-                  <div>
+                  <button
+                    type="button"
+                    aria-label={L('Open worker details') + ': ' + worker.name}
+                    onClick={() => setDetailFor(worker)}
+                    title={L('Open details')}
+                    className="min-w-0 flex-1 text-left rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-farm-500"
+                  >
                     <p className="text-sm font-black">{worker.name}</p>
                     <p className="text-[11px] text-slate-500">Rs. {formatCurrency(worker.daily_wage || 0)} / {L('day')} · {worker.days || 0} {L('days this month')}</p>
-                    {worker.notes && <p className="text-[11px] text-slate-500">{worker.notes}</p>}
-                  </div>
+                    {worker.notes && <p className="text-[11px] text-slate-500">{L('View notes')}</p>}
+                  </button>
                   {isAdmin && (
                     <div className="flex items-center gap-1">
                       <button type="button" onClick={(e) => { e.stopPropagation(); openEditWorker(worker); }} className="text-slate-400 hover:text-farm-600" aria-label={L('Edit worker')} title={L('Edit worker')}>
