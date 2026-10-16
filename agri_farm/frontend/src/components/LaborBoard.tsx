@@ -554,31 +554,22 @@ export default function LaborBoard({
               const worker = laborers.find(item => item._id === row.laborer_id);
               const crop = crops.find(item => item._id === row.crop_id);
               return (
-                <div
-                  key={row._id}
-                  role="button"
-                  tabIndex={0}
-                  aria-label={L('View attendance details') + ': ' + row.date + ' · ' + (worker?.name || L('Worker'))}
-                  onClick={() => setSelectedAttendance(row)}
-                  onKeyDown={(event) => {
-                    if (event.target !== event.currentTarget) return;
-                    if (event.key === 'Enter' || event.key === ' ') {
-                      event.preventDefault();
-                      setSelectedAttendance(row);
-                    }
-                  }}
-                  className="flex justify-between items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs cursor-pointer hover:border-farm-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-farm-500"
-                >
-                  <div className="min-w-0 flex-1">
+                <div key={row._id} className="flex justify-between items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 text-xs">
+                  <button
+                    type="button"
+                    aria-label={L('View attendance details') + ': ' + row.date + ' · ' + (worker?.name || L('Worker'))}
+                    onClick={() => setSelectedAttendance(row)}
+                    className="min-w-0 flex-1 text-left rounded-md focus-visible:outline focus-visible:outline-2 focus-visible:outline-farm-500"
+                  >
                     <p className="font-bold">{row.date} · {worker?.name || L('Worker')} · {row.day_type === 'half' ? L('Half') : L('Full')}</p>
                     <p className="text-[10px] text-slate-500">{crop?.name || L('Farm-wide')}{row.field ? ` · ${row.field}` : ''} · {row.posted ? L('Posted to ledger') : L('Unposted')}</p>
-                  </div>
+                  </button>
                   {isAdmin && !row.posted && (
-                    <span className="flex items-center gap-1.5" onClick={(event) => event.stopPropagation()}>
-                      <button type="button" onClick={(event) => { event.stopPropagation(); openEditAttendance(row); }} className="text-slate-400 hover:text-farm-600" aria-label={L('Edit attendance')} title={L('Edit attendance')}>
+                    <span className="flex items-center gap-1.5">
+                      <button type="button" onClick={() => openEditAttendance(row)} className="text-slate-400 hover:text-farm-600" aria-label={L('Edit attendance')} title={L('Edit attendance')}>
                         <Pencil size={13} />
                       </button>
-                      <button type="button" onClick={(event) => { event.stopPropagation(); handleDeleteAttendance(row._id); }} className="text-slate-400 hover:text-red-500" aria-label={L('Delete attendance')}>
+                      <button type="button" onClick={() => handleDeleteAttendance(row._id)} className="text-slate-400 hover:text-red-500" aria-label={L('Delete attendance')}>
                         <Trash2 size={14} />
                       </button>
                     </span>
