@@ -963,7 +963,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Warn below (days)')}</label>
-                  <input type="number" min="1" value={feedSettingsDraft.lowStockDays} onChange={(e) => setFeedSettingsDraft({ ...feedSettingsDraft, lowStockDays: e.target.value })} className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500" />
+                  <input type="number" min="1" value={feedSettingsDraft.lowStockDays} onChange={(e) => setFeedSettingsDraft({ ...feedSettingsDraft, lowStockDays: e.target.value })} className="muf-field muf-field-lg" />
                 </div>
               </div>
               <button
