@@ -243,8 +243,8 @@ async function main() {
   console.log(`\n   [OK] Commit created: "${commitMsg}"`);
   console.log(`   Files: ${fileCount} modified`);
   console.log('');
-  console.log('   Next: Run tools\push-main-update.bat to push to GitHub.');
-  console.log('          Run tools\send-to-projects.bat to sync to project repos.');
+  console.log('   Next: Run tools\\push-main-update.bat to push to GitHub.');
+  console.log('          Run tools\\send-to-projects.bat to sync to project repos.');
   console.log('');
   console.log('Press any key to continue...');
   process.stdin.resume();

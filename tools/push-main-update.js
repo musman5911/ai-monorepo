@@ -75,7 +75,7 @@ for (const branch of branches) {
 }
 
 console.log('');
-console.log('[OK] Main pushed to GitHub! Now run tools\send-to-projects.bat');
+console.log('[OK] Main pushed to GitHub! Now run tools\\send-to-projects.bat');
 console.log('');
 console.log('Press any key to continue...');
 process.stdin.resume();

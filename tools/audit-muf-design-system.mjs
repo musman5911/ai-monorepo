@@ -39,7 +39,7 @@ function loadTypeScript() {
       try { return require(candidate); } catch { /* try another frontend install */ }
     }
   }
-  throw new Error('TypeScript was not found in frontend node_modules. Run tools\build-all.bat once to install frontend dependencies, then rerun the audit.');
+  throw new Error('TypeScript was not found in frontend node_modules. Run tools\\build-all.bat once to install frontend dependencies, then rerun the audit.');
 }
 function walk(directory, extensions, output = []) {
   if (!fs.existsSync(directory)) return output;

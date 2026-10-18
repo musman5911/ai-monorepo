@@ -10,7 +10,7 @@ Last updated: 2026-10-18.
 - **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, and the popup design batch of 2026-10-17.
 - **Remaining:** owner's browser check of the 2026-10-17 batch, and the items in `ROADMAP.md`.
 - **Next:** the browser pass, then the testing safety net (ROADMAP section A).
-- **Branch:** work continues on `main`. The arena branch was squashed into `main` on 2026-10-18 and is to be deleted once `main` is pushed and verified.
+- **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
 ## Completed
 
@@ -63,6 +63,7 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 - Tests: 49 of 49 pass (6 new contracts for this batch).
 - Dairy and Flock type-check with 0 errors. Agri has no unresolved imports and 19 fewer existing type messages than before (none new from this work).
 - All three production builds pass, including through `tools/build-all.js`.
+- 2026-10-18: console messages in `get-update.js`, `push-main-update.js` and the audit script printed `tools\\...` paths with the backslash swallowed (JavaScript escape); fixed by escaping the backslash.
 - 2026-10-18: on Windows `main` the new Agri contract test failed because the checkout uses CRLF line endings; the test helper now normalises line endings (`tests/smoke.test.ts`).
 - **Not verified:** a real browser. Everything visual above is pending the owner's pass.
 
