@@ -17,3 +17,7 @@ tool-results/
 
 # Local env files (each app keeps its own .env; .env.example is tracked)
 **/.env
+
+# Playwright generated output. Approved PNG baselines under e2e/visual-baselines are tracked.
+playwright-report/
+test-results/

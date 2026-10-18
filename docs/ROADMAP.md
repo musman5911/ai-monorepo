@@ -11,7 +11,7 @@ Legend: **Risk** = chance of a visible change or break. **Approval** = needs the
 
 | ID | Item | Why | Risk | Approval |
 |---|---|---|---|---|
-| A1 | Automatic screenshot tests (Playwright) for about 20 key screens and popups at 360, 390, 768, 1024 and 1440 px, light and dark, compared with saved baselines | Replaces most of the manual browser pass and makes every later change safer | Low | Yes: adds a dev package and changes the lockfile |
+| A1 | Playwright screenshot regression in two slices: first the three farm entry shells and the MUF workbench (40 variants across five widths and two themes); then about 20 authenticated key screens/popups with reviewed baselines | Establishes repeatable visual checks without using live farm data as a fake test fixture | Low | Yes: root dev dependency and lockfile |
 | A2 | Runtime workbench smoke test using Node's built-in `fetch`: request `/__muf-workbench`, validate the mount/module/Vite-React refresh, and request the transformed editor and stylesheet | The source-only check cannot detect a broken route or Vite transformation | Low | No extra dependency; adds a root script and test file |
 | A3 | Dev-tool security upgrade (Vitest and its transitive packages) | Clears the `npm audit` findings in the root install. They affect test tooling only, not what the farm apps ship | Low | Yes: root manifest and lockfile |
 
@@ -26,6 +26,16 @@ The runtime test is `tools/check-muf-workbench-runtime.js`, exposed as `npm run 
    `cd /d F:\PROJECTS\dairy\ai-monorepo`
    `npm run check-workbench-runtime`
 3. Acceptance: all runtime checks pass against the live server; failures must exit non-zero and identify the failing route/module. Do not treat `check-muf-workbench.js` as a substitute for this live request.
+### A1 first-slice implementation and runbook
+
+The initial baseline harness covers the Agri, Dairy and Flock entry shells plus the data-free Dairy MUF workbench. It runs five viewport widths (360, 390, 768, 1024 and 1440) in light and dark mode, for 40 screenshot variants. This is a stable start, **not full A1 completion**; authenticated screens and actual popups remain a second slice.
+
+1. From the monorepo root run `npm ci` and `npx playwright install chromium`.
+2. Run `npm run test:visual:update` once. Playwright starts the three Vite frontend servers on ports 5000, 5001 and 5002 and creates initial PNG baselines in `e2e/visual-baselines/`.
+3. Inspect those images. A baseline is not approved merely because Playwright generated it.
+4. After review, use `npm run test:visual` for strict comparison. Only use `npm run test:visual:update` when intentionally accepting a reviewed visual change.
+5. Keep `playwright-report/` and `test-results/` as ignored generated output. Publish approved PNGs through the repository's usual process so the baseline set is repeatable across machines.
+6. For the later authenticated screens/popups slice, use a designated safe test account and predictable test state. Never commit passwords/session tokens and never fill the app with fabricated data just to create attractive screenshots.
 ## B. Finish the shared popup content work
 
 Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate reviewable batch, keep the three stylesheet copies identical, and update `PROGRESS.md` with actual test and browser results.
@@ -93,9 +103,9 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 ## Suggested order
 
 1. Owner's browser pass on the 2026-10-17 batch, then fixes.
-2. A2, then A1, then A3 (approval needed for packages).
-3. B1 automated validation has passed (56/56 tests and all three builds); complete B1/B3 browser review.
-4. Run A2 runtime smoke test, then implement A1 screenshot coverage.
-5. Complete A3 after reviewing the dependency-upgrade impact. Resume B2 only after reliable visual regression coverage is usable.
-5. D1 and D2, then D3.
-6. E3, then E2. E1 last, as a separate plan.
+2. A2 is runtime-verified (8/8 checks); rerun its source guard, then A1 first-slice setup and baseline review.
+3. Complete A1 authenticated-screen/pop-up coverage using safe test state; then complete A3 with a reviewed dependency plan.
+4. B1 automated validation has passed (56/56 tests and all three builds); complete B1/B3 browser review.
+5. Resume B2 only after useful visual regression coverage is repeatable; then C5, C1, C2 and C3.
+6. D1 and D2, then D3.
+7. E3, then E2. E1 last, as a separate plan.

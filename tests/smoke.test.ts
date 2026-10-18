@@ -348,3 +348,25 @@ describe('Dairy popup fields use shared MUF field styles (B1)', () => {
     }
   });
 });
+
+
+describe('Playwright visual harness (A1)', () => {
+  it('defines visual test and reviewed-baseline update commands', () => {
+    const pkg = JSON.parse(readSource('package.json'));
+    expect(pkg.devDependencies['@playwright/test']).toBe('1.63.0');
+    expect(pkg.scripts['test:visual']).toContain('playwright.config.mjs');
+    expect(pkg.scripts['test:visual:update']).toContain('--update-snapshots');
+  });
+
+  it('covers the three farm entry shells and MUF workbench across five widths and both themes', () => {
+    const config = readSource('playwright.config.mjs');
+    const suite = readSource('e2e/muf-visual.pw.mjs');
+    for (const width of [360, 390, 768, 1024, 1440]) expect(suite).toContain('width: ' + width);
+    expect(suite).toContain("const themes = ['light', 'dark']");
+    for (const target of ['agri-entry', 'dairy-entry', 'flock-entry', 'muf-workbench']) {
+      expect(suite).toContain(target);
+    }
+    expect(config).toContain("testMatch: '**/*.pw.mjs'");
+    expect(config).toContain("visual-baselines/{arg}{ext}");
+  });
+});

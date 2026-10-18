@@ -7,9 +7,13 @@
     "check-sync": "node tools/check-muf-sync.js",
     "check-ui": "node tools/check-ui-safety.js",
     "check-workbench": "node tools/check-muf-workbench.js",
-    "check-workbench-runtime": "node tools/check-muf-workbench-runtime.js"
+    "check-workbench-runtime": "node tools/check-muf-workbench-runtime.js",
+    "test:visual": "playwright test --config=playwright.config.mjs",
+    "test:visual:update": "playwright test --config=playwright.config.mjs --update-snapshots",
+    "test:visual:report": "playwright show-report playwright-report"
   },
   "devDependencies": {
-    "vitest": "^3.0.0"
+    "vitest": "^3.0.0",
+    "@playwright/test": "1.63.0"
   }
 }

@@ -7,9 +7,9 @@ Last updated: 2026-10-18.
 
 ## At a glance
 
-- **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, and B1 automated regression/build validation.
-- **Remaining:** B3/B1 visual browser review; verification of the 2026-10-17 UI batch; A2 runtime test (added in this commit, owner run pending), A1 Playwright screenshots and A3 dependency remediation; then the remaining items in `ROADMAP.md`.
-- **Next:** run A2's workbench runtime smoke test, then set up A1 screenshot coverage. B2 remains blocked until reliable visual regression coverage is available.
+- **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, B1 automated regression/build validation, and A2 live runtime smoke test (8/8 passed).
+- **Remaining:** A1 visual baseline generation/review and authenticated-screen coverage; A3 dependency remediation; B1/B3 visual browser review; verification of the 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
+- **Next:** run Playwright baseline generation and inspect the images before approving them. B2 remains blocked until reliable visual regression coverage is available.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
 ## B3 — shared micro-typography
@@ -29,7 +29,7 @@ Last updated: 2026-10-18.
 - The last reported `npm audit` showed 4 findings (1 moderate, 1 high, 2 critical); no later audit output has been supplied.
 - **Not yet shown as run:** A2 runtime workbench smoke test and A1 Playwright screenshot suite. These remain open; B2 is blocked until dependable screenshot/regression coverage is in place.
 
-## Active work: B1 — Dairy popup field consistency
+## B1 — Dairy popup field consistency
 
 **Automated validation: passed on the owner's Windows checkout (2026-10-18). Visual/browser review remains pending.**
 
@@ -53,25 +53,26 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 - The earlier failing runs were corrected before this passing run. No app logic, API, backend or dependency changes were made for B1.
 - **Still pending:** visual/browser review of the six affected components in both themes and at phone/desktop widths. Automated validation is green; do not label the visual acceptance criteria complete before browser review.
 
-## Active work: A2 — workbench runtime smoke test
+## A2 — workbench runtime smoke test
 
-**State: implementation pushed; owner-run runtime result pending. No runtime pass is claimed yet.**
+**Runtime validation passed on the owner's Windows checkout (2026-10-18): 8/8 checks.**
 
-- Added `tools/check-muf-workbench-runtime.js`, using Node's built-in `fetch` and no new dependency.
+- Added `tools/check-muf-workbench-runtime.js`, using Node's built-in `fetch` with no added package.
 - Added `npm run check-workbench-runtime` to the root package scripts.
-- The script requests `/__muf-workbench`, checks the mount point and transformed editor-module reference, verifies Vite/React refresh injection, fetches the transformed editor module and stylesheet, and checks the Vite client and React refresh endpoints return HTTP 200.
-- The request helper uses a timeout and returns a non-zero exit code on failure.
-- Extended `tools/check-muf-workbench.js` with four source-contract checks for this runtime test. Expected source-check count: 23 (previously 19).
-- **Not yet verified:** run it against a live local Vite server. It will fail intentionally if the server is not running, the route returns an error, or Vite fails to transform the editor code.
+- The live test returned HTTP 200 for the development route, verified the mount point and transformed editor-module reference, checked Vite/React Refresh injection, validated the editor TSX and workbench CSS responses, and confirmed the Vite client and React Refresh runtime endpoints.
+- The request helper has a timeout and exits non-zero on failure.
+- **Follow-up check still needed:** rerun `node tools/check-muf-workbench.js` after the runtime-guard additions; it should report 23 checks rather than the earlier 19. The live runtime pass itself is confirmed.
 
-### Owner-run B1 validation received (2026-10-18)
+## Active work: A1 — Playwright visual regression tests
 
-- `npm test`: 56/56 tests passed across 4 test files.
-- `node tools/check-muf-sync.js`: all checks passed.
-- `node tools/check-ui-safety.js`: all checks passed.
-- `node tools/check-muf-workbench.js`: all 19 checks passed on the previous version of the checker.
-- `tools\build-all.bat`: Dairy, Flock and Agri builds all passed.
-- **Visual review:** still pending for B1 and B3. No browser screenshots have been supplied.
+**State: harness pushed; browser install, baseline capture and visual review pending. Full A1 is not complete.**
+
+- Pinned `@playwright/test` to 1.63.0 in the root `package.json` and lockfile, keeping the tool dependency isolated from the three app manifests.
+- Added `playwright.config.mjs` with a Chromium project, deterministic screenshot settings, generated-report ignores and Vite web servers on ports 5000 (Dairy), 5001 (Flock) and 5002 (Agri).
+- Added `e2e/muf-visual.pw.mjs`: 40 initial combinations (four targets: three farm entry shells plus the data-free MUF workbench, five widths, light/dark).
+- Added `e2e/README.md` with baseline capture/review instructions. Approved PNGs live in `e2e/visual-baselines/`; generated `playwright-report/` and `test-results/` are ignored.
+- Added two Vitest source-contract checks for the A1 scripts and target/viewport/theme matrix.
+- **Not yet verified:** root `npm ci`, browser installation, initial screenshot capture, baseline image review, and strict screenshot comparisons. This first slice tests the entry shells and workbench; the full A1 goal of around 20 authenticated app screens/popups still requires a safe, repeatable signed-in state and must not use fake farm data.
 ## Completed
 
 ### Foundation (before this tracker)
@@ -129,18 +130,19 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 
 ## Remaining
 
-1. Run A2: start the Dairy Vite dev server on port 5000 and execute `npm run check-workbench-runtime` from the monorepo root. Confirm the runtime check passes.
-2. Complete A1: install/configure Playwright and create reviewed screenshot baselines for key screens/popups at the five planned widths, in light and dark modes.
-3. Complete A3: review and remediate the four reported root npm audit findings (1 moderate, 1 high, 2 critical). Dependency upgrades require the approval recorded in `ROADMAP.md`; do not use `npm audit fix --force` without reviewing the breaking-change impact.
-4. Browser-review B1 fields and B3 micro-typography at phone/desktop widths, both themes, and Urdu.
-5. Complete browser verification of the 2026-10-17 UI batch.
-6. Continue remaining items in `ROADMAP.md`.
+1. Validate A1 setup locally: `npm ci`, `npx playwright install chromium`, `npm test` (58 tests expected), and `node tools/check-muf-workbench.js` (23 checks expected).
+2. Run `npm run test:visual:update` once to generate 40 initial snapshots, inspect the PNGs under `e2e/visual-baselines/`, then run `npm run test:visual` without update mode.
+3. Publish only the reviewed baseline PNGs so other checkouts can compare against the same visual contract. The initial images are generated on the owner's Windows machine and are not in this commit.
+4. Expand A1 from entry shells/workbench to about 20 key screens/popups once a safe, repeatable signed-in test state is available; do not use real farm data as a test fixture.
+5. Complete A3: review the four reported root npm audit findings (1 moderate, 1 high, 2 critical) and choose a safe remediation; do not use `npm audit fix --force` without reviewing breaking-change impact.
+6. Browser-review B1 fields and B3 micro-typography at phone/desktop widths, both themes, and Urdu. Complete browser verification of the 2026-10-17 UI batch.
+7. Continue remaining work in `ROADMAP.md`.
 
 ## Next
 
-1. Run A2 using the two-terminal instructions in `ROADMAP.md`.
-2. If A2 passes, begin A1 Playwright setup and screenshot coverage.
-3. Keep B2 blocked until dependable visual regression coverage exists; then resume B2 as the next B sub-phase.
+1. Install Playwright's Chromium browser and generate the initial baseline set.
+2. Inspect screenshots before accepting them; use normal screenshot test mode for later regression runs.
+3. Continue A1 coverage for authenticated screens and popups, then A3. Keep B2 blocked until useful screenshot/regression coverage is available.
 ## How to update this file
 
 After each change: move the item from Remaining or Next into Completed with the date, update the validation block with the real numbers, and list anything unverified. Keep `ROADMAP.md` in step.
