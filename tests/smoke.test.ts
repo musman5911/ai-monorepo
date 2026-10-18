@@ -273,3 +273,19 @@ describe('Popup design update contracts (2026-10-17)', () => {
     expect(invBody).toContain('handleDeleteInventory(item._id)');
   });
 });
+
+describe('MUF micro-typography utilities', () => {
+  it('defines explicit 2xs and 3xs sizes in all three shared stylesheets', () => {
+    const stylesheetPaths = [
+      'agri_farm/frontend/src/muf-style.css',
+      'dairy_farm/client/src/muf-style.css',
+      'flock_farm/client/src/muf-style.css',
+    ];
+
+    for (const stylesheetPath of stylesheetPaths) {
+      const css = readSource(stylesheetPath);
+      expect(css).toMatch(/\.text-2xs\s*\{[^}]*font-size:\s*0\.6875rem;[^}]*line-height:\s*1rem;[^}]*\}/);
+      expect(css).toMatch(/\.text-3xs\s*\{[^}]*font-size:\s*0\.625rem;[^}]*line-height:\s*0\.875rem;[^}]*\}/);
+    }
+  });
+});

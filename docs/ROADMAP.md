@@ -17,12 +17,22 @@ Legend: **Risk** = chance of a visible change or break. **Approval** = needs the
 
 ## B. Finish the shared popup content work
 
+Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate reviewable batch, keep the three stylesheet copies identical, and update `PROGRESS.md` with actual test and browser results.
+
 | ID | Item | Why | Risk |
 |---|---|---|---|
-| B1 | Move popup input fields onto the shared field classes (Dairy popups have about 38 inputs that bypass `muf-field`) | One look for all form fields | Medium: needs the screenshot tests |
+| B3 | Define explicit sizes for `text-2xs` and `text-3xs` in the shared typography stylesheet | The approximately 134 existing uses currently inherit surrounding font sizes instead of expressing intentional micro-typography | Medium |
+| B1 | Move popup input fields onto the shared field classes (Dairy popups have about 38 inputs that bypass `muf-field`) | One look for all form fields | Medium: validate with screenshot/regression tests |
 | B2 | Use the `muf-pc-*` classes outside popups (about 187 repeated Tailwind strings on tab pages and in the admin shell) | Less repeated markup, one place to change a look | Medium |
-| B3 | Decide real sizes for the undefined `text-3xs` and `text-2xs` classes (134 uses that currently inherit the surrounding size) | Intentional, consistent micro-labels | Medium: changes how those labels look |
 
+### B3 implementation standard
+
+- `text-2xs`: `font-size: 0.6875rem`, `line-height: 1rem` (11px font size at a 16px root).
+- `text-3xs`: `font-size: 0.625rem`, `line-height: 0.875rem` (10px font size at a 16px root).
+- Definitions live in `src/muf/styles/05-density-footer-typography.css` and must be identical in Agri, Dairy and Flock.
+- A Vitest source-contract test verifies both rules in all three assembled stylesheets.
+- Mark B3 complete only after the test suite, MUF sync check, UI safety check, three production builds and browser checks pass. Check small text at 360px, 390px, 1024px and 1440px, including light/dark mode and Urdu.
+- B1 should start after screenshot/regression coverage is usable; do not migrate dozens of fields without a dependable way to compare before and after.
 ## C. Frontend improvements
 
 | ID | Item | Why | Risk |
@@ -62,7 +72,7 @@ Legend: **Risk** = chance of a visible change or break. **Approval** = needs the
 
 1. Owner's browser pass on the 2026-10-17 batch, then fixes.
 2. A2, then A1, then A3 (approval needed for packages).
-3. C5, B3 and B1.
-4. B2, C1, C2, C3.
+3. B3 is the current approved workstream; validate it before marking it complete.
+4. Complete C5, then set up screenshot coverage before B1 and B2. Continue with C1, C2 and C3 after the translation/UI batches.
 5. D1 and D2, then D3.
 6. E3, then E2. E1 last, as a separate plan.

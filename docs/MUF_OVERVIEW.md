@@ -31,7 +31,7 @@ Each app keeps its shared MUF code under `src/muf/`; the same folder layout exis
 | `muf/ui/` | Shared visual components: avatar, QR card, charts, entity grid, header search, farm profile, diary, login, telegram and worker panels, weather |
 | `muf/data/` | Shared data and output helpers: date, Urdu dictionary (`muf-urdu.ts` plus six `muf-urdu-terms-N.ts` parts), search, offline, image, PDF, print, voice, profile, compare, story |
 | `muf/domain/` | Farm business helpers: zakat, labor, khata, feedstock, supplier, farm book |
-| `muf/styles/` | The shared stylesheet in ten ordered parts, imported by `src/muf-style.css` |
+| `muf/styles/` | The shared stylesheet in twelve ordered parts, imported by `src/muf-style.css` |
 
 Rules for new files: put a new shared MUF file in the matching folder, keep it identical across the apps, and add it to `tools/check-muf-sync.js`. `tools/check-muf-sync.js`, `tools/check-ui-safety.js` and the tests read `muf-style.css` together with its parts as one stylesheet.
 
@@ -40,6 +40,7 @@ Rules for new files: put a new shared MUF file in the matching folder, keep it i
 - Primary color token: #136334.
 - Primary hover: #105229.
 - Success green: #16a34a.
+- Micro-typography utilities are explicit in the shared stylesheet: `.text-2xs` uses `0.6875rem / 1rem` and `.text-3xs` uses `0.625rem / 0.875rem`.
 - Text selection: primary green background with white selected text.
 - Detail popups keep the small/big size API.
 - On phones, small and big popups retain their existing width gutters and are capped at 70dvh height.

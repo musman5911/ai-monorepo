@@ -8,9 +8,27 @@ Last updated: 2026-10-18.
 ## At a glance
 
 - **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, and the popup design batch of 2026-10-17.
-- **Remaining:** owner's browser check of the 2026-10-17 batch, and the items in `ROADMAP.md`.
-- **Next:** the browser pass, then the testing safety net (ROADMAP section A).
+- **Remaining:** browser verification of the 2026-10-17 UI batch; B3 local validation and browser review; A2 runtime smoke test, A1 Playwright screenshot suite and A3 dependency remediation; then the remaining items in `ROADMAP.md`.
+- **Next:** validate B3 locally and in a browser. Keep B3 marked in progress until that evidence is recorded; then continue in the approved B workstream. B1/B2 still need reliable screenshot/regression coverage.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
+
+## Active work: B3 — shared micro-typography
+
+**State: implemented in source; local validation and browser review pending. Not yet marked completed.**
+
+- Added explicit shared styles to `src/muf/styles/05-density-footer-typography.css` in all three apps.
+- `.text-2xs`: 0.6875rem font size and 1rem line height.
+- `.text-3xs`: 0.625rem font size and 0.875rem line height.
+- Added a Vitest source-contract test that checks both definitions in Agri, Dairy and Flock.
+- Updated `ROADMAP.md` with the B3 acceptance criteria and sequence for B1/B2; updated this overview's stylesheet-part count and micro-typography notes.
+- **Not yet verified:** test count after this commit, MUF/style parity, UI safety checks, all three builds, or real-browser legibility in both themes. No validation has been claimed from source editing alone.
+
+### Owner-run validation received (2026-10-18, before B3)
+
+- `npm ci` completed successfully.
+- `npm test`: 49 tests passed across 4 test files.
+- `node tools/check-muf-workbench.js`: all 19 source checks passed.
+- `npm audit`: 4 findings (1 moderate, 1 high, 2 critical). These remain outstanding; the runtime workbench smoke test and Playwright screenshot suite were not shown as run.
 
 ## Completed
 
@@ -69,13 +87,16 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 
 ## Remaining
 
-1. Browser check of the 2026-10-17 batch (light and dark, 360, 390, 768, 1024, 1440 px): each popup in the table above; the filter bar on phone and PC; the + buttons (open, save, cancel, Esc); a sample of dark-mode popups in all three apps, especially Flock and Agri forms.
-2. Open items in `ROADMAP.md`.
+1. Validate B3: run `npm test` (expected suite count is now 50 only if the new test passes), `node tools/check-muf-sync.js`, `node tools/check-ui-safety.js`, `tools\\build-all.bat`, and `git diff --check`; then browser-check 360, 390, 1024 and 1440 px, light/dark, and Urdu legibility.
+2. Complete browser verification of the 2026-10-17 popup batch: every listed popup, filters on phone/PC, add buttons (open/save/cancel/Escape), and representative dark-mode popups in all three apps.
+3. Finish A2 runtime smoke testing, A1 Playwright screenshot baselines and A3 npm audit remediation before using screenshot comparisons as a prerequisite for B1/B2.
+4. Continue the remaining items in `ROADMAP.md`.
 
 ## Next
 
-1. Fix anything found in the browser pass.
-2. Start ROADMAP section A (testing safety net), starting with A2.
+1. Validate the new B3 implementation locally and in a browser; update this file with the real results before marking it completed.
+2. Fix any issues found during visual checks.
+3. Finish the outstanding A testing-safety-net items needed for reliable regression coverage, then proceed to B1.
 
 ## How to update this file
 
