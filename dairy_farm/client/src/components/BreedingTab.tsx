@@ -319,7 +319,7 @@ export default function BreedingTab({ isAdmin }: { isAdmin: boolean }) {
             <div className="space-y-1">
               <label className="text-slate-500 dark:text-slate-400">{L('Date')}</label>
               <input type="date" value={actionDate} onChange={(e) => setActionDate(e.target.value)} required
-                className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs outline-none focus:border-farm-500" />
+                className="muf-field" />
             </div>
             <div className="flex justify-end gap-2 pt-1">
               <button type="button" onClick={() => setPendingAction(null)} className="px-4 py-2 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs font-bold rounded-lg transition">{L('Cancel')}</button>

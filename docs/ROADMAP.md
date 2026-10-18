@@ -22,7 +22,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 | ID | Item | Why | Risk |
 |---|---|---|---|
 | B3 | Define explicit sizes for `text-2xs` and `text-3xs` in the shared typography stylesheet | The approximately 134 existing uses currently inherit surrounding font sizes instead of expressing intentional micro-typography | Medium |
-| B1 | Move popup input fields onto the shared field classes (Dairy popups have about 38 inputs that bypass `muf-field`) | One look for all form fields | Medium: validate with screenshot/regression tests |
+| B1 | Move 38 visible Dairy popup controls onto the shared `muf-field` classes across CowsTab (26), MilkTab (5), HealthTab (1), BreedingTab (1), CowDetailPopup (1) and Dashboard (4) | One consistent field surface across the most-used edit and quick-action popups | Medium: validate with regression tests and browser checks |
 | B2 | Use the `muf-pc-*` classes outside popups (about 187 repeated Tailwind strings on tab pages and in the admin shell) | Less repeated markup, one place to change a look | Medium |
 
 ### B3 implementation standard
@@ -33,6 +33,15 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 - A Vitest source-contract test verifies both rules in all three assembled stylesheets.
 - Mark B3 complete only after the test suite, MUF sync check, UI safety check, three production builds and browser checks pass. Check small text at 360px, 390px, 1024px and 1440px, including light/dark mode and Urdu.
 - B1 should start after screenshot/regression coverage is usable; do not migrate dozens of fields without a dependable way to compare before and after.
+
+### B1 implementation and acceptance
+
+- Scope: exactly 38 visible controls across the six Dairy components listed in the B1 row. Do not put the shared text-field class on hidden file inputs, checkboxes or unrelated filter controls.
+- Keep behavior, values, validation, submit handlers, API calls and permissions unchanged. This batch is presentation-only.
+- Where a control has a genuinely compact layout (the inline expected-price editor), preserve its dimensions while using the common field surface. Use the existing `muf-field-lg` variant for intentionally larger inputs.
+- Regression tests must cover every migrated group; require the full test suite, MUF sync check, UI safety check and all three builds to pass.
+- The owner approved starting B1 before A1 Playwright coverage was finished. Therefore B1 remains **in progress** until local checks and browser review pass. **Do not start B2** until reliable screenshot/regression coverage is available.
+
 ## C. Frontend improvements
 
 | ID | Item | Why | Risk |
@@ -72,7 +81,8 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 
 1. Owner's browser pass on the 2026-10-17 batch, then fixes.
 2. A2, then A1, then A3 (approval needed for packages).
-3. B3 is the current approved workstream; validate it before marking it complete.
-4. Complete C5, then set up screenshot coverage before B1 and B2. Continue with C1, C2 and C3 after the translation/UI batches.
+3. B3 automated validation has passed; complete its visual legibility review.
+4. B1 is the active workstream by owner approval; validate all 38 migrated controls locally and in a browser.
+5. Complete C5, then finish A1 screenshot coverage before starting B2. Continue with C1, C2 and C3 after the translation/UI batches.
 5. D1 and D2, then D3.
 6. E3, then E2. E1 last, as a separate plan.

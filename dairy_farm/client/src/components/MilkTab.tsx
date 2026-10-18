@@ -506,7 +506,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
         <form onSubmit={handleEditSubmit} className="space-y-4 muf-milk-edit-form">
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Cow *</label>
-            <select className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950" value={editForm.cowId} onChange={e => setEditForm({ ...editForm, cowId: e.target.value })}>
+            <select className="muf-field" value={editForm.cowId} onChange={e => setEditForm({ ...editForm, cowId: e.target.value })}>
               {cows.filter(isMilkEligible).map((c) => <option key={c._id} value={c._id}>{c.name}</option>)}
             </select>
           </div>

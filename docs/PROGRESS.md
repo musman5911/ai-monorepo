@@ -8,27 +8,48 @@ Last updated: 2026-10-18.
 ## At a glance
 
 - **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, and the popup design batch of 2026-10-17.
-- **Remaining:** browser verification of the 2026-10-17 UI batch; B3 local validation and browser review; A2 runtime smoke test, A1 Playwright screenshot suite and A3 dependency remediation; then the remaining items in `ROADMAP.md`.
-- **Next:** validate B3 locally and in a browser. Keep B3 marked in progress until that evidence is recorded; then continue in the approved B workstream. B1/B2 still need reliable screenshot/regression coverage.
+- **Remaining:** B3 visual/browser review; B1 local validation and browser review; verification of the 2026-10-17 UI batch; A2 runtime smoke test, A1 Playwright screenshot suite and A3 dependency remediation; then the remaining items in `ROADMAP.md`.
+- **Next:** validate B1 locally and in a browser. B3 automated checks now pass, but its visual legibility review remains open. Complete reliable screenshot/regression coverage before starting B2.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
-## Active work: B3 — shared micro-typography
+## B3 — shared micro-typography
 
-**State: implemented in source; local validation and browser review pending. Not yet marked completed.**
+**Automated validation: passed on the owner's Windows checkout (2026-10-18). Visual/browser review remains pending.**
 
 - Added explicit shared styles to `src/muf/styles/05-density-footer-typography.css` in all three apps.
 - `.text-2xs`: 0.6875rem font size and 1rem line height.
 - `.text-3xs`: 0.625rem font size and 0.875rem line height.
-- Added a Vitest source-contract test that checks both definitions in Agri, Dairy and Flock.
-- Updated `ROADMAP.md` with the B3 acceptance criteria and sequence for B1/B2; updated this overview's stylesheet-part count and micro-typography notes.
-- **Not yet verified:** test count after this commit, MUF/style parity, UI safety checks, all three builds, or real-browser legibility in both themes. No validation has been claimed from source editing alone.
+- Added a Vitest source-contract test for both definitions in all three assembled stylesheets.
+- Owner validation: `npm test` passed 50/50 tests across 4 files; `node tools/check-muf-sync.js` passed; `node tools/check-ui-safety.js` passed; `node tools/check-muf-workbench.js` passed all 19 checks; all three production builds passed; `git diff --check` was clean.
+- **Still unverified:** the visual scale and legibility at 360, 390, 1024 and 1440 px, in light/dark modes and Urdu. Keep that review open; automated success alone does not complete the visual acceptance criteria.
 
-### Owner-run validation received (2026-10-18, before B3)
+### Owner-run dependency/test-safety status (2026-10-18)
 
 - `npm ci` completed successfully.
-- `npm test`: 49 tests passed across 4 test files.
-- `node tools/check-muf-workbench.js`: all 19 source checks passed.
-- `npm audit`: 4 findings (1 moderate, 1 high, 2 critical). These remain outstanding; the runtime workbench smoke test and Playwright screenshot suite were not shown as run.
+- The last reported `npm audit` showed 4 findings (1 moderate, 1 high, 2 critical); no later audit output has been supplied.
+- **Not yet shown as run:** A2 runtime workbench smoke test and A1 Playwright screenshot suite. These remain open; B2 is blocked until dependable screenshot/regression coverage is in place.
+
+## Active work: B1 — Dairy popup field consistency
+
+**State: implemented in source on GitHub; local tests/builds and browser review pending.**
+
+Scope is 38 visible controls that previously used local or repeated input styling instead of the shared MUF field class:
+
+| Component | Controls migrated |
+|---|---:|
+| Dairy `CowsTab.tsx` — animal, calf and sale forms | 26 |
+| Dairy `MilkTab.tsx` — Edit Milk Record popup | 5 |
+| Dairy `HealthTab.tsx` — notes textarea | 1 |
+| Dairy `BreedingTab.tsx` — quick-action date | 1 |
+| Dairy `CowDetailPopup.tsx` — inline expected-price editor | 1 |
+| Dairy `Dashboard.tsx` — date range and feed-stock settings | 4 |
+| **Total** | **38** |
+
+- The hidden image/file upload controls remain specialized and are not styled as text fields.
+- The obsolete local `.inp` rule in `CowsTab.tsx` was removed after its 26 visible controls moved to `muf-field`.
+- The compact expected-price editor retains its 8rem width and 14px type scale; the two feed-stock settings use the existing larger MUF field variant.
+- Added six regression contracts for the migrated groups in `tests/smoke.test.ts`.
+- **Not yet verified:** whether the new six tests pass, the resulting test count, all three builds after B1, and visual equivalence in a browser. Do not mark B1 completed until those results are recorded.
 
 ## Completed
 
@@ -87,16 +108,19 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 
 ## Remaining
 
-1. Validate B3: run `npm test` (expected suite count is now 50 only if the new test passes), `node tools/check-muf-sync.js`, `node tools/check-ui-safety.js`, `tools\\build-all.bat`, and `git diff --check`; then browser-check 360, 390, 1024 and 1440 px, light/dark, and Urdu legibility.
-2. Complete browser verification of the 2026-10-17 popup batch: every listed popup, filters on phone/PC, add buttons (open/save/cancel/Escape), and representative dark-mode popups in all three apps.
-3. Finish A2 runtime smoke testing, A1 Playwright screenshot baselines and A3 npm audit remediation before using screenshot comparisons as a prerequisite for B1/B2.
-4. Continue the remaining items in `ROADMAP.md`.
+1. Validate B1 on the owner's Windows checkout: `npm test` (56 tests expected if all six new contracts pass), `node tools/check-muf-sync.js`, `node tools/check-ui-safety.js`, `node tools/check-muf-workbench.js`, `tools\\build-all.bat` and `git diff --check`.
+2. Browser-review B1 fields on phone and desktop in light/dark mode, especially CowsTab's three forms, the Milk edit popup, Health notes, Breeding date, expected-price edit and Dashboard feed settings.
+3. Finish B3 visual legibility checks at 360, 390, 1024 and 1440 px, including Urdu.
+4. Complete browser verification of the 2026-10-17 popup batch: the listed popups, Flock filters, add buttons (open/save/cancel/Escape), and representative dark-mode popups in all three apps.
+5. Finish A2 runtime smoke testing, A1 Playwright screenshot baselines and A3 dependency remediation. B2 must wait until screenshot/regression coverage is usable.
+6. Continue remaining items in `ROADMAP.md`.
 
 ## Next
 
-1. Validate the new B3 implementation locally and in a browser; update this file with the real results before marking it completed.
-2. Fix any issues found during visual checks.
-3. Finish the outstanding A testing-safety-net items needed for reliable regression coverage, then proceed to B1.
+1. Run the B1 local validation commands and share the output.
+2. Fix any source or build regressions before visual approval.
+3. Complete the B1 browser review and update the recorded status with real results.
+4. Finish the outstanding A testing safety net before B2; then continue the B sequence.
 
 ## How to update this file
 

@@ -345,7 +345,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                 <textarea
                   value={formData.notes}
                   onChange={e => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100 min-h-[80px]"
+                  className="muf-field"
                 ></textarea>
               </div>
               <div className="lg:col-span-3 flex justify-end space-x-2 pt-2">

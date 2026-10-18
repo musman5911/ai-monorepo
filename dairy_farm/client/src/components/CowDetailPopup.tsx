@@ -388,7 +388,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                         type="number" min="0" autoFocus
                         value={priceInput}
                         onChange={e => setPriceInput(e.target.value)}
-                        className="w-32 border border-slate-200 dark:border-slate-700 rounded-lg px-2 py-1.5 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500"
+                        className="muf-field muf-field-auto" style={{ width: '8rem', fontSize: '0.875rem', padding: '0.375rem 0.5rem' }}
                         placeholder="Rs"
                       />
                       <button

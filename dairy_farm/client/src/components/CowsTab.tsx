@@ -314,38 +314,38 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
         title={editingCow ? L('Edit Animal') : L('Add New Animal')}
         icon={<Plus className="w-5 h-5" />} iconBg="bg-farm-100 text-farm-700" size="small">
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Field label={L('Name *')} children={<input required className="inp" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />} />
-            <Field label={L('Breed *')} children={<input required className="inp" value={formData.breed} onChange={e => setFormData({ ...formData, breed: e.target.value })} />} />
+            <Field label={L('Name *')} children={<input required className="muf-field" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />} />
+            <Field label={L('Breed *')} children={<input required className="muf-field" value={formData.breed} onChange={e => setFormData({ ...formData, breed: e.target.value })} />} />
             <Field label={L('Gender')} children={
-              <select className="inp" value={formData.gender || 'female'} onChange={e => setFormData({ ...formData, gender: e.target.value as 'female' | 'male' })}>
+              <select className="muf-field" value={formData.gender || 'female'} onChange={e => setFormData({ ...formData, gender: e.target.value as 'female' | 'male' })}>
                 <option value="female">{L('Female (Cow)')}</option>
                 <option value="male">{L('Male (Bull)')}</option>
               </select>
             } />
             <Field label={L('Status')} children={
-              <select className="inp" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value as CowStatus })}>
+              <select className="muf-field" value={formData.status} onChange={e => setFormData({ ...formData, status: e.target.value as CowStatus })}>
                 <option value="active">{L('Active')}</option>
                 {formData.gender !== 'male' && <><option value="dry">{L('Dry')}</option><option value="pregnant">{L('Pregnant')}</option></>}
                 <option value="inactive">{L('Inactive')}</option>
               </select>
             } />
-            <Field label={L('Birth Date')} children={<input type="date" className="inp" value={formData.birthDate} onChange={e => setFormData({ ...formData, birthDate: e.target.value })} />} />
-            <Field label={L('Weight (kg)')} children={<input type="number" className="inp" value={formData.weight || ''} onChange={e => setFormData({ ...formData, weight: parseFloat(e.target.value) || undefined })} />} />
-            <Field label={L('Purchase Price (₨)')} children={<input type="number" className="inp" placeholder="e.g. 150000" value={formData.purchasePrice || ''} onChange={e => setFormData({ ...formData, purchasePrice: parseFloat(e.target.value) || 0 })} />} />
+            <Field label={L('Birth Date')} children={<input type="date" className="muf-field" value={formData.birthDate} onChange={e => setFormData({ ...formData, birthDate: e.target.value })} />} />
+            <Field label={L('Weight (kg)')} children={<input type="number" className="muf-field" value={formData.weight || ''} onChange={e => setFormData({ ...formData, weight: parseFloat(e.target.value) || undefined })} />} />
+            <Field label={L('Purchase Price (₨)')} children={<input type="number" className="muf-field" placeholder="e.g. 150000" value={formData.purchasePrice || ''} onChange={e => setFormData({ ...formData, purchasePrice: parseFloat(e.target.value) || 0 })} />} />
             {formData.gender !== 'male' && (
               <>
-                <Field label={L('Lactation #')} children={<input type="number" className="inp" value={formData.lactationNumber || 0} onChange={e => setFormData({ ...formData, lactationNumber: parseInt(e.target.value) || 0 })} />} />
-                <Field label={L('Calving Date')} children={<input type="date" className="inp" value={formData.calvingDate} onChange={e => setFormData({ ...formData, calvingDate: e.target.value })} />} />
-                <Field label={L('Pregnancy Date')} children={<input type="date" className="inp" value={formData.pregnancyDate} onChange={e => setFormData({ ...formData, pregnancyDate: e.target.value })} />} />
+                <Field label={L('Lactation #')} children={<input type="number" className="muf-field" value={formData.lactationNumber || 0} onChange={e => setFormData({ ...formData, lactationNumber: parseInt(e.target.value) || 0 })} />} />
+                <Field label={L('Calving Date')} children={<input type="date" className="muf-field" value={formData.calvingDate} onChange={e => setFormData({ ...formData, calvingDate: e.target.value })} />} />
+                <Field label={L('Pregnancy Date')} children={<input type="date" className="muf-field" value={formData.pregnancyDate} onChange={e => setFormData({ ...formData, pregnancyDate: e.target.value })} />} />
               </>
             )}
-            <Field label={L('Batch')} children={<input className="inp" placeholder={L('e.g. Jan 2026 Batch')} value={formData.batch} onChange={e => setFormData({ ...formData, batch: e.target.value })} />} />
+            <Field label={L('Batch')} children={<input className="muf-field" placeholder={L('e.g. Jan 2026 Batch')} value={formData.batch} onChange={e => setFormData({ ...formData, batch: e.target.value })} />} />
             <Field label={L('Photo (upload or URL)')} children={
               <div className="flex items-center gap-2">
                 {formData.image && (
                   <img src={formData.image} alt="Cow" className="w-9 h-9 rounded-lg object-cover border border-slate-200 dark:border-slate-700 shrink-0" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
                 )}
-                <input className="inp" placeholder={L('Paste image link or upload →')} value={(formData.image || '').startsWith('data:image/') ? '(uploaded photo)' : (formData.image || '')} onChange={e => setFormData({ ...formData, image: e.target.value })} readOnly={(formData.image || '').startsWith('data:image/')} />
+                <input className="muf-field" placeholder={L('Paste image link or upload →')} value={(formData.image || '').startsWith('data:image/') ? '(uploaded photo)' : (formData.image || '')} onChange={e => setFormData({ ...formData, image: e.target.value })} readOnly={(formData.image || '').startsWith('data:image/')} />
                 <label className="shrink-0 cursor-pointer bg-farm-600 hover:bg-farm-700 text-white rounded-lg px-2.5 py-2 text-xs font-semibold" title="Upload a photo (compressed & stored in the DB — a new photo replaces the old one, no space wasted)">
                   📷
                   <input type="file" accept="image/*" className="hidden" onChange={async (e) => {
@@ -363,7 +363,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
                 )}
               </div>
             } />
-            <div className="md:col-span-3"><Field label={L('Notes')} children={<textarea rows={2} className="inp" value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />} /></div>
+            <div className="md:col-span-3"><Field label={L('Notes')} children={<textarea rows={2} className="muf-field" value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />} /></div>
             <div className="md:col-span-3 flex justify-end gap-3 pt-2">
               <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800">{L('Cancel')}</button>
               <button type="submit" className="bg-farm-600 hover:bg-farm-700 text-white rounded-lg px-6 py-2 text-sm font-medium flex items-center gap-2"><Save className="h-4 w-4" /> {editingCow ? L('Update') : L('Save')}</button>
@@ -376,25 +376,25 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
         title={L('Add Calf')}
         icon={<Baby className="w-5 h-5" />} iconBg="bg-pink-100 text-pink-700" size="small">
         <form onSubmit={handleAddCalf} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Field label={L('Calf Name *')} children={<input required className="inp" value={calfForm.name} onChange={e => setCalfForm({ ...calfForm, name: e.target.value })} />} />
+            <Field label={L('Calf Name *')} children={<input required className="muf-field" value={calfForm.name} onChange={e => setCalfForm({ ...calfForm, name: e.target.value })} />} />
             <Field label={L('Gender *')} children={
-              <select required className="inp" value={calfForm.gender} onChange={e => setCalfForm({ ...calfForm, gender: e.target.value as 'female' | 'male' })}>
+              <select required className="muf-field" value={calfForm.gender} onChange={e => setCalfForm({ ...calfForm, gender: e.target.value as 'female' | 'male' })}>
                 <option value="female">{L('Female (Heifer)')}</option>
                 <option value="male">{L('Male (Bull calf)')}</option>
               </select>
             } />
             <Field label={L('Mother Cow *')} children={
-              <select required className="inp" value={calfForm.motherId} onChange={e => setCalfForm({ ...calfForm, motherId: e.target.value })}>
+              <select required className="muf-field" value={calfForm.motherId} onChange={e => setCalfForm({ ...calfForm, motherId: e.target.value })}>
                 <option value="">{L('Select mother')}</option>
                 {activeMothers.map(c => <option key={c._id} value={c._id}>{c.name} ({c.breed})</option>)}
               </select>
             } />
-            <Field label={L('Breed (auto from mother)')} children={<input className="inp" placeholder={L('Auto if blank')} value={calfForm.breed} onChange={e => setCalfForm({ ...calfForm, breed: e.target.value })} />} />
-            <Field label={L('Birth Date *')} children={<input type="date" required className="inp" value={calfForm.birthDate} onChange={e => setCalfForm({ ...calfForm, birthDate: e.target.value })} />} />
-            <Field label={L('Weight (kg)')} children={<input type="number" className="inp" value={calfForm.weight} onChange={e => setCalfForm({ ...calfForm, weight: e.target.value })} />} />
-            <Field label={L('Purchase Price (₨)')} children={<input type="number" className="inp" placeholder="e.g. 50000" value={calfForm.purchasePrice} onChange={e => setCalfForm({ ...calfForm, purchasePrice: e.target.value })} />} />
-            <Field label={L('Nursing Period (months)')} children={<input type="number" step="0.5" className="inp" value={calfForm.nursingMonths} onChange={e => setCalfForm({ ...calfForm, nursingMonths: parseFloat(e.target.value) || 2.5 })} />} />
-            <div className="md:col-span-3"><Field label={L('Notes')} children={<textarea rows={2} className="inp" value={calfForm.notes} onChange={e => setCalfForm({ ...calfForm, notes: e.target.value })} />} /></div>
+            <Field label={L('Breed (auto from mother)')} children={<input className="muf-field" placeholder={L('Auto if blank')} value={calfForm.breed} onChange={e => setCalfForm({ ...calfForm, breed: e.target.value })} />} />
+            <Field label={L('Birth Date *')} children={<input type="date" required className="muf-field" value={calfForm.birthDate} onChange={e => setCalfForm({ ...calfForm, birthDate: e.target.value })} />} />
+            <Field label={L('Weight (kg)')} children={<input type="number" className="muf-field" value={calfForm.weight} onChange={e => setCalfForm({ ...calfForm, weight: e.target.value })} />} />
+            <Field label={L('Purchase Price (₨)')} children={<input type="number" className="muf-field" placeholder="e.g. 50000" value={calfForm.purchasePrice} onChange={e => setCalfForm({ ...calfForm, purchasePrice: e.target.value })} />} />
+            <Field label={L('Nursing Period (months)')} children={<input type="number" step="0.5" className="muf-field" value={calfForm.nursingMonths} onChange={e => setCalfForm({ ...calfForm, nursingMonths: parseFloat(e.target.value) || 2.5 })} />} />
+            <div className="md:col-span-3"><Field label={L('Notes')} children={<textarea rows={2} className="muf-field" value={calfForm.notes} onChange={e => setCalfForm({ ...calfForm, notes: e.target.value })} />} /></div>
             <div className="md:col-span-3 flex justify-end gap-3 pt-2">
               <button type="button" onClick={() => setShowCalfForm(false)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
               <button type="submit" className="bg-pink-600 hover:bg-pink-700 text-white rounded-lg px-6 py-2 text-sm font-medium flex items-center gap-2"><Baby className="h-4 w-4" /> {L('Add Calf')}</button>
@@ -501,10 +501,10 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
       {saleCow && (
         <DetailModal open onClose={() => setSaleCow(null)} title={`Record Sale — ${saleCow.name} ${saleCow.gender === 'male' ? '🐂' : '🐄'}`} size="small">
           <form onSubmit={handleRecordSale} className="space-y-4">
-            <Field label={L('Sale Date *')} children={<input required type="date" className="inp" value={saleForm.date} onChange={e => setSaleForm({ ...saleForm, date: e.target.value })} />} />
-            <Field label={L('Sale Price (₨) *')} children={<input required type="number" min="1" className="inp" value={saleForm.salePrice} onChange={e => setSaleForm({ ...saleForm, salePrice: e.target.value })} />} />
-            <Field label={L('Buyer')} children={<input className="inp" value={saleForm.buyer} onChange={e => setSaleForm({ ...saleForm, buyer: e.target.value })} />} />
-            <Field label={L('Notes')} children={<textarea rows={2} className="inp" value={saleForm.notes} onChange={e => setSaleForm({ ...saleForm, notes: e.target.value })} />} />
+            <Field label={L('Sale Date *')} children={<input required type="date" className="muf-field" value={saleForm.date} onChange={e => setSaleForm({ ...saleForm, date: e.target.value })} />} />
+            <Field label={L('Sale Price (₨) *')} children={<input required type="number" min="1" className="muf-field" value={saleForm.salePrice} onChange={e => setSaleForm({ ...saleForm, salePrice: e.target.value })} />} />
+            <Field label={L('Buyer')} children={<input className="muf-field" value={saleForm.buyer} onChange={e => setSaleForm({ ...saleForm, buyer: e.target.value })} />} />
+            <Field label={L('Notes')} children={<textarea rows={2} className="muf-field" value={saleForm.notes} onChange={e => setSaleForm({ ...saleForm, notes: e.target.value })} />} />
             <div className="muf-pc-actions">
               <button type="button" onClick={() => setSaleCow(null)} className="muf-pc-btn-ghost">{L('Cancel')}</button>
               <button type="submit" className="bg-purple-600 hover:bg-purple-700 text-white rounded-lg px-6 py-2 text-sm font-medium flex items-center gap-2"><Banknote className="h-4 w-4" /> {L('Record Sale')}</button>
@@ -513,7 +513,6 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
         </DetailModal>
       )}
 
-      <style>{`.inp{width:100%;border:1px solid #e2e8f0;border-radius:0.5rem;padding:0.5rem 0.75rem;font-size:0.875rem;background:white;outline:none}.inp:focus{border-color:#1b854a}.dark .inp{background:#0f172a;border-color:#334155;color:#e2e8f0}`}</style>
       {/* ── Cow Detail (any card / row click) ───── */}
       {detailCowId && (
         <CowDetailPopup cowId={detailCowId} rate={rate.value} rateDate={rate.date} isAdmin={isAdmin} onClose={() => setDetailCowId(null)} onCowUpdated={(updatedCow) => setCows(prev => prev.map(c => c._id === updatedCow._id ? { ...c, ...updatedCow } : c))} />

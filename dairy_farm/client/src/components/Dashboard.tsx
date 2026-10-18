@@ -470,7 +470,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">{L('Custom Range')}</h4>
               <label className="block space-y-1">
                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">{L('From')}</span>
-                <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} className="w-full px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 rounded-lg font-mono" />
+                <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} className="muf-field font-mono" />
               </label>
               <label className="block space-y-1">
                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">To</span>
@@ -959,7 +959,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               <div className="grid grid-cols-2 gap-2">
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Daily use (kg)')}</label>
-                  <input type="number" min="0" step="any" value={feedSettingsDraft.dailyUseKg} onChange={(e) => setFeedSettingsDraft({ ...feedSettingsDraft, dailyUseKg: e.target.value })} className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500" />
+                  <input type="number" min="0" step="any" value={feedSettingsDraft.dailyUseKg} onChange={(e) => setFeedSettingsDraft({ ...feedSettingsDraft, dailyUseKg: e.target.value })} className="muf-field muf-field-lg" />
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Warn below (days)')}</label>

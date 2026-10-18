@@ -289,3 +289,62 @@ describe('MUF micro-typography utilities', () => {
     }
   });
 });
+
+describe('Dairy popup fields use shared MUF field styles (B1)', () => {
+  it('uses shared fields for all 26 visible cow, calf and sale popup controls', () => {
+    const source = readSource('dairy_farm/client/src/components/CowsTab.tsx');
+    expect(source).not.toContain('className="inp"');
+    expect(source).not.toContain('.inp{width:100%');
+    expect((source.match(/className="muf-field"/g) || []).length).toBe(26);
+  });
+
+  it('uses the shared field class on all five Edit Milk Record controls', () => {
+    const source = readSource('dairy_farm/client/src/components/MilkTab.tsx');
+    const start = source.indexOf("title={L('Edit Milk Record')}");
+    const end = source.indexOf('</DetailModal>', start);
+    expect(start).toBeGreaterThanOrEqual(0);
+    expect(end).toBeGreaterThan(start);
+    const popup = source.slice(start, end);
+    expect((popup.match(/className="muf-field"/g) || []).length).toBe(5);
+  });
+
+  it('uses the shared field class for the Health Record notes textarea', () => {
+    const source = readSource('dairy_farm/client/src/components/HealthTab.tsx');
+    const start = source.indexOf("title={editingId ? L('Edit Health Record') : L('Add Health Record')}");
+    const end = source.indexOf('</DetailModal>', start);
+    const popup = source.slice(start, end);
+    expect(popup).toMatch(/<textarea[\s\S]*?className="muf-field"/);
+  });
+
+  it('uses the shared field class for the Breeding quick-action date', () => {
+    const source = readSource('dairy_farm/client/src/components/BreedingTab.tsx');
+    expect(source).toMatch(/value=\{actionDate\}[\s\S]{0,180}className="muf-field"/);
+  });
+
+  it('uses MUF field styling for the compact inline sale-price editor', () => {
+    const source = readSource('dairy_farm/client/src/components/CowDetailPopup.tsx');
+    const start = source.indexOf('value={priceInput}');
+    const end = source.indexOf('/>', start);
+    expect(start).toBeGreaterThanOrEqual(0);
+    const field = source.slice(start, end);
+    expect(field).toContain('className="muf-field muf-field-auto"');
+    expect(field).toContain("width: '8rem'");
+    expect(field).toContain("fontSize: '0.875rem'");
+  });
+
+  it('uses shared field styling for the four Dashboard popup controls', () => {
+    const source = readSource('dairy_farm/client/src/components/Dashboard.tsx');
+    const markers = [
+      'value={customFrom}',
+      'value={customTo}',
+      'value={feedSettingsDraft.dailyUseKg}',
+      'value={feedSettingsDraft.lowStockDays}',
+    ];
+    for (const marker of markers) {
+      const start = source.indexOf(marker);
+      expect(start).toBeGreaterThanOrEqual(0);
+      const end = source.indexOf('/>', start);
+      expect(source.slice(start, end)).toContain('className="muf-field');
+    }
+  });
+});
