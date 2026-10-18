@@ -17,7 +17,7 @@ These rules govern changes to the Agri Farm, Dairy Farm, and Flock Farm monorepo
 - Agri, Dairy, and Flock each have their own frontend and backend directories. Keep domain-specific calculations and workflows in their own project.
 - The three live project repositories are mirrors. Do not edit them directly.
 - Do not deploy, publish, or run the mirror-sync workflow without explicit owner approval.
-- The owner works on `main` (the arena branch is retired). Assistants do not push, do not open pull requests and do not create branches; the owner publishes with `tools\push-main-update.bat`, the repository's established workflow.
+- The owner works on `main` (the arena branch is retired). Default behavior is no push, no pull request and no new branch. When the owner explicitly instructs a direct GitHub update in the current task, make one reviewable commit on `main` and report its SHA; the owner still runs local validation and controls deployment/mirror sync.
 - Work on `main` unless the owner names another branch. Do not create or switch to another branch without the owner's instruction.
 - Commits should be single-line, natural summaries. Do not include co-author trailers or machine-generated markers.
 

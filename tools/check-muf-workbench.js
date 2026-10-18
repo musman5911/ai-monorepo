@@ -23,11 +23,13 @@ const read = (p) => {
 const check = (condition, message) => (condition ? passed : failures).push(message);
 const workbenchPath = 'dairy_farm/client/src/editing-x-projetcs.tsx';
 const stylePath = 'dairy_farm/client/src/muf-workbench.css';
+const runtimeSmokePath = 'tools/check-muf-workbench-runtime.js';
 const vitePath = 'dairy_farm/client/vite.config.ts';
 const mainPath = 'dairy_farm/client/src/main.tsx';
 const appPath = 'dairy_farm/client/src/App.tsx';
 const workbench = read(workbenchPath);
 const styles = read(stylePath);
+const runtimeSmoke = read(runtimeSmokePath);
 const vite = read(vitePath);
 const main = read(mainPath);
 const app = read(appPath);
@@ -69,6 +71,10 @@ check(!/editing-x-projetcs|muf-workbench\.css/.test(main + '\n' + app), 'workben
 check(strayReferences.length === 0, `editor module and stylesheet are isolated from other app source files${strayReferences.length ? ': ' + strayReferences.join(', ') : ''}`);
 check(!/editing-x-projetcs|muf-workbench\.css/.test(packageJson.scripts?.build || ''), 'normal production build script does not explicitly invoke the workbench');
 check(!packageJson.dependencies?.['@puckeditor/core'] && !packageJson.devDependencies?.['@puckeditor/core'], 'no new Puck dependency was added to the app manifest');
+check(runtimeSmoke.includes("const routePath = '/__muf-workbench'") && runtimeSmoke.includes('MUF_WORKBENCH_URL'), 'runtime smoke test can target the development workbench URL');
+check(runtimeSmoke.includes('muf-workbench-root') && runtimeSmoke.includes('/src/editing-x-projetcs.tsx') && runtimeSmoke.includes('/src/muf-workbench.css'), 'runtime smoke test checks the editor mount, module and stylesheet');
+check(runtimeSmoke.includes('/@vite/client') && runtimeSmoke.includes('/@react-refresh'), 'runtime smoke test checks Vite and React refresh wiring');
+check(runtimeSmoke.includes('AbortSignal.timeout') && runtimeSmoke.includes('process.exitCode = 1'), 'runtime smoke test has a network timeout and fails with a non-zero exit code');
 
 console.log('\nMUF workbench source safety check');
 for (const result of passed) console.log(`  ✓ ${result}`);

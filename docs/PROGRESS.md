@@ -7,9 +7,9 @@ Last updated: 2026-10-18.
 
 ## At a glance
 
-- **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, and the popup design batch of 2026-10-17.
-- **Remaining:** B3 visual/browser review; B1 local validation and browser review; verification of the 2026-10-17 UI batch; A2 runtime smoke test, A1 Playwright screenshot suite and A3 dependency remediation; then the remaining items in `ROADMAP.md`.
-- **Next:** validate B1 locally and in a browser. B3 automated checks now pass, but its visual legibility review remains open. Complete reliable screenshot/regression coverage before starting B2.
+- **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, and B1 automated regression/build validation.
+- **Remaining:** B3/B1 visual browser review; verification of the 2026-10-17 UI batch; A2 runtime test (added in this commit, owner run pending), A1 Playwright screenshots and A3 dependency remediation; then the remaining items in `ROADMAP.md`.
+- **Next:** run A2's workbench runtime smoke test, then set up A1 screenshot coverage. B2 remains blocked until reliable visual regression coverage is available.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
 ## B3 — shared micro-typography
@@ -31,7 +31,7 @@ Last updated: 2026-10-18.
 
 ## Active work: B1 — Dairy popup field consistency
 
-**State: implemented in source on GitHub; local tests/builds and browser review pending.**
+**Automated validation: passed on the owner's Windows checkout (2026-10-18). Visual/browser review remains pending.**
 
 Scope is 38 visible controls that previously used local or repeated input styling instead of the shared MUF field class:
 
@@ -49,9 +49,29 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 - The obsolete local `.inp` rule in `CowsTab.tsx` was removed after its 26 visible controls moved to `muf-field`.
 - The compact expected-price editor retains its 8rem width and 14px type scale; the two feed-stock settings use the existing larger MUF field variant.
 - Added six regression contracts for the migrated groups in `tests/smoke.test.ts`.
-- Owner-run B1 validation: first run 54/56 passed; the follow-up resolved the popup anchor and most missed replacements. The next run reached 55/56; it identified the Dashboard `Warn below (days)` field still using the old class. The remaining field is corrected in commit `B1: finish Dashboard field migration`.
-- **Not yet verified:** rerun all tests after the last field fix and complete all three production builds. The owner's last build attempt was cancelled with Ctrl+C during Dairy, so it is not a pass. Browser review is still pending. Do not mark B1 completed until those results are recorded.
+- Owner validation on commit `3177e59`: `npm test` passed **56/56 tests** across 4 files; `node tools/check-muf-sync.js`, `node tools/check-ui-safety.js`, and `node tools/check-muf-workbench.js` all passed; all three production builds passed; `git status --short` was clean.
+- The earlier failing runs were corrected before this passing run. No app logic, API, backend or dependency changes were made for B1.
+- **Still pending:** visual/browser review of the six affected components in both themes and at phone/desktop widths. Automated validation is green; do not label the visual acceptance criteria complete before browser review.
 
+## Active work: A2 — workbench runtime smoke test
+
+**State: implementation pushed; owner-run runtime result pending. No runtime pass is claimed yet.**
+
+- Added `tools/check-muf-workbench-runtime.js`, using Node's built-in `fetch` and no new dependency.
+- Added `npm run check-workbench-runtime` to the root package scripts.
+- The script requests `/__muf-workbench`, checks the mount point and transformed editor-module reference, verifies Vite/React refresh injection, fetches the transformed editor module and stylesheet, and checks the Vite client and React refresh endpoints return HTTP 200.
+- The request helper uses a timeout and returns a non-zero exit code on failure.
+- Extended `tools/check-muf-workbench.js` with four source-contract checks for this runtime test. Expected source-check count: 23 (previously 19).
+- **Not yet verified:** run it against a live local Vite server. It will fail intentionally if the server is not running, the route returns an error, or Vite fails to transform the editor code.
+
+### Owner-run B1 validation received (2026-10-18)
+
+- `npm test`: 56/56 tests passed across 4 test files.
+- `node tools/check-muf-sync.js`: all checks passed.
+- `node tools/check-ui-safety.js`: all checks passed.
+- `node tools/check-muf-workbench.js`: all 19 checks passed on the previous version of the checker.
+- `tools\build-all.bat`: Dairy, Flock and Agri builds all passed.
+- **Visual review:** still pending for B1 and B3. No browser screenshots have been supplied.
 ## Completed
 
 ### Foundation (before this tracker)
@@ -109,20 +129,18 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 
 ## Remaining
 
-1. Validate B1 on the owner's Windows checkout: `npm test` (56 tests expected if all six new contracts pass), `node tools/check-muf-sync.js`, `node tools/check-ui-safety.js`, `node tools/check-muf-workbench.js`, `tools\\build-all.bat` and `git diff --check`.
-2. Browser-review B1 fields on phone and desktop in light/dark mode, especially CowsTab's three forms, the Milk edit popup, Health notes, Breeding date, expected-price edit and Dashboard feed settings.
-3. Finish B3 visual legibility checks at 360, 390, 1024 and 1440 px, including Urdu.
-4. Complete browser verification of the 2026-10-17 popup batch: the listed popups, Flock filters, add buttons (open/save/cancel/Escape), and representative dark-mode popups in all three apps.
-5. Finish A2 runtime smoke testing, A1 Playwright screenshot baselines and A3 dependency remediation. B2 must wait until screenshot/regression coverage is usable.
+1. Run A2: start the Dairy Vite dev server on port 5000 and execute `npm run check-workbench-runtime` from the monorepo root. Confirm the runtime check passes.
+2. Complete A1: install/configure Playwright and create reviewed screenshot baselines for key screens/popups at the five planned widths, in light and dark modes.
+3. Complete A3: review and remediate the four reported root npm audit findings (1 moderate, 1 high, 2 critical). Dependency upgrades require the approval recorded in `ROADMAP.md`; do not use `npm audit fix --force` without reviewing the breaking-change impact.
+4. Browser-review B1 fields and B3 micro-typography at phone/desktop widths, both themes, and Urdu.
+5. Complete browser verification of the 2026-10-17 UI batch.
 6. Continue remaining items in `ROADMAP.md`.
 
 ## Next
 
-1. Run the B1 local validation commands and share the output.
-2. Fix any source or build regressions before visual approval.
-3. Complete the B1 browser review and update the recorded status with real results.
-4. Finish the outstanding A testing safety net before B2; then continue the B sequence.
-
+1. Run A2 using the two-terminal instructions in `ROADMAP.md`.
+2. If A2 passes, begin A1 Playwright setup and screenshot coverage.
+3. Keep B2 blocked until dependable visual regression coverage exists; then resume B2 as the next B sub-phase.
 ## How to update this file
 
 After each change: move the item from Remaining or Next into Completed with the date, update the validation block with the real numbers, and list anything unverified. Keep `ROADMAP.md` in step.
