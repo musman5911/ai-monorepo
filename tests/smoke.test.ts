@@ -300,7 +300,7 @@ describe('Dairy popup fields use shared MUF field styles (B1)', () => {
 
   it('uses the shared field class on all five Edit Milk Record controls', () => {
     const source = readSource('dairy_farm/client/src/components/MilkTab.tsx');
-    const start = source.indexOf("title={L('Edit Milk Record')}");
+    const start = source.indexOf('/* ── Edit milk record');
     const end = source.indexOf('</DetailModal>', start);
     expect(start).toBeGreaterThanOrEqual(0);
     expect(end).toBeGreaterThan(start);

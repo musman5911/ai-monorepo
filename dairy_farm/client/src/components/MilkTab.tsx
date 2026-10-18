@@ -512,20 +512,20 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
           </div>
           <div>
             <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Date *</label>
-            <input required type="date" className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950" value={editForm.date} onChange={e => setEditForm({ ...editForm, date: e.target.value })} />
+            <input required type="date" className="muf-field" value={editForm.date} onChange={e => setEditForm({ ...editForm, date: e.target.value })} />
           </div>
           <div className="grid grid-cols-3 gap-3">
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Morning (L)')}</label>
-              <input type="number" min="0" step="0.1" className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950" value={editForm.morning} onChange={e => setEditForm({ ...editForm, morning: e.target.value })} />
+              <input type="number" min="0" step="0.1" className="muf-field" value={editForm.morning} onChange={e => setEditForm({ ...editForm, morning: e.target.value })} />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Evening (L)')}</label>
-              <input type="number" min="0" step="0.1" className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950" value={editForm.evening} onChange={e => setEditForm({ ...editForm, evening: e.target.value })} />
+              <input type="number" min="0" step="0.1" className="muf-field" value={editForm.evening} onChange={e => setEditForm({ ...editForm, evening: e.target.value })} />
             </div>
             <div>
               <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">{L('Calf (L)')}</label>
-              <input type="number" min="0" step="0.1" className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-white dark:bg-slate-950" value={editForm.calfMilk} onChange={e => setEditForm({ ...editForm, calfMilk: e.target.value })} />
+              <input type="number" min="0" step="0.1" className="muf-field" value={editForm.calfMilk} onChange={e => setEditForm({ ...editForm, calfMilk: e.target.value })} />
             </div>
           </div>
           <div className="muf-pc-actions">

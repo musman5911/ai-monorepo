@@ -474,7 +474,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               </label>
               <label className="block space-y-1">
                 <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">To</span>
-                <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="w-full px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 rounded-lg font-mono" />
+                <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="muf-field font-mono" />
               </label>
               <div className="flex justify-end gap-2 pt-2">
                 <button type="button" onClick={() => setCustomOpen(false)} className="px-3 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200">{L('Cancel')}</button>

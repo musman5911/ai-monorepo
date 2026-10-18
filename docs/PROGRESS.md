@@ -49,7 +49,8 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 - The obsolete local `.inp` rule in `CowsTab.tsx` was removed after its 26 visible controls moved to `muf-field`.
 - The compact expected-price editor retains its 8rem width and 14px type scale; the two feed-stock settings use the existing larger MUF field variant.
 - Added six regression contracts for the migrated groups in `tests/smoke.test.ts`.
-- **Not yet verified:** whether the new six tests pass, the resulting test count, all three builds after B1, and visual equivalence in a browser. Do not mark B1 completed until those results are recorded.
+- First owner-run B1 validation found 54/56 tests passing. Two failures exposed a test locator that matched the earlier read-only milk-history popup and four missed replacements in Edit Milk Record, plus one missed Dashboard `To` date field. Those causes are corrected in the follow-up commit.
+- **Not yet verified:** rerun all tests, all three builds after this fix, and visual equivalence in a browser. Do not mark B1 completed until those results are recorded.
 
 ## Completed
 

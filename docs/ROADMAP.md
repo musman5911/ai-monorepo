@@ -40,6 +40,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 - Keep behavior, values, validation, submit handlers, API calls and permissions unchanged. This batch is presentation-only.
 - Where a control has a genuinely compact layout (the inline expected-price editor), preserve its dimensions while using the common field surface. Use the existing `muf-field-lg` variant for intentionally larger inputs.
 - Regression tests must cover every migrated group; require the full test suite, MUF sync check, UI safety check and all three builds to pass.
+- For repeated class-string migrations, verify the entire target set is converted; regression tests should anchor to the specific popup wrapper/comment rather than a title string shared by multiple popups.
 - The owner approved starting B1 before A1 Playwright coverage was finished. Therefore B1 remains **in progress** until local checks and browser review pass. **Do not start B2** until reliable screenshot/regression coverage is available.
 
 ## C. Frontend improvements
