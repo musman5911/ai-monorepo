@@ -6,7 +6,7 @@ import Image from '../models/Image.js';
 
 const router = express.Router();
 
-const allowedKinds = new Set(['bird', 'batch']);
+const allowedKinds = new Set(['bird', 'batch', 'diary']);
 
 // Images are held in memory briefly, then persisted to MongoDB — NOT to local
 // disk. Local disk is ephemeral on Replit autoscale (files vanish on every
@@ -44,6 +44,19 @@ router.post('/uploads/image', authRequired, requireRole('admin'), upload.single(
   } catch (err) {
     console.error('POST /api/uploads/image error:', err);
     res.status(500).json({ error: err.message || 'Failed to upload image' });
+  }
+});
+
+// Diary uploads reuse the MongoDB Image store and the diary bucket's existing
+// authenticated write permissions. Bird and batch uploads remain admin-only.
+router.post('/uploads/diary-image', authRequired, upload.single('image'), async (req, res) => {
+  try {
+    if (!req.file?.buffer?.length) return res.status(400).json({ error: 'No image file uploaded' });
+    const img = await Image.create({ kind: 'diary', contentType: req.file.mimetype || 'image/jpeg', data: req.file.buffer, size: req.file.buffer.length, uploadedBy: req.user?.username || '' });
+    return res.status(201).json({ ok: true, path: `/api/images/${img._id}` });
+  } catch (err) {
+    console.error('POST /api/uploads/diary-image error:', err);
+    return res.status(500).json({ error: err.message || 'Failed to upload diary image' });
   }
 });
 

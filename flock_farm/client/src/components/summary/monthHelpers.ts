@@ -7,7 +7,7 @@
 // MonthlySummary composes them in a flock-specific way.
 import type { Bird, EggProduction, DateRange } from '../../types';
 import { todayStr, formatLocalDate } from '../../utils/calculations';
-import { mufMonthLabel, mufShiftMonth } from '../../muf-date';
+import { mufMonthLabel, mufShiftMonth } from '../../muf/data/muf-date';
 
 export const formatRs = (value: number) => `Rs ${Math.round(value || 0).toLocaleString()}`;
 export const formatKg = (value: number) => `${Number(value || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })} kg`;
@@ -20,7 +20,7 @@ export const formatKg = (value: number) => `${Number(value || 0).toLocaleString(
 export function buildFlockProfileData(
   birds: Bird[],
   eggProduction: EggProduction[],
-): Omit<import('../../muf-profile').MufProfileOpts, 'contact'> {
+): Omit<import('../../muf/data/muf-profile').MufProfileOpts, 'contact'> {
   const active = birds.filter(b => b.status === 'Active' || b.status === 'Sick');
   const hens = active.filter(b => b.gender === 'Female');
   const breeds = Array.from(new Set(active.map(b => b.breed).filter(Boolean))).slice(0, 4).join(', ');

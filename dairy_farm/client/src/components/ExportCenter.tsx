@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { FileText, Printer } from 'lucide-react';
 import { api } from '../api';
 import type { Cow, MilkEntry, Expense, Sale } from '../types';
-import { openPrintDocument } from '../muf-print';
+import { openPrintDocument } from '../muf/data/muf-print';
+import { L } from '../i18n';
 
 /**
  * Official Farm Export Center's
@@ -194,19 +195,19 @@ export default function ExportCenter() {
   };
 
   return (
-    <div className="p-5 rounded-[17px] border border-[#e6e6de] dark:border-[#203528] bg-[#fffefb]/60 dark:bg-[#0a140d]/40 shadow-xs space-y-4">
-      <div className="flex items-center gap-2 pb-2 border-b border-[#e6e6de] dark:border-[#203528]">
+    <div className="p-5 rounded-[17px] border border-[color:var(--muf-color-border)] bg-[#fffefb]/60 dark:bg-[#0a140d]/40 shadow-xs space-y-4">
+      <div className="flex items-center gap-2 pb-2 border-b border-[color:var(--muf-color-border)]">
         <div className="p-1.5 bg-farm-900/10 text-farm-600 dark:text-farm-400 rounded-lg">
           <FileText size={14} />
         </div>
         <div>
-          <h4 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">Official Farm Export Center</h4>
-          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">Generate and download PDF dairy reports.</p>
+          <h4 className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-wider">{L('Official Farm Export Center')}</h4>
+          <p className="text-[10px] text-slate-500 dark:text-slate-400 font-semibold">{L('Generate and download PDF dairy reports.')}</p>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
-        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider shrink-0">Scope</label>
+        <label className="text-[11px] font-bold text-slate-600 dark:text-slate-300 uppercase tracking-wider shrink-0">{L('Scope')}</label>
         <select
           value={scope}
           onChange={(e) => setScope(e.target.value)}

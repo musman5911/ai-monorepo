@@ -1,11 +1,11 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
-import { ensureMufLogo as ensureLogo, mufPdfHeader as header, mufPdfFooter as footer, mufLastAutoTableY } from './muf-pdf';
+import { ensureMufLogo as ensureLogo, mufPdfHeader as header, mufPdfFooter as footer, mufLastAutoTableY } from './muf/data/muf-pdf';
 import type { Cow, MilkEntry, Expense, Sale, HealthRecord, RateHistory } from './types';
 import { fmt, fmtPKR, fmtL, monthLabel } from './utils/format';
 import { calcRevenueWithHistory } from './utils/rates';
 import { todayStr, shiftDate } from './utils/date';
-import { mufFmt } from './muf-date';
+import { mufFmt } from './muf/data/muf-date';
 
 type Color = [number, number, number];
 const TEAL: Color = [27, 133, 74]; // farm green (brand)

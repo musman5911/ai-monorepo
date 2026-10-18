@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle, Droplets, FileText, FlaskConical, HardHat, Leaf, Trash2 } from 'lucide-react';
 import * as api from '../api';
 import ImageUploader from './ImageUploader';
-import { useConfirm } from '../muf-confirm';
+import { useConfirm } from '../muf/core/muf-confirm';
+import { L } from '../i18n';
 
 const fieldClass = 'w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-3 py-2 text-xs outline-none focus:border-farm-500';
 const labelClass = 'block text-[10px] font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider';
@@ -74,9 +75,9 @@ export default function LedgerBookForm({
 
   const handleDeleteIrrigation = async (id) => {
     const ok = await confirm({
-      title: 'Remove Irrigation Log',
-      message: 'Delete this irrigation entry? Any ledger charge it created stays until removed from the ledger.',
-      confirmLabel: 'Delete',
+      title: L('Remove Irrigation Log'),
+      message: L('Delete this irrigation entry? Any ledger charge it created stays until removed from the ledger.'),
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -95,9 +96,9 @@ export default function LedgerBookForm({
 
   const handleDeleteSpray = async (id) => {
     const ok = await confirm({
-      title: 'Remove Spray Log',
-      message: 'Delete this spray entry?',
-      confirmLabel: 'Delete',
+      title: L('Remove Spray Log'),
+      message: L('Delete this spray entry?'),
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -157,8 +158,8 @@ export default function LedgerBookForm({
                 value={finForm.type}
                 onChange={e => setFinForm({ ...finForm, type: e.target.value, category: e.target.value === 'income' ? 'Harvest Sale' : '' })}
               >
-                <option value="expense">Expenditure / Outflow (-)</option>
-                <option value="income">Revenue / Inflow (+)</option>
+                <option value="expense">{L('Expenditure / Outflow (-)')}</option>
+                <option value="income">{L('Revenue / Inflow (+)')}</option>
               </select>
             </div>
             <div>
@@ -179,13 +180,13 @@ export default function LedgerBookForm({
                     setFinForm({ ...finForm, category: val === 'Custom' ? '' : val });
                   }}
                 >
-                  <option value="Harvest Sale">Harvest Sale</option>
-                  <option value="Crop Sale">Crop Sale</option>
-                  <option value="Subsidy">Subsidy</option>
-                  <option value="Custom">Custom / Other Income</option>
+                  <option value="Harvest Sale">{L('Harvest Sale')}</option>
+                  <option value="Crop Sale">{L('Crop Sale')}</option>
+                  <option value="Subsidy">{L('Subsidy')}</option>
+                  <option value="Custom">{L('Custom / Other Income')}</option>
                 </select>
                 {(!['Harvest Sale', 'Crop Sale', 'Subsidy'].includes(finForm.category) || finForm.category === '') && (
-                  <input required className={fieldClass} value={finForm.category} onChange={e => setFinForm({ ...finForm, category: e.target.value })} placeholder="Enter income category..." />
+                  <input required className={fieldClass} value={finForm.category} onChange={e => setFinForm({ ...finForm, category: e.target.value })} placeholder={L('Enter income category...')} />
                 )}
               </>
             ) : (
@@ -198,13 +199,13 @@ export default function LedgerBookForm({
                     setFinForm({ ...finForm, category: val === 'Custom' ? '' : val });
                   }}
                 >
-                  <option value="Seed">Seed</option>
-                  <option value="Cultivator">Cultivator</option>
-                  <option value="Hal (Plough)">Hal (Plough)</option>
-                  <option value="Custom">Custom / Other Category</option>
+                  <option value="Seed">{L('Seed')}</option>
+                  <option value="Cultivator">{L('Cultivator')}</option>
+                  <option value="Hal (Plough)">{L('Hal (Plough)')}</option>
+                  <option value="Custom">{L('Custom / Other Category')}</option>
                 </select>
                 {(!LEDGER_EXPENSE_CATS.includes(finForm.category) || finForm.category === '') && (
-                  <input required className={fieldClass} value={finForm.category} onChange={e => setFinForm({ ...finForm, category: e.target.value })} placeholder="Enter custom category description..." />
+                  <input required className={fieldClass} value={finForm.category} onChange={e => setFinForm({ ...finForm, category: e.target.value })} placeholder={L('Enter custom category description...')} />
                 )}
               </>
             )}
@@ -213,15 +214,15 @@ export default function LedgerBookForm({
           {finForm.type === 'income' && (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 rounded-xl border border-farm-200 dark:border-farm-900/40 bg-farm-50/60 dark:bg-farm-950/20">
               <div>
-                <label className={labelClass}>Buyer Name</label>
-                <input className={fieldClass} value={finForm.buyer_name} onChange={e => setFinForm({ ...finForm, buyer_name: e.target.value })} placeholder="e.g. Local mandi" />
+                <label className={labelClass}>{L('Buyer Name')}</label>
+                <input className={fieldClass} value={finForm.buyer_name} onChange={e => setFinForm({ ...finForm, buyer_name: e.target.value })} placeholder={L('e.g. Local mandi')} />
               </div>
               <div>
-                <label className={labelClass}>Qty Sold</label>
+                <label className={labelClass}>{L('Qty Sold')}</label>
                 <input type="number" step="any" min="0" className={fieldClass} value={finForm.quantity_sold} onChange={e => handleFinanceFieldChange('quantity_sold', e.target.value)} placeholder="0" />
               </div>
               <div>
-                <label className={labelClass}>Rate / Unit (Rs.)</label>
+                <label className={labelClass}>{L('Rate / Unit (Rs.)')}</label>
                 <input type="number" step="any" min="0" className={fieldClass} value={finForm.rate_per_unit} onChange={e => handleFinanceFieldChange('rate_per_unit', e.target.value)} placeholder="0" />
               </div>
             </div>
@@ -231,7 +232,7 @@ export default function LedgerBookForm({
             <div>
               <label className={labelClass}>Supplier — udhaar khata (optional)</label>
               <select className={fieldClass} value={finForm.supplier_id || ''} onChange={e => setFinForm({ ...finForm, supplier_id: e.target.value })}>
-                <option value="">Cash / no supplier</option>
+                <option value="">{L('Cash / no supplier')}</option>
                 {suppliers.map(sup => <option key={sup._id} value={sup._id}>{sup.name}</option>)}
               </select>
             </div>
@@ -261,7 +262,7 @@ export default function LedgerBookForm({
                 <input required type="number" step="any" className={fieldClass} value={finForm.hourly_rate || ''} onChange={e => handleFinanceFieldChange('hourly_rate', e.target.value)} placeholder="e.g. 1500" />
               </div>
               <div>
-                <label className={labelClass}>Petrol / Fuel Cost</label>
+                <label className={labelClass}>{L('Petrol / Fuel Cost')}</label>
                 <input type="number" step="any" className={fieldClass} value={finForm.fuel_cost || ''} onChange={e => handleFinanceFieldChange('fuel_cost', e.target.value)} placeholder="e.g. 1000" />
               </div>
             </div>
@@ -278,7 +279,7 @@ export default function LedgerBookForm({
                 <input required type="number" step="any" className={fieldClass} value={finForm.hourly_rate || ''} onChange={e => handleFinanceFieldChange('hourly_rate', e.target.value)} placeholder="e.g. 1500" />
               </div>
               <div>
-                <label className={labelClass}>Petrol / Fuel Cost</label>
+                <label className={labelClass}>{L('Petrol / Fuel Cost')}</label>
                 <input type="number" step="any" className={fieldClass} value={finForm.fuel_cost || ''} onChange={e => handleFinanceFieldChange('fuel_cost', e.target.value)} placeholder="e.g. 800" />
               </div>
             </div>
@@ -306,7 +307,7 @@ export default function LedgerBookForm({
             <div>
               <label className={labelClass}>Crop *</label>
               <select required className={fieldClass} value={finForm.crop_id === 'farm-wide' ? '' : finForm.crop_id} onChange={e => setFinForm({ ...finForm, crop_id: e.target.value || 'farm-wide' })}>
-                <option value="">Select crop</option>
+                <option value="">{L('Select crop')}</option>
                 {crops.map(c => <option key={c._id} value={c._id}>{c.name} ({c.status})</option>)}
               </select>
             </div>
@@ -336,7 +337,7 @@ export default function LedgerBookForm({
             <p className="text-[11px] font-bold text-farm-700 dark:text-farm-400">Ledger charge: Rs. {formatCurrency(rentedTotal)}</p>
           )}
           <div className="space-y-2 max-h-36 overflow-y-auto">
-            {irrigationRows.length === 0 && <p className="text-xs text-slate-400 italic">No irrigation hours yet.</p>}
+            {irrigationRows.length === 0 && <p className="text-xs text-slate-400 italic">{L('No irrigation hours yet.')}</p>}
             {irrigationRows.slice().reverse().slice(0, 8).map(row => (
               <div key={row._id} className="flex justify-between items-start gap-2 p-2.5 rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50 dark:bg-[#101625]/40 text-xs">
                 <div>
@@ -345,7 +346,7 @@ export default function LedgerBookForm({
                     {row.tubewell === 'rented' ? `Rs. ${formatCurrency(row.amount || 0)} (${row.hours} × ${row.hourly_rate})` : 'Hours only — no ledger charge'}
                   </p>
                 </div>
-                <button type="button" disabled={opsBusy} onClick={() => handleDeleteIrrigation(row._id)} className="text-slate-400 hover:text-red-500" aria-label="Delete irrigation">
+                <button type="button" disabled={opsBusy} onClick={() => handleDeleteIrrigation(row._id)} className="text-slate-400 hover:text-red-500" aria-label={L('Delete irrigation')}>
                   <Trash2 size={14} />
                 </button>
               </div>
@@ -360,7 +361,7 @@ export default function LedgerBookForm({
             <div>
               <label className={labelClass}>Crop *</label>
               <select required className={fieldClass} value={finForm.crop_id === 'farm-wide' ? '' : finForm.crop_id} onChange={e => setFinForm({ ...finForm, crop_id: e.target.value || 'farm-wide' })}>
-                <option value="">Select crop</option>
+                <option value="">{L('Select crop')}</option>
                 {crops.map(c => <option key={c._id} value={c._id}>{c.name} ({c.status})</option>)}
               </select>
             </div>
@@ -370,16 +371,16 @@ export default function LedgerBookForm({
             </div>
             <div>
               <label className={labelClass}>Chemical *</label>
-              <input required className={fieldClass} value={finForm.chemical || ''} onChange={e => setFinForm({ ...finForm, chemical: e.target.value })} placeholder="e.g. Lambda" />
+              <input required className={fieldClass} value={finForm.chemical || ''} onChange={e => setFinForm({ ...finForm, chemical: e.target.value })} placeholder={L('e.g. Lambda')} />
             </div>
             <div>
-              <label className={labelClass}>Dose</label>
-              <input className={fieldClass} value={finForm.dose || ''} onChange={e => setFinForm({ ...finForm, dose: e.target.value })} placeholder="e.g. 0.5 L / acre" />
+              <label className={labelClass}>{L('Dose')}</label>
+              <input className={fieldClass} value={finForm.dose || ''} onChange={e => setFinForm({ ...finForm, dose: e.target.value })} placeholder={L('e.g. 0.5 L / acre')} />
             </div>
             <div>
-              <label className={labelClass}>Deduct inventory</label>
+              <label className={labelClass}>{L('Deduct inventory')}</label>
               <select className={fieldClass} value={finForm.inventory_item_id || ''} onChange={e => setFinForm({ ...finForm, inventory_item_id: e.target.value })}>
-                <option value="">No stock deduct</option>
+                <option value="">{L('No stock deduct')}</option>
                 {pesticides.map(item => (
                   <option key={item._id} value={item._id}>{item.name} ({item.current_stock} {item.unit})</option>
                 ))}
@@ -387,21 +388,21 @@ export default function LedgerBookForm({
             </div>
             {finForm.inventory_item_id && (
               <div>
-                <label className={labelClass}>Qty consumed</label>
+                <label className={labelClass}>{L('Qty consumed')}</label>
                 <input type="number" step="any" min="0" className={fieldClass} value={finForm.inventory_qty_consumed || ''} onChange={e => setFinForm({ ...finForm, inventory_qty_consumed: e.target.value })} />
               </div>
             )}
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <ImageUploader
-              label="Optional photo"
+              label={L('Optional photo')}
               value={finForm.spray_image}
               onDone={(base64) => setFinForm(prev => ({ ...prev, spray_image: base64 }))}
               onRemove={() => setFinForm(prev => ({ ...prev, spray_image: '' }))}
             />
           </div>
           <div className="space-y-2 max-h-36 overflow-y-auto">
-            {sprayRows.length === 0 && <p className="text-xs text-slate-400 italic">No spray logs yet.</p>}
+            {sprayRows.length === 0 && <p className="text-xs text-slate-400 italic">{L('No spray logs yet.')}</p>}
             {sprayRows.slice().reverse().slice(0, 8).map(row => (
               <div key={row._id} className="flex justify-between items-start gap-2 p-2.5 rounded-lg border border-slate-200/70 dark:border-slate-800 bg-slate-50 dark:bg-[#101625]/40 text-xs">
                 <div className="min-w-0">
@@ -411,7 +412,7 @@ export default function LedgerBookForm({
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
                   {row.image_base64 && <img src={row.image_base64} alt="" className="w-8 h-8 rounded object-cover" />}
-                  <button type="button" disabled={opsBusy} onClick={() => handleDeleteSpray(row._id)} className="text-slate-400 hover:text-red-500" aria-label="Delete spray">
+                  <button type="button" disabled={opsBusy} onClick={() => handleDeleteSpray(row._id)} className="text-slate-400 hover:text-red-500" aria-label={L('Delete spray')}>
                     <Trash2 size={14} />
                   </button>
                 </div>
@@ -458,9 +459,9 @@ export default function LedgerBookForm({
             <input required type="date" className={fieldClass} value={finForm.date || ''} onChange={e => setFinForm({ ...finForm, date: e.target.value })} />
           </div>
           <div>
-            <label className={labelClass}>Associate with Crop Sector</label>
+            <label className={labelClass}>{L('Associate with Crop Sector')}</label>
             <select className={fieldClass} value={finForm.crop_id} onChange={e => setFinForm({ ...finForm, crop_id: e.target.value })}>
-              <option value="farm-wide">General / Farm-Wide Operational</option>
+              <option value="farm-wide">{L('General / Farm-Wide Operational')}</option>
               {crops.map(c => (
                 <option key={c._id} value={c._id}>Crop: {c.name} ({c.status})</option>
               ))}
@@ -476,9 +477,9 @@ export default function LedgerBookForm({
 
       {tab !== 'irrigation' && tab !== 'spray' && (
         <div>
-          <label className={labelClass}>Receipt Photo (Optional)</label>
+          <label className={labelClass}>{L('Receipt Photo (Optional)')}</label>
           <ImageUploader
-            label="Add receipt photo"
+            label={L('Add receipt photo')}
             maxDim={900}
             quality={0.72}
             value={finForm.receipt_base64 || ''}
@@ -490,7 +491,7 @@ export default function LedgerBookForm({
       )}
 
       <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <button type="button" onClick={onCancel} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">Cancel</button>
+        <button type="button" onClick={onCancel} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
         <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
           {tab === 'irrigation' ? <Droplets size={14} /> : tab === 'spray' ? <FlaskConical size={14} /> : <CheckCircle size={14} />} {submitLabel()}
         </button>

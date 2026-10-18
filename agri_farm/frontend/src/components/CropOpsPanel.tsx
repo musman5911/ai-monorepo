@@ -3,7 +3,8 @@ import { Camera, CalendarPlus, Trash2, Loader } from 'lucide-react';
 import * as api from '../api';
 import ImageUploader from './ImageUploader';
 
-import { mufToday } from '../muf-date';
+import { mufToday } from '../muf/data/muf-date';
+import { L } from '../i18n';
 
 const todayIso = () => mufToday();
 
@@ -69,7 +70,7 @@ export default function CropOpsPanel({
   return (
     <div className="space-y-4">
       <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 space-y-3">
-        <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-wider flex items-center gap-1">
+        <h4 className="muf-caption flex items-center gap-1">
           <Camera size={12} /> Photo diary ({photos.length}/3)
         </h4>
         <p className="text-[11px] text-slate-500">Keep 2–3 field pictures. Each photo stores the date it was uploaded. Irrigation and spray live in Record Book Log.</p>
@@ -81,7 +82,7 @@ export default function CropOpsPanel({
                 {photo.uploaded_at || '—'}{photo.label ? ` · ${photo.label}` : ''}
               </div>
               {isAdmin && (
-                <button type="button" onClick={() => handleDeletePhoto(photo._id)} className="absolute top-1 right-1 p-1 rounded-full bg-black/50 text-white" aria-label="Delete photo">
+                <button type="button" onClick={() => handleDeletePhoto(photo._id)} className="absolute top-1 right-1 p-1 rounded-full bg-black/50 text-white" aria-label={L('Delete photo')}>
                   <Trash2 size={11} />
                 </button>
               )}
@@ -95,7 +96,7 @@ export default function CropOpsPanel({
                 <Camera size={16} className="text-slate-500" />
               )}
               <ImageUploader
-                label="Add photo"
+                label={L('Add photo')}
                 maxDim={400}
                 showPreview={false}
                 onDone={handleAddPhoto}

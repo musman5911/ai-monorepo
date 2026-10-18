@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import { UserPlus, Trash2, Key, Check, X, Shield, User as UserIcon, ShieldCheck, Mail, Pencil, Send } from 'lucide-react';
 import { Lang } from '../types';
 import { AuthUser, listUsers, createUser, updateUser, deleteUser, changePassword, changePasswordWithCode, requestProfileCode } from '../api';
-import { usePromptInput, notify } from '../muf-confirm';
-import { useConfirm } from '../muf-confirm';
+import { usePromptInput, notify } from '../muf/core/muf-confirm';
+import { useConfirm } from '../muf/core/muf-confirm';
 
 interface Props {
   currentUser: AuthUser;
@@ -331,7 +331,7 @@ export default function UserManagement({ currentUser, lang }: Props) {
         </h3>
         <button
           onClick={() => setShowNewForm((v) => !v)}
-          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white flex items-center gap-1.5"
+          className="text-xs font-bold px-3 py-1.5 rounded-lg bg-emerald-500 hover:bg-farm-600 text-white flex items-center gap-1.5"
         >
           <UserPlus className="w-3.5 h-3.5" />
           {showNewForm ? label.cancel : label.newUser}
@@ -359,7 +359,7 @@ export default function UserManagement({ currentUser, lang }: Props) {
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 className="w-full text-xs px-3 py-2 border border-slate-200 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 rounded-lg focus:outline-none focus:border-emerald-400 font-mono"
-                placeholder="e.g. aslam"
+                placeholder={L('e.g. aslam')}
               />
             </div>
             <div>

@@ -1,12 +1,12 @@
 import React, { useMemo, useState } from 'react';
 import { shareViaWhatsAppTo, urduMonthLabel } from '../utils/share';
 import { Users, Pencil, AlertTriangle, Eye, QrCode, Plus } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
+import MufCardQr from '../muf/ui/muf-card-qr';
 import { Customer, CustomerSale, EggProduction, Lang } from '../types';
 import { t, L } from '../i18n';
 import { customerBalance, todayStr } from '../utils/calculations';
-import DetailModal from '../muf-modal';
-import { useConfirm, notify } from '../muf-confirm';
+import DetailModal from '../muf/core/muf-modal';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 
 interface CustomerLedgerProps {
   lang: Lang;
@@ -101,15 +101,15 @@ export default function CustomerLedger({
     const qty = parseInt(saleEggs);
     const price = parseFloat(salePrice);
     const paid = parseFloat(salePaid) || 0;
-    if (!cid || !qty || qty <= 0 || !price || price <= 0) return notify('Fill all sale fields', 'error');
-    if (paid < 0) return notify('Amount paid cannot be negative', 'error');
+    if (!cid || !qty || qty <= 0 || !price || price <= 0) return notify(L('Fill all sale fields'), 'error');
+    if (paid < 0) return notify(L('Amount paid cannot be negative'), 'error');
     const total = qty * price;
     if (paid > total) {
       const ok = await confirmAction({
-        title: 'Overpayment Confirmation',
+        title: L('Overpayment Confirmation'),
         message: `Amount paid (Rs ${paid}) exceeds sale total (Rs ${total}). This will record an advance/overpayment. Continue?`,
-        confirmLabel: 'Continue',
-        cancelLabel: 'Cancel',
+        confirmLabel: L('Continue'),
+        cancelLabel: L('Cancel'),
         tone: 'warning',
       });
       if (!ok) {
@@ -121,10 +121,10 @@ export default function CustomerLedger({
     const eggRecord = eggProduction.find((entry) => entry.date === saleDate) || null;
     if (!eggRecord) {
       const ok = await confirmAction({
-        title: 'No Egg Record Found',
+        title: L('No Egg Record Found'),
         message: `No daily egg record exists for ${saleDate}. Save this customer sale anyway? (Recommended: also log that day's egg collection and keep direct/cash sales separate from customer sales.)`,
-        confirmLabel: 'Save Anyway',
-        cancelLabel: 'Cancel',
+        confirmLabel: L('Save Anyway'),
+        cancelLabel: L('Cancel'),
         tone: 'warning',
       });
       if (!ok) {
@@ -212,10 +212,10 @@ export default function CustomerLedger({
 
   const handleDeleteCustomerFromDetail = async (customer: Customer) => {
     const ok = await confirmAction({
-      title: 'Delete Customer',
-      message: 'Delete this customer from the active list? Their past sales history will remain.',
-      confirmLabel: 'Delete Customer',
-      cancelLabel: 'Cancel',
+      title: L('Delete Customer'),
+      message: L('Delete this customer from the active list? Their past sales history will remain.'),
+      confirmLabel: L('Delete Customer'),
+      cancelLabel: L('Cancel'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -225,10 +225,10 @@ export default function CustomerLedger({
 
   const handleDeleteSaleFromDetail = async (sale: CustomerSale) => {
     const ok = await confirmAction({
-      title: 'Delete Sale',
-      message: 'Delete this customer sale entry?',
-      confirmLabel: 'Delete Sale',
-      cancelLabel: 'Cancel',
+      title: L('Delete Sale'),
+      message: L('Delete this customer sale entry?'),
+      confirmLabel: L('Delete Sale'),
+      cancelLabel: L('Cancel'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -244,7 +244,7 @@ export default function CustomerLedger({
           <div className="muf-title-icon"><Users size={28}/></div>
           <div>
             <h2>{t(lang, 'customers')}</h2>
-            <p>Track buyers, egg sales, and outstanding balances.</p>
+            <p>{L('Track buyers, egg sales, and outstanding balances.')}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
@@ -254,7 +254,7 @@ export default function CustomerLedger({
             </button>
           )}
           {logSales && (
-            <button type="button" onClick={() => { resetSaleEdit(); setShowLogSaleModal(true); }} className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
+            <button type="button" onClick={() => { resetSaleEdit(); setShowLogSaleModal(true); }} className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition">
               <Plus size={16}/> Log Sale
             </button>
           )}
@@ -264,7 +264,7 @@ export default function CustomerLedger({
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {!manageCust && !logSales && (
           <div className="lg:col-span-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-5 text-center">
-            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Read-only view.</p>
+            <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">{L('Read-only view.')}</p>
           </div>
         )}
       </div>
@@ -318,9 +318,9 @@ export default function CustomerLedger({
         <table className="w-full text-xs">
           <thead>
             <tr className="bg-slate-50 dark:bg-slate-800 text-3xs uppercase text-slate-500">
-              <th className="p-3">Customer</th>
-              <th className="p-3">Contact</th>
-              <th className="p-3 text-right">Balance Due</th>
+              <th className="p-3">{L('Customer')}</th>
+              <th className="p-3">{L('Contact')}</th>
+              <th className="p-3 text-right">{L('Balance Due')}</th>
               <th className="p-3 sm:hidden text-right"></th>
             </tr>
           </thead>
@@ -332,7 +332,7 @@ export default function CustomerLedger({
                   key={customer.id}
                   className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40"
                   onClick={() => openCustomerDetail(customer)}
-                  title="View customer details"
+                  title={L('View customer details')}
                 >
                   <td className="p-3 font-semibold">{customer.name}</td>
                   <td className="p-3 text-slate-500">{customer.phone || customer.email || '—'}</td>
@@ -344,7 +344,7 @@ export default function CustomerLedger({
               );
             })}
             {customers.length === 0 && (
-              <tr><td colSpan={4} className="p-8 text-center text-slate-400 italic">No customers yet</td></tr>
+              <tr><td colSpan={4} className="p-8 text-center text-slate-400 italic">{L('No customers yet')}</td></tr>
             )}
           </tbody>
         </table>
@@ -352,14 +352,14 @@ export default function CustomerLedger({
 
       {sales.length > 0 && (
         <div className="bg-white dark:bg-slate-900 rounded-2xl border overflow-hidden">
-          <h4 className="p-3 font-bold text-sm border-b">Recent Sales</h4>
+          <h4 className="p-3 font-bold text-sm border-b">{L('Recent Sales')}</h4>
           <table className="w-full text-xs">
             <thead>
               <tr className="bg-slate-50 text-3xs uppercase text-slate-500">
-                <th className="p-3">Date</th>
-                <th className="p-3">Customer</th>
-                <th className="p-3">Eggs</th>
-                <th className="p-3 text-right">Total</th>
+                <th className="p-3">{L('Date')}</th>
+                <th className="p-3">{L('Customer')}</th>
+                <th className="p-3">{L('Eggs')}</th>
+                <th className="p-3 text-right">{L('Total')}</th>
                 <th className="p-3 sm:hidden text-right"></th>
               </tr>
             </thead>
@@ -371,7 +371,7 @@ export default function CustomerLedger({
                     key={sale.id}
                     className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40"
                     onClick={() => openSaleDetail(sale)}
-                    title="View sale details"
+                    title={L('View sale details')}
                   >
                     <td className="p-3 font-mono">{sale.date}</td>
                     <td className="p-3">{customer?.name ?? '—'}</td>
@@ -389,7 +389,7 @@ export default function CustomerLedger({
       <DetailModal
         open={!!activeCustomer}
         onClose={() => setActiveCustomerId(null)}
-        title="Customer Details"
+        title={L('Customer Details')}
         subtitle={activeCustomer?.name}
         icon={<Users className="w-5 h-5" />}
         iconBg="bg-indigo-100 text-indigo-700"
@@ -412,9 +412,9 @@ export default function CustomerLedger({
               </div>
 
               <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 space-y-2">
-                <CustomerDetailRow label="Name" value={activeCustomer.name} />
-                <CustomerDetailRow label="Phone" value={activeCustomer.phone || '—'} />
-                <CustomerDetailRow label="Email" value={activeCustomer.email || '—'} />
+                <CustomerDetailRow label={L('Name')} value={activeCustomer.name} />
+                <CustomerDetailRow label={L('Phone')} value={activeCustomer.phone || '—'} />
+                <CustomerDetailRow label={L('Email')} value={activeCustomer.email || '—'} />
               </div>
 
               <button
@@ -442,17 +442,17 @@ export default function CustomerLedger({
                   ];
                   shareViaWhatsAppTo(activeCustomer.phone, lines.join('\n'));
                 }}
-                className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#1ebe5b] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer"
+                className="w-full flex items-center justify-center gap-2 bg-[color:var(--muf-brand-whatsapp)] hover:bg-[color:var(--muf-brand-whatsapp-hover)] text-white px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer"
               >
                 💬 {L('Send khata on WhatsApp')}
               </button>
 
               <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden">
                 <div className="px-4 py-3 border-b border-slate-100">
-                  <h4 className="text-sm font-bold text-slate-800">Sales History</h4>
+                  <h4 className="text-sm font-bold text-slate-800">{L('Sales History')}</h4>
                 </div>
                 {customerSalesList.length === 0 ? (
-                  <div className="px-4 py-6 text-center text-xs text-slate-400">No sales recorded for this customer yet.</div>
+                  <div className="px-4 py-6 text-center text-xs text-slate-400">{L('No sales recorded for this customer yet.')}</div>
                 ) : (
                   <div className="divide-y divide-slate-100 max-h-72 overflow-y-auto">
                     {customerSalesList.map((sale) => {
@@ -488,9 +488,9 @@ export default function CustomerLedger({
                     <button
                       type="button"
                       onClick={() => handleDeleteCustomerFromDetail(activeCustomer)}
-                      className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold text-xs hover:bg-rose-100"
+                      className="muf-btn muf-btn-danger"
                     >
-                      Delete Customer
+                      {L('Delete Customer')}
                     </button>
                   )}
                   {manageCust && (
@@ -504,7 +504,7 @@ export default function CustomerLedger({
                       }}
                       className="px-4 py-2 rounded-xl bg-indigo-600 text-white font-semibold text-xs hover:bg-indigo-700"
                     >
-                      Edit Customer
+                      {L('Edit Customer')}
                     </button>
                   )}
                 </div>
@@ -517,7 +517,7 @@ export default function CustomerLedger({
       <DetailModal
         open={!!activeSale}
         onClose={() => setActiveSaleId(null)}
-        title="Sale Details"
+        title={L('Sale Details')}
         subtitle={activeSaleCustomer?.name}
         icon={<AlertTriangle className="w-5 h-5" />}
         iconBg="bg-emerald-100 text-emerald-700"
@@ -526,7 +526,7 @@ export default function CustomerLedger({
         {activeSale && (
           <div className="space-y-4 text-sm">
             <div className="grid grid-cols-2 gap-3">
-              <CustomerDetailTile label="Date" value={activeSale.date} />
+              <CustomerDetailTile label={L('Date')} value={activeSale.date} />
               <CustomerDetailTile label="Customer" value={activeSaleCustomer?.name || `#${activeSale.customerId}`} />
               <CustomerDetailTile label="Eggs" value={`${activeSale.eggsQty}`} />
               <CustomerDetailTile label="Price/Egg" value={`Rs ${activeSale.pricePerEgg.toLocaleString()}`} />
@@ -534,7 +534,7 @@ export default function CustomerLedger({
               <CustomerDetailTile label="Paid" value={`Rs ${activeSale.amountPaid.toLocaleString()}`} />
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Balance Due</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{L('Balance Due')}</p>
               <p className="mt-1 text-lg font-bold font-mono text-slate-800">Rs {((activeSale.eggsQty * activeSale.pricePerEgg) - activeSale.amountPaid).toLocaleString()}</p>
             </div>
             <div className="rounded-xl border px-3 py-2 text-[11px] bg-amber-50 border-amber-200 text-amber-800">
@@ -546,9 +546,9 @@ export default function CustomerLedger({
                   <button
                     type="button"
                     onClick={() => handleDeleteSaleFromDetail(activeSale)}
-                    className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold text-xs hover:bg-rose-100"
+                    className="muf-btn muf-btn-danger"
                   >
-                    Delete Sale
+                    {L('Delete Sale')}
                   </button>
                 )}
                 {logSales && (
@@ -564,7 +564,7 @@ export default function CustomerLedger({
                     }}
                     className="px-4 py-2 rounded-xl bg-green-700 text-white font-semibold text-xs hover:bg-green-800"
                   >
-                    Edit Sale
+                    {L('Edit Sale')}
                   </button>
                 )}
               </div>
@@ -573,11 +573,11 @@ export default function CustomerLedger({
         )}
       </DetailModal>
 
-      <DetailModal open={editCustId !== null} onClose={resetCustomerEdit} title="Edit Customer" icon={<Pencil className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700" size="small">
+      <DetailModal open={editCustId !== null} onClose={resetCustomerEdit} title={L('Edit Customer')} icon={<Pencil className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700" size="small">
         <form onSubmit={handleCustomerSubmit} className="space-y-3 text-xs">
-          <input required placeholder="Name" value={custName} onChange={(e) => setCustName(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
-          <input placeholder="Phone" value={custPhone} onChange={(e) => setCustPhone(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
-          <input placeholder="Email" value={custEmail} onChange={(e) => setCustEmail(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+          <input required placeholder={L('Name')} value={custName} onChange={(e) => setCustName(e.target.value)} className="muf-field" />
+          <input placeholder={L('Phone')} value={custPhone} onChange={(e) => setCustPhone(e.target.value)} className="muf-field" />
+          <input placeholder={L('Email')} value={custEmail} onChange={(e) => setCustEmail(e.target.value)} className="muf-field" />
           <div className="flex justify-end gap-2">
             <button type="button" onClick={resetCustomerEdit} className="px-4 py-2 border rounded-xl dark:border-slate-700 dark:text-slate-100">{t(lang, 'cancel')}</button>
             <button type="submit" className="px-4 py-2 bg-indigo-600 text-white rounded-xl font-semibold hover:bg-indigo-700">{t(lang, 'save')}</button>
@@ -585,9 +585,9 @@ export default function CustomerLedger({
         </form>
       </DetailModal>
 
-      <DetailModal open={editSaleId !== null} onClose={resetSaleEdit} title="Edit Sale" icon={<Pencil className="w-5 h-5" />} iconBg="bg-green-100 text-green-700" size="small">
+      <DetailModal open={editSaleId !== null} onClose={resetSaleEdit} title={L('Edit Sale')} icon={<Pencil className="w-5 h-5" />} iconBg="bg-green-100 text-green-700" size="small">
         <form onSubmit={handleSaleSubmit} className="space-y-3 text-xs">
-          <input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+          <input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className="muf-field" />
           <div className={`rounded-xl border px-3 py-2 text-[11px] ${eggRecordForSaleDate ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-300' : 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300'}`}>
             <div className="flex items-start gap-2">
               <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -601,16 +601,16 @@ export default function CustomerLedger({
               </div>
             </div>
           </div>
-          <select required value={saleCustomerId} onChange={(e) => setSaleCustomerId(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
-            <option value="">Select customer</option>
+          <select required value={saleCustomerId} onChange={(e) => setSaleCustomerId(e.target.value)} className="muf-field">
+            <option value="">{L('Select customer')}</option>
             {customers.map((c) => (
               <option key={c.id} value={c.id}>{c.name}</option>
             ))}
           </select>
           <div className="grid grid-cols-3 gap-2">
-            <input type="number" min="1" placeholder="Eggs" value={saleEggs} onChange={(e) => setSaleEggs(e.target.value)} className="px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
-            <input type="number" step="0.1" placeholder="Rs/egg" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} className="px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
-            <input type="number" placeholder="Paid" value={salePaid} onChange={(e) => setSalePaid(e.target.value)} className="px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <input type="number" min="1" placeholder={L('Eggs')} value={saleEggs} onChange={(e) => setSaleEggs(e.target.value)} className="px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <input type="number" step="0.1" placeholder={L('Rs/egg')} value={salePrice} onChange={(e) => setSalePrice(e.target.value)} className="px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <input type="number" placeholder={L('Paid')} value={salePaid} onChange={(e) => setSalePaid(e.target.value)} className="px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
           </div>
           <div className="flex justify-end gap-2">
             <button type="button" onClick={resetSaleEdit} className="px-4 py-2 border rounded-xl dark:border-slate-700 dark:text-slate-100">{t(lang, 'cancel')}</button>
@@ -624,16 +624,16 @@ export default function CustomerLedger({
         title={`${t(lang, 'add')} Customer`} icon={<Users className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700" size="small">
         <form onSubmit={handleCustomerSubmit} className="space-y-3 text-xs">
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Name *</label>
-            <input required placeholder="Name" value={custName} onChange={(e) => setCustName(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <label className="muf-label">Name *</label>
+            <input required placeholder={L('Name')} value={custName} onChange={(e) => setCustName(e.target.value)} className="muf-field" />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Phone</label>
-            <input placeholder="Phone" value={custPhone} onChange={(e) => setCustPhone(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <label className="muf-label">{L('Phone')}</label>
+            <input placeholder={L('Phone')} value={custPhone} onChange={(e) => setCustPhone(e.target.value)} className="muf-field" />
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Email</label>
-            <input placeholder="Email" value={custEmail} onChange={(e) => setCustEmail(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <label className="muf-label">{L('Email')}</label>
+            <input placeholder={L('Email')} value={custEmail} onChange={(e) => setCustEmail(e.target.value)} className="muf-field" />
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setShowAddCustModal(false)} className="px-4 py-2 border rounded-xl dark:border-slate-700 dark:text-slate-100">{t(lang, 'cancel')}</button>
@@ -644,11 +644,11 @@ export default function CustomerLedger({
 
       {/* ── Log Sale (popup) ───────────────────── */}
       <DetailModal open={showLogSaleModal} onClose={() => setShowLogSaleModal(false)}
-        title="Log Sale" icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-emerald-100 text-emerald-700" size="big">
+        title={L('Log Sale')} icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-emerald-100 text-emerald-700" size="big">
         <form onSubmit={handleSaleSubmit} className="space-y-3 text-xs">
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Date</label>
-            <input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+            <label className="muf-label">{L('Date')}</label>
+            <input type="date" value={saleDate} onChange={(e) => setSaleDate(e.target.value)} className="muf-field" />
           </div>
           <div className={`rounded-xl border px-3 py-2 text-[11px] ${eggRecordForSaleDate ? 'bg-emerald-50 border-emerald-200 text-emerald-800 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-300' : 'bg-amber-50 border-amber-200 text-amber-800 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-300'}`}>
             <div className="flex items-start gap-2">
@@ -666,9 +666,9 @@ export default function CustomerLedger({
             </div>
           </div>
           <div>
-            <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Customer *</label>
-            <select required value={saleCustomerId} onChange={(e) => setSaleCustomerId(e.target.value)} className="w-full px-3 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100">
-              <option value="">Select customer</option>
+            <label className="muf-label">Customer *</label>
+            <select required value={saleCustomerId} onChange={(e) => setSaleCustomerId(e.target.value)} className="muf-field">
+              <option value="">{L('Select customer')}</option>
               {customers.map((c) => (
                 <option key={c.id} value={c.id}>{c.name}</option>
               ))}
@@ -676,16 +676,16 @@ export default function CustomerLedger({
           </div>
           <div className="grid grid-cols-3 gap-2">
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Eggs *</label>
-              <input type="number" min="1" placeholder="Eggs" value={saleEggs} onChange={(e) => setSaleEggs(e.target.value)} className="w-full px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+              <label className="muf-label">Eggs *</label>
+              <input type="number" min="1" placeholder={L('Eggs')} value={saleEggs} onChange={(e) => setSaleEggs(e.target.value)} className="w-full px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Rs/egg *</label>
-              <input type="number" step="0.1" placeholder="Rs/egg" value={salePrice} onChange={(e) => setSalePrice(e.target.value)} className="w-full px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+              <label className="muf-label">Rs/egg *</label>
+              <input type="number" step="0.1" placeholder={L('Rs/egg')} value={salePrice} onChange={(e) => setSalePrice(e.target.value)} className="w-full px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase tracking-wider">Paid</label>
-              <input type="number" placeholder="Paid" value={salePaid} onChange={(e) => setSalePaid(e.target.value)} className="w-full px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
+              <label className="muf-label">{L('Paid')}</label>
+              <input type="number" placeholder={L('Paid')} value={salePaid} onChange={(e) => setSalePaid(e.target.value)} className="w-full px-2 py-2 border rounded-xl dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100" />
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-2">

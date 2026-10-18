@@ -1,5 +1,5 @@
 import { Cloud, CloudOff, Loader2, Check, RefreshCw } from 'lucide-react';
-import { AnimatePresence, motion } from '../muf-motion';
+import { AnimatePresence, motion } from '../muf/core/muf-motion';
 import { SyncStatus } from '../types';
 import { Lang } from '../types';
 import { t } from '../i18n';

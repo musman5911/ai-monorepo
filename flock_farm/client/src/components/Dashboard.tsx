@@ -3,35 +3,36 @@ import { L } from '../i18n';
 import {
   TrendingUp, TrendingDown, DollarSign, Percent, Activity, Egg,
   AlertTriangle, AlertCircle, HeartPulse, ShoppingBag, Coins,
-  Syringe, Package, Eye, ArrowRight, Share2,
+  Syringe, Package, Eye, ArrowRight, Share2, ChevronRight,
 } from 'lucide-react';
 import { Bird, OtherExpense, FeedRecord, EggProduction, GlobalSettings, DateRange, Lang, DeathReason, Customer,
   CustomerSale, VaccinationRecord } from '../types';
-import { motion, cardSpring, wobbleSpring, staggerDelay, prefersReducedMotion } from '../muf-motion';
+import { motion, staggerDelay, prefersReducedMotion } from '../muf/core/muf-motion';
 import {
   costPerEgg, costPerBird, birdSaleIncome, inDateRange, eggSaleIncome,
   totalOutstandingReceivables, birdsActiveInRange, productionRate,
   todayStr as localTodayStr, diffDateOnlyDays, feedStockKg,
 } from '../utils/calculations';
 import { DateRangeFilter } from './LightChart';
-import { MufAreaChart } from '../muf-charts';
-import { MufCountUpText } from '../muf-applike';
-import { mufToday, mufShiftDays } from '../muf-date';
-import DetailModal from '../muf-modal';
-import MufWeather from '../muf-weather';
-import MufFab from '../muf-fab';
-import MufWorkerPanel from '../muf-worker-panel';
-import { loadNotifPrefs, fireNotif } from '../muf-notifications';
+import { MufAreaChart } from '../muf/ui/muf-charts';
+import { mufToday, mufShiftDays } from '../muf/data/muf-date';
+import DetailModal from '../muf/core/muf-modal';
+import MufWeather from '../muf/ui/muf-weather';
+import MufFab from '../muf/core/muf-fab';
+import MufWorkerPanel from '../muf/ui/muf-worker-panel';
+import { loadNotifPrefs, fireNotif } from '../muf/core/muf-notifications';
 import { getFarmLocation } from '../api';
-import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from '../muf-compare';
-import { udhaarSummary, daysSince, udhaarReminderText } from '../muf-khata';
+import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from '../muf/data/muf-compare';
+import { udhaarSummary, daysSince, udhaarReminderText } from '../muf/domain/muf-khata';
 import { shareViaWhatsAppTo } from '../utils/share';
 import { customerBalance } from '../utils/calculations';
 import BirdAvatar, { breedLabel } from './BirdAvatar';
+import BirdDetailContent from './BirdDetailContent';
 import { shareViaWhatsApp } from '../utils/share';
 import { telegramAlerts } from '../api';
-import {mufWeekStart} from '../muf-date';
+import {mufWeekStart} from '../muf/data/muf-date';
 import { useRecentOps, type OpItem } from './dashboard/useRecentOps';
+import { StatCard } from './dashboard/StatCard';
 
 interface DashboardProps {
   birds: Bird[];
@@ -392,7 +393,7 @@ export default function Dashboard({
               <p>• {L('Weather / heat stress')}</p>
               <p>• {L('Egg entry — was today recorded?')}</p>
             </div>
-            <p className="text-[10px] text-slate-400">{L('Alarm fires when today falls {v0}%+ below the 7-day average (set in the Telegram panel). The evening Telegram summary carries this alarm too.', { v0: dropAlert.threshold || 20 })}</p>
+            <p className="muf-pc-micro">{L('Alarm fires when today falls {v0}%+ below the 7-day average (set in the Telegram panel). The evening Telegram summary carries this alarm too.', { v0: dropAlert.threshold || 20 })}</p>
           </div>
         )}
       </DetailModal>
@@ -474,7 +475,7 @@ export default function Dashboard({
               `🥚 Eggs today: ${eggProduction.filter(e => e.date === today).reduce((a, e) => a + (e.totalEggsCollected || 0), 0)}\n` +
               `💰 Net: Rs ${(totalIncome - totalExpense).toLocaleString()}`
             )}
-            title="Share today's summary on WhatsApp"
+            title={L('Share today\'s summary on WhatsApp')}
             className="flex items-center gap-1.5 rounded-xl border border-farm-300 dark:border-farm-700 px-2.5 py-1.5 text-2xs font-bold text-farm-700 dark:text-farm-300 hover:bg-farm-50 dark:hover:bg-farm-900/30 transition"
           >
             <Share2 className="w-3.5 h-3.5" /> {L('Share')}
@@ -622,13 +623,13 @@ export default function Dashboard({
       <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
         className="bg-white dark:bg-slate-800 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-xs space-y-4">
         <div className="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
-          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 font-display">Recent Operations</h4>
-          <button onClick={() => setModal('recentOps')} className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title="Show all recent operations">
+          <h4 className="font-bold text-sm text-slate-800 dark:text-slate-100 font-display">{L('Recent Operations')}</h4>
+          <button onClick={() => setModal('recentOps')} className="w-8 h-8 rounded-full border border-slate-200 dark:border-slate-700 flex items-center justify-center text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-900/20" title={L('Show all recent operations')}>
             <Eye className="w-4 h-4" />
           </button>
         </div>
         {recentOps.length === 0 ? (
-          <p className="text-slate-400 dark:text-slate-500 py-4 text-center text-xs">No operations recorded yet.</p>
+          <p className="text-slate-400 dark:text-slate-500 py-4 text-center text-xs">{L('No operations recorded yet.')}</p>
         ) : (
           <div className="divide-y divide-slate-100 dark:divide-slate-700 text-xs">
             {recentOps.map((item, i) => (
@@ -689,7 +690,7 @@ export default function Dashboard({
                 <div key={r.id} className="flex items-center justify-between gap-2 p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg text-sm">
                   <div className="min-w-0">
                     <p className="font-bold text-slate-800 dark:text-slate-100 truncate">{r.name}</p>
-                    <p className="text-[10px] text-slate-400">
+                    <p className="muf-pc-micro">
                       {days === null ? (L('no payment yet')) : (L('last payment {days} days ago', { days: days }))}
                       {days !== null && days > 30 ? ' ⚠️' : ''}
                     </p>
@@ -736,14 +737,14 @@ export default function Dashboard({
       <DetailModal
         open={modal === 'recentOps'}
         onClose={closeModal}
-        title="Recent Operations"
+        title={L('Recent Operations')}
         subtitle={`${allRecentOps.length} latest entries`}
         icon={<Eye className="w-5 h-5" />}
         iconBg="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300"
         size="small"
       >
         {allRecentOps.length === 0 ? (
-          <p className="text-slate-400 dark:text-slate-500 py-8 text-center text-sm">No operations recorded yet.</p>
+          <p className="text-slate-400 dark:text-slate-500 py-8 text-center text-sm">{L('No operations recorded yet.')}</p>
         ) : (
           <div className="divide-y divide-slate-100 dark:divide-slate-700 text-xs">
             {allRecentOps.map((item, i) => (
@@ -816,11 +817,11 @@ export default function Dashboard({
             <table className="w-full text-xs">
               <thead>
                 <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Bird</th>
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Breed/Gender</th>
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Date Died</th>
-                  <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Reason</th>
-                  <th className="py-2 font-semibold uppercase text-[10px]">Detail</th>
+                  <th className="muf-pc-th">{L('Bird')}</th>
+                  <th className="muf-pc-th">{L('Breed/Gender')}</th>
+                  <th className="muf-pc-th">{L('Date Died')}</th>
+                  <th className="muf-pc-th">{L('Reason')}</th>
+                  <th className="py-2 font-semibold uppercase text-[10px]">{L('Detail')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -847,21 +848,21 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'deficit'} onClose={closeModal}
         title="Financial Deficit" subtitle={`Current shortfall: ${formatRs(Math.abs(netProfitLoss))}`}
-        icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300">
+        icon={<AlertTriangle className="w-5 h-5" />} iconBg="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" size="big">
         <div className="grid grid-cols-2 gap-3 mb-5">
-          <MiniStat label="Total Income" value={formatRs(totalIncome)} color="emerald" />
-          <MiniStat label="Total Expenses" value={formatRs(totalExpense)} color="rose" />
-          <MiniStat label="Net Loss" value={formatRs(Math.abs(netProfitLoss))} color="rose" />
+          <MiniStat label={L('Total Income')} value={formatRs(totalIncome)} color="emerald" />
+          <MiniStat label={L('Total Expenses')} value={formatRs(totalExpense)} color="rose" />
+          <MiniStat label={L('Net Loss')} value={formatRs(Math.abs(netProfitLoss))} color="rose" />
           <MiniStat label="ROI" value={`${roiPercent.toFixed(1)}%`} color="rose" />
         </div>
-        <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2">Expense breakdown</h4>
+        <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mb-2">{L('Expense breakdown')}</h4>
         <div className="space-y-2 text-xs">
-          <BarRow label="Birds" value={totalBirdPurchaseCost} total={totalExpense} color="bg-sky-500" />
-          <BarRow label="Feed" value={totalFeedCost} total={totalExpense} color="bg-amber-500" />
-          <BarRow label="Vaccinations" value={totalVaccCost} total={totalExpense} color="bg-teal-500" />
-          <BarRow label="Other" value={totalOtherCost} total={totalExpense} color="bg-rose-500" />
+          <BarRow label={L('Birds')} value={totalBirdPurchaseCost} total={totalExpense} color="bg-sky-500" />
+          <BarRow label={L('Feed')} value={totalFeedCost} total={totalExpense} color="bg-amber-500" />
+          <BarRow label={L('Vaccinations')} value={totalVaccCost} total={totalExpense} color="bg-teal-500" />
+          <BarRow label={L('Other')} value={totalOtherCost} total={totalExpense} color="bg-rose-500" />
         </div>
-        <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mt-5 mb-2">Largest expenses in range</h4>
+        <h4 className="text-xs font-bold uppercase text-slate-500 dark:text-slate-400 mt-5 mb-2">{L('Largest expenses in range')}</h4>
         <div className="divide-y divide-slate-100 dark:divide-slate-700">
           {expenseLineItems.slice(0, 8).map((x, i) => (
             <div key={i} className="flex justify-between py-2 text-xs">
@@ -884,7 +885,7 @@ export default function Dashboard({
                 <Syringe className={`w-5 h-5 shrink-0 ${overdue ? 'text-red-600 dark:text-red-400' : 'text-amber-600 dark:text-amber-400'}`} />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{bird.name} · {breedLabel(bird)}</p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Last: {bird.lastVaccinationDate || 'never'}</p>
+                  <p className="muf-pc-muted">Last: {bird.lastVaccinationDate || 'never'}</p>
                 </div>
                 <span className={`text-[10px] font-bold font-mono px-2 py-1 rounded ${overdue ? 'bg-red-600 text-white' : 'bg-amber-600 text-white'}`}>
                   {daysUntilDue === null ? 'NEVER' : daysUntilDue < 0 ? `OVERDUE ${Math.abs(daysUntilDue)}d` : daysUntilDue === 0 ? 'TODAY' : `IN ${daysUntilDue}d`}
@@ -901,9 +902,9 @@ export default function Dashboard({
       </DetailModal>
 
       <DetailModal open={modal === 'feedRestock'} onClose={closeModal}
-        title="Feed Restock"
+        title={L('Feed Restock')}
         subtitle={feedStockRemainingKg !== null ? `~${Math.round(feedStockRemainingKg)} kg remaining` : `${feedRestockReminders.length} feed type${feedRestockReminders.length === 1 ? '' : 's'} need attention`}
-        icon={<Package className="w-5 h-5" />} iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">
+        icon={<Package className="w-5 h-5" />} iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300" size="big">
         {feedStockRemainingKg !== null ? (
           <div className="p-3 mb-3 rounded-xl bg-orange-50 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900">
             <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">
@@ -924,9 +925,9 @@ export default function Dashboard({
               <Package className="w-5 h-5 text-orange-600 dark:text-orange-400 shrink-0" />
               <div className="flex-1">
                 <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{r.type}</p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">Last purchase: {r.lastDate} · {r.daysSince} days ago</p>
+                <p className="muf-pc-muted">Last purchase: {r.lastDate} · {r.daysSince} days ago</p>
               </div>
-              <span className="text-[10px] font-bold font-mono px-2 py-1 rounded bg-orange-600 text-white">RESTOCK</span>
+              <span className="text-[10px] font-bold font-mono px-2 py-1 rounded bg-orange-600 text-white">{L('RESTOCK')}</span>
             </div>
           ))}
           {feedStockRemainingKg !== null && feedRestockReminders.length === 0 && (
@@ -934,8 +935,8 @@ export default function Dashboard({
           )}
         </div>
         <div className="mt-4 flex justify-end gap-2">
-          <button onClick={() => { closeModal(); openQuickAction('feed'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">Log Feed Purchase</button>
-          <button onClick={() => { closeModal(); onNavigate('ledger'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200">Go to Ledger</button>
+          <button onClick={() => { closeModal(); openQuickAction('feed'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-farm-600 hover:bg-farm-700 text-white">{L('Log Feed Purchase')}</button>
+          <button onClick={() => { closeModal(); onNavigate('ledger'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200">{L('Go to Ledger')}</button>
         </div>
       </DetailModal>
 
@@ -943,9 +944,9 @@ export default function Dashboard({
         title="Total Income Breakdown" subtitle={`${formatRs(totalIncome)} · ${rangeLabel}`}
         icon={<Coins className="w-5 h-5" />} iconBg="bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300" size="small">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
-          <MiniStat label="Egg income" value={formatRs(eggIncome)} color="emerald" />
-          <MiniStat label="Bird sale income" value={formatRs(birdIncome)} color="emerald" />
-          <MiniStat label="Credit sales" value={formatRs(customerIncome)} color="emerald" />
+          <MiniStat label={L('Egg income')} value={formatRs(eggIncome)} color="emerald" />
+          <MiniStat label={L('Bird sale income')} value={formatRs(birdIncome)} color="emerald" />
+          <MiniStat label={L('Credit sales')} value={formatRs(customerIncome)} color="emerald" />
         </div>
         {outstanding > 0 && (
           <div className="mb-3 p-2.5 rounded-lg bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900 text-xs text-amber-800 dark:text-amber-200">
@@ -959,10 +960,10 @@ export default function Dashboard({
         title="Total Expenses Breakdown" subtitle={`${formatRs(totalExpense)} · ${rangeLabel}`}
         icon={<ShoppingBag className="w-5 h-5" />} iconBg="bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300" size="small">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-          <MiniStat label="Birds" value={formatRs(totalBirdPurchaseCost)} color="sky" />
-          <MiniStat label="Feed" value={formatRs(totalFeedCost)} color="amber" />
-          <MiniStat label="Vaccinations" value={formatRs(totalVaccCost)} color="teal" />
-          <MiniStat label="Other" value={formatRs(totalOtherCost)} color="rose" />
+          <MiniStat label={L('Birds')} value={formatRs(totalBirdPurchaseCost)} color="sky" />
+          <MiniStat label={L('Feed')} value={formatRs(totalFeedCost)} color="amber" />
+          <MiniStat label={L('Vaccinations')} value={formatRs(totalVaccCost)} color="teal" />
+          <MiniStat label={L('Other')} value={formatRs(totalOtherCost)} color="rose" />
         </div>
         <LineItemTable items={expenseLineItems} emptyMsg="No expenses recorded in this range." />
       </DetailModal>
@@ -970,10 +971,10 @@ export default function Dashboard({
       <DetailModal open={modal === 'net'} onClose={closeModal}
         title="Net Profit / Loss" subtitle={`${netProfitLoss >= 0 ? 'Profitable' : 'Running at a loss'} · ${rangeLabel}`}
         icon={netProfitLoss >= 0 ? <TrendingUp className="w-5 h-5" /> : <TrendingDown className="w-5 h-5" />}
-        iconBg={netProfitLoss >= 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'}>
+        iconBg={netProfitLoss >= 0 ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-950 dark:text-rose-300'} size="small">
         <div className="grid grid-cols-2 gap-3 mb-5">
-          <MiniStat label="Income" value={formatRs(totalIncome)} color="emerald" />
-          <MiniStat label="Expenses" value={formatRs(totalExpense)} color="rose" />
+          <MiniStat label={L('Income')} value={formatRs(totalIncome)} color="emerald" />
+          <MiniStat label={L('Expenses')} value={formatRs(totalExpense)} color="rose" />
           <MiniStat label="Net" value={`${netProfitLoss >= 0 ? '+' : '-'}${formatRs(Math.abs(netProfitLoss))}`} color={netProfitLoss >= 0 ? 'emerald' : 'rose'} />
           <MiniStat label="ROI" value={`${roiPercent.toFixed(1)}%`} color={roiPercent >= 0 ? 'emerald' : 'rose'} />
         </div>
@@ -984,15 +985,15 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'roi'} onClose={closeModal}
         title="Return on Investment" subtitle={`${roiPercent.toFixed(1)}% · ${rangeLabel}`}
-        icon={<Percent className="w-5 h-5" />} iconBg="bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300">
+        icon={<Percent className="w-5 h-5" />} iconBg="bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300" size="small">
         <div className="text-center py-6">
           <div className={`text-5xl font-black font-mono ${roiPercent >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>{roiPercent.toFixed(1)}%</div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">
             {roiPercent >= 0 ? 'Profitable return' : 'Negative return — expenses exceed income'}</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
-          <MiniStat label="Investment" value={formatRs(totalExpense)} color="violet" />
-          <MiniStat label="Net return" value={formatRs(netProfitLoss)} color={netProfitLoss >= 0 ? 'emerald' : 'rose'} />
+          <MiniStat label={L('Investment')} value={formatRs(totalExpense)} color="violet" />
+          <MiniStat label={L('Net return')} value={formatRs(netProfitLoss)} color={netProfitLoss >= 0 ? 'emerald' : 'rose'} />
         </div>
       </DetailModal>
 
@@ -1005,38 +1006,50 @@ export default function Dashboard({
           activeFlockFilter === 'female'   ? activeBirds.filter(b => b.gender === 'Female') :
           activeFlockFilter === 'inactive' ? [...deadBirds, ...birds.filter(b => b.status === 'Sold')] :
           activeBirds;
-        const chip = (id: typeof activeFlockFilter, label: string, value: string | number, color: 'sky'|'slate') => (
-          <button onClick={() => setActiveFlockFilter(id)}
-            className={`text-left transition ${activeFlockFilter === id ? 'ring-2 ring-sky-400' : 'hover:scale-[1.02]'}`}>
-            <MiniStat label={label} value={`${value}`} color={color} />
+        const chip = (id: typeof activeFlockFilter, label: string, value: string | number) => (
+          <button key={id} type="button" onClick={() => setActiveFlockFilter(id)} aria-pressed={activeFlockFilter === id}
+            className={`muf-segmented-nav-button ${activeFlockFilter === id ? 'is-active' : ''}`}>
+            <span>{label}</span><span className="muf-segmented-nav-count">{value}</span>
           </button>
         );
         return (
           <DetailModal open={modal === 'activeBirds'} onClose={closeModal}
             title="Active Flock" subtitle={`${rangeLabel}`}
             icon={<Activity className="w-5 h-5" />} iconBg="bg-sky-100 text-sky-700 dark:bg-sky-950 dark:text-sky-300" size="big">
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
-              {chip('all',      'In Flock',   activeBirdsCount,      'sky')}
-              {chip('male',     'Males',      maleCount,            'slate')}
-              {chip('female',   'Females',    femaleCount,          'sky')}
-              {chip('inactive', 'Dead/Sold',  inactiveShown,        'slate')}
-            </div>
+            <nav className="muf-segmented-nav mb-5" aria-label={L('Filter birds')}>
+              {chip('all', L('In Flock'), activeBirdsCount)}
+              {chip('male', L('Males'), maleCount)}
+              {chip('female', L('Females'), femaleCount)}
+              {chip('inactive', L('Dead/Sold'), inactiveShown)}
+            </nav>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Name</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Breed</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Gender</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Status</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Age</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Bought</th>
-                    <th className="py-2 font-semibold uppercase text-[10px]">Last Vax</th>
+                    <th className="muf-pc-th">{L('Name')}</th>
+                    <th className="muf-pc-th">{L('Breed')}</th>
+                    <th className="muf-pc-th">{L('Gender')}</th>
+                    <th className="muf-pc-th">{L('Status')}</th>
+                    <th className="muf-pc-th">{L('Age')}</th>
+                    <th className="muf-pc-th">{L('Bought')}</th>
+                    <th className="py-2 font-semibold uppercase text-[10px]">{L('Last Vax')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                   {shownBirds.map(b => (
-                    <tr key={b.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer" onClick={() => openBirdDetail(b, 'activeBirds')}>
+                    <tr
+                      key={b.id}
+                      tabIndex={0}
+                      aria-label={L('Open bird details') + ': ' + b.name}
+                      className="hover:bg-slate-50 dark:hover:bg-slate-800/50 cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-emerald-500"
+                      onClick={() => openBirdDetail(b, 'activeBirds')}
+                      onKeyDown={(event) => {
+                        if (event.target !== event.currentTarget) return;
+                        if (event.key === 'Enter' || event.key === ' ') {
+                          event.preventDefault();
+                          openBirdDetail(b, 'activeBirds');
+                        }
+                      }}>
                       <td className="py-2 pr-3 font-semibold text-slate-800 dark:text-slate-100">{b.name}</td>
                       <td className="py-2 pr-3 text-slate-600 dark:text-slate-300">{breedLabel(b)}</td>
                       <td className="py-2 pr-3">{b.gender === 'Male' ? '♂' : '♀'}</td>
@@ -1062,8 +1075,8 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'totalEggs'} onClose={closeModal}
         title="Total Eggs Collected" subtitle={`${totalEggsCollected} eggs over ${uniqueDaysCount} day${uniqueDaysCount === 1 ? '' : 's'} · ${rangeLabel}`}
-        icon={<Egg className="w-5 h-5" />} iconBg="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" size="big">
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+        icon={<Egg className="w-5 h-5" />} iconBg="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" size="small">
+        <div className="grid grid-cols-2 gap-3 mb-5">
           <MiniStat label="Collected" value={`${totalEggsCollected}`} color="amber" />
           <MiniStat label="Sold" value={`${eggsSold}`} color="emerald" />
           <MiniStat label="Home use" value={`${eggsHome}`} color="slate" />
@@ -1073,11 +1086,11 @@ export default function Dashboard({
           <table className="w-full text-xs">
             <thead>
               <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Date</th>
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Collected</th>
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Sold</th>
-                <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Home</th>
-                <th className="py-2 font-semibold uppercase text-[10px]">Broken</th>
+                <th className="muf-pc-th">{L('Date')}</th>
+                <th className="muf-pc-th">{L('Collected')}</th>
+                <th className="muf-pc-th">{L('Sold')}</th>
+                <th className="muf-pc-th">{L('Home')}</th>
+                <th className="py-2 font-semibold uppercase text-[10px]">{L('Broken')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -1097,7 +1110,7 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'eggEfficiency'} onClose={closeModal}
         title="Egg Production Efficiency" subtitle={`${avgEggsPerHenPerDay.toFixed(2)} eggs/hen/day · ${rangeLabel}`}
-        icon={<Egg className="w-5 h-5" />} iconBg="bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300">
+        icon={<Egg className="w-5 h-5" />} iconBg="bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300" size="small">
         <div className="text-center py-4">
           <div className="text-5xl font-black font-mono text-teal-600 dark:text-teal-400">{avgEggsPerHenPerDay.toFixed(2)}</div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">eggs per hen per day</p>
@@ -1115,14 +1128,14 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'costEgg'} onClose={closeModal}
         title="Cost Per Egg" subtitle={`${formatRs(costPerEggValue)} · ${rangeLabel}`}
-        icon={<Coins className="w-5 h-5" />} iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300">
+        icon={<Coins className="w-5 h-5" />} iconBg="bg-orange-100 text-orange-700 dark:bg-orange-950 dark:text-orange-300" size="small">
         <div className="text-center py-4">
           <div className="text-5xl font-black font-mono text-orange-600 dark:text-orange-400">{formatRs(costPerEggValue)}</div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">cost to produce 1 egg</p>
         </div>
         <div className="grid grid-cols-2 gap-3 mb-4">
-          <MiniStat label="Sale price" value={formatRs(settings.defaultPricePerEgg)} color={costPerEggValue <= settings.defaultPricePerEgg ? 'emerald' : 'rose'} />
-          <MiniStat label="Margin/egg" value={formatRs(settings.defaultPricePerEgg - costPerEggValue)} color={settings.defaultPricePerEgg >= costPerEggValue ? 'emerald' : 'rose'} />
+          <MiniStat label={L('Sale price')} value={formatRs(settings.defaultPricePerEgg)} color={costPerEggValue <= settings.defaultPricePerEgg ? 'emerald' : 'rose'} />
+          <MiniStat label={L('Margin/egg')} value={formatRs(settings.defaultPricePerEgg - costPerEggValue)} color={settings.defaultPricePerEgg >= costPerEggValue ? 'emerald' : 'rose'} />
         </div>
         <p className="text-xs text-slate-500 dark:text-slate-400 bg-slate-50 dark:bg-slate-800 rounded-xl p-3">
           All-in cost per egg = (bird purchases + feed + other ops + vaccinations) ÷ total eggs collected in range.
@@ -1132,20 +1145,20 @@ export default function Dashboard({
 
       <DetailModal open={modal === 'costBird'} onClose={closeModal}
         title="Cost Per Bird" subtitle={`${formatRs(costPerBirdValue)} · ${rangeLabel}`}
-        icon={<DollarSign className="w-5 h-5" />} iconBg="bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950 dark:text-fuchsia-300">
+        icon={<DollarSign className="w-5 h-5" />} iconBg="bg-fuchsia-100 text-fuchsia-700 dark:bg-fuchsia-950 dark:text-fuchsia-300" size="small">
         <div className="text-center py-4">
           <div className="text-5xl font-black font-mono text-fuchsia-600 dark:text-fuchsia-400">{formatRs(costPerBirdValue)}</div>
           <p className="text-sm text-slate-500 dark:text-slate-400 mt-2">cost per active bird</p>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <MiniStat label="Active birds" value={`${activeBirdsCount}`} color="slate" />
-          <MiniStat label="Total cost" value={formatRs(totalExpense)} color="fuchsia" />
+          <MiniStat label={L('Total cost')} value={formatRs(totalExpense)} color="fuchsia" />
         </div>
       </DetailModal>
 
       <DetailModal open={modal === 'feedPerBird'} onClose={closeModal}
         title="Feed Per Bird (This Month)" subtitle={`${feedKgPerBird.toFixed(1)} kg/bird · ${monthPrefix}`}
-        icon={<Package className="w-5 h-5" />} iconBg="bg-lime-100 text-lime-700 dark:bg-lime-950 dark:text-lime-300">
+        icon={<Package className="w-5 h-5" />} iconBg="bg-lime-100 text-lime-700 dark:bg-lime-950 dark:text-lime-300" size="small">
         <div className="text-center py-4">
           <div className="text-5xl font-black font-mono text-lime-600 dark:text-lime-400">{feedKgPerBird.toFixed(1)}<span className="text-2xl text-lime-500"> kg</span></div>
         </div>
@@ -1157,29 +1170,29 @@ export default function Dashboard({
 
       {(['feedToday', 'feedWeek', 'feedMonth'] as const).map((key) => {
         const cfg = {
-          feedToday: { title: 'Feed Purchased Today', icon: <Package className="w-5 h-5" />, bg: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300', value: feedKgToday, records: feedRecords.filter(f => f.date === today), sub: today },
+          feedToday: { title: L('Feed Purchased Today'), icon: <Package className="w-5 h-5" />, bg: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300', value: feedKgToday, records: feedRecords.filter(f => f.date === today), sub: today },
           feedWeek: { title: 'Feed Purchased This Week', icon: <Package className="w-5 h-5" />, bg: 'bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300', value: feedKgThisWeek, records: feedRecords.filter(f => f.date >= weekStart), sub: `${weekStart} → ${today}` },
-          feedMonth: { title: 'Feed Purchased This Month', icon: <Package className="w-5 h-5" />, bg: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300', value: feedKgThisMonth, records: feedRecords.filter(f => f.date.startsWith(monthPrefix)), sub: monthPrefix },
+          feedMonth: { title: L('Feed Purchased This Month'), icon: <Package className="w-5 h-5" />, bg: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300', value: feedKgThisMonth, records: feedRecords.filter(f => f.date.startsWith(monthPrefix)), sub: monthPrefix },
         }[key];
         const kgTotal = cfg.records.reduce((s, f) => s + f.quantityKg, 0);
         const rsTotal = cfg.records.reduce((s, f) => s + f.quantityKg * f.rateRsPerKg, 0);
         return (
           <React.Fragment key={key}>
           <DetailModal open={modal === key} onClose={closeModal} title={cfg.title} subtitle={`${cfg.value} kg · ${cfg.sub}`}
-            icon={cfg.icon} iconBg={cfg.bg} size="big">
+            icon={cfg.icon} iconBg={cfg.bg} size={key === 'feedWeek' ? 'small' : 'big'}>
             <div className="grid grid-cols-2 gap-3 mb-5">
               <MiniStat label="Total weight" value={`${kgTotal} kg`} color="slate" />
-              <MiniStat label="Total cost" value={formatRs(rsTotal)} color="emerald" />
+              <MiniStat label={L('Total cost')} value={formatRs(rsTotal)} color="emerald" />
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-xs">
                 <thead>
                   <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Date</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Type</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Qty (kg)</th>
-                    <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Rate/kg</th>
-                    <th className="py-2 font-semibold uppercase text-[10px]">Total</th>
+                    <th className="muf-pc-th">{L('Date')}</th>
+                    <th className="muf-pc-th">{L('Type')}</th>
+                    <th className="muf-pc-th">{L('Qty (kg)')}</th>
+                    <th className="muf-pc-th">{L('Rate/kg')}</th>
+                    <th className="py-2 font-semibold uppercase text-[10px]">{L('Total')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -1204,73 +1217,45 @@ export default function Dashboard({
       <DetailModal open={modal === 'sickBirds'} onClose={closeModal}
         title="Sick Birds" subtitle={`${sickBirdsCount} bird${sickBirdsCount === 1 ? '' : 's'} need care`}
         icon={<HeartPulse className="w-5 h-5" />} iconBg="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300" size="small">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="muf-callout muf-callout--bad mb-3">
+          <span className="muf-callout-icon"><HeartPulse className="w-5 h-5" /></span>
+          <div className="min-w-0">
+            <p className="muf-callout-title">{sickBirdsCount} {sickBirdsCount === 1 ? L('bird needs care') : L('birds need care')}</p>
+            <p className="muf-callout-sub">{L('Tap a bird to open its details.')}</p>
+          </div>
+        </div>
+        <ul className="muf-rowlist">
           {sickBirds.map(b => (
-            <button key={b.id} onClick={() => openBirdDetail(b, 'sickBirds')}
-              className="flex items-center gap-3 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 hover:border-red-400 rounded-xl transition text-left cursor-pointer">
-              <BirdAvatar bird={b} size="sm" />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-bold text-red-900 dark:text-red-200 truncate">{b.name}</p>
-                <p className="text-2xs text-red-700 dark:text-red-400 font-mono">{breedLabel(b)} · {b.gender} · {birdAge(b)}</p>
-              </div>
-            </button>
+            <li key={b.id}>
+              <button type="button" onClick={() => openBirdDetail(b, 'sickBirds')} aria-label={`${L('Open bird details')}: ${b.name}`} className="muf-row muf-row--bad">
+                <BirdAvatar bird={b} size="sm" />
+                <span className="muf-row-main">
+                  <span className="muf-row-title">{b.name}</span>
+                  <span className="muf-row-sub">{breedLabel(b)} · {b.gender} · {birdAge(b)}</span>
+                </span>
+                <span className="muf-chip muf-chip--bad">{L('Sick')}</span>
+                <ChevronRight className="w-4 h-4 shrink-0 text-slate-400" aria-hidden="true" />
+              </button>
+            </li>
           ))}
-        </div>
-        <div className="mt-4 flex justify-end gap-2">
-          <button onClick={() => { closeModal(); onNavigate('health'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white">Go to Health Portal →</button>
-        </div>
+        </ul>
+        <button type="button" onClick={() => { closeModal(); onNavigate('health'); }} className="muf-popup-cta muf-popup-cta--danger">
+          {L('Go to Health Portal')} <ArrowRight className="w-4 h-4" />
+        </button>
       </DetailModal>
 
-      {/* Bird Detail (from anywhere — with back button when opened from another modal) */}
+      {/* Shared rich MUF bird details, matching the Birds register popup. */}
       {(() => {
         const b = selectedBird;
         if (!b) return null;
         const isBack = !!parentModal;
-        const statusBadge =
-          b.status === 'Sick' ? { txt: 'Sick', cls: 'bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300' } :
-          b.status === 'Dead' ? { txt: 'Dead', cls: 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300' } :
-          b.status === 'Sold' ? { txt: 'Sold', cls: 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300' } :
-          { txt: 'Active', cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300' };
-        return (
-          <DetailModal
-            open={modal === 'birdDetail'}
-            onClose={closeModal}
-            onBack={isBack ? closeBirdDetail : undefined}
-            backLabel="Back"
-            title={b.name}
-            subtitle={`${breedLabel(b)} · ${b.gender} · ${birdAge(b)} old`}
-            icon={<BirdAvatar bird={b} size="sm" showBadge={false} />}
-            iconBg=""
-            size="small">
-            <div className="flex flex-col items-center text-center mb-4">
-              <BirdAvatar bird={b} size="lg" />
-              <span className={`mt-2 px-2 py-0.5 rounded-full text-2xs font-bold ${statusBadge.cls}`}>{statusBadge.txt}</span>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-xs">
-              <InfoRow label="ID" value={`BRD-${String(b.id).padStart(3, '0')}`} />
-              <InfoRow label="Breed" value={breedLabel(b)} />
-              <InfoRow label="Gender" value={b.gender} />
-              <InfoRow label="Age" value={birdAge(b)} />
-              <InfoRow label="Bought" value={b.dateBought} />
-              <InfoRow label="Price" value={`Rs ${b.price}`} />
-              <InfoRow label="Last Vax" value={b.lastVaccinationDate || '—'} />
-              {b.dateOfBirth && <InfoRow label="DOB" value={b.dateOfBirth} />}
-              {b.saleDate && <InfoRow label="Sold on" value={b.saleDate} />}
-              {b.salePrice != null && <InfoRow label="Sale price" value={`Rs ${b.salePrice}`} />}
-              {b.dateDied && <InfoRow label="Died" value={b.dateDied} />}
-              {b.deathReason && <InfoRow label="Cause" value={b.deathReason} />}
-            </div>
-            {b.deathDetail && (
-              <div className="mt-3 p-3 bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 rounded-xl text-xs text-red-900 dark:text-red-200">
-                {b.deathDetail}
-              </div>
-            )}
-            <div className="mt-4 flex justify-end">
-              <button onClick={() => { closeModal(); onNavigate('flock', { editBirdId: b.id }); }}
-                className="text-xs font-bold px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white">Edit in Flock →</button>
-            </div>
-          </DetailModal>
-        );
+        const detailVaccinations = [...vaccinations.filter((record) => record.birdId === b.id)].sort((a, next) => next.date.localeCompare(a.date));
+        return <DetailModal open={modal === 'birdDetail'} onClose={closeModal} onBack={isBack ? closeBirdDetail : undefined}
+          backLabel="Back" title={b.name} subtitle={`${breedLabel(b)} · ${b.gender} · ${birdAge(b)} old`}
+          icon={<BirdAvatar bird={b} size="sm" showBadge={false} />} iconBg="" size="big">
+          <BirdDetailContent bird={b} detailVaccinations={detailVaccinations} vaccinationIntervalDays={settings.vaccinationIntervalDays} lang={lang}
+            canEdit canDelete={false} onEdit={() => { closeModal(); onNavigate('flock', { editBirdId: b.id }); }} />
+        </DetailModal>;
       })()}
 
       {/* Quick Actions FAB */}
@@ -1295,58 +1280,6 @@ function StaggerItem({ index, children, className = '' }: { index: number; child
       className={className}
     >
       {children}
-    </motion.div>
-  );
-}
-
-// StatCard — vertical card with emerald icon, decorative blob, profit/loss tinting (dairy-style)
-interface StatCardProps {
-  label: string;
-  value: string;
-  icon: React.ElementType;
-  trend?: number;
-  trendUnit?: string;
-  subText?: string;
-  isNegative?: boolean;
-  isProfit?: boolean;
-}
-
-function StatCard({ label, value, icon: Icon, trend, trendUnit = '', subText, isNegative, isProfit }: StatCardProps) {
-  const isPositive = trend && trend > 0;
-  return (
-    <motion.div
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.97 }}
-      transition={cardSpring}
-      className={`group relative overflow-hidden rounded-2xl border bg-white/90 dark:bg-[#0d1a11]/90 p-4 shadow-sm backdrop-blur transition-colors duration-200 hover:shadow-xl ${
-      isProfit === true ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-900/10' :
-      isProfit === false ? 'border-rose-200 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-900/10' :
-      'border-slate-200 dark:border-[#203528] hover:border-emerald-300 dark:hover:border-emerald-700'
-    }`}>
-      <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-emerald-500/10 transition-transform duration-300 group-hover:scale-125" />
-      <Eye className="absolute right-3 bottom-3 w-3.5 h-3.5 text-emerald-500/70 opacity-0 group-hover:opacity-100 transition" />
-      <div className="relative flex justify-between items-start mb-4">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</span>
-        <motion.div
-          whileHover={{ rotate: -6, scale: 1.06 }}
-          transition={wobbleSpring}
-          className="rounded-xl bg-emerald-50 dark:bg-emerald-900/30 p-2 text-emerald-600 dark:text-emerald-300"
-        >
-          <Icon className="w-4 h-4" />
-        </motion.div>
-      </div>
-      <div className="relative">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <span className={`font-display text-2xl font-bold ${isNegative ? 'text-red-600 dark:text-red-400' : isProfit === true ? 'text-emerald-700 dark:text-emerald-400' : isProfit === false ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}><MufCountUpText text={String(value)} /></span>
-          {trend !== undefined && trend !== 0 && (
-            <div className={`flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ${isPositive ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'}`}>
-              {isPositive ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
-              {Math.abs(trend)}{trendUnit}
-            </div>
-          )}
-        </div>
-        {subText && <p className="text-[11px] text-slate-400 mt-1">{subText}</p>}
-      </div>
     </motion.div>
   );
 }
@@ -1428,9 +1361,9 @@ function LineItemTable({ items, emptyMsg }: { items: { date: string; label: stri
       <table className="w-full text-xs">
         <thead>
           <tr className="text-left text-slate-500 dark:text-slate-400 border-b border-slate-200 dark:border-slate-700">
-            <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Date</th>
-            <th className="py-2 pr-3 font-semibold uppercase text-[10px]">Description</th>
-            <th className="py-2 text-right font-semibold uppercase text-[10px]">Amount</th>
+            <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Date')}</th>
+            <th className="py-2 pr-3 font-semibold uppercase text-[10px]">{L('Description')}</th>
+            <th className="py-2 text-right font-semibold uppercase text-[10px]">{L('Amount')}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100 dark:divide-slate-700">

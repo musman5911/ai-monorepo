@@ -15,6 +15,7 @@ export default defineConfig(() => {
             react: ['react', 'react-dom'],
             motion: ['motion'],
             icons: ['lucide-react'],
+            pdf: ['jspdf', 'jspdf-autotable'],
           },
         },
       },

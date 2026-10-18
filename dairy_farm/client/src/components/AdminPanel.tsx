@@ -7,23 +7,23 @@ import {
   Check, AlertCircle,
   FileText, RefreshCw, Globe2,
 } from 'lucide-react';
-import AvatarUploader from '../muf-avatar';
-import { useConfirm, usePromptInput, notify } from '../muf-confirm';
+import AvatarUploader from '../muf/ui/muf-avatar';
+import { useConfirm, usePromptInput, notify } from '../muf/core/muf-confirm';
 import ExportCenter from './ExportCenter';
 import MyFarmsPanel from './MyFarmsPanel';
 import BuyerKhata from './BuyerKhata';
 import { shareBackupFile, shareViaWhatsAppTo } from '../utils/share';
-import TelegramPanel from '../muf-telegram-panel';
-import MufAdminShell from '../muf-admin-shell';
-import MufAdminCard from '../muf-admin-card';
-import MufAdminButton from '../muf-admin-button';
-import MufAdminUsers from '../muf-admin-users';
-import MufAdminReports from '../muf-admin-reports';
-import MufAdminGeneral from '../muf-admin-general';
+import TelegramPanel from '../muf/ui/muf-telegram-panel';
+import MufAdminShell from '../muf/admin/muf-admin-shell';
+import MufAdminCard from '../muf/admin/muf-admin-card';
+import MufAdminButton from '../muf/admin/muf-admin-button';
+import MufAdminUsers from '../muf/admin/muf-admin-users';
+import MufAdminReports from '../muf/admin/muf-admin-reports';
+import MufAdminGeneral from '../muf/admin/muf-admin-general';
 import { api } from '../api';
 import type { AuthUser, Buyer, Rate, RateHistory, UserRole } from '../types';
 import { fmtPKR } from '../utils/format';
-import {mufToday} from '../muf-date';
+import {mufToday} from '../muf/data/muf-date';
 
 interface Props {
   username: string | null;
@@ -152,7 +152,7 @@ export default function AdminPanel({ username, onClose }: Props) {
       message,
       label: 'Admin password',
       type: 'password',
-      confirmLabel: 'Authorize',
+      confirmLabel: L('Authorize'),
     });
     if (pw === null || pw === '') return null;
     return pw;
@@ -250,9 +250,9 @@ export default function AdminPanel({ username, onClose }: Props) {
 
   async function handleDeleteBuyer(id: string) {
     const ok = await confirmAction({
-      title: 'Delete Buyer',
-      message: 'Delete this buyer? This cannot be undone.',
-      confirmLabel: 'Delete',
+      title: L('Delete Buyer'),
+      message: L('Delete this buyer? This cannot be undone.'),
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -401,12 +401,12 @@ export default function AdminPanel({ username, onClose }: Props) {
 
   async function editUserEmail(user: AuthUser) {
     const email = await promptInput({
-      title: 'Edit email',
+      title: L('Edit email'),
       message: `Set email for ${user.username} (leave blank to remove).`,
       label: 'Email address',
       type: 'email',
       initialValue: user.email || '',
-      confirmLabel: 'Save email',
+      confirmLabel: L('Save email'),
     });
     if (email === null) return;
     const adminPassword = await askAdminPassword(
@@ -426,9 +426,9 @@ export default function AdminPanel({ username, onClose }: Props) {
   async function handleDeleteUser(user: AuthUser) {
     if (user.username === username) return;
     const ok = await confirmAction({
-      title: 'Delete User',
+      title: L('Delete User'),
       message: `Delete user "${user.username}"? This cannot be undone.`,
-      confirmLabel: 'Delete',
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -495,9 +495,9 @@ export default function AdminPanel({ username, onClose }: Props) {
     event.target.value = '';
     if (!file) return;
     const ok = await confirmAction({
-      title: 'Restore from Backup',
+      title: L('Restore from Backup'),
       message: `Restore all farm data from "${file.name}"? This replaces everything currently saved.`,
-      confirmLabel: 'Overwrite & Restore',
+      confirmLabel: L('Overwrite & Restore'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -530,7 +530,7 @@ export default function AdminPanel({ username, onClose }: Props) {
     <MufAdminShell
       open={true}
       onClose={onClose}
-      title="Settings & Admin Hub"
+      title={L('Settings & Admin Hub')}
       subtitle={`${username || 'Admin'} · Control Panel`}
       icon={<Shield className="w-5 h-5" />}
       sections={sections}
@@ -592,12 +592,12 @@ export default function AdminPanel({ username, onClose }: Props) {
               onSendEmailCode={() => sendProfileCode('email')}
               onSubmitEmail={handleChangeEmail}
             >
-              <MufAdminCard icon={<History className="w-5 h-5" />} title="Milk Rate Management" subtitle="Set the current per-litre rate">
-                <p className="text-xs text-slate-400 uppercase mb-1">Current Rate</p>
+              <MufAdminCard icon={<History className="w-5 h-5" />} title={L('Milk Rate Management')} subtitle={L('Set the current per-litre rate')}>
+                <p className="text-xs text-slate-400 uppercase mb-1">{L('Current Rate')}</p>
                 <p className="text-3xl font-bold text-farm-600">{fmtPKR(currentRate?.value || 0)} <span className="text-sm font-normal text-slate-400">/ litre</span></p>
                 <div className="flex gap-2 mt-4">
-                  <input type="number" value={newRate} onChange={(event) => setNewRate(event.target.value)} placeholder="New rate (₨)" className={inputClass} />
-                  <button onClick={handleUpdateRate} className="bg-farm-600 hover:bg-farm-700 text-white rounded-xl px-4 py-2 text-sm font-semibold transition">Update</button>
+                  <input type="number" value={newRate} onChange={(event) => setNewRate(event.target.value)} placeholder={L('New rate (₨)')} className={inputClass} />
+                  <button onClick={handleUpdateRate} className="bg-farm-600 hover:bg-farm-700 text-white rounded-xl px-4 py-2 text-sm font-semibold transition">{L('Update')}</button>
                 </div>
 
                 <div className="mt-4 border-t border-slate-100 dark:border-slate-800 pt-3">
@@ -608,7 +608,7 @@ export default function AdminPanel({ username, onClose }: Props) {
                   >💬 {showRateShare ? 'Hide' : 'Send rate to buyers on WhatsApp'}</button>
                   {showRateShare && (
                     <div className="mt-2 space-y-1.5 max-h-44 overflow-y-auto">
-                      {buyers.length === 0 && <p className="text-xs text-slate-400">No buyers yet.</p>}
+                      {buyers.length === 0 && <p className="text-xs text-slate-400">{L('No buyers yet.')}</p>}
                       {buyers.map((buyer) => {
                         const rateForBuyer = buyer.defaultRate || currentRate?.value || 0;
                         const msg = [
@@ -628,7 +628,7 @@ export default function AdminPanel({ username, onClose }: Props) {
                               onClick={() => shareViaWhatsAppTo(buyer.phone!, msg)}
                               className="shrink-0 px-2.5 py-1 rounded-lg text-white text-[11px] font-bold disabled:opacity-40 transition"
                               style={{ backgroundColor: '#25D366' }}
-                            >Send</button>
+                            >{L('Send')}</button>
                           </div>
                         );
                       })}
@@ -637,7 +637,7 @@ export default function AdminPanel({ username, onClose }: Props) {
                 </div>
 
                 <div className="mt-4 max-h-[200px] overflow-y-auto">
-                  <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Rate History</h4>
+                  <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">{L('Rate History')}</h4>
                   <div className="space-y-1">
                     {rateHistory.map((history) => (
                       <div key={history._id} className="flex justify-between text-sm border-b border-slate-100 dark:border-slate-800 pb-1">
@@ -645,13 +645,13 @@ export default function AdminPanel({ username, onClose }: Props) {
                         <span className="font-medium text-slate-700 dark:text-slate-300">{fmtPKR(history.value)}</span>
                       </div>
                     ))}
-                    {rateHistory.length === 0 && <p className="text-xs text-slate-400">No history yet</p>}
+                    {rateHistory.length === 0 && <p className="text-xs text-slate-400">{L('No history yet')}</p>}
                   </div>
                 </div>
               </MufAdminCard>
 
               {/* Farm Location (weather widget) */}
-              <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title="Farm Location" subtitle="Set your farm coordinates for live weather">
+              <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title={L('Farm Location')} subtitle={L('Set your farm coordinates for live weather')}>
                 <div className="space-y-3">
                   {farmLocCurrent && (
                     <p className="text-xs text-slate-500">
@@ -669,8 +669,8 @@ export default function AdminPanel({ username, onClose }: Props) {
                     placeholder="33.9943, 72.9106"
                     className={inputClass + ' font-mono'}
                   />
-                  <p className="text-[10px] text-slate-400">Enter latitude, longitude (decimal degrees). City is auto-detected.</p>
-                  <MufAdminButton variant="secondary" size="md" onClick={handleSaveLocation}>Save Location</MufAdminButton>
+                  <p className="text-[10px] text-slate-400">{L('Enter latitude, longitude (decimal degrees). City is auto-detected.')}</p>
+                  <MufAdminButton variant="secondary" size="md" onClick={handleSaveLocation}>{L('Save Location')}</MufAdminButton>
                 </div>
               </MufAdminCard>
             </MufAdminGeneral>
@@ -720,7 +720,7 @@ export default function AdminPanel({ username, onClose }: Props) {
           {section === 'buyers' && (
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Buyers Management</h3>
+                <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{L('Buyers Management')}</h3>
                 <button onClick={() => setShowBuyerForm(!showBuyerForm)} className="text-xs text-farm-600 hover:text-farm-700 font-semibold transition">
                   {showBuyerForm ? 'Cancel' : '+ Add Buyer'}
                 </button>
@@ -728,29 +728,29 @@ export default function AdminPanel({ username, onClose }: Props) {
 
               {showBuyerForm && (
                 <form onSubmit={handleAddBuyer} className="dm-card p-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <input required placeholder="Name *" value={newBuyer.name} onChange={(event) => setNewBuyer({ ...newBuyer, name: event.target.value })} className={inputClass} />
-                  <input placeholder="Phone" value={newBuyer.phone} onChange={(event) => setNewBuyer({ ...newBuyer, phone: event.target.value })} className={inputClass} />
-                  <input type="number" placeholder="Default Rate" value={newBuyer.defaultRate} onChange={(event) => setNewBuyer({ ...newBuyer, defaultRate: event.target.value })} className={inputClass} />
-                  <input placeholder="Address" value={newBuyer.address} onChange={(event) => setNewBuyer({ ...newBuyer, address: event.target.value })} className={inputClass} />
-                  <input placeholder="Notes" value={newBuyer.notes} onChange={(event) => setNewBuyer({ ...newBuyer, notes: event.target.value })} className="sm:col-span-2 w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 transition" />
-                  <button type="submit" className="sm:col-span-2 bg-farm-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition hover:bg-farm-700">Add Buyer</button>
+                  <input required placeholder={L('Name *')} value={newBuyer.name} onChange={(event) => setNewBuyer({ ...newBuyer, name: event.target.value })} className={inputClass} />
+                  <input placeholder={L('Phone')} value={newBuyer.phone} onChange={(event) => setNewBuyer({ ...newBuyer, phone: event.target.value })} className={inputClass} />
+                  <input type="number" placeholder={L('Default Rate')} value={newBuyer.defaultRate} onChange={(event) => setNewBuyer({ ...newBuyer, defaultRate: event.target.value })} className={inputClass} />
+                  <input placeholder={L('Address')} value={newBuyer.address} onChange={(event) => setNewBuyer({ ...newBuyer, address: event.target.value })} className={inputClass} />
+                  <input placeholder={L('Notes')} value={newBuyer.notes} onChange={(event) => setNewBuyer({ ...newBuyer, notes: event.target.value })} className="sm:col-span-2 w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 transition" />
+                  <button type="submit" className="sm:col-span-2 bg-farm-600 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition hover:bg-farm-700">{L('Add Buyer')}</button>
                 </form>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {buyers.map((buyer) => (
-                  <div key={buyer._id} className="dm-card p-4 flex items-center justify-between gap-3 cursor-pointer hover:border-farm-300 dark:hover:border-farm-700 transition" onClick={() => setKhataBuyer(buyer)} title="Open khata">
+                  <div key={buyer._id} className="dm-card p-4 flex items-center justify-between gap-3 cursor-pointer hover:border-farm-300 dark:hover:border-farm-700 transition" onClick={() => setKhataBuyer(buyer)} title={L('Open khata')}>
                     <div>
                       <p className="text-sm font-semibold text-slate-800 dark:text-slate-100">{buyer.name}</p>
                       <p className="text-xs text-slate-400">{buyer.phone || '-'} · {buyer.defaultRate ? `₨${buyer.defaultRate}/L` : 'Global rate'}</p>
                     </div>
                     <div className="flex items-center gap-3 shrink-0">
-                      <button onClick={(e) => { e.stopPropagation(); setKhataBuyer(buyer); }} className="text-farm-600 hover:text-farm-700 text-xs font-semibold transition">Khata</button>
-                      <button onClick={(e) => { e.stopPropagation(); handleDeleteBuyer(buyer._id); }} className="text-red-400 hover:text-red-600 text-xs font-semibold transition">Delete</button>
+                      <button onClick={(e) => { e.stopPropagation(); setKhataBuyer(buyer); }} className="text-farm-600 hover:text-farm-700 text-xs font-semibold transition">{L('Khata')}</button>
+                      <button onClick={(e) => { e.stopPropagation(); handleDeleteBuyer(buyer._id); }} className="text-red-400 hover:text-red-600 text-xs font-semibold transition">{L('Delete')}</button>
                     </div>
                   </div>
                 ))}
-                {buyers.length === 0 && <p className="text-xs text-slate-400 text-center py-4 md:col-span-2">No buyers yet</p>}
+                {buyers.length === 0 && <p className="text-xs text-slate-400 text-center py-4 md:col-span-2">{L('No buyers yet')}</p>}
               </div>
             </div>
           )}
@@ -776,14 +776,14 @@ export default function AdminPanel({ username, onClose }: Props) {
           {section === 'backup' && (
             <div className="space-y-6">
               {/* Manual Backup */}
-              <MufAdminCard icon={<Database className="w-5 h-5" />} title="Manual Backup" subtitle="Download or share your farm data">
+              <MufAdminCard icon={<Database className="w-5 h-5" />} title={L('Manual Backup')} subtitle={L('Download or share your farm data')}>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <MufAdminButton variant="primary" size="md" icon={<Download className="w-5 h-5" />}
                     onClick={handleBackup}
                     className="flex-col h-24 py-4"
                   >
-                    <span>Download Backup</span>
-                    <span className="text-[10px] font-normal opacity-80">All data as .json file</span>
+                    <span>{L('Download Backup')}</span>
+                    <span className="text-[10px] font-normal opacity-80">{L('All data as .json file')}</span>
                   </MufAdminButton>
                   <MufAdminButton variant="success" size="md"
                     icon={<span className="text-xl">💬</span>}
@@ -799,26 +799,26 @@ export default function AdminPanel({ username, onClose }: Props) {
                     }}
                     className="flex-col h-24 py-4"
                   >
-                    <span>Send via WhatsApp</span>
-                    <span className="text-[10px] font-normal opacity-80">Share backup file to a chat</span>
+                    <span>{L('Send via WhatsApp')}</span>
+                    <span className="text-[10px] font-normal opacity-80">{L('Share backup file to a chat')}</span>
                   </MufAdminButton>
                 </div>
               </MufAdminCard>
 
               {/* Restore from File */}
-              <MufAdminCard icon={<Upload className="w-5 h-5" />} title="Restore from File" subtitle="Upload a .json backup to restore data">
+              <MufAdminCard icon={<Upload className="w-5 h-5" />} title={L('Restore from File')} subtitle={L('Upload a .json backup to restore data')}>
                 <div className="relative">
                   <input type="file" accept=".json" onChange={handleRestore} className="absolute inset-0 opacity-0 cursor-pointer z-10" />
                   <div className="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg p-6 flex flex-col items-center gap-2 hover:border-farm-500 hover:bg-farm-50/30 dark:hover:bg-farm-900/10 transition cursor-pointer">
                     <Upload className="w-8 h-8 text-purple-600" />
-                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200">Choose JSON file...</p>
+                    <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{L('Choose JSON file...')}</p>
                     <p className="text-[10px] text-red-500 font-bold">⚠️ This will overwrite all current data</p>
                   </div>
                 </div>
               </MufAdminCard>
 
               {/* Auto-Backup */}
-              <MufAdminCard icon={<RefreshCw className="w-5 h-5" />} title="Automatic Monthly Backup" subtitle="System creates a backup once per month">
+              <MufAdminCard icon={<RefreshCw className="w-5 h-5" />} title={L('Automatic Monthly Backup')} subtitle={L('System creates a backup once per month')}>
                 <p className="text-xs font-bold text-slate-700 dark:text-slate-200 mb-3">
                   {autoBackup?.available
                     ? `Last auto backup: ${autoBackup.name}`
@@ -838,7 +838,7 @@ export default function AdminPanel({ username, onClose }: Props) {
                       } finally { setAutoBackupBusy(false); }
                     }}
                   >
-                    Back up now
+                    {L('Back up now')}
                   </MufAdminButton>
                   <MufAdminButton variant="secondary" size="sm" icon={<Download className="w-3.5 h-3.5" />}
                     disabled={autoBackupBusy || !autoBackup?.available}
@@ -853,15 +853,15 @@ export default function AdminPanel({ username, onClose }: Props) {
                       URL.revokeObjectURL(url);
                     }}
                   >
-                    Download
+                    {L('Download')}
                   </MufAdminButton>
                   <MufAdminButton variant="warning" size="sm" icon={<Upload className="w-3.5 h-3.5" />}
                     disabled={autoBackupBusy || !autoBackup?.available}
                     onClick={async () => {
                       const ok = await confirmAction({
-                        title: 'Restore from auto-backup',
+                        title: L('Restore from auto-backup'),
                         message: `Restore ${autoBackup?.name}? Current data will be replaced.`,
-                        confirmLabel: 'Restore',
+                        confirmLabel: L('Restore'),
                         tone: 'warning',
                       });
                       if (!ok) return;
@@ -875,7 +875,7 @@ export default function AdminPanel({ username, onClose }: Props) {
                       } finally { setAutoBackupBusy(false); }
                     }}
                   >
-                    Restore from it
+                    {L('Restore from it')}
                   </MufAdminButton>
                 </div>
               </MufAdminCard>

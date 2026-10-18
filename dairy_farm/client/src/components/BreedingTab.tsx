@@ -8,8 +8,8 @@ import { CalendarHeart, Baby, Droplets, Flame, RefreshCw, Repeat } from 'lucide-
 import { api } from '../api';
 import { L } from '../i18n';
 import { Cow } from '../types';
-import { notify } from '../muf-confirm';
-import DetailModal from '../muf-modal';
+import { notify } from '../muf/core/muf-confirm';
+import DetailModal from '../muf/core/muf-modal';
 import CowDetailPopup from './CowDetailPopup';
 import type { RateHistory } from '../types';
 import { todayStr } from '../utils/date';
@@ -177,7 +177,7 @@ export default function BreedingTab({ isAdmin }: { isAdmin: boolean }) {
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4">
         <div className="flex items-center justify-between mb-2">
           <p className="text-[11px] font-bold text-slate-500 uppercase">{L('Next 30 days')}</p>
-          <button onClick={load} className="text-slate-400 hover:text-slate-600" title="Refresh"><RefreshCw className="w-3.5 h-3.5" /></button>
+          <button onClick={load} className="text-slate-400 hover:text-slate-600" title={L('Refresh')}><RefreshCw className="w-3.5 h-3.5" /></button>
         </div>
         {reminders.length === 0 && (
           <p className="text-xs text-slate-400 italic">{L('Nothing due — sab theek hai.')}</p>

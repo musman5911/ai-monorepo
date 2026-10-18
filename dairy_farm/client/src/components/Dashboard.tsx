@@ -1,29 +1,25 @@
 import React, { useState, useEffect } from 'react';
 import { L } from '../i18n';
-import { motion, AnimatePresence, cardSpring, wobbleSpring, staggerDelay, prefersReducedMotion } from '../muf-motion';
-import {
-  TrendingUp, TrendingDown, Droplets,
-  DollarSign, Hash, AlertCircle, History, CalendarDays, Share2,
-  ArrowRight, Eye,
-} from 'lucide-react';
+import { motion, AnimatePresence, staggerDelay, prefersReducedMotion } from '../muf/core/muf-motion';
+import { Droplets, DollarSign, Hash, AlertCircle, History, CalendarDays, Share2, ArrowRight, Eye } from 'lucide-react';
 import { api } from '../api';
-import { MufAreaChart } from '../muf-charts';
-import { MufCountUpText } from '../muf-applike';
+import { MufAreaChart } from '../muf/ui/muf-charts';
 import { shareViaWhatsApp, shareViaWhatsAppTo } from '../utils/share';
 import { Cow, MilkEntry, Expense, HealthRecord, Rate, RateHistory, Sale, Buyer } from '../types';
 import { fmt, fmtPKR } from '../utils/format';
 import { calcRevenueWithHistory, saleableMilkLiters, getRateForDate } from '../utils/rates';
-import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sameMonthLastYearKey } from '../muf-compare';
+import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sameMonthLastYearKey } from '../muf/data/muf-compare';
 import { buildDashboardComparison } from './dashboard/buildDashboardComparison';
-import { feedStockSummary } from '../muf-feedstock';
-import { udhaarSummary, daysSince, udhaarReminderText, type UdhaarRow } from '../muf-khata';
+import { feedStockSummary } from '../muf/domain/muf-feedstock';
+import { udhaarSummary, daysSince, udhaarReminderText, type UdhaarRow } from '../muf/domain/muf-khata';
 import { todayStr as getTodayStr, shiftDate, formatDate } from '../utils/date';
 import CowDetailPopup from './CowDetailPopup';
-import DetailModal from '../muf-modal';
-import MufWeather from '../muf-weather';
-import MufFab from '../muf-fab';
-import MufWorkerPanel from '../muf-worker-panel';
-import { loadNotifPrefs, fireNotif } from '../muf-notifications';
+import DetailModal from '../muf/core/muf-modal';
+import MufWeather from '../muf/ui/muf-weather';
+import MufFab from '../muf/core/muf-fab';
+import MufWorkerPanel from '../muf/ui/muf-worker-panel';
+import { loadNotifPrefs, fireNotif } from '../muf/core/muf-notifications';
+import { StatCard } from './dashboard/StatCard';
 
 interface DashboardProps {
   isAdmin: boolean;
@@ -358,7 +354,6 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
   const bullCount = data.cows.filter(c => c.gender === 'male').length;
 
 
-
   return (
     <div className="space-y-6 tab-panel muf-dashboard-workspace">
       {/* Worker panel — shown for non-admin users */}
@@ -397,7 +392,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
       )}
       <div className="relative z-20 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between rounded-2xl border border-slate-200 dark:border-[#203528] bg-white/90 dark:bg-[#0d1a11]/90 p-3 sm:p-4 shadow-sm backdrop-blur">
         <div>
-          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Date Range</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-slate-400">{L('Date Range')}</p>
           <p className="text-xs font-mono text-slate-500 dark:text-slate-400">{rangeLabel}</p>
         </div>
         {/* Quick preset chips */}
@@ -433,7 +428,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               `💰 Today's milk value: Rs ${todayMilkRev.toLocaleString()}\n` +
               `🐄 Active animals: ${data.cows.filter(c => c.status === 'active').length}`
             )}
-            title="Share today's summary on WhatsApp"
+            title={L('Share today\'s summary on WhatsApp')}
             className="flex items-center gap-1.5 rounded-xl border border-farm-300 dark:border-farm-700 px-3 py-2 text-xs font-bold text-farm-700 dark:text-farm-300 hover:bg-farm-50 dark:hover:bg-farm-900/30 transition"
           >
             <Share2 className="h-3.5 w-3.5" /> Share
@@ -452,7 +447,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
           <button
             type="button"
             onClick={openCustomRange}
-            title="Custom range"
+            title={L('Custom range')}
             className={`p-1.5 rounded-lg border transition ${
               !isCurrentMonthRange
                 ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
@@ -472,9 +467,9 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               className="absolute right-0 top-full mt-2 z-30 w-72 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl overflow-hidden"
             >
             <div className="p-4 space-y-3">
-              <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">Custom Range</h4>
+              <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">{L('Custom Range')}</h4>
               <label className="block space-y-1">
-                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">From</span>
+                <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">{L('From')}</span>
                 <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)} className="w-full px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 rounded-lg font-mono" />
               </label>
               <label className="block space-y-1">
@@ -482,8 +477,8 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)} className="w-full px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 rounded-lg font-mono" />
               </label>
               <div className="flex justify-end gap-2 pt-2">
-                <button type="button" onClick={() => setCustomOpen(false)} className="px-3 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200">Cancel</button>
-                <button type="button" onClick={applyCustomRange} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">Apply</button>
+                <button type="button" onClick={() => setCustomOpen(false)} className="px-3 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200">{L('Cancel')}</button>
+                <button type="button" onClick={applyCustomRange} className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">{L('Apply')}</button>
               </div>
             </div>
             </motion.div>
@@ -644,19 +639,19 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
           <p className="text-[10px] text-slate-400 mb-3">{todayStr}</p>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-farm-50 dark:bg-farm-900/10 rounded-lg">
-              <span className="text-xs text-farm-700 dark:text-farm-400">Total Milk (gross)</span>
+              <span className="text-xs text-farm-700 dark:text-farm-400">{L('Total Milk (gross)')}</span>
               <span className="text-sm font-bold text-farm-700 dark:text-farm-400">{fmt(todayMilk)} L</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-farm-50/60 dark:bg-farm-900/5 rounded-lg">
-              <span className="text-xs text-farm-700 dark:text-farm-400">Saleable Milk</span>
+              <span className="text-xs text-farm-700 dark:text-farm-400">{L('Saleable Milk')}</span>
               <span className="text-sm font-bold text-farm-700 dark:text-farm-400">{fmt(todayMilkSaleable)} L</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg">
-              <span className="text-xs text-emerald-700 dark:text-emerald-400">Milk Revenue</span>
+              <span className="text-xs text-emerald-700 dark:text-emerald-400">{L('Milk Revenue')}</span>
               <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{fmtPKR(todayMilkRev)}</span>
             </div>
             <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
-              <span className="text-xs text-red-700 dark:text-red-400">Total Expenses</span>
+              <span className="text-xs text-red-700 dark:text-red-400">{L('Total Expenses')}</span>
               <span className="text-sm font-bold text-red-700 dark:text-red-400">{fmtPKR(todayTotalExp)}</span>
             </div>
             {/* Compact expense breakdown bars */}
@@ -679,7 +674,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
             )}
             {todayPurchases > 0 && (
               <div className="flex justify-between items-center p-3 bg-amber-50 dark:bg-amber-900/10 rounded-lg">
-                <span className="text-xs text-amber-700 dark:text-amber-400">Animal Purchases</span>
+                <span className="text-xs text-amber-700 dark:text-amber-400">{L('Animal Purchases')}</span>
                 <span className="text-sm font-bold text-amber-700 dark:text-amber-400">{fmtPKR(todayPurchases)}</span>
               </div>
             )}
@@ -712,14 +707,14 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 </button>
               </StaggerItem>
             )) : (
-              <p className="text-xs text-slate-400 text-center py-4">No recent activity</p>
+              <p className="text-xs text-slate-400 text-center py-4">{L('No recent activity')}</p>
             )}
           </div>
         </div>
 
         <div className="muf-panel p-5">
           <div className="flex items-center justify-between gap-3 mb-3">
-            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Top Producers</h3>
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{L('Top Producers')}</h3>
             <button type="button" onClick={() => setShowTopPopup(true)} className="text-[11px] font-semibold text-farm-600 dark:text-farm-400 hover:underline">View details →</button>
           </div>
           <div className="space-y-2">
@@ -733,9 +728,9 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 <span className="text-xs font-extrabold text-farm-700 dark:text-farm-300 shrink-0">{fmt(p.milk)} L</span>
               </button>
             ))}
-            {topProducers.length === 0 && <p className="text-xs text-slate-400 text-center py-4">No milk data in this range</p>}
+            {topProducers.length === 0 && <p className="text-xs text-slate-400 text-center py-4">{L('No milk data in this range')}</p>}
           </div>
-          <p className="text-[10px] text-slate-400 mt-3">Based on the selected date range.</p>
+          <p className="text-[10px] text-slate-400 mt-3">{L('Based on the selected date range.')}</p>
         </div>
 
         <div className="muf-panel p-4 sm:p-5 muf-cow-pnl-compact">
@@ -794,8 +789,6 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
 
       {/* ── Popups ──────────────────────────────── */}
       <AnimatePresence>
-      {selectedCowId && <CowDetailPopup key="cow-detail" cowId={selectedCowId} rate={data.rate?.value || 0} rateHistory={rateHistory} rateDate={data.rate?.date || ''} isAdmin={isAdmin} onClose={() => setSelectedCowId(null)} />}
-
       {showDropPopup && dropAlert && (
         <Popup key="drop-alarm" title={L('Milk production alarm')} onClose={() => setShowDropPopup(false)}>
           <div className="space-y-3 text-xs">
@@ -847,7 +840,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
       )}
 
       {showMilkPopup && (
-        <Popup key="milk" title="Milk Production" rangeLabel={rangeLabel} onClose={() => setShowMilkPopup(false)}>
+        <Popup key="milk" title={L('Milk Production')} rangeLabel={rangeLabel} onClose={() => setShowMilkPopup(false)}>
           <div className="space-y-2">
             {rangeMilkByCow.map(d => (
               <div key={d.cow._id} className="flex items-center justify-between p-3 bg-stone-50 dark:bg-stone-800/50 rounded-lg">
@@ -861,35 +854,35 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 </div>
               </div>
             ))}
-            {rangeMilkByCow.length === 0 && <p className="text-sm text-slate-400 text-center py-4">No milk recorded in this range</p>}
+            {rangeMilkByCow.length === 0 && <p className="text-sm text-slate-400 text-center py-4">{L('No milk recorded in this range')}</p>}
           </div>
           <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between">
-            <span className="text-sm font-medium text-slate-500">Total</span>
+            <span className="text-sm font-medium text-slate-500">{L('Total')}</span>
             <span className="text-lg font-bold text-farm-600">{fmt(rangeTotalMilk)}L</span>
           </div>
         </Popup>
       )}
 
       {showPnlPopup && (
-        <Popup key="pnl" title="Profit & Loss" rangeLabel={rangeLabel} onClose={() => setShowPnlPopup(false)}>
+        <Popup key="pnl" title={L('Profit & Loss')} rangeLabel={rangeLabel} onClose={() => setShowPnlPopup(false)}>
           <div className="space-y-3">
             <div className="flex justify-between items-center p-3 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg">
-              <span className="text-xs text-emerald-700 dark:text-emerald-400">Milk Revenue</span>
+              <span className="text-xs text-emerald-700 dark:text-emerald-400">{L('Milk Revenue')}</span>
               <span className="text-sm font-bold text-emerald-700 dark:text-emerald-400">{fmtPKR(rangeRevenue)}</span>
             </div>
             {rangeSalesIncome > 0 && (
               <div className="flex justify-between items-center p-3 bg-purple-50 dark:bg-purple-900/10 rounded-lg">
-                <span className="text-xs text-purple-700 dark:text-purple-400">Animal Sales</span>
+                <span className="text-xs text-purple-700 dark:text-purple-400">{L('Animal Sales')}</span>
                 <span className="text-sm font-bold text-purple-700 dark:text-purple-400">{fmtPKR(rangeSalesIncome)}</span>
               </div>
             )}
             <div className="flex justify-between items-center p-3 bg-red-50 dark:bg-red-900/10 rounded-lg">
-              <span className="text-xs text-red-700 dark:text-red-400">Operating Expenses</span>
+              <span className="text-xs text-red-700 dark:text-red-400">{L('Operating Expenses')}</span>
               <span className="text-sm font-bold text-red-700 dark:text-red-400">{fmtPKR(rangeOperatingExpenses)}</span>
             </div>
             {rangePurchases > 0 && (
               <div className="flex justify-between items-center p-3 bg-amber-50 dark:bg-amber-900/10 rounded-lg">
-                <span className="text-xs text-amber-700 dark:text-amber-400">Animal Purchases</span>
+                <span className="text-xs text-amber-700 dark:text-amber-400">{L('Animal Purchases')}</span>
                 <span className="text-sm font-bold text-amber-700 dark:text-amber-400">{fmtPKR(rangePurchases)}</span>
               </div>
             )}
@@ -897,15 +890,15 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
               <span className={`text-xs font-medium ${profitLoss >= 0 ? 'text-farm-700 dark:text-farm-400' : 'text-red-700 dark:text-red-400'}`}>Net Profit</span>
               <span className={`text-lg font-bold ${profitLoss >= 0 ? 'text-farm-700 dark:text-farm-400' : 'text-red-700 dark:text-red-400'}`}>{fmtPKR(profitLoss)}</span>
             </div>
-            <button onClick={() => { setShowPnlPopup(false); onNavigate('reports'); }} className="w-full rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2 text-sm font-semibold">Open Reports</button>
+            <button onClick={() => { setShowPnlPopup(false); onNavigate('reports'); }} className="w-full rounded-xl bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-2 text-sm font-semibold">{L('Open Reports')}</button>
           </div>
         </Popup>
       )}
 
       {showRatePopup && (
-        <Popup key="rate" title="Milk Rate History" rangeLabel={rangeLabel} onClose={() => setShowRatePopup(false)}>
+        <Popup key="rate" title={L('Milk Rate History')} rangeLabel={rangeLabel} onClose={() => setShowRatePopup(false)}>
           <div className="flex items-center justify-between p-3 bg-farm-50 dark:bg-farm-900/20 rounded-lg mb-3">
-            <span className="text-xs text-farm-600 font-medium">Current Rate</span>
+            <span className="text-xs text-farm-600 font-medium">{L('Current Rate')}</span>
             <span className="text-lg font-bold text-farm-700 dark:text-farm-400">{fmtPKR(data.rate?.value || 0)}/L</span>
           </div>
           <div className="space-y-2">
@@ -915,7 +908,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 <span className="font-medium text-slate-700 dark:text-slate-300">{fmtPKR(h.value)}/L</span>
               </div>
             ))}
-            {rateHistory.length === 0 && <p className="text-xs text-slate-400 text-center py-4">No rate changes yet</p>}
+            {rateHistory.length === 0 && <p className="text-xs text-slate-400 text-center py-4">{L('No rate changes yet')}</p>}
           </div>
         </Popup>
       )}
@@ -1038,47 +1031,51 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
         const topList = Object.entries(topMilkMap).map(([id, milk]) => ({ cow: data.cows.find(c => c._id === id), milk })).filter(p => p.cow).sort((a, b) => b.milk - a.milk).slice(0, 10);
         const topDays = topRange === 'week' ? 7 : topRange === 'month' ? 30 : topRange === 'year' ? 365 : 365;
         return (
-        <Popup key="top" title="Top Producers" rangeLabel={topRange === 'all' ? 'All time' : topRange === 'week' ? 'Last 7 days' : topRange === 'month' ? 'This month' : 'This year'} onClose={() => setShowTopPopup(false)}>
+        <Popup key="top" title={L('Top Producers')} rangeLabel={topRange === 'all' ? 'All time' : topRange === 'week' ? 'Last 7 days' : topRange === 'month' ? 'This month' : 'This year'} onClose={() => setShowTopPopup(false)}>
           <div className="space-y-3">
             {/* Range selector */}
-            <div className="flex items-center gap-1.5 flex-wrap pb-2 border-b border-slate-100 dark:border-slate-800">
-              {([
-                { key: 'week', label: L('This Week') },
-                { key: 'month', label: L('This Month') },
-                { key: 'year', label: L('This Year') },
-                { key: 'all', label: L('All Time') },
-              ] as { key: 'week' | 'month' | 'year' | 'all'; label: string }[]).map(r => (
-                <button key={r.key} onClick={() => setTopRange(r.key)}
-                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition whitespace-nowrap ${
-                    topRange === r.key ? 'bg-farm-600 text-white border-farm-700 shadow-sm' : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
-                  }`}>{r.label}</button>
-              ))}
+            <div className="muf-filter-group">
+              <span className="muf-filter-label" id="top-producers-range-label">{L('Period')}</span>
+              <div className="muf-seg" role="group" aria-labelledby="top-producers-range-label">
+                {([
+                  { key: 'week', label: L('This Week') },
+                  { key: 'month', label: L('This Month') },
+                  { key: 'year', label: L('This Year') },
+                  { key: 'all', label: L('All Time') },
+                ] as { key: 'week' | 'month' | 'year' | 'all'; label: string }[]).map(r => (
+                  <button key={r.key} type="button" aria-pressed={topRange === r.key} onClick={() => setTopRange(r.key)}>{r.label}</button>
+                ))}
+              </div>
             </div>
-            {topList.map((p, i) => {
-              const avg = p.milk / topDays;
-              const second = topList[1];
-              const lead = i === 0 && second ? p.milk - second.milk : 0;
-              return (
-                <div key={p.cow!._id} className={`p-4 rounded-lg ${i === 0 ? 'bg-farm-50 dark:bg-farm-900/20 border border-farm-200 dark:border-farm-800' : 'bg-slate-50 dark:bg-slate-800/50'}`}>
-                  <div className="flex items-center gap-3">
-                    <span className="text-2xl font-bold text-slate-300 dark:text-slate-600">#{i + 1}</span>
-                    <CowImg src={p.cow!.image} name={p.cow!.name} size="w-12 h-12" />
-                    <div className="flex-1">
-                      <p className="font-bold text-slate-800 dark:text-slate-100">{genderLabel(p.cow!)} {p.cow!.name}</p>
-                      <p className="text-xs text-slate-500">{p.cow!.breed} · {p.cow!.gender === 'male' ? 'Bull' : `Lact #${p.cow!.lactationNumber || 0}`}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-xl font-bold text-farm-600">{fmt(p.milk)}L</p>
-                      <p className="text-[10px] text-slate-400">Avg: {fmt(avg)}L/day</p>
-                    </div>
-                  </div>
-                  {i === 0 && lead > 0 && (
-                    <p className="text-[10px] text-farm-600 mt-2 ml-14">🏆 Leading by {fmt(lead)}L over #2</p>
-                  )}
-                </div>
-              );
-            })}
-            {topList.length === 0 && <p className="text-xs text-slate-400 text-center py-4">No milk data in this range</p>}
+            <ul className="muf-rowlist">
+              {topList.map((p, i) => {
+                const avg = p.milk / topDays;
+                const second = topList[1];
+                const lead = i === 0 && second ? p.milk - second.milk : 0;
+                const share = topList[0].milk > 0 ? Math.round((p.milk / topList[0].milk) * 100) : 0;
+                return (
+                  <li key={p.cow!._id}>
+                    <button type="button" onClick={() => setSelectedCowId(p.cow!._id)} aria-label={`${L('Open cow details')}: ${p.cow!.name}`} className={`muf-row${i === 0 ? ' muf-row--lead' : ''}`}>
+                      <span className={`muf-rank${i < 3 ? ` muf-rank--${i + 1}` : ''}`}>{i + 1}</span>
+                      <CowImg src={p.cow!.image} name={p.cow!.name} size="w-11 h-11" />
+                      <span className="muf-row-main">
+                        <span className="muf-row-title">{genderLabel(p.cow!)} {p.cow!.name}</span>
+                        <span className="muf-row-sub">{p.cow!.breed} · {p.cow!.gender === 'male' ? 'Bull' : `Lact #${p.cow!.lactationNumber || 0}`}</span>
+                        <span className="muf-meter" aria-hidden="true"><span style={{ width: `${share}%` }} /></span>
+                      </span>
+                      <span className="muf-row-end">
+                        <span className="muf-row-value muf-row-value--good">{fmt(p.milk)}L</span>
+                        <span className="muf-row-sub">Avg {fmt(avg)}L/day</span>
+                      </span>
+                    </button>
+                    {i === 0 && lead > 0 && (
+                      <p className="mt-1 px-1 text-[10px] font-semibold text-farm-600 dark:text-farm-400">🏆 Leading by {fmt(lead)}L over #2</p>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+            {topList.length === 0 && <p className="text-xs text-slate-400 text-center py-4">{L('No milk data in this range')}</p>}
           </div>
         </Popup>
         );
@@ -1091,27 +1088,27 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
         const row = (c: (typeof pnlCows)[number], i: number, tone: 'good' | 'bad') => {
           const net = pnlMode === 'lifetime' ? c.lifetimeNet : c.runningNet;
           return (
-            <div key={c._id} className={`min-w-0 rounded-xl border p-3 ${tone === 'good' ? 'border-farm-200 bg-farm-50/80 dark:border-farm-900 dark:bg-farm-900/20' : 'border-red-200 bg-red-50/80 dark:border-red-900 dark:bg-red-900/10'}`}>
-              <div className="flex min-w-0 items-center gap-2">
-                <span className={`text-xs font-black ${tone === 'good' ? 'text-farm-500 dark:text-farm-400' : 'text-red-500 dark:text-red-400'}`}>#{i + 1}</span>
+            <li key={c._id}>
+              <button type="button" onClick={() => setSelectedCowId(c._id)} aria-label={`${L('Open cow details')}: ${c.name}`} className={`muf-row ${tone === 'good' ? 'muf-row--good' : 'muf-row--bad'}`}>
+                <span className={`muf-rank${tone === 'good' && i < 3 ? ` muf-rank--${i + 1}` : ''}`}>{i + 1}</span>
                 <CowImg src={c.image} name={c.name} size="w-9 h-9" />
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs font-bold text-slate-800 dark:text-slate-100">{c.name}{c.status === 'sold' && <span className="ml-1 text-[9px] font-semibold text-purple-500">SOLD</span>}</p>
-                  <p className={`mt-0.5 truncate text-sm font-black ${net >= 0 ? 'text-farm-600 dark:text-farm-400' : 'text-red-500'}`}>{net >= 0 ? '+' : ''}{fmtPKR(net)}</p>
-                </div>
-              </div>
-              <p className="mt-2 truncate text-[9px] text-slate-500 dark:text-slate-400">Milk {fmtPKR(c.milkRevenue)}{c.saleRevenue > 0 ? ` · Sale ${fmtPKR(c.saleRevenue)}` : ''}</p>
-              <p className="truncate text-[9px] text-slate-500 dark:text-slate-400">Cost {fmtPKR(c.opExpenses + (pnlMode === 'lifetime' ? c.purchasePrice : 0))}</p>
-            </div>
+                <span className="muf-row-main">
+                  <span className="muf-row-title">{c.name}{c.status === 'sold' && <span className="ml-1 text-[9px] font-semibold text-purple-500">SOLD</span>}</span>
+                  <span className="muf-row-sub">Milk {fmtPKR(c.milkRevenue)}{c.saleRevenue > 0 ? ` · Sale ${fmtPKR(c.saleRevenue)}` : ''} · Cost {fmtPKR(c.opExpenses + (pnlMode === 'lifetime' ? c.purchasePrice : 0))}</span>
+                </span>
+                <span className="muf-row-end">
+                  <span className={`muf-row-value ${net >= 0 ? 'muf-row-value--good' : 'muf-row-value--bad'}`}>{net >= 0 ? '+' : ''}{fmtPKR(net)}</span>
+                </span>
+              </button>
+            </li>
           );
         };
         return (
-        <Popup key="cowpnl" title="Cow P&L" rangeLabel="" onClose={() => setShowCowPnlPopup(false)}>
+        <Popup key="cowpnl" title={L('Cow P&L')} rangeLabel="" onClose={() => setShowCowPnlPopup(false)}>
           <div className="space-y-3">
-            <div className="flex items-center gap-2">
+            <div className="muf-seg" role="group" aria-label={L('P&L mode')}>
               {(['running', 'lifetime'] as const).map((m) => (
-                <button key={m} onClick={() => setPnlMode(m)}
-                  className={`px-3 py-1.5 rounded-full text-[11px] font-bold transition ${pnlMode === m ? 'bg-farm-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'}`}>
+                <button key={m} type="button" aria-pressed={pnlMode === m} onClick={() => setPnlMode(m)}>
                   {m === 'running' ? 'Running (no purchase)' : 'Lifetime (with purchase)'}
                 </button>
               ))}
@@ -1121,21 +1118,22 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
                 ? 'Milk + sale income minus operating expenses (feed/medicine) per cow.'
                 : 'Running P&L minus the cow\'s purchase price — full lifecycle picture.'}
             </p>
-            <h4 className="text-xs font-bold text-farm-700 dark:text-farm-400 uppercase tracking-wider">Top 5</h4>
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+            <h4 className="text-xs font-bold text-farm-700 dark:text-farm-400 uppercase tracking-wider">{L('Top 5')}</h4>
+            <ul className="muf-rowlist">
               {top.map((c, i) => row(c, i, 'good'))}
-              {top.length === 0 && <p className="text-xs text-slate-400 text-center py-3">No P&L data yet</p>}
-            </div>
+            </ul>
+            {top.length === 0 && <p className="text-xs text-slate-400 text-center py-3">{L('No P&L data yet')}</p>}
             {bottom.length > 0 && (<>
               <h4 className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Bottom {bottom.length}</h4>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              <ul className="muf-rowlist">
                 {bottom.map((c, i) => row(c, i, 'bad'))}
-              </div>
+              </ul>
             </>)}
           </div>
         </Popup>
         );
       })()}
+      {selectedCowId && <CowDetailPopup key="cow-detail" cowId={selectedCowId} rate={data.rate?.value || 0} rateHistory={rateHistory} rateDate={data.rate?.date || ''} isAdmin={isAdmin} onClose={() => setSelectedCowId(null)} />}
       </AnimatePresence>
 
       {/* Quick Actions FAB */}
@@ -1158,57 +1156,6 @@ function StaggerItem({ index, children, className = '' }: { index: number; child
       className={className}
     >
       {children}
-    </motion.div>
-  );
-}
-
-interface StatCardProps {
-  label: string;
-  value: string;
-  icon: React.ElementType;
-  trend?: number;
-  trendUnit?: string;
-  subText?: string;
-  isNegative?: boolean;
-  isProfit?: boolean;
-}
-
-function StatCard({ label, value, icon: Icon, trend, trendUnit = '', subText, isNegative, isProfit }: StatCardProps) {
-  const isPositive = trend && trend > 0;
-  return (
-    <motion.div
-      whileHover={{ y: -2 }}
-      whileTap={{ scale: 0.97 }}
-      transition={cardSpring}
-      className={`group relative overflow-hidden rounded-2xl border bg-white/90 dark:bg-[#0d1a11]/90 p-4 shadow-sm backdrop-blur transition-colors duration-200 hover:shadow-xl ${
-      isProfit === true ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50/60 dark:bg-emerald-900/10' :
-      isProfit === false ? 'border-rose-200 dark:border-rose-800 bg-rose-50/60 dark:bg-rose-900/10' :
-      'border-slate-200 dark:border-[#203528] hover:border-emerald-300 dark:hover:border-emerald-700'
-    }`}>
-      <div className="absolute -right-8 -top-8 h-20 w-20 rounded-full bg-emerald-500/10 transition-transform duration-300 group-hover:scale-125" />
-      <Eye className="absolute right-3 bottom-3 w-3.5 h-3.5 text-emerald-500/70 opacity-0 group-hover:opacity-100 transition" />
-      <div className="relative flex justify-between items-start mb-4">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{label}</span>
-        <motion.div
-          whileHover={{ rotate: -6, scale: 1.06 }}
-          transition={wobbleSpring}
-          className="rounded-xl bg-emerald-50 dark:bg-emerald-900/30 p-2 text-emerald-600 dark:text-emerald-300"
-        >
-          <Icon className="w-4 h-4" />
-        </motion.div>
-      </div>
-      <div className="relative">
-        <div className="flex items-baseline gap-2 flex-wrap">
-          <span className={`font-display text-2xl font-bold ${isNegative ? 'text-red-600 dark:text-red-400' : isProfit === true ? 'text-emerald-700 dark:text-emerald-400' : isProfit === false ? 'text-red-600 dark:text-red-400' : 'text-slate-900 dark:text-white'}`}><MufCountUpText text={String(value)} /></span>
-          {trend !== undefined && trend !== 0 && (
-            <div className={`flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold ${isPositive ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300' : 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300'}`}>
-              {isPositive ? <TrendingUp className="w-3 h-3 mr-0.5" /> : <TrendingDown className="w-3 h-3 mr-0.5" />}
-              {Math.abs(trend)}{trendUnit}
-            </div>
-          )}
-        </div>
-        {subText && <p className="text-[11px] text-slate-400 mt-1">{subText}</p>}
-      </div>
     </motion.div>
   );
 }

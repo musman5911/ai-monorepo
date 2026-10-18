@@ -1,24 +1,7 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
-import { mufL } from './muf-urdu';
-import {
-  Home,
-  HardHat,
-  Bird as BirdIcon,
-  DollarSign,
-  BarChart2,
-  Egg,
-  ClipboardList,
-  Shield,
-  LogOut,
-  Package,
-  ChevronDown,
-  Bell,
-  Moon,
-  Sun,
-  Users,
-  HeartPulse,
-} from 'lucide-react';
-import { motion } from './muf-motion';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { Home, HardHat, Bird as BirdIcon, DollarSign, BarChart2, Egg, Shield, LogOut, Package, ChevronDown, Bell, Moon, Sun, Users, HeartPulse, BookOpen, Languages } from 'lucide-react';
+import { motion } from './muf/core/muf-motion';
 
 import {
   INITIAL_SETTINGS,
@@ -60,23 +43,23 @@ import HealthPortal from './components/HealthPortal';
 import MonthlySummary from './components/MonthlySummary';
 import IncubationModule from './components/IncubationModule';
 import DailyChecklist from './components/DailyChecklist';
-import DiaryNotes from './components/DiaryNotes';
+import MufDiary, { type MufDiaryEntry } from './muf/ui/muf-diary';
 import BatchesTab from './components/BatchesTab';
 import LaborTab from './components/LaborTab';
-import HeaderSearch from './muf-header-search';
-import OfflineBanner from './muf-offline-banner';
-import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf-applike';
+import HeaderSearch from './muf/ui/muf-header-search';
+import OfflineBanner from './muf/core/muf-offline-banner';
+import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf/core/muf-applike';
 import AdminMenu from './components/AdminMenu';
 import LoginScreen from './components/LoginScreen';
 import SyncIndicator from './components/SyncIndicator';
-import DetailModal from './muf-modal';
-import { useConfirm, notify } from './muf-confirm';
-import { loadData, getToken, getStoredUser, fetchMe, logout as apiLogout, AuthUser, importAllBatchData, wipeAllBatchData, updateMe, changePassword, syncOfflineBuckets, offlineBucketCount, getFarmLocation, saveFarmLocation } from './api';
+import DetailModal from './muf/core/muf-modal';
+import { useConfirm, notify } from './muf/core/muf-confirm';
+import { loadData, getToken, getStoredUser, fetchMe, logout as apiLogout, AuthUser, importAllBatchData, wipeAllBatchData, syncOfflineBuckets, offlineBucketCount, saveData, uploadImage } from './api';
 import type { FlockFarmBackup } from './reportExport';
-import AvatarUploader from './muf-avatar';
 import { useDebouncedSave, mergeSyncStatus } from './hooks/useDebouncedSave';
 import { t, L, getLang, setCurrentLang } from './i18n';
 import { todayStr, monthStartStr, daysAgoStr, diffDateOnlyDays, feedStockKg } from './utils/calculations';
+import { MyProfileContent } from './components/MyProfileContent';
 
 function nextId<T extends { id: number }>(items: T[]): number {
   return items.length > 0 ? Math.max(...items.map((i) => i.id)) + 1 : 1;
@@ -372,18 +355,18 @@ export default function App() {
   const handleAddBird = (newBird: Omit<Bird, 'id'>) => {
     if (!canManageStructure) return;
     setBirds([...birds, { ...newBird, id: nextId(birds) }]);
-    notify('Bird added successfully.', 'success');
+    notify(L('Bird added successfully.'), 'success');
   };
   // Update bird is allowed for both (marking sick/dead/sold, updating vax)
   const handleUpdateBird = (id: number, updatedBird: Bird) => {
     if (!canLogDaily) return;
     setBirds(birds.map((b) => (b.id === id ? updatedBird : b)));
-    notify('Bird updated successfully.', 'success');
+    notify(L('Bird updated successfully.'), 'success');
   };
   const handleDeleteBird = (id: number) => {
     if (!canDelete) return;
     setBirds((prev) => prev.filter((b) => b.id !== id));
-    notify('Bird deleted successfully.', 'success');
+    notify(L('Bird deleted successfully.'), 'success');
     setVaccinations((prev) => prev.filter((v) => v.birdId !== id));
   };
 
@@ -525,14 +508,22 @@ export default function App() {
     }
   };
 
-  const handleSaveDiary = (entry: DiaryEntry) => {
-    if (!canLogDaily) return;
-    const exists = diary.some((d) => d.date === entry.date);
-    if (exists) {
-      setDiary(diary.map((d) => (d.date === entry.date ? entry : d)));
-    } else {
-      setDiary([...diary, entry]);
-    }
+  const handleSaveDiary = async (entry: MufDiaryEntry) => {
+    if (!canLogDaily) throw new Error(L('You do not have permission to edit diary notes.'));
+    const entryId = entry.id || ('legacy-' + entry.date);
+    const existing = diary.filter((item) => !(entry.originalDate && entry.originalDate !== entry.date &&
+      item.date === entry.originalDate && (item.id || ('legacy-' + item.date)) === entryId));
+    const index = existing.findIndex((item) => (item.id || ('legacy-' + item.date)) === entryId);
+    const next = index >= 0 ? existing.map((item, i) => i === index ? entry : item) : [...existing, entry];
+    await saveData('diary', next);
+    setDiary(next);
+  };
+
+  const handleDeleteDiary = async (id: string, date: string) => {
+    if (!canLogDaily) throw new Error(L('You do not have permission to delete diary notes.'));
+    const next = diary.filter((item) => !((item.id || ('legacy-' + item.date)) === id && item.date === date));
+    await saveData('diary', next);
+    setDiary(next);
   };
 
   const [shouldOpenAddBirdModal, setShouldOpenAddBirdModal] = useState(false);
@@ -615,15 +606,60 @@ export default function App() {
   }, [isLoaded, birds, settings, feedRecords, eggProduction, lang]);
   const [quickOpenLedgerTab, setQuickOpenLedgerTab] = useState<'feed' | 'expense' | 'egg' | 'customers' | 'suppliers' | null>(null);
   const [financeMenuOpen, setFinanceMenuOpen] = useState(false);
-  // Close Finance menu when the user clicks anywhere outside its navbar item.
+  const financeMenuAnchorRef = useRef<HTMLDivElement | null>(null);
+  const financeMenuTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const [financeMenuPosition, setFinanceMenuPosition] = useState({ top: 8, left: 8 });
+
+  const toggleFinanceMenu = () => {
+    if (financeMenuOpen) {
+      setFinanceMenuOpen(false);
+      return;
+    }
+    const anchor = financeMenuAnchorRef.current?.getBoundingClientRect();
+    const menuWidth = Math.min(208, Math.max(0, window.innerWidth - 16));
+    const maxMenuHeight = Math.min(window.innerHeight * 0.7, 416);
+    if (anchor) {
+      setFinanceMenuPosition({
+        top: Math.max(8, Math.min(anchor.bottom + 8, window.innerHeight - maxMenuHeight - 8)),
+        left: Math.max(8, Math.min(anchor.left, window.innerWidth - menuWidth - 8)),
+      });
+    }
+    setFinanceMenuOpen(true);
+  };
+
+  // Body portal escapes the horizontally scrolling navigation and its clipping.
+  // Keep outside-pointer, Escape, resize and page-scroll dismissal consistent.
   useEffect(() => {
     if (!financeMenuOpen) return;
     const closeOnOutsidePointer = (event: PointerEvent) => {
       const target = event.target;
-      if (target instanceof Element && !target.closest('.muf-finance-nav-item')) setFinanceMenuOpen(false);
+      if (target instanceof Element &&
+        !target.closest('.muf-finance-nav-item') &&
+        !target.closest('.muf-finance-menu')) {
+        setFinanceMenuOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setFinanceMenuOpen(false);
+      financeMenuTriggerRef.current?.focus({ preventScroll: true });
+    };
+    const closeOnScroll = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest('.muf-finance-menu')) return;
+      setFinanceMenuOpen(false);
     };
     document.addEventListener('pointerdown', closeOnOutsidePointer);
-    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+    document.addEventListener('keydown', closeOnEscape);
+    window.addEventListener('resize', closeOnScroll);
+    window.addEventListener('scroll', closeOnScroll, true);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer);
+      document.removeEventListener('keydown', closeOnEscape);
+      window.removeEventListener('resize', closeOnScroll);
+      window.removeEventListener('scroll', closeOnScroll, true);
+    };
   }, [financeMenuOpen]);
 
   const handleQuickAction = (actionType: 'bird' | 'egg' | 'expense' | 'feed') => {
@@ -675,6 +711,7 @@ export default function App() {
       <LoginScreen
         lang={lang}
         onLoginSuccess={handleLoginSuccess}
+        onToggleLang={() => setLang(lang === 'en' ? 'ur' : lang === 'ur' ? 'roman' : 'en')}
       />
     );
   }
@@ -694,7 +731,8 @@ export default function App() {
   'Farm profile PDF for buyers — in the reports section',
   'More Urdu across the whole app',
 ]} />
-      <header className="muf-header">
+      <div className="muf-sticky-chrome">
+<header className="muf-header">
         <div className="muf-header-brand cursor-pointer hover:opacity-90 transition-opacity">
           <img src="/flock-farm-logo-round-192.png" className="muf-brand-logo" alt="Usman Flock Farm" />
           <div>
@@ -721,16 +759,16 @@ export default function App() {
           <button
             className="muf-icon-button"
             onClick={() => setDailyOpsOpen(true)}
-            title={L('Daily Operations')}
-            aria-label="Daily Operations"
+            title={L('Notes')}
+            aria-label={L('Notes')}
           >
-            <ClipboardList size={19} />
+            <BookOpen size={19} />
           </button>
 
           <button
             className="muf-icon-button muf-notif-wrap"
             title={L('Notifications')}
-            aria-label="Notifications"
+            aria-label={L('Notifications')}
             onClick={() => setNotifOpen(true)}
           >
             <Bell size={19} />
@@ -741,9 +779,18 @@ export default function App() {
 
           <button
             className="muf-icon-button"
+            onClick={() => setLang(lang === 'en' ? 'ur' : lang === 'ur' ? 'roman' : 'en')}
+            title={lang === 'en' ? L('Switch to Urdu') : lang === 'ur' ? L('Switch to Roman Urdu') : L('Switch to English')}
+            aria-label={L('Switch language')}
+          >
+            <Languages size={19} />
+          </button>
+
+          <button
+            className="muf-icon-button"
             onClick={() => setIsDark(!isDark)}
             title={isDark ? (L('Switch to Light Mode')) : (L('Switch to Dark Mode'))}
-            aria-label="Toggle theme"
+            aria-label={L('Toggle theme')}
           >
             {isDark ? <Sun size={19} /> : <Moon size={19} />}
           </button>
@@ -753,7 +800,7 @@ export default function App() {
               className="muf-profile"
               onClick={() => setAdminMenuOpen(true)}
               title={L('Admin panel')}
-              aria-label="Open admin panel"
+              aria-label={L('Open admin panel')}
             >
               <span className="muf-avatar">
                 {currentUser && typeof currentUser === 'object' && currentUser.avatarBase64 ? (
@@ -769,7 +816,7 @@ export default function App() {
               <ChevronDown size={17} />
             </button>
           ) : (
-            <button className="muf-profile" onClick={() => setProfileOpen(true)} title={L('My profile')} aria-label="Open my profile">
+            <button className="muf-profile" onClick={() => setProfileOpen(true)} title={L('My profile')} aria-label={L('Open my profile')}>
               <span className="muf-avatar">
                 {currentUser && typeof currentUser === 'object' && currentUser.avatarBase64 ? (
                   <img src={currentUser.avatarBase64} className="object-cover rounded-full" alt={currentUser.username} />
@@ -799,29 +846,39 @@ export default function App() {
               }
             }}
             title={t(lang, 'logout')}
-            aria-label="Logout"
+            aria-label={L('Logout')}
           >
             <LogOut size={18} />
           </button>
         </div>
       </header>
 
-      <nav className="muf-top-nav" aria-label="Primary navigation" id="tab-navigation">
+      <nav className="muf-top-nav" aria-label={L('Primary navigation')} id="tab-navigation">
         <div className="muf-top-nav-scroll">
           {navItems.map(({ id, label, icon: Icon }) => {
             const active = activeTab === id;
             return (
-              <div className={`muf-nav-item relative ${id === 'ledger' ? 'muf-finance-nav-item' : ''}`} key={id}>
+              <div className={`muf-nav-item relative ${id === 'ledger' ? 'muf-finance-nav-item' : ''}`} ref={id === 'ledger' ? financeMenuAnchorRef : undefined} key={id}>
                 <div className="flex items-center">
                   <button type="button" className={`muf-nav-link ${active ? 'active' : ''}`} onClick={() => { setActiveTab(id); setFinanceMenuOpen(false); }} id={`nav-${id}`}><Icon size={15} /><span>{label}</span></button>
-                  {id === 'ledger' && <button type="button" aria-label="Open Finance sections" aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
+                  {id === 'ledger' && <button type="button" ref={financeMenuTriggerRef} aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} aria-controls="muf-finance-menu" onClick={toggleFinanceMenu} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
                 </div>
-                {id === 'ledger' && financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{label:'Feed',value:'feed'},{label:'Expenses',value:'expense'},{label:'Eggs',value:'egg'},{label:'Customers',value:'customers'},{label:'Suppliers',value:'suppliers'}].map(item => <button key={item.value} type="button" onClick={() => { setActiveTab('ledger'); setQuickOpenLedgerTab(item.value as 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers'); setFinanceMenuOpen(false); }} className="block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800">{item.label}</button>)}</div>}
+                {id === 'ledger' && financeMenuOpen && createPortal(
+                <div
+                  id="muf-finance-menu"
+                  className="muf-finance-menu"
+                  role="group"
+                  aria-label={L('Finance sections')}
+                  style={financeMenuPosition}
+                >{[{label:'Feed',value:'feed'},{label:'Expenses',value:'expense'},{label:'Eggs',value:'egg'},{label:'Customers',value:'customers'},{label:'Suppliers',value:'suppliers'}].map(item => <button key={item.value} type="button" onClick={() => { setActiveTab('ledger'); setQuickOpenLedgerTab(item.value as 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers'); setFinanceMenuOpen(false); }} className="muf-finance-menu-item">{item.label}</button>)}</div>,
+                document.body
+              )}
               </div>
             );
           })}
         </div>
       </nav>
+</div>
 
       <div className="w-full p-3 sm:p-6 flex-1 flex flex-col gap-4 md:gap-6">
         <motion.main
@@ -847,7 +904,7 @@ export default function App() {
                 </div>
                 <button
                   onClick={() => setLoadVersion((v) => v + 1)}
-                  className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold"
+                  className="px-4 py-2 rounded-xl bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold"
                 >
                   {L('Retry')}
                 </button>
@@ -1037,15 +1094,35 @@ export default function App() {
       <DetailModal
         open={dailyOpsOpen}
         onClose={() => setDailyOpsOpen(false)}
-        title={L('Daily Operations')}
-        subtitle={L('Checklist and diary notes')}
-        icon={<ClipboardList className="w-5 h-5" />}
+        title={L('Notes')}
+        subtitle={L('Notes, photos, voice and daily checklist')}
+        icon={<BookOpen className="w-5 h-5" />}
         iconBg="bg-indigo-100 text-indigo-700"
         size="small"
       >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <DailyChecklist lang={lang} entries={checklist} onSave={handleSaveChecklist} readOnly={!canLogDaily} />
-          <DiaryNotes lang={lang} entries={diary} onSave={handleSaveDiary} readOnly={!canLogDaily} />
+        <div className="space-y-5">
+          <MufDiary
+            entries={diary.map((entry) => ({ ...entry, id: entry.id || ('legacy-' + entry.date), photos: entry.photos || [] } as MufDiaryEntry))}
+            onSave={handleSaveDiary}
+            onDelete={handleDeleteDiary}
+            uploadPhoto={(file) => uploadImage(file, 'diary')}
+            readOnly={!canLogDaily}
+            entityOptions={[
+              ...birds.map((item) => ({ id: String(item.id), type: 'bird', label: item.name || L('Bird') })),
+              ...laborers.map((item) => ({ id: String(item.id), type: 'labor', label: item.name || L('Laborer') })),
+              ...customers.map((item) => ({ id: String(item.id), type: 'customer', label: item.name || L('Customer') })),
+            ]}
+            shareTargets={[
+              ...customers.map((item: any) => ({ id: String(item.id), type: 'customer', label: item.name || L('Customer'), phone: item.phone || item.mobile })),
+              ...laborers.map((item: any) => ({ id: String(item.id), type: 'labor', label: item.name || L('Laborer'), phone: item.phone || item.mobile })),
+            ]}
+          />
+          <details className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+            <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist')}</summary>
+            <div className="mt-4">
+              <DailyChecklist lang={lang} entries={checklist} onSave={handleSaveChecklist} readOnly={!canLogDaily} />
+            </div>
+          </details>
         </div>
       </DetailModal>
 
@@ -1063,7 +1140,7 @@ export default function App() {
           </p>
           <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
             {notifications.map((notif) => (
-              <div key={notif.id} className="p-3.5 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
+              <div key={notif.id} className="p-3.5 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
                 <div className="flex justify-between items-center">
                   <span className="font-extrabold text-xs text-slate-800 dark:text-white flex items-center gap-1.5">
                     {notif.title}
@@ -1073,7 +1150,7 @@ export default function App() {
                     notif.type === 'warning' ? 'bg-amber-900/20 text-amber-600 border-amber-900/30' :
                     'bg-blue-900/20 text-blue-600 border-blue-900/30'
                   }`}>
-                    Alert
+                    {L('Alert')}
                   </span>
                 </div>
                 <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">{notif.desc}</p>
@@ -1153,95 +1230,6 @@ export default function App() {
           <span>{isAdmin ? 'admin' : 'worker'}</span>
         </span>
       </footer>
-    </div>
-  );
-}
-
-// ─── My Profile (avatar + own password) — used from the header profile chip ──
-function MyProfileContent({
-  lang,
-  currentUser,
-  onUserUpdate,
-}: {
-  lang: Lang;
-  currentUser: AuthUser | null;
-  onUserUpdate: (u: AuthUser) => void;
-}) {
-  const L = (en: string, urOrVars?: string | Record<string, string | number | null>) => mufL(lang, en, urOrVars);
-  const [curPw, setCurPw] = useState('');
-  const [newPw, setNewPw] = useState('');
-  const [busy, setBusy] = useState(false);
-  const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
-
-  const flash = (ok: boolean, text: string) => {
-    setMsg({ ok, text });
-    setTimeout(() => setMsg(null), 3000);
-  };
-
-  return (
-    <div className="space-y-5">
-      {msg && <p className={`text-xs font-bold ${msg.ok ? 'text-emerald-600' : 'text-rose-500'}`}>{msg.text}</p>}
-
-      <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/40">
-        <p className="text-2xs font-bold text-slate-500 uppercase tracking-wider mb-2">{L('Profile photo')}</p>
-        <AvatarUploader
-          lang={lang}
-          avatar={currentUser?.avatarBase64 || ''}
-          fallbackLetter={(currentUser?.username || 'U')[0]}
-          onSave={async (base64) => {
-            const updated = await updateMe({ avatarBase64: base64 });
-            onUserUpdate(updated);
-            flash(true, L('Avatar updated'));
-          }}
-          onRemove={async () => {
-            const updated = await updateMe({ avatarBase64: 'REMOVE_AVATAR' });
-            onUserUpdate(updated);
-            flash(true, L('Photo removed'));
-          }}
-        />
-      </div>
-
-      <div className="p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white/60 dark:bg-slate-900/40 space-y-2">
-        <p className="text-2xs font-bold text-slate-500 uppercase tracking-wider">{L('Change my password')}</p>
-        <input
-          type="password"
-          value={curPw}
-          onChange={(e) => setCurPw(e.target.value)}
-          placeholder={L('Current password')}
-          className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl font-mono"
-        />
-        <input
-          type="password"
-          value={newPw}
-          onChange={(e) => setNewPw(e.target.value)}
-          placeholder={L('New password (min 8)')}
-          className="w-full text-sm px-3 py-2 border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl font-mono"
-        />
-        <button
-          type="button"
-          disabled={busy}
-          onClick={async () => {
-            if (!curPw || newPw.length < 8) {
-              flash(false, L('New password must be at least 8 characters'));
-              return;
-            }
-            setBusy(true);
-            try {
-              await changePassword(curPw, newPw);
-              setCurPw('');
-              setNewPw('');
-              flash(true, L('Password updated'));
-            } catch (err) {
-              flash(false, err instanceof Error ? err.message : L('Could not change password'));
-            } finally {
-              setBusy(false);
-            }
-          }}
-          className="text-xs font-bold px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-800 dark:bg-slate-700 dark:hover:bg-slate-600 text-white disabled:opacity-60"
-        >
-          {busy ? L('Updating…') : L('Update password')}
-        </button>
-      </div>
     </div>
   );
 }

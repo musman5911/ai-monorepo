@@ -1,28 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { L } from '../i18n';
 import { api } from '../api';
-import { useConfirm, notify } from '../muf-confirm';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 import type { Cow, Expense, ExpenseType, Supplier } from '../types';
 import SupplierKhata from './SupplierKhata';
-import { mufMonthStart } from '../muf-date';
+import { mufMonthStart } from '../muf/data/muf-date';
 import { todayStr, formatDate } from '../utils/date';
-import { compressToAvatar } from '../muf-avatar';
+import { compressToAvatar } from '../muf/ui/muf-avatar';
 import {
   Plus,
   Calendar,
   Filter,
   Trash2,
   Edit2,
+  Eye,
   X,
   Banknote,
   LayoutGrid,
   Grid3x3,
-  Coins,
-  Users,
 } from 'lucide-react';
-import DetailModal from '../muf-modal';
-import { zakatStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, downloadZakatPdf } from '../muf-zakat';
-import { openMufPrint } from '../muf-print';
+import DetailModal from '../muf/core/muf-modal';
+import { ZakatCalculator } from './expenses/ZakatCalculator';
 
 interface ExpensesTabProps {
   isAdmin: boolean;
@@ -67,6 +65,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
     note: ''
   });
   const [receiptBase64, setReceiptBase64] = useState('');
+  const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
   const [viewReceipt, setViewReceipt] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
 
@@ -128,7 +127,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
       setEditingId(null);
       fetchData();
     } catch (error) {
-      notify('Failed to save expense', 'error');
+      notify(L('Failed to save expense'), 'error');
     }
   };
 
@@ -147,21 +146,24 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
     setShowForm(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: string): Promise<boolean> => {
     const ok = await confirmAction({
-      title: 'Delete Expense',
-      message: 'Are you sure you want to delete this expense?',
-      confirmLabel: 'Delete',
+      title: L('Delete Expense'),
+      message: L('Are you sure you want to delete this expense?'),
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
-    if (!ok) return;
+    if (!ok) return false;
     try {
       await api.deleteExpense(id);
       setExpenses(prev => prev.filter(exp => exp._id !== id));
-      notify('Expense deleted successfully.', 'success');
+      setSelectedExpense(current => current?._id === id ? null : current);
+      notify(L('Expense deleted successfully.'), 'success');
       void fetchData();
+      return true;
     } catch (error) {
-      notify('Failed to delete expense', 'error');
+      notify(L('Failed to delete expense'), 'error');
+      return false;
     }
   };
 
@@ -245,93 +247,93 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
         icon={<Plus className="w-5 h-5" />} iconBg="bg-farm-100 text-farm-700" size="small">
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Date *</label>
+                <label className="muf-pc-muted">Date *</label>
                 <input
                   type="date"
                   required
                   value={formData.date}
                   onChange={e => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Type *</label>
+                <label className="muf-pc-muted">Type *</label>
                 <select
                   required
                   value={formData.type}
                   onChange={e => setFormData({ ...formData, type: e.target.value as ExpenseType })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 >
-                  <option value="feed">Feed</option>
-                  <option value="medicine">Medicine</option>
-                  <option value="equipment">Equipment</option>
-                  <option value="labor">Labor</option>
-                  <option value="purchasing">Purchasing</option>
-                  <option value="misc">Misc</option>
+                  <option value="feed">{L('Feed')}</option>
+                  <option value="medicine">{L('Medicine')}</option>
+                  <option value="equipment">{L('Equipment')}</option>
+                  <option value="labor">{L('Labor')}</option>
+                  <option value="purchasing">{L('Purchasing')}</option>
+                  <option value="misc">{L('Misc')}</option>
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Amount')} (₨) *</label>
+                <label className="muf-pc-muted">{L('Amount')} (₨) *</label>
                 <input
                   type="number"
                   required
                   min="0"
                   value={formData.amount}
                   onChange={e => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                   placeholder="0.00"
                 />
               </div>
               {formData.type === 'feed' && (
                 <div className="space-y-1">
-                  <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Feed quantity (kg) — for the stock card')}</label>
+                  <label className="muf-pc-muted">{L('Feed quantity (kg) — for the stock card')}</label>
                   <input
                     type="number"
                     min="0"
                     step="any"
                     value={formData.feedKg}
                     onChange={e => setFormData({ ...formData, feedKg: e.target.value })}
-                    className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                    className="muf-field"
                     placeholder="e.g. 350"
                   />
                 </div>
               )}
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Supplier — udhaar khata (optional)')}</label>
+                <label className="muf-pc-muted">{L('Supplier — udhaar khata (optional)')}</label>
                 <select
                   value={formData.supplierId}
                   onChange={e => setFormData({ ...formData, supplierId: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 >
                   <option value="">{L('Cash / no supplier')}</option>
                   {suppliers.map(sup => <option key={sup._id} value={sup._id}>{sup.name}</option>)}
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">{L('Cow (Optional)')}</label>
+                <label className="muf-pc-muted">{L('Cow (Optional)')}</label>
                 <select
                   value={formData.cowId}
                   onChange={e => setFormData({ ...formData, cowId: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 >
-                  <option value="">Farm-wide</option>
+                  <option value="">{L('Farm-wide')}</option>
                   {cows.map(cow => (
                     <option key={cow._id} value={cow._id}>{cow.name}</option>
                   ))}
                 </select>
               </div>
               <div className="space-y-1 lg:col-span-2">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Note</label>
+                <label className="muf-pc-muted">{L('Note')}</label>
                 <input
                   type="text"
                   value={formData.note}
                   onChange={e => setFormData({ ...formData, note: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
-                  placeholder="Additional details..."
+                  className="muf-field"
+                  placeholder={L('Additional details...')}
                 />
               </div>
               <div className="space-y-1 lg:col-span-3">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Receipt photo (optional)</label>
+                <label className="muf-pc-muted">{L('Receipt photo (optional)')}</label>
                 <div className="flex items-center gap-3">
                   {receiptBase64 ? (
                     <>
@@ -351,10 +353,10 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                           if (!file) return;
                           try {
                             const b64 = await compressToAvatar(file, 900, 0.72);
-                            if (b64.length > 400000) { notify('Photo is too large even after compression', 'error'); return; }
+                            if (b64.length > 400000) { notify(L('Photo is too large even after compression'), 'error'); return; }
                             setReceiptBase64(b64);
                           } catch {
-                            notify('Could not read that image', 'error');
+                            notify(L('Could not read that image'), 'error');
                           }
                         }}
                       />
@@ -381,7 +383,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                     }}
                     className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
                   >
-                    Cancel
+                    {L('Cancel')}
                   </button>
                 )}
                 <button
@@ -404,7 +406,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
               value={dateFrom}
               onChange={e => setDateFrom(e.target.value)}
               className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100"
-              placeholder="From"
+              placeholder={L('From')}
             />
             <span className="text-slate-400">to</span>
             <input
@@ -422,13 +424,13 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
               onChange={e => setTypeFilter(e.target.value)}
               className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100"
             >
-                <option value="">All Types</option>
-                <option value="feed">Feed</option>
-                <option value="medicine">Medicine</option>
-                <option value="equipment">Equipment</option>
-                <option value="labor">Labor</option>
-                <option value="purchasing">Purchasing</option>
-                <option value="misc">Misc</option>
+                <option value="">{L('All Types')}</option>
+                <option value="feed">{L('Feed')}</option>
+                <option value="medicine">{L('Medicine')}</option>
+                <option value="equipment">{L('Equipment')}</option>
+                <option value="labor">{L('Labor')}</option>
+                <option value="purchasing">{L('Purchasing')}</option>
+                <option value="misc">{L('Misc')}</option>
             </select>
           </div>
           {(dateFrom || dateTo || typeFilter) && (
@@ -457,22 +459,21 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
           <table className="w-full text-left">
             <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               <tr>
-                <th className="px-6 py-4 font-medium">Date</th>
-                <th className="px-6 py-4 font-medium">Type</th>
-                <th className="px-6 py-4 font-medium">Amount</th>
-                <th className="px-6 py-4 font-medium">Cow</th>
-                <th className="px-6 py-4 font-medium">Note</th>
-                {isAdmin && <th className="px-6 py-4 font-medium text-right">Actions</th>}
+                <th className="px-6 py-4 font-medium">{L('Date')}</th>
+                <th className="px-6 py-4 font-medium">{L('Type')}</th>
+                <th className="px-6 py-4 font-medium">{L('Amount')}</th>
+                <th className="px-6 py-4 font-medium">{L('Cow')}</th>
+                <th className="px-6 py-4 font-medium text-right">{L('Details / Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {loading ? (
                 <tr>
-                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-slate-400">Loading expenses...</td>
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">{L('Loading expenses...')}</td>
                 </tr>
               ) : expenses.length === 0 ? (
                 <tr>
-                  <td colSpan={isAdmin ? 6 : 5} className="px-6 py-8 text-center text-slate-400">No expenses found</td>
+                  <td colSpan={5} className="px-6 py-8 text-center text-slate-400">{L('No expenses found')}</td>
                 </tr>
               ) : expenses.map(expense => (
                 <tr key={expense._id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
@@ -490,39 +491,41 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                   <td className="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">
                     {expense.cowId ? cows.find(c => c._id === expense.cowId)?.name || 'Unknown' : 'Farm-wide'}
                   </td>
-                  <td className="px-6 py-4 text-sm text-slate-500 dark:text-slate-400 max-w-xs truncate">
-                    <span className="inline-flex items-center gap-2">
-                      {expense.receiptBase64 && (
-                        <img
-                          src={expense.receiptBase64}
-                          alt="Receipt"
-                          className="w-8 h-8 rounded-md object-cover border border-slate-200 dark:border-slate-700 cursor-pointer shrink-0 hover:scale-105 transition-transform"
-                          onClick={() => setViewReceipt(expense.receiptBase64!)}
-                        />
-                      )}
-                      {expense.note || '-'}{expense.feedKg ? <span className="ml-1 text-[10px] font-bold text-farm-600">· {expense.feedKg} kg</span> : null}{expense.supplierId ? <span className="ml-1 text-[10px] font-bold text-amber-600">· {suppliers.find(sup => sup._id === expense.supplierId)?.name || 'Supplier'}</span> : null}
-                    </span>
-                  </td>
-                  {isAdmin && (
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end space-x-2">
-                        <button 
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        title={L('View expense details')}
+                        aria-label={L('View expense details')}
+                        onClick={() => setSelectedExpense(expense)}
+                        className="p-1.5 text-slate-400 hover:text-farm-600 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          title={L('Edit expense')}
+                          aria-label={L('Edit expense')}
                           onClick={() => handleEdit(expense)}
                           className="p-1.5 text-slate-400 hover:text-farm-600 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        {canDelete && (
-                          <button 
-                            onClick={() => handleDelete(expense._id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  )}
+                      )}
+                      {canDelete && (
+                        <button
+                          type="button"
+                          title={L('Delete expense')}
+                          aria-label={L('Delete expense')}
+                          onClick={() => handleDelete(expense._id)}
+                          className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -535,9 +538,9 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
       {viewMode === 'grid' && (
         <div className="muf-entity-grid">
           {loading ? (
-            <p className="col-span-full text-center text-slate-400 py-8">Loading expenses...</p>
+            <p className="col-span-full text-center text-slate-400 py-8">{L('Loading expenses...')}</p>
           ) : expenses.length === 0 ? (
-            <p className="col-span-full text-center text-slate-400 py-8">No expenses found</p>
+            <p className="col-span-full text-center text-slate-400 py-8">{L('No expenses found')}</p>
           ) : expenses.map(expense => {
             const cow = expense.cowId ? cows.find(c => c._id === expense.cowId) : null;
             return (
@@ -555,22 +558,95 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                     </div>
                   </div>
                   <div className="muf-entity-stats">
-                    <span><Calendar className="w-3 h-3"/> <span>{expense.note || '-'}</span></span>
-                    {expense.feedKg && <span><Coins className="w-3 h-3"/> <span>{expense.feedKg} kg</span></span>}
-                    {expense.supplierId && <span><Users className="w-3 h-3"/> <span>{suppliers.find(s => s._id === expense.supplierId)?.name || 'Supplier'}</span></span>}
+                    <span><Calendar className="w-3 h-3"/> <span>{formatDate(expense.date)}</span></span>
+                    <span className="text-[11px] text-slate-400">{L('Open details to view notes, supplier and receipt information.')}</span>
                   </div>
-                  {isAdmin && (
-                    <div className="muf-entity-actions">
-                      <button onClick={() => handleEdit(expense)} className="muf-mini-icon"><Edit2 className="w-3.5 h-3.5"/></button>
-                      {canDelete && <button onClick={() => handleDelete(expense._id)} className="muf-mini-icon text-red-500"><Trash2 className="w-3.5 h-3.5"/></button>}
-                    </div>
-                  )}
+                  <div className="muf-entity-actions">
+                    <button type="button" onClick={() => setSelectedExpense(expense)} className="muf-mini-icon" title={L('View details')} aria-label={L('View details')}><Eye className="w-3.5 h-3.5"/></button>
+                    {isAdmin && <button type="button" onClick={() => handleEdit(expense)} className="muf-mini-icon" title={L('Edit expense')} aria-label={L('Edit expense')}><Edit2 className="w-3.5 h-3.5"/></button>}
+                    {canDelete && <button type="button" onClick={() => handleDelete(expense._id)} className="muf-mini-icon text-red-500" title={L('Delete expense')} aria-label={L('Delete expense')}><Trash2 className="w-3.5 h-3.5"/></button>}
+                  </div>
                 </div>
               </article>
             );
           })}
         </div>
       )}
+
+      {/* Summary-first expense detail: the table/grid stay compact; supporting data is opened on demand. */}
+      <DetailModal
+        open={!!selectedExpense}
+        onClose={() => setSelectedExpense(null)}
+        title={L('Expense Details')}
+        subtitle={selectedExpense ? `${formatDate(selectedExpense.date)} · ${L(selectedExpense.type)}` : undefined}
+        icon={<Banknote className="w-5 h-5" />}
+        iconBg="bg-farm-100 text-farm-700"
+        size="small"
+      >
+        {selectedExpense && (() => {
+          const cow = selectedExpense.cowId ? cows.find(item => item._id === selectedExpense.cowId) : null;
+          const supplier = selectedExpense.supplierId ? suppliers.find(item => item._id === selectedExpense.supplierId) : null;
+          return (
+            <div className="space-y-4 text-sm">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="muf-kpi-card">
+                  <small>{L('Date')}</small>
+                  <strong>{formatDate(selectedExpense.date)}</strong>
+                </div>
+                <div className="muf-kpi-card">
+                  <small>{L('Type')}</small>
+                  <strong><span className={`inline-flex px-2 py-1 rounded-full text-[10px] font-bold uppercase ${typeStyles[selectedExpense.type]}`}>{L(selectedExpense.type)}</span></strong>
+                </div>
+                <div className="muf-kpi-card col-span-2">
+                  <small>{L('Amount')}</small>
+                  <strong>₨ {selectedExpense.amount.toLocaleString()}</strong>
+                </div>
+                <div className="muf-kpi-card">
+                  <small>{L('Cow')}</small>
+                  <strong>{cow?.name || (selectedExpense.cowId ? L('Unknown') : L('Farm-wide'))}</strong>
+                </div>
+                <div className="muf-kpi-card">
+                  <small>{L('Feed quantity')}</small>
+                  <strong>{selectedExpense.feedKg ? `${selectedExpense.feedKg} kg` : '—'}</strong>
+                </div>
+              </div>
+              {supplier && (
+                <div className="rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50 dark:bg-amber-950/20 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-amber-700 dark:text-amber-300">{L('Supplier')}</p>
+                  <p className="mt-1 font-semibold text-slate-800 dark:text-slate-100">{supplier.name}</p>
+                  {supplier.phone && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{supplier.phone}</p>}
+                </div>
+              )}
+              <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{L('Note')}</p>
+                <p className="mt-1 whitespace-pre-wrap break-words text-slate-700 dark:text-slate-200">{selectedExpense.note?.trim() || L('No notes added.')}</p>
+              </div>
+              {selectedExpense.receiptBase64 && (
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">{L('Receipt Photo')}</p>
+                  <button type="button" onClick={() => setViewReceipt(selectedExpense.receiptBase64!)} className="block w-full rounded-xl overflow-hidden bg-white dark:bg-slate-950" aria-label={L('Open receipt photo')}>
+                    <img src={selectedExpense.receiptBase64} alt={L('Receipt')} className="w-full max-h-56 object-contain" />
+                  </button>
+                </div>
+              )}
+              {(isAdmin || canDelete) && (
+                <div className="flex flex-wrap justify-end gap-2 pt-3 border-t border-slate-100 dark:border-slate-800">
+                  {isAdmin && (
+                    <button type="button" onClick={() => { setSelectedExpense(null); handleEdit(selectedExpense); }} className="muf-btn muf-btn-primary">
+                      <Edit2 className="w-3.5 h-3.5" /> {L('Edit Expense')}
+                    </button>
+                  )}
+                  {canDelete && (
+                    <button type="button" onClick={async () => { const deleted = await handleDelete(selectedExpense._id); if (deleted) setSelectedExpense(null); }} className="muf-btn muf-btn-danger">
+                      <Trash2 className="w-3.5 h-3.5" /> {L('Delete Expense')}
+                    </button>
+                  )}
+                </div>
+              )}
+            </div>
+          );
+        })()}
+      </DetailModal>
 
       {/* Receipt photo lightbox */}
       {/* canDelete = real admin (App passes isAdmin there); workers keep logging expenses but the khata stays admin-only */}
@@ -587,67 +663,3 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
 };
 
 export default ExpensesTab;
-
-// ── Zakat calculator (simplified version for Finance tab) ────────────
-function ZakatCalculator({ expenses }: { expenses: Expense[] }) {
-  const thisYear = new Date().getFullYear();
-  const [year, setYear] = useState(String(thisYear));
-  const [pct, setPct] = useState(String(ZAKAT_DEFAULT_PCT));
-  const [incomeOv, setIncomeOv] = useState<string | null>(null);
-  const [expenseOv, setExpenseOv] = useState<string | null>(null);
-  const [open, setOpen] = useState(false);
-  const years: string[] = [];
-  for (let y = thisYear; y >= thisYear - 4; y--) years.push(String(y));
-  const autoExpenses = Math.round(expenses.filter(e => (e.date || '').startsWith(year)).reduce((a, e) => a + e.amount, 0));
-  const income = incomeOv === null ? Math.round(autoExpenses * 1.5) : (parseFloat(incomeOv) || 0);
-  const expensesTotal = expenseOv === null ? autoExpenses : (parseFloat(expenseOv) || 0);
-  const profit = income - expensesTotal;
-  const pctNum = parseFloat(pct) || 0;
-  const amount = pctAmount(profit, pctNum);
-  const inputClass = 'w-full border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500';
-  return (
-    <>
-      <button onClick={() => setOpen(true)} className="w-full flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0d1a11] hover:shadow-md transition-shadow text-left">
-        <span className="shrink-0 w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">🕌</span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-slate-700 dark:text-slate-200">{L('Zakat calculator (yearly)')}</p>
-          <p className="text-[11px] text-slate-400 truncate">{L('Income − expenses = profit, then the rate you choose.')}</p>
-        </div>
-        <span className="shrink-0 text-[10px] font-bold text-farm-600 dark:text-farm-400 uppercase tracking-wider">{L('Open')} →</span>
-      </button>
-      <DetailModal open={open} onClose={() => setOpen(false)} title={L('Zakat calculator (yearly)')} size="big"
-        icon={<span className="text-lg leading-none">🕌</span>} iconBg="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400">
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <p className="text-[11px] text-slate-500 flex-1">{L('Income − expenses = profit, then the rate you choose. The app only does the math — the ruling is your decision.')}</p>
-            <select value={year} onChange={e => { setYear(e.target.value); setIncomeOv(null); setExpenseOv(null); }} className={inputClass} style={{ width: 'auto' }}>
-              {years.map(y => <option key={y} value={y}>{y}</option>)}
-            </select>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
-            <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Income')} ({year})</label>
-              <input type="number" className={inputClass} value={incomeOv === null ? income : incomeOv} onChange={e => setIncomeOv(e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Expenses')} ({year})</label>
-              <input type="number" className={inputClass} value={expenseOv === null ? autoExpenses : expenseOv} onChange={e => setExpenseOv(e.target.value)} />
-            </div>
-            <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Rate %')}</label>
-              <input type="number" step="any" min="0" className={inputClass} value={pct} onChange={e => setPct(e.target.value)} />
-            </div>
-            <div className="flex flex-col justify-end">
-              <p className="text-[10px] text-slate-400 uppercase">{L('Profit')}: <span className={profit >= 0 ? 'text-farm-600 font-bold' : 'text-red-500 font-bold'}>{profit >= 0 ? '+' : ''}Rs {profit.toLocaleString()}</span></p>
-              <p className="text-base font-black text-farm-700 dark:text-farm-400">{L('Zakat')}: Rs {amount.toLocaleString()}</p>
-            </div>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <button onClick={() => downloadZakatPdf({ periodLabel: year, income, expenses: expensesTotal, pct: pctNum })} className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg transition">{L('Download zakat statement (PDF)')}</button>
-            <button onClick={() => openMufPrint({ title: `Zakat Statement — ${year}`, metaHtml: `<p>Period: ${year}</p>`, bodyHtml: zakatStatementBody({ periodLabel: year, income, expenses: expensesTotal, pct: pctNum }) })} className="px-4 py-2 border border-farm-600 text-farm-700 dark:text-farm-400 hover:bg-farm-50 dark:hover:bg-farm-900/20 text-xs font-bold rounded-lg transition">{L('Print')}</button>
-          </div>
-        </div>
-      </DetailModal>
-    </>
-  );
-}

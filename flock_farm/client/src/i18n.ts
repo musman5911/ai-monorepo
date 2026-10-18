@@ -3,7 +3,7 @@
 // (App re-renders the whole tree when the language changes).
 // ALL Urdu lives in the shared muf-urdu dictionary (MUF_URDU).
 import { Lang } from './types';
-import { mufL, mufUr } from './muf-urdu';
+import { mufL, mufUr } from './muf/data/muf-urdu';
 
 const STORAGE_KEY = 'ff_lang';
 const LEGACY_KEY = 'flockfarm_lang';
@@ -45,7 +45,7 @@ const EN: Record<string, string> = {
   ledger: 'Financial Ledger',
   health: 'Health Portal',
   incubation: 'Incubation',
-  operations: 'Daily Ops',
+  operations: 'Diary',
   summary: 'Reports',
   labor: 'Labor',
   settings: 'Settings',

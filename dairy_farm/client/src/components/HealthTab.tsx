@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { L } from '../i18n';
 import { api } from '../api';
-import { useConfirm, notify } from '../muf-confirm';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
 import type { Cow, HealthRecord, HealthType } from '../types';
 import { todayStr, formatDate, isDateBeforeToday } from '../utils/date';
-import DetailModal from '../muf-modal';
+import DetailModal from '../muf/core/muf-modal';
 import {
   Plus,
   Filter,
   Trash2,
   Edit2,
+  Eye,
   X,
   Stethoscope,
   AlertCircle,
@@ -119,7 +120,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
       setEditingId(null);
       fetchData();
     } catch (error) {
-      notify('Failed to save health record', 'error');
+      notify(L('Failed to save health record'), 'error');
     }
   };
 
@@ -142,9 +143,9 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
 
   const handleDelete = async (id: string) => {
     const ok = await confirmAction({
-      title: 'Delete Health Record',
-      message: 'Are you sure you want to delete this record?',
-      confirmLabel: 'Delete',
+      title: L('Delete Health Record'),
+      message: L('Are you sure you want to delete this record?'),
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -152,7 +153,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
       await api.deleteHealth(id);
       fetchData();
     } catch (error) {
-      notify('Failed to delete record', 'error');
+      notify(L('Failed to delete record'), 'error');
     }
   };
 
@@ -215,7 +216,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
         </div>
         <div className="space-y-3 max-h-[200px] overflow-y-auto pr-2">
           {upcoming.length === 0 ? (
-            <p className="text-sm text-slate-400 text-center py-4">No upcoming health events</p>
+            <p className="text-sm text-slate-400 text-center py-4">{L('No upcoming health events')}</p>
           ) : upcoming.map(item => {
             const cow = cows.find(c => c._id === item.cowId);
             return (
@@ -253,94 +254,94 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
         icon={<Plus className="w-5 h-5" />} iconBg="bg-farm-100 text-farm-700" size="small">
         <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Cow *</label>
+                <label className="muf-pc-muted">Cow *</label>
                 <select
                   required
                   value={formData.cowId}
                   onChange={e => setFormData({ ...formData, cowId: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 >
-                  <option value="">Select Cow</option>
+                  <option value="">{L('Select Cow')}</option>
                   {cows.map(cow => (
                     <option key={cow._id} value={cow._id}>{cow.name}</option>
                   ))}
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Date *</label>
+                <label className="muf-pc-muted">Date *</label>
                 <input
                   type="date"
                   required
                   value={formData.date}
                   onChange={e => setFormData({ ...formData, date: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Type *</label>
+                <label className="muf-pc-muted">Type *</label>
                 <select
                   required
                   value={formData.type}
                   onChange={e => setFormData({ ...formData, type: e.target.value as HealthType })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 >
-                  <option value="vaccination">Vaccination</option>
-                  <option value="treatment">Treatment</option>
-                  <option value="checkup">Checkup</option>
-                  <option value="deworming">Deworming</option>
-                  <option value="other">Other</option>
+                  <option value="vaccination">{L('Vaccination')}</option>
+                  <option value="treatment">{L('Treatment')}</option>
+                  <option value="checkup">{L('Checkup')}</option>
+                  <option value="deworming">{L('Deworming')}</option>
+                  <option value="other">{L('Other')}</option>
                 </select>
               </div>
               <div className="space-y-1 lg:col-span-2">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Description *</label>
+                <label className="muf-pc-muted">Description *</label>
                 <input
                   type="text"
                   required
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
-                  placeholder="e.g. FMD Vaccination"
+                  className="muf-field"
+                  placeholder={L('e.g. FMD Vaccination')}
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Medicine</label>
+                <label className="muf-pc-muted">{L('Medicine')}</label>
                 <input
                   type="text"
                   value={formData.medicine}
                   onChange={e => setFormData({ ...formData, medicine: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Vet Name</label>
+                <label className="muf-pc-muted">{L('Vet Name')}</label>
                 <input
                   type="text"
                   value={formData.vet}
                   onChange={e => setFormData({ ...formData, vet: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Next Due Date</label>
+                <label className="muf-pc-muted">{L('Next Due Date')}</label>
                 <input
                   type="date"
                   value={formData.nextDueDate}
                   onChange={e => setFormData({ ...formData, nextDueDate: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 />
               </div>
               <div className="space-y-1">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Cost (₨)</label>
+                <label className="muf-pc-muted">Cost (₨)</label>
                 <input
                   type="number"
                   min="0"
                   value={formData.cost}
                   onChange={e => setFormData({ ...formData, cost: e.target.value })}
-                  className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100"
+                  className="muf-field"
                 />
               </div>
               <div className="space-y-1 lg:col-span-3">
-                <label className="text-slate-500 dark:text-slate-400 text-xs">Notes</label>
+                <label className="muf-pc-muted">{L('Notes')}</label>
                 <textarea
                   value={formData.notes}
                   onChange={e => setFormData({ ...formData, notes: e.target.value })}
@@ -368,7 +369,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                     }}
                     className="px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
                   >
-                    Cancel
+                    {L('Cancel')}
                   </button>
                 )}
                 <button
@@ -391,7 +392,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
               onChange={e => setCowFilter(e.target.value)}
               className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100"
             >
-              <option value="">All Cows</option>
+              <option value="">{L('All Cows')}</option>
               {cows.map(cow => (
                 <option key={cow._id} value={cow._id}>{cow.name}</option>
               ))}
@@ -403,12 +404,12 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
               onChange={e => setTypeFilter(e.target.value)}
               className="border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-xs bg-white dark:bg-slate-950 text-slate-800 dark:text-slate-100"
             >
-              <option value="">All Types</option>
-              <option value="vaccination">Vaccination</option>
-              <option value="treatment">Treatment</option>
-              <option value="checkup">Checkup</option>
-              <option value="deworming">Deworming</option>
-              <option value="other">Other</option>
+              <option value="">{L('All Types')}</option>
+              <option value="vaccination">{L('Vaccination')}</option>
+              <option value="treatment">{L('Treatment')}</option>
+              <option value="checkup">{L('Checkup')}</option>
+              <option value="deworming">{L('Deworming')}</option>
+              <option value="other">{L('Other')}</option>
             </select>
           </div>
           {(cowFilter || typeFilter) && (
@@ -437,27 +438,38 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
           <table className="w-full text-left">
             <thead className="bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wider">
               <tr>
-                <th className="px-6 py-4 font-medium">Date</th>
-                <th className="px-6 py-4 font-medium">Cow</th>
-                <th className="px-6 py-4 font-medium">Type</th>
-                <th className="px-6 py-4 font-medium">Description</th>
-                <th className="px-6 py-4 font-medium">Medicine/Vet</th>
-                <th className="px-6 py-4 font-medium">Next Due</th>
-                <th className="px-6 py-4 font-medium">Cost</th>
-                {isAdmin && <th className="px-6 py-4 font-medium text-right">Actions</th>}
+                <th className="px-6 py-4 font-medium">{L('Date')}</th>
+                <th className="px-6 py-4 font-medium">{L('Cow')}</th>
+                <th className="px-6 py-4 font-medium">{L('Type')}</th>
+                <th className="px-6 py-4 font-medium">{L('Next Due')}</th>
+                <th className="px-6 py-4 font-medium">{L('Cost')}</th>
+                <th className="px-6 py-4 font-medium text-right">{L('Details / Actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
               {loading ? (
                 <tr>
-                  <td colSpan={isAdmin ? 8 : 7} className="px-6 py-8 text-center text-slate-400">Loading records...</td>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400">{L('Loading records...')}</td>
                 </tr>
               ) : records.length === 0 ? (
                 <tr>
-                  <td colSpan={isAdmin ? 8 : 7} className="px-6 py-8 text-center text-slate-400">No records found</td>
+                  <td colSpan={6} className="px-6 py-8 text-center text-slate-400">{L('No records found')}</td>
                 </tr>
               ) : records.map(record => (
-                <tr key={record._id} onClick={() => setSelectedRecord(record)} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors text-sm cursor-pointer">
+                <tr
+                  key={record._id}
+                  onClick={() => setSelectedRecord(record)}
+                  onKeyDown={event => {
+                    if (event.target !== event.currentTarget) return;
+                    if (event.key === 'Enter' || event.key === ' ') {
+                      event.preventDefault();
+                      setSelectedRecord(record);
+                    }
+                  }}
+                  tabIndex={0}
+                  aria-label={L('Open health record details')}
+                  className="hover:bg-slate-50 dark:hover:bg-slate-800/30 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-farm-500 transition-colors text-sm cursor-pointer"
+                >
                   <td className="px-6 py-4 text-slate-800 dark:text-slate-200 whitespace-nowrap">
                     {formatDate(record.date)}
                   </td>
@@ -469,13 +481,6 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                       {record.type}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-slate-600 dark:text-slate-400 max-w-xs truncate">
-                    {record.description}
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="text-slate-700 dark:text-slate-300">{record.medicine || '-'}</div>
-                    <div className="text-xs text-slate-500">{record.vet}</div>
-                  </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {record.nextDueDate ? (
                       <span className={isOverdue(record.nextDueDate) ? 'text-red-500 font-medium' : 'text-slate-600 dark:text-slate-400'}>
@@ -486,26 +491,41 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                   <td className="px-6 py-4 text-slate-800 dark:text-slate-200">
                     {record.cost ? `₨ ${record.cost.toLocaleString()}` : '-'}
                   </td>
-                  {isAdmin && (
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end space-x-2">
-                        <button 
-                          onClick={() => handleEdit(record)}
+                  <td className="px-6 py-4 text-right">
+                    <div className="flex justify-end gap-2">
+                      <button
+                        type="button"
+                        title={L('View health record details')}
+                        aria-label={L('View health record details')}
+                        onClick={event => { event.stopPropagation(); setSelectedRecord(record); }}
+                        className="p-1.5 text-slate-400 hover:text-farm-600 transition-colors"
+                      >
+                        <Eye className="w-4 h-4" />
+                      </button>
+                      {isAdmin && (
+                        <button
+                          type="button"
+                          title={L('Edit health record')}
+                          aria-label={L('Edit health record')}
+                          onClick={event => { event.stopPropagation(); handleEdit(record); }}
                           className="p-1.5 text-slate-400 hover:text-farm-600 transition-colors"
                         >
                           <Edit2 className="w-4 h-4" />
                         </button>
-                        {canDelete && (
-                          <button 
-                            onClick={() => handleDelete(record._id)}
-                            className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        )}
-                      </div>
-                    </td>
-                  )}
+                      )}
+                      {isAdmin && canDelete && (
+                        <button
+                          type="button"
+                          title={L('Delete health record')}
+                          aria-label={L('Delete health record')}
+                          onClick={event => { event.stopPropagation(); handleDelete(record._id); }}
+                          className="p-1.5 text-slate-400 hover:text-red-600 transition-colors"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -518,13 +538,27 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
       {viewMode === 'grid' && (
         <div className="muf-entity-grid">
           {loading ? (
-            <p className="col-span-full text-center text-slate-400 py-8">Loading health records...</p>
+            <p className="col-span-full text-center text-slate-400 py-8">{L('Loading health records...')}</p>
           ) : records.length === 0 ? (
-            <p className="col-span-full text-center text-slate-400 py-8">No health records found</p>
+            <p className="col-span-full text-center text-slate-400 py-8">{L('No health records found')}</p>
           ) : records.map(rec => {
             const cow = cows.find(c => c._id === rec.cowId);
             return (
-              <article key={rec._id} className="muf-entity-card" onClick={() => setSelectedRecord(rec)}>
+              <article
+              key={rec._id}
+              className="muf-entity-card cursor-pointer"
+              role="button"
+              tabIndex={0}
+              aria-label={L('Open health record details')}
+              onClick={() => setSelectedRecord(rec)}
+              onKeyDown={event => {
+                if (event.target !== event.currentTarget) return;
+                if (event.key === 'Enter' || event.key === ' ') {
+                  event.preventDefault();
+                  setSelectedRecord(rec);
+                }
+              }}
+            >
                 <div className={cow?.image ? "muf-entity-photo" : "muf-entity-photo muf-entity-photo-noimg"} style={cow?.image ? { backgroundImage: `url(${cow.image})` } : undefined}>
                   {cow?.image ? <img src={cow.image} alt="" /> : <span className="muf-entity-emoji">🐄</span>}
                   <span className="muf-entity-status" data-tone={rec.type === 'vaccination' ? 'good' : rec.type === 'treatment' ? 'warn' : 'muted'}>{rec.type}</span>
@@ -539,8 +573,9 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
                     <span className="muf-entity-chip">{rec.cost ? `₨${rec.cost}` : '-'}</span>
                   </div>
                   <div className="muf-entity-stats">
-                    <span><Calendar className="w-3 h-3"/> <span>{rec.description || '-'}</span></span>
+                    <span><Calendar className="w-3 h-3"/> <span>{L('Health record')} · {formatDate(rec.date)}</span></span>
                     {rec.nextDueDate && <span><CalendarDays className="w-3 h-3"/> <span>Next: {formatDate(rec.nextDueDate)}</span></span>}
+                    <span className="text-[10px] font-semibold text-farm-600 dark:text-farm-400">{L('Tap for details')}</span>
                   </div>
                   {isAdmin && (
                     <div className="muf-entity-actions">

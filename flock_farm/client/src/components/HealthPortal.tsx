@@ -14,8 +14,9 @@ import {
 } from 'lucide-react';
 import { Bird, DeathReason, VaccinationRecord, Lang } from '../types';
 import { todayStr, diffDateOnlyDays } from '../utils/calculations';
-import { useConfirm, notify } from '../muf-confirm';
-import DetailModal from '../muf-modal';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
+import DetailModal from '../muf/core/muf-modal';
+import { L } from '../i18n';
 
 interface HealthPortalProps {
   birds: Bird[];
@@ -123,6 +124,7 @@ export default function HealthPortal({
   const [logCost, setLogCost] = useState('');
   const [logNotes, setLogNotes] = useState('');
   const [activeVaccinationId, setActiveVaccinationId] = useState<number | null>(null);
+  const [showLogModal, setShowLogModal] = useState(false);
   const [editVax, setEditVax] = useState<VaccinationRecord | null>(null);
   const [editVaxForm, setEditVaxForm] = useState({ birdId: '', date: '', vaccineName: '', dose: '', cost: '', notes: '' });
 
@@ -136,8 +138,8 @@ export default function HealthPortal({
 
   const handleLogVaccinationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!logBirdId) return notify('Please select a bird', 'error');
-    if (!logVaccineName.trim()) return notify('Please enter the vaccine name', 'error');
+    if (!logBirdId) return notify(L('Please select a bird'), 'error');
+    if (!logVaccineName.trim()) return notify(L('Please enter the vaccine name'), 'error');
 
     const birdId = parseInt(logBirdId);
     onAddVaccination({
@@ -159,6 +161,7 @@ export default function HealthPortal({
     setLogDose('');
     setLogCost('');
     setLogNotes('');
+    setShowLogModal(false);
   };
 
   // Action: Mark vaccinated today (quick action) — also logs a history entry
@@ -191,8 +194,8 @@ export default function HealthPortal({
   const handleEditVaccinationSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!editVax) return;
-    if (!editVaxForm.birdId) return notify('Please select a bird', 'error');
-    if (!editVaxForm.vaccineName.trim()) return notify('Please enter the vaccine name', 'error');
+    if (!editVaxForm.birdId) return notify(L('Please select a bird'), 'error');
+    if (!editVaxForm.vaccineName.trim()) return notify(L('Please enter the vaccine name'), 'error');
     const birdId = parseInt(editVaxForm.birdId);
     onUpdateVaccination(editVax.id, {
       birdId,
@@ -211,10 +214,10 @@ export default function HealthPortal({
 
   const handleDeleteVaccinationFromDetail = async (record: VaccinationRecord) => {
     const ok = await confirmAction({
-      title: 'Delete Vaccination Record',
-      message: 'Delete this vaccination record?',
-      confirmLabel: 'Delete Record',
-      cancelLabel: 'Cancel',
+      title: L('Delete Vaccination Record'),
+      message: L('Delete this vaccination record?'),
+      confirmLabel: L('Delete Record'),
+      cancelLabel: L('Cancel'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -229,7 +232,7 @@ export default function HealthPortal({
         <div className="muf-page-title">
           <div className="muf-title-icon"><HeartPulse size={28}/></div>
           <div>
-            <h2>Health</h2>
+            <h2>{L('Health')}</h2>
             <p>Monitor mortality stats and track vaccination schedules to keep your flock immune and healthy.</p>
           </div>
         </div>
@@ -277,11 +280,11 @@ export default function HealthPortal({
 
           {/* Active birds schedule list */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-slate-400 font-mono uppercase tracking-wider">Flock Immunization Log</h4>
+            <h4 className="text-xs font-semibold text-slate-400 font-mono uppercase tracking-wider">{L('Flock Immunization Log')}</h4>
             
             <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden max-h-80 overflow-y-auto">
               {activeBirds.length === 0 ? (
-                <p className="p-6 text-center text-xs text-slate-400 italic bg-slate-50/50">No active birds registered.</p>
+                <p className="p-6 text-center text-xs text-slate-400 italic bg-slate-50/50">{L('No active birds registered.')}</p>
               ) : (
                 activeBirds.map(bird => {
                   const info = getVaccinationStatus(bird.lastVaccinationDate);
@@ -311,7 +314,7 @@ export default function HealthPortal({
                           <button 
                             onClick={() => handleMarkVaccinated(bird)}
                             className="px-2.5 py-1 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 rounded-lg text-3xs font-bold border border-indigo-100 transition shrink-0 flex items-center gap-0.5 cursor-pointer"
-                            title="Click to register vaccination today"
+                            title={L('Click to register vaccination today')}
                           >
                             <Check className="w-3 h-3" /> Vaccine Today
                           </button>
@@ -338,34 +341,34 @@ export default function HealthPortal({
 
           {/* Deaths breakdown categorized card */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-400 font-mono uppercase tracking-wider mb-2.5">Losses Breakdown by Cause</h4>
+            <h4 className="text-xs font-semibold text-slate-400 font-mono uppercase tracking-wider mb-2.5">{L('Losses Breakdown by Cause')}</h4>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 text-center text-xs font-semibold">
               <div className="p-2.5 bg-red-50/50 rounded-xl border border-red-100">
                 <span className="text-lg font-bold font-mono text-red-800">{deathBreakdown.Disease}</span>
-                <p className="text-4xs text-red-600 mt-1 uppercase font-mono tracking-wider">Disease</p>
+                <p className="text-4xs text-red-600 mt-1 uppercase font-mono tracking-wider">{L('Disease')}</p>
               </div>
               <div className="p-2.5 bg-amber-50/50 rounded-xl border border-amber-100">
                 <span className="text-lg font-bold font-mono text-amber-800">{deathBreakdown.Injury}</span>
-                <p className="text-4xs text-amber-600 mt-1 uppercase font-mono tracking-wider">Injury</p>
+                <p className="text-4xs text-amber-600 mt-1 uppercase font-mono tracking-wider">{L('Injury')}</p>
               </div>
               <div className="p-2.5 bg-orange-50/50 rounded-xl border border-orange-100">
                 <span className="text-lg font-bold font-mono text-orange-800">{deathBreakdown.Predator}</span>
-                <p className="text-4xs text-orange-600 mt-1 uppercase font-mono tracking-wider">Predator</p>
+                <p className="text-4xs text-orange-600 mt-1 uppercase font-mono tracking-wider">{L('Predator')}</p>
               </div>
               <div className="p-2.5 bg-slate-50 rounded-xl border border-slate-200">
                 <span className="text-lg font-bold font-mono text-slate-800 dark:text-slate-100">{deathBreakdown.Other}</span>
-                <p className="text-4xs text-slate-600 mt-1 uppercase font-mono tracking-wider">Other</p>
+                <p className="text-4xs text-slate-600 mt-1 uppercase font-mono tracking-wider">{L('Other')}</p>
               </div>
               <div className="p-2.5 bg-slate-100/50 rounded-xl border border-slate-200">
                 <span className="text-lg font-bold font-mono text-slate-800 dark:text-slate-100">{deathBreakdown.Unknown}</span>
-                <p className="text-4xs text-slate-600 mt-1 uppercase font-mono tracking-wider">Unknown</p>
+                <p className="text-4xs text-slate-600 mt-1 uppercase font-mono tracking-wider">{L('Unknown')}</p>
               </div>
             </div>
           </div>
 
           {/* Historical Dead Birds details register */}
           <div className="space-y-3">
-            <h4 className="text-xs font-semibold text-slate-400 font-mono uppercase tracking-wider">Deceased Birds History</h4>
+            <h4 className="text-xs font-semibold text-slate-400 font-mono uppercase tracking-wider">{L('Deceased Birds History')}</h4>
             
             <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden max-h-80 overflow-y-auto">
               {deadBirds.length === 0 ? (
@@ -403,131 +406,150 @@ export default function HealthPortal({
 
       {/* VACCINATION HISTORY LOG */}
       <div className="muf-panel p-4 sm:p-6 space-y-5">
-        <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 font-display flex items-center gap-2 border-b border-slate-100 pb-3">
-          <History className="w-5 h-5 text-indigo-600" /> Vaccination History Log
-        </h3>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Add vaccination record form — Admin only */}
+        <div className="muf-section-head border-b border-slate-100 dark:border-slate-800 pb-3">
+          <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 font-display flex items-center gap-2">
+            <History className="w-5 h-5 text-indigo-600" /> Vaccination History Log
+          </h3>
           {isAdmin && (
-          <form onSubmit={handleLogVaccinationSubmit} className="space-y-3 lg:col-span-1">
-            <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Bird *</label>
-              <select
-                value={logBirdId}
-                onChange={(e) => setLogBirdId(e.target.value)}
-                className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
-                id="vaccination-log-bird-select"
-              >
-                <option value="">Select a bird...</option>
-                {birds.filter((b) => b.status === 'Active' || b.status === 'Sick').map(b => (
-                  <option key={b.id} value={b.id}>{b.name} ({b.status})</option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-cols-2 gap-2">
-              <div>
-                <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Date *</label>
-                <input
-                  type="date"
-                  value={logDate}
-                  onChange={(e) => setLogDate(e.target.value)}
-                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
-                />
-              </div>
-              <div>
-                <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Cost (Rs)</label>
-                <input
-                  type="number"
-                  min="0"
-                  placeholder="Optional"
-                  value={logCost}
-                  onChange={(e) => setLogCost(e.target.value)}
-                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
-                />
-              </div>
-            </div>
-            <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Vaccine Name *</label>
-              <input
-                type="text"
-                placeholder="e.g. Newcastle Disease"
-                value={logVaccineName}
-                onChange={(e) => setLogVaccineName(e.target.value)}
-                className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
-              />
-            </div>
-            <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Dose</label>
-              <input
-                type="text"
-                placeholder="e.g. 0.5ml"
-                value={logDose}
-                onChange={(e) => setLogDose(e.target.value)}
-                className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
-              />
-            </div>
-            <div>
-              <label className="block text-2xs font-bold text-slate-500 uppercase tracking-wider mb-1">Notes</label>
-              <textarea
-                placeholder="Optional notes"
-                value={logNotes}
-                onChange={(e) => setLogNotes(e.target.value)}
-                rows={2}
-                className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden resize-none"
-              />
-            </div>
             <button
-              type="submit"
-              className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-2"
-              id="btn-log-vaccination"
+              type="button"
+              onClick={() => setShowLogModal(true)}
+              className="muf-add-btn"
+              aria-label={L('Log vaccination record')}
+              title={L('Log vaccination record')}
+              id="btn-open-vaccination-log"
             >
-              <Plus className="w-4 h-4" /> Log Vaccination Record
+              <Plus className="w-5 h-5" />
             </button>
-          </form>
           )}
+        </div>
 
-          {/* History list */}
-          <div className={isAdmin ? "lg:col-span-2 space-y-2" : "lg:col-span-3 space-y-2"}>
-            <h4 className="text-xs font-semibold text-slate-400 font-mono uppercase tracking-wider">
-              Full History ({sortedVaccinations.length} records)
-            </h4>
-            <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden max-h-96 overflow-y-auto">
-              {sortedVaccinations.length === 0 ? (
-                <p className="p-6 text-center text-xs text-slate-400 italic bg-slate-50/50">No vaccination records logged yet.</p>
-              ) : (
-                sortedVaccinations.map((record) => (
-                  <button
-                    key={record.id}
-                    type="button"
-                    onClick={() => setActiveVaccinationId(record.id)}
-                    className="w-full flex items-center justify-between gap-2 p-3 text-xs bg-white dark:bg-slate-900 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 text-left"
-                  >
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-slate-800 dark:text-slate-100">{getBirdName(record.birdId)}</span>
-                        <span className="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded text-3xs font-semibold">
-                          {record.vaccineName}
-                        </span>
-                      </div>
-                      <p className="text-3xs text-slate-500 font-mono mt-0.5">{record.date}</p>
+        <div className="space-y-2">
+          <h4 className="text-xs font-semibold text-slate-400 font-mono uppercase tracking-wider">
+            Full History ({sortedVaccinations.length} records)
+          </h4>
+          <div className="divide-y divide-slate-100 border border-slate-200 rounded-xl overflow-hidden max-h-96 overflow-y-auto">
+            {sortedVaccinations.length === 0 ? (
+              <p className="p-6 text-center text-xs text-slate-400 italic bg-slate-50/50">{L('No vaccination records logged yet.')}</p>
+            ) : (
+              sortedVaccinations.map((record) => (
+                <button
+                  key={record.id}
+                  type="button"
+                  onClick={() => setActiveVaccinationId(record.id)}
+                  className="w-full flex items-center justify-between gap-2 p-3 text-xs bg-white dark:bg-slate-900 hover:bg-slate-50/50 dark:hover:bg-slate-800/50 text-left"
+                >
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-bold text-slate-800 dark:text-slate-100">{getBirdName(record.birdId)}</span>
+                      <span className="px-1.5 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-100 rounded text-3xs font-semibold">
+                        {record.vaccineName}
+                      </span>
                     </div>
-                    <div className="text-right text-3xs text-slate-400 flex items-center gap-2">
-                      <span className="hidden sm:inline">{record.cost ? `Rs ${record.cost.toLocaleString()}` : 'No cost'}</span>
-                      <span className="sm:hidden"><Eye className="w-4 h-4" /></span>
-                    </div>
-                  </button>
-                ))
-              )}
-            </div>
+                    <p className="text-3xs text-slate-500 font-mono mt-0.5">{record.date}</p>
+                  </div>
+                  <div className="text-right text-3xs text-slate-400 flex items-center gap-2">
+                    <span className="hidden sm:inline">{record.cost ? `Rs ${record.cost.toLocaleString()}` : 'No cost'}</span>
+                    <span className="sm:hidden"><Eye className="w-4 h-4" /></span>
+                  </div>
+                </button>
+              ))
+            )}
           </div>
         </div>
       </div>
 
+      {isAdmin && (
+        <DetailModal
+          open={showLogModal}
+          onClose={() => setShowLogModal(false)}
+          title={L('Log Vaccination Record')}
+          icon={<Syringe className="w-5 h-5" />}
+          iconBg="bg-indigo-100 text-indigo-700"
+          size="small"
+        >
+          <form onSubmit={handleLogVaccinationSubmit} className="space-y-3">
+              <div>
+                <label className="muf-pc-label-2xs-slate">Bird *</label>
+                <select
+                  value={logBirdId}
+                  onChange={(e) => setLogBirdId(e.target.value)}
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
+                  id="vaccination-log-bird-select"
+                >
+                  <option value="">{L('Select a bird...')}</option>
+                  {birds.filter((b) => b.status === 'Active' || b.status === 'Sick').map(b => (
+                    <option key={b.id} value={b.id}>{b.name} ({b.status})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="muf-pc-label-2xs-slate">Date *</label>
+                  <input
+                    type="date"
+                    value={logDate}
+                    onChange={(e) => setLogDate(e.target.value)}
+                    className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
+                  />
+                </div>
+                <div>
+                  <label className="muf-pc-label-2xs-slate">{L('Cost (Rs)')}</label>
+                  <input
+                    type="number"
+                    min="0"
+                    placeholder={L('Optional')}
+                    value={logCost}
+                    onChange={(e) => setLogCost(e.target.value)}
+                    className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="muf-pc-label-2xs-slate">Vaccine Name *</label>
+                <input
+                  type="text"
+                  placeholder={L('e.g. Newcastle Disease')}
+                  value={logVaccineName}
+                  onChange={(e) => setLogVaccineName(e.target.value)}
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
+                />
+              </div>
+              <div>
+                <label className="muf-pc-label-2xs-slate">{L('Dose')}</label>
+                <input
+                  type="text"
+                  placeholder="e.g. 0.5ml"
+                  value={logDose}
+                  onChange={(e) => setLogDose(e.target.value)}
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden"
+                />
+              </div>
+              <div>
+                <label className="muf-pc-label-2xs-slate">{L('Notes')}</label>
+                <textarea
+                  placeholder={L('Optional notes')}
+                  value={logNotes}
+                  onChange={(e) => setLogNotes(e.target.value)}
+                  rows={2}
+                  className="w-full text-xs px-3 py-2 border border-slate-200 rounded-xl focus:border-indigo-400 focus:outline-hidden resize-none"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-2"
+                id="btn-log-vaccination"
+              >
+                <Plus className="w-4 h-4" /> Log Vaccination Record
+              </button>
+          </form>
+        </DetailModal>
+      )}
+
       <DetailModal
         open={!!activeVaccination}
         onClose={() => setActiveVaccinationId(null)}
-        title="Vaccination Record Details"
+        title={L('Vaccination Record Details')}
         subtitle={activeVaccination ? getBirdName(activeVaccination.birdId) : undefined}
         icon={<Syringe className="w-5 h-5" />}
         iconBg="bg-indigo-100 text-indigo-700"
@@ -536,14 +558,14 @@ export default function HealthPortal({
         {activeVaccination && (
           <div className="space-y-4 text-sm">
             <div className="grid grid-cols-2 gap-3">
-              <HealthDetailTile label="Bird" value={getBirdName(activeVaccination.birdId)} />
-              <HealthDetailTile label="Date" value={activeVaccination.date} />
-              <HealthDetailTile label="Vaccine" value={activeVaccination.vaccineName} />
-              <HealthDetailTile label="Dose" value={activeVaccination.dose || '—'} />
+              <HealthDetailTile label={L('Bird')} value={getBirdName(activeVaccination.birdId)} />
+              <HealthDetailTile label={L('Date')} value={activeVaccination.date} />
+              <HealthDetailTile label={L('Vaccine')} value={activeVaccination.vaccineName} />
+              <HealthDetailTile label={L('Dose')} value={activeVaccination.dose || '—'} />
               <HealthDetailTile label="Cost" value={typeof activeVaccination.cost === 'number' ? `Rs ${activeVaccination.cost.toLocaleString()}` : '—'} />
             </div>
             <div className="rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Notes</p>
+              <p className="text-xs font-bold uppercase tracking-wider text-slate-500">{L('Notes')}</p>
               <p className="mt-1 text-sm text-slate-700 dark:text-slate-200">{activeVaccination.notes || 'No notes added.'}</p>
             </div>
             {isAdmin && (
@@ -552,9 +574,9 @@ export default function HealthPortal({
                   <button
                     type="button"
                     onClick={() => handleDeleteVaccinationFromDetail(activeVaccination)}
-                    className="px-4 py-2 rounded-xl border border-rose-200 bg-rose-50 text-rose-700 font-semibold text-xs hover:bg-rose-100"
+                    className="muf-btn muf-btn-danger"
                   >
-                    Delete Record
+                    {L('Delete Record')}
                   </button>
                 )}
                 <button
@@ -562,7 +584,7 @@ export default function HealthPortal({
                   onClick={() => openEditVaccination(activeVaccination)}
                   className="px-4 py-2 rounded-xl border border-emerald-200 bg-emerald-50 text-emerald-700 font-semibold text-xs hover:bg-emerald-100"
                 >
-                  Edit Record
+                  {L('Edit Record')}
                 </button>
               </div>
             )}
@@ -574,7 +596,7 @@ export default function HealthPortal({
       <DetailModal
         open={!!editVax}
         onClose={() => setEditVax(null)}
-        title="Edit Vaccination Record"
+        title={L('Edit Vaccination Record')}
         subtitle={editVax ? getBirdName(editVax.birdId) : undefined}
         icon={<Syringe className="w-5 h-5" />}
         iconBg="bg-indigo-100 text-indigo-700"
@@ -584,44 +606,44 @@ export default function HealthPortal({
           <form onSubmit={handleEditVaccinationSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Bird *</label>
+                <label className="muf-pc-label-2xs-gray">Bird *</label>
                 <select value={editVaxForm.birdId} onChange={(e) => setEditVaxForm({ ...editVaxForm, birdId: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden">
-                  <option value="">Select bird</option>
+                  <option value="">{L('Select bird')}</option>
                   {birds.map((b) => <option key={b.id} value={b.id}>{b.name}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Date *</label>
+                <label className="muf-pc-label-2xs-gray">Date *</label>
                 <input type="date" required value={editVaxForm.date} onChange={(e) => setEditVaxForm({ ...editVaxForm, date: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
               </div>
             </div>
             <div>
-              <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Vaccine Name *</label>
+              <label className="muf-pc-label-2xs-gray">Vaccine Name *</label>
               <input type="text" required value={editVaxForm.vaccineName} onChange={(e) => setEditVaxForm({ ...editVaxForm, vaccineName: e.target.value })}
                 className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Dose</label>
+                <label className="muf-pc-label-2xs-gray">{L('Dose')}</label>
                 <input type="text" value={editVaxForm.dose} onChange={(e) => setEditVaxForm({ ...editVaxForm, dose: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
               </div>
               <div>
-                <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Cost (Rs)</label>
+                <label className="muf-pc-label-2xs-gray">{L('Cost (Rs)')}</label>
                 <input type="number" min="0" step="any" value={editVaxForm.cost} onChange={(e) => setEditVaxForm({ ...editVaxForm, cost: e.target.value })}
                   className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
               </div>
             </div>
             <div>
-              <label className="block text-2xs font-bold text-gray-500 uppercase tracking-wider mb-1">Notes</label>
+              <label className="muf-pc-label-2xs-gray">{L('Notes')}</label>
               <textarea rows={2} value={editVaxForm.notes} onChange={(e) => setEditVaxForm({ ...editVaxForm, notes: e.target.value })}
                 className="w-full text-xs px-3 py-2 border border-gray-200 rounded-xl focus:border-indigo-400 focus:outline-hidden" />
             </div>
             <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
-              <button type="button" onClick={() => setEditVax(null)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs rounded-xl transition">Cancel</button>
-              <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition">Save Changes</button>
+              <button type="button" onClick={() => setEditVax(null)} className="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-xs rounded-xl transition">{L('Cancel')}</button>
+              <button type="submit" className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition">{L('Save Changes')}</button>
             </div>
           </form>
         )}

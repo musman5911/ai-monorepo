@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pctChange, trendArrow, sameMonthLastYearKey, lastMonthKey, thisMonthKey } from '../dairy_farm/client/src/muf-compare';
+import { pctChange, trendArrow, sameMonthLastYearKey, lastMonthKey, thisMonthKey } from '../dairy_farm/client/src/muf/data/muf-compare';
 
 describe('muf-compare helpers', () => {
   describe('pctChange', () => {

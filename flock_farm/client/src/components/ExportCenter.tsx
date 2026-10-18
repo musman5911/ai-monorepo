@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { mufL } from '../muf-urdu';
-import { openPrintDocument } from '../muf-print';
+import { mufL } from '../muf/data/muf-urdu';
+import { openPrintDocument } from '../muf/data/muf-print';
 import { FileText, Printer } from 'lucide-react';
 import { listBatches } from '../api';
 import {
@@ -112,7 +112,7 @@ export default function ExportCenter({
           ${batches.length > 0 ? `
           <h3>📦 Batch P&amp;L Register</h3>
           <table>
-            <thead><tr><th>Batch</th><th>Type</th><th>Status</th><th>Total Cost</th><th>Revenue</th><th>Profit / Loss</th></tr></thead>
+            <thead><tr><th>{L('Batch')}</th><th>{L('Type')}</th><th>{L('Status')}</th><th>{L('Total Cost')}</th><th>{L('Revenue')}</th><th>{L('Profit / Loss')}</th></tr></thead>
             <tbody>${batches.map((b) => `
               <tr>
                 <td><strong>${b.name}</strong></td>

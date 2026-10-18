@@ -1,21 +1,25 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import { LogIn, AlertCircle, ArrowLeft, Check, Mail, UserPlus, Eye, EyeOff } from 'lucide-react';
-import { AnimatePresence, motion } from '../muf-motion';
+import { AnimatePresence, motion } from '../muf/core/muf-motion';
+import MufLoginLang from '../muf/ui/muf-login-lang';
+import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from '../muf/ui/muf-login';
 import { Lang } from '../types';
 import {
   login, forgotPassword, resetPassword,
   signupRequestCode, signupVerify, getCanSignup, getMailStatus,
 } from '../api';
+import { CodeInput } from './login/CodeInput';
 
 interface Props {
   lang: Lang;
   onLoginSuccess: () => void;
+  onToggleLang?: () => void;
 }
 
 type View = 'login' | 'forgotEmail' | 'forgotCode' | 'signup' | 'signupCode';
 
-export default function LoginScreen({ lang, onLoginSuccess }: Props) {
+export default function LoginScreen({ lang, onLoginSuccess, onToggleLang }: Props) {
   const L = (en: string, urOrVars?: string | Record<string, string | number | null>) => mufL(lang, en, urOrVars);
 
   const [view, setView] = useState<View>('login');
@@ -188,23 +192,12 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
   const isRtl = lang === 'ur';
 
   return (
-    <div className={`min-h-screen bg-[#faf9f6] dark:bg-[#070b13] flex flex-col justify-center items-center px-4 transition-colors ${isRtl ? 'rtl' : 'ltr'}`}>
-      <div className="bg-[#fcfbf9] dark:bg-[#0f172a] border border-[#e2dfdb] dark:border-slate-800 p-6 md:p-8 rounded-2xl w-full max-w-md my-8 shadow-2xl flex flex-col transition-all pulse-border-hover">
+    <MufLoginScreen className={isRtl ? 'rtl' : 'ltr'} dir={isRtl ? 'rtl' : 'ltr'}>
+      {onToggleLang && <MufLoginLang lang={lang} onToggle={onToggleLang} />}
+      <MufLoginPanel className="pulse-border-hover">
         {view === 'login' && (
           <>
-            <div className="flex justify-center mb-4">
-              <img
-                src="/logo.png"
-                alt="Usman Flock Farm"
-                className="w-20 h-20 rounded-full object-cover border-2 border-slate-200 dark:border-slate-800 shadow-md shrink-0 animate-bounce-soft"
-              />
-            </div>
-            <h2 className="font-sans text-center text-slate-800 dark:text-farm-400 text-2xl font-extrabold tracking-tight mb-1">
-              {L('Usman Flock Farm')}
-            </h2>
-            <p className="text-center text-slate-500 dark:text-slate-400 text-xs mb-8 uppercase tracking-widest font-semibold">
-              {L('Secure Sign-In Interface')}
-            </p>
+            <MufLoginBrand farmName="Usman Flock Farm" logoSrc="/logo.png" logoAlt="Usman Flock Farm" subtitle={L('Sign in to continue')} />
           </>
         )}
         <AnimatePresence mode="wait">
@@ -221,7 +214,7 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
               {err && <AlertBox type="err" text={err} />}
 
             <div>
-              <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 uppercase tracking-wider">
+              <label className="muf-label">
                 {L('Username or email')}
               </label>
               <input
@@ -231,8 +224,8 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
                 autoComplete="username"
                 value={loginId}
                 onChange={(e) => setLoginId(e.target.value)}
-                placeholder="admin"
-                className="w-full bg-slate-100 border border-slate-200 text-slate-900 dark:bg-[#1e293b] dark:border-slate-700 dark:text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-farm-500 transition-colors"
+                placeholder={L('admin')}
+                className="muf-field muf-field-lg"
                 disabled={busy}
               />
             </div>
@@ -376,7 +369,7 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
                 <div className="grid grid-cols-2 gap-3">
                   <Field label={L('Username')}>
                     <input type="text" autoFocus value={suUsername} onChange={(e) => setSuUsername(e.target.value)}
-                      placeholder="admin" className={inputCls} disabled={busy} />
+                      placeholder={L('admin')} className={inputCls} disabled={busy} />
                   </Field>
                   <Field label={L('Display name')}>
                     <input type="text" value={suName} onChange={(e) => setSuName(e.target.value)}
@@ -431,8 +424,8 @@ export default function LoginScreen({ lang, onLoginSuccess }: Props) {
               </motion.form>
             )}
         </AnimatePresence>
-      </div>
-    </div>
+      </MufLoginPanel>
+    </MufLoginScreen>
   );
 }
 
@@ -469,34 +462,5 @@ function AlertBox({ type, text }: { type: 'err' | 'ok'; text: string }) {
       {type === 'err' ? <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" /> : <Check className="w-4 h-4 mt-0.5 shrink-0" />}
       <span>{text}</span>
     </motion.div>
-  );
-}
-
-function CodeInput({ value, refs, onChange, onKey }: {
-  value: string;
-  setter: (v: string) => void;
-  refs: React.MutableRefObject<(HTMLInputElement | null)[]>;
-  onChange: (idx: number, val: string) => void;
-  onKey: (idx: number, e: React.KeyboardEvent<HTMLInputElement>) => void;
-}) {
-  const digits = value.split('');
-  while (digits.length < 6) digits.push('');
-  return (
-    <div className="flex justify-between gap-2">
-      {digits.map((d, i) => (
-        <input
-          key={i}
-          ref={(el) => { refs.current[i] = el; }}
-          type="text"
-          inputMode="numeric"
-          maxLength={1}
-          value={d}
-          onChange={(e) => onChange(i, e.target.value)}
-          onKeyDown={(e) => onKey(i, e)}
-          onFocus={(e) => e.target.select()}
-          className="w-12 h-14 text-center text-2xl font-bold font-mono border border-slate-200 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 rounded-xl focus:border-farm-400 focus:ring-2 focus:ring-farm-100 dark:focus:ring-farm-900/40 focus:outline-none transition"
-        />
-      ))}
-    </div>
   );
 }

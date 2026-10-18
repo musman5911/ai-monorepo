@@ -2,11 +2,12 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { Plus, Trash2, ChevronLeft, ChevronRight, CalendarDays, Mic, Square } from 'lucide-react';
 import { api } from '../api';
 import { L } from '../i18n';
-import { notify } from '../muf-confirm';
-import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, type VoiceRecorder } from '../muf-voice';
+import { notify } from '../muf/core/muf-confirm';
+import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, type VoiceRecorder } from '../muf/data/muf-voice';
 import type { ChecklistItem } from '../types';
 import { useDebouncedSave } from '../useDebouncedSave';
 import SaveIndicator from './SaveIndicator';
+import MufDiaryMedia, { type DiaryPhoto } from '../muf/ui/muf-diary-media';
 import { todayStr, shiftDate } from '../utils/date';
 
 const DEFAULT_CHECKLIST: Omit<ChecklistItem, 'done'>[] = [
@@ -22,7 +23,9 @@ function newItemId(): string {
   return 'item-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 }
 
-export default function DiaryTab() {
+interface DiaryTabProps { checklistOnly?: boolean; }
+
+export default function DiaryTab({ checklistOnly = false }: DiaryTabProps) {
   const [date, setDate] = useState(todayStr());
   const [loading, setLoading] = useState(true);
   const [checklist, setChecklist] = useState<ChecklistItem[]>([]);
@@ -30,6 +33,7 @@ export default function DiaryTab() {
   const [newItemText, setNewItemText] = useState('');
   interface VoiceNote { id: string; base64: string; createdAt: string; }
   const [voiceNotes, setVoiceNotes] = useState<VoiceNote[]>([]);
+  const [photos, setPhotos] = useState<DiaryPhoto[]>([]);
   const [recorder, setRecorder] = useState<VoiceRecorder | null>(null);
   const [recording, setRecording] = useState(false);
 
@@ -46,15 +50,16 @@ export default function DiaryTab() {
       }
       setNotes(log.notes || '');
       setVoiceNotes(log.voiceNotes || []);
+      setPhotos(log.photos || []);
       setLoading(false);
     }).catch(() => setLoading(false));
     return () => { cancelled = true; };
   }, [date]);
 
   // Combine checklist + notes into one payload for autosave
-  const payload = useMemo(() => ({ checklist, notes, voiceNotes }), [checklist, notes, voiceNotes]);
+  const payload = useMemo(() => ({ checklist, notes, voiceNotes, photos }), [checklist, notes, voiceNotes, photos]);
 
-  const saveFn = useCallback((p: { checklist: ChecklistItem[]; notes: string; voiceNotes: VoiceNote[] }) => {
+  const saveFn = useCallback((p: { checklist: ChecklistItem[]; notes: string; voiceNotes: VoiceNote[]; photos: DiaryPhoto[] }) => {
     return api.saveDailyLog(date, p);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [date]);
@@ -138,7 +143,7 @@ export default function DiaryTab() {
               onClick={() => setDate(todayStr())}
               className="text-xs font-medium text-farm-600 hover:text-farm-700 px-2"
             >
-              Today
+              {L('Today')}
             </button>
           )}
         </div>
@@ -146,13 +151,13 @@ export default function DiaryTab() {
       </div>
 
       {loading ? (
-        <div className="text-center text-slate-400 py-12">Loading...</div>
+        <div className="text-center text-slate-400 py-12">{L('Loading...')}</div>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className={`grid grid-cols-1 gap-4 ${checklistOnly ? '' : 'lg:grid-cols-2 lg:gap-6'}`}>
           {/* Checklist */}
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">Daily Checklist</h3>
+              <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100">{L('Daily Checklist')}</h3>
               <span className="text-xs text-slate-400">{doneCount}/{checklist.length} done</span>
             </div>
 
@@ -184,7 +189,7 @@ export default function DiaryTab() {
             <div className="flex items-center gap-2 mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
               <input
                 type="text"
-                placeholder="Add a task..."
+                placeholder={L('Add a task...')}
                 value={newItemText}
                 onChange={(e) => setNewItemText(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addItem(); } }}
@@ -199,9 +204,11 @@ export default function DiaryTab() {
             </div>
           </div>
 
-          {/* Notes / Diary */}
+          {!checklistOnly && (
+          <>
+          {/* Legacy Notes editor remains available in the original tab only. */}
           <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-5">
-            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4">Notes / Diary</h3>
+            <h3 className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-4">{L('Notes / Diary')}</h3>
             <textarea
               rows={12}
               placeholder="Anything worth remembering about today — weather, a cow acting off, a visitor, feed delivery, etc."
@@ -209,7 +216,8 @@ export default function DiaryTab() {
               onChange={(e) => setNotes(e.target.value)}
               className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100 resize-none"
             />
-            <p className="text-[11px] text-slate-400 mt-2">Saves automatically as you type.</p>
+            <p className="text-[11px] text-slate-400 mt-2">{L('Saves automatically as you type.')}</p>
+            <MufDiaryMedia date={date} photos={photos} onChange={setPhotos} />
 
             {/* ── Voice notes (Urdu-friendly) — record instead of typing ── */}
             <div className="mt-4 border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2">
@@ -226,7 +234,7 @@ export default function DiaryTab() {
               {voiceNotes.map((v) => (
                 <div key={v.id} className="flex items-center gap-2 p-2 bg-slate-50 dark:bg-slate-800/40 rounded-lg">
                   <audio controls src={v.base64} className="flex-1 h-9" />
-                  <button onClick={() => setVoiceNotes((list) => list.filter((x) => x.id !== v.id))} className="p-1.5 rounded text-slate-400 hover:text-red-500 transition" aria-label="Delete voice note">
+                  <button onClick={() => setVoiceNotes((list) => list.filter((x) => x.id !== v.id))} className="p-1.5 rounded text-slate-400 hover:text-red-500 transition" aria-label={L('Delete voice note')}>
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
@@ -236,6 +244,8 @@ export default function DiaryTab() {
               )}
             </div>
           </div>
+          </>
+          )}
         </div>
       )}
     </div>

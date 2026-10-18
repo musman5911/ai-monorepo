@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import {
   Shield, LogOut, X, AlertCircle, Check, Settings,
   Languages, Save, RotateCcw, AlertTriangle, RefreshCw,
   FileSpreadsheet, Download, Upload, Users, UserRound,
   Database, FileText, Send, Loader2, MessageCircle, Mail, Globe2,
 } from 'lucide-react';
-import { AnimatePresence, motion } from '../muf-motion';
+import { AnimatePresence, motion } from '../muf/core/muf-motion';
 import { Lang, GlobalSettings, Bird, OtherExpense, FeedRecord, EggProduction, VaccinationRecord, Customer, CustomerSale, IncubationRecord, DailyChecklistEntry, DiaryEntry, LaborWorker, LaborAttendanceEntry, LaborAdvanceEntry } from '../types';
 import {
   logout as apiLogout, changePassword, changePasswordWithCode, requestProfileCode, AuthUser, updateMe, getToken,
@@ -15,24 +15,24 @@ import {
   telegramStatus, telegramLinkCode, telegramUnlink, telegramSettings, telegramSaveSettings, telegramSendSummary, listUsers,
   createUser, updateUser, deleteUser,
 } from '../api';
-import AvatarUploader from '../muf-avatar';
+import AvatarUploader from '../muf/ui/muf-avatar';
 import MyFarmsPanel from './MyFarmsPanel';
-import TelegramPanel from '../muf-telegram-panel';
+import TelegramPanel from '../muf/ui/muf-telegram-panel';
 import { shareBackupFile } from '../utils/share';
 import ExportCenter from './ExportCenter';
 import { shareViaWhatsApp } from '../utils/share';
 import { todayStr as localTodayStr } from '../utils/calculations';
 import UserManagement from './UserManagement';
-import ModalPortal from '../muf-portal';
-import MufAdminShell from '../muf-admin-shell';
-import MufAdminCard from '../muf-admin-card';
-import MufAdminButton from '../muf-admin-button';
-import MufAdminUsers from '../muf-admin-users';
-import MufAdminReports from '../muf-admin-reports';
-import MufAdminGeneral from '../muf-admin-general';
+import ModalPortal from '../muf/core/muf-portal';
+import MufAdminShell from '../muf/admin/muf-admin-shell';
+import MufAdminCard from '../muf/admin/muf-admin-card';
+import MufAdminButton from '../muf/admin/muf-admin-button';
+import MufAdminUsers from '../muf/admin/muf-admin-users';
+import MufAdminReports from '../muf/admin/muf-admin-reports';
+import MufAdminGeneral from '../muf/admin/muf-admin-general';
 import { getFarmLocation, saveFarmLocation } from '../api';
-import { useConfirm, notify } from '../muf-confirm';
-import { useBodyScrollLock } from '../muf-scroll-lock';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
+import { useBodyScrollLock } from '../muf/core/muf-scroll-lock';
 import {
   exportEggPDF,
   exportExpensePDF,
@@ -43,7 +43,7 @@ import {
   parseBackupFile,
 } from '../reportExport';
 import type { FlockFarmBackup } from '../reportExport';
-import { mufToday } from '../muf-date';
+import { mufToday } from '../muf/data/muf-date';
 
 interface AdminMenuProps {
   open: boolean;
@@ -362,10 +362,6 @@ export default function AdminMenu(props: AdminMenuProps) {
           onSectionChange={(id) => setSection(id as Section)}
           headerActions={
             <>
-              <motion.button whileTap={{ scale: 0.9 }} whileHover={{ rotate: 12 }} onClick={onToggleLang} title={L('Switch language')}
-                className="w-9 h-9 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400 transition">
-                <Languages className="w-4 h-4" />
-              </motion.button>
               <motion.button whileTap={{ scale: 0.9 }} whileHover={{ rotate: -12 }} onClick={handleLogout} title={L('Sign out')}
                 className="w-9 h-9 rounded-full hover:bg-rose-100 dark:hover:bg-rose-900/30 flex items-center justify-center text-rose-500 dark:text-rose-400 transition">
                 <LogOut className="w-4 h-4" />
@@ -448,7 +444,7 @@ export default function AdminMenu(props: AdminMenuProps) {
                 </MufAdminCard>
 
                 {/* Farm Location (weather widget) */}
-                <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title="Farm Location" subtitle="Set your farm coordinates for live weather">
+                <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title={L('Farm Location')} subtitle={L('Set your farm coordinates for live weather')}>
                   <div className="space-y-3">
                     {farmLocCurrent && (
                       <p className="text-xs text-slate-500">
@@ -466,8 +462,8 @@ export default function AdminMenu(props: AdminMenuProps) {
                       placeholder="33.9943, 72.9106"
                       className="w-full px-3 py-2 text-sm font-mono bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg outline-none focus:border-farm-500"
                     />
-                    <p className="text-[10px] text-slate-400">Enter latitude, longitude (decimal degrees). City is auto-detected.</p>
-                    <MufAdminButton variant="secondary" size="md" onClick={handleSaveLocation}>Save Location</MufAdminButton>
+                    <p className="text-[10px] text-slate-400">{L('Enter latitude, longitude (decimal degrees). City is auto-detected.')}</p>
+                    <MufAdminButton variant="secondary" size="md" onClick={handleSaveLocation}>{L('Save Location')}</MufAdminButton>
                   </div>
                 </MufAdminCard>
               </MufAdminGeneral>

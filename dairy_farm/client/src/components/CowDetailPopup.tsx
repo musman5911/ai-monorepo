@@ -6,13 +6,13 @@ import type { Cow, MilkEntry, Expense, HealthRecord, RateHistory, CowLifetime, M
 import { fmt, fmtPKR, fmtL } from '../utils/format';
 import { calcRevenueWithHistory } from '../utils/rates';
 import { L } from '../i18n';
-import { mufStoryNet, mufVerdictText, mufDaysBetween } from '../muf-story';
+import { mufStoryNet, mufVerdictText, mufDaysBetween } from '../muf/data/muf-story';
 import { getLang } from '../i18n';
 import { todayStr, shiftDate } from '../utils/date';
-import DetailModal from '../muf-modal';
-import { useConfirm, notify } from '../muf-confirm';
-import { compressGalleryImage, GALLERY_MAX_PHOTOS } from '../muf-image';
-import { mufFmt } from '../muf-date';
+import DetailModal from '../muf/core/muf-modal';
+import { useConfirm, notify } from '../muf/core/muf-confirm';
+import { compressGalleryImage, GALLERY_MAX_PHOTOS } from '../muf/data/muf-image';
+import { mufFmt } from '../muf/data/muf-date';
 
 interface CowSummary {
   cow: Cow;
@@ -74,7 +74,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
       const mergedCow = { ...data.cow, ...updated, _id: data.cow._id };
       setData({ ...data, cow: mergedCow });
       onCowUpdated?.(mergedCow);
-      notify(updated?.offline ? 'Saved on this device. It will sync when internet returns.' : 'Saved', updated?.offline ? 'info' : 'success');
+      notify(updated?.offline ? L('Saved on this device. It will sync when internet returns.') : L('Saved'), updated?.offline ? 'info' : 'success');
     } catch (err) {
       notify(err instanceof Error ? err.message : 'Could not save', 'error');
     } finally { setMarketBusy(false); }
@@ -90,7 +90,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
 
   if (loading) {
     return (
-      <DetailModal open onClose={onClose} title="Loading…" size="small">
+      <DetailModal open onClose={onClose} title={L('Loading…')} size="small">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-farm-600 mx-auto" />
       </DetailModal>
     );
@@ -161,8 +161,8 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <InfoItem icon={Tag} label="Tag" value={`#${cow._id.slice(-6).toUpperCase()}`} />
             <InfoItem icon={Scale} label="Weight" value={cow.weight ? `${fmt(cow.weight)} kg` : 'N/A'} />
-            <InfoItem icon={Activity} label="Birth" value={cow.birthDate || 'N/A'} />
-            <InfoItem icon={Activity} label="Batch" value={cow.batch || 'N/A'} />
+            <InfoItem icon={Activity} label={L('Birth')} value={cow.birthDate || 'N/A'} />
+            <InfoItem icon={Activity} label={L('Batch')} value={cow.batch || 'N/A'} />
           </div>
 
           {/* ── Mother / Offspring ────────────────── */}
@@ -171,9 +171,9 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
               <h4 className="text-xs font-semibold text-pink-700 dark:text-pink-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                 <Baby className="w-3.5 h-3.5" /> Lineage
               </h4>
-              {mother && <p className="text-sm text-slate-700 dark:text-slate-300">Mother: <span className="font-medium">{mother.name}</span> ({mother.breed})</p>}
+              {mother && <p className="text-sm text-slate-700 dark:text-slate-300">{L('Mother:')} <span className="font-medium">{mother.name}</span> ({mother.breed})</p>}
               {cow.nursingUntil && (
-                <p className="text-sm text-slate-700 dark:text-slate-300">Nursing until: <span className="font-medium">{cow.nursingUntil}</span></p>
+                <p className="text-sm text-slate-700 dark:text-slate-300">{L('Nursing until:')} <span className="font-medium">{cow.nursingUntil}</span></p>
               )}
               {offspring.length > 0 && (
                 <p className="text-sm text-slate-700 dark:text-slate-300 mt-1">
@@ -189,10 +189,10 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
               <Droplets className="w-3.5 h-3.5" /> Milk Production
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <StatBox label="Last 7 Days" value={fmtL(milk.last7Days)} />
-              <StatBox label="Last 30 Days" value={fmtL(milk.last30Days)} />
-              <StatBox label="Calf Milk (30d)" value={fmtL(milk.calfMilk30Days)} color="text-pink-600" />
-              <StatBox label="Revenue (30d)" value={fmtPKR(milkRev30)} color="text-emerald-600" />
+              <StatBox label={L('Last 7 Days')} value={fmtL(milk.last7Days)} />
+              <StatBox label={L('Last 30 Days')} value={fmtL(milk.last30Days)} />
+              <StatBox label={L('Calf Milk (30d)')} value={fmtL(milk.calfMilk30Days)} color="text-pink-600" />
+              <StatBox label={L('Revenue (30d)')} value={fmtPKR(milkRev30)} color="text-emerald-600" />
             </div>
           </div>
 
@@ -207,7 +207,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
             }
             return (
               <div className="bg-slate-50 dark:bg-slate-800/30 rounded-lg p-4">
-                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Last 14 Days Milk</h4>
+                <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">{L('Last 14 Days Milk')}</h4>
                 <div className="h-36 w-full">
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={chartData}>
@@ -229,7 +229,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
               <DollarSign className="w-3.5 h-3.5" /> Expenses (30 days)
             </h4>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <StatBox label="Total" value={fmtPKR(expenses.total30)} color="text-red-500" />
+              <StatBox label={L('Total')} value={fmtPKR(expenses.total30)} color="text-red-500" />
               {Object.entries(expenses.byType).filter(([, v]) => v > 0).map(([type, amount]) => (
                 <StatBox key={type} label={type.charAt(0).toUpperCase() + type.slice(1)} value={fmtPKR(amount)} />
               ))}
@@ -266,7 +266,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                           const base64 = await compressGalleryImage(file);
                           const next: GalleryPhoto[] = [...(cow.gallery || []), { id: `g-${Date.now()}`, date: todayStr(), base64, caption: '' }];
                           await saveMarket({ gallery: next } as any);
-                          notify('Photo added');
+                          notify(L('Photo added'));
                         } catch (err) {
                           notify(err instanceof Error ? err.message : 'Could not add the photo', 'error');
                         } finally { setGalleryBusy(false); }
@@ -276,7 +276,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                 )}
               </div>
               {(cow.gallery || []).length === 0 && !isAdmin && (
-                <p className="text-xs text-slate-400 italic">No photos yet.</p>
+                <p className="muf-pc-faint">{L('No photos yet.')}</p>
               )}
             </div>
           </div>
@@ -296,7 +296,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                   <>
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
-                        <p className="text-[10px] text-slate-400 uppercase">Current weight</p>
+                        <p className="text-[10px] text-slate-400 uppercase">{L('Current weight')}</p>
                         <p className="text-base font-bold text-slate-800 dark:text-slate-100">
                           {latest ? `${latest.weightKg} kg` : 'Not recorded'}
                           {gain !== null && (
@@ -315,20 +315,20 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
 
                     {showWeightForm && (
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                        <input type="date" value={wDate} onChange={e => setWDate(e.target.value)} className="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500" />
-                        <input type="number" min="0" step="any" placeholder="Weight (kg) *" value={wKg} onChange={e => setWKg(e.target.value)} className="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500" />
-                        <input placeholder="Note" value={wNote} onChange={e => setWNote(e.target.value)} className="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500" />
+                        <input type="date" value={wDate} onChange={e => setWDate(e.target.value)} className="muf-field muf-field-auto" />
+                        <input type="number" min="0" step="any" placeholder={L('Weight (kg) *')} value={wKg} onChange={e => setWKg(e.target.value)} className="muf-field muf-field-auto" />
+                        <input placeholder={L('Note')} value={wNote} onChange={e => setWNote(e.target.value)} className="muf-field muf-field-auto" />
                         <button
                           disabled={marketBusy}
                           onClick={async () => {
                             const kg = Number(wKg);
-                            if (!(kg > 0)) { notify('Enter a weight above 0', 'error'); return; }
+                            if (!(kg > 0)) { notify(L('Enter a weight above 0'), 'error'); return; }
                             const next: WeightEntry[] = [...(cow.weightHistory || []), { id: `w-${Date.now()}`, date: wDate, weightKg: kg, note: wNote.trim() }];
                             await saveMarket({ weightHistory: next } as any);
                             setWKg(''); setWNote(''); setShowWeightForm(false);
                           }}
                           className="sm:col-span-3 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white px-3 py-2 rounded-lg text-xs font-semibold transition"
-                        >Save weight</button>
+                        >{L('Save weight')}</button>
                       </div>
                     )}
 
@@ -381,7 +381,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
             <div className="bg-slate-50 dark:bg-slate-800/30 rounded-lg p-4 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                  <p className="text-[10px] text-slate-400 uppercase">Expected sale price</p>
+                  <p className="text-[10px] text-slate-400 uppercase">{L('Expected sale price')}</p>
                   {editingPrice ? (
                     <div className="flex items-center gap-2 mt-1">
                       <input
@@ -395,8 +395,8 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                         disabled={marketBusy}
                         onClick={async () => { await saveMarket({ expectedPrice: Number(priceInput) || 0 }); setEditingPrice(false); }}
                         className="text-xs font-semibold text-white bg-farm-600 hover:bg-farm-700 disabled:opacity-60 px-3 py-1.5 rounded-lg transition"
-                      >Save</button>
-                      <button onClick={() => setEditingPrice(false)} className="text-xs font-semibold text-slate-500 hover:text-slate-700 transition">Cancel</button>
+                      >{L('Save')}</button>
+                      <button onClick={() => setEditingPrice(false)} className="text-xs font-semibold text-slate-500 hover:text-slate-700 transition">{L('Cancel')}</button>
                     </div>
                   ) : (
                     <p className="text-base font-bold text-slate-800 dark:text-slate-100">
@@ -414,7 +414,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
 
               <div className="border-t border-slate-200 dark:border-slate-700 pt-3">
                 <div className="flex items-center justify-between mb-2">
-                  <p className="text-[10px] text-slate-400 uppercase">Interested buyers</p>
+                  <p className="text-[10px] text-slate-400 uppercase">{L('Interested buyers')}</p>
                   {isAdmin && (
                     <button onClick={() => setShowNoteForm(v => !v)} className="text-xs font-semibold text-farm-600 hover:text-farm-700 transition">
                       {showNoteForm ? 'Cancel' : '+ Add buyer'}
@@ -424,14 +424,14 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
 
                 {showNoteForm && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-3">
-                    <input placeholder="Buyer name *" value={noteBuyer} onChange={e => setNoteBuyer(e.target.value)} className="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500" />
-                    <input placeholder="Phone" value={notePhone} onChange={e => setNotePhone(e.target.value)} className="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500" />
-                    <input type="number" min="0" placeholder="Offer (Rs)" value={noteOffer} onChange={e => setNoteOffer(e.target.value)} className="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500" />
-                    <input placeholder="Note" value={noteText} onChange={e => setNoteText(e.target.value)} className="border border-slate-200 dark:border-slate-700 rounded-lg px-2.5 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500" />
+                    <input placeholder={L('Buyer name *')} value={noteBuyer} onChange={e => setNoteBuyer(e.target.value)} className="muf-field muf-field-auto" />
+                    <input placeholder={L('Phone')} value={notePhone} onChange={e => setNotePhone(e.target.value)} className="muf-field muf-field-auto" />
+                    <input type="number" min="0" placeholder={L('Offer (Rs)')} value={noteOffer} onChange={e => setNoteOffer(e.target.value)} className="muf-field muf-field-auto" />
+                    <input placeholder={L('Note')} value={noteText} onChange={e => setNoteText(e.target.value)} className="muf-field muf-field-auto" />
                     <button
                       disabled={marketBusy}
                       onClick={async () => {
-                        if (!noteBuyer.trim()) { notify('Enter the buyer name', 'error'); return; }
+                        if (!noteBuyer.trim()) { notify(L('Enter the buyer name'), 'error'); return; }
                         const next: MarketNote[] = [...(cow.marketNotes || []), {
                           id: `mn-${Date.now()}`,
                           date: todayStr(),
@@ -444,12 +444,12 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                         setNoteBuyer(''); setNotePhone(''); setNoteOffer(''); setNoteText(''); setShowNoteForm(false);
                       }}
                       className="sm:col-span-2 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white px-3 py-2 rounded-lg text-xs font-semibold transition"
-                    >Save buyer</button>
+                    >{L('Save buyer')}</button>
                   </div>
                 )}
 
                 {(cow.marketNotes || []).length === 0 ? (
-                  <p className="text-sm text-slate-400">No interested buyers noted yet</p>
+                  <p className="text-sm text-slate-400">{L('No interested buyers noted yet')}</p>
                 ) : (
                   <div className="space-y-2">
                     {(cow.marketNotes || []).map(n => (
@@ -469,7 +469,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                               await saveMarket({ marketNotes: (cow.marketNotes || []).filter(x => x.id !== n.id) });
                             }}
                             className="p-1 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition shrink-0"
-                            title="Remove"
+                            title={L('Remove')}
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -503,7 +503,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                 ))}
               </div>
             ) : (
-              <p className="text-sm text-slate-400">No health records</p>
+              <p className="text-sm text-slate-400">{L('No health records')}</p>
             )}
           </div>
         </div>
@@ -523,9 +523,9 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                       setLightbox(null);
                     }}
                     className="px-3 py-1.5 rounded-lg bg-red-600 hover:bg-red-700 font-bold transition"
-                  >Delete</button>
+                  >{L('Delete')}</button>
                 )}
-                <button onClick={() => setLightbox(null)} className="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 font-bold transition">Close</button>
+                <button onClick={() => setLightbox(null)} className="px-3 py-1.5 rounded-lg bg-white/20 hover:bg-white/30 font-bold transition">{L('Close')}</button>
               </div>
             </div>
           </div>

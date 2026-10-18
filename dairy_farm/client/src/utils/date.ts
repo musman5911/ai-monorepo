@@ -2,7 +2,7 @@
  * Date utilities — thin wrappers over the shared muf-date twin.
  * (Kept for existing importers; new code should import muf-date directly.)
  */
-import { mufToday, mufShiftDays, mufParse } from '../muf-date';
+import { mufToday, mufShiftDays, mufParse } from '../muf/data/muf-date';
 
 /** Returns today's date as YYYY-MM-DD in the local timezone */
 export function todayStr(): string {

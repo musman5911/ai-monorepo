@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import QRCode from 'qrcode';
-import { notify } from '../muf-confirm';
+import { notify } from '../muf/core/muf-confirm';
 import { QrCode, CheckCircle2, Copy, Printer, X, ShieldCheck, Truck, RefreshCw } from './Icons';
+import { L } from '../i18n';
 
 export interface WaybillData {
   id: string;
@@ -102,7 +103,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
       return;
     }
     if (activeFarm === 'super_admin') {
-      notify('Paste a real waybill payload into the field below. Sample waybills are disabled in Superadmin.', 'info', 'No waybill payload');
+      notify(L('Paste a real waybill payload into the field below. Sample waybills are disabled in Superadmin.'), 'info', 'No waybill payload');
       return;
     }
     const demoWaybill: WaybillData = {
@@ -181,7 +182,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Dispatching Unit (Source)
+                        {L('Dispatching Unit (Source)')}
                       </label>
                       <select
                         value={source}
@@ -196,7 +197,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
 
                     <div>
                       <label className="block text-xs font-semibold text-slate-700 mb-1">
-                        Receiving Unit (Destination)
+                        {L('Receiving Unit (Destination)')}
                       </label>
                       <select
                         value={destination}
@@ -212,7 +213,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Source Location / Shed</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{L('Source Location / Shed')}</label>
                       <input
                         type="text"
                         value={sourceLocation}
@@ -222,7 +223,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Destination Facility</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{L('Destination Facility')}</label>
                       <input
                         type="text"
                         value={destLocation}
@@ -235,7 +236,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
 
                   <div className="grid grid-cols-3 gap-3">
                     <div className="col-span-1">
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Material / Crop Item</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{L('Material / Crop Item')}</label>
                       <input
                         type="text"
                         value={item}
@@ -245,7 +246,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Quantity</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{L('Quantity')}</label>
                       <input
                         type="number"
                         min="1"
@@ -256,16 +257,16 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Unit of Measure</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{L('Unit of Measure')}</label>
                       <select
                         value={unit}
                         onChange={(e) => setUnit(e.target.value)}
                         className="w-full text-xs rounded-lg border border-slate-300 p-2"
                       >
-                        <option value="Maunds (40kg)">Maunds (40kg)</option>
-                        <option value="Tons">Metric Tons</option>
-                        <option value="Bags (50kg)">Bags (50kg)</option>
-                        <option value="Trolleys">Tractor Trolleys</option>
+                        <option value="Maunds (40kg)">{L('Maunds (40kg)')}</option>
+                        <option value="Tons">{L('Metric Tons')}</option>
+                        <option value="Bags (50kg)">{L('Bags (50kg)')}</option>
+                        <option value="Trolleys">{L('Tractor Trolleys')}</option>
                       </select>
                     </div>
                   </div>
@@ -281,7 +282,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Driver Name</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{L('Driver Name')}</label>
                       <input
                         type="text"
                         value={driver}
@@ -290,7 +291,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
                       />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold text-slate-700 mb-1">Book Value (PKR)</label>
+                      <label className="block text-xs font-semibold text-slate-700 mb-1">{L('Book Value (PKR)')}</label>
                       <input
                         type="number"
                         value={internalValueRs}
@@ -364,19 +365,19 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
                   {/* Summary Card */}
                   <div className="bg-white p-3 rounded-lg border border-slate-200 text-left text-xs grid grid-cols-2 gap-2">
                     <div>
-                      <span className="text-slate-400 block">Item / Cargo:</span>
+                      <span className="text-slate-400 block">{L('Item / Cargo:')}</span>
                       <strong className="text-slate-800">{generatedWaybill.item}</strong> ({generatedWaybill.quantity} {generatedWaybill.unit})
                     </div>
                     <div>
-                      <span className="text-slate-400 block">Transfer Route:</span>
+                      <span className="text-slate-400 block">{L('Transfer Route:')}</span>
                       <strong className="text-emerald-700 uppercase">{generatedWaybill.source}</strong> $\rightarrow$ <strong className="text-indigo-700 uppercase">{generatedWaybill.destination}</strong>
                     </div>
                     <div>
-                      <span className="text-slate-400 block">Driver / Tractor:</span>
+                      <span className="text-slate-400 block">{L('Driver / Tractor:')}</span>
                       <span className="text-slate-700">{generatedWaybill.driver} ({generatedWaybill.vehicle})</span>
                     </div>
                     <div>
-                      <span className="text-slate-400 block">Valuation:</span>
+                      <span className="text-slate-400 block">{L('Valuation:')}</span>
                       <span className="text-slate-700 font-semibold">PKR {generatedWaybill.internalValueRs.toLocaleString()}</span>
                     </div>
                   </div>
@@ -404,7 +405,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
                       onClick={() => setGeneratedWaybill(null)}
                       className="py-2 px-3 bg-slate-200 hover:bg-slate-300 text-slate-700 text-xs font-medium rounded-lg transition-colors"
                     >
-                      New
+                      {L('New')}
                     </button>
                   </div>
                 </div>
@@ -443,7 +444,7 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
                       setScanResult(null);
                     }
                   }}
-                  placeholder="Paste scanned QR raw payload here..."
+                  placeholder={L('Paste scanned QR raw payload here...')}
                   className="w-full text-xs font-mono p-3 bg-white border border-slate-300 rounded-lg h-28 focus:ring-2 focus:ring-emerald-500"
                 />
               </div>
@@ -457,19 +458,19 @@ export const QrWaybillModal: React.FC<QrWaybillModalProps> = ({
 
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div>
-                      <span className="text-slate-500">Inbound Material:</span>
+                      <span className="text-slate-500">{L('Inbound Material:')}</span>
                       <p className="font-semibold text-slate-800">{scanResult.item}</p>
                     </div>
                     <div>
-                      <span className="text-slate-500">Net Quantity:</span>
+                      <span className="text-slate-500">{L('Net Quantity:')}</span>
                       <p className="font-semibold text-slate-800">{scanResult.quantity} {scanResult.unit}</p>
                     </div>
                     <div>
-                      <span className="text-slate-500">From / To:</span>
+                      <span className="text-slate-500">{L('From / To:')}</span>
                       <p className="font-semibold text-slate-800">{scanResult.sourceLocation} $\rightarrow$ {scanResult.destLocation}</p>
                     </div>
                     <div>
-                      <span className="text-slate-500">Driver & Vehicle:</span>
+                      <span className="text-slate-500">{L('Driver & Vehicle:')}</span>
                       <p className="font-semibold text-slate-800">{scanResult.driver} ({scanResult.vehicle})</p>
                     </div>
                   </div>

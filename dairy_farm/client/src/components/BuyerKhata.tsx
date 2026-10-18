@@ -1,15 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Wallet, FileDown, Plus, Trash2, Share2, QrCode, Pencil } from 'lucide-react';
-import MufCardQr from '../muf-card-qr';
-import DetailModal from '../muf-modal';
+import MufCardQr from '../muf/ui/muf-card-qr';
+import DetailModal from '../muf/core/muf-modal';
 import { api } from '../api';
-import { notify } from '../muf-confirm';
+import { notify } from '../muf/core/muf-confirm';
 import type { Buyer, BuyerPayment, MilkEntry, RateHistory } from '../types';
 import { fmtPKR, monthKey, monthLabel, lastNMonths } from '../utils/format';
 import { todayStr } from '../utils/date';
 import { getRateForDate, saleableMilkLiters } from '../utils/rates';
 import { shareViaWhatsAppTo, urduMonthLabel } from '../utils/share';
 import { generateBuyerStatement, type BuyerLedgerRow } from '../reportExport';
+import { L } from '../i18n';
 
 /* Buyer khata (udhaar ledger) — every milk delivery adds to the buyer's
    balance, every collected payment reduces it. Mirrors the flock farm's
@@ -124,12 +125,12 @@ export default function BuyerKhata({ buyer, open, onClose, isAdmin, onFlash }: B
     try {
       await api.deleteBuyerPayment(buyer._id, id);
       setPayments((p) => p.filter((x) => x._id !== id));
-      notify('Payment deleted', 'success', undefined, {
+      notify(L('Payment deleted'), 'success', undefined, {
         label: 'Undo',
         fn: () => {
           api.addBuyerPayment(buyer._id, { date: payment.date, amount: payment.amount, note: payment.note || undefined })
             .then(() => setPayments((prev) => [...prev, payment]))
-            .catch(() => notify('Undo failed — add the payment again', 'error'));
+            .catch(() => notify(L('Undo failed — add the payment again'), 'error'));
         },
       });
     } catch (err) {
@@ -205,7 +206,7 @@ export default function BuyerKhata({ buyer, open, onClose, isAdmin, onFlash }: B
           <button
             onClick={() => setQrOpen(true)}
             className="flex items-center gap-1.5 bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-xl text-xs font-semibold transition"
-            title="QR card for this buyer"
+            title={L('QR card for this buyer')}
           >
             <QrCode className="w-3.5 h-3.5" /> QR card
           </button>
@@ -222,8 +223,8 @@ export default function BuyerKhata({ buyer, open, onClose, isAdmin, onFlash }: B
               ];
               shareViaWhatsAppTo(buyer.phone, lines.join('\n'));
             }}
-            className="flex items-center gap-1.5 bg-[#25D366] hover:bg-[#1ebe5b] text-white px-3 py-2 rounded-xl text-xs font-semibold transition"
-            title="Send this month's khata to the buyer on WhatsApp"
+            className="flex items-center gap-1.5 bg-[color:var(--muf-brand-whatsapp)] hover:bg-[color:var(--muf-brand-whatsapp-hover)] text-white px-3 py-2 rounded-xl text-xs font-semibold transition"
+            title={L('Send this month\'s khata to the buyer on WhatsApp')}
           >
             <Share2 className="w-3.5 h-3.5" /> WhatsApp khata
           </button>
@@ -232,8 +233,8 @@ export default function BuyerKhata({ buyer, open, onClose, isAdmin, onFlash }: B
         {showPayForm && (
           <form onSubmit={handleCollect} className="dm-card p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
             <input type="date" required value={payDate} onChange={(e) => setPayDate(e.target.value)} className={inputClass} />
-            <input type="number" min="1" step="any" required placeholder="Amount (Rs) *" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} className={inputClass} />
-            <input placeholder="Note" value={payNote} onChange={(e) => setPayNote(e.target.value)} className={inputClass} />
+            <input type="number" min="1" step="any" required placeholder={L('Amount (Rs) *')} value={payAmount} onChange={(e) => setPayAmount(e.target.value)} className={inputClass} />
+            <input placeholder={L('Note')} value={payNote} onChange={(e) => setPayNote(e.target.value)} className={inputClass} />
             <button type="submit" disabled={saving} className="sm:col-span-3 bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white px-4 py-2.5 rounded-xl text-sm font-semibold transition">
               {saving ? 'Saving…' : 'Save payment'}
             </button>
@@ -243,10 +244,10 @@ export default function BuyerKhata({ buyer, open, onClose, isAdmin, onFlash }: B
         {editPay && (
           <form onSubmit={handleEditPayment} className="dm-card p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
             <input type="date" required value={editPay.date} onChange={(e) => setEditPay({ ...editPay, date: e.target.value })} className={inputClass} />
-            <input type="number" min="1" step="any" required placeholder="Amount (Rs) *" value={editPay.amount} onChange={(e) => setEditPay({ ...editPay, amount: e.target.value })} className={inputClass} />
-            <input placeholder="Note" value={editPay.note} onChange={(e) => setEditPay({ ...editPay, note: e.target.value })} className={inputClass} />
+            <input type="number" min="1" step="any" required placeholder={L('Amount (Rs) *')} value={editPay.amount} onChange={(e) => setEditPay({ ...editPay, amount: e.target.value })} className={inputClass} />
+            <input placeholder={L('Note')} value={editPay.note} onChange={(e) => setEditPay({ ...editPay, note: e.target.value })} className={inputClass} />
             <div className="sm:col-span-3 flex justify-end gap-2">
-              <button type="button" onClick={() => setEditPay(null)} className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition">Cancel</button>
+              <button type="button" onClick={() => setEditPay(null)} className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition">{L('Cancel')}</button>
               <button type="submit" disabled={saving} className="bg-farm-600 hover:bg-farm-700 disabled:opacity-60 text-white px-4 py-2 rounded-xl text-xs font-semibold transition">
                 {saving ? 'Saving…' : 'Save changes'}
               </button>
@@ -260,17 +261,17 @@ export default function BuyerKhata({ buyer, open, onClose, isAdmin, onFlash }: B
             <table className="w-full text-left">
               <thead>
                 <tr className="text-[10px] uppercase tracking-wider text-slate-400 border-b border-slate-100 dark:border-slate-800">
-                  <th className="px-4 py-2.5">Date</th>
-                  <th className="px-4 py-2.5">Details</th>
-                  <th className="px-4 py-2.5 text-right">Milk value</th>
-                  <th className="px-4 py-2.5 text-right">Collected</th>
-                  <th className="px-4 py-2.5 text-right">Balance</th>
+                  <th className="px-4 py-2.5">{L('Date')}</th>
+                  <th className="px-4 py-2.5">{L('Details')}</th>
+                  <th className="px-4 py-2.5 text-right">{L('Milk value')}</th>
+                  <th className="px-4 py-2.5 text-right">{L('Collected')}</th>
+                  <th className="px-4 py-2.5 text-right">{L('Balance')}</th>
                   {isAdmin && <th className="px-2 py-2.5" />}
                 </tr>
               </thead>
               <tbody>
                 <tr className="text-xs border-b border-slate-50 dark:border-slate-800/50 bg-slate-50/60 dark:bg-slate-800/30">
-                  <td className="px-4 py-2 text-slate-400" colSpan={2}>Balance carried forward</td>
+                  <td className="px-4 py-2 text-slate-400" colSpan={2}>{L('Balance carried forward')}</td>
                   <td className="px-4 py-2 text-right text-slate-400">—</td>
                   <td className="px-4 py-2 text-right text-slate-400">—</td>
                   <td className="px-4 py-2 text-right font-bold text-slate-600 dark:text-slate-300">{fmtPKR(ledger.opening)}</td>
@@ -279,7 +280,7 @@ export default function BuyerKhata({ buyer, open, onClose, isAdmin, onFlash }: B
                 {loading ? (
                   <tr><td colSpan={isAdmin ? 6 : 5} className="px-4 py-8 text-center text-xs text-slate-400">Loading…</td></tr>
                 ) : ledger.rows.length === 0 ? (
-                  <tr><td colSpan={isAdmin ? 6 : 5} className="px-4 py-8 text-center text-xs text-slate-400">No entries this month</td></tr>
+                  <tr><td colSpan={isAdmin ? 6 : 5} className="px-4 py-8 text-center text-xs text-slate-400">{L('No entries this month')}</td></tr>
                 ) : ledger.rows.map((r, i) => (
                   <tr key={i} className="text-xs border-b border-slate-50 dark:border-slate-800/50 hover:bg-slate-50 dark:hover:bg-slate-800/40 transition">
                     <td className="px-4 py-2.5 whitespace-nowrap text-slate-500">{r.date}</td>
@@ -296,10 +297,10 @@ export default function BuyerKhata({ buyer, open, onClose, isAdmin, onFlash }: B
                       <td className="px-2 py-2.5">
                         {r.kind === 'payment' && (r as { id?: string }).id && (
                           <>
-                            <button onClick={() => openEditPayment((r as { id?: string }).id!)} className="p-1 rounded-lg text-farm-500 hover:text-farm-700 hover:bg-farm-50 dark:hover:bg-farm-900/20 transition" title="Edit payment">
+                            <button onClick={() => openEditPayment((r as { id?: string }).id!)} className="p-1 rounded-lg text-farm-500 hover:text-farm-700 hover:bg-farm-50 dark:hover:bg-farm-900/20 transition" title={L('Edit payment')}>
                               <Pencil className="w-3.5 h-3.5" />
                             </button>
-                            <button onClick={() => handleDeletePayment((r as { id?: string }).id!)} className="p-1 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition" title="Delete payment">
+                            <button onClick={() => handleDeletePayment((r as { id?: string }).id!)} className="p-1 rounded-lg text-red-400 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 transition" title={L('Delete payment')}>
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </>

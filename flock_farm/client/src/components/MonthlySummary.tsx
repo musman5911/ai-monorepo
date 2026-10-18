@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { mufL } from '../muf-urdu';
-import { mufMonthLabel } from '../muf-date';
+import { mufL } from '../muf/data/muf-urdu';
+import { mufMonthLabel } from '../muf/data/muf-date';
 import {
   Calendar,
   ChevronLeft,
@@ -55,13 +55,13 @@ import {
   exportExpensePDF,
   exportMonthlySummaryPDF,
 } from '../reportExport';
-import { openMufPrint } from '../muf-print';
-import { zakatStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, downloadZakatPdf } from '../muf-zakat';
-import FarmProfileCard from '../muf-farm-profile';
-import { downloadFarmBookPdf } from '../muf-farmbook';
-import {mufShiftMonth} from '../muf-date';
-import { MufAreaChart, MufBarChart, type MufChartPoint } from '../muf-charts';
-import DetailModal from '../muf-modal';
+import { openMufPrint } from '../muf/data/muf-print';
+import { zakatStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, downloadZakatPdf } from '../muf/domain/muf-zakat';
+import FarmProfileCard from '../muf/ui/muf-farm-profile';
+import { downloadFarmBookPdf } from '../muf/domain/muf-farmbook';
+import {mufShiftMonth} from '../muf/data/muf-date';
+import { MufAreaChart, MufBarChart, type MufChartPoint } from '../muf/ui/muf-charts';
+import DetailModal from '../muf/core/muf-modal';
 
 interface MonthlySummaryProps {
   birds: Bird[];
@@ -811,7 +811,7 @@ function ZakatSection({ lang = 'en', birds, otherExpenses, feedRecords, vaccinat
     <>
       <button
         onClick={() => setOpen(true)}
-        className="w-full flex items-center gap-3 p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0d1a11] hover:shadow-md transition-shadow text-left"
+        className="muf-card-link w-full flex items-center gap-3 p-4 text-left"
       >
         <span className="shrink-0 w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">🕌</span>
         <div className="min-w-0 flex-1">
@@ -832,15 +832,15 @@ function ZakatSection({ lang = 'en', birds, otherExpenses, feedRecords, vaccinat
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-4 gap-2 text-xs">
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Income')} ({year})</label>
+              <label className="muf-pc-label-micro">{L('Income')} ({year})</label>
               <input type="number" className={inputClass} value={incomeOverride === null ? autoIncome : incomeOverride} onChange={(e) => setIncomeOverride(e.target.value)} />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Expenses')} ({year})</label>
+              <label className="muf-pc-label-micro">{L('Expenses')} ({year})</label>
               <input type="number" className={inputClass} value={expenseOverride === null ? autoExpenses : expenseOverride} onChange={(e) => setExpenseOverride(e.target.value)} />
             </div>
             <div>
-              <label className="block text-[10px] font-bold text-slate-500 mb-1 uppercase">{L('Rate %')}</label>
+              <label className="muf-pc-label-micro">{L('Rate %')}</label>
               <input type="number" step="any" min="0" className={inputClass} value={pct} onChange={(e) => setPct(e.target.value)} />
             </div>
             <div className="flex flex-col justify-end">
@@ -851,7 +851,7 @@ function ZakatSection({ lang = 'en', birds, otherExpenses, feedRecords, vaccinat
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => downloadZakatPdf({ periodLabel: year, income, expenses: expensesTotal, pct: pctNum })}
-              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl transition"
+              className="px-4 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-xl transition"
             >{L('Download zakat statement (PDF)')}</button>
             <button
               onClick={() => openMufPrint({

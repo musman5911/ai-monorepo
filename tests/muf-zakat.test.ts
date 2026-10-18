@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { pctAmount, ZAKAT_DEFAULT_PCT } from '../dairy_farm/client/src/muf-zakat';
+import { pctAmount, ZAKAT_DEFAULT_PCT } from '../dairy_farm/client/src/muf/domain/muf-zakat';
 
 describe('muf-zakat helpers', () => {
   describe('ZAKAT_DEFAULT_PCT', () => {

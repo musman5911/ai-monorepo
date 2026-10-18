@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Loader, X, UploadCloud, ImagePlus, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { compressImage, formatBytes } from '../imageUtils';
+import { L } from '../i18n';
 
 /**
  * Reusable image upload control with:
@@ -118,7 +119,7 @@ export default function ImageUploader({
   const successLine = sizes && !busy && stage === 'done' && (
     <p className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1 flex-wrap">
       <CheckCircle2 size={11} className="text-farm-600 dark:text-farm-400 shrink-0" />
-      <span className="text-farm-700 dark:text-farm-300 font-bold">Optimized:</span>
+      <span className="text-farm-700 dark:text-farm-300 font-bold">{L('Optimized:')}</span>
       {formatBytes(sizes.original)} → <span className="text-farm-600 dark:text-farm-400 font-bold">{formatBytes(sizes.compressed)}</span>
       {savedPct != null && savedPct > 0 && (
         <span className="px-1.5 py-px rounded-full bg-farm-100 dark:bg-farm-900/40 text-farm-700 dark:text-farm-300 font-black">−{savedPct}%</span>
@@ -170,8 +171,8 @@ export default function ImageUploader({
               type="button"
               onClick={openPicker}
               className="p-2 rounded-lg bg-white/90 text-slate-700 hover:bg-white cursor-pointer shadow"
-              title="Replace photo"
-              aria-label="Replace image"
+              title={L('Replace photo')}
+              aria-label={L('Replace image')}
             >
               <RefreshCw size={14} />
             </button>
@@ -180,15 +181,15 @@ export default function ImageUploader({
                 type="button"
                 onClick={() => { onRemove(); setSizes(null); setStage(null); setProgress(null); }}
                 className="p-2 rounded-lg bg-red-500/95 text-white hover:bg-red-600 cursor-pointer shadow"
-                title="Remove photo"
-                aria-label="Remove image"
+                title={L('Remove photo')}
+                aria-label={L('Remove image')}
               >
                 <X size={14} />
               </button>
             )}
           </div>
           <span className="absolute bottom-1 left-1 px-1.5 py-px rounded bg-black/55 text-white text-[9px] font-bold uppercase tracking-wider pointer-events-none group-hover:opacity-0 transition-opacity">
-            Photo attached
+            {L('Photo attached')}
           </span>
         </div>
       ) : (

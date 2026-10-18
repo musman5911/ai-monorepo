@@ -399,7 +399,7 @@ async function compressImage(file: File, maxDim = 1024, quality = 0.82): Promise
   }
 }
 
-export async function uploadImage(file: File, kind: 'bird' | 'batch'): Promise<string> {
+export async function uploadImage(file: File, kind: 'bird' | 'batch' | 'diary'): Promise<string> {
   const token = getToken();
   if (!token) throw new Error('Authentication required');
 
@@ -408,7 +408,8 @@ export async function uploadImage(file: File, kind: 'bird' | 'batch'): Promise<s
   const uploadName = compressed === file ? file.name : `${file.name.replace(/\.[^.]+$/, '')}.jpg`;
   form.append('image', compressed, uploadName);
 
-  const res = await fetch(`/api/uploads/image?kind=${encodeURIComponent(kind)}`, {
+  const uploadUrl = kind === 'diary' ? '/api/uploads/diary-image' : `/api/uploads/image?kind=${encodeURIComponent(kind)}`;
+  const res = await fetch(uploadUrl, {
     method: 'POST',
     headers: tokenHeaders(token),
     body: form,

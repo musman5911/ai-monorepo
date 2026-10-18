@@ -3,6 +3,7 @@ import { CalendarDays } from 'lucide-react';
 import { Lang } from '../types';
 import { t } from '../i18n';
 import { formatLocalDate } from '../utils/calculations';
+import { L } from '../i18n';
 
 interface LightSparklineProps {
   title: string;
@@ -98,7 +99,7 @@ export function DateRangeFilter({ lang, from, to, onChange, onPreset }: DateRang
         onClick={selectMonth}
         className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition ${
           !isCustomActive
-            ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
+            ? 'bg-farm-600 text-white border-emerald-700 shadow-sm'
             : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
         }`}
       >
@@ -107,10 +108,10 @@ export function DateRangeFilter({ lang, from, to, onChange, onPreset }: DateRang
       <button
         type="button"
         onClick={openCustom}
-        title="Custom range"
+        title={L('Custom range')}
         className={`p-1.5 rounded-lg border transition ${
           isCustomActive
-            ? 'bg-emerald-600 text-white border-emerald-700 shadow-sm'
+            ? 'bg-farm-600 text-white border-emerald-700 shadow-sm'
             : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
         }`}
       >
@@ -119,10 +120,10 @@ export function DateRangeFilter({ lang, from, to, onChange, onPreset }: DateRang
 
       {customOpen && (
         <div className="absolute right-0 top-full mt-2 z-50 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-xl p-4 space-y-3 w-72">
-          <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">Custom Range</h4>
+          <h4 className="font-bold text-xs text-slate-800 dark:text-slate-100 uppercase tracking-wider">{L('Custom Range')}</h4>
           <div className="space-y-2">
             <label className="block space-y-1">
-              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">From</span>
+              <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">{L('From')}</span>
               <input
                 type="date" value={cFrom} onChange={(e) => setCFrom(e.target.value)}
                 className="w-full px-2 py-1.5 text-xs border border-slate-200 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 rounded-lg font-mono"
@@ -139,11 +140,11 @@ export function DateRangeFilter({ lang, from, to, onChange, onPreset }: DateRang
           <div className="flex justify-end gap-2 pt-2">
             <button type="button" onClick={() => setCustomOpen(false)}
               className="px-3 py-1.5 text-xs font-semibold rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200">
-              Cancel
+              {L('Cancel')}
             </button>
             <button type="button" onClick={apply}
-              className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white">
-              Apply
+              className="px-3 py-1.5 text-xs font-bold rounded-lg bg-farm-600 hover:bg-farm-700 text-white">
+              {L('Apply')}
             </button>
           </div>
         </div>

@@ -175,4 +175,8 @@ export const updateLiability = (id, item) => api.put(`/liabilities/${id}`, item)
 export const payLiability = (id) => api.put(`/liabilities/${id}/pay`);
 export const deleteLiability = (id) => api.delete(`/liabilities/${id}`);
 
+export const getDiaryMedia = (date: string) => api.get(`/diary-media/${encodeURIComponent(date)}`);
+export const getDiaryEntries = () => api.get('/diary-media/entries');
+export const saveDiaryMedia = (date: string, photos?: unknown[], entries?: unknown[]) => api.put(`/diary-media/${encodeURIComponent(date)}`, { ...(photos !== undefined ? { photos } : {}), ...(entries !== undefined ? { entries } : {}) });
+
 export default api;

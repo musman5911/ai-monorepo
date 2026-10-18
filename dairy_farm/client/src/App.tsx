@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence, prefersReducedMotion } from './muf-motion';
+import { useState, useEffect, useMemo, useRef } from "react";
+import { createPortal } from "react-dom";
+import { motion, AnimatePresence, prefersReducedMotion } from './muf/core/muf-motion';
 import {
   CalendarHeart,
   Home,
@@ -17,13 +18,14 @@ import {
   Bell,
   Users,
   ChevronDown,
+  Languages,
 } from "lucide-react";
 import { getToken, getRole, getUsername, clearAuth, api, syncOfflineQueue, offlineQueueCount } from "./api";
 import type { HealthRecord, AuthUser } from "./types";
 import MyProfilePopup from "./components/MyProfilePopup";
 import { todayStr } from "./utils/date";
 import { L, getLang, setCurrentLang, type Lang } from "./i18n";
-import { notify, useConfirm } from './muf-confirm';
+import { notify, useConfirm } from './muf/core/muf-confirm';
 import Login from "./components/Login";
 import Dashboard from "./components/Dashboard";
 import { SuperAdminTab } from "./components/SuperAdminTab";
@@ -34,12 +36,13 @@ import ExpensesTab from "./components/ExpensesTab";
 import HealthTab from "./components/HealthTab";
 import ReportsTab from "./components/ReportsTab";
 import DiaryTab from "./components/DiaryTab";
+import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from "./muf/ui/muf-diary";
 import LaborTab from "./components/LaborTab";
-import HeaderSearch from "./muf-header-search";
-import OfflineBanner from "./muf-offline-banner";
-import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf-applike';
+import HeaderSearch from "./muf/ui/muf-header-search";
+import OfflineBanner from "./muf/core/muf-offline-banner";
+import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf/core/muf-applike';
 import AdminPanel from "./components/AdminPanel";
-import DetailModal from './muf-modal';
+import DetailModal from './muf/core/muf-modal';
 
 type Tab =
   | "dashboard"
@@ -78,15 +81,60 @@ export default function App() {
   );
   const [tab, setTab] = useState<Tab>("dashboard");
   const [financeMenuOpen, setFinanceMenuOpen] = useState(false);
-  // Close Finance menu when the user clicks anywhere outside its navbar item.
+  const financeMenuAnchorRef = useRef<HTMLDivElement | null>(null);
+  const financeMenuTriggerRef = useRef<HTMLButtonElement | null>(null);
+  const [financeMenuPosition, setFinanceMenuPosition] = useState({ top: 8, left: 8 });
+
+  const toggleFinanceMenu = () => {
+    if (financeMenuOpen) {
+      setFinanceMenuOpen(false);
+      return;
+    }
+    const anchor = financeMenuAnchorRef.current?.getBoundingClientRect();
+    const menuWidth = Math.min(208, Math.max(0, window.innerWidth - 16));
+    const maxMenuHeight = Math.min(window.innerHeight * 0.7, 416);
+    if (anchor) {
+      setFinanceMenuPosition({
+        top: Math.max(8, Math.min(anchor.bottom + 8, window.innerHeight - maxMenuHeight - 8)),
+        left: Math.max(8, Math.min(anchor.left, window.innerWidth - menuWidth - 8)),
+      });
+    }
+    setFinanceMenuOpen(true);
+  };
+
+  // Body portal escapes the horizontally scrolling navigation and its clipping.
+  // Keep outside-pointer, Escape, resize and page-scroll dismissal consistent.
   useEffect(() => {
     if (!financeMenuOpen) return;
     const closeOnOutsidePointer = (event: PointerEvent) => {
       const target = event.target;
-      if (target instanceof Element && !target.closest('.muf-finance-nav-item')) setFinanceMenuOpen(false);
+      if (target instanceof Element &&
+        !target.closest('.muf-finance-nav-item') &&
+        !target.closest('.muf-finance-menu')) {
+        setFinanceMenuOpen(false);
+      }
+    };
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault();
+      setFinanceMenuOpen(false);
+      financeMenuTriggerRef.current?.focus({ preventScroll: true });
+    };
+    const closeOnScroll = (event: Event) => {
+      const target = event.target;
+      if (target instanceof Element && target.closest('.muf-finance-menu')) return;
+      setFinanceMenuOpen(false);
     };
     document.addEventListener('pointerdown', closeOnOutsidePointer);
-    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+    document.addEventListener('keydown', closeOnEscape);
+    window.addEventListener('resize', closeOnScroll);
+    window.addEventListener('scroll', closeOnScroll, true);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePointer);
+      document.removeEventListener('keydown', closeOnEscape);
+      window.removeEventListener('resize', closeOnScroll);
+      window.removeEventListener('scroll', closeOnScroll, true);
+    };
   }, [financeMenuOpen]);
   const [financeCategory, setFinanceCategory] = useState('');
   const [lang, setLangState] = useState<Lang>(getLang());
@@ -124,7 +172,66 @@ export default function App() {
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [diaryOpen, setDiaryOpen] = useState(false);
+  const [diaryEntries, setDiaryEntries] = useState<MufDiaryEntry[]>([]);
+  const [diaryEntityOptions, setDiaryEntityOptions] = useState<MufDiaryChoice[]>([]);
+  const [diaryShareTargets, setDiaryShareTargets] = useState<MufDiaryChoice[]>([]);
   const [me, setMe] = useState<AuthUser | null>(null);
+
+  useEffect(() => {
+    if (!diaryOpen || !token) return;
+    let cancelled = false;
+    Promise.all([
+      api.getDiaryEntries().catch(() => ({ entries: [] })),
+      api.getCows({}).catch(() => []),
+      api.getBuyers().catch(() => []),
+      api.getLaborWorkers().catch(() => []),
+      api.getSuppliers().catch(() => []),
+    ]).then(([diaryResult, cows, buyers, workers, suppliers]) => {
+      if (cancelled) return;
+      setDiaryEntries(Array.isArray(diaryResult.entries) ? diaryResult.entries : []);
+      const entityOptions: MufDiaryChoice[] = [
+        ...(Array.isArray(cows) ? cows.map((x: any) => ({ id: String(x._id || x.id), type: 'animal', label: x.name || x.tagNo || x.tag || L('Animal') })) : []),
+        ...(Array.isArray(buyers) ? buyers.map((x: any) => ({ id: String(x._id || x.id), type: 'buyer', label: x.name || L('Buyer') })) : []),
+        ...(Array.isArray(workers) ? workers.map((x: any) => ({ id: String(x._id || x.id), type: 'labor', label: x.name || L('Laborer') })) : []),
+        ...(Array.isArray(suppliers) ? suppliers.map((x: any) => ({ id: String(x._id || x.id), type: 'dealer', label: x.name || L('Dealer') })) : []),
+      ].filter((x) => x.id && x.id !== 'undefined');
+      setDiaryEntityOptions(entityOptions);
+      setDiaryShareTargets([
+        ...(Array.isArray(buyers) ? buyers.map((x: any) => ({ id: String(x._id || x.id), type: 'buyer', label: x.name || L('Buyer'), phone: x.phone || x.mobile })) : []),
+        ...(Array.isArray(workers) ? workers.map((x: any) => ({ id: String(x._id || x.id), type: 'labor', label: x.name || L('Laborer'), phone: x.phone || x.mobile })) : []),
+        ...(Array.isArray(suppliers) ? suppliers.map((x: any) => ({ id: String(x._id || x.id), type: 'dealer', label: x.name || L('Dealer'), phone: x.phone || x.mobile })) : []),
+      ].filter((x) => x.id && x.id !== 'undefined'));
+    }).catch(() => {});
+    return () => { cancelled = true; };
+  }, [diaryOpen, token]);
+
+  const saveDiaryEntry = async (entry: MufDiaryEntry) => {
+    if (entry.originalDate && entry.originalDate !== entry.date) await deleteDiaryEntry(entry.id, entry.originalDate);
+    const current = await api.getDailyLog(entry.date);
+    let dayEntries: MufDiaryEntry[] = Array.isArray(current.diaryEntries) ? current.diaryEntries : [];
+    if (!dayEntries.length && (current.notes || current.photos?.length || current.voiceNotes?.length)) {
+      dayEntries = [{
+        id: 'legacy-' + entry.date, date: entry.date, note: current.notes || '',
+        photos: Array.isArray(current.photos) ? current.photos : [],
+        voiceBase64: Array.isArray(current.voiceNotes) && current.voiceNotes.length ? current.voiceNotes[0].base64 : undefined,
+      }];
+    }
+    dayEntries = dayEntries.filter((item) => item.id !== entry.id);
+    dayEntries.push(entry);
+    await api.saveDailyLog(entry.date, { diaryEntries: dayEntries, notes: '', photos: [], voiceNotes: [] });
+    setDiaryEntries((previous) => [...previous.filter((item) => item.date !== entry.date), ...dayEntries].sort((a, b) => b.date.localeCompare(a.date)));
+  };
+
+  const deleteDiaryEntry = async (id: string, date: string) => {
+    const current = await api.getDailyLog(date);
+    let dayEntries: MufDiaryEntry[] = Array.isArray(current.diaryEntries) ? current.diaryEntries : [];
+    if (!dayEntries.length && (current.notes || current.photos?.length || current.voiceNotes?.length)) {
+      dayEntries = [{ id: 'legacy-' + date, date, note: current.notes || '', photos: Array.isArray(current.photos) ? current.photos : [], voiceBase64: current.voiceNotes?.[0]?.base64 }];
+    }
+    dayEntries = dayEntries.filter((entry) => entry.id !== id);
+    await api.saveDailyLog(date, { diaryEntries: dayEntries, ...(id === 'legacy-' + date ? { notes: '', photos: [], voiceNotes: [] } : {}) });
+    setDiaryEntries((previous) => previous.filter((entry) => !(entry.date === date && entry.id === id)));
+  };
   const [healthAlerts, setHealthAlerts] = useState<HealthRecord[]>([]);
 
   // Load own profile (for the header avatar); refresh when the admin panel
@@ -230,7 +337,7 @@ export default function App() {
 
   if (!token) {
     return (
-      <Login onLogin={handleLogin} sessionNotice={sessionNotice} />
+      <Login onLogin={handleLogin} sessionNotice={sessionNotice} lang={lang} onToggleLang={toggleLang} />
     );
   }
 
@@ -243,7 +350,7 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-800 dark:text-slate-100 transition-colors duration-200 overflow-x-hidden relative"
+      className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col font-sans text-slate-800 dark:text-slate-100 transition-colors duration-200 overflow-x-clip relative"
       id="app-root"
     >
       {/* Decorative background — one-shot fade-in, no loops */}
@@ -284,7 +391,8 @@ export default function App() {
   'Farm profile PDF for buyers — in the reports section',
   'More Urdu across the whole app',
 ]} />
-      <header className="muf-header">
+      <div className="muf-sticky-chrome">
+<header className="muf-header">
         <a href="/" target="_self" className="muf-header-brand cursor-pointer hover:opacity-90 transition-opacity">
           <img
             src="/dairy-farm-logo-round-512.png"
@@ -292,8 +400,8 @@ export default function App() {
             alt="Usman Dairy Farm"
           />
           <div>
-            <h1>Usman Dairy Farm</h1>
-            <p>Farm Management System</p>
+            <h1>{L('Usman Dairy Farm')}</h1>
+            <p>{L('Farm Management System')}</p>
           </div>
         </a>
 
@@ -322,9 +430,18 @@ export default function App() {
           />
 
           <button
+            className="muf-icon-button"
+            onClick={() => setDiaryOpen(true)}
+            title={L("Notes")}
+            aria-label={L("Notes")}
+          >
+            <BookOpen size={19} />
+          </button>
+
+          <button
             className="muf-icon-button muf-notif-wrap"
-            title="Notifications"
-            aria-label="Notifications"
+            title={L('Notifications')}
+            aria-label={L('Notifications')}
             onClick={() => setNotifOpen(true)}
           >
             <Bell size={19} />
@@ -335,33 +452,24 @@ export default function App() {
 
           <button
             className="muf-icon-button"
-            onClick={() => setDiaryOpen(true)}
-            title={L("Diary")}
-            aria-label="Diary"
-          >
-            <BookOpen size={19} />
-          </button>
-
-          <button
-            className="muf-icon-button"
             onClick={toggleLang}
             title={lang === "en" ? L("Switch to Urdu") : lang === "ur" ? L("Switch to Roman Urdu") : L("Switch to English")}
-            aria-label="Switch language"
+            aria-label={L("Switch language")}
           >
-            <span className="text-[10px] font-bold">{lang === "en" ? "EN" : lang === "ur" ? "UR" : "Roman"}</span>
+            <Languages size={19} />
           </button>
 
           <button
             className="muf-icon-button"
             onClick={() => setDark((d) => !d)}
-            title={dark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-            aria-label="Toggle theme"
+            title={dark ? L("Switch to Light Mode") : L("Switch to Dark Mode")}
+            aria-label={L("Toggle theme")}
           >
             {dark ? <Sun size={19} /> : <Moon size={19} /> }
           </button>
 
           {isAdmin ? (
-            <button className="muf-profile" onClick={() => setShowAdmin(true)} title="Open admin panel" aria-label="Open admin panel">
+            <button className="muf-profile" onClick={() => setShowAdmin(true)} title={L("Open admin panel")} aria-label={L("Open admin panel")}>
               <span className="muf-avatar">
                 {me?.avatarBase64 ? (
                   <img src={me.avatarBase64} className="object-cover rounded-full" alt={username || 'Admin'} />
@@ -369,11 +477,11 @@ export default function App() {
                   <Shield size={18} />
                 )}
               </span>
-              <span><strong>Welcome - {username || "Admin"}</strong><small>Administrator</small></span>
+              <span><strong>Welcome - {username || "Admin"}</strong><small>{L('Administrator')}</small></span>
               <ChevronDown size={17} />
             </button>
           ) : (
-            <button className="muf-profile" onClick={() => setProfileOpen(true)} title="My profile" aria-label="Open my profile">
+            <button className="muf-profile" onClick={() => setProfileOpen(true)} title={L("My profile")} aria-label={L("Open my profile")}>
               <span className="muf-avatar">
                 {me?.avatarBase64 ? (
                   <img src={me.avatarBase64} className="object-cover rounded-full" alt={username || 'Worker'} />
@@ -381,30 +489,40 @@ export default function App() {
                   <Users size={18} />
                 )}
               </span>
-              <span><strong>Welcome - {username || "Worker"}</strong><small>Worker</small></span>
+              <span><strong>Welcome - {username || "Worker"}</strong><small>{L('Worker')}</small></span>
             </button>
           )}
 
-          <button className="muf-icon-button muf-logout" onClick={handleLogout} title="Logout" aria-label="Logout">
+          <button className="muf-icon-button muf-logout" onClick={handleLogout} title={L("Logout")} aria-label={L("Logout")}>
             <LogOut size={18} />
           </button>
         </div>
       </header>
 
       {/* Tab Nav */}
-      <nav className="muf-top-nav" aria-label="Primary navigation">
+      <nav className="muf-top-nav" aria-label={L('Primary navigation')}>
         <div className="muf-top-nav-scroll">
           {visibleNav.map(({ id, label, icon: Icon }) => id === "expenses" ? (
-            <div className="muf-nav-item muf-finance-nav-item relative" key={id}>
+            <div className="muf-nav-item muf-finance-nav-item relative" ref={financeMenuAnchorRef} key={id}>
               <div className="flex items-center">
                 <button type="button" className={`muf-nav-link ${tab === id ? "active" : ""}`} onClick={() => { setTab(id); setFinanceMenuOpen(false); }}><Icon size={15}/><span>{label}</span></button>
-                <button type="button" aria-label="Open Finance sections" aria-expanded={financeMenuOpen} onClick={() => setFinanceMenuOpen(v => !v)} className="muf-nav-link !px-2" title="Finance sections"><ChevronDown size={14}/></button>
+                <button type="button" ref={financeMenuTriggerRef} aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} aria-controls="muf-finance-menu" onClick={toggleFinanceMenu} className="muf-nav-link !px-2" title={L('Finance sections')}><ChevronDown size={14}/></button>
               </div>
-              {financeMenuOpen && <div className="absolute left-0 top-full z-[9999] mt-2 min-w-48 rounded-xl border border-slate-200 bg-white p-1.5 shadow-xl dark:border-slate-700 dark:bg-slate-900">{[{label:'All expenses',value:''},{label:'Feed',value:'feed'},{label:'Medicine',value:'medicine'},{label:'Equipment',value:'equipment'},{label:'Labor',value:'labor'},{label:'Purchasing',value:'purchasing'},{label:'Other',value:'misc'}].map(item => <button key={item.label} type="button" onClick={() => { setFinanceCategory(item.value); setTab('expenses'); setFinanceMenuOpen(false); }} className={`block w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-emerald-50 dark:hover:bg-slate-800 ${financeCategory === item.value ? 'font-bold text-emerald-700 dark:text-emerald-400' : ''}`}>{item.label}</button>)}</div>}
+              {financeMenuOpen && createPortal(
+                <div
+                  id="muf-finance-menu"
+                  className="muf-finance-menu"
+                  role="group"
+                  aria-label={L('Finance sections')}
+                  style={financeMenuPosition}
+                >{[{label:'All expenses',value:''},{label:'Feed',value:'feed'},{label:'Medicine',value:'medicine'},{label:'Equipment',value:'equipment'},{label:'Labor',value:'labor'},{label:'Purchasing',value:'purchasing'},{label:'Other',value:'misc'}].map(item => <button key={item.label} type="button" onClick={() => { setFinanceCategory(item.value); setTab('expenses'); setFinanceMenuOpen(false); }} className={`muf-finance-menu-item ${financeCategory === item.value ? 'is-active' : ''}`}>{item.label}</button>)}</div>,
+                document.body
+              )}
             </div>
           ) : <div className="muf-nav-item" key={id}><button type="button" className={`muf-nav-link ${tab === id ? "active" : ""}`} onClick={() => setTab(id)}><Icon size={15}/><span>{label}</span></button></div>)}
         </div>
       </nav>
+</div>
 
       {/* Content */}
       <div className="flex-1 w-full p-3 sm:p-5 relative z-10">
@@ -437,7 +555,7 @@ export default function App() {
             {tab === "labor" && isAdmin && <LaborTab />}
             {tab === "reports" && (isAdmin ? <ReportsTab /> : (
               <div className="p-8 text-center text-slate-500 text-sm">
-                Reports are available to admin accounts only.
+                {L('Reports are available to admin accounts only.')}
               </div>
             ))}
             {tab === "super_admin" && isAdmin && <SuperAdminTab />}
@@ -475,28 +593,35 @@ export default function App() {
       <DetailModal
         open={diaryOpen}
         onClose={() => setDiaryOpen(false)}
-        title={L("Diary")}
+        title={L("Notes")}
         subtitle={L("Daily checklist and notes")}
         icon={<BookOpen className="w-5 h-5" />}
         iconBg="bg-indigo-100 text-indigo-700"
         size="big"
       >
-        <DiaryTab />
+        <div className="space-y-5">
+          <MufDiary entries={diaryEntries} onSave={saveDiaryEntry} onDelete={deleteDiaryEntry}
+            entityOptions={diaryEntityOptions} shareTargets={diaryShareTargets} />
+          <details className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
+            <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist')}</summary>
+            <div className="mt-4"><DiaryTab checklistOnly /></div>
+          </details>
+        </div>
       </DetailModal>
 
       {/* Notifications popup */}
       <DetailModal
         open={notifOpen}
         onClose={() => setNotifOpen(false)}
-        title="Active Farm Notifications"
-        subtitle="Real-time Operational Alerts"
+        title={L('Active Farm Notifications')}
+        subtitle={L('Real-time Operational Alerts')}
         icon={<Bell className="w-4 h-4" />}
         iconBg="bg-farm-100 text-farm-700 dark:bg-farm-900/40 dark:text-farm-300"
         size="small"
       >
         <div className="space-y-2.5 max-h-[50vh] overflow-y-auto pr-1">
                   {notifications.map((notif) => (
-                    <div key={notif.id} className="p-3.5 rounded-xl border border-[#e6e6de] dark:border-[#203528] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
+                    <div key={notif.id} className="p-3.5 rounded-xl border border-[color:var(--muf-color-border)] bg-slate-50 dark:bg-slate-900/40 space-y-1 animate-fade-in">
                       <div className="flex justify-between items-center">
                         <span className="font-extrabold text-xs text-slate-800 dark:text-white flex items-center gap-1.5">
                           {notif.title}
@@ -506,7 +631,7 @@ export default function App() {
                             ? "bg-red-900/20 text-red-600 border-red-900/30"
                             : "bg-amber-900/20 text-amber-600 border-amber-900/30"
                         }`}>
-                          Alert
+                          {L('Alert')}
                         </span>
                       </div>
                       <p className="text-xs text-slate-600 dark:text-slate-300 font-medium">{notif.desc}</p>

@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { KeyRound, UserRound } from 'lucide-react';
-import DetailModal from '../muf-modal';
-import AvatarUploader from '../muf-avatar';
+import DetailModal from '../muf/core/muf-modal';
+import AvatarUploader from '../muf/ui/muf-avatar';
 import { api } from '../api';
 import type { AuthUser } from '../types';
+import { L } from '../i18n';
 
 /**
  * My Profile — compact popup for the logged-in user (used by workers, who
@@ -54,7 +55,7 @@ export default function MyProfilePopup({
     <DetailModal
       open
       onClose={onClose}
-      title="My Profile"
+      title={L('My Profile')}
       subtitle={`${me?.username} · ${me?.role === 'admin' ? 'Administrator' : 'Worker'}`}
       icon={<UserRound className="w-4 h-4" />}
       iconBg="bg-farm-100 text-farm-700 dark:bg-farm-900/40 dark:text-farm-300"
@@ -66,7 +67,7 @@ export default function MyProfilePopup({
           )}
 
           <div className="dm-card p-4">
-            <h3 className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-3">Profile photo</h3>
+            <h3 className="text-xs font-black uppercase tracking-wider text-slate-600 dark:text-slate-300 mb-3">{L('Profile photo')}</h3>
             <AvatarUploader
               avatar={me?.avatarBase64 || ''}
               fallbackLetter={(me?.username || 'U')[0]}
@@ -91,14 +92,14 @@ export default function MyProfilePopup({
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="Current password"
+              placeholder={L('Current password')}
               className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 transition"
             />
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="New password (min 8 characters)"
+              placeholder={L('New password (min 8 characters)')}
               minLength={8}
               className="w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 transition"
             />

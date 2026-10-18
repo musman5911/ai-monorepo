@@ -1,0 +1,282 @@
+/* --------------------------------------------------------------------------
+   MUF SEMANTIC TOKENS + FINANCE DROPDOWN / MOBILE POPUP SAFEGUARDS
+   Presentation only. Keep byte-identical in dairy, flock and agri.
+   -------------------------------------------------------------------------- */
+:root {
+  --muf-space-1: 0.25rem;
+  --muf-space-2: 0.5rem;
+  --muf-space-3: 0.75rem;
+  --muf-space-4: 1rem;
+  --muf-space-6: 1.5rem;
+  --muf-control-height: 2.75rem;
+  --muf-type-body: 0.875rem;
+  --muf-brand-primary: #16a34a;
+  --muf-brand-primary-hover: #15803d;
+  --muf-dropdown-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
+}
+.dark {
+  --muf-brand-primary-hover: #4ade80;
+  --muf-dropdown-shadow: 0 16px 36px rgba(0, 0, 0, 0.32);
+}
+
+/* This menu is portalled to document.body so nav overflow cannot clip it. */
+.muf-finance-menu {
+  position: fixed;
+  z-index: calc(var(--muf-z-dropdown) + 1);
+  box-sizing: border-box;
+  width: min(13rem, calc(100vw - 1rem));
+  min-width: min(11rem, calc(100vw - 1rem));
+  max-width: calc(100vw - 1rem);
+  max-height: min(70vh, 26rem);
+  max-height: min(70dvh, 26rem);
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: var(--muf-space-1);
+  border: 1px solid var(--muf-line);
+  border-radius: var(--muf-radius-md);
+  background: var(--muf-surface);
+  color: var(--muf-ink);
+  box-shadow: var(--muf-dropdown-shadow);
+  isolation: isolate;
+}
+.muf-finance-menu-item {
+  appearance: none;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  min-height: var(--muf-control-height);
+  box-sizing: border-box;
+  padding: var(--muf-space-2) var(--muf-space-3);
+  border: 0;
+  border-radius: var(--muf-radius-sm);
+  background: transparent;
+  color: inherit;
+  text-align: start;
+  white-space: normal;
+  overflow-wrap: break-word;
+  font: inherit;
+  font-size: var(--muf-type-body);
+  line-height: 1.35;
+  cursor: pointer;
+}
+.muf-finance-menu-item:hover {
+  background: var(--muf-primary-soft);
+}
+.dark .muf-finance-menu-item:hover {
+  background: rgba(74, 222, 128, 0.12);
+}
+.muf-finance-menu-item.is-active {
+  color: var(--muf-brand-primary);
+  font-weight: 800;
+}
+.dark .muf-finance-menu-item.is-active {
+  color: var(--muf-brand-primary-hover);
+}
+.muf-finance-menu-item:focus-visible {
+  outline: 2px solid var(--muf-brand-primary);
+  outline-offset: -2px;
+}
+
+/* Prevent nested layout tracks from forcing controls/labels narrower than text.
+   Wide table wrappers remain scrollable, preserving actual column widths. */
+.muf-overlay :is(.flex, .grid) > * {
+  min-width: 0;
+}
+.muf-overlay :is(input, select, textarea) {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
+}
+.muf-overlay :is(div, span, label, p, h1, h2, h3, h4, th, td) {
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+.muf-overlay .overflow-x-auto {
+  max-width: 100%;
+  overflow-x: auto !important;
+  overscroll-behavior-x: contain;
+}
+.muf-overlay .overflow-x-auto table :is(th, td) {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+@media (max-width: 640px) {
+  .muf-overlay :is(input, select, textarea) {
+    font-size: 16px !important;
+  }
+  .muf-overlay .muf-pup-card,
+  .muf-overlay .muf-pup-width-sm,
+  .muf-overlay .muf-pup-width-lg,
+  .muf-overlay .muf-admin-shell-card {
+    box-sizing: border-box;
+    min-width: 0;
+    max-width: calc(100vw - 1rem);
+  }
+}
+
+
+/* MUF shared login, compact filter navigation and mobile dialog sizing */
+.muf-login-screen{box-sizing:border-box;min-height:100vh;min-height:100dvh;width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:max(20px,env(safe-area-inset-top)) max(16px,env(safe-area-inset-right)) max(20px,env(safe-area-inset-bottom)) max(16px,env(safe-area-inset-left));background:var(--muf-login-page,#faf9f6);color:var(--muf-ink,#10291c)}
+.dark .muf-login-screen{background:var(--muf-login-page-dark,#070b13);color:#f1f5f9}
+.muf-login-card{box-sizing:border-box;width:min(100%,26rem);max-width:26rem;min-width:0;margin:14px 0;padding:clamp(20px,5vw,32px);display:flex;flex-direction:column;border:1px solid var(--muf-line,#e2dfdb);border-radius:var(--muf-radius-xl,1.25rem);background:var(--muf-login-card-bg,#fcfbf9);color:var(--muf-ink,#10291c);box-shadow:0 22px 60px rgba(15,23,42,.14)}
+.dark .muf-login-card{border-color:#1e293b;background:var(--muf-login-card-bg-dark,#0f172a);color:#f1f5f9;box-shadow:0 22px 60px rgba(0,0,0,.36)}
+.muf-login-brand{display:flex;flex-direction:column;align-items:center;min-width:0;margin-bottom:1.5rem;text-align:center}
+.muf-login-brand .muf-login-logo-wrap{display:flex;align-items:center;justify-content:center;margin-bottom:1rem}
+.muf-login-brand .muf-login-logo{display:block;width:4.5rem;height:4.5rem}
+.muf-login-brand .muf-login-title{margin:0 0 .35rem;max-width:100%;line-height:1.2;overflow-wrap:anywhere}
+.muf-login-brand .muf-login-sub{margin:0;max-width:100%;line-height:1.5;letter-spacing:.04em;overflow-wrap:anywhere}
+.muf-login-card :is(form,input,select,textarea,button){min-width:0}
+.muf-login-card :is(input:not([type=checkbox]):not([type=radio]),select,textarea){box-sizing:border-box;max-width:100%;font-size:16px}
+.muf-segmented-nav{box-sizing:border-box;display:flex;align-items:center;flex-wrap:wrap;gap:var(--muf-space-1,4px);width:100%;min-width:0;padding:4px;border:1px solid var(--muf-line,#e2e7df);border-radius:999px;background:var(--muf-surface-alt,#f5f7f4)}
+.muf-segmented-nav-button{appearance:none;flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:7px;width:auto;min-height:34px;padding:6px 12px;border:1px solid transparent;border-radius:999px;background:transparent;color:var(--muf-ink-soft,#68736e);font-size:12px;font-weight:750;line-height:1.25;white-space:nowrap;cursor:pointer}
+.muf-segmented-nav-button:hover{background:rgba(22,163,74,.08);color:var(--muf-green-dark,#14532d)}
+.muf-segmented-nav-button.is-active{border-color:var(--muf-green,#16a34a);background:var(--muf-green,#16a34a);color:#fff;box-shadow:0 2px 6px rgba(22,163,74,.2)}
+.muf-segmented-nav-count{display:inline-flex;align-items:center;justify-content:center;min-width:1.35rem;height:1.35rem;padding:0 5px;border-radius:999px;background:rgba(100,116,139,.13);font-size:10px;font-weight:800;font-variant-numeric:tabular-nums}
+.muf-segmented-nav-button.is-active .muf-segmented-nav-count{background:rgba(255,255,255,.2);color:#fff}
+.muf-segmented-nav-button:focus-visible{outline:2px solid var(--muf-green,#16a34a);outline-offset:2px}
+@media(max-width:380px){.muf-segmented-nav{gap:2px;padding:3px}.muf-segmented-nav-button{min-height:32px;padding:5px 8px;gap:5px;font-size:11px}}
+/* Specific mobile sizing beats old broad dialog defaults. */
+@media(max-width:640px){
+ .muf-overlay [role=dialog]{width:auto!important;max-width:calc(100vw - 1rem)!important;max-height:calc(100dvh - 1rem)!important}
+ .muf-overlay .muf-pup-card.muf-pup-width-sm{width:calc(100vw - 48px)!important;max-width:calc(100vw - 48px)!important;height:auto!important;min-height:0!important}
+ .muf-overlay .muf-pup-card.muf-pup-width-lg{width:calc(100vw - 32px)!important;max-width:calc(100vw - 32px)!important;height:auto!important;min-height:0!important}
+ .muf-overlay .muf-admin-shell-card[role=dialog]{box-sizing:border-box!important;width:calc(100vw - 32px)!important;max-width:calc(100vw - 32px)!important;height:auto!important;min-height:0!important;max-height:min(var(--muf-popup-mobile-max-height,70dvh),calc(100dvh - 24px))!important;flex:0 1 auto;border-radius:var(--muf-radius-lg,14px)!important}
+}
+@media(max-width:380px){.muf-overlay .muf-pup-card.muf-pup-width-sm{width:calc(100vw - 40px)!important;max-width:calc(100vw - 40px)!important}.muf-overlay .muf-pup-card.muf-pup-width-lg{width:calc(100vw - 24px)!important;max-width:calc(100vw - 24px)!important}.muf-overlay .muf-admin-shell-card[role=dialog]{width:calc(100vw - 24px)!important;max-width:calc(100vw - 24px)!important}}
+
+/* Keep the app header and primary tab bar together as one sticky region.
+   Children stay in normal flow so mobile header height/safe-area is measured naturally. */
+.muf-sticky-chrome {
+  position: sticky;
+  top: 0;
+  z-index: 200;
+  isolation: isolate;
+}
+.muf-sticky-chrome > .muf-header {
+  position: relative !important;
+  top: auto !important;
+  z-index: 2 !important;
+}
+.muf-sticky-chrome > .muf-top-nav {
+  position: relative !important;
+  top: auto !important;
+  z-index: 1 !important;
+}
+
+/* MUF canonical color roles, shared by Agri, Dairy and Flock. */
+:root {
+  --muf-color-primary: #136334;
+  --muf-color-primary-hover: #105229;
+  --muf-color-success: #16a34a;
+  --muf-color-page: #f8fafc;
+  --muf-color-surface: #fffefb;
+  --muf-color-surface-alt: #f1f5f9;
+  --muf-color-text: #1e293b;
+  --muf-color-text-muted: #64748b;
+  --muf-color-border: #e6e6de;
+  --muf-color-danger: #dc2626;
+  --muf-color-warning: #d97706;
+  --muf-primary: var(--muf-color-primary);
+  --muf-primary-hover: var(--muf-color-primary-hover);
+  --muf-brand-primary: var(--muf-color-primary);
+  --muf-brand-primary-hover: var(--muf-color-primary-hover);
+  --muf-green: var(--muf-color-primary);
+  --muf-green-2: var(--muf-color-success);
+  --muf-green-dark: var(--muf-color-primary-hover);
+  --muf-ink: var(--muf-color-text);
+  --muf-ink-soft: var(--muf-color-text-muted);
+  --muf-line: var(--muf-color-border);
+  --muf-surface: var(--muf-color-surface);
+  --muf-surface-alt: var(--muf-color-surface-alt);
+  --muf-danger: var(--muf-color-danger);
+}
+.dark {
+  --muf-color-page: #070b13;
+  --muf-color-surface: #0d1a11;
+  --muf-color-surface-alt: #0f172a;
+  --muf-color-text: #e2e8f0;
+  --muf-color-text-muted: #94a3b8;
+  --muf-color-border: #203528;
+  --muf-field-bg: #1e293b;
+  --muf-field-line: #334155;
+}
+::selection { background: var(--muf-color-primary, #136334); color: #fff; }
+::-moz-selection { background: var(--muf-color-primary, #136334); color: #fff; }
+.dark ::selection,
+.dark ::-moz-selection { background: var(--muf-color-primary, #136334); color: #fff; }
+
+/* All small/big/admin popups share the 70% mobile height cap. Keep width gutters. */
+@media (max-width: 640px) {
+  :root { --muf-popup-mobile-max-height: 70dvh; }
+  .muf-overlay .muf-pup-card {
+    box-sizing: border-box;
+    max-height: var(--muf-popup-mobile-max-height) !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .muf-overlay .muf-pup-card.muf-pup-width-sm {
+    width: calc(100vw - 48px) !important;
+    max-width: calc(100vw - 48px) !important;
+  }
+  .muf-overlay .muf-pup-card.muf-pup-width-lg {
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+  }
+  .muf-overlay .muf-admin-shell-card[role="dialog"] {
+    box-sizing: border-box !important;
+    width: calc(100vw - 32px) !important;
+    max-width: calc(100vw - 32px) !important;
+    max-height: min(var(--muf-popup-mobile-max-height, 70dvh), calc(100dvh - 24px)) !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  .muf-overlay .muf-pup-card.muf-pup-sm {
+    --pup-head-pad: 9px;
+    --pup-body-pad: 10px;
+    --pup-gap: 6px;
+    --pup-icon: 28px;
+  }
+  .muf-overlay .muf-pup-card.muf-pup-lg {
+    --pup-head-pad: 9px;
+    --pup-body-pad: 12px;
+    --pup-gap: 6px;
+    --pup-icon: 28px;
+  }
+  .muf-overlay .muf-ledger-group-content { gap: 8px !important; }
+  .muf-overlay .muf-ledger-net-balance { gap: 8px; padding: 10px !important; }
+  .muf-overlay .muf-ledger-net-balance > span { font-size: 10px; letter-spacing: .06em; }
+  .muf-overlay .muf-ledger-net-balance > strong { font-size: 15px; text-align: right; }
+  .muf-overlay table.muf-ledger-records tbody { gap: 6px; }
+  .muf-overlay table.muf-ledger-records tr { padding: 5px 8px; }
+  .muf-overlay table.muf-ledger-records td { gap: 8px; padding: 4px 1px !important; line-height: 1.3; }
+  .muf-overlay table.muf-ledger-records td::before { flex-basis: 29%; font-size: 9px; }
+  .muf-overlay table.muf-ledger-records .muf-ledger-description {
+    display: block; width: 100%; max-width: 100%; text-align: right; overflow-wrap: anywhere;
+  }
+  .muf-overlay table.muf-ledger-records .muf-ledger-description > div + div { margin-top: 2px !important; }
+}
+@media (max-width: 380px) {
+  .muf-overlay .muf-pup-card.muf-pup-width-sm { width: calc(100vw - 40px) !important; max-width: calc(100vw - 40px) !important; }
+  .muf-overlay .muf-pup-card.muf-pup-width-lg { width: calc(100vw - 24px) !important; max-width: calc(100vw - 24px) !important; }
+  .muf-overlay .muf-admin-shell-card[role="dialog"] { width: calc(100vw - 24px) !important; max-width: calc(100vw - 24px) !important; }
+}
+
+/* Keep the aliases on the dark-theme element mapped to the same canonical roles. */
+.dark {
+  --muf-primary: var(--muf-color-primary);
+  --muf-primary-hover: var(--muf-color-primary-hover);
+  --muf-brand-primary: var(--muf-color-primary);
+  --muf-brand-primary-hover: var(--muf-color-primary-hover);
+  --muf-green: var(--muf-color-primary);
+  --muf-green-2: var(--muf-color-success);
+  --muf-green-dark: var(--muf-color-primary-hover);
+  --muf-ink: var(--muf-color-text);
+  --muf-ink-soft: var(--muf-color-text-muted);
+  --muf-line: var(--muf-color-border);
+  --muf-surface: var(--muf-color-surface);
+  --muf-surface-alt: var(--muf-color-surface-alt);
+  --muf-danger: var(--muf-color-danger);
+}
+

@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -102,6 +101,11 @@ button:disabled,
 .dark .border-slate-100:not([class*="dark:border"]) {
   border-color: #1e293b !important;
 }
+
+/* Flock dark safety net, extended to the muf-pc popup-content classes so they match the
+   Tailwind slate-700 / slate-600 text they replaced (Agri and Dairy have no such net). */
+.dark .muf-pc-label { color: #cbd5e1 !important; }
+.dark .muf-pc-btn-ghost { color: #94a3b8 !important; }
 
 /* Dark-mode inputs that don't have explicit dark:bg */
 .dark input:not([class*="dark:bg"]),

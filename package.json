@@ -4,8 +4,9 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "check-sync": "node check-muf-sync.js",
-    "check-ui": "node check-ui-safety.js"
+    "check-sync": "node tools/check-muf-sync.js",
+    "check-ui": "node tools/check-ui-safety.js",
+    "check-workbench": "node tools/check-muf-workbench.js"
   },
   "devDependencies": {
     "vitest": "^3.0.0"

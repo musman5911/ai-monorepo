@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { mufL } from '../muf-urdu';
+import { mufL } from '../muf/data/muf-urdu';
 import { BookOpen, Save, Mic, Square, Trash2 } from 'lucide-react';
-import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, VoiceRecorder } from '../muf-voice';
-import { notify } from '../muf-confirm';
+import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, VoiceRecorder } from '../muf/data/muf-voice';
+import { notify } from '../muf/core/muf-confirm';
 import { DiaryEntry, Lang } from '../types';
 import { t } from '../i18n';
 import { todayStr } from '../utils/calculations';
+import MufDiaryMedia, { type DiaryPhoto } from '../muf/ui/muf-diary-media';
+import { uploadImage } from '../api';
 
 interface DiaryNotesProps {
   lang: Lang;
@@ -20,6 +22,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
   const [date, setDate] = useState(today);
   const [note, setNote] = useState(existing?.note ?? '');
   const [voiceBase64, setVoiceBase64] = useState<string | undefined>(existing?.voiceBase64);
+  const [photos, setPhotos] = useState<DiaryPhoto[]>(existing?.photos || []);
   const [recorder, setRecorder] = useState<VoiceRecorder | null>(null);
   const [recording, setRecording] = useState(false);
   const L = (en: string, urOrVars?: string | Record<string, string | number | null>) => mufL(lang, en, urOrVars);
@@ -28,6 +31,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
     const found = entries.find((e) => e.date === date);
     setNote(found?.note ?? '');
     setVoiceBase64(found?.voiceBase64);
+    setPhotos(found?.photos || []);
   }, [entries, date]);
 
   const loadDate = (d: string) => {
@@ -35,11 +39,12 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
     const found = entries.find((e) => e.date === d);
     setNote(found?.note ?? '');
     setVoiceBase64(found?.voiceBase64);
+    setPhotos(found?.photos || []);
   };
 
   const handleSave = () => {
-    if (!note.trim() && !voiceBase64) return;
-    onSave({ date, note: note.trim(), voiceBase64 });
+    if (!note.trim() && !voiceBase64 && photos.length === 0) return;
+    onSave({ date, note: note.trim(), voiceBase64, photos });
   };
 
   const handleRecordToggle = async () => {
@@ -47,7 +52,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
       try {
         const base64 = await recorder.stop();
         setVoiceBase64(base64);
-        onSave({ date, note: note.trim(), voiceBase64: base64 });
+        onSave({ date, note: note.trim(), voiceBase64: base64, photos });
         notify(L('Voice note saved.'));
       } catch (err) {
         notify(err instanceof Error ? err.message : 'Recording failed', 'error');
@@ -75,7 +80,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
         <BookOpen className="w-4 h-4" /> {t(lang, 'diary')}
       </h3>
       <div>
-        <label className="block text-3xs font-bold text-slate-400 uppercase mb-1">Date</label>
+        <label className="block text-3xs font-bold text-slate-400 uppercase mb-1">{L('Date')}</label>
         <input
           type="date"
           value={date}
@@ -87,9 +92,10 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
         value={note}
         onChange={(e) => setNote(e.target.value)}
         disabled={readOnly}
-        placeholder="Weather, issues, observations…"
+        placeholder={L('Weather, issues, observations…')}
         className="w-full text-xs px-3 py-2 border border-slate-200 dark:border-slate-700 rounded-xl h-24 resize-none"
       />
+      <MufDiaryMedia date={date} photos={photos} canEdit={!readOnly} uploadPhoto={(file) => uploadImage(file, 'diary')} onChange={(next) => { setPhotos(next); onSave({ date, note: note.trim(), voiceBase64, photos: next }); }} />
       {/* ── Voice note (Urdu-friendly) — speak instead of typing ── */}
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
@@ -98,7 +104,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
             <button
               type="button"
               onClick={handleRecordToggle}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-3xs font-bold transition ${recording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-emerald-600 hover:bg-emerald-700'}`}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-white text-3xs font-bold transition ${recording ? 'bg-red-600 hover:bg-red-700 animate-pulse' : 'bg-farm-600 hover:bg-farm-700'}`}
             >
               {recording ? <Square className="w-3 h-3" /> : <Mic className="w-3 h-3" />}
               {recording ? L('Stop & save') : (voiceBase64 ? L('Re-record') : L('Record'))}
@@ -113,7 +119,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
                 type="button"
                 onClick={() => { setVoiceBase64(undefined); onSave({ date, note: note.trim(), voiceBase64: undefined }); }}
                 className="p-1.5 rounded text-slate-400 hover:text-red-500 transition"
-                aria-label="Delete voice note"
+                aria-label={L('Delete voice note')}
               ><Trash2 className="w-4 h-4" /></button>
             )}
           </div>
@@ -131,7 +137,7 @@ export default function DiaryNotes({ lang, entries, onSave, readOnly }: DiaryNot
       )}
       {recent.length > 0 && (
         <div className="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-          <p className="text-3xs font-bold text-slate-400 uppercase">Recent</p>
+          <p className="text-3xs font-bold text-slate-400 uppercase">{L('Recent')}</p>
           {recent.map((e) => (
             <button
               key={e.date}

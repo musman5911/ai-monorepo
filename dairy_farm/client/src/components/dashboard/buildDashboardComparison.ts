@@ -5,7 +5,7 @@
 // inline in flock Dashboard.tsx as the `cmp` useMemo (different data shape
 // — eggs + birds vs milk + expenses). Do NOT promote to muf-* unless the
 // two apps converge on a shared comparison shape.
-import { pctChange } from '../../muf-compare';
+import { pctChange } from '../../muf/data/muf-compare';
 import { calcRevenueWithHistory } from '../../utils/rates';
 
 export interface DashboardCmpData {
