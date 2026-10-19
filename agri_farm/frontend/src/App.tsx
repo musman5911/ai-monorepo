@@ -1990,20 +1990,20 @@ function App() {
       transactions = finance.filter(f => dashboardCropFilter === 'all' ? true : f.crop_id === dashboardCropFilter);
       income = transactions.filter(f => f.type === 'income').reduce((sum, item) => sum + item.amount, 0);
       expense = transactions.filter(f => f.type === 'expense').reduce((sum, item) => sum + item.amount, 0);
-      const cropName = dashboardCropFilter === 'all' ? 'All Crops' : (crops.find(c => c._id === dashboardCropFilter)?.name || 'Crop');
-      title = `Dashboard Ledger Flow: ${cropName}`;
+      const cropName = dashboardCropFilter === 'all' ? L('All Crops') : (crops.find(c => c._id === dashboardCropFilter)?.name || L('Crop'));
+      title = `${L('Dashboard Ledger Flow')}: ${cropName}`;
     } else if (source === 'reports') {
       transactions = filteredPeriodFinance;
       income = periodIncome;
       expense = periodExpense;
-      const cropName = reportsCropFilter === 'all' ? 'All Crops' : (crops.find(c => c._id === reportsCropFilter)?.name || 'Crop');
-      title = `Reports Ledger Flow: ${cropName}`;
+      const cropName = reportsCropFilter === 'all' ? L('All Crops') : (crops.find(c => c._id === reportsCropFilter)?.name || L('Crop'));
+      title = `${L('Reports Ledger Flow')}: ${cropName}`;
     } else {
       transactions = ledgerScopedFinance;
       income = pageIncome;
       expense = pageExpense;
-      const cropName = financeCropFilter === 'all' ? 'All Crops' : (crops.find(c => c._id === financeCropFilter)?.name || 'Crop');
-      title = `Financial Ledger Flow: ${cropName}`;
+      const cropName = financeCropFilter === 'all' ? L('All Crops') : (crops.find(c => c._id === financeCropFilter)?.name || L('Crop'));
+      title = `${L('Financial Ledger Flow')}: ${cropName}`;
     }
 
     // Process breakdowns based on cardType
@@ -2011,7 +2011,7 @@ function App() {
     let listTransactions = [...transactions];
 
     if (cardType === 'income') {
-      title += " (Income Source)";
+      title += ` (${L('Income Source')})`;
       listTransactions = transactions.filter(f => f.type === 'income');
       const group = {};
       listTransactions.forEach(f => {
@@ -2023,7 +2023,7 @@ function App() {
         .map(([name, amount]) => ({ name, amount }))
         .sort((a, b) => b.amount - a.amount);
     } else if (cardType === 'expense') {
-      title += " (Expense Breakdown)";
+      title += ` (${L('Expense Breakdown')})`;
       listTransactions = transactions.filter(f => f.type === 'expense');
       const group = {};
       listTransactions.forEach(f => {
@@ -2034,10 +2034,10 @@ function App() {
         .map(([name, amount]) => ({ name, amount }))
         .sort((a, b) => b.amount - a.amount);
     } else if (cardType === 'profit') {
-      title += " (Profit Formula)";
+      title += ` (${L('Profit Formula')})`;
       listTransactions = [];
     } else if (cardType === 'margin') {
-      title += " (Margin Formula)";
+      title += ` (${L('Margin Formula')})`;
       listTransactions = [];
     }
 
@@ -3446,10 +3446,10 @@ function App() {
                 <div className="muf-panel-heading"><div><h3><Coins size={21}/> {L('Loan & Credit Liability Tracker')}</h3><p>{L('Review your recorded loans and credit liabilities.')}</p></div><span className="text-xs font-bold text-farm-600 dark:text-farm-400">Open details →</span></div>
                 <div className="p-4 flex flex-wrap gap-4 text-xs"><span><strong>{liabilities.filter(l => l.status !== 'Paid').length}</strong> unpaid liabilities</span><span><strong>Rs. {formatCurrency(liabilities.filter(l => l.status !== 'Paid').reduce((sum, l) => sum + (Number(l.amount_owed) || 0), 0))}</strong> outstanding</span></div>
               </button>
-              {showLiabilityDetailsModal && <DetailModal open={showLiabilityDetailsModal} onClose={() => setShowLiabilityDetailsModal(false)} title="Loan & Credit Liability Tracker" subtitle={`${liabilities.length} recorded liabilities`} icon={<Coins size={20}/>} size="big">
+              {showLiabilityDetailsModal && <DetailModal open={showLiabilityDetailsModal} onClose={() => setShowLiabilityDetailsModal(false)} title={L('Loan & Credit Liability Tracker')} subtitle={L('{count} recorded liabilities', { count: liabilities.length })} icon={<Coins size={20}/>} size="big">
               <div className="space-y-4">
                 <div className="muf-section-head">
-                  <p className="muf-pc-muted">Track fertilizer, seed credit debts, and crop dealer loans (unpaid outlays count as committed crop costs).</p>
+                  <p className="muf-pc-muted">{L('Track fertilizer, seed credit debts, and crop dealer loans (unpaid outlays count as committed crop costs).')}</p>
                   {userRole === 'admin' && (
                     <button
                       onClick={() => { setLiaForm({ creditor: '', amount_owed: '', due_date: '', crop_id: 'farm-wide', notes: '' }); setEditingLiabilityId(null); setShowLiabilityModal(true); }}
@@ -3537,10 +3537,10 @@ function App() {
                 <div className="muf-panel-heading"><div><h3><Database size={21}/> {L('Input Inventory & Stocks')}</h3><p>{L('Review recorded seed, fertilizer, and pesticide stock.')}</p></div><span className="text-xs font-bold text-farm-600 dark:text-farm-400">Open details →</span></div>
                 <div className="p-4 flex flex-wrap gap-4 text-xs"><span><strong>{inventory.length}</strong> stock items</span><span><strong>{inventory.filter(i => Number(i.current_stock) <= Number(i.low_stock_threshold)).length}</strong> at or below low-stock threshold</span></div>
               </button>
-              {showInventoryDetailsModal && <DetailModal open={showInventoryDetailsModal} onClose={() => setShowInventoryDetailsModal(false)} title="Input Inventory & Stocks" subtitle={`${inventory.length} recorded stock items`} icon={<Database size={20}/>} size="big">
+              {showInventoryDetailsModal && <DetailModal open={showInventoryDetailsModal} onClose={() => setShowInventoryDetailsModal(false)} title={L('Input Inventory & Stocks')} subtitle={L('{count} recorded stock items', { count: inventory.length })} icon={<Database size={20}/>} size="big">
               <div className="space-y-4">
                 <div className="muf-section-head">
-                  <p className="muf-pc-muted">Track seeds, fertilizer, and pesticide stock levels (manually adjust or correct counts anytime).</p>
+                  <p className="muf-pc-muted">{L('Track seeds, fertilizer, and pesticide stock levels (manually adjust or correct counts anytime).')}</p>
                   {userRole === 'admin' && (
                     <button
                       onClick={() => { setInvForm({ name: '', category: 'fertilizer', current_stock: '', unit: 'kg', low_stock_threshold: '10' }); setShowInventoryModal(true); }}

@@ -303,4 +303,15 @@ export const MUF_URDU_PART_5: Record<string, string> = {
   'Profit / Loss': 'نفع / نقصان',
   'Projected Direct Sale Revenue:': 'متوقع براہِ راست فروخت کی آمدنی:',
   'Purchase Date': 'خریداری کی تاریخ',
+  // C5 — October 17 popup labels and titles (E–P).
+  'Feed Purchased This Week': 'اس ہفتے خریدا گیا چارہ',
+  'Financial Ledger Flow': 'مالی لیجر کی تفصیل',
+  'Go to Health Portal': 'صحت کے پورٹل پر جائیں',
+  'Income Source': 'آمدنی کا ذریعہ',
+  'Log Vaccination Record': 'ویکسینیشن کا ریکارڈ درج کریں',
+  'Log vaccination record': 'ویکسینیشن کا ریکارڈ درج کریں',
+  'Margin Formula': 'منافع کی شرح کا فارمولا',
+  'P&L mode': 'نفع و نقصان کا طریقہ',
+  'Profit Formula': 'منافع کا فارمولا',
+  'Expense Breakdown': 'اخراجات کی تفصیل',
 };

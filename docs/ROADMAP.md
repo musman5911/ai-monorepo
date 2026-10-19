@@ -87,6 +87,8 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 | C4 | Service-worker update prompt ("new version available") | Users can otherwise keep running stale code | Medium |
 | C5 | Add Urdu translations for the new popup strings added on 2026-10-17 (see PROGRESS) | Urdu mode currently falls back to English for those labels | Low |
 
+**C5 status (2026-10-19):** The popup label/title translations and shared dictionary entries are implemented in source, with regression tests added for the three identical dictionary copies. The next owner run must verify `npm ci`, `npm test` (62 expected), the MUF/UI check scripts and the three app builds. Browser acceptance remains pending; source-contract checks are not visual sign-off.
+
 ## D. Cleanup
 
 | ID | Item | Why | Risk |

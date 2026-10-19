@@ -271,4 +271,9 @@ export const MUF_URDU_PART_6: Record<string, string> = {
   'This photo is too large even after compression. Try a smaller image.': 'چھوٹی کرنے کے بعد بھی یہ تصویر بہت بڑی ہے۔ کوئی چھوٹی تصویر آزمائیں۔',
   'Voice notes are saved on this phone only.': 'آواز کے نوٹ صرف اسی فون میں محفوظ ہوتے ہیں۔',
   'Photos are made small and saved with your farm records, so they show on other devices too.': 'تصاویر چھوٹی کر کے آپ کے فارم ریکارڈ کے ساتھ محفوظ ہوتی ہیں، اس لیے دوسرے ڈیوائس پر بھی نظر آتی ہیں۔',
+  // C5 — October 17 popup labels and titles (Q–Z).
+  'Reports Ledger Flow': 'رپورٹس کے لیجر کی تفصیل',
+  'Total Eggs Collected': 'کل جمع شدہ انڈے',
+  'Track fertilizer, seed credit debts, and crop dealer loans (unpaid outlays count as committed crop costs).': 'کھاد، بیج کے ادھار اور فصل کے ڈیلر کے قرض دیکھیں (غیر ادا شدہ خرچے فصل کی لاگت میں شمار ہوں گے)۔',
+  'Track seeds, fertilizer, and pesticide stock levels (manually adjust or correct counts anytime).': 'بیج، کھاد اور زرعی ادویات کا اسٹاک دیکھیں (گنتی کسی بھی وقت دستی طور پر درست کریں)۔',
 };

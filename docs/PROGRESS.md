@@ -8,7 +8,7 @@ Last updated: 2026-10-19.
 ## At a glance
 
 - **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, B1 automated regression/build validation, and A2 live runtime smoke test (8/8 passed).
-- **Remaining:** verify the Playwright 1.64.1 browser install; generate/review A1 baselines and add authenticated-screen coverage; A3 dependency remediation; B1/B3 visual browser review; verification of the 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
+- **Remaining:** verify the Playwright 1.64.1 browser install; generate/review A1 baselines and add authenticated-screen coverage; run C5's new localization tests and browser review; A3 dependency remediation; B1/B3 visual browser review; verify the remaining 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
 - **Next:** run `npm ci` and the post-fix test suite, then retry the headless-shell install using the updated Playwright 1.64.1 pin. B2 remains blocked until usable visual baselines have been reviewed.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
@@ -77,8 +77,18 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 - Owner run on 2026-10-19: `npm ci` succeeded (54 packages added; audit reported 4 root dev-tool findings: 1 moderate, 1 high, 2 critical). Both `npx playwright install chromium` and `npx playwright install --only-shell chromium` failed after repeated CDN timeouts, including 120 seconds per attempt. `npm run test:visual:update` stopped at the preflight because `chromium_headless_shell-1243` was absent; no snapshots were generated. This is a browser-install/environment blocker, not evidence of UI defects.
 - Added `e2e/global-setup.mjs` to check the browser executable once and provide actionable recovery instructions rather than repeating the same failure 40 times. Added the `PW_CHANNEL=chrome` fallback for machines with Google Chrome, and made the screenshot suite re-apply its requested theme after app hydration.
 - Follow-up owner run: `node tools/check-muf-workbench.js` passed 23/23 checks. `npm test` reported 59/60 passing because the no-PR test still expected obsolete wording (`do not open pull requests`) after `RULES.md` changed to `Default behavior is no push, no pull request`; corrected in the current follow-up commit.
-- **Next verification:** run `npm ci`, `npm test` (60 tests expected), `node tools/check-muf-workbench.js` (23 checks expected), `node tools/check-muf-sync.js` and `node tools/check-ui-safety.js`. Then run `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000` and `npx playwright install --only-shell chromium`. The pin is now 1.64.1, but a successful install has not been observed here. If it still fails, run `where chrome`; when Chrome is installed, set `PW_CHANNEL=chrome` and use that same channel for baseline and comparison runs. No baseline images or visual pass are claimed yet.
+- **Next verification:** run `npm ci`, `npm test` (62 tests expected), `node tools/check-muf-workbench.js` (23 checks expected), `node tools/check-muf-sync.js` and `node tools/check-ui-safety.js`. Then run `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000` and `npx playwright install --only-shell chromium`. The pin is now 1.64.1, but a successful install has not been observed here. If it still fails, run `where chrome`; when Chrome is installed, set `PW_CHANNEL=chrome` and use that same channel for baseline and comparison runs. No baseline images or visual pass are claimed yet.
 - The full A1 goal of around 20 authenticated app screens/popups still requires a safe, repeatable signed-in state and must not use fake farm data.
+## C5 — Urdu translations for the October 17 popup batch
+
+**State: source changes and regression tests are committed; owner-run tests/builds and browser review remain pending.**
+
+- Routed the Flock dashboard's Sick Birds and Total Eggs Collected popup titles and dynamic subtitles through the shared `L()` helper, and localized the Feed Purchased This Week title.
+- Added missing shared Urdu labels for Clear filters, Go to Health Portal, Log Vaccination Record, Add Incubation Record and the Dairy P&L-mode control. The vaccination submit button now uses the same translation as its modal title.
+- Routed Agri ledger popup titles and formula/source suffixes through `L()`; localized the liability and stock modal count subtitles and help text too.
+- Added two Vitest source-contract tests that check the new Urdu translations in all three dictionary twins and guard the associated component call sites.
+- This patch adds two tests, so the next full `npm test` run should report **62 tests**. Test/build scripts were not executed in this session; no passing test or visual-browser result is claimed here.
+
 ## Completed
 
 ### Foundation (before this tracker)
@@ -136,7 +146,7 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 
 ## Remaining
 
-1. Pull the latest update, run `npm ci`, then rerun `npm test` (60 expected) and all three MUF/UI source guards.
+1. Pull the latest update, run `npm ci`, then rerun `npm test` (62 expected) and all three MUF/UI source guards.
 2. Retry `npx playwright install --only-shell chromium` with the updated Playwright 1.64.1 pin and the documented longer timeout. The former failure used 1.63.0, which had a known Windows installer-timeout regression.
 3. If the updated installer still fails, run `where chrome`. If Chrome is installed, use `set PW_CHANNEL=chrome` then `npm run test:visual:update`; keep the channel set for comparisons.
 4. Generate 40 initial screenshots, inspect `e2e/visual-baselines/`, and only then run `npm run test:visual` without update mode.

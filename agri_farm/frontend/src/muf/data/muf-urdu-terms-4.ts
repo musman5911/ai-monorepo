@@ -305,4 +305,9 @@ export const MUF_URDU_PART_4: Record<string, string> = {
   'Enter custom season...': 'اپنا موسم لکھیں...',
   'Enter eggs set count': 'رکھے گئے انڈوں کی تعداد لکھیں',
   'Enter income category...': 'آمدنی کی قسم لکھیں...',
+  // C5 — October 17 popup labels and titles (A–D).
+  'Add Incubation Record': 'انکیوبیشن کا ریکارڈ شامل کریں',
+  'Add incubation record': 'انکیوبیشن کا ریکارڈ شامل کریں',
+  'Clear filters': 'فلٹرز صاف کریں',
+  'Dashboard Ledger Flow': 'ڈیش بورڈ لیجر کی تفصیل',
 };

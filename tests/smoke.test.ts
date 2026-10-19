@@ -405,3 +405,90 @@ describe('Playwright browser preflight (A1)', () => {
     expect(suite).toContain('document.documentElement.style.colorScheme = requestedTheme');
   });
 });
+
+
+describe('C5 Urdu labels for the October 17 popup batch', () => {
+  const dictionaryApps = [
+    'dairy_farm/client',
+    'flock_farm/client',
+    'agri_farm/frontend',
+  ];
+  const translationGroups = [
+    { part: 1, entries: [
+      ['{count} bird{plural} need care', '{count} بیمار پرندوں کو دیکھ بھال کی ضرورت ہے'],
+      ['{count} eggs over 1 day · {range}', '{range} میں ایک دن کے دوران {count} انڈے جمع ہوئے'],
+      ['{count} eggs over {days} days · {range}', '{range} میں {days} دنوں کے دوران {count} انڈے جمع ہوئے'],
+      ['{count} recorded liabilities', '{count} واجبات درج ہیں'],
+      ['{count} recorded stock items', '{count} اسٹاک آئٹمز درج ہیں'],
+    ] },
+    { part: 4, entries: [
+      ['Add Incubation Record', 'انکیوبیشن کا ریکارڈ شامل کریں'],
+      ['Add incubation record', 'انکیوبیشن کا ریکارڈ شامل کریں'],
+      ['Clear filters', 'فلٹرز صاف کریں'],
+      ['Dashboard Ledger Flow', 'ڈیش بورڈ لیجر کی تفصیل'],
+    ] },
+    { part: 5, entries: [
+      ['Feed Purchased This Week', 'اس ہفتے خریدا گیا چارہ'],
+      ['Financial Ledger Flow', 'مالی لیجر کی تفصیل'],
+      ['Go to Health Portal', 'صحت کے پورٹل پر جائیں'],
+      ['Income Source', 'آمدنی کا ذریعہ'],
+      ['Log Vaccination Record', 'ویکسینیشن کا ریکارڈ درج کریں'],
+      ['Log vaccination record', 'ویکسینیشن کا ریکارڈ درج کریں'],
+      ['Margin Formula', 'منافع کی شرح کا فارمولا'],
+      ['P&L mode', 'نفع و نقصان کا طریقہ'],
+      ['Profit Formula', 'منافع کا فارمولا'],
+    ] },
+    { part: 6, entries: [
+      ['Reports Ledger Flow', 'رپورٹس کے لیجر کی تفصیل'],
+      ['Total Eggs Collected', 'کل جمع شدہ انڈے'],
+      ['Track fertilizer, seed credit debts, and crop dealer loans (unpaid outlays count as committed crop costs).', 'کھاد، بیج کے ادھار اور فصل کے ڈیلر کے قرض دیکھیں (غیر ادا شدہ خرچے فصل کی لاگت میں شمار ہوں گے)۔'],
+      ['Track seeds, fertilizer, and pesticide stock levels (manually adjust or correct counts anytime).', 'بیج، کھاد اور زرعی ادویات کا اسٹاک دیکھیں (گنتی کسی بھی وقت دستی طور پر درست کریں)۔'],
+    ] },
+  ] as const;
+
+  it('provides the new Urdu labels in all three identical dictionary copies', () => {
+    for (const app of dictionaryApps) {
+      for (const group of translationGroups) {
+        const source = readSource(`${app}/src/muf/data/muf-urdu-terms-${group.part}.ts`);
+        for (const [english, urdu] of group.entries) {
+          expect(source).toContain(`'${english}': '${urdu}'`);
+        }
+      }
+    }
+  });
+
+  it('uses L() for the redesigned popup headings, buttons, count subtitles and ledger formula titles', () => {
+    const flockDashboard = readSource('flock_farm/client/src/components/Dashboard.tsx');
+    const flockHealth = readSource('flock_farm/client/src/components/HealthPortal.tsx');
+    const flockRegister = readSource('flock_farm/client/src/components/FlockRegister.tsx');
+    const incubation = readSource('flock_farm/client/src/components/IncubationModule.tsx');
+    const dairyDashboard = readSource('dairy_farm/client/src/components/Dashboard.tsx');
+    const agriApp = readSource('agri_farm/frontend/src/App.tsx');
+
+    expect(flockDashboard).toContain("title={L('Sick Birds')}");
+    expect(flockDashboard).toContain("subtitle={L('{count} bird{plural} need care'");
+    expect(flockDashboard).toContain("title={L('Total Eggs Collected')}");
+    expect(flockDashboard).toContain("L(uniqueDaysCount === 1 ? '{count} eggs over 1 day · {range}'");
+    expect(flockDashboard).toContain("title: L('Feed Purchased This Week')");
+    expect(flockDashboard).toContain("{L('Go to Health Portal')}");
+    expect(flockRegister).toContain("L('Clear filters')");
+    expect(flockHealth).toContain("title={L('Log Vaccination Record')}");
+    expect(flockHealth).toContain("{L('Log Vaccination Record')}");
+    expect(flockHealth).toContain("label={L('Sick Birds')}");
+    expect(incubation).toContain("L('Add Incubation Record')");
+    expect(incubation).toContain("L('Add incubation record')");
+    expect(dairyDashboard).toContain("aria-label={L('P&L mode')}");
+
+    expect(agriApp).toContain("title={L('Loan & Credit Liability Tracker')}");
+    expect(agriApp).toContain("subtitle={L('{count} recorded liabilities'");
+    expect(agriApp).toContain("title={L('Input Inventory & Stocks')}");
+    expect(agriApp).toContain("subtitle={L('{count} recorded stock items'");
+    expect(agriApp).toContain("L('Dashboard Ledger Flow')");
+    expect(agriApp).toContain("L('Reports Ledger Flow')");
+    expect(agriApp).toContain("L('Financial Ledger Flow')");
+    expect(agriApp).toContain("L('Income Source')");
+    expect(agriApp).toContain("L('Expense Breakdown')");
+    expect(agriApp).toContain("L('Profit Formula')");
+    expect(agriApp).toContain("L('Margin Formula')");
+  });
+});

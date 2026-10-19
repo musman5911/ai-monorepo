@@ -240,7 +240,7 @@ export default function HealthPortal({
 
       <div className="muf-kpi-grid">
         <HealthStatCard label="Birds In Flock" value={`${activeBirds.length}`} accent="emerald" />
-        <HealthStatCard label="Sick Birds" value={`${birds.filter((b) => b.status === 'Sick').length}`} accent="amber" />
+        <HealthStatCard label={L('Sick Birds')} value={`${birds.filter((b) => b.status === 'Sick').length}`} accent="amber" />
         <HealthStatCard label="Vaccines Overdue" value={`${vacMetrics.overdue}`} accent="rose" />
         <HealthStatCard label="Dead Birds" value={`${deadBirds.length}`} accent="slate" />
       </div>
@@ -540,7 +540,7 @@ export default function HealthPortal({
                 className="w-full py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs rounded-xl transition cursor-pointer flex items-center justify-center gap-2"
                 id="btn-log-vaccination"
               >
-                <Plus className="w-4 h-4" /> Log Vaccination Record
+                <Plus className="w-4 h-4" /> {L('Log Vaccination Record')}
               </button>
           </form>
         </DetailModal>

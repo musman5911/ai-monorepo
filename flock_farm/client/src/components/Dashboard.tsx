@@ -1074,7 +1074,7 @@ export default function Dashboard({
       })()}
 
       <DetailModal open={modal === 'totalEggs'} onClose={closeModal}
-        title="Total Eggs Collected" subtitle={`${totalEggsCollected} eggs over ${uniqueDaysCount} day${uniqueDaysCount === 1 ? '' : 's'} · ${rangeLabel}`}
+        title={L('Total Eggs Collected')} subtitle={L(uniqueDaysCount === 1 ? '{count} eggs over 1 day · {range}' : '{count} eggs over {days} days · {range}', { count: totalEggsCollected, days: uniqueDaysCount, range: rangeLabel })}
         icon={<Egg className="w-5 h-5" />} iconBg="bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300" size="small">
         <div className="grid grid-cols-2 gap-3 mb-5">
           <MiniStat label="Collected" value={`${totalEggsCollected}`} color="amber" />
@@ -1171,7 +1171,7 @@ export default function Dashboard({
       {(['feedToday', 'feedWeek', 'feedMonth'] as const).map((key) => {
         const cfg = {
           feedToday: { title: L('Feed Purchased Today'), icon: <Package className="w-5 h-5" />, bg: 'bg-green-100 text-green-700 dark:bg-green-950 dark:text-green-300', value: feedKgToday, records: feedRecords.filter(f => f.date === today), sub: today },
-          feedWeek: { title: 'Feed Purchased This Week', icon: <Package className="w-5 h-5" />, bg: 'bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300', value: feedKgThisWeek, records: feedRecords.filter(f => f.date >= weekStart), sub: `${weekStart} → ${today}` },
+          feedWeek: { title: L('Feed Purchased This Week'), icon: <Package className="w-5 h-5" />, bg: 'bg-teal-100 text-teal-700 dark:bg-teal-950 dark:text-teal-300', value: feedKgThisWeek, records: feedRecords.filter(f => f.date >= weekStart), sub: `${weekStart} → ${today}` },
           feedMonth: { title: L('Feed Purchased This Month'), icon: <Package className="w-5 h-5" />, bg: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300', value: feedKgThisMonth, records: feedRecords.filter(f => f.date.startsWith(monthPrefix)), sub: monthPrefix },
         }[key];
         const kgTotal = cfg.records.reduce((s, f) => s + f.quantityKg, 0);
@@ -1215,7 +1215,7 @@ export default function Dashboard({
 
       {/* Sick birds alert modal */}
       <DetailModal open={modal === 'sickBirds'} onClose={closeModal}
-        title="Sick Birds" subtitle={`${sickBirdsCount} bird${sickBirdsCount === 1 ? '' : 's'} need care`}
+        title={L('Sick Birds')} subtitle={L('{count} bird{plural} need care', { count: sickBirdsCount, plural: sickBirdsCount === 1 ? '' : 's' })}
         icon={<HeartPulse className="w-5 h-5" />} iconBg="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300" size="small">
         <div className="muf-callout muf-callout--bad mb-3">
           <span className="muf-callout-icon"><HeartPulse className="w-5 h-5" /></span>
