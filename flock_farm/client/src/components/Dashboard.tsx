@@ -896,7 +896,7 @@ export default function Dashboard({
         </div>
         <div className="mt-4 flex justify-end">
           <button onClick={() => { closeModal(); onNavigate('health'); }} className="text-xs font-bold px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-900 dark:bg-slate-700 dark:hover:bg-slate-600 text-white">
-            Go to Health Portal →
+            {L('Go to Health Portal')} <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </DetailModal>

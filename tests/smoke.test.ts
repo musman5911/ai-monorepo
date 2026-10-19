@@ -472,6 +472,7 @@ describe('C5 Urdu labels for the October 17 popup batch', () => {
     expect(flockDashboard).toContain("L(uniqueDaysCount === 1 ? '{count} eggs over 1 day · {range}'");
     expect(flockDashboard).toContain("title: L('Feed Purchased This Week')");
     expect(flockDashboard).toContain("{L('Go to Health Portal')}");
+    expect(flockDashboard).not.toMatch(/>\s*Go to Health Portal\s*→/);
     expect(flockRegister).toContain("L('Clear filters')");
     expect(flockHealth).toContain("title={L('Log Vaccination Record')}");
     expect(flockHealth).toContain("{L('Log Vaccination Record')}");
