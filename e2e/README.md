@@ -6,17 +6,39 @@
 
 This establishes the harness and verifies that each entry point mounts without a Vite error overlay or uncaught page exception. It does **not** finish the full A1 goal of roughly 20 authenticated screens/popups. We need a safe, repeatable signed-in state for those flows; do not seed or screenshot real farm data just to make a test pass.
 
-## First baseline capture
+## Browser setup and download recovery
 
-From the monorepo root:
+Playwright needs a compatible browser binary. A previous owner-run install timed out after 30 seconds at Microsoft's browser CDN; all 40 visual tests then failed because `chrome-headless-shell` was missing. Those failures did not establish an app regression, and no baseline images were generated.
+
+Preferred recovery in Windows CMD, from the monorepo root:
 
 ```bat
-npm ci
-npx playwright install chromium
+set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000
+npx playwright install --only-shell chromium
+```
+
+The longer download timeout is documented by Playwright. `--only-shell` downloads the headless shell used by this suite instead of the full Chromium bundle.
+
+If the CDN still times out and Google Chrome is already installed, use the opt-in local Chrome fallback:
+
+```bat
+set PW_CHANNEL=chrome
 npm run test:visual:update
 ```
 
-The first `test:visual:update` run creates PNGs in `e2e/visual-baselines/`. Open and inspect these images before approving them as the visual contract. Do not use the update command to silence a regression.
+When using this fallback, leave `PW_CHANNEL=chrome` set for regular `npm run test:visual` runs so baseline capture and comparison use the same browser channel. To return to Playwright-managed Chromium later, run `set PW_CHANNEL=` in that CMD window and install the bundled browser.
+
+The Playwright config preflights browser launch once before running the 40 cases. If the binary is missing, it fails fast with recovery instructions rather than printing 40 duplicate failures.
+
+## First baseline capture
+
+After a browser successfully launches, from the monorepo root run:
+
+```bat
+npm run test:visual:update
+```
+
+The first update run creates PNGs in `e2e/visual-baselines/`. Open and inspect these images before approving them as the visual contract. Do not use the update command to silence a regression.
 
 After the first set exists and has been reviewed:
 

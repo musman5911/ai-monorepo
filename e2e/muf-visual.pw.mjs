@@ -77,6 +77,13 @@ for (const target of targets) {
           if (await splash.count()) await expect(splash).toBeHidden({ timeout: 12_000 });
         }
 
+        // Re-apply theme after hydration so app startup preferences cannot undo the
+        // requested light/dark variant before the screenshot is taken.
+        await page.evaluate((requestedTheme) => {
+          document.documentElement.classList.toggle('dark', requestedTheme === 'dark');
+          document.documentElement.style.colorScheme = requestedTheme;
+        }, theme);
+
         await expect(page.locator('vite-error-overlay')).toHaveCount(0);
         await page.evaluate(() => document.fonts.ready);
         expect(pageErrors, 'Page errors on ' + target.key + ': ' + pageErrors.join('; ')).toEqual([]);

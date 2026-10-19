@@ -1,15 +1,15 @@
 # Progress
 
 What is done, what remains and what is next. Keep this file up to date after every change.
-Last updated: 2026-10-18.
+Last updated: 2026-10-19.
 
 **Validation honesty rule:** a row says "verified" only for checks that actually ran. Browser testing is done by the owner; until then UI changes are "done in source, browser check pending".
 
 ## At a glance
 
 - **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, B1 automated regression/build validation, and A2 live runtime smoke test (8/8 passed).
-- **Remaining:** A1 visual baseline generation/review and authenticated-screen coverage; A3 dependency remediation; B1/B3 visual browser review; verification of the 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
-- **Next:** run Playwright baseline generation and inspect the images before approving them. B2 remains blocked until reliable visual regression coverage is available.
+- **Remaining:** A1 browser installation, baseline generation/review and authenticated-screen coverage; A3 dependency remediation; B1/B3 visual browser review; verification of the 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
+- **Next:** retry Playwright's headless-shell browser install with the longer download timeout, or use the documented installed-Chrome fallback. B2 remains blocked until a usable visual baseline has been reviewed.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
 ## B3 — shared micro-typography
@@ -65,14 +65,17 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 
 ## Active work: A1 — Playwright visual regression tests
 
-**State: harness pushed; browser install, baseline capture and visual review pending. Full A1 is not complete.**
+**State: harness pushed; browser install is blocked by CDN timeouts, baseline capture/review pending. Full A1 is not complete.**
 
 - Pinned `@playwright/test` to 1.63.0 in the root `package.json` and lockfile, keeping the tool dependency isolated from the three app manifests.
 - Added `playwright.config.mjs` with a Chromium project, deterministic screenshot settings, generated-report ignores and Vite web servers on ports 5000 (Dairy), 5001 (Flock) and 5002 (Agri).
 - Added `e2e/muf-visual.pw.mjs`: 40 initial combinations (four targets: three farm entry shells plus the data-free MUF workbench, five widths, light/dark).
 - Added `e2e/README.md` with baseline capture/review instructions. Approved PNGs live in `e2e/visual-baselines/`; generated `playwright-report/` and `test-results/` are ignored.
 - Added two Vitest source-contract checks for the A1 scripts and target/viewport/theme matrix.
-- **Not yet verified:** root `npm ci`, browser installation, initial screenshot capture, baseline image review, and strict screenshot comparisons. This first slice tests the entry shells and workbench; the full A1 goal of around 20 authenticated app screens/popups still requires a safe, repeatable signed-in state and must not use fake farm data.
+- Owner run on 2026-10-19: `npm ci` succeeded (54 packages added; audit reported 4 root dev-tool findings: 1 moderate, 1 high, 2 critical). `npx playwright install chromium` failed after repeated 30-second CDN download timeouts. `npm run test:visual:update` attempted all 40 cases, but all failed before navigation because `chromium_headless_shell-1243` was absent; no snapshots were generated. This is a browser-install/environment blocker, not evidence of 40 UI defects.
+- Added `e2e/global-setup.mjs` to check the browser executable once and provide actionable recovery instructions rather than repeating the same failure 40 times. Added the `PW_CHANNEL=chrome` fallback for machines with Google Chrome, and made the screenshot suite re-apply its requested theme after app hydration.
+- **Next verification:** run `npm test` (60 tests expected), install the headless shell with `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000` and `npx playwright install --only-shell chromium`, then run the visual baseline command. If CDN download remains blocked, set `PW_CHANNEL=chrome` and use the same channel for baseline and comparison runs. No baseline images or visual pass are claimed yet.
+- The full A1 goal of around 20 authenticated app screens/popups still requires a safe, repeatable signed-in state and must not use fake farm data.
 ## Completed
 
 ### Foundation (before this tracker)
@@ -130,19 +133,20 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 
 ## Remaining
 
-1. Validate A1 setup locally: `npm ci`, `npx playwright install chromium`, `npm test` (58 tests expected), and `node tools/check-muf-workbench.js` (23 checks expected).
-2. Run `npm run test:visual:update` once to generate 40 initial snapshots, inspect the PNGs under `e2e/visual-baselines/`, then run `npm run test:visual` without update mode.
-3. Publish only the reviewed baseline PNGs so other checkouts can compare against the same visual contract. The initial images are generated on the owner's Windows machine and are not in this commit.
-4. Expand A1 from entry shells/workbench to about 20 key screens/popups once a safe, repeatable signed-in test state is available; do not use real farm data as a test fixture.
-5. Complete A3: review the four reported root npm audit findings (1 moderate, 1 high, 2 critical) and choose a safe remediation; do not use `npm audit fix --force` without reviewing breaking-change impact.
-6. Browser-review B1 fields and B3 micro-typography at phone/desktop widths, both themes, and Urdu. Complete browser verification of the 2026-10-17 UI batch.
-7. Continue remaining work in `ROADMAP.md`.
+1. Pull the latest A1 browser-preflight update and run `npm test` (60 tests expected) plus `node tools/check-muf-workbench.js` (23 checks expected).
+2. Preferred browser install in Windows CMD: `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000` then `npx playwright install --only-shell chromium`.
+3. If CDN downloads still time out and Google Chrome is installed, run `set PW_CHANNEL=chrome` then `npm run test:visual:update`. Keep the same channel set for comparisons.
+4. Generate 40 initial screenshots, inspect the PNGs under `e2e/visual-baselines/`, and only then run `npm run test:visual` without update mode.
+5. Expand A1 to authenticated screens/popups using a safe, repeatable test state; keep secrets and real farm data out of fixtures.
+6. Complete A3: review the four reported root npm audit findings (1 moderate, 1 high, 2 critical) and choose a safe remediation.
+7. Browser-review B1 fields and B3 micro-typography at phone/desktop widths, both themes, and Urdu; verify the 2026-10-17 UI batch.
+8. Continue the remaining work in `ROADMAP.md`.
 
 ## Next
 
-1. Install Playwright's Chromium browser and generate the initial baseline set.
-2. Inspect screenshots before accepting them; use normal screenshot test mode for later regression runs.
-3. Continue A1 coverage for authenticated screens and popups, then A3. Keep B2 blocked until useful screenshot/regression coverage is available.
+1. Pull the browser-preflight commit and run the root Vitest/source checks.
+2. Install the Playwright headless shell with the longer timeout, or use installed Chrome as the documented fallback.
+3. Generate/review screenshot baselines before calling A1 complete or starting B2.
 ## How to update this file
 
 After each change: move the item from Remaining or Next into Completed with the date, update the validation block with the real numbers, and list anything unverified. Keep `ROADMAP.md` in step.

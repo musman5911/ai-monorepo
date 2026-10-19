@@ -5,6 +5,7 @@ import { defineConfig } from '@playwright/test';
 const root = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
+  globalSetup: './e2e/global-setup.mjs',
   testDir: './e2e',
   testMatch: '**/*.pw.mjs',
   fullyParallel: true,
@@ -27,6 +28,7 @@ export default defineConfig({
   snapshotPathTemplate: '{testDir}/visual-baselines/{arg}{ext}',
   use: {
     browserName: 'chromium',
+    ...(process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {}),
     headless: true,
     serviceWorkers: 'block',
     actionTimeout: 8_000,

@@ -370,3 +370,26 @@ describe('Playwright visual harness (A1)', () => {
     expect(config).toContain("visual-baselines/{arg}{ext}");
   });
 });
+
+
+describe('Playwright browser preflight (A1)', () => {
+  it('fails once with browser-install recovery steps before running visual cases', () => {
+    const config = readSource('playwright.config.mjs');
+    const setup = readSource('e2e/global-setup.mjs');
+    expect(config).toContain("globalSetup: './e2e/global-setup.mjs'");
+    expect(setup).toContain('chromium.launch');
+    expect(setup).toContain('PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000');
+    expect(setup).toContain('npx playwright install --only-shell chromium');
+    expect(setup).toContain('Original browser error:');
+  });
+
+  it('supports an explicit installed-Chrome fallback and repeats the theme at screenshot time', () => {
+    const config = readSource('playwright.config.mjs');
+    const setup = readSource('e2e/global-setup.mjs');
+    const suite = readSource('e2e/muf-visual.pw.mjs');
+    expect(config).toContain("...(process.env.PW_CHANNEL ? { channel: process.env.PW_CHANNEL } : {})");
+    expect(setup).toContain('set PW_CHANNEL=chrome');
+    expect(suite).toContain("document.documentElement.classList.toggle('dark', requestedTheme === 'dark')");
+    expect(suite).toContain('document.documentElement.style.colorScheme = requestedTheme');
+  });
+});

@@ -28,14 +28,20 @@ The runtime test is `tools/check-muf-workbench-runtime.js`, exposed as `npm run 
 3. Acceptance: all runtime checks pass against the live server; failures must exit non-zero and identify the failing route/module. Do not treat `check-muf-workbench.js` as a substitute for this live request.
 ### A1 first-slice implementation and runbook
 
+Owner tried the initial install on 2026-10-19. `npm ci` succeeded, but Chromium downloads from Microsoft's CDN timed out after 30 seconds; all 40 screenshot cases failed because the headless-shell executable was absent. No baselines were generated. The test harness now preflights browser availability and prints recovery steps once. This is a setup blocker, not a UI test result.
+
 The initial baseline harness covers the Agri, Dairy and Flock entry shells plus the data-free Dairy MUF workbench. It runs five viewport widths (360, 390, 768, 1024 and 1440) in light and dark mode, for 40 screenshot variants. This is a stable start, **not full A1 completion**; authenticated screens and actual popups remain a second slice.
 
-1. From the monorepo root run `npm ci` and `npx playwright install chromium`.
-2. Run `npm run test:visual:update` once. Playwright starts the three Vite frontend servers on ports 5000, 5001 and 5002 and creates initial PNG baselines in `e2e/visual-baselines/`.
-3. Inspect those images. A baseline is not approved merely because Playwright generated it.
-4. After review, use `npm run test:visual` for strict comparison. Only use `npm run test:visual:update` when intentionally accepting a reviewed visual change.
-5. Keep `playwright-report/` and `test-results/` as ignored generated output. Publish approved PNGs through the repository's usual process so the baseline set is repeatable across machines.
-6. For the later authenticated screens/popups slice, use a designated safe test account and predictable test state. Never commit passwords/session tokens and never fill the app with fabricated data just to create attractive screenshots.
+1. From the monorepo root run `npm ci`.
+2. In Windows CMD set the documented longer download timeout and install only the headless shell this headless suite needs:
+   `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000`
+   `npx playwright install --only-shell chromium`
+3. If the browser CDN still times out and Google Chrome is installed, run `set PW_CHANNEL=chrome`; the config then uses the local stable Chrome. Keep that variable set for all later comparison runs made against those baselines.
+4. Run `npm run test:visual:update` once. Playwright preflights browser launch, then starts the three Vite frontend servers on ports 5000, 5001 and 5002 and creates initial PNG baselines in `e2e/visual-baselines/`.
+5. Inspect those images. A baseline is not approved merely because Playwright generated it.
+6. After review, use `npm run test:visual` for strict comparison. Only use `npm run test:visual:update` when intentionally accepting a reviewed visual change.
+7. Keep `playwright-report/` and `test-results/` as ignored generated output. Publish approved PNGs through the repository's usual process so the baseline set is repeatable across machines.
+8. For the later authenticated screens/popups slice, use a designated safe test account and predictable test state. Never commit passwords/session tokens and never fill the app with fabricated data just to create attractive screenshots.
 ## B. Finish the shared popup content work
 
 Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate reviewable batch, keep the three stylesheet copies identical, and update `PROGRESS.md` with actual test and browser results.
