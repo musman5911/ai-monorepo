@@ -64,6 +64,7 @@ jobs:
         run: |
           set -euo pipefail
           log="$RUNNER_TEMP/muf-vite.log"
+          cd "$GITHUB_WORKSPACE/dairy_farm/client"
           npx vite --host 127.0.0.1 --port 5000 --strictPort >"$log" 2>&1 &
           server_pid=$!
           cleanup() {
@@ -74,7 +75,7 @@ jobs:
 
           ready=0
           for _ in $(seq 1 30); do
-            if node -e "fetch('http://127.0.0.1:5000/__muf-workbench').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"; then
+            if node -e "fetch('http://127.0.0.1:5000/').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"; then
               ready=1
               break
             fi
@@ -86,6 +87,7 @@ jobs:
           done
 
           if [ "$ready" -ne 1 ]; then
+            echo "Dairy Vite did not become ready at http://127.0.0.1:5000/"
             cat "$log"
             exit 1
           fi
