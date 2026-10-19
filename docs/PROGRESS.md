@@ -8,8 +8,8 @@ Last updated: 2026-10-19.
 ## At a glance
 
 - **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, B1 automated regression/build validation, A2 live runtime smoke test (8/8 passed), C5 popup-source localization slice, and A4 GitHub Actions checks (root tests/guards/runtime plus all three app builds passed on 2026-10-19).
-- **Remaining:** verify the Playwright 1.64.1 browser install, generate/review A1 baselines and add authenticated-screen coverage; finish C5's remaining-label audit and browser review; resolve A3's Vitest/Vite advisories; complete B1/B3 visual review and verify the remaining 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
-- **Next:** A1 browser install/baselines and A3 security remediation. CI on commit `a4ac92b` passed end-to-end: root tests, shared MUF parity, UI safety, 23 workbench source checks, design-system audit, 8 workbench runtime checks, and all three independent frontend builds.
+- **Remaining:** review A1's CI-generated screenshot candidates and approve/reject baselines; add authenticated-screen coverage; finish C5's remaining-label audit and browser review; resolve A3's Vitest/Vite advisories; complete B1/B3 visual review and verify the remaining 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
+- **Next:** inspect A1's generated screenshot artifact, visually review all 40 candidates, and commit only the approved PNG baselines. Then continue the A3 Vitest/Vite security remediation. A4 is green on commit `a4ac92b`.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
 ## B3 — shared micro-typography
@@ -87,6 +87,15 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 - CI runs root `npm ci`, installs Dairy frontend dependencies needed by root tests that import chart/PDF modules, runs `npm test`, then runs MUF sync, UI safety, workbench source safety and design-system audit checks; starts the Dairy Vite server for `npm run check-workbench-runtime`; and independently runs `npm ci` and `npm run build` in Dairy, Flock and Agri frontends.
 - Uses Node.js 24 and the current GitHub checkout/setup-node actions. It does not call the repo's auto-fixing `tools/build-all.js`; each app's declared build is run directly so CI cannot silently remove imports or switch to a Vite-only fallback.
 - CI run for commit `14dde2e` initially failed because the workflow started Vite from the repository root. The workflow was corrected to start Vite from `dairy_farm/client` and wait for the root route before the smoke test. On commit `a4ac92b`, all steps passed: root tests (4 files), MUF sync, UI safety, workbench source guard (23/23), design-system audit, live workbench runtime (8/8), and Dairy/Flock/Agri builds. No visual Playwright cases or snapshot updates run until A1 has approved baselines; no deploy or mirror sync is configured.
+
+## A1 — CI screenshot candidate capture
+
+**State: screenshot capture job added; candidate artifact and visual review are pending. Baselines are not approved or committed.**
+
+- Added a separate GitHub Actions job that installs the root Playwright tools, all three frontend dependencies, and Playwright's Chromium headless shell plus Linux dependencies.
+- The job runs `npm run test:visual:update` for the 40 existing entry/workbench viewport/theme combinations, then uploads `e2e/visual-baselines/`, `playwright-report/`, and `test-results/` as an artifact retained for 14 days.
+- The job does not commit screenshot files or mark them as approved. Review the uploaded PNGs for page rendering, mobile overflow, light/dark contrast, splash-screen timing, and missing remote data before copying any into tracked baselines.
+- Candidate capture is not the authenticated-screen/pop-up slice; that remains blocked on safe repeatable sign-in/test state.
 
 ## C5 — Urdu translations for the October 17 popup batch
 

@@ -31,7 +31,7 @@ The runtime test is `tools/check-muf-workbench-runtime.js`, exposed as `npm run 
 
 The workflow is `.github/workflows/muf-frontend-checks.yml`. It installs the root test-tool lockfile, installs Dairy frontend dependencies needed by root tests that import chart/PDF modules, runs `npm test`, the MUF/UI source guards and design-system audit, starts the Dairy Vite server to exercise the real `/__muf-workbench` route, then installs and builds each farm frontend using that app's own lockfile. It uses Node.js 24 and current checkout/setup-node actions.
 
-Deliberately not included: Playwright visual snapshots (no reviewed baselines exist yet), automatic baseline updates, deploys, mirror sync, and dependency remediation. Runs 1 and 2 on 2026-10-19 exposed stale popup title assertions and missing Dairy React/jsPDF test dependencies. Run 3 exposed Vite starting from the wrong working directory. After fixing the test selectors, dependency ordering and Vite working directory, run 4 on commit `a4ac92b` passed: root tests, all source checks, all 8 runtime checks and all three app builds. A4 is verified for source/runtime/build CI coverage, but not visual snapshots. The Vitest/Vite audit remains A3 and must be resolved with an npm-generated lockfile plus full compatibility tests, not manual lockfile edits.
+A separate `visual-candidate` job now installs Playwright Chromium, captures the 40 existing A1 entry/workbench viewport/theme variants with snapshot update mode, and uploads PNGs, report and test traces as a 14-day artifact for human review. It deliberately does not commit the generated PNGs or approve baselines. Review the artifact before checking any baselines into source control; authenticated popups remain a separate slice. A4 is verified for source/runtime/build CI coverage. The Vitest/Vite audit remains A3 and must be resolved with an npm-generated lockfile plus full compatibility tests, not manual lockfile edits.
 
 ### A3 security triage (2026-10-19)
 
@@ -124,7 +124,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 ## Suggested order
 
 1. Owner's browser pass on the 2026-10-17 batch, then fixes.
-2. A2 is runtime-verified (8/8 checks), and A4 is green on GitHub Actions (root tests, source guards, workbench runtime, all three frontend builds). Continue A1 first-slice browser installation and baseline review.
+2. A2 is runtime-verified (8/8 checks), and A4 is green on GitHub Actions. Inspect/review the A1 CI screenshot artifact first; commit only visually approved PNG baselines, then add the authenticated-screen slice.
 3. Complete A1 authenticated-screen/pop-up coverage using safe test state; complete A3 by auditing the current lockfile and applying a compatible, patched Vitest upgrade.
 4. B1 automated validation has passed (56/56 tests and all three builds); complete B1/B3 browser review.
 5. Resume B2 only after useful visual regression coverage is repeatable. Finish C5's remaining-label audit and browser review, then take C1, C2 and C3.
