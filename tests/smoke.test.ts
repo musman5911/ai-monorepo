@@ -375,6 +375,8 @@ describe('Playwright visual harness (A1)', () => {
     const suite = readSource('e2e/muf-visual.pw.mjs');
     for (const width of [360, 390, 768, 1024, 1440]) expect(suite).toContain('width: ' + width);
     expect(suite).toContain("const themes = ['light', 'dark']");
+    expect(suite).toContain("document.documentElement?.classList.add('dark')");
+    expect(suite).toContain("document.documentElement.classList.toggle('dark', requestedTheme === 'dark')");
     for (const target of ['agri-entry', 'dairy-entry', 'flock-entry', 'muf-workbench']) {
       expect(suite).toContain(target);
     }

@@ -90,10 +90,12 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 
 ## A1 — CI screenshot candidate capture
 
-**State: screenshot capture job added; candidate artifact and visual review are pending. Baselines are not approved or committed.**
+**State: first CI browser run produced 20/40 passing cases; a harness error in the early dark-theme init script is fixed in source, and a rerun is pending. Baselines remain unapproved and uncommitted.**
 
 - Added a separate GitHub Actions job that installs the root Playwright tools, all three frontend dependencies, and Playwright's Chromium headless shell plus Linux dependencies.
 - The job runs `npm run test:visual:update` for the 40 existing entry/workbench viewport/theme combinations, then uploads `e2e/visual-baselines/`, `playwright-report/`, and `test-results/` as an artifact retained for 14 days.
+- First candidate run on commit `ad55754`: Chromium installed successfully; 20 light-theme cases passed and the 20 dark-theme cases failed because the early init script accessed `document.documentElement.classList` before the root element existed. The artifact `muf-visual-candidates-ad5575453ae29c7453125d0ccc2abfa24aef36d0` (ID `12169106960`) was uploaded for 14 days: https://github.com/musman5911/ai-monorepo/actions/runs/39214532353/artifacts/12169106960.
+- Fixed the harness to use optional chaining for the early theme initializer and added a source regression assertion; the visual job must rerun before A1 can be marked passing.
 - The job does not commit screenshot files or mark them as approved. Review the uploaded PNGs for page rendering, mobile overflow, light/dark contrast, splash-screen timing, and missing remote data before copying any into tracked baselines.
 - Candidate capture is not the authenticated-screen/pop-up slice; that remains blocked on safe repeatable sign-in/test state.
 

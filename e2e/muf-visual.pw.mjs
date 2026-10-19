@@ -56,7 +56,7 @@ for (const target of targets) {
         page.on('pageerror', error => pageErrors.push(error.message));
         await page.addInitScript((requestedTheme) => {
           if (requestedTheme === 'dark') {
-            document.documentElement.classList.add('dark');
+            document.documentElement?.classList.add('dark');
           }
         }, theme);
 
