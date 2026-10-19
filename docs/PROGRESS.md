@@ -7,9 +7,9 @@ Last updated: 2026-10-19.
 
 ## At a glance
 
-- **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, B1 automated regression/build validation, and A2 live runtime smoke test (8/8 passed).
-- **Remaining:** verify the A4 rerun after its first-run fixes; verify the Playwright 1.64.1 browser install, generate/review A1 baselines and add authenticated-screen coverage; run C5's localization tests and browser review; resolve A3's Vitest/Vite advisories; B1/B3 visual review; verify the remaining 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
-- **Next:** inspect the A4 rerun after the runtime server starts from `dairy_farm/client`. Root tests, MUF/UI guards and design-system audit passed; all three app builds passed. Then continue A1 browser installation/baselines and A3 security remediation.
+- **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, B1 automated regression/build validation, A2 live runtime smoke test (8/8 passed), C5 popup-source localization slice, and A4 GitHub Actions checks (root tests/guards/runtime plus all three app builds passed on 2026-10-19).
+- **Remaining:** verify the Playwright 1.64.1 browser install, generate/review A1 baselines and add authenticated-screen coverage; finish C5's remaining-label audit and browser review; resolve A3's Vitest/Vite advisories; complete B1/B3 visual review and verify the remaining 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
+- **Next:** A1 browser install/baselines and A3 security remediation. CI on commit `a4ac92b` passed end-to-end: root tests, shared MUF parity, UI safety, 23 workbench source checks, design-system audit, 8 workbench runtime checks, and all three independent frontend builds.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
 ## B3 — shared micro-typography
@@ -81,22 +81,22 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 - The full A1 goal of around 20 authenticated app screens/popups still requires a safe, repeatable signed-in state and must not use fake farm data.
 ## A4 — repeatable GitHub Actions checks
 
-**State: workflow added in source; its first run is not yet verified.**
+**State: verified in GitHub Actions on 2026-10-19 (run 4, commit `a4ac92b`).**
 
 - Added `.github/workflows/muf-frontend-checks.yml` for pushes and pull requests targeting `main`, plus manual dispatch.
 - CI runs root `npm ci`, installs Dairy frontend dependencies needed by root tests that import chart/PDF modules, runs `npm test`, then runs MUF sync, UI safety, workbench source safety and design-system audit checks; starts the Dairy Vite server for `npm run check-workbench-runtime`; and independently runs `npm ci` and `npm run build` in Dairy, Flock and Agri frontends.
 - Uses Node.js 24 and the current GitHub checkout/setup-node actions. It does not call the repo's auto-fixing `tools/build-all.js`; each app's declared build is run directly so CI cannot silently remove imports or switch to a Vite-only fallback.
-- CI run for commit `14dde2e` (2026-10-19): root tests passed, shared MUF parity passed, UI safety passed, the workbench source guard passed 23/23, and the design-system audit passed. All three frontend builds also passed. The live workbench runtime step then failed because Vite had been started from the repository root instead of `dairy_farm/client`; the updated workflow now starts the server from the Dairy frontend and checks the base server URL before running the 8-point smoke test. This fix still needs a green run. No visual Playwright cases or snapshot updates run until A1 has approved baselines; no deploy or mirror sync is configured.
+- CI run for commit `14dde2e` initially failed because the workflow started Vite from the repository root. The workflow was corrected to start Vite from `dairy_farm/client` and wait for the root route before the smoke test. On commit `a4ac92b`, all steps passed: root tests (4 files), MUF sync, UI safety, workbench source guard (23/23), design-system audit, live workbench runtime (8/8), and Dairy/Flock/Agri builds. No visual Playwright cases or snapshot updates run until A1 has approved baselines; no deploy or mirror sync is configured.
 
 ## C5 — Urdu translations for the October 17 popup batch
 
-**State: source changes and regression tests are committed; owner-run tests/builds and browser review remain pending.**
+**State: source changes are committed and the C5 source-contract tests passed in GitHub Actions on 2026-10-19; browser review and remaining-label audit remain pending.**
 
 - Routed the Flock dashboard's Sick Birds and Total Eggs Collected popup titles and dynamic subtitles through the shared `L()` helper, and localized the Feed Purchased This Week title. The Sick Birds popup's full-width Health Portal CTA also uses `L()`.
 - Added missing shared Urdu labels for Clear filters, Go to Health Portal, Log Vaccination Record, Add Incubation Record and the Dairy P&L-mode control. The vaccination submit button now uses the same translation as its modal title.
 - Routed Agri ledger popup titles and formula/source suffixes through `L()`; localized the liability and stock modal count subtitles and help text too. The follow-up also localizes Dairy Cow P&L toggle/help copy and bottom-list heading, Flock egg/feed mini-stat labels, and Agri activity/task counts.
 - Added two Vitest source-contract tests that check the new Urdu translations in all three dictionary twins and guard the associated component call sites.
-- This patch adds two tests, so the next full `npm test` run should report **62 tests**. Test/build scripts were not executed in this session; no passing test or visual-browser result is claimed here.
+- GitHub Actions run 4 passed the updated root suite (4/4 test files), including both C5 source-contract tests. The three production builds also pass in CI. A visual/browser result is not claimed; C5's remaining-label sweep is still open.
 
 ## Completed
 

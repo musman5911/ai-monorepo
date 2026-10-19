@@ -31,7 +31,7 @@ The runtime test is `tools/check-muf-workbench-runtime.js`, exposed as `npm run 
 
 The workflow is `.github/workflows/muf-frontend-checks.yml`. It installs the root test-tool lockfile, installs Dairy frontend dependencies needed by root tests that import chart/PDF modules, runs `npm test`, the MUF/UI source guards and design-system audit, starts the Dairy Vite server to exercise the real `/__muf-workbench` route, then installs and builds each farm frontend using that app's own lockfile. It uses Node.js 24 and current checkout/setup-node actions.
 
-Deliberately not included: Playwright visual snapshots (no reviewed baselines exist yet), automatic baseline updates, deploys, mirror sync, and dependency remediation. CI run for commit `14dde2e` (2026-10-19): root tests, MUF/UI source guards and design-system audit passed; all three app build jobs passed. The live workbench smoke step failed because the workflow launched Vite from the monorepo root rather than `dairy_farm/client`. The workflow now starts Vite in the correct app directory and checks server readiness before invoking the runtime test; A4 remains open until rerun success. The Vitest/Vite audit remains A3 and must be resolved with an npm-generated lockfile plus full compatibility tests, not manual lockfile edits.
+Deliberately not included: Playwright visual snapshots (no reviewed baselines exist yet), automatic baseline updates, deploys, mirror sync, and dependency remediation. Runs 1 and 2 on 2026-10-19 exposed stale popup title assertions and missing Dairy React/jsPDF test dependencies. Run 3 exposed Vite starting from the wrong working directory. After fixing the test selectors, dependency ordering and Vite working directory, run 4 on commit `a4ac92b` passed: root tests, all source checks, all 8 runtime checks and all three app builds. A4 is verified for source/runtime/build CI coverage, but not visual snapshots. The Vitest/Vite audit remains A3 and must be resolved with an npm-generated lockfile plus full compatibility tests, not manual lockfile edits.
 
 ### A3 security triage (2026-10-19)
 
@@ -124,7 +124,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 ## Suggested order
 
 1. Owner's browser pass on the 2026-10-17 batch, then fixes.
-2. A2 is runtime-verified (8/8 checks) and its source guard passed 23/23; A4 now runs repeatable root checks, workbench runtime, and all three frontend builds on GitHub. Use its result to fix test/build regressions before completing A1 browser installation and baseline review.
+2. A2 is runtime-verified (8/8 checks), and A4 is green on GitHub Actions (root tests, source guards, workbench runtime, all three frontend builds). Continue A1 first-slice browser installation and baseline review.
 3. Complete A1 authenticated-screen/pop-up coverage using safe test state; complete A3 by auditing the current lockfile and applying a compatible, patched Vitest upgrade.
 4. B1 automated validation has passed (56/56 tests and all three builds); complete B1/B3 browser review.
 5. Resume B2 only after useful visual regression coverage is repeatable. Finish C5's remaining-label audit and browser review, then take C1, C2 and C3.
