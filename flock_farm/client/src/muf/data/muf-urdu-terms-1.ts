@@ -11,6 +11,8 @@ export const MUF_URDU_PART_1: Record<string, string> = {
   '{count} eggs over {days} days · {range}': '{range} میں {days} دنوں کے دوران {count} انڈے جمع ہوئے',
   '{count} recorded liabilities': '{count} واجبات درج ہیں',
   '{count} recorded stock items': '{count} اسٹاک آئٹمز درج ہیں',
+  '{count} total activities': '{count} کل سرگرمیاں',
+  '{count} pending tasks': '{count} زیر التوا کام',
   '{days}d': '{days} دن',
   '{daysPregnant} days pregnant': 'گابھ کو {daysPregnant} دن',
   '{subject} ended with a loss of Rs {amt}': '{subject} کل {amt} روپے نقصان میں رہا',

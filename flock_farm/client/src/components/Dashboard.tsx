@@ -1079,8 +1079,8 @@ export default function Dashboard({
         <div className="grid grid-cols-2 gap-3 mb-5">
           <MiniStat label="Collected" value={`${totalEggsCollected}`} color="amber" />
           <MiniStat label="Sold" value={`${eggsSold}`} color="emerald" />
-          <MiniStat label="Home use" value={`${eggsHome}`} color="slate" />
-          <MiniStat label="Broken/waste" value={`${eggsBroken}`} color="rose" />
+          <MiniStat label={L('Home use')} value={`${eggsHome}`} color="slate" />
+          <MiniStat label={L('Broken/waste')} value={`${eggsBroken}`} color="rose" />
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
@@ -1181,7 +1181,7 @@ export default function Dashboard({
           <DetailModal open={modal === key} onClose={closeModal} title={cfg.title} subtitle={`${cfg.value} kg · ${cfg.sub}`}
             icon={cfg.icon} iconBg={cfg.bg} size={key === 'feedWeek' ? 'small' : 'big'}>
             <div className="grid grid-cols-2 gap-3 mb-5">
-              <MiniStat label="Total weight" value={`${kgTotal} kg`} color="slate" />
+              <MiniStat label={L('Total weight')} value={`${kgTotal} kg`} color="slate" />
               <MiniStat label={L('Total cost')} value={formatRs(rsTotal)} color="emerald" />
             </div>
             <div className="overflow-x-auto">

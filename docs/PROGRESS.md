@@ -85,7 +85,7 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 
 - Routed the Flock dashboard's Sick Birds and Total Eggs Collected popup titles and dynamic subtitles through the shared `L()` helper, and localized the Feed Purchased This Week title. The Sick Birds popup's full-width Health Portal CTA also uses `L()`.
 - Added missing shared Urdu labels for Clear filters, Go to Health Portal, Log Vaccination Record, Add Incubation Record and the Dairy P&L-mode control. The vaccination submit button now uses the same translation as its modal title.
-- Routed Agri ledger popup titles and formula/source suffixes through `L()`; localized the liability and stock modal count subtitles and help text too.
+- Routed Agri ledger popup titles and formula/source suffixes through `L()`; localized the liability and stock modal count subtitles and help text too. The follow-up also localizes Dairy Cow P&L toggle/help copy and bottom-list heading, Flock egg/feed mini-stat labels, and Agri activity/task counts.
 - Added two Vitest source-contract tests that check the new Urdu translations in all three dictionary twins and guard the associated component call sites.
 - This patch adds two tests, so the next full `npm test` run should report **62 tests**. Test/build scripts were not executed in this session; no passing test or visual-browser result is claimed here.
 

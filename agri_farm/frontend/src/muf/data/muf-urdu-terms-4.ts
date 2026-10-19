@@ -310,4 +310,7 @@ export const MUF_URDU_PART_4: Record<string, string> = {
   'Add incubation record': 'انکیوبیشن کا ریکارڈ شامل کریں',
   'Clear filters': 'فلٹرز صاف کریں',
   'Dashboard Ledger Flow': 'ڈیش بورڈ لیجر کی تفصیل',
+  // C5 follow-up — additional popup labels (B–D).
+  'Bottom {count}': 'کم کارکردگی والے: {count}',
+  'Broken/waste': 'ٹوٹے / ضائع شدہ',
 };

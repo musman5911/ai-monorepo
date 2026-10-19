@@ -1109,14 +1109,14 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
             <div className="muf-seg" role="group" aria-label={L('P&L mode')}>
               {(['running', 'lifetime'] as const).map((m) => (
                 <button key={m} type="button" aria-pressed={pnlMode === m} onClick={() => setPnlMode(m)}>
-                  {m === 'running' ? 'Running (no purchase)' : 'Lifetime (with purchase)'}
+                  {L(m === 'running' ? 'Running (no purchase)' : 'Lifetime (with purchase)')}
                 </button>
               ))}
             </div>
             <p className="text-[10px] text-slate-400">
-              {pnlMode === 'running'
+              {L(pnlMode === 'running'
                 ? 'Milk + sale income minus operating expenses (feed/medicine) per cow.'
-                : 'Running P&L minus the cow\'s purchase price — full lifecycle picture.'}
+                : 'Running P&L minus the cow\'s purchase price — full lifecycle picture.')}
             </p>
             <h4 className="text-xs font-bold text-farm-700 dark:text-farm-400 uppercase tracking-wider">{L('Top 5')}</h4>
             <ul className="muf-rowlist">
@@ -1124,7 +1124,7 @@ export default function Dashboard({ isAdmin, onNavigate }: DashboardProps) {
             </ul>
             {top.length === 0 && <p className="text-xs text-slate-400 text-center py-3">{L('No P&L data yet')}</p>}
             {bottom.length > 0 && (<>
-              <h4 className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">Bottom {bottom.length}</h4>
+              <h4 className="text-xs font-bold text-red-600 dark:text-red-400 uppercase tracking-wider">{L('Bottom {count}', { count: bottom.length })}</h4>
               <ul className="muf-rowlist">
                 {bottom.map((c, i) => row(c, i, 'bad'))}
               </ul>

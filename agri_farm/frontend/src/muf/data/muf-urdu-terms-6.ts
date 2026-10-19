@@ -276,4 +276,8 @@ export const MUF_URDU_PART_6: Record<string, string> = {
   'Total Eggs Collected': 'کل جمع شدہ انڈے',
   'Track fertilizer, seed credit debts, and crop dealer loans (unpaid outlays count as committed crop costs).': 'کھاد، بیج کے ادھار اور فصل کے ڈیلر کے قرض دیکھیں (غیر ادا شدہ خرچے فصل کی لاگت میں شمار ہوں گے)۔',
   'Track seeds, fertilizer, and pesticide stock levels (manually adjust or correct counts anytime).': 'بیج، کھاد اور زرعی ادویات کا اسٹاک دیکھیں (گنتی کسی بھی وقت دستی طور پر درست کریں)۔',
+  // C5 follow-up — additional popup labels (R–T).
+  'Running (no purchase)': 'جاری حساب (خریداری کے بغیر)',
+  'Running P&L minus the cow\'s purchase price — full lifecycle picture.': 'گائے کی خریداری کی قیمت منہا کرنے کے بعد نفع نقصان، یعنی پوری مدت کا حساب۔',
+  'Total weight': 'کل وزن',
 };

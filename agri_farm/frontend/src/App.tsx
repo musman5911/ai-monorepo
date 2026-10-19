@@ -2856,7 +2856,7 @@ function App() {
                 open={showCareRosterModal}
                 onClose={() => setShowCareRosterModal(false)}
                 title={L('Care & Operations Roster')}
-                subtitle={`${dashTasks.filter(t => t.status !== 'Completed').length} pending tasks`}
+                subtitle={L('{count} pending tasks', { count: dashTasks.filter(t => t.status !== 'Completed').length })}
                 icon={<HeartPulse size={20} />}
                 iconBg="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
                 size="small"
@@ -2896,7 +2896,7 @@ function App() {
                 open={showRecentActivitiesModal}
                 onClose={() => setShowRecentActivitiesModal(false)}
                 title={L('Recent Activities')}
-                subtitle={`${dashTasks.length + dashFinance.length} total activities`}
+                subtitle={L('{count} total activities', { count: dashTasks.length + dashFinance.length })}
                 icon={<Calendar size={20} />}
                 iconBg="bg-indigo-100 text-indigo-600 dark:bg-indigo-900/30 dark:text-indigo-400"
                 size="small"

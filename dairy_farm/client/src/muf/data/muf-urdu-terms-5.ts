@@ -314,4 +314,8 @@ export const MUF_URDU_PART_5: Record<string, string> = {
   'P&L mode': 'نفع و نقصان کا طریقہ',
   'Profit Formula': 'منافع کا فارمولا',
   'Expense Breakdown': 'اخراجات کی تفصیل',
+  // C5 follow-up — additional popup labels (H–M).
+  'Home use': 'گھریلو استعمال',
+  'Lifetime (with purchase)': 'خریداری سمیت مکمل مدت',
+  'Milk + sale income minus operating expenses (feed/medicine) per cow.': 'فی گائے دودھ اور فروخت کی آمدنی میں سے عملی اخراجات (چارہ/دوا) منہا۔',
 };

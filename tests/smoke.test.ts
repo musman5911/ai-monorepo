@@ -420,17 +420,24 @@ describe('C5 Urdu labels for the October 17 popup batch', () => {
       ['{count} eggs over {days} days · {range}', '{range} میں {days} دنوں کے دوران {count} انڈے جمع ہوئے'],
       ['{count} recorded liabilities', '{count} واجبات درج ہیں'],
       ['{count} recorded stock items', '{count} اسٹاک آئٹمز درج ہیں'],
+      ['{count} total activities', '{count} کل سرگرمیاں'],
+      ['{count} pending tasks', '{count} زیر التوا کام'],
     ] },
     { part: 4, entries: [
       ['Add Incubation Record', 'انکیوبیشن کا ریکارڈ شامل کریں'],
       ['Add incubation record', 'انکیوبیشن کا ریکارڈ شامل کریں'],
       ['Clear filters', 'فلٹرز صاف کریں'],
       ['Dashboard Ledger Flow', 'ڈیش بورڈ لیجر کی تفصیل'],
+      ['Bottom {count}', 'کم کارکردگی والے: {count}'],
+      ['Broken/waste', 'ٹوٹے / ضائع شدہ'],
     ] },
     { part: 5, entries: [
       ['Feed Purchased This Week', 'اس ہفتے خریدا گیا چارہ'],
       ['Financial Ledger Flow', 'مالی لیجر کی تفصیل'],
       ['Go to Health Portal', 'صحت کے پورٹل پر جائیں'],
+      ['Home use', 'گھریلو استعمال'],
+      ['Lifetime (with purchase)', 'خریداری سمیت مکمل مدت'],
+      ['Milk + sale income minus operating expenses (feed/medicine) per cow.', 'فی گائے دودھ اور فروخت کی آمدنی میں سے عملی اخراجات (چارہ/دوا) منہا۔'],
       ['Income Source', 'آمدنی کا ذریعہ'],
       ['Expense Breakdown', 'اخراجات کی تفصیل'],
       ['Log Vaccination Record', 'ویکسینیشن کا ریکارڈ درج کریں'],
@@ -442,6 +449,9 @@ describe('C5 Urdu labels for the October 17 popup batch', () => {
     { part: 6, entries: [
       ['Reports Ledger Flow', 'رپورٹس کے لیجر کی تفصیل'],
       ['Total Eggs Collected', 'کل جمع شدہ انڈے'],
+      ['Running (no purchase)', 'جاری حساب (خریداری کے بغیر)'],
+      ['Running P&L minus the cow\'s purchase price — full lifecycle picture.', 'گائے کی خریداری کی قیمت منہا کرنے کے بعد نفع نقصان، یعنی پوری مدت کا حساب۔'],
+      ['Total weight', 'کل وزن'],
       ['Track fertilizer, seed credit debts, and crop dealer loans (unpaid outlays count as committed crop costs).', 'کھاد، بیج کے ادھار اور فصل کے ڈیلر کے قرض دیکھیں (غیر ادا شدہ خرچے فصل کی لاگت میں شمار ہوں گے)۔'],
       ['Track seeds, fertilizer, and pesticide stock levels (manually adjust or correct counts anytime).', 'بیج، کھاد اور زرعی ادویات کا اسٹاک دیکھیں (گنتی کسی بھی وقت دستی طور پر درست کریں)۔'],
     ] },
@@ -452,7 +462,8 @@ describe('C5 Urdu labels for the October 17 popup batch', () => {
       for (const group of translationGroups) {
         const source = readSource(`${app}/src/muf/data/muf-urdu-terms-${group.part}.ts`);
         for (const [english, urdu] of group.entries) {
-          expect(source).toContain(`'${english}': '${urdu}'`);
+          const escapedEnglish = english.replace(/'/g, "\\'");
+          expect(source).toContain(`'${escapedEnglish}': '${urdu}'`);
         }
       }
     }
@@ -480,11 +491,19 @@ describe('C5 Urdu labels for the October 17 popup batch', () => {
     expect(incubation).toContain("L('Add Incubation Record')");
     expect(incubation).toContain("L('Add incubation record')");
     expect(dairyDashboard).toContain("aria-label={L('P&L mode')}");
+    expect(dairyDashboard).toContain("L(m === 'running' ? 'Running (no purchase)' : 'Lifetime (with purchase)')");
+    expect(dairyDashboard).toContain("L(pnlMode === 'running'");
+    expect(dairyDashboard).toContain("L('Bottom {count}'");
+    expect(flockDashboard).toContain("label={L('Home use')}");
+    expect(flockDashboard).toContain("label={L('Broken/waste')}");
+    expect(flockDashboard).toContain("label={L('Total weight')}");
 
     expect(agriApp).toContain("title={L('Loan & Credit Liability Tracker')}");
     expect(agriApp).toContain("subtitle={L('{count} recorded liabilities'");
     expect(agriApp).toContain("title={L('Input Inventory & Stocks')}");
     expect(agriApp).toContain("subtitle={L('{count} recorded stock items'");
+    expect(agriApp).toContain("subtitle={L('{count} total activities'");
+    expect(agriApp).toContain("subtitle={L('{count} pending tasks'");
     expect(agriApp).toContain("L('Dashboard Ledger Flow')");
     expect(agriApp).toContain("L('Reports Ledger Flow')");
     expect(agriApp).toContain("L('Financial Ledger Flow')");
