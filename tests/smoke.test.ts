@@ -353,7 +353,19 @@ describe('Dairy popup fields use shared MUF field styles (B1)', () => {
 describe('Playwright visual harness (A1)', () => {
   it('defines visual test and reviewed-baseline update commands', () => {
     const pkg = JSON.parse(readSource('package.json'));
-    expect(pkg.devDependencies['@playwright/test']).toBe('1.63.0');
+    expect(pkg.devDependencies['@playwright/test']).toBe('1.64.1');
+    const lock = JSON.parse(readSource('package-lock.json'));
+    expect(lock.packages[''].devDependencies['@playwright/test']).toBe('1.64.1');
+    for (const packagePath of [
+      'node_modules/@playwright/test',
+      'node_modules/playwright',
+      'node_modules/playwright-core',
+    ]) {
+      expect(lock.packages[packagePath].version).toBe('1.64.1');
+      expect(lock.packages[packagePath].integrity).toMatch(/^sha512-/);
+    }
+    expect(lock.packages['node_modules/@playwright/test'].dependencies.playwright).toBe('1.64.1');
+    expect(lock.packages['node_modules/playwright'].dependencies['playwright-core']).toBe('1.64.1');
     expect(pkg.scripts['test:visual']).toContain('playwright.config.mjs');
     expect(pkg.scripts['test:visual:update']).toContain('--update-snapshots');
   });

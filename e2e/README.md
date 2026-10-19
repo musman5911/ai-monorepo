@@ -8,11 +8,12 @@ This establishes the harness and verifies that each entry point mounts without a
 
 ## Browser setup and download recovery
 
-Playwright needs a compatible browser binary. A previous owner-run install timed out after 30 seconds at Microsoft's browser CDN; all 40 visual tests then failed because `chrome-headless-shell` was missing. Those failures did not establish an app regression, and no baseline images were generated.
+Playwright needs a compatible browser binary. The 2026-10-19 install attempts were made with `@playwright/test` 1.63.0, which has a documented Windows browser-download timeout regression ([upstream issue #42597](https://github.com/microsoft/playwright/issues/42597)); maintainers confirmed the fix for the 1.64 line. The root manifest and lockfile now pin 1.64.1 with matching `playwright` and `playwright-core` packages. The previous runs failed before navigation because `chrome-headless-shell` was missing, did not establish an app regression, and produced no baseline images. The updated browser install must still be verified on the owner's Windows machine.
 
-Preferred recovery in Windows CMD, from the monorepo root:
+Preferred recovery in Windows CMD, from the monorepo root. First sync the updated lockfile, then try the managed browser install:
 
 ```bat
+npm ci
 set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000
 npx playwright install --only-shell chromium
 ```

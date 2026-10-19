@@ -8,8 +8,8 @@ Last updated: 2026-10-19.
 ## At a glance
 
 - **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, B1 automated regression/build validation, and A2 live runtime smoke test (8/8 passed).
-- **Remaining:** A1 browser installation, baseline generation/review and authenticated-screen coverage; A3 dependency remediation; B1/B3 visual browser review; verification of the 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
-- **Next:** retry Playwright's headless-shell browser install with the longer download timeout, or use the documented installed-Chrome fallback. B2 remains blocked until a usable visual baseline has been reviewed.
+- **Remaining:** verify the Playwright 1.64.1 browser install; generate/review A1 baselines and add authenticated-screen coverage; A3 dependency remediation; B1/B3 visual browser review; verification of the 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
+- **Next:** run `npm ci` and the post-fix test suite, then retry the headless-shell install using the updated Playwright 1.64.1 pin. B2 remains blocked until usable visual baselines have been reviewed.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
 ## B3 — shared micro-typography
@@ -23,11 +23,13 @@ Last updated: 2026-10-19.
 - Owner validation: `npm test` passed 50/50 tests across 4 files; `node tools/check-muf-sync.js` passed; `node tools/check-ui-safety.js` passed; `node tools/check-muf-workbench.js` passed all 19 checks; all three production builds passed; `git diff --check` was clean.
 - **Still unverified:** the visual scale and legibility at 360, 390, 1024 and 1440 px, in light/dark modes and Urdu. Keep that review open; automated success alone does not complete the visual acceptance criteria.
 
-### Owner-run dependency/test-safety status (2026-10-18)
+### Owner-run dependency/test-safety status (updated 2026-10-19)
 
-- `npm ci` completed successfully.
-- The last reported `npm audit` showed 4 findings (1 moderate, 1 high, 2 critical); no later audit output has been supplied.
-- **Not yet shown as run:** A2 runtime workbench smoke test and A1 Playwright screenshot suite. These remain open; B2 is blocked until dependable screenshot/regression coverage is in place.
+- `npm ci` completed successfully before the Playwright version bump; run it again to validate/install the updated lockfile.
+- The last reported `npm audit` showed 4 findings (1 moderate, 1 high, 2 critical). No post-change audit output is available, so A3 is not cleared.
+- A2 runtime workbench smoke test **passed 8/8** on the owner's Windows checkout. The source guard's follow-up run passed **23/23** checks.
+- The stale wording assertion that caused 59/60 tests to pass was corrected in commit `93bf4e3`; the full test suite has not yet been reported as rerun after that fix. A1's real-browser install and screenshot suite are still pending.
+- Public Vitest advisories were updated on 2026-10-16, including `GHSA-xp26-3454-mjgp`, `GHSA-qxg6-89mg-rqv8`, and `GHSA-p458-7748-mcp3`. The locked Vitest version remains 3.2.7, so A3 needs a fresh `npm audit` and compatibility-led remediation rather than relying on the older four-finding snapshot.
 
 ## B1 — Dairy popup field consistency
 
@@ -65,9 +67,9 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 
 ## Active work: A1 — Playwright visual regression tests
 
-**State: harness pushed; browser install is blocked by CDN timeouts, baseline capture/review pending. Full A1 is not complete.**
+**State: harness pushed; Playwright 1.63.0's known Windows installer-timeout regression has been addressed by pinning 1.64.1. Browser-install verification, baseline capture/review and authenticated-screen coverage are still pending. Full A1 is not complete.**
 
-- Pinned `@playwright/test` to 1.63.0 in the root `package.json` and lockfile, keeping the tool dependency isolated from the three app manifests.
+- Pinned `@playwright/test` to 1.64.1 in the root `package.json` and lockfile, with matching 1.64.1 entries for `playwright` and `playwright-core`. The bump targets the upstream Windows installer-timeout regression documented in [Playwright issue #42597](https://github.com/microsoft/playwright/issues/42597); no farm app manifest was changed.
 - Added `playwright.config.mjs` with a Chromium project, deterministic screenshot settings, generated-report ignores and Vite web servers on ports 5000 (Dairy), 5001 (Flock) and 5002 (Agri).
 - Added `e2e/muf-visual.pw.mjs`: 40 initial combinations (four targets: three farm entry shells plus the data-free MUF workbench, five widths, light/dark).
 - Added `e2e/README.md` with baseline capture/review instructions. Approved PNGs live in `e2e/visual-baselines/`; generated `playwright-report/` and `test-results/` are ignored.
@@ -75,7 +77,7 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 - Owner run on 2026-10-19: `npm ci` succeeded (54 packages added; audit reported 4 root dev-tool findings: 1 moderate, 1 high, 2 critical). Both `npx playwright install chromium` and `npx playwright install --only-shell chromium` failed after repeated CDN timeouts, including 120 seconds per attempt. `npm run test:visual:update` stopped at the preflight because `chromium_headless_shell-1243` was absent; no snapshots were generated. This is a browser-install/environment blocker, not evidence of UI defects.
 - Added `e2e/global-setup.mjs` to check the browser executable once and provide actionable recovery instructions rather than repeating the same failure 40 times. Added the `PW_CHANNEL=chrome` fallback for machines with Google Chrome, and made the screenshot suite re-apply its requested theme after app hydration.
 - Follow-up owner run: `node tools/check-muf-workbench.js` passed 23/23 checks. `npm test` reported 59/60 passing because the no-PR test still expected obsolete wording (`do not open pull requests`) after `RULES.md` changed to `Default behavior is no push, no pull request`; corrected in the current follow-up commit.
-- **Next verification:** rerun `npm test` (60 expected), then run `where chrome` to see whether Google Chrome is installed. If found, `set PW_CHANNEL=chrome` and `npm run test:visual:update` should use it without the blocked Playwright CDN. Keep that same channel for later comparison runs. If no Chrome is installed, the browser download needs a network path that can reach `cdn.playwright.dev`. No baseline images or visual pass are claimed yet.
+- **Next verification:** run `npm ci`, `npm test` (60 tests expected), `node tools/check-muf-workbench.js` (23 checks expected), `node tools/check-muf-sync.js` and `node tools/check-ui-safety.js`. Then run `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000` and `npx playwright install --only-shell chromium`. The pin is now 1.64.1, but a successful install has not been observed here. If it still fails, run `where chrome`; when Chrome is installed, set `PW_CHANNEL=chrome` and use that same channel for baseline and comparison runs. No baseline images or visual pass are claimed yet.
 - The full A1 goal of around 20 authenticated app screens/popups still requires a safe, repeatable signed-in state and must not use fake farm data.
 ## Completed
 
@@ -134,9 +136,9 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 
 ## Remaining
 
-1. Pull the latest A1 follow-up and run `npm test` (60 tests expected) plus `node tools/check-muf-workbench.js` (23 checks expected).
-2. Run `where chrome`. If Chrome is installed, use `set PW_CHANNEL=chrome` then `npm run test:visual:update`. Keep that variable set for comparisons with those baselines.
-3. If Chrome is unavailable, resolve network access to `cdn.playwright.dev` before retrying `npx playwright install --only-shell chromium`; increasing the timeout to 120 seconds did not solve the current timeout.
+1. Pull the latest update, run `npm ci`, then rerun `npm test` (60 expected) and all three MUF/UI source guards.
+2. Retry `npx playwright install --only-shell chromium` with the updated Playwright 1.64.1 pin and the documented longer timeout. The former failure used 1.63.0, which had a known Windows installer-timeout regression.
+3. If the updated installer still fails, run `where chrome`. If Chrome is installed, use `set PW_CHANNEL=chrome` then `npm run test:visual:update`; keep the channel set for comparisons.
 4. Generate 40 initial screenshots, inspect `e2e/visual-baselines/`, and only then run `npm run test:visual` without update mode.
 5. Expand A1 to authenticated screens/popups using a safe, repeatable test state; keep credentials and real farm data out of fixtures.
 6. Complete A3: review the four root npm audit findings (1 moderate, 1 high, 2 critical) and choose safe remediation.
@@ -145,8 +147,8 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 
 ## Next
 
-1. Verify the repaired Vitest assertion passes.
-2. Check whether Google Chrome is available; use it as a fallback if present.
+1. Verify the Playwright 1.64.1 lockfile with `npm ci` and rerun all root tests/checks.
+2. Retry the managed Chromium headless-shell install; use local Chrome only if the updated installer still fails.
 3. Generate and visually inspect screenshot baselines before marking A1 complete or starting B2.
 ## How to update this file
 

@@ -12,7 +12,9 @@ export default async function globalSetup() {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error([
       'Playwright browser preflight failed before the visual tests started.',
-      'If the bundled browser is missing or its download timed out, try:',
+      'This repo pins @playwright/test 1.64.1; 1.63.0 had a documented Windows installer-timeout regression (microsoft/playwright#42597).',
+      'Sync dependencies, then install the bundled headless shell:',
+      '  npm ci',
       '  set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000',
       '  npx playwright install --only-shell chromium',
       'If the bundled download still fails and Google Chrome is installed, use this fallback:',

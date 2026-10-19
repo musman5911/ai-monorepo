@@ -13,7 +13,7 @@ Legend: **Risk** = chance of a visible change or break. **Approval** = needs the
 |---|---|---|---|---|
 | A1 | Playwright screenshot regression in two slices: first the three farm entry shells and the MUF workbench (40 variants across five widths and two themes); then about 20 authenticated key screens/popups with reviewed baselines | Establishes repeatable visual checks without using live farm data as a fake test fixture | Low | Yes: root dev dependency and lockfile |
 | A2 | Runtime workbench smoke test using Node's built-in `fetch`: request `/__muf-workbench`, validate the mount/module/Vite-React refresh, and request the transformed editor and stylesheet | The source-only check cannot detect a broken route or Vite transformation | Low | No extra dependency; adds a root script and test file |
-| A3 | Dev-tool security upgrade (Vitest and its transitive packages) | Clears the `npm audit` findings in the root install. They affect test tooling only, not what the farm apps ship | Low | Yes: root manifest and lockfile |
+| A3 | Resolve current root dev-tool audit findings (Vitest and transitive packages), based on exact current advisory ranges and test compatibility | Reduces test-tooling risk without changing shipped farm app code | Medium | Yes: root manifest and lockfile |
 
 ### A2 run instructions and acceptance
 
@@ -26,14 +26,20 @@ The runtime test is `tools/check-muf-workbench-runtime.js`, exposed as `npm run 
    `cd /d F:\PROJECTS\dairy\ai-monorepo`
    `npm run check-workbench-runtime`
 3. Acceptance: all runtime checks pass against the live server; failures must exit non-zero and identify the failing route/module. Do not treat `check-muf-workbench.js` as a substitute for this live request.
+### A3 security triage (2026-10-19)
+
+The last owner-run audit reported four findings (1 moderate, 1 high, 2 critical) while the root lockfile resolved Vitest 3.2.7. The Vitest maintainers' advisory list now includes three additional advisories published on 2026-10-16: [GHSA-xp26-3454-mjgp](https://github.com/vitest-dev/vitest/security/advisories/GHSA-xp26-3454-mjgp), [GHSA-qxg6-89mg-rqv8](https://github.com/vitest-dev/vitest/security/advisories/GHSA-qxg6-89mg-rqv8), and [GHSA-p458-7748-mcp3](https://github.com/vitest-dev/vitest/security/advisories/GHSA-p458-7748-mcp3). Do not assume the historical npm-audit count covers those advisories or that a minor update to the old Vitest major can fix all of them.
+
+Next steps: rerun `npm audit --json` against the current lockfile; map each finding to its affected and first-patched versions; select a maintained compatible Vitest release; update the root lockfile; then run the entire root test suite and check scripts. Do not use `npm audit fix --force` as a blind shortcut. No Vitest dependency change is included in the A1 Playwright fix.
+
 ### A1 first-slice implementation and runbook
 
-Owner tried the initial install on 2026-10-19. `npm ci` succeeded, but Chromium downloads from Microsoft's CDN timed out at both 30 seconds and 120 seconds; the headless-shell executable remains absent. The screenshot run stopped at the new preflight, and no baselines were generated. The test harness prints recovery steps once. This is a setup blocker, not a UI test result.
+Owner tried the initial install on 2026-10-19 with `@playwright/test` 1.63.0. `npm ci` succeeded, but Chromium downloads from Microsoft's CDN timed out at both 30 seconds and 120 seconds; no baselines were generated. Investigation found an upstream Windows installer-timeout regression in Playwright 1.63.0 ([issue #42597](https://github.com/microsoft/playwright/issues/42597)); maintainers stated the fix was due in 1.64. The root manifest and lockfile are now pinned to 1.64.1, including matching `playwright` and `playwright-core` package versions and integrity values. This targets the known version-specific failure, but it is **not yet verified on the owner's Windows machine** and is not a UI test result.
 
 The initial baseline harness covers the Agri, Dairy and Flock entry shells plus the data-free Dairy MUF workbench. It runs five viewport widths (360, 390, 768, 1024 and 1440) in light and dark mode, for 40 screenshot variants. This is a stable start, **not full A1 completion**; authenticated screens and actual popups remain a second slice.
 
-1. From the monorepo root run `npm ci`.
-2. In Windows CMD set the documented longer download timeout and install only the headless shell this headless suite needs:
+1. From the monorepo root run `npm ci` to install and validate the updated Playwright 1.64.1 lockfile.
+2. In Windows CMD set the longer download timeout and install only the headless shell this suite needs. The previous timeout happened on 1.63.0; if this updated version still fails, investigate remaining network/IPv6 path issues rather than repeating the same install command indefinitely:
    `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000`
    `npx playwright install --only-shell chromium`
 3. If the browser CDN still times out and Google Chrome is installed, confirm it with `where chrome`, then run `set PW_CHANNEL=chrome`; the config then uses the local stable Chrome. Keep that variable set for all later comparison runs made against those baselines. If `where chrome` finds nothing, fix access to `cdn.playwright.dev` before retrying the managed download.
@@ -109,8 +115,8 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 ## Suggested order
 
 1. Owner's browser pass on the 2026-10-17 batch, then fixes.
-2. A2 is runtime-verified (8/8 checks); rerun its source guard, then A1 first-slice setup and baseline review.
-3. Complete A1 authenticated-screen/pop-up coverage using safe test state; then complete A3 with a reviewed dependency plan.
+2. A2 is runtime-verified (8/8 checks) and its source guard passed 23/23; verify the latest root tests, then complete A1 first-slice browser installation and baseline review.
+3. Complete A1 authenticated-screen/pop-up coverage using safe test state; complete A3 by auditing the current lockfile and applying a compatible, patched Vitest upgrade.
 4. B1 automated validation has passed (56/56 tests and all three builds); complete B1/B3 browser review.
 5. Resume B2 only after useful visual regression coverage is repeatable; then C5, C1, C2 and C3.
 6. D1 and D2, then D3.
