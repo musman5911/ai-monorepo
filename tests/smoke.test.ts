@@ -203,11 +203,11 @@ describe('Popup design update contracts (2026-10-17)', () => {
 
   it('Flock dashboard popups: eggs and weekly feed are small, Sick Birds is a list with a call to action', () => {
     const source = readSource('flock_farm/client/src/components/Dashboard.tsx');
-    const eggs = source.indexOf('title="Total Eggs Collected"');
+    const eggs = source.indexOf("title={L('Total Eggs Collected')}");
     expect(source.indexOf('size="small"', eggs)).toBeGreaterThan(eggs);
     expect(source.slice(eggs, source.indexOf('</DetailModal>', eggs))).not.toContain('size="big"');
     expect(source).toContain("size={key === 'feedWeek' ? 'small' : 'big'}");
-    const sick = source.indexOf('title="Sick Birds"');
+    const sick = source.indexOf("title={L('Sick Birds')}");
     const sickBody = source.slice(sick, source.indexOf('</DetailModal>', sick));
     expect(sickBody).toContain('muf-rowlist');
     expect(sickBody).toContain('muf-popup-cta');
@@ -260,13 +260,13 @@ describe('Popup design update contracts (2026-10-17)', () => {
     const recent = source.indexOf("title={L('Recent Activities')}\n                subtitle");
     expect(source.slice(recent, recent + 500)).toContain('size="small"');
     expect(source).toContain("size={ledgerModalData.cardType === 'profit' || ledgerModalData.cardType === 'margin' ? 'small' : 'big'}");
-    const liab = source.indexOf('title="Loan & Credit Liability Tracker"');
+    const liab = source.indexOf("title={L('Loan & Credit Liability Tracker')}");
     const liabBody = source.slice(liab, source.indexOf('</DetailModal>', liab));
     expect(liabBody).toContain('muf-rowlist');
     expect(liabBody).not.toContain('muf-reflow');
     expect(liabBody).toContain('handlePayLiability(l._id)');
     expect(liabBody).toContain('handleDeleteLiability(l._id)');
-    const inv = source.indexOf('title="Input Inventory & Stocks"');
+    const inv = source.indexOf("title={L('Input Inventory & Stocks')}");
     const invBody = source.slice(inv, source.indexOf('</DetailModal>', inv));
     expect(invBody).toContain('muf-rowlist');
     expect(invBody).not.toContain('muf-reflow');

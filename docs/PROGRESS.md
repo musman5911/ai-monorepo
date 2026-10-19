@@ -8,8 +8,8 @@ Last updated: 2026-10-19.
 ## At a glance
 
 - **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, B1 automated regression/build validation, and A2 live runtime smoke test (8/8 passed).
-- **Remaining:** review A4's first GitHub Actions run and fix any failures; verify the Playwright 1.64.1 browser install, generate/review A1 baselines and add authenticated-screen coverage; run C5's localization tests and browser review; resolve A3's Vitest/Vite advisories; B1/B3 visual review; verify the remaining 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
-- **Next:** inspect the first A4 workflow result and resolve any root-test, source-guard, runtime or build failures it finds. Then continue A1 browser installation/baselines and A3 dependency remediation; B2 stays blocked until usable visual baselines have been reviewed.
+- **Remaining:** verify the A4 rerun after its first-run fixes; verify the Playwright 1.64.1 browser install, generate/review A1 baselines and add authenticated-screen coverage; run C5's localization tests and browser review; resolve A3's Vitest/Vite advisories; B1/B3 visual review; verify the remaining 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
+- **Next:** review the A4 rerun after fixing root test dependency order and C5-aware popup selectors. All three frontend builds passed in the first CI run; continue A1 browser installation/baselines and A3 dependency remediation after source regressions are green.
 - **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
 
 ## B3 — shared micro-typography
@@ -84,9 +84,9 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 **State: workflow added in source; its first run is not yet verified.**
 
 - Added `.github/workflows/muf-frontend-checks.yml` for pushes and pull requests targeting `main`, plus manual dispatch.
-- CI runs `npm ci` and `npm test` at the root; MUF sync, UI safety, workbench source safety and design-system audit checks; separately installs Dairy frontend dependencies before starting its Vite server for `npm run check-workbench-runtime`; and independently runs `npm ci` and `npm run build` in Dairy, Flock and Agri frontends.
+- CI runs root `npm ci`, installs Dairy frontend dependencies needed by root tests that import chart/PDF modules, runs `npm test`, then runs MUF sync, UI safety, workbench source safety and design-system audit checks; starts the Dairy Vite server for `npm run check-workbench-runtime`; and independently runs `npm ci` and `npm run build` in Dairy, Flock and Agri frontends.
 - Uses Node.js 24 and the current GitHub checkout/setup-node actions. It does not call the repo's auto-fixing `tools/build-all.js`; each app's declared build is run directly so CI cannot silently remove imports or switch to a Vite-only fallback.
-- No visual Playwright cases or snapshot updates run until A1 has approved baselines. No deploy or mirror sync is configured. Review the first workflow run before marking A4 validated.
+- First run on 2026-10-19: all three frontend build jobs passed. The root job failed because Vitest lacked the Dairy frontend's React/jsPDF dependencies and two popup tests searched for literal `title="..."` after C5 changed those titles to `title={L(...)}`. This follow-up fixes the dependency order and test selectors. No visual Playwright cases or snapshot updates run until A1 has approved baselines; no deploy or mirror sync is configured. Review the next run before marking A4 validated.
 
 ## C5 — Urdu translations for the October 17 popup batch
 

@@ -29,9 +29,9 @@ The runtime test is `tools/check-muf-workbench-runtime.js`, exposed as `npm run 
 3. Acceptance: all runtime checks pass against the live server; failures must exit non-zero and identify the failing route/module. Do not treat `check-muf-workbench.js` as a substitute for this live request.
 ### A4 CI workflow
 
-The workflow is `.github/workflows/muf-frontend-checks.yml`. It installs the root test-tool lockfile, runs `npm test`, the MUF/UI source guards and design-system audit, starts the Dairy Vite server to exercise the real `/__muf-workbench` route, then installs and builds each farm frontend using that app's own lockfile. It uses Node.js 24 and current checkout/setup-node actions.
+The workflow is `.github/workflows/muf-frontend-checks.yml`. It installs the root test-tool lockfile, installs Dairy frontend dependencies needed by root tests that import chart/PDF modules, runs `npm test`, the MUF/UI source guards and design-system audit, starts the Dairy Vite server to exercise the real `/__muf-workbench` route, then installs and builds each farm frontend using that app's own lockfile. It uses Node.js 24 and current checkout/setup-node actions.
 
-Deliberately not included: Playwright visual snapshots (no reviewed baselines exist yet), automatic baseline updates, deploys, mirror sync, and dependency remediation. The first workflow run must be reviewed before claiming CI validation. The Vitest/Vite audit remains A3 and must be resolved with an npm-generated lockfile plus full compatibility tests, not manual lockfile edits.
+Deliberately not included: Playwright visual snapshots (no reviewed baselines exist yet), automatic baseline updates, deploys, mirror sync, and dependency remediation. First run on 2026-10-19: all three app build jobs passed; root tests exposed two stale popup title lookups and missing Dairy React/jsPDF test dependencies. This follow-up fixes both issues. Review the next run before claiming A4 validation. The Vitest/Vite audit remains A3 and must be resolved with an npm-generated lockfile plus full compatibility tests, not manual lockfile edits.
 
 ### A3 security triage (2026-10-19)
 

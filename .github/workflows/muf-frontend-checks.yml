@@ -37,6 +37,10 @@ jobs:
       - name: Install root test tools
         run: npm ci
 
+      - name: Install Dairy frontend dependencies used by root tests
+        working-directory: dairy_farm/client
+        run: npm ci
+
       - name: Run root regression tests
         run: npm test
 
@@ -54,10 +58,6 @@ jobs:
 
       - name: Run design-system source audit
         run: node tools/audit-muf-design-system.mjs
-
-      - name: Install Dairy frontend dependencies for the runtime smoke test
-        working-directory: dairy_farm/client
-        run: npm ci
 
       - name: Verify the live workbench route and transformed modules
         shell: bash
