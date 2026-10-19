@@ -84,7 +84,7 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 **State: workflow added in source; its first run is not yet verified.**
 
 - Added `.github/workflows/muf-frontend-checks.yml` for pushes and pull requests targeting `main`, plus manual dispatch.
-- CI runs `npm ci` and `npm test` at the root; MUF sync, UI safety, workbench source safety and design-system audit checks; starts the Dairy Vite server to run `npm run check-workbench-runtime`; and independently runs `npm ci` and `npm run build` in Dairy, Flock and Agri frontends.
+- CI runs `npm ci` and `npm test` at the root; MUF sync, UI safety, workbench source safety and design-system audit checks; separately installs Dairy frontend dependencies before starting its Vite server for `npm run check-workbench-runtime`; and independently runs `npm ci` and `npm run build` in Dairy, Flock and Agri frontends.
 - Uses Node.js 24 and the current GitHub checkout/setup-node actions. It does not call the repo's auto-fixing `tools/build-all.js`; each app's declared build is run directly so CI cannot silently remove imports or switch to a Vite-only fallback.
 - No visual Playwright cases or snapshot updates run until A1 has approved baselines. No deploy or mirror sync is configured. Review the first workflow run before marking A4 validated.
 
