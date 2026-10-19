@@ -28,7 +28,7 @@ The runtime test is `tools/check-muf-workbench-runtime.js`, exposed as `npm run 
 3. Acceptance: all runtime checks pass against the live server; failures must exit non-zero and identify the failing route/module. Do not treat `check-muf-workbench.js` as a substitute for this live request.
 ### A1 first-slice implementation and runbook
 
-Owner tried the initial install on 2026-10-19. `npm ci` succeeded, but Chromium downloads from Microsoft's CDN timed out after 30 seconds; all 40 screenshot cases failed because the headless-shell executable was absent. No baselines were generated. The test harness now preflights browser availability and prints recovery steps once. This is a setup blocker, not a UI test result.
+Owner tried the initial install on 2026-10-19. `npm ci` succeeded, but Chromium downloads from Microsoft's CDN timed out at both 30 seconds and 120 seconds; the headless-shell executable remains absent. The screenshot run stopped at the new preflight, and no baselines were generated. The test harness prints recovery steps once. This is a setup blocker, not a UI test result.
 
 The initial baseline harness covers the Agri, Dairy and Flock entry shells plus the data-free Dairy MUF workbench. It runs five viewport widths (360, 390, 768, 1024 and 1440) in light and dark mode, for 40 screenshot variants. This is a stable start, **not full A1 completion**; authenticated screens and actual popups remain a second slice.
 
@@ -36,7 +36,7 @@ The initial baseline harness covers the Agri, Dairy and Flock entry shells plus 
 2. In Windows CMD set the documented longer download timeout and install only the headless shell this headless suite needs:
    `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000`
    `npx playwright install --only-shell chromium`
-3. If the browser CDN still times out and Google Chrome is installed, run `set PW_CHANNEL=chrome`; the config then uses the local stable Chrome. Keep that variable set for all later comparison runs made against those baselines.
+3. If the browser CDN still times out and Google Chrome is installed, confirm it with `where chrome`, then run `set PW_CHANNEL=chrome`; the config then uses the local stable Chrome. Keep that variable set for all later comparison runs made against those baselines. If `where chrome` finds nothing, fix access to `cdn.playwright.dev` before retrying the managed download.
 4. Run `npm run test:visual:update` once. Playwright preflights browser launch, then starts the three Vite frontend servers on ports 5000, 5001 and 5002 and creates initial PNG baselines in `e2e/visual-baselines/`.
 5. Inspect those images. A baseline is not approved merely because Playwright generated it.
 6. After review, use `npm run test:visual` for strict comparison. Only use `npm run test:visual:update` when intentionally accepting a reviewed visual change.

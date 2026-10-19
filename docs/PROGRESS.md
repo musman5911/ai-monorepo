@@ -72,9 +72,10 @@ Scope is 38 visible controls that previously used local or repeated input stylin
 - Added `e2e/muf-visual.pw.mjs`: 40 initial combinations (four targets: three farm entry shells plus the data-free MUF workbench, five widths, light/dark).
 - Added `e2e/README.md` with baseline capture/review instructions. Approved PNGs live in `e2e/visual-baselines/`; generated `playwright-report/` and `test-results/` are ignored.
 - Added two Vitest source-contract checks for the A1 scripts and target/viewport/theme matrix.
-- Owner run on 2026-10-19: `npm ci` succeeded (54 packages added; audit reported 4 root dev-tool findings: 1 moderate, 1 high, 2 critical). `npx playwright install chromium` failed after repeated 30-second CDN download timeouts. `npm run test:visual:update` attempted all 40 cases, but all failed before navigation because `chromium_headless_shell-1243` was absent; no snapshots were generated. This is a browser-install/environment blocker, not evidence of 40 UI defects.
+- Owner run on 2026-10-19: `npm ci` succeeded (54 packages added; audit reported 4 root dev-tool findings: 1 moderate, 1 high, 2 critical). Both `npx playwright install chromium` and `npx playwright install --only-shell chromium` failed after repeated CDN timeouts, including 120 seconds per attempt. `npm run test:visual:update` stopped at the preflight because `chromium_headless_shell-1243` was absent; no snapshots were generated. This is a browser-install/environment blocker, not evidence of UI defects.
 - Added `e2e/global-setup.mjs` to check the browser executable once and provide actionable recovery instructions rather than repeating the same failure 40 times. Added the `PW_CHANNEL=chrome` fallback for machines with Google Chrome, and made the screenshot suite re-apply its requested theme after app hydration.
-- **Next verification:** run `npm test` (60 tests expected), install the headless shell with `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000` and `npx playwright install --only-shell chromium`, then run the visual baseline command. If CDN download remains blocked, set `PW_CHANNEL=chrome` and use the same channel for baseline and comparison runs. No baseline images or visual pass are claimed yet.
+- Follow-up owner run: `node tools/check-muf-workbench.js` passed 23/23 checks. `npm test` reported 59/60 passing because the no-PR test still expected obsolete wording (`do not open pull requests`) after `RULES.md` changed to `Default behavior is no push, no pull request`; corrected in the current follow-up commit.
+- **Next verification:** rerun `npm test` (60 expected), then run `where chrome` to see whether Google Chrome is installed. If found, `set PW_CHANNEL=chrome` and `npm run test:visual:update` should use it without the blocked Playwright CDN. Keep that same channel for later comparison runs. If no Chrome is installed, the browser download needs a network path that can reach `cdn.playwright.dev`. No baseline images or visual pass are claimed yet.
 - The full A1 goal of around 20 authenticated app screens/popups still requires a safe, repeatable signed-in state and must not use fake farm data.
 ## Completed
 
@@ -133,20 +134,20 @@ Notes: the Profit and Margin formula popups keep the big size for the Income Sou
 
 ## Remaining
 
-1. Pull the latest A1 browser-preflight update and run `npm test` (60 tests expected) plus `node tools/check-muf-workbench.js` (23 checks expected).
-2. Preferred browser install in Windows CMD: `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000` then `npx playwright install --only-shell chromium`.
-3. If CDN downloads still time out and Google Chrome is installed, run `set PW_CHANNEL=chrome` then `npm run test:visual:update`. Keep the same channel set for comparisons.
-4. Generate 40 initial screenshots, inspect the PNGs under `e2e/visual-baselines/`, and only then run `npm run test:visual` without update mode.
-5. Expand A1 to authenticated screens/popups using a safe, repeatable test state; keep secrets and real farm data out of fixtures.
-6. Complete A3: review the four reported root npm audit findings (1 moderate, 1 high, 2 critical) and choose a safe remediation.
+1. Pull the latest A1 follow-up and run `npm test` (60 tests expected) plus `node tools/check-muf-workbench.js` (23 checks expected).
+2. Run `where chrome`. If Chrome is installed, use `set PW_CHANNEL=chrome` then `npm run test:visual:update`. Keep that variable set for comparisons with those baselines.
+3. If Chrome is unavailable, resolve network access to `cdn.playwright.dev` before retrying `npx playwright install --only-shell chromium`; increasing the timeout to 120 seconds did not solve the current timeout.
+4. Generate 40 initial screenshots, inspect `e2e/visual-baselines/`, and only then run `npm run test:visual` without update mode.
+5. Expand A1 to authenticated screens/popups using a safe, repeatable test state; keep credentials and real farm data out of fixtures.
+6. Complete A3: review the four root npm audit findings (1 moderate, 1 high, 2 critical) and choose safe remediation.
 7. Browser-review B1 fields and B3 micro-typography at phone/desktop widths, both themes, and Urdu; verify the 2026-10-17 UI batch.
 8. Continue the remaining work in `ROADMAP.md`.
 
 ## Next
 
-1. Pull the browser-preflight commit and run the root Vitest/source checks.
-2. Install the Playwright headless shell with the longer timeout, or use installed Chrome as the documented fallback.
-3. Generate/review screenshot baselines before calling A1 complete or starting B2.
+1. Verify the repaired Vitest assertion passes.
+2. Check whether Google Chrome is available; use it as a fallback if present.
+3. Generate and visually inspect screenshot baselines before marking A1 complete or starting B2.
 ## How to update this file
 
 After each change: move the item from Remaining or Next into Completed with the date, update the validation block with the real numbers, and list anything unverified. Keep `ROADMAP.md` in step.

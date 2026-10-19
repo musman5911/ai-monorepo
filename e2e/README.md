@@ -19,7 +19,7 @@ npx playwright install --only-shell chromium
 
 The longer download timeout is documented by Playwright. `--only-shell` downloads the headless shell used by this suite instead of the full Chromium bundle.
 
-If the CDN still times out and Google Chrome is already installed, use the opt-in local Chrome fallback:
+If the CDN still times out, first check whether Google Chrome is installed by running `where chrome`. If it is, use the opt-in local Chrome fallback:
 
 ```bat
 set PW_CHANNEL=chrome
