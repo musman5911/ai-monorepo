@@ -1,0 +1,123 @@
+name: MUF frontend checks
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: muf-checks-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  source-regressions:
+    name: Root tests and source guards
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            dairy_farm/client/package-lock.json
+            flock_farm/client/package-lock.json
+            agri_farm/frontend/package-lock.json
+
+      - name: Install root test tools
+        run: npm ci
+
+      - name: Run root regression tests
+        run: npm test
+
+      - name: Check shared MUF parity
+        run: node tools/check-muf-sync.js
+
+      - name: Check UI safety
+        run: node tools/check-ui-safety.js
+
+      - name: Check workbench source safety
+        run: npm run check-workbench
+
+      - name: Check design-system audit script syntax
+        run: node --check tools/audit-muf-design-system.mjs
+
+      - name: Run design-system source audit
+        run: node tools/audit-muf-design-system.mjs
+
+      - name: Verify the live workbench route and transformed modules
+        shell: bash
+        run: |
+          set -euo pipefail
+          log="$RUNNER_TEMP/muf-vite.log"
+          npx vite --host 127.0.0.1 --port 5000 --strictPort >"$log" 2>&1 &
+          server_pid=$!
+          cleanup() {
+            kill "$server_pid" 2>/dev/null || true
+            wait "$server_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          ready=0
+          for _ in $(seq 1 30); do
+            if node -e "fetch('http://127.0.0.1:5000/__muf-workbench').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"; then
+              ready=1
+              break
+            fi
+            if ! kill -0 "$server_pid" 2>/dev/null; then
+              cat "$log"
+              exit 1
+            fi
+            sleep 1
+          done
+
+          if [ "$ready" -ne 1 ]; then
+            cat "$log"
+            exit 1
+          fi
+
+          cd "$GITHUB_WORKSPACE"
+          npm run check-workbench-runtime
+
+  frontend-builds:
+    name: Build ${{ matrix.app.name }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        app:
+          - name: Dairy Farm
+            path: dairy_farm/client
+          - name: Flock Farm
+            path: flock_farm/client
+          - name: Agri Farm
+            path: agri_farm/frontend
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: ${{ matrix.app.path }}/package-lock.json
+
+      - name: Install app dependencies
+        working-directory: ${{ matrix.app.path }}
+        run: npm ci
+
+      - name: Build app with its configured TypeScript/Vite command
+        working-directory: ${{ matrix.app.path }}
+        run: npm run build

@@ -14,6 +14,7 @@ Legend: **Risk** = chance of a visible change or break. **Approval** = needs the
 | A1 | Playwright screenshot regression in two slices: first the three farm entry shells and the MUF workbench (40 variants across five widths and two themes); then about 20 authenticated key screens/popups with reviewed baselines | Establishes repeatable visual checks without using live farm data as a fake test fixture | Low | Yes: root dev dependency and lockfile |
 | A2 | Runtime workbench smoke test using Node's built-in `fetch`: request `/__muf-workbench`, validate the mount/module/Vite-React refresh, and request the transformed editor and stylesheet | The source-only check cannot detect a broken route or Vite transformation | Low | No extra dependency; adds a root script and test file |
 | A3 | Resolve current root dev-tool audit findings (Vitest and transitive packages), based on exact current advisory ranges and test compatibility | Reduces test-tooling risk without changing shipped farm app code | Medium | Yes: root manifest and lockfile |
+| A4 | Repeatable GitHub Actions verification of root tests, MUF/UI source guards, live workbench runtime, design-system audit and independent builds for all three frontends | Turns local-only results into per-commit evidence; keeps visual snapshots and security-dependency remediation as explicit separate gates | Low | No new npm dependency; workflow only |
 
 ### A2 run instructions and acceptance
 
@@ -26,6 +27,12 @@ The runtime test is `tools/check-muf-workbench-runtime.js`, exposed as `npm run 
    `cd /d F:\PROJECTS\dairy\ai-monorepo`
    `npm run check-workbench-runtime`
 3. Acceptance: all runtime checks pass against the live server; failures must exit non-zero and identify the failing route/module. Do not treat `check-muf-workbench.js` as a substitute for this live request.
+### A4 CI workflow
+
+The workflow is `.github/workflows/muf-frontend-checks.yml`. It installs the root test-tool lockfile, runs `npm test`, the MUF/UI source guards and design-system audit, starts the Dairy Vite server to exercise the real `/__muf-workbench` route, then installs and builds each farm frontend using that app's own lockfile. It uses Node.js 24 and current checkout/setup-node actions.
+
+Deliberately not included: Playwright visual snapshots (no reviewed baselines exist yet), automatic baseline updates, deploys, mirror sync, and dependency remediation. The first workflow run must be reviewed before claiming CI validation. The Vitest/Vite audit remains A3 and must be resolved with an npm-generated lockfile plus full compatibility tests, not manual lockfile edits.
+
 ### A3 security triage (2026-10-19)
 
 The last owner-run audit reported four findings (1 moderate, 1 high, 2 critical) while the root lockfile resolved Vitest 3.2.7. The Vitest maintainers' advisory list now includes three additional advisories published on 2026-10-16: [GHSA-xp26-3454-mjgp](https://github.com/vitest-dev/vitest/security/advisories/GHSA-xp26-3454-mjgp), [GHSA-qxg6-89mg-rqv8](https://github.com/vitest-dev/vitest/security/advisories/GHSA-qxg6-89mg-rqv8), and [GHSA-p458-7748-mcp3](https://github.com/vitest-dev/vitest/security/advisories/GHSA-p458-7748-mcp3). Do not assume the historical npm-audit count covers those advisories or that a minor update to the old Vitest major can fix all of them.
@@ -117,7 +124,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 ## Suggested order
 
 1. Owner's browser pass on the 2026-10-17 batch, then fixes.
-2. A2 is runtime-verified (8/8 checks) and its source guard passed 23/23; verify the latest root tests, then complete A1 first-slice browser installation and baseline review.
+2. A2 is runtime-verified (8/8 checks) and its source guard passed 23/23; A4 now runs repeatable root checks, workbench runtime, and all three frontend builds on GitHub. Use its result to fix test/build regressions before completing A1 browser installation and baseline review.
 3. Complete A1 authenticated-screen/pop-up coverage using safe test state; complete A3 by auditing the current lockfile and applying a compatible, patched Vitest upgrade.
 4. B1 automated validation has passed (56/56 tests and all three builds); complete B1/B3 browser review.
 5. Resume B2 only after useful visual regression coverage is repeatable. Finish C5's remaining-label audit and browser review, then take C1, C2 and C3.
