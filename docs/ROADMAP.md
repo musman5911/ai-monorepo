@@ -85,7 +85,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 | C2 | Right-to-left correctness for Urdu: replace physical left/right padding and positioning with logical properties | Identical in English, correct in Urdu | Low |
 | C3 | Accessibility pass: labels on icon-only buttons, focus kept inside open popups and restored on close, dark-mode contrast (Flock first) | Keyboard and screen-reader use | Low |
 | C4 | Service-worker update prompt ("new version available") | Users can otherwise keep running stale code | Medium |
-| C5 | Add Urdu translations for the new popup strings added on 2026-10-17 (see PROGRESS) | Urdu mode currently falls back to English for those labels | Low |
+| C5 | Complete Urdu coverage for the 2026-10-17 popup batch and audit remaining fallback labels (see PROGRESS) | Prevent English fallbacks in redesigned popups; first source slice is implemented, full validation remains | Low |
 
 **C5 status (2026-10-19):** The popup label/title translations and shared dictionary entries are implemented in source, with regression tests added for the three identical dictionary copies. The next owner run must verify `npm ci`, `npm test` (62 expected), the MUF/UI check scripts and the three app builds. Browser acceptance remains pending; source-contract checks are not visual sign-off.
 
@@ -120,6 +120,6 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 2. A2 is runtime-verified (8/8 checks) and its source guard passed 23/23; verify the latest root tests, then complete A1 first-slice browser installation and baseline review.
 3. Complete A1 authenticated-screen/pop-up coverage using safe test state; complete A3 by auditing the current lockfile and applying a compatible, patched Vitest upgrade.
 4. B1 automated validation has passed (56/56 tests and all three builds); complete B1/B3 browser review.
-5. Resume B2 only after useful visual regression coverage is repeatable; then C5, C1, C2 and C3.
+5. Resume B2 only after useful visual regression coverage is repeatable. Finish C5's remaining-label audit and browser review, then take C1, C2 and C3.
 6. D1 and D2, then D3.
 7. E3, then E2. E1 last, as a separate plan.

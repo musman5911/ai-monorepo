@@ -130,7 +130,7 @@ Many small/big popups showed white panels with light text, or dark slate text on
 | 10 | Loan and Credit Liability Tracker, Input Inventory and Stocks: scrollbar on PC | Wide 6-column tables replaced by list rows with chips and the same actions; no horizontal scroll | Agri `App.tsx` |
 | 11 | Reports Ledger Flow (Profit and Margin Formula) | Same shared popup as item 8 | Agri `App.tsx` |
 
-Notes: the Profit and Margin formula popups keep the big size for the Income Source and Expense Breakdown variants. Popup titles and the new controls use existing translation keys where they exist; new strings fall back to English in Urdu mode (ROADMAP C5).
+Notes: the Profit and Margin formula popups keep the big size for the Income Source and Expense Breakdown variants. The C5 follow-up now adds Urdu labels for the audited popup titles, controls, formula suffixes, and liability/inventory help text. A broader sweep for any remaining English fallbacks and browser review is still open.
 
 ## Latest validation (source level, 2026-10-17)
 
