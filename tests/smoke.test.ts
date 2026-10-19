@@ -432,6 +432,7 @@ describe('C5 Urdu labels for the October 17 popup batch', () => {
       ['Financial Ledger Flow', 'مالی لیجر کی تفصیل'],
       ['Go to Health Portal', 'صحت کے پورٹل پر جائیں'],
       ['Income Source', 'آمدنی کا ذریعہ'],
+      ['Expense Breakdown', 'اخراجات کی تفصیل'],
       ['Log Vaccination Record', 'ویکسینیشن کا ریکارڈ درج کریں'],
       ['Log vaccination record', 'ویکسینیشن کا ریکارڈ درج کریں'],
       ['Margin Formula', 'منافع کی شرح کا فارمولا'],
