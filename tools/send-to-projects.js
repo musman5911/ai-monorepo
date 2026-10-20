@@ -12,11 +12,11 @@
  */
 const { spawnSync } = require('child_process');
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const CONFIG_FILE = path.join(__dirname, 'project-config.json');
-const createdTempDirectories = new Set();
 
 const EXPECTED_REPOS = {
   agri_farm: 'https://github.com/musman5911/agri_farm',
@@ -50,6 +50,14 @@ function git(dir, ...args) {
     code: typeof result.status === 'number' ? result.status : 1,
     out: result.error ? result.error.message + (output ? '\n' + output : '') : output,
   };
+}
+
+function requireGit(dir, label, ...args) {
+  const result = git(dir, ...args);
+  if (result.code !== 0) {
+    throw new Error(label + (result.out ? '\n' + result.out : ''));
+  }
+  return result.out;
 }
 
 function die(message, details) {
@@ -281,12 +289,11 @@ function prepareDestination(dstDir, repoUrl, branch) {
   if (clone.code !== 0) {
     throw new Error('Clone failed' + (clone.out ? '\n' + clone.out : ''));
   }
-  createdTempDirectories.add(dstDir);
 }
 
-function syncProject(appName, appConfig, commitMessage, ownerName, ownerEmail) {
+function syncProject(appName, appConfig, commitMessage, ownerName, ownerEmail, tempRoot) {
   const sourceDirectory = path.join(ROOT, appName);
-  const destinationDirectory = path.join(ROOT, '_sync_' + process.pid + '_' + appName);
+  const destinationDirectory = path.join(tempRoot, appName);
   const branch = appConfig.branch || 'main';
 
   console.log('\n---- ' + appName + ' ----');
@@ -408,27 +415,27 @@ function main() {
   console.log('Commit message: "' + commitMessage + '"');
   console.log('Git identity: ' + ownerName + '\n');
 
+  const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'ai-monorepo-sync-'));
   const results = [];
 
   try {
     console.log('[2/3] Syncing project repositories...');
+    console.log('   Temporary clones are outside the monorepo: ' + tempRoot);
     for (const appName of expectedNames) {
       try {
-        results.push(syncProject(appName, config.projects[appName], commitMessage, ownerName, ownerEmail));
+        results.push(syncProject(appName, config.projects[appName], commitMessage, ownerName, ownerEmail, tempRoot));
       } catch (error) {
         console.error('   [FAIL] ' + error.message);
         results.push({ app: appName, status: 'FAIL', note: error.message.split('\n')[0] });
       }
     }
   } finally {
-    console.log('\n[3/3] Cleaning up temporary clones...');
-    for (const directory of createdTempDirectories) {
-      if (!fs.existsSync(directory)) continue;
-      try {
-        fs.rmSync(directory, { recursive: true, force: true });
-      } catch (error) {
-        console.error('   [WARN] Could not remove temporary clone ' + directory + ': ' + error.message);
-      }
+    console.log('\n[3/3] Cleaning up temporary working copies...');
+    try {
+      fs.rmSync(tempRoot, { recursive: true, force: true, maxRetries: 5, retryDelay: 500 });
+    } catch (error) {
+      console.error('   [WARN] Could not remove temporary working directory: ' + tempRoot);
+      console.error('   [WARN] ' + error.message);
     }
   }
 
