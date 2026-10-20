@@ -1,113 +1,22 @@
 # Progress
 
 What is done, what remains and what is next. Keep this file up to date after every change.
-Last updated: 2026-10-19.
+Last updated: 2026-10-20 (verified against the uploaded `main` snapshot; see "Latest verification").
 
-**Validation honesty rule:** a row says "verified" only for checks that actually ran. Browser testing is done by the owner; until then UI changes are "done in source, browser check pending".
+**Honesty rule:** a row says "verified" only for checks that actually ran. Source checks, tests and CI are automated evidence; they are not visual sign-off. Visual acceptance is done by the owner in a browser and is recorded separately below.
 
 ## At a glance
 
-- **Completed:** shared MUF design system and workbench (foundation), popup and structure work (phases 6 to 12), repository reorganization, dark-mode repair for popups, B1 automated regression/build validation, A2 live runtime smoke test (8/8 passed), C5 popup-source localization slice, and A4 GitHub Actions checks (root tests/guards/runtime plus all three app builds passed on 2026-10-19).
-- **Remaining:** review A1's CI-generated screenshot candidates and approve/reject baselines; add authenticated-screen coverage; finish C5's remaining-label audit and browser review; resolve A3's Vitest/Vite advisories; complete B1/B3 visual review and verify the remaining 2026-10-17 UI batch; then the remaining items in `ROADMAP.md`.
-- **Next:** inspect A1's generated screenshot artifact, visually review all 40 candidates, and commit only the approved PNG baselines. Then continue the A3 Vitest/Vite security remediation. A4 is green on commit `a4ac92b`.
-- **Branch:** work continues on `main`. The arena branch was squashed into `main`, pushed to GitHub on 2026-10-18 (commit `Popup redesign and repo cleanup`), and then deleted locally and on GitHub. Remote branches `audit/ui-v2-merge`, `ui-v2-combined` and `ui-v2-full` still exist and hold unmerged work; the owner decides whether to keep them.
-
-## B3 — shared micro-typography
-
-**Automated validation: passed on the owner's Windows checkout (2026-10-18). Visual/browser review remains pending.**
-
-- Added explicit shared styles to `src/muf/styles/05-density-footer-typography.css` in all three apps.
-- `.text-2xs`: 0.6875rem font size and 1rem line height.
-- `.text-3xs`: 0.625rem font size and 0.875rem line height.
-- Added a Vitest source-contract test for both definitions in all three assembled stylesheets.
-- Owner validation: `npm test` passed 50/50 tests across 4 files; `node tools/check-muf-sync.js` passed; `node tools/check-ui-safety.js` passed; `node tools/check-muf-workbench.js` passed all 19 checks; all three production builds passed; `git diff --check` was clean.
-- **Still unverified:** the visual scale and legibility at 360, 390, 1024 and 1440 px, in light/dark modes and Urdu. Keep that review open; automated success alone does not complete the visual acceptance criteria.
-
-### Owner-run dependency/test-safety status (updated 2026-10-19)
-
-- `npm ci` completed successfully before the Playwright version bump; run it again to validate/install the updated lockfile.
-- The last reported `npm audit` showed 4 findings (1 moderate, 1 high, 2 critical). No post-change audit output is available, so A3 is not cleared.
-- A2 runtime workbench smoke test **passed 8/8** on the owner's Windows checkout. The source guard's follow-up run passed **23/23** checks.
-- The stale wording assertion that caused 59/60 tests to pass was corrected in commit `93bf4e3`; the full test suite has not yet been reported as rerun after that fix. A1's real-browser install and screenshot suite are still pending.
-- Public Vitest advisories were updated on 2026-10-16, including `GHSA-xp26-3454-mjgp`, `GHSA-qxg6-89mg-rqv8`, and `GHSA-p458-7748-mcp3`. The locked Vitest version remains 3.2.7, so A3 needs a fresh `npm audit` and compatibility-led remediation rather than relying on the older four-finding snapshot.
-
-## B1 — Dairy popup field consistency
-
-**Automated validation: passed on the owner's Windows checkout (2026-10-18). Visual/browser review remains pending.**
-
-Scope is 38 visible controls that previously used local or repeated input styling instead of the shared MUF field class:
-
-| Component | Controls migrated |
-|---|---:|
-| Dairy `CowsTab.tsx` — animal, calf and sale forms | 26 |
-| Dairy `MilkTab.tsx` — Edit Milk Record popup | 5 |
-| Dairy `HealthTab.tsx` — notes textarea | 1 |
-| Dairy `BreedingTab.tsx` — quick-action date | 1 |
-| Dairy `CowDetailPopup.tsx` — inline expected-price editor | 1 |
-| Dairy `Dashboard.tsx` — date range and feed-stock settings | 4 |
-| **Total** | **38** |
-
-- The hidden image/file upload controls remain specialized and are not styled as text fields.
-- The obsolete local `.inp` rule in `CowsTab.tsx` was removed after its 26 visible controls moved to `muf-field`.
-- The compact expected-price editor retains its 8rem width and 14px type scale; the two feed-stock settings use the existing larger MUF field variant.
-- Added six regression contracts for the migrated groups in `tests/smoke.test.ts`.
-- Owner validation on commit `3177e59`: `npm test` passed **56/56 tests** across 4 files; `node tools/check-muf-sync.js`, `node tools/check-ui-safety.js`, and `node tools/check-muf-workbench.js` all passed; all three production builds passed; `git status --short` was clean.
-- The earlier failing runs were corrected before this passing run. No app logic, API, backend or dependency changes were made for B1.
-- **Still pending:** visual/browser review of the six affected components in both themes and at phone/desktop widths. Automated validation is green; do not label the visual acceptance criteria complete before browser review.
-
-## A2 — workbench runtime smoke test
-
-**Runtime validation passed on the owner's Windows checkout (2026-10-18): 8/8 checks.**
-
-- Added `tools/check-muf-workbench-runtime.js`, using Node's built-in `fetch` with no added package.
-- Added `npm run check-workbench-runtime` to the root package scripts.
-- The live test returned HTTP 200 for the development route, verified the mount point and transformed editor-module reference, checked Vite/React Refresh injection, validated the editor TSX and workbench CSS responses, and confirmed the Vite client and React Refresh runtime endpoints.
-- The request helper has a timeout and exits non-zero on failure.
-- **Follow-up check still needed:** rerun `node tools/check-muf-workbench.js` after the runtime-guard additions; it should report 23 checks rather than the earlier 19. The live runtime pass itself is confirmed.
-
-## Active work: A1 — Playwright visual regression tests
-
-**State: harness pushed; Playwright 1.63.0's known Windows installer-timeout regression has been addressed by pinning 1.64.1. Browser-install verification, baseline capture/review and authenticated-screen coverage are still pending. Full A1 is not complete.**
-
-- Pinned `@playwright/test` to 1.64.1 in the root `package.json` and lockfile, with matching 1.64.1 entries for `playwright` and `playwright-core`. The bump targets the upstream Windows installer-timeout regression documented in [Playwright issue #42597](https://github.com/microsoft/playwright/issues/42597); no farm app manifest was changed.
-- Added `playwright.config.mjs` with a Chromium project, deterministic screenshot settings, generated-report ignores and Vite web servers on ports 5000 (Dairy), 5001 (Flock) and 5002 (Agri).
-- Added `e2e/muf-visual.pw.mjs`: 40 initial combinations (four targets: three farm entry shells plus the data-free MUF workbench, five widths, light/dark).
-- Added `e2e/README.md` with baseline capture/review instructions. Approved PNGs live in `e2e/visual-baselines/`; generated `playwright-report/` and `test-results/` are ignored.
-- Added two Vitest source-contract checks for the A1 scripts and target/viewport/theme matrix.
-- Owner run on 2026-10-19: `npm ci` succeeded (54 packages added; audit reported 4 root dev-tool findings: 1 moderate, 1 high, 2 critical). Both `npx playwright install chromium` and `npx playwright install --only-shell chromium` failed after repeated CDN timeouts, including 120 seconds per attempt. `npm run test:visual:update` stopped at the preflight because `chromium_headless_shell-1243` was absent; no snapshots were generated. This is a browser-install/environment blocker, not evidence of UI defects.
-- Added `e2e/global-setup.mjs` to check the browser executable once and provide actionable recovery instructions rather than repeating the same failure 40 times. Added the `PW_CHANNEL=chrome` fallback for machines with Google Chrome, and made the screenshot suite re-apply its requested theme after app hydration.
-- Follow-up owner run: `node tools/check-muf-workbench.js` passed 23/23 checks. `npm test` reported 59/60 passing because the no-PR test still expected obsolete wording (`do not open pull requests`) after `RULES.md` changed to `Default behavior is no push, no pull request`; corrected in commit `93bf4e3`. A full post-fix test rerun has not yet been reported.
-- **Next verification:** run `npm ci`, `npm test` (62 tests expected), `node tools/check-muf-workbench.js` (23 checks expected), `node tools/check-muf-sync.js` and `node tools/check-ui-safety.js`. Then run `set PLAYWRIGHT_DOWNLOAD_CONNECTION_TIMEOUT=120000` and `npx playwright install --only-shell chromium`. The pin is now 1.64.1, but a successful install has not been observed here. If it still fails, run `where chrome`; when Chrome is installed, set `PW_CHANNEL=chrome` and use that same channel for baseline and comparison runs. No baseline images or visual pass are claimed yet.
-- The full A1 goal of around 20 authenticated app screens/popups still requires a safe, repeatable signed-in state and must not use fake farm data.
-## A4 — repeatable GitHub Actions checks
-
-**State: verified in GitHub Actions on 2026-10-19 (run 4, commit `a4ac92b`).**
-
-- Added `.github/workflows/muf-frontend-checks.yml` for pushes and pull requests targeting `main`, plus manual dispatch.
-- CI runs root `npm ci`, installs Dairy frontend dependencies needed by root tests that import chart/PDF modules, runs `npm test`, then runs MUF sync, UI safety, workbench source safety and design-system audit checks; starts the Dairy Vite server for `npm run check-workbench-runtime`; and independently runs `npm ci` and `npm run build` in Dairy, Flock and Agri frontends.
-- Uses Node.js 24 and the current GitHub checkout/setup-node actions. It does not call the repo's auto-fixing `tools/build-all.js`; each app's declared build is run directly so CI cannot silently remove imports or switch to a Vite-only fallback.
-- CI run for commit `14dde2e` initially failed because the workflow started Vite from the repository root. The workflow was corrected to start Vite from `dairy_farm/client` and wait for the root route before the smoke test. On commit `a4ac92b`, all steps passed: root tests (4 files), MUF sync, UI safety, workbench source guard (23/23), design-system audit, live workbench runtime (8/8), and Dairy/Flock/Agri builds. No visual Playwright cases or snapshot updates run until A1 has approved baselines; no deploy or mirror sync is configured.
-
-## A1 — CI screenshot candidate capture
-
-**State: first CI browser run produced 20/40 passing cases; a harness error in the early dark-theme init script is fixed in source, and a rerun is pending. Baselines remain unapproved and uncommitted.**
-
-- Added a separate GitHub Actions job that installs the root Playwright tools, all three frontend dependencies, and Playwright's Chromium headless shell plus Linux dependencies.
-- The job runs `npm run test:visual:update` for the 40 existing entry/workbench viewport/theme combinations, then uploads `e2e/visual-baselines/`, `playwright-report/`, and `test-results/` as an artifact retained for 14 days.
-- First candidate run on commit `ad55754`: Chromium installed successfully; 20 light-theme cases passed and the 20 dark-theme cases failed because the early init script accessed `document.documentElement.classList` before the root element existed. The artifact `muf-visual-candidates-ad5575453ae29c7453125d0ccc2abfa24aef36d0` (ID `12169106960`) was uploaded for 14 days: https://github.com/musman5911/ai-monorepo/actions/runs/39214532353/artifacts/12169106960.
-- Fixed the harness to use optional chaining for the early theme initializer and added a source regression assertion; the visual job must rerun before A1 can be marked passing.
-- The job does not commit screenshot files or mark them as approved. Review the uploaded PNGs for page rendering, mobile overflow, light/dark contrast, splash-screen timing, and missing remote data before copying any into tracked baselines.
-- Candidate capture is not the authenticated-screen/pop-up slice; that remains blocked on safe repeatable sign-in/test state.
-
-## C5 — Urdu translations for the October 17 popup batch
-
-**State: source changes are committed and the C5 source-contract tests passed in GitHub Actions on 2026-10-19; browser review and remaining-label audit remain pending.**
-
-- Routed the Flock dashboard's Sick Birds and Total Eggs Collected popup titles and dynamic subtitles through the shared `L()` helper, and localized the Feed Purchased This Week title. The Sick Birds popup's full-width Health Portal CTA also uses `L()`.
-- Added missing shared Urdu labels for Clear filters, Go to Health Portal, Log Vaccination Record, Add Incubation Record and the Dairy P&L-mode control. The vaccination submit button now uses the same translation as its modal title.
-- Routed Agri ledger popup titles and formula/source suffixes through `L()`; localized the liability and stock modal count subtitles and help text too. The follow-up also localizes Dairy Cow P&L toggle/help copy and bottom-list heading, Flock egg/feed mini-stat labels, and Agri activity/task counts.
-- Added two Vitest source-contract tests that check the new Urdu translations in all three dictionary twins and guard the associated component call sites.
-- GitHub Actions run 4 passed the updated root suite (4/4 test files), including both C5 source-contract tests. The three production builds also pass in CI. A visual/browser result is not claimed; C5's remaining-label sweep is still open.
+| Area | State |
+|---|---|
+| Shared MUF design system, folders, split stylesheet (phases 6 to 12) | Done, on `main` |
+| Popup design batch of 2026-10-17 (11 items) and dark-mode popup repair | Done; owner reported it working in the browser on 2026-10-18 |
+| B3 micro-typography, B1 Dairy field consistency, C5 Urdu popup labels | Done in source; automated checks pass; **visual review pending** |
+| A2 workbench runtime smoke test | Done and re-verified (8/8) |
+| A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; reported green on `main` |
+| A1 screenshot regression | **Partly done:** harness and CI candidate capture work (40 entry-shell/workbench cases); no approved baselines yet; no authenticated screens or popups covered |
+| A3 dependency security | **Not done:** fresh audit below; nothing remediated yet |
+| Roadmap B2, C1 to C4, D, E, F | Not started |
 
 ## Completed
 
@@ -126,60 +35,100 @@ Shared MUF design system across the three apps, the small/big popup API (`Detail
 | 11 | MUF files grouped into `src/muf/core`, `admin`, `ui`, `data`, `domain`; stylesheet split into ordered parts under `src/muf/styles/` with compiled CSS byte-identical |
 | 12 | Final validation and delivery |
 
-### Repository reorganization (2026-10-17)
-- Root now holds one Markdown file, `RULES.md`. Other documents are in `docs/`; old phase and audit histories were removed.
-- All scripts are in `tools/` (checks, audit, build, start, `get-update`, `push-main-update`, `send-to-projects`, `project-config.json`). Launchers (`tools\build-all.bat` and others) change to the repository root first, so they work from any folder.
-- Applied the owner's workbench fix (`transformIndexHtml` in the Vite route) and its regression check.
+### Repository reorganization (2026-10-17 to 2026-10-18)
+- Root holds one Markdown file, `RULES.md`; other documents are in `docs/`.
+- All scripts are in `tools/`; launchers change to the repository root first.
+- The arena branch was squashed into `main`, pushed on 2026-10-18 and deleted. Work continues on `main`.
 
-### Dark-mode repair for popups (2026-10-17)
-Many small/big popups showed white panels with light text, or dark slate text on the dark background, because the repair for light-only utility classes existed only for the admin shell. A new stylesheet part (`11-dark-popup-repair.css`) now repairs those classes inside `.muf-pup-card` and `.muf-form-sheet`, skipping any element that already has its own `dark:` variant. A shared-controls part (`12-shared-controls.css`) adds the new components below and fixes the view toggle in dark mode.
+### Dark-mode repair and popup design batch (2026-10-17)
+- `11-dark-popup-repair.css` repairs light-only utility classes inside `.muf-pup-card` and `.muf-form-sheet`; `12-shared-controls.css` adds `muf-add-btn`, `muf-seg`, `muf-rowlist`, `muf-chip`, `muf-callout`.
+- The 11 requested popup changes (Flock Sick Birds, eggs/feed popups, register filters, vaccination and incubation + buttons; Dairy Top Producers and Cow P&L; Agri small popups, formula popups, liability and inventory lists) are on `main`.
+- Owner reported on 2026-10-18 that everything worked in the browser. There is no written screen-by-screen record, and the later items below were added after that report.
 
-### Popup design batch (2026-10-17): done in source, browser check pending
+### B3 — shared micro-typography (automated checks pass; visual review pending)
+- `.text-2xs` is 0.6875rem with 1rem line height; `.text-3xs` is 0.625rem with 0.875rem line height, in `05-density-footer-typography.css`, identical in all three apps (verified).
+- Source-contract test covers both rules in the three assembled stylesheets.
+- Still to review visually: legibility at 360, 390, 1024 and 1440 px, light/dark and Urdu.
 
-| # | Request | What changed | File |
-|---|---|---|---|
-| 1 | Sick Birds popup design | Summary callout, tappable list rows with avatar, details and chip, full-width "Go to Health Portal" button | Flock `Dashboard.tsx` |
-| 2 | Total Eggs Collected and Feed Purchased This Week too large | Both now use the small popup; the egg stats show 2 per row. Feed Today and Feed This Month stay big | Flock `Dashboard.tsx` |
-| 3 | Gender and Status filter design (mobile and PC) | Labelled segmented controls with counts, scroll instead of wrapping, search above, "Clear filters" when active | Flock `FlockRegister.tsx` |
-| 4 | Vaccination History Log: replace inline add with a + button | Round + button in the header opens a "Log Vaccination Record" popup; the history list is now full width | Flock `HealthPortal.tsx` |
-| 5 | Incubation: replace Add with a + button | Round + button opens one shared add/edit popup (with the live preview); the records table is full width | Flock `IncubationModule.tsx` |
-| 6 | Top Producers design | Segmented period selector, rank badges, progress meters, leader highlight | Dairy `Dashboard.tsx` |
-| 7 | Cow P&L as a list | Single-column list rows with rank, cow, milk/sale/cost line and net amount; mode toggle is a segmented control | Dairy `Dashboard.tsx` |
-| 8 | Dashboard Ledger Flow (Profit Formula), Recent Activities, Care and Operations Roster too large | All now use the small popup; the formula boxes stack vertically | Agri `App.tsx` |
-| 9 | Financial Ledger Flow (Profit Formula) | Same shared popup as item 8: small for Profit and Margin formulas | Agri `App.tsx` |
-| 10 | Loan and Credit Liability Tracker, Input Inventory and Stocks: scrollbar on PC | Wide 6-column tables replaced by list rows with chips and the same actions; no horizontal scroll | Agri `App.tsx` |
-| 11 | Reports Ledger Flow (Profit and Margin Formula) | Same shared popup as item 8 | Agri `App.tsx` |
+### B1 — Dairy popup field consistency (automated checks pass; visual review pending)
+38 visible controls moved to `muf-field`: CowsTab 26, MilkTab 5, HealthTab 1, BreedingTab 1, CowDetailPopup 1, Dashboard 4. The obsolete `.inp` rule is gone (verified: no `.inp` left in those files). Six regression contracts were added. Still to review visually in both themes at phone and desktop widths. Other Dairy tabs and the Agri and Flock apps still contain inputs with their own styling; that is outside B1's defined scope.
 
-Notes: the Profit and Margin formula popups keep the big size for the Income Source and Expense Breakdown variants. The C5 follow-up now adds Urdu labels for the audited popup titles, controls, formula suffixes, and liability/inventory help text. A broader sweep for any remaining English fallbacks and browser review is still open.
+### C5 — Urdu labels for the 2026-10-17 popup batch (source slice done; audit and browser review pending)
+Nine representative new labels (Clear filters, Go to Health Portal, Log Vaccination Record, Add Incubation Record, P&L mode, Sick Birds, Total Eggs Collected, Feed Purchased This Week, Gender) are present in the Urdu dictionary of all three apps, and the three dictionary copies are identical (verified). The wider sweep for remaining English fallback labels has not been done.
 
-## Latest validation (source level, 2026-10-17)
+### A2 — workbench runtime smoke test
+`tools/check-muf-workbench-runtime.js` (`npm run check-workbench-runtime`) requests the live `/__muf-workbench` route. Re-run on 2026-10-20 against a fresh Dairy Vite server: 8/8 checks passed. The source guard `tools/check-muf-workbench.js` reports 23/23.
 
-- `tools/check-muf-sync.js`: 198 checks pass.
-- `tools/check-ui-safety.js`: 42 checks pass. `npm run check-workbench`: 19 pass.
-- Popup audit: Agri 36, Dairy 38, Flock 70 popups; 0 missing sizes.
-- Tests: 49 of 49 pass (6 new contracts for this batch).
-- Dairy and Flock type-check with 0 errors. Agri has no unresolved imports and 19 fewer existing type messages than before (none new from this work).
-- All three production builds pass, including through `tools/build-all.js`.
-- 2026-10-18: console messages in `get-update.js`, `push-main-update.js` and the audit script printed `tools\\...` paths with the backslash swallowed (JavaScript escape); fixed by escaping the backslash.
-- 2026-10-18: on Windows `main` the new Agri contract test failed because the checkout uses CRLF line endings; the test helper now normalises line endings (`tests/smoke.test.ts`).
-- **Not verified:** a real browser. Everything visual above is pending the owner's pass.
+### A4 — GitHub Actions
+`.github/workflows/muf-frontend-checks.yml` has three jobs: `source-regressions` (root tests, sync, UI safety, workbench source and runtime, design audit), `visual-candidate` (Playwright candidate capture) and `frontend-builds` (each app's own `npm ci` and `npm run build`). It was reported green on `main`; I cannot see GitHub from the uploaded snapshot, so that claim is the maintainers' record, not something re-verified here.
+
+## In progress
+
+### A1 — Playwright visual regression
+- Done: Playwright 1.64.1 pinned; `playwright.config.mjs`; `e2e/muf-visual.pw.mjs` (4 targets: three farm entry shells and the data-free workbench; widths 360, 390, 768, 1024, 1440; light and dark = 40 cases); `e2e/global-setup.mjs` browser preflight; `e2e/README.md`; the early dark-theme init script now uses `document.documentElement?.classList` (verified in source).
+- CI candidate run: reported 40/40 passed and the PNG artifact uploaded (14 days). The CI job uses `npm run test:visual:update`, which writes snapshots, so it cannot fail on a visual change. **It generates candidates; it is not regression protection.**
+- Not done: review of the 40 candidates; commit of approved baselines (`e2e/visual-baselines/` does not exist yet); switching CI to the strict `npm run test:visual`; the authenticated-screen and popup slice (needs a safe repeatable signed-in state, no real credentials or fabricated farm data).
+- Coverage gap to remember: the 40 cases are logged-out entry screens and the workbench. None of the popups, tabs or dark-mode repairs from phases 6 to 12 and the 2026-10-17 batch are covered by any screenshot test yet.
 
 ## Remaining
 
-1. Pull the latest update, run `npm ci`, then rerun `npm test` (62 expected) and all three MUF/UI source guards.
-2. Retry `npx playwright install --only-shell chromium` with the updated Playwright 1.64.1 pin and the documented longer timeout. The former failure used 1.63.0, which had a known Windows installer-timeout regression.
-3. If the updated installer still fails, run `where chrome`. If Chrome is installed, use `set PW_CHANNEL=chrome` then `npm run test:visual:update`; keep the channel set for comparisons.
-4. Generate 40 initial screenshots, inspect `e2e/visual-baselines/`, and only then run `npm run test:visual` without update mode.
-5. Expand A1 to authenticated screens/popups using a safe, repeatable test state; keep credentials and real farm data out of fixtures.
-6. Complete A3: review the four root npm audit findings (1 moderate, 1 high, 2 critical) and choose safe remediation.
-7. Browser-review B1 fields and B3 micro-typography at phone/desktop widths, both themes, and Urdu; verify the 2026-10-17 UI batch.
-8. Continue the remaining work in `ROADMAP.md`.
+1. **A1:** review the 40 candidates; commit approved baselines; make CI strict; add the authenticated slice (about 20 screens and popups).
+2. **A3 dependency security:** see the audit below; needs the owner's approval to change manifests and lockfiles.
+3. **Visual review (owner):** B1 fields, B3 micro-typography, C5 Urdu labels, at 360, 390, 768/1024 and 1440 px in light, dark and Urdu.
+4. **C5:** sweep for remaining English fallback labels.
+5. Roadmap items B2, C1 to C4, D1 to D3, E1 to E3, F (see `ROADMAP.md`). Do not start B2 until A1 coverage is useful.
 
 ## Next
 
-1. Verify the Playwright 1.64.1 lockfile with `npm ci` and rerun all root tests/checks.
-2. Retry the managed Chromium headless-shell install; use local Chrome only if the updated installer still fails.
-3. Generate and visually inspect screenshot baselines before marking A1 complete or starting B2.
+1. Owner reviews the CI screenshot artifact (it expires 2026-11-02) and approves or rejects the baselines.
+2. A3: targeted dependency updates, starting with the production-exposed ones (see audit).
+3. Update this file after each step.
+
+## Latest verification (2026-10-20, uploaded `main` snapshot, Linux)
+
+| Check | Result |
+|---|---|
+| `npm test` | 62 of 62 pass (4 files) |
+| `node tools/check-muf-sync.js` | 198 checks pass |
+| `node tools/check-ui-safety.js` | 42 checks pass |
+| `node tools/check-muf-workbench.js` | 23 of 23 pass |
+| `node tools/check-muf-workbench-runtime.js` against live Dairy dev server | 8 of 8 pass |
+| `node tools/audit-muf-design-system.mjs` | Agri 36, Dairy 38, Flock 70 popups; 0 missing sizes |
+| Dairy and Flock `tsc --noEmit` | 0 errors |
+| Production builds, each app's own `npm run build` | Agri, Dairy, Flock all succeed (Dairy and Flock include `tsc --noEmit`) |
+| Not run here | Playwright browser tests (browser download is blocked in this environment), GitHub Actions, Windows checkout |
+
+## A3 — fresh dependency audit (2026-10-20, `npm audit`)
+
+| Project | All findings | Shipped to users (`--omit=dev`) |
+|---|---|---|
+| Root (test tools) | 4: 2 critical, 1 high, 1 moderate | **0** |
+| Dairy frontend | 4: 2 high, 1 moderate, 1 low | 1 low (`dompurify`) |
+| Flock frontend | 2: 1 high, 1 low | 1 low (`dompurify`) |
+| Agri frontend | 4: 3 high, 1 low | **2: `axios` high (direct dependency), `dompurify` low** |
+
+Fixes:
+
+| Package | Where | Severity | Fix |
+|---|---|---|---|
+| `axios` 1.19.0 | Agri (shipped) | high | 1.20.0, non-breaking |
+| `dompurify` 3.4.13 | all three apps (shipped, via `jspdf`) | low | 3.4.17, non-breaking |
+| `nanoid` 3.3.16 | Agri (build tooling) | high | 3.3.20, non-breaking |
+| `source-map-js` 1.2.1 | root and all apps (build tooling) | high | 1.2.2, non-breaking |
+| `vitest` / `tinypool` / `@vitest/mocker` | root only (test tooling) | critical, critical, moderate | needs the Vitest 5 major upgrade |
+| `vite` / `esbuild` | Dairy only (dev server) | high, moderate | needs the Vite 8 major upgrade |
+
+Notes:
+- The earlier plan treated A3 as a root-only Vitest problem. The root findings affect only the test tools. The production-exposed item is Agri's `axios`.
+- Do not run a blanket `npm audit fix`: in this check it also rewrote the lockfiles with 50 to 68 added optional platform packages. Prefer targeted updates (for example `npm update axios nanoid dompurify source-map-js` in the right folder) and review `git diff --stat` on each `package-lock.json`.
+- Vitest 5 and Vite 8 are major upgrades; plan them separately and only after A1 can catch visual regressions.
+- Nothing has been changed yet for A3.
+
+## Housekeeping notes
+- The previous version of this file said three old remote branches still existed. The maintainers report that GitHub now lists only `main`; this could not be checked from the snapshot.
+- Flock `ZakatSection` (in `MonthlySummary.tsx`) is still defined and unused (roadmap D1).
+- If `tools\send-to-projects.bat` has not been run since the reorganization, run it only when ready; it is untested by the assistant.
+
 ## How to update this file
 
-After each change: move the item from Remaining or Next into Completed with the date, update the validation block with the real numbers, and list anything unverified. Keep `ROADMAP.md` in step.
+After each change: move the item to Completed with the date, update the verification table with real numbers, and list anything unverified. Keep `ROADMAP.md` in step.

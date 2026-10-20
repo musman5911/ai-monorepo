@@ -33,13 +33,19 @@ The workflow is `.github/workflows/muf-frontend-checks.yml`. It installs the roo
 
 A separate `visual-candidate` job now installs Playwright Chromium, captures the 40 existing A1 entry/workbench viewport/theme variants with snapshot update mode, and uploads PNGs, report and test traces as a 14-day artifact for human review. It deliberately does not commit the generated PNGs or approve baselines. Review the artifact before checking any baselines into source control; authenticated popups remain a separate slice. A4 is verified for source/runtime/build CI coverage. The Vitest/Vite audit remains A3 and must be resolved with an npm-generated lockfile plus full compatibility tests, not manual lockfile edits.
 
-### A3 security triage (2026-10-19)
+### A3 security triage (fresh audit 2026-10-20)
 
-The last owner-run audit reported four findings (1 moderate, 1 high, 2 critical) while the root lockfile resolved Vitest 3.2.7. The Vitest maintainers' advisory list now includes three additional advisories published on 2026-10-16: [GHSA-xp26-3454-mjgp](https://github.com/vitest-dev/vitest/security/advisories/GHSA-xp26-3454-mjgp), [GHSA-qxg6-89mg-rqv8](https://github.com/vitest-dev/vitest/security/advisories/GHSA-qxg6-89mg-rqv8), and [GHSA-p458-7748-mcp3](https://github.com/vitest-dev/vitest/security/advisories/GHSA-p458-7748-mcp3). Do not assume the historical npm-audit count covers those advisories or that a minor update to the old Vitest major can fix all of them.
+The earlier root-only picture was incomplete. A fresh `npm audit` of every project shows:
 
-Next steps: rerun `npm audit --json` against the current lockfile; map each finding to its affected and first-patched versions; select a maintained compatible Vitest release; update the root lockfile; then run the entire root test suite and check scripts. Do not use `npm audit fix --force` as a blind shortcut. No Vitest dependency change is included in the A1 Playwright fix.
+- **Root test tools:** 4 findings (2 critical, 1 high, 1 moderate), all dev-only and none shipped. `vitest`, `tinypool` and `@vitest/mocker` need the Vitest 5 major upgrade; `source-map-js` has a non-breaking fix.
+- **Agri frontend (shipped):** `axios` 1.19.0 is a **high** finding in a direct dependency; fix is 1.20.0, non-breaking. `dompurify` low (via `jspdf`), fix 3.4.17. Dev-only: `nanoid` high (fix 3.3.20) and `source-map-js` high (fix 1.2.2).
+- **Dairy and Flock frontends:** `dompurify` low is the only shipped finding; `source-map-js` high is build tooling; Dairy also has `vite` (high) and `esbuild` (moderate) in the dev server, needing the Vite 8 major.
+
+Recommended order: (1) targeted non-breaking updates for the shipped packages (`axios` in Agri, `dompurify` in all three), then the dev-only `source-map-js` and `nanoid` bumps; (2) rebuild, run all tests and checks; (3) defer Vitest 5 and Vite 8 to a separate, owner-approved phase after A1 baselines exist. Do not run a blanket `npm audit fix`: it adds 50 to 68 unrelated optional platform packages to each lockfile. Review `git diff --stat` for every `package-lock.json`. Each lockfile or manifest change needs the owner's approval.
 
 ### A1 first-slice implementation and runbook
+
+**Status (2026-10-20):** the Playwright 1.64.1 install works in CI and the dark-theme init fix is in source; CI candidate capture is reported at 40/40. Baselines are not approved or committed, and CI still uses update mode. The 40 cases cover only logged-out entry shells and the workbench, not the popups and tabs changed in earlier phases.
 
 Owner tried the initial install on 2026-10-19 with `@playwright/test` 1.63.0. `npm ci` succeeded, but Chromium downloads from Microsoft's CDN timed out at both 30 seconds and 120 seconds; no baselines were generated. Investigation found an upstream Windows installer-timeout regression in Playwright 1.63.0 ([issue #42597](https://github.com/microsoft/playwright/issues/42597)); maintainers stated the fix was due in 1.64. The root manifest and lockfile are now pinned to 1.64.1, including matching `playwright` and `playwright-core` package versions and integrity values. This targets the known version-specific failure, but it is **not yet verified on the owner's Windows machine** and is not a UI test result.
 
@@ -82,7 +88,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 - Regression tests must cover every migrated group; require the full test suite, MUF sync check, UI safety check and all three builds to pass.
 - For repeated class-string migrations, verify the entire target set is converted; regression tests should anchor to the specific popup wrapper/comment rather than a title string shared by multiple popups.
 - Dashboard feed-stock settings are a pair: both `Daily use (kg)` and `Warn below (days)` must use `muf-field` (with the larger variant), and both are covered by the B1 regression test.
-- The owner approved starting B1 before A1 Playwright coverage was finished. Therefore B1 remains **in progress** until local checks and browser review pass. **Do not start B2** until reliable screenshot/regression coverage is available.
+- The owner approved starting B1 before A1 Playwright coverage was finished. Automated validation has passed (tests, checks and builds); B1 stays **pending visual review** until the owner confirms it in a browser. **Do not start B2** until reliable screenshot/regression coverage is available.
 
 ## C. Frontend improvements
 
@@ -94,7 +100,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 | C4 | Service-worker update prompt ("new version available") | Users can otherwise keep running stale code | Medium |
 | C5 | Complete Urdu coverage for the 2026-10-17 popup batch and audit remaining fallback labels (see PROGRESS) | Prevent English fallbacks in redesigned popups; first source slice is implemented, full validation remains | Low |
 
-**C5 status (2026-10-19):** The popup label/title translations and shared dictionary entries are implemented in source, with regression tests added for the three identical dictionary copies. The next owner run must verify `npm ci`, `npm test` (62 expected), the MUF/UI check scripts and the three app builds. Browser acceptance remains pending; source-contract checks are not visual sign-off.
+**C5 status (2026-10-20):** popup label/title translations and shared dictionary entries are in source and identical across the three apps (nine representative labels verified present in all three). Source-contract tests pass. The remaining-label sweep and browser review are still open; source checks are not visual sign-off.
 
 ## D. Cleanup
 
@@ -123,10 +129,9 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 
 ## Suggested order
 
-1. Owner's browser pass on the 2026-10-17 batch, then fixes.
-2. A2 is runtime-verified (8/8 checks), and A4 is green on GitHub Actions. Inspect/review the A1 CI screenshot artifact first; commit only visually approved PNG baselines, then add the authenticated-screen slice.
-3. Complete A1 authenticated-screen/pop-up coverage using safe test state; complete A3 by auditing the current lockfile and applying a compatible, patched Vitest upgrade.
-4. B1 automated validation has passed (56/56 tests and all three builds); complete B1/B3 browser review.
-5. Resume B2 only after useful visual regression coverage is repeatable. Finish C5's remaining-label audit and browser review, then take C1, C2 and C3.
-6. D1 and D2, then D3.
-7. E3, then E2. E1 last, as a separate plan.
+1. A1: review the 40 CI candidates, commit only approved baselines, make CI strict (`npm run test:visual`), then add the authenticated-screen and popup slice with safe test state.
+2. A3: targeted non-breaking updates first (Agri `axios`, `dompurify` in all three apps, then the dev-only bumps), with owner approval for each manifest or lockfile change; Vitest 5 and Vite 8 later as a separate phase.
+3. Owner visual review of B1 fields, B3 typography and C5 Urdu labels; finish the C5 remaining-label sweep.
+4. Resume B2 only after useful visual regression coverage is repeatable. Then C1, C2, C3 and C4.
+5. D1 and D2, then D3.
+6. E3, then E2. E1 last, as a separate plan.
