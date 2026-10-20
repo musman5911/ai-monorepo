@@ -1,6 +1,12 @@
 {
-  "monorepoRepo": "https://github.com/musman5911/just_for_appp",
+  "monorepoRepo": "https://github.com/musman5911/ai-monorepo",
   "projects": {
+    "agri_farm": {
+      "repo": "https://github.com/musman5911/agri_farm",
+      "frontendDir": "frontend",
+      "backendDir": "backend",
+      "port": 8000
+    },
     "dairy_farm": {
       "repo": "https://github.com/musman5911/dairy_farm",
       "frontendDir": "client",
@@ -12,12 +18,6 @@
       "frontendDir": "client",
       "backendDir": "backend",
       "port": 3001
-    },
-    "agri_farm": {
-      "repo": "https://github.com/musman5911/agri_farm",
-      "frontendDir": "frontend",
-      "backendDir": "backend",
-      "port": 8000
     }
   }
 }

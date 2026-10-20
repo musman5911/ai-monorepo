@@ -1,262 +1,451 @@
 #!/usr/bin/env node
 /**
- * send-to-projects.js — Mirror sync monorepo app folders → separate project repos.
+ * Mirror each monorepo project folder to its matching standalone repository.
  *
- * - Mirror sync: overwrites ALL files in the project repo (deletes files that
- *   no longer exist in the monorepo, adds new files, modifies changed files)
- * - Selective: only pushes to project repos whose files actually changed
- * - 5-word commit message (no email, no co-author)
- * - Excludes: .git, node_modules, .env, dist, .replit, replit.nix, .jwt_secret
- * - Runs check-sync.js before syncing
+ * The monorepo project folder is authoritative for ordinary project files:
+ * new files are added, changed files are updated, and deleted files are removed.
+ * Git metadata, dependencies, build output, local secrets, and caches are kept
+ * out of the mirror. Project configuration files (including .gitignore and
+ * Replit config) are mirrored normally.
  *
  * Usage: node tools/send-to-projects.js
  */
-const { execSync, spawnSync } = require('child_process');
+const { spawnSync } = require('child_process');
 const fs = require('fs');
 const path = require('path');
 
 const ROOT = path.resolve(__dirname, '..');
 const CONFIG_FILE = path.join(__dirname, 'project-config.json');
+const createdTempDirectories = new Set();
+
+const EXPECTED_REPOS = {
+  agri_farm: 'https://github.com/musman5911/agri_farm',
+  dairy_farm: 'https://github.com/musman5911/dairy_farm',
+  flock_farm: 'https://github.com/musman5911/flock_farm',
+};
+
+const EXCLUDED_NAMES = new Set([
+  '.git',
+  'node_modules',
+  'dist',
+  '.jwt_secret',
+  '__pycache__',
+  '.venv',
+  'venv',
+  '.pytest_cache',
+]);
 
 function git(dir, ...args) {
-  try {
-    const res = execSync(`git ${args.join(' ')}`, { cwd: dir, encoding: 'utf8', stdio: ['pipe', 'pipe', 'pipe'] });
-    return { code: 0, out: res.trim() };
-  } catch (e) {
-    return { code: e.status || 1, out: (e.stdout || '').trim() + (e.stderr || '').trim() };
-  }
+  const result = spawnSync('git', args, {
+    cwd: dir,
+    encoding: 'utf8',
+    windowsHide: true,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  const output = [result.stdout, result.stderr]
+    .filter(Boolean)
+    .join('\n')
+    .trim();
+  return {
+    code: typeof result.status === 'number' ? result.status : 1,
+    out: result.error ? result.error.message + (output ? '\n' + output : '') : output,
+  };
 }
 
-function die(msg, details) {
-  console.error(`\n[FAIL] ${msg}`);
-  if (details) console.error(details.split('\n').map(l => '   | ' + l).join('\n'));
+function die(message, details) {
+  console.error('\n[FAIL] ' + message);
+  if (details) {
+    console.error(String(details).split('\n').map(line => '   | ' + line).join('\n'));
+  }
   process.exit(1);
 }
 
+function normalizeRepo(repo) {
+  return String(repo || '').trim().replace(/\/+$/, '').replace(/\.git$/i, '').toLowerCase();
+}
+
 function humanizeMsg(subject) {
-  let s = String(subject || '').split('\n')[0].trim();
-  const FILLER = new Set(['the','a','an','in','to','and','or','for','with','from','of','on','at','by','is','was','are','be','that','this','it','as','if','but','than','then','we','our','have','has','do','will','can','could','should','may','might','must','them','they','their','there','here','now','just','also','only','very']);
+  let value = String(subject || '').split('\n')[0].trim();
+  const filler = new Set([
+    'the', 'a', 'an', 'in', 'to', 'and', 'or', 'for', 'with', 'from', 'of',
+    'on', 'at', 'by', 'is', 'was', 'are', 'be', 'that', 'this', 'it', 'as',
+    'if', 'but', 'than', 'then', 'we', 'our', 'have', 'has', 'do', 'will',
+    'can', 'could', 'should', 'may', 'might', 'must', 'them', 'they',
+    'their', 'there', 'here', 'now', 'just', 'also', 'only', 'very',
+  ]);
+
   for (let i = 0; i < 5; i++) {
-    s = s.replace(/^wave\s+[a-z0-9]+\s*:\s*/i, '')
+    value = value
+      .replace(/^wave\s+[a-z0-9]+\s*:\s*/i, '')
       .replace(/^sync from monorepo:\s*/i, '')
       .replace(/^agent update:?\s*/i, '')
       .replace(/^muf-update:\s*/i, '')
       .replace(/^muf:\s*/i, '')
       .replace(/^fix:\s*/i, '')
       .replace(/^chore:\s*/i, '')
-      .replace(/^refactor:\s*/i, '').trim();
+      .replace(/^refactor:\s*/i, '')
+      .trim();
   }
-  s = s.split(' — ')[0].split(' -- ')[0].split(' (')[0].split(': ')[0].split(' - ')[0].trim();
-  const words = s.split(/\s+/).filter(Boolean);
-  const meaningful = words.filter(w => {
-    const clean = w.toLowerCase().replace(/[^a-z0-9._-]/g, '');
-    return clean && !FILLER.has(clean);
+
+  value = value.split(' — ')[0]
+    .split(' -- ')[0]
+    .split(' (')[0]
+    .split(': ')[0]
+    .split(' - ')[0]
+    .trim();
+
+  const meaningful = value.split(/\s+/).filter(Boolean).filter(word => {
+    const clean = word.toLowerCase().replace(/[^a-z0-9._-]/g, '');
+    return clean && !filler.has(clean);
   });
   let result = meaningful.slice(0, 5).join(' ');
   if (result.length > 50) result = result.slice(0, 47).trimEnd() + '...';
   return result || 'Farm updates';
 }
 
-// ── Mirror copy: overwrite everything, delete files not in source ────────
-const EXCLUDE_PATTERNS = [
-  '.git', 'node_modules', '.env', 'dist', '.replit', 'replit.nix',
-  '.jwt_secret', '.gitignore', '.env.example', '__pycache__', '.venv',
-];
-
 function shouldExclude(name) {
-  return EXCLUDE_PATTERNS.includes(name);
-}
+  const normalized = String(name).toLowerCase();
+  if (EXCLUDED_NAMES.has(normalized)) return true;
 
-function mirrorSync(srcDir, dstDir) {
-  // Delete everything in dst except excluded files
-  if (fs.existsSync(dstDir)) {
-    for (const entry of fs.readdirSync(dstDir, { withFileTypes: true })) {
-      if (shouldExclude(entry.name)) continue;
-      const dstPath = path.join(dstDir, entry.name);
-      try {
-        if (entry.isDirectory()) fs.rmSync(dstPath, { recursive: true, force: true });
-        else fs.unlinkSync(dstPath);
-      } catch { /* ignore locked files */ }
-    }
-  }
-
-  // Copy everything from src to dst (excluding excluded patterns)
-  let copied = 0;
-  function copyRecursive(src, dst) {
-    if (!fs.existsSync(src)) return;
-    for (const entry of fs.readdirSync(src, { withFileTypes: true })) {
-      if (shouldExclude(entry.name)) continue;
-      const srcPath = path.join(src, entry.name);
-      const dstPath = path.join(dst, entry.name);
-      if (entry.isDirectory()) {
-        fs.mkdirSync(dstPath, { recursive: true });
-        copyRecursive(srcPath, dstPath);
-      } else {
-        fs.copyFileSync(srcPath, dstPath);
-        copied++;
-      }
-    }
-  }
-  copyRecursive(srcDir, dstDir);
-  return copied;
-}
-
-// ── Check if app folder has any changes vs the project repo ──────────────
-function hasAppChanges(srcDir, dstDir) {
-  // Compare file lists (excluding .git, node_modules, etc.)
-  function getFiles(dir, base = '') {
-    const files = new Set();
-    if (!fs.existsSync(dir)) return files;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (shouldExclude(entry.name)) continue;
-      const rel = base ? `${base}/${entry.name}` : entry.name;
-      if (entry.isDirectory()) {
-        for (const f of getFiles(path.join(dir, entry.name), rel)) files.add(f);
-      } else {
-        files.add(rel);
-      }
-    }
-    return files;
-  }
-
-  const srcFiles = getFiles(srcDir);
-  const dstFiles = getFiles(dstDir);
-
-  // New or modified files
-  for (const f of srcFiles) {
-    if (!dstFiles.has(f)) return true; // new file
-    const srcContent = fs.readFileSync(path.join(srcDir, f));
-    const dstContent = fs.readFileSync(path.join(dstDir, f));
-    if (!srcContent.equals(dstContent)) return true; // modified
-  }
-  // Deleted files
-  for (const f of dstFiles) {
-    if (!srcFiles.has(f)) return true;
+  // Environment files are excluded, but safe examples/templates are source.
+  if (normalized === '.env' || normalized.startsWith('.env.')) {
+    return !/\.(example|sample|template)$/.test(normalized);
   }
   return false;
 }
 
-// ── Main ─────────────────────────────────────────────────────────────────
-function main() {
-  console.log('================ SEND TO PROJECTS ================');
-  console.log(`Monorepo: ${ROOT}`);
-  console.log('');
-
-  // Load config
-  if (!fs.existsSync(CONFIG_FILE)) die('project-config.json not found.');
-  const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
-  const projects = Object.entries(config.projects);
-
-  // 1. Check muf sync
-  console.log('[1/3] Checking muf twin sync...');
-  const checkResult = spawnSync('node', [path.join(__dirname, 'check-muf-sync.js')], { cwd: ROOT, encoding: 'utf8' });
-  if (checkResult.status !== 0) {
-    die('muf sync check failed — fix the ❌ lines above first.', checkResult.stdout);
+function exists(filePath) {
+  try {
+    fs.lstatSync(filePath);
+    return true;
+  } catch (error) {
+    if (error.code === 'ENOENT') return false;
+    throw error;
   }
-  console.log('   [OK] All muf checks passed');
+}
 
-  // 2. Get current monorepo commit message (for the 5-word commit)
-  const monorepoMsg = git(ROOT, 'log', '-1', '--pretty=%s').out.split('\n')[0];
-  const commitMsg = humanizeMsg(monorepoMsg);
-  const ownerName = git(ROOT, 'config', 'user.name').out;
-  const ownerEmail = git(ROOT, 'config', 'user.email').out;
-  if (!ownerName || !ownerEmail) die('Git identity not set. Run: git config --global user.name "Name" && git config --global user.email "email"');
+function getFiles(dir, base = '') {
+  const files = new Set();
+  if (!fs.existsSync(dir)) return files;
 
-  console.log(`   Commit message: "${commitMsg}"`);
-  console.log(`   Owner: ${ownerName}`);
-  console.log('');
-
-  // 3. Sync each project
-  console.log('[2/3] Syncing projects...');
-  const results = [];
-  for (const [appName, appConfig] of projects) {
-    const srcDir = path.join(ROOT, appName);
-    const dstDir = path.join(ROOT, `_sync_${appName}`);
-
-    console.log(`\n---- ${appName} ----`);
-
-    // Clone or pull the project repo
-    if (fs.existsSync(dstDir)) {
-      console.log('   [..] Pulling latest from project repo...');
-      git(dstDir, 'fetch', 'origin');
-      git(dstDir, 'checkout', 'main');
-      git(dstDir, 'reset', '--hard', 'origin/main');
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (shouldExclude(entry.name)) continue;
+    if (entry.isSymbolicLink()) {
+      throw new Error('Symbolic links are not supported by the mirror: ' + path.join(dir, entry.name));
+    }
+    const relative = base ? base + '/' + entry.name : entry.name;
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      for (const file of getFiles(fullPath, relative)) files.add(file);
     } else {
-      console.log('   [..] Cloning project repo...');
-      const clone = git(ROOT, 'clone', appConfig.repo, `_sync_${appName}`);
-      if (clone.code !== 0) {
-        console.log(`   [FAIL] Clone failed: ${clone.out}`);
-        results.push({ app: appName, status: 'FAIL', note: 'clone failed' });
+      files.add(relative);
+    }
+  }
+  return files;
+}
+
+function hasAppChanges(srcDir, dstDir) {
+  const sourceFiles = getFiles(srcDir);
+  const destinationFiles = getFiles(dstDir);
+
+  for (const relative of sourceFiles) {
+    if (!destinationFiles.has(relative)) return true;
+    const sourceContent = fs.readFileSync(path.join(srcDir, relative));
+    const destinationContent = fs.readFileSync(path.join(dstDir, relative));
+    if (!sourceContent.equals(destinationContent)) return true;
+  }
+
+  for (const relative of destinationFiles) {
+    if (!sourceFiles.has(relative)) return true;
+  }
+  return false;
+}
+
+/**
+ * Remove mirrored content below a path, retaining excluded runtime/local items.
+ * If an excluded item prevents a file/directory type change, the sync fails
+ * safely rather than deleting a local secret or dependency.
+ */
+function removeManagedPath(targetPath) {
+  if (!exists(targetPath)) return;
+  const stat = fs.lstatSync(targetPath);
+
+  if (stat.isDirectory() && !stat.isSymbolicLink()) {
+    for (const entry of fs.readdirSync(targetPath, { withFileTypes: true })) {
+      if (shouldExclude(entry.name)) continue;
+      removeManagedPath(path.join(targetPath, entry.name));
+    }
+    if (fs.readdirSync(targetPath).length === 0) fs.rmdirSync(targetPath);
+    return;
+  }
+
+  fs.unlinkSync(targetPath);
+}
+
+function mirrorSync(srcDir, dstDir) {
+  const counts = { copied: 0, deleted: 0 };
+
+  function syncDirectory(sourceDirectory, destinationDirectory) {
+    fs.mkdirSync(destinationDirectory, { recursive: true });
+
+    const sourceEntries = new Map(
+      fs.readdirSync(sourceDirectory, { withFileTypes: true }).map(entry => [entry.name, entry])
+    );
+    const destinationEntries = fs.readdirSync(destinationDirectory, { withFileTypes: true });
+
+    // Remove destination items missing from the source. Excluded runtime/local
+    // items are deliberately retained and are never copied from the monorepo.
+    for (const destinationEntry of destinationEntries) {
+      if (shouldExclude(destinationEntry.name)) continue;
+      const sourceEntry = sourceEntries.get(destinationEntry.name);
+      const destinationPath = path.join(destinationDirectory, destinationEntry.name);
+
+      if (!sourceEntry) {
+        removeManagedPath(destinationPath);
+        counts.deleted++;
         continue;
       }
-      git(dstDir, 'checkout', 'main');
+
+      if (sourceEntry.isSymbolicLink()) {
+        throw new Error('Symbolic links are not supported by the mirror: ' + path.join(sourceDirectory, sourceEntry.name));
+      }
+
+      const sourceIsDirectory = sourceEntry.isDirectory();
+      const destinationIsDirectory = destinationEntry.isDirectory() && !destinationEntry.isSymbolicLink();
+      if (sourceIsDirectory !== destinationIsDirectory) {
+        removeManagedPath(destinationPath);
+        if (exists(destinationPath)) {
+          throw new Error('Cannot replace ' + destinationPath + ' because excluded content remains inside it.');
+        }
+      }
     }
 
-    // Check if there are actual changes
-    if (!hasAppChanges(srcDir, dstDir)) {
-      console.log('   [OK] No changes — skipping this project.');
-      results.push({ app: appName, status: 'SKIP', note: 'no changes' });
-      continue;
-    }
+    // Add new source items and update changed files.
+    for (const sourceEntry of sourceEntries.values()) {
+      if (shouldExclude(sourceEntry.name)) continue;
+      if (sourceEntry.isSymbolicLink()) {
+        throw new Error('Symbolic links are not supported by the mirror: ' + path.join(sourceDirectory, sourceEntry.name));
+      }
 
-    // Mirror sync
-    console.log('   [..] Mirroring files...');
-    const copied = mirrorSync(srcDir, dstDir);
-    console.log(`   [OK] ${copied} files synced`);
+      const sourcePath = path.join(sourceDirectory, sourceEntry.name);
+      const destinationPath = path.join(destinationDirectory, sourceEntry.name);
+      const currentStat = exists(destinationPath) ? fs.lstatSync(destinationPath) : null;
 
-    // Stage all changes
-    git(dstDir, 'add', '-A');
+      if (sourceEntry.isDirectory()) {
+        if (currentStat && (!currentStat.isDirectory() || currentStat.isSymbolicLink())) {
+          removeManagedPath(destinationPath);
+          if (exists(destinationPath)) {
+            throw new Error('Cannot replace ' + destinationPath + ' because excluded content remains inside it.');
+          }
+        }
+        fs.mkdirSync(destinationPath, { recursive: true });
+        syncDirectory(sourcePath, destinationPath);
+        continue;
+      }
 
-    // Check if there's anything to commit
-    const staged = git(dstDir, 'diff', '--cached', '--quiet');
-    if (staged.code === 0) {
-      console.log('   [OK] No actual changes after sync — skipping.');
-      results.push({ app: appName, status: 'SKIP', note: 'no staged changes' });
-      continue;
-    }
+      if (currentStat && currentStat.isDirectory() && !currentStat.isSymbolicLink()) {
+        removeManagedPath(destinationPath);
+        if (exists(destinationPath)) {
+          throw new Error('Cannot replace ' + destinationPath + ' because excluded content remains inside it.');
+        }
+      } else if (currentStat && currentStat.isSymbolicLink()) {
+        fs.unlinkSync(destinationPath);
+      }
 
-    // Commit with 5-word message, owner identity only
-    git(dstDir, '-c', `user.name=${ownerName}`, '-c', `user.email=${ownerEmail}`, 'commit', '-m', commitMsg);
-    console.log(`   [OK] Commit: "${commitMsg}"`);
+      const targetExists = exists(destinationPath);
+      const sameContent = targetExists
+        && fs.lstatSync(destinationPath).isFile()
+        && fs.readFileSync(sourcePath).equals(fs.readFileSync(destinationPath));
 
-    // Push
-    console.log('   [..] Pushing to project repo...');
-    const push = git(dstDir, 'push', 'origin', 'main');
-    if (push.code !== 0) {
-      console.log(`   [FAIL] Push failed: ${push.out}`);
-      results.push({ app: appName, status: 'FAIL', note: 'push failed' });
-    } else {
-      console.log('   [OK] Pushed!');
-      results.push({ app: appName, status: 'OK', note: 'pushed' });
+      if (!sameContent) {
+        fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
+        fs.copyFileSync(sourcePath, destinationPath);
+        counts.copied++;
+      }
     }
   }
 
-  // Clean up temp clone folders
-  console.log('\n[3/3] Cleaning up...');
-  for (const [appName] of projects) {
-    const tmpDir = path.join(ROOT, `_sync_${appName}`);
-    if (fs.existsSync(tmpDir)) {
-      try { fs.rmSync(tmpDir, { recursive: true, force: true }); } catch { /* locked */ }
+  syncDirectory(srcDir, dstDir);
+  return counts;
+}
+
+function prepareDestination(dstDir, repoUrl, branch) {
+  // Use a fresh, run-specific clone. Never reset or delete a pre-existing
+  // directory whose ownership/content may belong to the user.
+  if (exists(dstDir)) {
+    throw new Error('Temporary path already exists; refusing to overwrite it: ' + dstDir);
+  }
+
+  console.log('   [..] Cloning latest project repository...');
+  const clone = git(ROOT, 'clone', '--branch', branch, '--single-branch', repoUrl, dstDir);
+  if (clone.code !== 0) {
+    throw new Error('Clone failed' + (clone.out ? '\n' + clone.out : ''));
+  }
+  createdTempDirectories.add(dstDir);
+}
+
+function syncProject(appName, appConfig, commitMessage, ownerName, ownerEmail) {
+  const sourceDirectory = path.join(ROOT, appName);
+  const destinationDirectory = path.join(ROOT, '_sync_' + process.pid + '_' + appName);
+  const branch = appConfig.branch || 'main';
+
+  console.log('\n---- ' + appName + ' ----');
+  prepareDestination(destinationDirectory, appConfig.repo, branch);
+
+  if (!hasAppChanges(sourceDirectory, destinationDirectory)) {
+    console.log('   [OK] No changes; skipping this project.');
+    return { app: appName, status: 'SKIP', note: 'no changes' };
+  }
+
+  console.log('   [..] Mirroring project files...');
+  const counts = mirrorSync(sourceDirectory, destinationDirectory);
+  console.log('   [OK] Updated ' + counts.copied + ' file(s); removed ' + counts.deleted + ' stale path(s).');
+
+  const add = git(destinationDirectory, 'add', '-A');
+  if (add.code !== 0) throw new Error('Git add failed' + (add.out ? '\n' + add.out : ''));
+
+  const staged = git(destinationDirectory, 'diff', '--cached', '--quiet');
+  if (staged.code === 0) {
+    console.log('   [OK] No staged changes after applying ignore rules; skipping.');
+    return { app: appName, status: 'SKIP', note: 'no staged changes' };
+  }
+  if (staged.code !== 1) {
+    throw new Error('Could not inspect staged changes' + (staged.out ? '\n' + staged.out : ''));
+  }
+
+  // Use argument arrays, not a shell-built command string: names/messages with
+  // spaces must remain one Git argument.
+  const commit = git(
+    destinationDirectory,
+    '-c', 'user.name=' + ownerName,
+    '-c', 'user.email=' + ownerEmail,
+    'commit', '-m', commitMessage
+  );
+  if (commit.code !== 0) throw new Error('Commit failed' + (commit.out ? '\n' + commit.out : ''));
+
+  const commitSha = requireGit(destinationDirectory, 'Could not read commit SHA', 'rev-parse', '--short', 'HEAD');
+  console.log('   [OK] Created commit ' + commitSha + ': "' + commitMessage + '"');
+
+  console.log('   [..] Pushing to ' + appConfig.repo + ' (' + branch + ')...');
+  const push = git(destinationDirectory, 'push', 'origin', branch);
+  if (push.code !== 0) throw new Error('Push failed' + (push.out ? '\n' + push.out : ''));
+
+  console.log('   [OK] Pushed successfully.');
+  return { app: appName, status: 'OK', note: 'pushed ' + commitSha };
+}
+
+function main() {
+  console.log('================ SEND TO PROJECTS ================');
+  console.log('Monorepo: ' + ROOT + '\n');
+
+  if (!fs.existsSync(CONFIG_FILE)) die('project-config.json not found.');
+  let config;
+  try {
+    config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf8'));
+  } catch (error) {
+    die('project-config.json is not valid JSON.', error.message);
+  }
+
+  if (normalizeRepo(config.monorepoRepo) !== normalizeRepo('https://github.com/musman5911/ai-monorepo')) {
+    die('project-config.json points to the wrong monorepo.', 'Expected https://github.com/musman5911/ai-monorepo');
+  }
+
+  if (!config.projects || typeof config.projects !== 'object' || Array.isArray(config.projects)) {
+    die('project-config.json must contain a projects object.');
+  }
+
+  const expectedNames = Object.keys(EXPECTED_REPOS);
+  const configuredNames = Object.keys(config.projects);
+  const unexpectedNames = configuredNames.filter(name => !expectedNames.includes(name));
+  if (unexpectedNames.length) die('Unexpected project mapping(s) in project-config.json.', unexpectedNames.join('\n'));
+  for (const appName of expectedNames) {
+    const appConfig = config.projects[appName];
+    if (!appConfig || normalizeRepo(appConfig.repo) !== normalizeRepo(EXPECTED_REPOS[appName])) {
+      die('Incorrect repository mapping for ' + appName + '.', 'Expected ' + EXPECTED_REPOS[appName]);
+    }
+
+    const sourceDirectory = path.resolve(ROOT, appName);
+    if (!sourceDirectory.startsWith(ROOT + path.sep) || !fs.existsSync(sourceDirectory) || !fs.statSync(sourceDirectory).isDirectory()) {
+      die('Source folder missing for ' + appName + '.', sourceDirectory);
+    }
+
+    try {
+      if (getFiles(sourceDirectory).size === 0) {
+        die('Source folder is empty for ' + appName + '; refusing to sync an empty project.');
+      }
+    } catch (error) {
+      die('Could not inspect source folder for ' + appName + '.', error.message);
     }
   }
 
-  // Summary
+  console.log('[1/3] Checking shared MUF files...');
+  const check = spawnSync('node', [path.join(__dirname, 'check-muf-sync.js')], {
+    cwd: ROOT,
+    encoding: 'utf8',
+    windowsHide: true,
+    stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  if (check.error || check.status !== 0) {
+    const detail = [
+      check.stdout,
+      check.stderr,
+      check.error ? check.error.message : '',
+    ].filter(Boolean).join('\n');
+    die('MUF sync check failed; no project repositories were changed.', detail);
+  }
+  console.log('   [OK] Shared MUF files are in sync.\n');
+
+  const monorepoMessage = git(ROOT, 'log', '-1', '--pretty=%s');
+  if (monorepoMessage.code !== 0) die('Could not read the latest monorepo commit.', monorepoMessage.out);
+
+  const commitMessage = humanizeMsg(monorepoMessage.out);
+  const ownerName = git(ROOT, 'config', 'user.name').out;
+  const ownerEmail = git(ROOT, 'config', 'user.email').out;
+  if (!ownerName || !ownerEmail) {
+    die('Git identity is not configured.', 'Run git config --global user.name "Your Name" and git config --global user.email "your@email.com".');
+  }
+
+  console.log('Commit message: "' + commitMessage + '"');
+  console.log('Git identity: ' + ownerName + '\n');
+
+  const results = [];
+
+  try {
+    console.log('[2/3] Syncing project repositories...');
+    for (const appName of expectedNames) {
+      try {
+        results.push(syncProject(appName, config.projects[appName], commitMessage, ownerName, ownerEmail));
+      } catch (error) {
+        console.error('   [FAIL] ' + error.message);
+        results.push({ app: appName, status: 'FAIL', note: error.message.split('\n')[0] });
+      }
+    }
+  } finally {
+    console.log('\n[3/3] Cleaning up temporary clones...');
+    for (const directory of createdTempDirectories) {
+      if (!fs.existsSync(directory)) continue;
+      try {
+        fs.rmSync(directory, { recursive: true, force: true });
+      } catch (error) {
+        console.error('   [WARN] Could not remove temporary clone ' + directory + ': ' + error.message);
+      }
+    }
+  }
+
   console.log('\n================ RESULTS ================');
-  for (const r of results) {
-    const icon = r.status === 'OK' ? '✅' : r.status === 'SKIP' ? '⏭️' : '❌';
-    console.log(`  ${icon} ${r.app.padEnd(12)} : ${r.status} — ${r.note}`);
+  for (const result of results) {
+    const icon = result.status === 'OK' ? '✅' : result.status === 'SKIP' ? '⏭️' : '❌';
+    console.log('  ' + icon + ' ' + result.app.padEnd(12) + ' : ' + result.status + ' — ' + result.note);
   }
 
-  const failed = results.filter(r => r.status === 'FAIL');
-  if (failed.length > 0) {
-    console.log(`\n[FAIL] ${failed.length} project(s) failed — check errors above.`);
-    process.exit(1);
+  const failed = results.filter(result => result.status === 'FAIL');
+  if (failed.length) {
+    console.error('\n[FAIL] ' + failed.length + ' project(s) failed. See the errors above.');
+    process.exitCode = 1;
+    return;
   }
 
-  console.log('\n[OK] All projects synced!');
-  console.log('\nPress any key to continue...');
-  process.stdin.resume();
-  process.stdin.once("data", () => process.exit(0));
+  console.log('\n[OK] Project mirror sync finished.');
 }
 
 main();
