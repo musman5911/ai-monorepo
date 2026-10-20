@@ -45,6 +45,23 @@ function nowSeconds() {
   return Math.floor(Date.now() / 1000);
 }
 
+// JWT_EXPIRES_IN accepts common durations such as 1440m or 7d.
+// Bare numbers are interpreted as minutes to match the documented convention.
+function tokenTtlMilliseconds(value) {
+  const match = String(value).trim().match(/^(\d+(?:\.\d+)?)\s*(ms|s|m|h|d|w|y)$/i);
+  if (!match) return 24 * 60 * 60 * 1000;
+  const units = {
+    ms: 1,
+    s: 1000,
+    m: 60 * 1000,
+    h: 60 * 60 * 1000,
+    d: 24 * 60 * 60 * 1000,
+    w: 7 * 24 * 60 * 60 * 1000,
+    y: 365 * 24 * 60 * 60 * 1000,
+  };
+  return Number(match[1]) * units[match[2].toLowerCase()];
+}
+
 // ─── HEALTH / SETUP ─────────────────────────────────────────────────────────
 router.get('/health', (_req, res) => {
   res.json({ message: 'Welcome to Usman Agri Farm Management API!' });
@@ -102,10 +119,11 @@ router.post('/login', authLimiter, asyncHandler(async (req, res) => {
   // Token identifies the user by DATABASE ID: deleting a user truly kills
   // their sessions, and a re-created account with the same username never
   // inherits old tokens.
+  const tokenTtl = MUF_ENV.jwtExpiresIn || '1440m';
   const token = jwt.sign(
     { sub: String(user._id), role: user.role || 'worker', username: user.username },
     getSecret(),
-    { algorithm: 'HS256', expiresIn: '1440m' },
+    { algorithm: 'HS256', expiresIn: tokenTtl },
   );
 
   // Mark the cookie Secure whenever the request arrived over HTTPS (directly
@@ -113,7 +131,7 @@ router.post('/login', authLimiter, asyncHandler(async (req, res) => {
   const forwardedProto = String(req.headers['x-forwarded-proto'] || '');
   const isHttps = req.secure || forwardedProto === 'https' || MUF_ENV.cookieSecure;
   res.cookie('access_token', token, {
-    maxAge: 60 * 60 * 24 * 1000,
+    maxAge: tokenTtlMilliseconds(tokenTtl),
     httpOnly: true,
     secure: isHttps,
     sameSite: 'lax',

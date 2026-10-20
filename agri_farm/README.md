@@ -17,3 +17,7 @@ Shared visual components and tokens live in frontend/src/muf/ (core, admin, ui, 
 Current MUF task restrictions: no backend edits, no business-logic edits, and no feature removals. Do not alter API behavior, calculations or permissions during styling.
 
 See ../docs/README.md for commands, ../RULES.md for non-negotiable rules, ../docs/MUF_OVERVIEW.md for the design-system overview, ../docs/muf-rules.md for popup/style rules, ../docs/PROGRESS.md for work status and ../docs/ROADMAP.md for planned work.
+
+## Replit deployment
+
+See `../docs/DEPLOYMENT.md` for the production build/run configuration, canonical secret names, per-farm settings, and smoke-test checklist. Run the app's deployment build before expecting the backend to serve the frontend; generated `dist/` folders are intentionally not mirrored from Git.

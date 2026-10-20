@@ -127,6 +127,15 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 - Export-to-token tool: turn the workbench's exported JSON into a proposed token change for the shared stylesheet.
 - Use the new shared controls (`muf-seg`, `muf-rowlist`, `muf-chip`, `muf-callout`, `muf-add-btn`) on more screens: Dairy and Agri filters, other popup lists, other inline add forms.
 
+## G. Replit deployment reliability
+
+| ID | Item | Why | Risk | Approval |
+|---|---|---|---|---|
+| G1 | Keep Node.js 24 and lockfile-driven build/run commands consistent in all three `.replit` files | Avoid runtime drift and make the actual production startup reproducible | Medium | No new dependency |
+| G2 | Keep canonical environment names in all three backends and document each app's extra recipient/scheduler values | Avoid secret-name mismatches while preserving separate credentials and databases | Low | No |
+| G3 | Run the live deployment smoke-test checklist from `docs/DEPLOYMENT.md` for each Replit app after publish | CI builds do not verify Replit secrets, MongoDB access, mail, Telegram or scheduler setup | Medium | Owner runs live tests |
+| G4 | Resolve dependency audit findings from section A3 | Reduce known dependency risk, including production dependencies | Medium to high | Yes: review manifests and lockfiles |
+
 ## Suggested order
 
 1. A1: review the 40 CI candidates, commit only approved baselines, make CI strict (`npm run test:visual`), then add the authenticated-screen and popup slice with safe test state.

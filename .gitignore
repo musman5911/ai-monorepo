@@ -1,7 +1,7 @@
 # ── Malik Usman Farms monorepo ignores ─────────────────────────
-# node_modules and build output stay OFF git. Builds happen locally
-# (build-all.bat) and muf-sync mirrors the app folders (with dist)
-# to the live sibling repos, so nothing depends on these being tracked.
+# node_modules and generated build output stay OFF git. Local builds are
+# reproducible from package-lock.json files; deployment build commands create
+# each frontend dist/ folder before its backend serves the production app.
 node_modules/
 **/dist/
 *.log

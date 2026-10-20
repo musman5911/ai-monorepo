@@ -27,6 +27,15 @@ export function mufEnvList(value) {
   return String(value || '').split(',').map((s) => s.trim()).filter(Boolean);
 }
 
+// Normalize numeric token lifetimes consistently across all three apps.
+// JWT libraries interpret unitless strings as milliseconds, but this project
+// documents bare numeric values as minutes. Preserve explicit units (7d, 30m).
+function normalizeJwtExpiresIn(value) {
+  if (value === undefined || value === null || String(value).trim() === '') return undefined;
+  const raw = String(value).trim();
+  return /^\d+$/.test(raw) ? raw + 'm' : raw;
+}
+
 export const MUF_ENV = {
   nodeEnv: env.NODE_ENV || '',
 
@@ -39,7 +48,7 @@ export const MUF_ENV = {
   // ── Auth ──
   /** Canonical JWT_SECRET (legacy aliases: SECRET_KEY, SESSION_SECRET). */
   jwtSecret: pick('JWT_SECRET', 'SECRET_KEY', 'SESSION_SECRET'),
-  jwtExpiresIn: pick('JWT_EXPIRES_IN'),
+  jwtExpiresIn: normalizeJwtExpiresIn(pick('JWT_EXPIRES_IN')),
   bcryptRounds: pick('BCRYPT_SALT_ROUNDS'),
 
   // ── Server ──

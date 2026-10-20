@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next. Keep this file up to date after every change.
-Last updated: 2026-10-20 (verified against the uploaded `main` snapshot; see "Latest verification").
+Last updated: 2026-10-20 (deployment hardening configuration updated; see "Replit deployment readiness").
 
 **Honesty rule:** a row says "verified" only for checks that actually ran. Source checks, tests and CI are automated evidence; they are not visual sign-off. Visual acceptance is done by the owner in a browser and is recorded separately below.
 
@@ -16,7 +16,21 @@ Last updated: 2026-10-20 (verified against the uploaded `main` snapshot; see "La
 | A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; reported green on `main` |
 | A1 screenshot regression | **Partly done:** harness and CI candidate capture work (40 entry-shell/workbench cases); no approved baselines yet; no authenticated screens or popups covered |
 | A3 dependency security | **Not done:** fresh audit below; nothing remediated yet |
+| Replit deployment configuration | Source configuration improved; **live publishing/runtime validation pending** |
 | Roadmap B2, C1 to C4, D, E, F | Not started |
+
+## Replit deployment readiness (2026-10-20)
+
+Source-only configuration updates in the deployment-hardening task:
+
+- All three `.replit` files now declare the Node.js 24 module, keep the existing backend local port mapping (Agri 8000, Dairy 3000, Flock 3001), and build each frontend from its tracked lockfile before production startup.
+- Agri's deployment now builds `frontend/dist` before its backend starts. Its Nix package selection is updated from Node.js 20 to Node.js 24.
+- Deployment install commands use `npm ci` from the matching lockfiles; production backend startup sets `NODE_ENV=production`.
+- All three apps now normalize `JWT_EXPIRES_IN` consistently (`1440` means 1440 minutes); Agri defaults to `1440m` and its auth cookie lifetime follows the token lifetime.
+- Each `.env.example` documents canonical variable names and farm-specific recipient/scheduler settings. No live secrets were added to Git.
+- Added `docs/DEPLOYMENT.md` covering canonical names, shared-versus-unique secret values, build/run commands, and production smoke tests. Corrected the root ignore-file comment about dist mirroring.
+
+**Not yet verified by this source change:** the Replit build/run configuration has not been exercised in the owner's three Replit projects; external scheduler setup, database reachability, SMTP delivery, Telegram webhooks and live publish quotas still require live checks. GitHub Actions tests frontend builds and source guards, not the Replit deployment environment.
 
 ## Completed
 
@@ -80,9 +94,10 @@ Nine representative new labels (Clear filters, Go to Health Portal, Log Vaccinat
 
 ## Next
 
-1. Owner reviews the CI screenshot artifact (it expires 2026-11-02) and approves or rejects the baselines.
-2. A3: targeted dependency updates, starting with the production-exposed ones (see audit).
-3. Update this file after each step.
+1. Apply the updated project configurations to the three Replit workspaces and published deployment settings; publish and complete the live smoke-test list in `docs/DEPLOYMENT.md`.
+2. Owner reviews the CI screenshot artifact (it expires 2026-11-02) and approves or rejects the baselines.
+3. A3: targeted dependency updates, starting with the production-exposed ones (see audit).
+4. Update this file with actual build, publish and runtime results after each step.
 
 ## Latest verification (2026-10-20, uploaded `main` snapshot, Linux)
 
@@ -96,7 +111,7 @@ Nine representative new labels (Clear filters, Go to Health Portal, Log Vaccinat
 | `node tools/audit-muf-design-system.mjs` | Agri 36, Dairy 38, Flock 70 popups; 0 missing sizes |
 | Dairy and Flock `tsc --noEmit` | 0 errors |
 | Production builds, each app's own `npm run build` | Agri, Dairy, Flock all succeed (Dairy and Flock include `tsc --noEmit`) |
-| Not run here | Playwright browser tests (browser download is blocked in this environment), GitHub Actions, Windows checkout |
+| Not run in this source audit | Replit deployment builds, live MongoDB/SMTP/Telegram/scheduler tests, and Replit publishing-limit check |
 
 ## A3 — fresh dependency audit (2026-10-20, `npm audit`)
 
