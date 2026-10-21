@@ -27,6 +27,7 @@ Source-only configuration updates in the deployment-hardening task:
 - Agri's deployment now builds `frontend/dist` before its backend starts. Its Nix package selection is updated from Node.js 20 to Node.js 24.
 - Deployment install commands use `npm ci` from the matching lockfiles; production backend startup sets `NODE_ENV=production`.
 - All three apps now normalize `JWT_EXPIRES_IN` consistently (`1440` means 1440 minutes); Agri defaults to `1440m` and its auth cookie lifetime follows the token lifetime.
+- Mirror-sync audit: the user's run copied files to temporary clones but produced no commits/pushes. `tools/send-to-projects.js` now force-stages the mirrored tree because the source scanner explicitly excludes secrets/build artifacts before staging; rerun sync and confirm each project reports `Pushed successfully` before pulling in Replit.
 - Each `.env.example` documents canonical variable names and farm-specific recipient/scheduler settings. No live secrets were added to Git.
 - Added `docs/DEPLOYMENT.md` covering canonical names, shared-versus-unique secret values, build/run commands, and production smoke tests. Corrected the root ignore-file comment about dist mirroring.
 

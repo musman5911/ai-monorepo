@@ -308,7 +308,11 @@ function syncProject(appName, appConfig, commitMessage, ownerName, ownerEmail, t
   const counts = mirrorSync(sourceDirectory, destinationDirectory);
   console.log('   [OK] Updated ' + counts.copied + ' file(s); removed ' + counts.deleted + ' stale path(s).');
 
-  const add = git(destinationDirectory, 'add', '-A');
+  // Force-add the mirrored working tree. Some standalone Replit templates ignore
+  // files such as .replit or .env.example; the source scanner has already
+  // excluded real .env files, dist, node_modules, .jwt_secret and local caches.
+  // Without -f Git can silently omit deployment config while reporting a clean stage.
+  const add = git(destinationDirectory, 'add', '-A', '-f');
   if (add.code !== 0) throw new Error('Git add failed' + (add.out ? '\n' + add.out : ''));
 
   const staged = git(destinationDirectory, 'diff', '--cached', '--quiet');
