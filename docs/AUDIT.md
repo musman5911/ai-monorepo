@@ -25,7 +25,7 @@ The Playwright job captured 40 candidate PNGs across the three entry screens and
 
 | Priority | Finding | Evidence and impact | Required next action |
 |---|---|---|---|
-| High | Visual regression is not yet a strict gate (A1) | The 40-case harness and CI candidate capture work, but approved PNG baselines are not committed. Current cases cover logged-out entry shells and the workbench only; authenticated popups/tabs are not covered. | Owner reviews the artifact, approves/rejects baselines, then CI can switch to strict comparison and add a safe authenticated slice. |
+| High | Visual regression is not yet a strict gate (A1) | The 40-case harness and CI candidate capture work, but approved PNG baselines are not committed. Candidate review found a Flock dark-mode white band below the login area at 1024px and 1440px; the root background selector has been corrected and a regression test added, pending CI. Current cases cover logged-out entry shells and the workbench only. | Confirm the CSS fix in CI; owner reviews/approves baselines, then CI can switch to strict comparison and add a safe authenticated slice. |
 | High | Dependency audit remediation remains open (A3/G4) | The latest dependency audit recorded in `PROGRESS.md` and `ROADMAP.md` is dated 2026-10-20. It reported a shipped Agri Axios high-severity finding and DOMPurify low-severity findings, plus development-tool findings involving source-map-js, Vitest/tinypool and Dairy Vite/esbuild. This session did not rerun `npm audit`; exact current advisory status is therefore not newly verified. | Re-run targeted audits in a Node/npm workspace; review npm-generated lockfile updates and their diffs. Avoid blanket `npm audit fix`. |
 | High | Published deployments remain unverified (G3) | CI builds the frontend source; it does not validate Replit secrets, published startup, MongoDB, SMTP, Telegram webhooks, scheduled jobs, or publish limits. | Complete the live checklist in [DEPLOYMENT.md](DEPLOYMENT.md) independently for all three Replit projects. |
 | Medium | Visual acceptance remains open for completed source changes | B1 field consistency and B3 typography are implemented and automated checks were previously recorded as passing, but mobile/desktop, light/dark and Urdu visual review is pending. C5 has nine representative translated labels, not a full fallback sweep. | Review B1/B3 in a browser and complete the C5 fallback-label sweep. |
@@ -38,7 +38,7 @@ The Playwright job captured 40 candidate PNGs across the three entry screens and
 
 | Phase | Status after audit | Gate or remaining work |
 |---|---|---|
-| A1 visual regression | Partial | Review/approve candidate PNGs; commit baselines; strict comparison; safe authenticated-screen/popup slice. |
+| A1 visual regression | Partial | Candidate review found a Flock dark-mode background issue and a CSS/test fix is now included; CI confirmation, owner baseline approval, strict comparison and authenticated-screen/popup coverage remain. |
 | A2 workbench runtime smoke test | Done | Latest CI runtime check passed. |
 | A3 dependency security | Open | Fresh audit and targeted generated lockfile updates. |
 | A4 GitHub Actions verification | Done | All five jobs passed in the 2026-10-21 main run. |

@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next. Keep this file up to date after every change.
-Last updated: 2026-10-21 (C5 Urdu fallback sweep and regression test passed in main-branch CI run #19).
+Last updated: 2026-10-21 (C5 Urdu fallback coverage passed CI; A1 candidate review found and fixed a Flock dark-background gap, pending CI).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran. Source checks, tests and CI are automated evidence; they are not visual sign-off. Visual acceptance is done by the owner in a browser and is recorded separately below.
 
@@ -15,7 +15,7 @@ Last updated: 2026-10-21 (C5 Urdu fallback sweep and regression test passed in m
 | C5 Urdu popup labels | Targeted fallback sweep and regression test committed; all five CI jobs pass; broader fallback sweep and browser review pending |
 | A2 workbench runtime smoke test | Done and re-verified (8/8) |
 | A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; live GitHub Actions run #17 passed all five jobs on 2026-10-21 |
-| A1 screenshot regression | **Partly done:** CI run #17 captured all 40 entry-shell/workbench candidates; owner approval, committed baselines and authenticated screens/popups remain |
+| A1 screenshot regression | **Partly done:** 40 candidates captured and reviewed; candidate review found and fixed a Flock dark-mode background gap; owner approval, committed baselines and authenticated screens/popups remain |
 | A3 dependency security | **Not done:** fresh audit below; nothing remediated yet |
 | Replit deployment configuration | Source configuration improved; **live publishing/runtime validation pending** |
 | Roadmap B2, C1 to C4, D, E, F | Not started |
@@ -84,7 +84,8 @@ The nine representative 2026-10-17 popup labels remain present. This batch adds 
 - Done: Playwright 1.64.1 pinned; `playwright.config.mjs`; `e2e/muf-visual.pw.mjs` (4 targets: three farm entry shells and the data-free workbench; widths 360, 390, 768, 1024, 1440; light and dark = 40 cases); `e2e/global-setup.mjs` browser preflight; `e2e/README.md`; the early dark-theme init script now uses `document.documentElement?.classList` (verified in source).
 - CI candidate run: confirmed in [run #17](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974) on 2026-10-21. All 40 candidate PNGs were captured and uploaded in the [artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179). The job uses `npm run test:visual:update`, which writes snapshots, so it cannot fail on a visual change. **It generates candidates; it is not regression protection.**
 - Not done: owner review of the 40 candidates; commit of approved baselines to `e2e/visual-baselines/`; switching CI to strict `npm run test:visual`; authenticated-screen and popup coverage (requires safe repeatable signed-in state, no committed credentials or fabricated farm data).
-- Coverage gap to remember: the 40 cases are logged-out entry screens and the workbench. None of the popups, tabs or dark-mode repairs from phases 6 to 12 and the 2026-10-17 batch are covered by any screenshot test yet.
+- Candidate review (2026-10-21) found a white strip below the Flock login screen in dark mode at 1024px and 1440px viewports. The selector `.dark html` could never target the root `html` element; it is corrected to `html.dark` and a focused source-contract test was added. The corrected visual output still needs CI confirmation.
+- Coverage gap to remember: the 40 cases are logged-out entry screens and the workbench. None of the popups, tabs or dark-mode repairs from phases 6 to 12 and the 2026-10-17 batch are covered by screenshot comparison yet.
 
 ## Remaining
 

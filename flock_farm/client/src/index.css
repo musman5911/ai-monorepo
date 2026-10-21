@@ -35,8 +35,8 @@ html, body {
   color: #0f172a;
 }
 
-.dark html,
-.dark body {
+html.dark,
+html.dark body {
   background-color: #020617;
   color: #e2e8f0;
 }
