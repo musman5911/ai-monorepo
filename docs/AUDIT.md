@@ -49,7 +49,7 @@ The Playwright job captured 40 candidate PNGs across the three entry screens and
 | C2 Urdu RTL logical properties | Not started | Audit directional styles and verify in RTL. |
 | C3 accessibility | Not started | Keyboard, focus, labels and dark contrast verification. |
 | C4 service-worker update prompt | Not started | Adds runtime behavior; reconcile with the current no-logic-change rule before implementation. |
-| C5 popup Urdu coverage | Partial | Targeted fallback sweep implemented for audited modules; regression test and CI pending; broader sweep and browser review remain. |
+| C5 popup Urdu coverage | Partial | Targeted fallback sweep implemented for audited modules; CI caught and led to a fix for an `ROI` acronym fallback; follow-up CI and broader browser review remain. |
 | D1-D3 cleanup/CSS cascade | Not started | D1 needs proof before deletion; D3 is high-risk and depends on A1. |
 | E1 shared MUF package | Not started | Requires approved manifest/build changes. |
 | E2 component extraction | Not started | High-risk refactor; depends on A1 and must preserve behavior. |

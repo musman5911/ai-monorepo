@@ -413,7 +413,7 @@ export const MUF_URDU_PART_4: Record<string, string> = {
   "Mortality (lifetime)": "مجموعی اموات",
   "No egg logs yet": "ابھی انڈوں کا کوئی اندراج نہیں ہوا",
   "Open bird details": "پرندے کی تفصیلات کھولیں",
-  "ROI": "ROI",
+  "ROI": "سرمایہ کاری پر منافع",
   "Return on investment": "سرمایہ کاری پر منافع",
   "Sick": "بیمار",
   "Sun – today": "اتوار – آج",
