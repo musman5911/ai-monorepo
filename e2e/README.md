@@ -4,7 +4,7 @@
 
 `muf-visual.pw.mjs` captures 40 viewport/theme combinations: Agri, Dairy and Flock entry shells plus the Dairy MUF workbench, at 360, 390, 768, 1024 and 1440 CSS pixels, in light and dark mode.
 
-This establishes the harness and verifies that each entry point mounts without a Vite error overlay or uncaught page exception. It does **not** finish the full A1 goal of roughly 20 authenticated screens/popups. We need a safe, repeatable signed-in state for those flows; do not seed or screenshot real farm data just to make a test pass.
+This establishes the harness and verifies that each entry point mounts without a Vite error overlay or uncaught page exception. The 2026-10-21 [CI run #17](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974) captured and uploaded 40 candidate PNGs in [artifact 12329275179](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179). These are unapproved candidates, not a strict regression gate. It does **not** finish the full A1 goal of roughly 20 authenticated screens/popups. We need a safe, repeatable signed-in state for those flows; do not seed or screenshot real farm data just to make a test pass.
 
 ## Browser setup and download recovery
 
@@ -48,7 +48,7 @@ npm run test:visual
 npm run test:visual:report
 ```
 
-Approved PNGs belong in source control. `playwright-report/` and `test-results/` are generated output and are ignored. The initial baseline set is created on the owner's Windows machine, so it remains local until those images are reviewed and published through the repository's normal workflow.
+Approved PNGs belong in source control. `playwright-report/` and `test-results/` are generated output and are ignored. CI can produce downloadable candidate PNGs, but only the owner can approve them as the visual contract. After review, commit the approved baseline set to `e2e/visual-baselines/` and change CI to run strict `npm run test:visual`; never turn a candidate-generation run into an approval shortcut.
 
 ## App servers
 

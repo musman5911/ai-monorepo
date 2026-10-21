@@ -48,4 +48,4 @@ Rules for new files: put a new shared MUF file in the matching folder, keep it i
 - Shared CSS copies remain byte-identical across Agri, Dairy and Flock.
 - Semantic state colors must not be replaced just to make all literals identical.
 
-See `muf-rules.md` for enforceable UI rules, `WORKBENCH.md` for the visual editor, `PROGRESS.md` for what is done and what is next, and `ROADMAP.md` for planned work.
+See `muf-rules.md` for enforceable UI rules, `WORKBENCH.md` for the visual editor, `PROGRESS.md` for what is done and what is next, `ROADMAP.md` for planned work, and `AUDIT.md` for current findings and phase blockers.

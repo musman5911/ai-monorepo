@@ -1,6 +1,6 @@
 # Replit deployment and environment guide
 
-Last reviewed: 2026-10-20. This guide describes repository configuration; it does not prove that a published Replit deployment is currently running.
+Last reviewed: 2026-10-21. Main-branch CI passed all three frontend builds, but this guide documents repository configuration and does not prove that a published Replit deployment is currently running. See [AUDIT.md](AUDIT.md) for verification boundaries.
 
 ## Project and port map
 

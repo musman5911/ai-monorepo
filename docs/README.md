@@ -44,6 +44,7 @@ Run `node tools/check-muf-workbench.js` from the monorepo root to run the workbe
 - `docs/WORKBENCH.md`: the development-only visual workbench, how to open it and what it can and cannot do.
 - `docs/ROADMAP.md`: ideas and planned phases, with risk and approval notes.
 - `docs/PROGRESS.md`: what is completed, what remains, what is next, and the latest validation results. Keep it updated.
+- `docs/AUDIT.md`: repository/phase audit, current CI evidence, risk-ranked findings and explicit blockers.
 - `docs/DEPLOYMENT.md`: Replit build/run configuration, canonical environment names, and the production smoke-test checklist.
 - `agri_farm/README.md`, `dairy_farm/README.md`, `flock_farm/README.md`: app-specific orientation.
 

@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next. Keep this file up to date after every change.
-Last updated: 2026-10-20 (deployment hardening configuration updated; see "Replit deployment readiness").
+Last updated: 2026-10-21 (CI run #17 verified; cross-project findings in [AUDIT.md](AUDIT.md)).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran. Source checks, tests and CI are automated evidence; they are not visual sign-off. Visual acceptance is done by the owner in a browser and is recorded separately below.
 
@@ -13,8 +13,8 @@ Last updated: 2026-10-20 (deployment hardening configuration updated; see "Repli
 | Popup design batch of 2026-10-17 (11 items) and dark-mode popup repair | Done; owner reported it working in the browser on 2026-10-18 |
 | B3 micro-typography, B1 Dairy field consistency, C5 Urdu popup labels | Done in source; automated checks pass; **visual review pending** |
 | A2 workbench runtime smoke test | Done and re-verified (8/8) |
-| A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; reported green on `main` |
-| A1 screenshot regression | **Partly done:** harness and CI candidate capture work (40 entry-shell/workbench cases); no approved baselines yet; no authenticated screens or popups covered |
+| A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; live GitHub Actions run #17 passed all five jobs on 2026-10-21 |
+| A1 screenshot regression | **Partly done:** CI run #17 captured all 40 entry-shell/workbench candidates; owner approval, committed baselines and authenticated screens/popups remain |
 | A3 dependency security | **Not done:** fresh audit below; nothing remediated yet |
 | Replit deployment configuration | Source configuration improved; **live publishing/runtime validation pending** |
 | Roadmap B2, C1 to C4, D, E, F | Not started |
@@ -75,14 +75,14 @@ Nine representative new labels (Clear filters, Go to Health Portal, Log Vaccinat
 `tools/check-muf-workbench-runtime.js` (`npm run check-workbench-runtime`) requests the live `/__muf-workbench` route. Re-run on 2026-10-20 against a fresh Dairy Vite server: 8/8 checks passed. The source guard `tools/check-muf-workbench.js` reports 23/23.
 
 ### A4 — GitHub Actions
-`.github/workflows/muf-frontend-checks.yml` has three jobs: `source-regressions` (root tests, sync, UI safety, workbench source and runtime, design audit), `visual-candidate` (Playwright candidate capture) and `frontend-builds` (each app's own `npm ci` and `npm run build`). It was reported green on `main`; I cannot see GitHub from the uploaded snapshot, so that claim is the maintainers' record, not something re-verified here.
+`.github/workflows/muf-frontend-checks.yml` has three job groups: `source-regressions` (root tests, sync, UI safety, workbench source/runtime and design audit), `visual-candidate` (Playwright candidate capture) and `frontend-builds` (each app's own `npm ci` and `npm run build`). The latest live [main run #17](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974) completed successfully.
 
 ## In progress
 
 ### A1 — Playwright visual regression
 - Done: Playwright 1.64.1 pinned; `playwright.config.mjs`; `e2e/muf-visual.pw.mjs` (4 targets: three farm entry shells and the data-free workbench; widths 360, 390, 768, 1024, 1440; light and dark = 40 cases); `e2e/global-setup.mjs` browser preflight; `e2e/README.md`; the early dark-theme init script now uses `document.documentElement?.classList` (verified in source).
-- CI candidate run: reported 40/40 passed and the PNG artifact uploaded (14 days). The CI job uses `npm run test:visual:update`, which writes snapshots, so it cannot fail on a visual change. **It generates candidates; it is not regression protection.**
-- Not done: review of the 40 candidates; commit of approved baselines (`e2e/visual-baselines/` does not exist yet); switching CI to the strict `npm run test:visual`; the authenticated-screen and popup slice (needs a safe repeatable signed-in state, no real credentials or fabricated farm data).
+- CI candidate run: confirmed in [run #17](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974) on 2026-10-21. All 40 candidate PNGs were captured and uploaded in the [artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179). The job uses `npm run test:visual:update`, which writes snapshots, so it cannot fail on a visual change. **It generates candidates; it is not regression protection.**
+- Not done: owner review of the 40 candidates; commit of approved baselines to `e2e/visual-baselines/`; switching CI to strict `npm run test:visual`; authenticated-screen and popup coverage (requires safe repeatable signed-in state, no committed credentials or fabricated farm data).
 - Coverage gap to remember: the 40 cases are logged-out entry screens and the workbench. None of the popups, tabs or dark-mode repairs from phases 6 to 12 and the 2026-10-17 batch are covered by any screenshot test yet.
 
 ## Remaining
@@ -100,7 +100,13 @@ Nine representative new labels (Clear filters, Go to Health Portal, Log Vaccinat
 3. A3: targeted dependency updates, starting with the production-exposed ones (see audit).
 4. Update this file with actual build, publish and runtime results after each step.
 
-## Latest verification (2026-10-20, uploaded `main` snapshot, Linux)
+## Live GitHub Actions verification (2026-10-21)
+
+[Run #17](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974) ran on `main` commit `7f6e1e28f339d755dfb70c1c21ff656b5ff94146`. All five jobs succeeded: root tests/source guards, Playwright visual candidate capture, and Agri, Dairy and Flock frontend builds. The candidate capture uploaded 40 PNGs in [artifact 12329275179](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179).
+
+This proves CI passed on that commit. It does not approve images as baselines, enforce strict visual comparison, re-run `npm audit`, or verify Replit publishing/runtime integrations.
+
+## Historical local verification (2026-10-20, uploaded `main` snapshot, Linux)
 
 | Check | Result |
 |---|---|

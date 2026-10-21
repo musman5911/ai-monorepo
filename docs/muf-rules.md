@@ -61,7 +61,7 @@ Primary action buttons, active primary navigation, text actions and detail butto
 4. Update all applicable MUF twins atomically.
 5. Run tools/check-muf-sync.js, tools/check-ui-safety.js, tools/check-muf-workbench.js and tools\build-all.bat.
 6. Open all three apps and verify the affected screen on phone and desktop, then dark mode.
-7. Update `docs/PROGRESS.md` with the change and the actual validation results.
+7. Update `docs/PROGRESS.md` with the change and the actual validation results; update `docs/AUDIT.md` when phase status, risks or blockers materially change.
 
 
 ## Validation checks should follow source intent

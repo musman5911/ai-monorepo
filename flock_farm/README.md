@@ -10,7 +10,7 @@ Flock Farm is the poultry-management app in this monorepo.
 
 ## Working on Flock
 
-Run shared validation from the monorepo root after `npm ci`: `npm run check-workbench`, `node tools/check-muf-sync.js`, `node tools/check-ui-safety.js`, `node --check tools/audit-muf-design-system.mjs`, `node tools/audit-muf-design-system.mjs`, `tools\build-all.bat` and `npm test`. Start services with `tools\start-all.bat` after the frontend build. See `../docs/PROGRESS.md` for current validation status and what remains.
+Run shared validation from the monorepo root after `npm ci`: `npm run check-workbench`, `node tools/check-muf-sync.js`, `node tools/check-ui-safety.js`, `node --check tools/audit-muf-design-system.mjs`, `node tools/audit-muf-design-system.mjs`, `tools\build-all.bat` and `npm test`. Start services with `tools\start-all.bat` after the frontend build. See `../docs/PROGRESS.md` for current validation status and what remains, and `../docs/AUDIT.md` for the cross-project findings and phase blockers.
 
 Shared visual components and tokens live in client/src/muf/ (core, admin, ui, data, domain, styles) and the `muf-style.css` entry. Keep the shared MUF stylesheet synchronized with Agri and Dairy. Birds, batches, incubation, eggs, health, labor, finance and other poultry-specific behavior stays inside the Flock app.
 
