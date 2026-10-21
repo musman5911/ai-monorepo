@@ -102,7 +102,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 | C4 | Service-worker update prompt ("new version available") | Users can otherwise keep running stale code | Medium |
 | C5 | Complete Urdu coverage for the 2026-10-17 popup batch and audit remaining fallback labels (see PROGRESS) | Prevent English fallbacks in redesigned popups; first source slice is implemented, full validation remains | Low |
 
-**C5 status (2026-10-21):** the targeted fallback sweep adds dictionary entries for previously untranslated literal `L()` labels across Agri App, Dairy App/Dashboard/Cows/Milk/Health/CowDetailPopup, and Flock App/Dashboard/FlockRegister/IncubationModule. New regression coverage requires translations for every added key and checks placeholder preservation. The first CI run caught the `ROI` acronym fallback; the same-key entry has been corrected across all three dictionary copies. The follow-up CI run is pending; other modules and Urdu browser review remain open. Source checks are not visual sign-off.
+**C5 status (2026-10-21):** the targeted fallback sweep adds dictionary entries for previously untranslated literal `L()` labels across Agri App, Dairy App/Dashboard/Cows/Milk/Health/CowDetailPopup, and Flock App/Dashboard/FlockRegister/IncubationModule. New regression coverage requires translations for every added key and checks placeholder preservation. The first CI run caught the `ROI` acronym fallback; the same-key entry was corrected across all three dictionary copies. [Follow-up CI run #19](https://github.com/musman5911/ai-monorepo/actions/runs/39637309926) passed all five jobs. Other modules and Urdu browser review remain open. Source checks are not visual sign-off.
 
 ## D. Cleanup
 

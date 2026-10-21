@@ -3,7 +3,7 @@
 Last audited: 2026-10-21  
 Repository: [musman5911/ai-monorepo](https://github.com/musman5911/ai-monorepo)  
 Branch reviewed: `main`  
-Reviewed head: [`7f6e1e28f339`](https://github.com/musman5911/ai-monorepo/commit/7f6e1e28f339d755dfb70c1c21ff656b5ff94146)
+Reviewed head: [`8dc21b6fb89c`](https://github.com/musman5911/ai-monorepo/commit/8dc21b6fb89c0c2fe5102fb9ba2b10fcfdfac6b5)
 
 ## Executive assessment
 
@@ -13,13 +13,13 @@ This audit reviewed the repository tree and Markdown documentation, `RULES.md`, 
 
 ## Current verification
 
-The latest main-branch workflow is [run #17, “Install backend packages in build step, not at start”](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974), on 2026-10-21. All five jobs completed successfully:
+The latest main-branch workflow is [run #19](https://github.com/musman5911/ai-monorepo/actions/runs/39637309926) on 2026-10-21. It completed successfully after the C5 translation fallback correction. All five jobs completed successfully:
 
 - Root tests and source guards, including MUF parity, UI safety, workbench runtime, and the design-system audit.
 - Playwright candidate capture.
 - Independent Agri, Dairy and Flock frontend builds.
 
-The Playwright job captured 40 candidate PNGs across the three entry screens and the data-free MUF workbench at five viewport widths and in light/dark themes. The [candidate artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179) is available for review. **Candidate generation is not baseline approval**: CI uses `test:visual:update`, so it writes snapshots during the job instead of enforcing stable visual baselines.
+The Playwright job captured 40 candidate PNGs across the three entry screens and the data-free MUF workbench at five viewport widths and in light/dark themes. The [latest candidate artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39637309926) is available from the run; the earlier [artifact 12329275179](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179) is also available for review. **Candidate generation is not baseline approval**: CI uses `test:visual:update`, so it writes snapshots during the job instead of enforcing stable visual baselines.
 
 ## Findings by priority
 
@@ -49,7 +49,7 @@ The Playwright job captured 40 candidate PNGs across the three entry screens and
 | C2 Urdu RTL logical properties | Not started | Audit directional styles and verify in RTL. |
 | C3 accessibility | Not started | Keyboard, focus, labels and dark contrast verification. |
 | C4 service-worker update prompt | Not started | Adds runtime behavior; reconcile with the current no-logic-change rule before implementation. |
-| C5 popup Urdu coverage | Partial | Targeted fallback sweep implemented for audited modules; CI caught and led to a fix for an `ROI` acronym fallback; follow-up CI and broader browser review remain. |
+| C5 popup Urdu coverage | Partial | Targeted fallback sweep implemented for audited modules; `ROI` fallback fixed; all five jobs passed in [CI run #19](https://github.com/musman5911/ai-monorepo/actions/runs/39637309926); broader sweep and browser review remain. |
 | D1-D3 cleanup/CSS cascade | Not started | D1 needs proof before deletion; D3 is high-risk and depends on A1. |
 | E1 shared MUF package | Not started | Requires approved manifest/build changes. |
 | E2 component extraction | Not started | High-risk refactor; depends on A1 and must preserve behavior. |

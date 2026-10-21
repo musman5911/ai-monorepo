@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next. Keep this file up to date after every change.
-Last updated: 2026-10-21 (C5 Urdu fallback sweep implemented; CI results linked below).
+Last updated: 2026-10-21 (C5 Urdu fallback sweep and regression test passed in main-branch CI run #19).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran. Source checks, tests and CI are automated evidence; they are not visual sign-off. Visual acceptance is done by the owner in a browser and is recorded separately below.
 
@@ -12,7 +12,7 @@ Last updated: 2026-10-21 (C5 Urdu fallback sweep implemented; CI results linked 
 | Shared MUF design system, folders, split stylesheet (phases 6 to 12) | Done, on `main` |
 | Popup design batch of 2026-10-17 (11 items) and dark-mode popup repair | Done; owner reported it working in the browser on 2026-10-18 |
 | B3 micro-typography, B1 Dairy field consistency | Done in source; automated checks pass; **visual review pending** |
-| C5 Urdu popup labels | Targeted fallback sweep added to the shared dictionary; new coverage test added; CI and broader visual review pending |
+| C5 Urdu popup labels | Targeted fallback sweep and regression test committed; all five CI jobs pass; broader fallback sweep and browser review pending |
 | A2 workbench runtime smoke test | Done and re-verified (8/8) |
 | A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; live GitHub Actions run #17 passed all five jobs on 2026-10-21 |
 | A1 screenshot regression | **Partly done:** CI run #17 captured all 40 entry-shell/workbench candidates; owner approval, committed baselines and authenticated screens/popups remain |
@@ -70,7 +70,7 @@ Shared MUF design system across the three apps, the small/big popup API (`Detail
 38 visible controls moved to `muf-field`: CowsTab 26, MilkTab 5, HealthTab 1, BreedingTab 1, CowDetailPopup 1, Dashboard 4. The obsolete `.inp` rule is gone (verified: no `.inp` left in those files). Six regression contracts were added. Still to review visually in both themes at phone and desktop widths. Other Dairy tabs and the Agri and Flock apps still contain inputs with their own styling; that is outside B1's defined scope.
 
 ### C5 — Urdu fallback sweep (targeted source slice implemented; CI and visual review pending)
-The nine representative 2026-10-17 popup labels remain present. This batch adds Urdu dictionary entries for the literal `L()` labels that were falling back to English in the audited screens: Agri App (small popups, crop/task/finance prompts), Dairy App/Dashboard/Cows/Milk/Health/CowDetailPopup, and Flock App/Dashboard/FlockRegister/IncubationModule. The same dictionary additions are applied to all three MUF twins. The first CI run caught one remaining acronym fallback (`ROI`); it has now been translated consistently and the regression test remains enabled. A new regression test checks every newly added key and the `{today}` template placeholder. The scan is limited to these named source modules; other modules may still contain English fallbacks. Browser review of the labels/layout in Urdu remains pending.
+The nine representative 2026-10-17 popup labels remain present. This batch adds Urdu dictionary entries for the literal `L()` labels that were falling back to English in the audited screens: Agri App (small popups, crop/task/finance prompts), Dairy App/Dashboard/Cows/Milk/Health/CowDetailPopup, and Flock App/Dashboard/FlockRegister/IncubationModule. The same dictionary additions are applied to all three MUF twins. The first CI run caught one remaining acronym fallback (`ROI`); it was translated consistently, and follow-up [CI run #19](https://github.com/musman5911/ai-monorepo/actions/runs/39637309926) passed all five jobs. The regression test checks every newly added key and the `{today}` template placeholder. The scan is limited to these named source modules; other modules may still contain English fallbacks. Browser review of the labels/layout in Urdu remains pending.
 
 ### A2 — workbench runtime smoke test
 `tools/check-muf-workbench-runtime.js` (`npm run check-workbench-runtime`) requests the live `/__muf-workbench` route. Re-run on 2026-10-20 against a fresh Dairy Vite server: 8/8 checks passed. The source guard `tools/check-muf-workbench.js` reports 23/23.
