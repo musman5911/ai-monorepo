@@ -70,6 +70,14 @@ const apiLimiter = rateLimit({
   legacyHeaders: false,
   handler: (_req, res) => res.status(429).json({ detail: 'Too many request attempts. Please wait a few minutes before trying again.' }),
 });
+// Startup gate: the port opens immediately (so Replit health checks pass) while the
+// database connects. API calls get a short 503 until startup has finished.
+let appReady = false;
+app.use('/api', (req, res, next) => {
+  if (appReady) return next();
+  res.status(503).json({ error: 'Server is starting, please retry in a few seconds.' });
+});
+
 app.use('/api', apiLimiter);
 
 // Request logging (diagnostics) — only when LOG_REQUESTS=1
@@ -180,6 +188,9 @@ if (!distReady) {
 
 const PORT = Number(MUF_ENV.port || 8000);
 
+// Open the port right away so Replit health checks pass, then finish startup.
+app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+
 connectDB().then(async () => {
   // Startup status + admin check (same boot report as before)
   try {
@@ -200,5 +211,5 @@ connectDB().then(async () => {
 
   initTelegram();
   startScheduler();
-  app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+  appReady = true;
 });

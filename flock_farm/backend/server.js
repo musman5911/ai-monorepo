@@ -117,6 +117,14 @@ app.use(express.json({ limit: '10mb' }));
 app.use(mongoSanitize());
 app.use(cookieParser());
 
+// Startup gate: the port opens immediately (so Replit health checks pass) while the
+// database connects. API calls get a short 503 until startup has finished.
+let appReady = false;
+app.use('/api', (req, res, next) => {
+  if (appReady || req.path === '/health') return next();
+  res.status(503).json({ error: 'Server is starting, please retry in a few seconds.' });
+});
+
 app.use('/api/', apiLimiter);
 
 // --- Auth routes ---
@@ -215,6 +223,11 @@ app.use((err, _req, res, _next) => {
   if (!res.headersSent) res.status(500).json({ error: 'Internal server error' });
 });
 
+// Open the port right away so Replit health checks pass, then finish startup.
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`🐔 Flock Farm server running on port ${PORT}`);
+});
+
 connectDB()
   .then(async () => {
     // Monthly auto-backup — snapshots the whole DB once per month
@@ -224,9 +237,7 @@ connectDB()
       console.error('Auto-backup failed:', err.message);
     }
     initTelegram();
-    app.listen(PORT, '0.0.0.0', () => {
-      console.log(`🐔 Flock Farm server running on port ${PORT}`);
-    });
+    appReady = true;
   })
   .catch((err) => {
     console.error('❌ Failed to connect to MongoDB:', err.message);
