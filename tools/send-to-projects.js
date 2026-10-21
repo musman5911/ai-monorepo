@@ -132,6 +132,24 @@ function exists(filePath) {
   }
 }
 
+// Git commonly normalizes text-file line endings on checkout/commit. Compare
+// text as Git sees it so LF-vs-CRLF alone cannot trigger a whole-tree rewrite.
+// Binary files remain byte-for-byte comparisons.
+function contentEquals(left, right) {
+  if (left.equals(right)) return true;
+  if (left.includes(0) || right.includes(0)) return false;
+
+  const leftText = left.toString('utf8');
+  const rightText = right.toString('utf8');
+  if (!Buffer.from(leftText, 'utf8').equals(left)
+    || !Buffer.from(rightText, 'utf8').equals(right)) {
+    return false;
+  }
+
+  const normalizeEol = (value) => value.replace(/\r\n/g, '\n').replace(/\r/g, '\n');
+  return normalizeEol(leftText) === normalizeEol(rightText);
+}
+
 function getFiles(dir, base = '') {
   const files = new Set();
   if (!fs.existsSync(dir)) return files;
@@ -160,7 +178,7 @@ function hasAppChanges(srcDir, dstDir) {
     if (!destinationFiles.has(relative)) return true;
     const sourceContent = fs.readFileSync(path.join(srcDir, relative));
     const destinationContent = fs.readFileSync(path.join(dstDir, relative));
-    if (!sourceContent.equals(destinationContent)) return true;
+    if (!contentEquals(sourceContent, destinationContent)) return true;
   }
 
   for (const relative of destinationFiles) {
@@ -191,7 +209,7 @@ function removeManagedPath(targetPath) {
 }
 
 function mirrorSync(srcDir, dstDir) {
-  const counts = { copied: 0, deleted: 0 };
+  const counts = { copied: 0, deleted: 0, copiedFiles: [], removedPaths: [] };
 
   function syncDirectory(sourceDirectory, destinationDirectory) {
     fs.mkdirSync(destinationDirectory, { recursive: true });
@@ -211,6 +229,7 @@ function mirrorSync(srcDir, dstDir) {
       if (!sourceEntry) {
         removeManagedPath(destinationPath);
         counts.deleted++;
+        counts.removedPaths.push(path.relative(dstDir, destinationPath).split(path.sep).join('/'));
         continue;
       }
 
@@ -263,12 +282,13 @@ function mirrorSync(srcDir, dstDir) {
       const targetExists = exists(destinationPath);
       const sameContent = targetExists
         && fs.lstatSync(destinationPath).isFile()
-        && fs.readFileSync(sourcePath).equals(fs.readFileSync(destinationPath));
+        && contentEquals(fs.readFileSync(sourcePath), fs.readFileSync(destinationPath));
 
       if (!sameContent) {
         fs.mkdirSync(path.dirname(destinationPath), { recursive: true });
         fs.copyFileSync(sourcePath, destinationPath);
         counts.copied++;
+        counts.copiedFiles.push(path.relative(srcDir, sourcePath).split(path.sep).join('/'));
       }
     }
   }
@@ -300,13 +320,27 @@ function syncProject(appName, appConfig, commitMessage, ownerName, ownerEmail, t
   prepareDestination(destinationDirectory, appConfig.repo, branch);
 
   if (!hasAppChanges(sourceDirectory, destinationDirectory)) {
-    console.log('   [OK] No changes; skipping this project.');
+    console.log('   [OK] No content changes (line-ending-only differences are ignored); skipping this project.');
     return { app: appName, status: 'SKIP', note: 'no changes' };
   }
 
   console.log('   [..] Mirroring project files...');
   const counts = mirrorSync(sourceDirectory, destinationDirectory);
   console.log('   [OK] Updated ' + counts.copied + ' file(s); removed ' + counts.deleted + ' stale path(s).');
+  if (counts.copiedFiles.length) {
+    const shown = counts.copiedFiles.slice(0, 12);
+    for (const file of shown) console.log('      M ' + file);
+    if (counts.copiedFiles.length > shown.length) {
+      console.log('      ... and ' + (counts.copiedFiles.length - shown.length) + ' more changed file(s).');
+    }
+  }
+  if (counts.removedPaths.length) {
+    const shown = counts.removedPaths.slice(0, 12);
+    for (const file of shown) console.log('      D ' + file);
+    if (counts.removedPaths.length > shown.length) {
+      console.log('      ... and ' + (counts.removedPaths.length - shown.length) + ' more removed path(s).');
+    }
+  }
 
   // Force-add the mirrored working tree. Some standalone Replit templates ignore
   // files such as .replit or .env.example; the source scanner has already
