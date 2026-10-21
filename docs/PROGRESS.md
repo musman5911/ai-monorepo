@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next. Keep this file up to date after every change.
-Last updated: 2026-10-21 (CI run #17 verified; cross-project findings in [AUDIT.md](AUDIT.md)).
+Last updated: 2026-10-21 (C5 Urdu fallback sweep implemented; CI results linked below).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran. Source checks, tests and CI are automated evidence; they are not visual sign-off. Visual acceptance is done by the owner in a browser and is recorded separately below.
 
@@ -11,7 +11,8 @@ Last updated: 2026-10-21 (CI run #17 verified; cross-project findings in [AUDIT.
 |---|---|
 | Shared MUF design system, folders, split stylesheet (phases 6 to 12) | Done, on `main` |
 | Popup design batch of 2026-10-17 (11 items) and dark-mode popup repair | Done; owner reported it working in the browser on 2026-10-18 |
-| B3 micro-typography, B1 Dairy field consistency, C5 Urdu popup labels | Done in source; automated checks pass; **visual review pending** |
+| B3 micro-typography, B1 Dairy field consistency | Done in source; automated checks pass; **visual review pending** |
+| C5 Urdu popup labels | Targeted fallback sweep added to the shared dictionary; new coverage test added; CI and broader visual review pending |
 | A2 workbench runtime smoke test | Done and re-verified (8/8) |
 | A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; live GitHub Actions run #17 passed all five jobs on 2026-10-21 |
 | A1 screenshot regression | **Partly done:** CI run #17 captured all 40 entry-shell/workbench candidates; owner approval, committed baselines and authenticated screens/popups remain |
@@ -68,8 +69,8 @@ Shared MUF design system across the three apps, the small/big popup API (`Detail
 ### B1 — Dairy popup field consistency (automated checks pass; visual review pending)
 38 visible controls moved to `muf-field`: CowsTab 26, MilkTab 5, HealthTab 1, BreedingTab 1, CowDetailPopup 1, Dashboard 4. The obsolete `.inp` rule is gone (verified: no `.inp` left in those files). Six regression contracts were added. Still to review visually in both themes at phone and desktop widths. Other Dairy tabs and the Agri and Flock apps still contain inputs with their own styling; that is outside B1's defined scope.
 
-### C5 — Urdu labels for the 2026-10-17 popup batch (source slice done; audit and browser review pending)
-Nine representative new labels (Clear filters, Go to Health Portal, Log Vaccination Record, Add Incubation Record, P&L mode, Sick Birds, Total Eggs Collected, Feed Purchased This Week, Gender) are present in the Urdu dictionary of all three apps, and the three dictionary copies are identical (verified). The wider sweep for remaining English fallback labels has not been done.
+### C5 — Urdu fallback sweep (targeted source slice implemented; CI and visual review pending)
+The nine representative 2026-10-17 popup labels remain present. This batch adds Urdu dictionary entries for the literal `L()` labels that were falling back to English in the audited screens: Agri App (small popups, crop/task/finance prompts), Dairy App/Dashboard/Cows/Milk/Health/CowDetailPopup, and Flock App/Dashboard/FlockRegister/IncubationModule. The same dictionary additions are applied to all three MUF twins. A new regression test checks every newly added key and the `{today}` template placeholder. The scan is limited to these named source modules; other modules may still contain English fallbacks. Browser review of the labels/layout in Urdu remains pending.
 
 ### A2 — workbench runtime smoke test
 `tools/check-muf-workbench-runtime.js` (`npm run check-workbench-runtime`) requests the live `/__muf-workbench` route. Re-run on 2026-10-20 against a fresh Dairy Vite server: 8/8 checks passed. The source guard `tools/check-muf-workbench.js` reports 23/23.
@@ -90,7 +91,7 @@ Nine representative new labels (Clear filters, Go to Health Portal, Log Vaccinat
 1. **A1:** review the 40 candidates; commit approved baselines; make CI strict; add the authenticated slice (about 20 screens and popups).
 2. **A3 dependency security:** see the audit below; needs the owner's approval to change manifests and lockfiles.
 3. **Visual review (owner):** B1 fields, B3 micro-typography, C5 Urdu labels, at 360, 390, 768/1024 and 1440 px in light, dark and Urdu.
-4. **C5:** sweep for remaining English fallback labels.
+4. **C5:** extend the fallback sweep beyond the audited modules and complete Urdu browser review of translated labels.
 5. Roadmap items B2, C1 to C4, D1 to D3, E1 to E3, F (see `ROADMAP.md`). Do not start B2 until A1 coverage is useful.
 
 ## Next

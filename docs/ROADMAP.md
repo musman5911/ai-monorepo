@@ -102,7 +102,7 @@ Implementation sequence: **B3 → B1 → B2**. Complete each item as a separate 
 | C4 | Service-worker update prompt ("new version available") | Users can otherwise keep running stale code | Medium |
 | C5 | Complete Urdu coverage for the 2026-10-17 popup batch and audit remaining fallback labels (see PROGRESS) | Prevent English fallbacks in redesigned popups; first source slice is implemented, full validation remains | Low |
 
-**C5 status (2026-10-20):** popup label/title translations and shared dictionary entries are in source and identical across the three apps (nine representative labels verified present in all three). Source-contract tests pass. The remaining-label sweep and browser review are still open; source checks are not visual sign-off.
+**C5 status (2026-10-21):** the targeted fallback sweep adds dictionary entries for previously untranslated literal `L()` labels across Agri App, Dairy App/Dashboard/Cows/Milk/Health/CowDetailPopup, and Flock App/Dashboard/FlockRegister/IncubationModule. New regression coverage requires translations for every added key and checks placeholder preservation. CI is pending for this batch; other modules and Urdu browser review remain open. Source checks are not visual sign-off.
 
 ## D. Cleanup
 
