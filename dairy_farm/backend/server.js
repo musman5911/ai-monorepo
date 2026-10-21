@@ -169,7 +169,16 @@ if (!distReady) {
 
 const PORT = Number(MUF_ENV.port || 3000);
 // Open the port right away so Replit health checks pass, then finish startup.
-app.listen(PORT, '0.0.0.0', () => console.log(`Server running on port ${PORT}`));
+// Replit publishes the port named as localPort in .replit (DEFAULT_PORT), so in
+// production always serve there. If the platform also set a different PORT, serve
+// on it too (errors on the extra port are logged, never fatal).
+const DEFAULT_PORT = 3000;
+const listenPorts = (MUF_ENV.nodeEnv === 'production' && PORT !== DEFAULT_PORT) ? [DEFAULT_PORT, PORT] : [PORT];
+console.log(`[startup] PORT env=${process.env.PORT || '(not set)'} -> listening on ${listenPorts.join(', ')}`);
+listenPorts.forEach((p, i) => {
+  const srv = app.listen(p, '0.0.0.0', () => console.log(`Server running on port ${p}`));
+  if (i > 0) srv.on('error', (err) => console.warn(`Extra port ${p} unavailable: ${err.message}`));
+});
 connectDB().then(async () => {
   // Monthly auto-backup — snapshots the whole DB once per month
   try {
