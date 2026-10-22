@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next. Keep this file up to date after every change.
-Last updated: 2026-10-22 (A1 Flock dark-background fix confirmed by CI; CI now switches to strict visual comparison when baseline PNGs are committed; human baseline approval and authenticated coverage remain).
+Last updated: 2026-10-22 (A1 conditional visual-gate policy and regression test passed in CI run 39722404493; 40 new candidates captured; owner baseline approval and authenticated coverage remain).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran. Source checks, tests and CI are automated evidence; they are not visual sign-off. Visual acceptance is done by the owner in a browser and is recorded separately below.
 
@@ -14,7 +14,7 @@ Last updated: 2026-10-22 (A1 Flock dark-background fix confirmed by CI; CI now s
 | B3 micro-typography, B1 Dairy field consistency | Done in source; automated checks pass; **visual review pending** |
 | C5 Urdu popup labels | Targeted fallback sweep and regression test committed; all five CI jobs pass; broader fallback sweep and browser review pending |
 | A2 workbench runtime smoke test | Done and re-verified (8/8) |
-| A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; latest pre-policy-change run [39638311112](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112) passed all five jobs on 2026-10-21 |
+| A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; [run 39722404493](https://github.com/musman5911/ai-monorepo/actions/runs/39722404493) passed all five jobs on 2026-10-22, including the conditional visual-gate policy test |
 | A1 screenshot regression | **Partly done:** 40 candidates captured; Flock dark-mode background fix passed CI; CI now uses strict comparisons once baseline PNGs are committed; owner baseline approval and authenticated screens/popups remain |
 | A3 dependency security | **Not done:** fresh audit below; nothing remediated yet |
 | Replit deployment configuration | Source configuration improved; **live publishing/runtime validation pending** |
@@ -97,8 +97,8 @@ The nine representative 2026-10-17 popup labels remain present. This batch adds 
 ### A1 — Playwright visual regression
 - Implemented: Playwright 1.64.1, the 40-case screenshot harness (Agri/Dairy/Flock entry shells and data-free MUF workbench; five viewport widths; light/dark), browser preflight, and the visual-test runbook.
 - Candidate review found a dark-mode white strip below the Flock login screen at 1024px and 1440px. The app-specific selector was corrected from the ineffective `.dark html` form to `html.dark`, with a focused source-contract regression test.
-- CI confirmation: [run 39638311112](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112) on commit `a1a0f6f` passed all five jobs, including root tests/source guards, the screenshot candidate capture, and all three frontend builds. The new Flock CSS test passed in the root test job. [Current 40-image candidate artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112/artifacts/12364800394).
-- Workflow improvement in this follow-up: CI checks for tracked PNG baselines. With none, it captures candidates; with one or more, it runs strict `npm run test:visual`. An incomplete baseline set fails on missing snapshots rather than silently updating them. A regression test protects this policy. The CI run for this new workflow/test change is pending and will be recorded after it executes.
+- CI confirmation: [run 39722404493](https://github.com/musman5911/ai-monorepo/actions/runs/39722404493) on commit `da09299` passed all five jobs. Root regression tests (including the visual-gate policy test), source guards, candidate capture, and all three frontend builds passed. The Flock CSS fix was already confirmed in the preceding run. [Current 40-image candidate artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39722404493/artifacts/12401507653), which expires on 2026-11-05.
+- CI policy verified: no committed baseline PNGs means CI captures unapproved candidates; once at least one PNG is committed, it runs strict `npm run test:visual`. An incomplete set fails on missing snapshots rather than silently updating them. This run exercised candidate mode because no approved baseline set is committed yet.
 - Still not complete: the owner must visually approve the initial 40 baseline images before they are committed. Authenticated screen/popup coverage also remains open until a safe repeatable signed-in state is available. No credentials or fake farm data are to be committed.
 - Existing coverage remains entry screens and the data-free workbench; it does not yet snapshot the farm tabs/popups or the full authenticated slice.
 
@@ -119,9 +119,9 @@ The nine representative 2026-10-17 popup labels remain present. This batch adds 
 
 ## Latest GitHub Actions verification (2026-10-22)
 
-The latest run before the visual-CI-policy follow-up is [run 39638311112](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112) on commit `a1a0f6f14d8debe69148d04063b6969e1a7d2439`. All five jobs succeeded: root regression tests and source guards, Playwright candidate capture, and independent Agri, Dairy and Flock frontend builds. This confirms the Flock dark-background fix and its source-contract regression test. The 40-image [candidate artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112/artifacts/12364800394) expires on 2026-11-04.
+[Run 39722404493](https://github.com/musman5911/ai-monorepo/actions/runs/39722404493) on commit `da09299b06fd907f3566ab0f065b5bbc34811be5` completed successfully. All five jobs passed: root regression tests and source guards, Playwright candidate capture, and independent Agri, Dairy and Flock frontend builds. This validates the conditional CI policy and its new regression test. As no baseline PNGs have been committed, the visual job correctly ran in candidate mode, capturing the current 40-image [artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39722404493/artifacts/12401507653), which expires on 2026-11-05.
 
-The conditional strict-mode workflow and its new policy test are changes in the current follow-up commit. Their validation is **pending the next CI run**, not assumed from the preceding green run.
+This is technical CI verification, not owner approval of the image set. A1 remains partial until the images are reviewed and approved, the approved baseline set is committed, and a safe authenticated-screen/popup slice is added.
 ## Historical local verification (2026-10-20, uploaded `main` snapshot, Linux)
 
 | Check | Result |
