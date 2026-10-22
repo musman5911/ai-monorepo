@@ -1,9 +1,9 @@
 # Repository audit and phase status
 
-Last audited: 2026-10-21  
+Last audited: 2026-10-22  
 Repository: [musman5911/ai-monorepo](https://github.com/musman5911/ai-monorepo)  
 Branch reviewed: `main`  
-Reviewed head: [`8dc21b6fb89c`](https://github.com/musman5911/ai-monorepo/commit/8dc21b6fb89c0c2fe5102fb9ba2b10fcfdfac6b5)
+Reviewed source head before this follow-up: [`a1a0f6f14d8debe69148d04063b6969e1a7d2439`](https://github.com/musman5911/ai-monorepo/commit/a1a0f6f14d8debe69148d04063b6969e1a7d2439)
 
 ## Executive assessment
 
@@ -13,19 +13,19 @@ This audit reviewed the repository tree and Markdown documentation, `RULES.md`, 
 
 ## Current verification
 
-The latest main-branch workflow is [run #19](https://github.com/musman5911/ai-monorepo/actions/runs/39637309926) on 2026-10-21. It completed successfully after the C5 translation fallback correction. All five jobs completed successfully:
+The latest verified main-branch workflow before the visual-CI-policy follow-up is [run 39638311112](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112) on 2026-10-21. It completed successfully after the Flock dark-background correction. All five jobs completed successfully:
 
 - Root tests and source guards, including MUF parity, UI safety, workbench runtime, and the design-system audit.
 - Playwright candidate capture.
 - Independent Agri, Dairy and Flock frontend builds.
 
-The Playwright job captured 40 candidate PNGs across the three entry screens and the data-free MUF workbench at five viewport widths and in light/dark themes. The [latest candidate artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39637309926) is available from the run; the earlier [artifact 12329275179](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179) is also available for review. **Candidate generation is not baseline approval**: CI uses `test:visual:update`, so it writes snapshots during the job instead of enforcing stable visual baselines.
+The Playwright job captured 40 candidate PNGs across the three entry screens and the data-free workbench at five viewport widths and in light/dark themes. The [current candidate artifact 12364800394](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112/artifacts/12364800394) is available for owner review until 2026-11-04. **Candidate generation is not baseline approval.** The workflow update in this follow-up makes no committed PNGs mean candidate capture, while one or more committed PNGs trigger strict visual comparison; the CI run for that policy change is pending.
 
 ## Findings by priority
 
 | Priority | Finding | Evidence and impact | Required next action |
 |---|---|---|---|
-| High | Visual regression is not yet a strict gate (A1) | The 40-case harness and CI candidate capture work, but approved PNG baselines are not committed. Candidate review found a Flock dark-mode white band below the login area at 1024px and 1440px; the root background selector has been corrected and a regression test added, pending CI. Current cases cover logged-out entry shells and the workbench only. | Confirm the CSS fix in CI; owner reviews/approves baselines, then CI can switch to strict comparison and add a safe authenticated slice. |
+| High | Visual regression is not yet a strict gate (A1) | The 40-case harness captures candidates and a source-contract test covers the corrected Flock dark root background; the latest preceding CI run passed all five jobs. This follow-up adds conditional CI behavior: strict comparison starts as soon as any PNG baselines are committed. Owner-approved full baselines and a safe authenticated slice remain missing, so A1 is still partial. | Verify the new conditional CI policy in the next run; owner reviews/approves the 40 candidates; then add authenticated coverage using a safe repeatable signed-in state. |
 | High | Dependency audit remediation remains open (A3/G4) | The latest dependency audit recorded in `PROGRESS.md` and `ROADMAP.md` is dated 2026-10-20. It reported a shipped Agri Axios high-severity finding and DOMPurify low-severity findings, plus development-tool findings involving source-map-js, Vitest/tinypool and Dairy Vite/esbuild. This session did not rerun `npm audit`; exact current advisory status is therefore not newly verified. | Re-run targeted audits in a Node/npm workspace; review npm-generated lockfile updates and their diffs. Avoid blanket `npm audit fix`. |
 | High | Published deployments remain unverified (G3) | CI builds the frontend source; it does not validate Replit secrets, published startup, MongoDB, SMTP, Telegram webhooks, scheduled jobs, or publish limits. | Complete the live checklist in [DEPLOYMENT.md](DEPLOYMENT.md) independently for all three Replit projects. |
 | Medium | Visual acceptance remains open for completed source changes | B1 field consistency and B3 typography are implemented and automated checks were previously recorded as passing, but mobile/desktop, light/dark and Urdu visual review is pending. C5 has nine representative translated labels, not a full fallback sweep. | Review B1/B3 in a browser and complete the C5 fallback-label sweep. |
@@ -38,7 +38,7 @@ The Playwright job captured 40 candidate PNGs across the three entry screens and
 
 | Phase | Status after audit | Gate or remaining work |
 |---|---|---|
-| A1 visual regression | Partial | Candidate review found a Flock dark-mode background issue and a CSS/test fix is now included; CI confirmation, owner baseline approval, strict comparison and authenticated-screen/popup coverage remain. |
+| A1 visual regression | Partial | Flock dark-mode fix passed the latest prior CI run; this follow-up makes CI strict automatically when baseline PNGs are committed. Owner baseline approval and authenticated-screen/popup coverage remain. |
 | A2 workbench runtime smoke test | Done | Latest CI runtime check passed. |
 | A3 dependency security | Open | Fresh audit and targeted generated lockfile updates. |
 | A4 GitHub Actions verification | Done | All five jobs passed in the 2026-10-21 main run. |
@@ -71,8 +71,8 @@ The Playwright job captured 40 candidate PNGs across the three entry screens and
 
 ## Recommended execution order
 
-1. Review the 40-image artifact and decide whether the entry/workbench visuals are acceptable.
-2. Establish approved baseline PNGs and strict visual comparison; design the authenticated-screen slice using a safe test state.
+1. Review the 40-image [artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112/artifacts/12364800394) and decide whether the entry/workbench visuals are acceptable.
+2. Commit the full approved baseline set; the updated workflow enables strict comparison automatically once baseline PNGs exist. Design the authenticated-screen slice using a safe test state.
 3. Re-run dependency audits and perform targeted A3/G4 updates in an environment with npm; run all root checks and three builds.
 4. Complete B1/B3/C5 browser review and the C5 fallback sweep.
 5. Resume B2, then profile and implement C1-C3 in narrow, testable slices. Treat C4 as a policy decision because it adds runtime behavior.
@@ -80,4 +80,4 @@ The Playwright job captured 40 candidate PNGs across the three entry screens and
 
 ## Audit limitations
 
-This pass did not run commands in a local checkout, regenerate lockfiles, connect to live farm databases or Replit deployments, or approve screenshot baselines on the owner's behalf. These remain pending rather than being inferred from green frontend CI.
+This pass did not run commands in a local checkout, regenerate lockfiles, connect to live farm databases or Replit deployments, or approve screenshot baselines on the owner's behalf. The current CI evidence predates the conditional visual-gate follow-up; its root test and workflow policy will be confirmed by the next Actions run.

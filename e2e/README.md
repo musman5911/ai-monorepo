@@ -4,7 +4,7 @@
 
 `muf-visual.pw.mjs` captures 40 viewport/theme combinations: Agri, Dairy and Flock entry shells plus the Dairy MUF workbench, at 360, 390, 768, 1024 and 1440 CSS pixels, in light and dark mode.
 
-This establishes the harness and verifies that each entry point mounts without a Vite error overlay or uncaught page exception. The 2026-10-21 [CI run #17](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974) captured and uploaded 40 candidate PNGs in [artifact 12329275179](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179). These are unapproved candidates, not a strict regression gate. It does **not** finish the full A1 goal of roughly 20 authenticated screens/popups. We need a safe, repeatable signed-in state for those flows; do not seed or screenshot real farm data just to make a test pass.
+This establishes the harness and verifies that each entry point mounts without a Vite error overlay or uncaught page exception. The latest pre-policy-change [CI run](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112) captured 40 candidate PNGs in [artifact 12364800394](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112/artifacts/12364800394). They remain unapproved. CI now captures candidates only while no PNG baselines are committed; once any baseline PNG exists, it runs strict `npm run test:visual`. An incomplete baseline set therefore fails rather than being silently overwritten. This does **not** finish the full A1 goal of roughly 20 authenticated screens/popups. A safe, repeatable signed-in state is still needed; do not seed or screenshot real farm data just to make a test pass.
 
 ## Browser setup and download recovery
 
@@ -41,14 +41,9 @@ npm run test:visual:update
 
 The first update run creates PNGs in `e2e/visual-baselines/`. Open and inspect these images before approving them as the visual contract. Do not use the update command to silence a regression.
 
-After the first set exists and has been reviewed:
+Review all 40 candidates before committing any as the visual contract. Once one or more PNG baselines are tracked under `e2e/visual-baselines/`, CI automatically runs strict `npm run test:visual`; a partial set fails on missing snapshots instead of switching back to update mode. Until then, CI runs `npm run test:visual:update` and uploads unapproved candidates. To accept a reviewed visual change later, use the update command intentionally and inspect the resulting diff before committing it.
 
-```bat
-npm run test:visual
-npm run test:visual:report
-```
-
-Approved PNGs belong in source control. `playwright-report/` and `test-results/` are generated output and are ignored. CI can produce downloadable candidate PNGs, but only the owner can approve them as the visual contract. After review, commit the approved baseline set to `e2e/visual-baselines/` and change CI to run strict `npm run test:visual`; never turn a candidate-generation run into an approval shortcut.
+`playwright-report/` and `test-results/` are generated output and are ignored. The owner must approve the initial baseline images; generating them is not approval. The authenticated-screen/popup slice remains separate and needs a safe, repeatable signed-in state.
 
 ## App servers
 

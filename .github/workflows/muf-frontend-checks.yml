@@ -96,7 +96,7 @@ jobs:
           npm run check-workbench-runtime
 
   visual-candidate:
-    name: Capture unapproved visual candidates
+    name: Visual regression (strict when baselines exist)
     runs-on: ubuntu-latest
     timeout-minutes: 35
     steps:
@@ -132,14 +132,28 @@ jobs:
       - name: Install Chromium headless shell and Linux dependencies
         run: npx playwright install --with-deps --only-shell chromium
 
-      - name: Capture 40 unapproved screenshot candidates
-        run: npm run test:visual:update
+      - name: Compare approved baselines or capture review candidates
+        shell: bash
+        run: |
+          set -euo pipefail
+          baseline_count=0
+          if [ -d e2e/visual-baselines ]; then
+            baseline_count="$(find e2e/visual-baselines -maxdepth 1 -type f -name '*.png' -print | wc -l | tr -d '[:space:]')"
+          fi
 
-      - name: Upload screenshot candidates, report and failure traces
+          if [ "$baseline_count" -eq 0 ]; then
+            echo "No committed PNG baselines found; capturing unapproved review candidates."
+            npm run test:visual:update
+          else
+            echo "Found $baseline_count committed PNG baseline(s); strict visual comparison is required."
+            npm run test:visual
+          fi
+
+      - name: Upload visual results, report and failure traces
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: muf-visual-candidates-${{ github.sha }}
+          name: muf-visual-results-${{ github.sha }}
           path: |
             e2e/visual-baselines/
             playwright-report/

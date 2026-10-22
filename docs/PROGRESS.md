@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next. Keep this file up to date after every change.
-Last updated: 2026-10-21 (C5 Urdu fallback coverage passed CI; A1 candidate review found and fixed a Flock dark-background gap, pending CI).
+Last updated: 2026-10-22 (A1 Flock dark-background fix confirmed by CI; CI now switches to strict visual comparison when baseline PNGs are committed; human baseline approval and authenticated coverage remain).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran. Source checks, tests and CI are automated evidence; they are not visual sign-off. Visual acceptance is done by the owner in a browser and is recorded separately below.
 
@@ -14,11 +14,25 @@ Last updated: 2026-10-21 (C5 Urdu fallback coverage passed CI; A1 candidate revi
 | B3 micro-typography, B1 Dairy field consistency | Done in source; automated checks pass; **visual review pending** |
 | C5 Urdu popup labels | Targeted fallback sweep and regression test committed; all five CI jobs pass; broader fallback sweep and browser review pending |
 | A2 workbench runtime smoke test | Done and re-verified (8/8) |
-| A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; live GitHub Actions run #17 passed all five jobs on 2026-10-21 |
-| A1 screenshot regression | **Partly done:** 40 candidates captured and reviewed; candidate review found and fixed a Flock dark-mode background gap; owner approval, committed baselines and authenticated screens/popups remain |
+| A4 GitHub Actions (tests, guards, runtime, 3 builds) | Done; latest pre-policy-change run [39638311112](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112) passed all five jobs on 2026-10-21 |
+| A1 screenshot regression | **Partly done:** 40 candidates captured; Flock dark-mode background fix passed CI; CI now uses strict comparisons once baseline PNGs are committed; owner baseline approval and authenticated screens/popups remain |
 | A3 dependency security | **Not done:** fresh audit below; nothing remediated yet |
 | Replit deployment configuration | Source configuration improved; **live publishing/runtime validation pending** |
 | Roadmap B2, C1 to C4, D, E, F | Not started |
+
+## Roadmap phase count
+
+The roadmap currently tracks **23 line items** across A–G (with F counted as one grouped bucket):
+
+| Status | Count | Items |
+|---|---:|---|
+| Fully done | 2 | A2, A4 |
+| Source/config implemented; owner verification still pending | 4 | B1, B3, G1, G2 |
+| Partly done | 2 | A1, C5 |
+| Open diagnosis/remediation | 3 | A3, E3, G4 |
+| Not started or owner-side pending | 12 | B2; C1–C4; D1–D3; E1–E2; F; G3 |
+
+These totals intentionally separate code/source completion from visual sign-off and live deployment checks. A green build does not make those owner-side tasks disappear.
 
 ## Replit deployment readiness (2026-10-20)
 
@@ -81,11 +95,12 @@ The nine representative 2026-10-17 popup labels remain present. This batch adds 
 ## In progress
 
 ### A1 — Playwright visual regression
-- Done: Playwright 1.64.1 pinned; `playwright.config.mjs`; `e2e/muf-visual.pw.mjs` (4 targets: three farm entry shells and the data-free workbench; widths 360, 390, 768, 1024, 1440; light and dark = 40 cases); `e2e/global-setup.mjs` browser preflight; `e2e/README.md`; the early dark-theme init script now uses `document.documentElement?.classList` (verified in source).
-- CI candidate run: confirmed in [run #17](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974) on 2026-10-21. All 40 candidate PNGs were captured and uploaded in the [artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179). The job uses `npm run test:visual:update`, which writes snapshots, so it cannot fail on a visual change. **It generates candidates; it is not regression protection.**
-- Not done: owner review of the 40 candidates; commit of approved baselines to `e2e/visual-baselines/`; switching CI to strict `npm run test:visual`; authenticated-screen and popup coverage (requires safe repeatable signed-in state, no committed credentials or fabricated farm data).
-- Candidate review (2026-10-21) found a white strip below the Flock login screen in dark mode at 1024px and 1440px viewports. The selector `.dark html` could never target the root `html` element; it is corrected to `html.dark` and a focused source-contract test was added. The corrected visual output still needs CI confirmation.
-- Coverage gap to remember: the 40 cases are logged-out entry screens and the workbench. None of the popups, tabs or dark-mode repairs from phases 6 to 12 and the 2026-10-17 batch are covered by screenshot comparison yet.
+- Implemented: Playwright 1.64.1, the 40-case screenshot harness (Agri/Dairy/Flock entry shells and data-free MUF workbench; five viewport widths; light/dark), browser preflight, and the visual-test runbook.
+- Candidate review found a dark-mode white strip below the Flock login screen at 1024px and 1440px. The app-specific selector was corrected from the ineffective `.dark html` form to `html.dark`, with a focused source-contract regression test.
+- CI confirmation: [run 39638311112](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112) on commit `a1a0f6f` passed all five jobs, including root tests/source guards, the screenshot candidate capture, and all three frontend builds. The new Flock CSS test passed in the root test job. [Current 40-image candidate artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112/artifacts/12364800394).
+- Workflow improvement in this follow-up: CI checks for tracked PNG baselines. With none, it captures candidates; with one or more, it runs strict `npm run test:visual`. An incomplete baseline set fails on missing snapshots rather than silently updating them. A regression test protects this policy. The CI run for this new workflow/test change is pending and will be recorded after it executes.
+- Still not complete: the owner must visually approve the initial 40 baseline images before they are committed. Authenticated screen/popup coverage also remains open until a safe repeatable signed-in state is available. No credentials or fake farm data are to be committed.
+- Existing coverage remains entry screens and the data-free workbench; it does not yet snapshot the farm tabs/popups or the full authenticated slice.
 
 ## Remaining
 
@@ -102,12 +117,11 @@ The nine representative 2026-10-17 popup labels remain present. This batch adds 
 3. A3: targeted dependency updates, starting with the production-exposed ones (see audit).
 4. Update this file with actual build, publish and runtime results after each step.
 
-## Live GitHub Actions verification (2026-10-21)
+## Latest GitHub Actions verification (2026-10-22)
 
-[Run #17](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974) ran on `main` commit `7f6e1e28f339d755dfb70c1c21ff656b5ff94146`. All five jobs succeeded: root tests/source guards, Playwright visual candidate capture, and Agri, Dairy and Flock frontend builds. The candidate capture uploaded 40 PNGs in [artifact 12329275179](https://github.com/musman5911/ai-monorepo/actions/runs/39563285974/artifacts/12329275179).
+The latest run before the visual-CI-policy follow-up is [run 39638311112](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112) on commit `a1a0f6f14d8debe69148d04063b6969e1a7d2439`. All five jobs succeeded: root regression tests and source guards, Playwright candidate capture, and independent Agri, Dairy and Flock frontend builds. This confirms the Flock dark-background fix and its source-contract regression test. The 40-image [candidate artifact](https://github.com/musman5911/ai-monorepo/actions/runs/39638311112/artifacts/12364800394) expires on 2026-11-04.
 
-This proves CI passed on that commit. It does not approve images as baselines, enforce strict visual comparison, re-run `npm audit`, or verify Replit publishing/runtime integrations.
-
+The conditional strict-mode workflow and its new policy test are changes in the current follow-up commit. Their validation is **pending the next CI run**, not assumed from the preceding green run.
 ## Historical local verification (2026-10-20, uploaded `main` snapshot, Linux)
 
 | Check | Result |

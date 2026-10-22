@@ -12,6 +12,8 @@ The source of truth for three independent farm-management web apps: Agri Farm, D
 
 The URLs above are the local URLs printed by tools\start-all.bat. The command starts services; it does not rebuild the frontends.
 
+Visual regression status is tracked in `docs/PROGRESS.md`; screenshot baseline approval and Playwright instructions are in `e2e/README.md`.
+
 ## First commands on Windows
 
 From the repository root, run these in order after pulling `main`. All helper scripts live in the `tools` folder:
@@ -45,6 +47,7 @@ Run `node tools/check-muf-workbench.js` from the monorepo root to run the workbe
 - `docs/ROADMAP.md`: ideas and planned phases, with risk and approval notes.
 - `docs/PROGRESS.md`: what is completed, what remains, what is next, and the latest validation results. Keep it updated.
 - `docs/AUDIT.md`: repository/phase audit, current CI evidence, risk-ranked findings and explicit blockers.
+- `e2e/README.md`: Playwright visual-regression setup, baseline approval workflow, and browser recovery instructions. CI uses strict comparisons after baseline PNGs are committed.
 - `docs/DEPLOYMENT.md`: Replit build/run configuration, canonical environment names, and the production smoke-test checklist.
 - `agri_farm/README.md`, `dairy_farm/README.md`, `flock_farm/README.md`: app-specific orientation.
 
