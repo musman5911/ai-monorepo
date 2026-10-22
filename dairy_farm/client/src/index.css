@@ -1,0 +1,170 @@
+@import "tailwindcss";
+
+@variant dark (&:is(.dark *));
+
+@theme {
+  --color-farm-50: #f4f8f4;
+  --color-farm-100: #e2ede5;
+  --color-farm-200: #c0dbc8;
+  --color-farm-300: #93c4a1;
+  --color-farm-400: #5ea772;
+  --color-farm-500: #1b854a;
+  --color-farm-600: #136334;
+  --color-farm-700: #105229;
+  --color-farm-800: #0d421f;
+  --color-farm-900: #0a3216;
+  --color-farm-950: #041f0a;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+.dark body {
+  background-color: #020617;
+  color: #e2e8f0;
+}
+
+h1, h2, h3, h4, .font-display {
+  font-family: var(--font-display);
+}
+
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+/* Fix chart focus border on mobile */
+.recharts-pie:focus,
+.recharts-sector:focus,
+.recharts-surface:focus,
+.recharts-wrapper:focus {
+  outline: none !important;
+}
+
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Fixed modal overlays: dynamic viewport height so mobile URL bars
+   don't shove the modal off-center (100vh fallback). */
+.modal-overlay {
+  height: 100vh;
+  height: 100dvh;
+}
+
+/* Shared surfaces used by the animated settings pages */
+.dm-card {
+  border: 1px solid #e6e6de;
+  border-radius: 17px;
+  background: rgba(255, 254, 251, 0.6);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease, background-color 180ms ease;
+}
+
+.dark .dm-card {
+  border-color: #203528;
+  background: rgba(10, 20, 13, 0.4);
+}
+
+@media (hover: hover) {
+  .dm-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 35px rgba(15, 23, 42, 0.08);
+  }
+
+  .dark .dm-card:hover {
+    box-shadow: 0 16px 35px rgba(0, 0, 0, 0.24);
+  }
+}
+
+
+/* ================================================================
+   MUF SHARED DESIGN SYSTEM  (Malik Usman Farms)
+   Single parent design, inherited by all three farm apps:
+   agri_farm (parent) / dairy_farm / flock_farm.
+   Keep this block identical in all three apps.
+   ================================================================ */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulseBorder {
+  0%, 100% { border-color: rgba(128, 237, 153, 0.2); }
+  50% { border-color: rgba(128, 237, 153, 0.6); }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.pulse-border-hover {
+  transition: all 0.3s ease;
+}
+.pulse-border-hover:hover {
+  animation: pulseBorder 2s infinite;
+  box-shadow: 0 4px 12px rgba(128, 237, 153, 0.1);
+}
+
+@keyframes spinSlow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes bounceSoft {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+.animate-spin-slow {
+  animation: spinSlow 12s linear infinite;
+}
+
+.animate-bounce-soft {
+  animation: bounceSoft 2.4s ease-in-out infinite;
+}
+
+/* All muf- design-system classes now live in muf-style.css (imported after this file). */

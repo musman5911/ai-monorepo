@@ -1,0 +1,14 @@
+modules = ["nodejs-24", "web"]
+run = "npm --prefix backend ci --omit=dev && npm --prefix frontend ci --include=dev && npm --prefix frontend run build && cd backend && NODE_ENV=production npm start"
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[nix]
+channel = "stable-25_05"
+
+[deployment]
+deploymentTarget = "autoscale"
+build = ["sh", "-c", "cd backend && npm ci --omit=dev && cd ../frontend && npm ci --include=dev && npm run build"]
+run = ["sh", "-c", "cd backend && NODE_ENV=production npm start"]

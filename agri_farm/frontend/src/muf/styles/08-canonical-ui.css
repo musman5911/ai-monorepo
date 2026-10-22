@@ -1,0 +1,333 @@
+/* ================================================================
+   MUF canonical UI layer — mobile popup, table, Notes and admin sizing.
+   Edit these tokens here, not with per-screen overrides.
+   Keep byte-identical across Agri, Dairy and Flock.
+   ================================================================ */
+:root {
+  --muf-popup-small-width: min(92vw, 28rem);
+  --muf-popup-big-width: min(94vw, 42rem, 100vh);
+  --muf-popup-max-height: min(86vh, 720px);
+  --muf-popup-mobile-max-height: 70dvh;
+  --muf-popup-mobile-gutter: 16px;
+  --muf-admin-surface: #fffefb;
+  --muf-admin-border: #e6e6de;
+  --muf-admin-text: #1e293b;
+  --muf-admin-muted: #64748b;
+  --muf-admin-gap: 10px;
+  --muf-admin-pad: 12px;
+  --muf-admin-card-pad: 12px;
+  --muf-admin-title-size: 13px;
+  --muf-admin-body-size: 12px;
+  --muf-header-mobile-height: 48px;
+  --muf-header-mobile-action: 34px;
+  --muf-nav-mobile-height: 34px;
+}
+.dark {
+  --muf-admin-surface: #0d1a11;
+  --muf-admin-border: #203528;
+  --muf-admin-text: #e2e8f0;
+  --muf-admin-muted: #94a3b8;
+}
+
+/* Popup dimensions are owned by MUF. The size prop stays the only per-popup choice. */
+.muf-pup-width-sm { width: var(--muf-popup-small-width); }
+.muf-pup-width-lg { width: var(--muf-popup-big-width); }
+.muf-pup-card {
+  box-sizing: border-box;
+  max-width: calc(100vw - 16px);
+  max-height: var(--muf-popup-max-height);
+  min-width: 0;
+}
+.muf-admin-backdrop { background: rgba(0,0,0,.74); backdrop-filter: blur(3px); }
+.muf-admin-shell-card { max-height: 88vh !important; }
+.muf-popup-overlay {
+  padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right))
+    max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+}
+.muf-popup-stage,
+.muf-pup-card,
+.muf-admin-shell-card,
+.muf-admin-content { min-width: 0; }
+
+/* Wide table headings must not collapse into one letter per line in a popup.
+   The table's own horizontal scroller exposes full information without shrinking text. */
+.muf-popup-stage .overflow-x-auto,
+.muf-overlay .overflow-x-auto,
+.muf-admin-shell-card .overflow-x-auto {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+.muf-popup-stage .overflow-x-auto table,
+.muf-overlay .overflow-x-auto table,
+.muf-admin-shell-card .overflow-x-auto table {
+  width: max-content;
+  min-width: max-content;
+  max-width: none;
+}
+.muf-popup-stage table :is(th, td),
+.muf-overlay table :is(th, td),
+.muf-admin-shell-card table :is(th, td) {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+.muf-popup-stage table th,
+.muf-overlay table th,
+.muf-admin-shell-card table th {
+  white-space: nowrap;
+}
+
+/* Consistent pointer/focus affordance for clickable UI, including reused cards. */
+button:not(:disabled),
+a[href],
+[role="button"],
+summary,
+label[for],
+input[type="button"],
+input[type="submit"] { cursor: pointer; }
+button:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled { cursor: not-allowed; }
+
+/* Shared Notes component: tokens control spacing, typography, cards and actions. */
+.muf-notes { display: grid; gap: 12px; min-width: 0; color: var(--muf-ink); }
+.muf-notes-header { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 0; }
+.muf-notes-heading { display: grid; gap: 3px; min-width: 0; }
+.muf-notes-title { display: flex; align-items: center; gap: 8px; margin: 0; color: var(--muf-ink); font-size: 14px; font-weight: 800; line-height: 1.25; }
+.muf-notes-subtitle { margin: 0; color: var(--muf-ink-soft); font-size: 11px; line-height: 1.4; }
+.muf-notes-empty { display: grid; justify-items: center; gap: 6px; padding: 24px 14px; border: 1px dashed var(--muf-line); border-radius: var(--muf-radius-lg); text-align: center; }
+.muf-notes-empty-icon { width: 28px; height: 28px; color: var(--muf-ink-soft); opacity: .55; }
+.muf-notes-list { display: grid; gap: 8px; min-width: 0; }
+.muf-note-card { display: flex; align-items: stretch; gap: 8px; min-width: 0; padding: 10px; border: 1px solid var(--muf-line); border-radius: var(--muf-radius-lg); background: var(--muf-surface); box-shadow: 0 1px 2px rgba(15,23,42,.04); }
+.muf-note-open { display: grid; align-content: start; gap: 5px; flex: 1 1 auto; min-width: 0; padding: 0; border: 0; background: transparent; text-align: left; }
+.muf-note-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; color: var(--muf-ink-soft); font-size: 10px; font-weight: 700; }
+.muf-note-preview { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muf-ink); font-size: 13px; line-height: 1.45; }
+.muf-note-linked { display: inline-flex; align-items: center; gap: 5px; width: fit-content; max-width: 100%; overflow: hidden; padding: 4px 8px; border-radius: 999px; background: var(--muf-primary-soft); color: var(--muf-primary); font-size: 10px; font-weight: 700; text-overflow: ellipsis; }
+.muf-note-panel { display: grid; gap: 10px; min-width: 0; padding: 12px; border: 1px solid var(--muf-line); border-radius: var(--muf-radius-lg); background: var(--muf-surface); }
+.muf-note-panel-head { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; min-width: 0; }
+.muf-note-panel-title { margin: 0; color: var(--muf-ink); font-size: 12px; font-weight: 800; }
+.muf-note-panel-hint { color: var(--muf-ink-soft); font-size: 11px; line-height: 1.4; }
+.muf-note-photo-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(68px, 1fr)); gap: 8px; min-width: 0; }
+.muf-note-photo { position: relative; display: block; width: 100%; aspect-ratio: 1; overflow: hidden; padding: 0; border-radius: var(--muf-radius-md); background: var(--muf-surface-alt); }
+.muf-note-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.muf-note-voice { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.muf-note-voice audio { flex: 1 1 auto; min-width: 0; height: 36px; }
+.muf-note-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; padding-top: 10px; border-top: 1px solid var(--muf-line); }
+.muf-note-delete-action { margin-right: auto; }
+.muf-notes .muf-field { min-width: 0; font-size: 13px; }
+.muf-notes textarea.muf-field { min-height: 112px; }
+.muf-notes .muf-label { margin-bottom: 4px; font-size: 11px; }
+.muf-btn-icon { display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto; min-width: 34px; min-height: 34px; padding: 7px; border: 1px solid var(--muf-line); border-radius: var(--muf-radius-md); background: var(--muf-surface); color: var(--muf-ink-soft); cursor: pointer; }
+.muf-btn-icon:hover:not(:disabled) { background: var(--muf-primary-soft); color: var(--muf-primary); }
+.muf-note-editor { display: grid; gap: 12px; min-width: 0; }
+.muf-note-viewer { display: grid; gap: 12px; min-width: 0; }
+.muf-note-viewer-text { white-space: pre-wrap; overflow-wrap: anywhere; color: var(--muf-ink); font-size: 13px; line-height: 1.55; }
+.muf-note-viewer-photo { width: 100%; aspect-ratio: 1; overflow: hidden; padding: 0; border: 1px solid var(--muf-line); border-radius: var(--muf-radius-lg); background: var(--muf-surface-alt); }
+.muf-note-viewer-photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.muf-photo-viewer { position: fixed; inset: 0; z-index: var(--muf-z-photo); display: flex; flex-direction: column; overflow: hidden; padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)); background: rgba(0,0,0,.96); color: #fff; }
+.muf-photo-viewer-image { display: flex; flex: 1 1 auto; min-height: 0; align-items: center; justify-content: center; padding-block: 12px; }
+.muf-photo-viewer-image img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+.muf-photo-viewer-toolbar { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 8px; padding-top: 10px; border-top: 1px solid rgba(255,255,255,.16); }
+.muf-photo-viewer .muf-btn-soft { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.24); color: #fff; }
+.muf-photo-viewer .muf-btn-primary { background: #fff; color: #17251a; }
+.muf-photo-viewer .muf-field { width: auto; min-width: min(100%, 14rem); border-color: rgba(255,255,255,.24); background: #111827; color: #fff; }
+
+/* Compact, theme-aware admin shell and cards; keep all admin behavior untouched. */
+.muf-admin-shell-card {
+  box-sizing: border-box;
+  width: min(92vw, 56rem, 112vh);
+  height: min(680px, 84dvh);
+  min-height: min(680px, 84dvh);
+  max-height: 88vh;
+  border: 1px solid var(--muf-admin-border);
+  border-radius: 18px;
+  background: var(--muf-admin-surface);
+  color: var(--muf-admin-text);
+  box-shadow: 0 22px 60px rgba(15,23,42,.2);
+  font-size: var(--muf-admin-body-size);
+}
+.dark .muf-admin-shell-card { box-shadow: 0 22px 60px rgba(0,0,0,.38); }
+.muf-admin-shell-header { padding: 10px 14px; gap: 8px; border-bottom: 1px solid var(--muf-admin-border); background: linear-gradient(110deg, rgba(22,101,52,.07), transparent 58%); }
+.dark .muf-admin-shell-header { background: linear-gradient(110deg, rgba(22,101,52,.13), transparent 58%); }
+.muf-admin-shell-icon { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; padding: 5px; border-radius: 10px; background: var(--muf-primary-soft); color: var(--muf-primary); }
+.muf-admin-shell-title { margin: 0; color: var(--muf-admin-text); font-size: 14px; font-weight: 800; line-height: 1.25; }
+.muf-admin-shell-subtitle { margin: 2px 0 0; color: var(--muf-admin-muted); font-size: 10px; font-weight: 600; letter-spacing: .02em; line-height: 1.3; }
+.muf-admin-shell-close { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; flex: 0 0 auto; padding: 0; border: 0; border-radius: 999px; background: transparent; color: var(--muf-admin-muted); }
+.muf-admin-shell-close:hover { background: var(--muf-primary-soft); color: var(--muf-primary); }
+.muf-admin-content { padding: var(--muf-admin-pad); }
+.muf-admin-footer { padding: 8px 14px; border-top: 1px solid var(--muf-admin-border); background: var(--muf-admin-surface); color: var(--muf-admin-muted); font-size: 9px; }
+.muf-admin-card { min-width: 0; border: 1px solid var(--muf-admin-border); border-radius: 14px; background: var(--muf-admin-surface); color: var(--muf-admin-text); }
+.muf-admin-card-head { display: flex; align-items: center; gap: 9px; padding: 10px 12px; border-bottom: 1px solid var(--muf-admin-border); background: var(--muf-surface-alt); }
+.dark .muf-admin-card-head { background: rgba(255,255,255,.025); }
+.muf-admin-card-icon { display: flex; align-items: center; justify-content: center; flex: 0 0 auto; padding: 6px; border-radius: 9px; background: var(--muf-primary-soft); color: var(--muf-primary); }
+.muf-admin-card-title { margin: 0; color: var(--muf-admin-text); font-size: 12.5px; font-weight: 800; line-height: 1.3; }
+.muf-admin-card-subtitle { margin: 2px 0 0; color: var(--muf-admin-muted); font-size: 10.5px; line-height: 1.35; }
+.muf-admin-card-body { display: grid; gap: 8px; padding: var(--muf-admin-card-pad); min-width: 0; }
+.muf-admin-user-field { min-height: 36px; padding: 8px 10px; border-radius: var(--muf-radius-md); font-size: 12px; }
+.muf-admin-user-avatar { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 10px; background: var(--muf-primary-soft); color: var(--muf-primary); }
+/* Override earlier broad admin-card rules with the dedicated MUF tokens. */
+.muf-admin-shell-card .muf-admin-card { border-radius: 14px; border-color: var(--muf-admin-border); box-shadow: none; }
+.muf-admin-shell-card .muf-admin-card > .muf-admin-card-head { padding: 10px 12px; border-bottom: 1px solid var(--muf-admin-border); background: var(--muf-surface-alt); }
+.dark .muf-admin-shell-card .muf-admin-card > .muf-admin-card-head { background: rgba(255,255,255,.025); }
+.muf-admin-shell-card .muf-admin-card > .muf-admin-card-body { display: grid; gap: 8px; padding: var(--muf-admin-card-pad); }
+.muf-admin-shell-card .muf-admin-content { padding: var(--muf-admin-pad) !important; }
+.muf-admin-shell-card .muf-admin-footer { padding: 8px 14px; border-top: 1px solid var(--muf-admin-border); background: var(--muf-admin-surface); }
+.muf-admin-shell-card .muf-admin-tabs-sticky { padding-inline: var(--muf-admin-pad); }
+.muf-admin-shell .space-y-6 > :not(:last-child) { margin-block-end: 10px !important; }
+.muf-admin-shell .space-y-4 > :not(:last-child) { margin-block-end: 9px !important; }
+.muf-admin-shell .gap-3 { gap: 8px !important; }
+.muf-admin-shell .gap-4 { gap: 10px !important; }
+.muf-admin-shell .p-6 { padding: 12px !important; }
+.muf-admin-shell .p-5 { padding: 11px !important; }
+.muf-admin-shell .p-4 { padding: 10px !important; }
+  .muf-admin-shell-card .muf-admin-content { padding: 8px !important; }
+  .muf-admin-shell-card .muf-admin-card > .muf-admin-card-body { padding: 9px; gap: 7px; }
+  .muf-admin-shell-card .muf-admin-footer { padding: 7px 10px; }
+.muf-admin-shell .text-2xl { font-size: 19px !important; }
+.muf-admin-shell .text-xl { font-size: 16px !important; }
+.muf-admin-shell .text-lg { font-size: 14px !important; }
+
+/* Header and navigation use one mobile scale across the three apps. */
+.muf-header { box-sizing: border-box; }
+.muf-top-nav { min-width: 0; max-width: 100%; }
+.muf-top-nav-scroll { display: flex; flex-wrap: nowrap; align-items: center; justify-content: flex-start; max-width: 100%; overflow-x: auto; overflow-y: hidden; white-space: nowrap; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.muf-top-nav-scroll::-webkit-scrollbar { display: none; }
+.muf-nav-link { flex: 0 0 auto; white-space: nowrap; }
+@media (max-width: 640px) {
+  .muf-popup-overlay { padding: max(8px, env(safe-area-inset-top)) 8px max(8px, env(safe-area-inset-bottom)); }
+  .muf-overlay .muf-pup-width-sm { width: calc(100vw - 48px); max-width: calc(100vw - 48px); }
+  .muf-overlay .muf-pup-width-lg { width: calc(100vw - 32px); max-width: calc(100vw - 32px); }
+  .muf-overlay .muf-pup-card { max-height: var(--muf-popup-mobile-max-height) !important; height: auto !important; min-height: 0 !important; }
+  .muf-pup-lg { height: auto !important; min-height: 0 !important; max-height: var(--muf-popup-mobile-max-height) !important; }
+  .muf-pup-sm { max-height: var(--muf-popup-mobile-max-height); }
+  .muf-form-sheet { max-height: var(--muf-popup-mobile-max-height) !important; height: auto !important; min-height: 0 !important; }
+  .muf-admin-shell-card { width: calc(100vw - 32px); height: auto !important; min-height: 0 !important; max-height: var(--muf-popup-mobile-max-height) !important; border-radius: 14px; }
+  .muf-admin-shell-header { padding: 9px 11px; }
+  .muf-admin-shell-icon { width: 30px; height: 30px; }
+  .muf-admin-content { padding: 8px; }
+  .muf-admin-footer { padding: 7px 10px; }
+  .muf-admin-card-head { padding: 9px 10px; }
+  .muf-admin-card-body { padding: 9px; gap: 7px; }
+  .muf-admin-user-field { min-height: 36px; }
+  .muf-admin-shell .space-y-6 > :not(:last-child) { margin-block-end: 8px !important; }
+  .muf-admin-shell .p-6 { padding: 10px !important; }
+  .muf-admin-shell .p-5 { padding: 9px !important; }
+  .muf-admin-shell .p-4 { padding: 8px !important; }
+  .muf-header { min-height: var(--muf-header-mobile-height); height: auto; padding: 4px 8px; gap: 5px; }
+  .muf-header-brand { min-width: 0; flex: 1 1 auto; gap: 5px; }
+  .muf-header-brand h1 { max-width: 24vw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px !important; }
+  .muf-header-brand p { display: none; }
+  .muf-header-actions { min-width: 0; flex: 0 1 auto; gap: 3px !important; }
+  .muf-header-actions .muf-icon-button,
+  .muf-header-actions .muf-profile,
+  .muf-header-actions .muf-logout,
+  .muf-icon-button {
+    width: var(--muf-header-mobile-action) !important;
+    height: var(--muf-header-mobile-action) !important;
+    min-width: var(--muf-header-mobile-action) !important;
+    min-height: var(--muf-header-mobile-action) !important;
+    padding: 0 !important;
+    border-radius: 9px !important;
+    flex: 0 0 var(--muf-header-mobile-action) !important;
+  }
+  .muf-header-actions .muf-icon-button svg,
+  .muf-header-actions .muf-profile svg,
+  .muf-header-actions .muf-logout svg { width: 15px !important; height: 15px !important; }
+  .muf-header-actions .muf-profile span:nth-child(2),
+  .muf-header-actions .muf-profile > svg:last-child { display: none !important; }
+  .muf-profile .muf-avatar { width: 100%; height: 100%; margin: 0; overflow: hidden; border-radius: 50%; }
+  .muf-top-nav { width: 100%; overflow: hidden; }
+  .muf-top-nav-scroll { gap: 4px !important; padding: 2px 4px; }
+  .muf-nav-link { height: var(--muf-nav-mobile-height) !important; min-height: var(--muf-nav-mobile-height) !important; padding: 0 9px !important; gap: 4px !important; font-size: 11px !important; }
+  .muf-photo-viewer { padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)); }
+  .muf-notes-header { align-items: flex-start; }
+  .muf-notes-add { min-height: 36px; padding: 7px 10px; }
+  .muf-note-card { padding: 8px; gap: 6px; }
+  .muf-note-panel { padding: 9px; }
+  .muf-note-actions { gap: 6px; }
+  .muf-note-actions .muf-btn { min-height: 36px; padding: 7px 10px; }
+}
+@media (max-width: 380px) {
+  :root { --muf-header-mobile-action: 32px; --muf-header-mobile-height: 44px; --muf-nav-mobile-height: 32px; }
+  .muf-header-brand h1 { max-width: 20vw; }
+  .muf-header-actions { gap: 2px !important; }
+}
+
+/* Main-page tables share the same safe heading wrapping as popup tables. */
+.muf-main-content .overflow-x-auto table th {
+  white-space: nowrap;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+/* Tables marked muf-reflow use their existing data-label values as compact
+   mobile record cards instead of shrinking five columns into vertical letters. */
+@media (max-width: 640px) {
+  .muf-overlay table.muf-reflow,
+  .muf-main-content table.muf-reflow {
+    display: block;
+    width: 100%;
+    min-width: 0 !important;
+    max-width: 100%;
+    border-collapse: separate;
+  }
+  .muf-overlay table.muf-reflow thead,
+  .muf-main-content table.muf-reflow thead { display: none; }
+  .muf-overlay table.muf-reflow tbody,
+  .muf-main-content table.muf-reflow tbody {
+    display: grid;
+    width: 100%;
+    gap: 8px;
+  }
+  .muf-overlay table.muf-reflow tr,
+  .muf-main-content table.muf-reflow tr {
+    display: block;
+    min-width: 0;
+    padding: 5px 9px;
+    border: 1px solid var(--muf-line);
+    border-radius: var(--muf-radius-lg);
+    background: var(--muf-surface);
+  }
+  .muf-overlay table.muf-reflow td,
+  .muf-main-content table.muf-reflow td {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    min-width: 0;
+    padding: 7px 2px !important;
+    border: 0 !important;
+    text-align: right;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+  }
+  .muf-overlay table.muf-reflow td::before,
+  .muf-main-content table.muf-reflow td::before {
+    content: attr(data-label);
+    flex: 0 0 36%;
+    min-width: 0;
+    color: var(--muf-ink-soft);
+    font-size: 10px;
+    font-weight: 800;
+    line-height: 1.35;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  .muf-overlay table.muf-reflow td[colspan],
+  .muf-main-content table.muf-reflow td[colspan] {
+    justify-content: center;
+    text-align: center;
+  }
+  .muf-overlay table.muf-reflow td[colspan]::before,
+  .muf-main-content table.muf-reflow td[colspan]::before { content: none; }
+}
+.muf-main-content .overflow-x-auto table :is(th, td),
+.muf-admin-shell-card table :is(th, td) {
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+/* End of canonical MUF mobile/popup refinement layer. */
+

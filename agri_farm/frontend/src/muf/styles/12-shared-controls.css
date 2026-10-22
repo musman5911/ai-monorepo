@@ -1,0 +1,130 @@
+/* ============================================================
+   SHARED CONTROLS: add button, section header, segmented filters,
+   row lists, rank badges, meters, chips and callouts.
+   Built on the semantic MUF tokens, so light/dark follow --muf-color-*.
+   Used by popup redesigns (Sick Birds, Top Producers, Cow P&L, liability
+   and inventory lists) and the Flock register filters.
+   ============================================================ */
+
+/* Section header: title on the left, optional action on the right. */
+.muf-section-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-width: 0; }
+.muf-section-head > :first-child { min-width: 0; }
+
+/* Round "+" button used instead of inline add forms. */
+.muf-add-btn {
+  display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+  width: 36px; height: 36px; border: 0; border-radius: 999px; cursor: pointer;
+  background: var(--muf-color-primary); color: #fff;
+  box-shadow: 0 2px 8px rgba(19, 99, 52, 0.28);
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+.muf-add-btn:hover { background: var(--muf-color-primary-hover); }
+.muf-add-btn:active { transform: scale(0.94); }
+.muf-add-btn:focus-visible { outline: 2px solid var(--muf-ui-focus, var(--muf-color-success)); outline-offset: 2px; }
+
+/* Filter bar with labelled segmented groups (wraps cleanly on phones). */
+.muf-filter-bar { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+@media (min-width: 768px) { .muf-filter-bar--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.muf-filter-group { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+.muf-filter-label { padding-inline: 2px; font-size: 10px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; color: var(--muf-color-text-muted); }
+.muf-filter-reset { align-self: flex-start; border: 0; background: transparent; padding: 2px 4px; font-size: 11px; font-weight: 800; color: var(--muf-color-primary); cursor: pointer; }
+.muf-filter-reset:hover { text-decoration: underline; }
+.dark .muf-filter-reset { color: #6ee7b7; }
+
+.muf-seg {
+  display: flex; gap: 2px; max-width: 100%; padding: 3px; overflow-x: auto; scrollbar-width: none;
+  border: 1px solid var(--muf-color-border); border-radius: 12px; background: var(--muf-color-surface-alt);
+}
+.muf-seg::-webkit-scrollbar { display: none; }
+.muf-seg > button {
+  display: inline-flex; flex: 1 1 auto; align-items: center; justify-content: center; gap: 6px;
+  min-height: 34px; padding: 6px 12px; border: 0; border-radius: 9px; background: transparent; cursor: pointer;
+  font-size: 12px; font-weight: 700; white-space: nowrap; color: var(--muf-color-text-muted);
+  transition: background-color 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.muf-seg > button:hover { color: var(--muf-color-text); }
+.muf-seg > button:focus-visible { outline: 2px solid var(--muf-ui-focus, var(--muf-color-success)); outline-offset: 1px; }
+.muf-seg > button[aria-pressed="true"],
+.muf-seg > button.on { background: #fff; color: var(--muf-color-primary); box-shadow: 0 1px 4px rgba(29, 54, 36, 0.16); }
+.dark .muf-seg > button[aria-pressed="true"],
+.dark .muf-seg > button.on { background: #1d3425; color: #6ee7b7; box-shadow: none; }
+.muf-seg-count { padding: 1px 6px; border-radius: 999px; font-size: 10px; font-weight: 800; background: rgba(100, 116, 139, 0.16); }
+.muf-seg > button.on .muf-seg-count,
+.muf-seg > button[aria-pressed="true"] .muf-seg-count { background: rgba(19, 99, 52, 0.14); }
+.dark .muf-seg > button.on .muf-seg-count,
+.dark .muf-seg > button[aria-pressed="true"] .muf-seg-count { background: rgba(110, 231, 183, 0.18); }
+
+/* View toggle was light-only in dark mode. */
+.dark .muf-view-toggle { background: #14251a; }
+.dark .muf-view-toggle button { color: #a9bbaf; }
+.dark .muf-view-toggle button:hover { color: #e5edf7; }
+.dark .muf-view-toggle button.on { background: #1d3425; color: #6ee7b7; box-shadow: none; }
+
+/* Row lists (replace grids of cards and wide tables inside popups). */
+.muf-rowlist { display: flex; flex-direction: column; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.muf-row {
+  display: flex; align-items: center; gap: 12px; width: 100%; min-width: 0; box-sizing: border-box;
+  padding: 10px 12px; text-align: left; font: inherit; color: inherit;
+  border: 1px solid var(--muf-color-border); border-radius: 14px; background: var(--muf-color-surface-alt);
+}
+button.muf-row { cursor: pointer; transition: border-color 0.15s ease, background-color 0.15s ease; }
+button.muf-row:hover { border-color: #86c49b; }
+button.muf-row:focus-visible { outline: 2px solid var(--muf-ui-focus, var(--muf-color-success)); outline-offset: 2px; }
+.muf-row--good { border-color: rgba(22, 163, 74, 0.35); background: rgba(22, 163, 74, 0.08); }
+.muf-row--bad { border-color: rgba(220, 38, 38, 0.30); background: rgba(220, 38, 38, 0.06); }
+.muf-row--lead { border-color: rgba(19, 99, 52, 0.40); background: rgba(19, 99, 52, 0.08); }
+.muf-row--stack { flex-direction: column; align-items: stretch; gap: 8px; }
+.muf-row-main { display: block; flex: 1 1 auto; min-width: 0; }
+.muf-row-title { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; font-weight: 700; color: var(--muf-color-text); }
+.muf-row-title--wrap { white-space: normal; overflow-wrap: anywhere; }
+.muf-row-sub { display: block; margin-top: 2px; font-size: 11px; color: var(--muf-color-text-muted); overflow-wrap: anywhere; }
+.muf-row-end { flex-shrink: 0; text-align: right; }
+.muf-row-value { display: block; font-size: 14px; font-weight: 800; color: var(--muf-color-text); }
+.muf-row-value--good { color: var(--muf-color-primary); }
+.muf-row-value--bad { color: var(--muf-color-danger); }
+.dark .muf-row-value--good { color: #6ee7b7; }
+.dark .muf-row-value--bad { color: #fca5a5; }
+.muf-row-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
+.muf-row-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.muf-row-actions { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+.muf-rank { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 26px; height: 26px; border-radius: 999px; font-size: 11px; font-weight: 800; background: rgba(100, 116, 139, 0.18); color: var(--muf-color-text-muted); }
+.muf-rank--1 { background: #fde68a; color: #78350f; }
+.muf-rank--2 { background: #e2e8f0; color: #334155; }
+.muf-rank--3 { background: #fed7aa; color: #7c2d12; }
+
+.muf-meter { display: block; height: 5px; margin-top: 6px; overflow: hidden; border-radius: 999px; background: rgba(100, 116, 139, 0.2); }
+.muf-meter > span { display: block; height: 100%; border-radius: inherit; background: var(--muf-color-primary); }
+.muf-meter--bad > span { background: var(--muf-color-danger); }
+.dark .muf-meter > span { background: #34d399; }
+.dark .muf-meter--bad > span { background: #f87171; }
+
+/* Small status chips. */
+.muf-chip { display: inline-flex; align-items: center; gap: 4px; padding: 2px 8px; border: 1px solid transparent; border-radius: 999px; font-size: 10px; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; white-space: nowrap; }
+.muf-chip--ok { background: rgba(22, 163, 74, 0.12); border-color: rgba(22, 163, 74, 0.30); color: #166534; }
+.muf-chip--warn { background: rgba(217, 119, 6, 0.12); border-color: rgba(217, 119, 6, 0.30); color: #92400e; }
+.muf-chip--bad { background: rgba(220, 38, 38, 0.10); border-color: rgba(220, 38, 38, 0.28); color: #991b1b; }
+.muf-chip--muted { background: rgba(100, 116, 139, 0.12); border-color: rgba(100, 116, 139, 0.25); color: #475569; }
+.dark .muf-chip--ok { color: #86efac; }
+.dark .muf-chip--warn { color: #fcd34d; }
+.dark .muf-chip--bad { color: #fca5a5; }
+.dark .muf-chip--muted { color: #cbd5e1; }
+
+/* Summary callout at the top of a popup. */
+.muf-callout { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border: 1px solid var(--muf-color-border); border-radius: 14px; background: var(--muf-color-surface-alt); }
+.muf-callout--bad { border-color: rgba(220, 38, 38, 0.28); background: rgba(220, 38, 38, 0.07); }
+.muf-callout--good { border-color: rgba(22, 163, 74, 0.30); background: rgba(22, 163, 74, 0.08); }
+.muf-callout-icon { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 12px; background: rgba(100, 116, 139, 0.16); }
+.muf-callout--bad .muf-callout-icon { background: rgba(220, 38, 38, 0.14); color: #b91c1c; }
+.muf-callout--good .muf-callout-icon { background: rgba(22, 163, 74, 0.14); color: #166534; }
+.dark .muf-callout--bad .muf-callout-icon { color: #fca5a5; }
+.dark .muf-callout--good .muf-callout-icon { color: #86efac; }
+.muf-callout-title { margin: 0; font-size: 13px; font-weight: 800; color: var(--muf-color-text); }
+.muf-callout-sub { margin: 2px 0 0; font-size: 11px; color: var(--muf-color-text-muted); }
+
+/* Full-width popup footer action. */
+.muf-popup-cta { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; margin-top: 14px; padding: 10px 14px; border: 0; border-radius: 12px; cursor: pointer; font-size: 12px; font-weight: 800; color: #fff; background: var(--muf-color-primary); }
+.muf-popup-cta:hover { background: var(--muf-color-primary-hover); }
+.muf-popup-cta--danger { background: var(--muf-color-danger); }
+.muf-popup-cta--danger:hover { background: #b91c1c; }
+.muf-popup-cta:focus-visible { outline: 2px solid var(--muf-ui-focus, var(--muf-color-success)); outline-offset: 2px; }

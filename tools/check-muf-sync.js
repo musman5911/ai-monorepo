@@ -1,0 +1,687 @@
+#!/usr/bin/env node
+/* ═══════════════════════════════════════════════════════════════
+   check-muf-sync.js — muf design-system drift detector
+   ───────────────────────────────────────────────────────────────
+   The three farm apps (agri_farm / dairy_farm / flock_farm) share
+   the muf design system. Shared muf files must stay IDENTICAL
+   except farm names, subtitles, logos and storage keys.
+
+   Run from the repo root:   node tools/check-muf-sync.js
+
+   Dev tool only — not deployed with any app.
+   ═══════════════════════════════════════════════════════════════ */
+const fs = require('fs');
+const path = require('path');
+
+const ROOT = path.resolve(__dirname, '..');
+process.chdir(ROOT); // some scans use repo-relative paths; make the script work from any folder
+let failures = 0;
+
+function read(p) {
+  try {
+    let text = fs.readFileSync(path.join(ROOT, p), 'utf8');
+    // muf-style.css is an entry file that @imports ./muf/styles/*.css; read it as ONE
+    // stylesheet (entry + parts in import order) so every invariant keeps working.
+    if (/(^|\/)muf-style\.css$/.test(p)) {
+      const dir = path.dirname(p);
+      for (const m of text.matchAll(/@import\s+'(\.\/[^']+\.css)';/g)) {
+        text += '\n' + fs.readFileSync(path.join(ROOT, dir, m[1]), 'utf8');
+      }
+    }
+    return text;
+  }
+  catch { return null; }
+}
+
+// Normalize away the ALLOWED differences between apps
+function normalize(src) {
+  return src
+    // farm identity
+    .replace(/Usman (Dairy|Flock|Agri) Farm/g, 'FARM')
+    .replace(/(Dairy & Livestock|Dairy &amp; Livestock|Poultry Farm|Crop & Agriculture|Crop &amp; Agriculture) Management System/g, 'SUBTITLE')
+    .replace(/عثمان (ڈیری|فلاک|ایگری) فارم/g, 'FARM_UR')
+    // logos
+    .replace(/\/(dairy-farm|flock-farm)-logo-round-\d+\.png/g, '/LOGO.png')
+    .replace(/\/logo-round-\d+\.png/g, '/LOGO.png')
+    .replace(/\/logo\.png/g, '/LOGO.png')
+    // MyFarmsPanel per-app identity
+    .replace(/const SELF: string = '(dairy|flock|agri)';/g, "const SELF = 'APP';")
+    .replace(/const SELF = '(dairy|flock|agri)';/g, "const SELF = 'APP';")
+    // storage keys
+    .replace(/\b(dm|ff|af)_(\w+)/g, 'KEY_$2')
+    .replace(/\b(flockfarm|dairyfarm|agrifarm)_(\w+)/g, 'KEY_$2')
+    // animation lib import name (dairy uses framer-motion, flock uses motion/react)
+    .replace(/from 'framer-motion'/g, "from 'MOTION'")
+    .replace(/from 'motion\/react'/g, "from 'MOTION'")
+    // farm-word inside comments/messages
+    .replace(/\b(dairy|flock|agri) farm app/gi, 'FARM app')
+    // whitespace
+    .replace(/[ \t]+$/gm, '')
+    .trim();
+}
+
+function diffCount(a, b) {
+  const A = a.split('\n');
+  const B = b.split('\n');
+  const setB = new Set(B);
+  const setA = new Set(A);
+  let diff = 0;
+  for (const l of A) if (!setB.has(l)) diff++;
+  for (const l of B) if (!setA.has(l)) diff++;
+  return diff;
+}
+
+function firstDiff(a, b) {
+  const A = a.split('\n');
+  const B = b.split('\n');
+  for (let i = 0; i < Math.max(A.length, B.length); i++) {
+    if (A[i] !== B[i]) return `line ~${i + 1}:\n      ${JSON.stringify((A[i] || '').slice(0, 90))}\n      ${JSON.stringify((B[i] || '').slice(0, 90))}`;
+  }
+  return '';
+}
+
+function pad(s, n) { return (s + ' '.repeat(n)).slice(0, n); }
+
+// ─── 1. TWIN FILES: dairy ↔ flock must match line-for-line after normalize ───
+console.log('\n━━ Twin files (dairy ↔ flock, must be identical after normalizing farm identity) ━━');
+const TWINS = [
+  ['components/MyFarmsPanel.tsx',   'dairy_farm/client/src/components/MyFarmsPanel.tsx',   'flock_farm/client/src/components/MyFarmsPanel.tsx'],
+  ['muf-print.ts',                  'dairy_farm/client/src/muf/data/muf-print.ts',                  'flock_farm/client/src/muf/data/muf-print.ts'],
+  ['utils/share.ts',                'dairy_farm/client/src/utils/share.ts',                'flock_farm/client/src/utils/share.ts'],
+  ['muf-labor.ts',                  'dairy_farm/client/src/muf/domain/muf-labor.ts',                  'flock_farm/client/src/muf/domain/muf-labor.ts'],
+  ['muf-zakat.ts',                  'dairy_farm/client/src/muf/domain/muf-zakat.ts',                  'flock_farm/client/src/muf/domain/muf-zakat.ts'],
+  ['muf-pdf.ts',                    'dairy_farm/client/src/muf/data/muf-pdf.ts',                    'flock_farm/client/src/muf/data/muf-pdf.ts'],
+  ['muf-feedstock.ts',              'dairy_farm/client/src/muf/domain/muf-feedstock.ts',              'flock_farm/client/src/muf/domain/muf-feedstock.ts'],
+  ['muf-khata.ts',                  'dairy_farm/client/src/muf/domain/muf-khata.ts',                  'flock_farm/client/src/muf/domain/muf-khata.ts'],
+  ['muf-farmbook.ts',               'dairy_farm/client/src/muf/domain/muf-farmbook.ts',               'flock_farm/client/src/muf/domain/muf-farmbook.ts'],
+  ['muf-image.ts',                  'dairy_farm/client/src/muf/data/muf-image.ts',                  'flock_farm/client/src/muf/data/muf-image.ts'],
+  ['muf-voice.ts',                  'dairy_farm/client/src/muf/data/muf-voice.ts',                  'flock_farm/client/src/muf/data/muf-voice.ts'],
+  ['muf-urdu.ts',                   'dairy_farm/client/src/muf/data/muf-urdu.ts',                   'flock_farm/client/src/muf/data/muf-urdu.ts'],
+  ['muf-urdu-terms-1.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-1.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-1.ts'],
+  ['muf-urdu-terms-2.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-2.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-2.ts'],
+  ['muf-urdu-terms-3.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-3.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-3.ts'],
+  ['muf-urdu-terms-4.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-4.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-4.ts'],
+  ['muf-urdu-terms-5.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-5.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-5.ts'],
+  ['muf-urdu-terms-6.ts',           'dairy_farm/client/src/muf/data/muf-urdu-terms-6.ts',           'flock_farm/client/src/muf/data/muf-urdu-terms-6.ts'],
+  ['muf-search.ts',                 'dairy_farm/client/src/muf/data/muf-search.ts',                 'flock_farm/client/src/muf/data/muf-search.ts'],
+  ['muf-offline.ts',                'dairy_farm/client/src/muf/data/muf-offline.ts',                'flock_farm/client/src/muf/data/muf-offline.ts'],
+  ['muf-charts.tsx',                'dairy_farm/client/src/muf/ui/muf-charts.tsx',                'flock_farm/client/src/muf/ui/muf-charts.tsx'],
+  ['muf-profile.ts',                'dairy_farm/client/src/muf/data/muf-profile.ts',                'flock_farm/client/src/muf/data/muf-profile.ts'],
+  ['muf-applike.tsx',               'dairy_farm/client/src/muf/core/muf-applike.tsx',               'flock_farm/client/src/muf/core/muf-applike.tsx'],
+  ['muf-date.ts',                   'dairy_farm/client/src/muf/data/muf-date.ts',                   'flock_farm/client/src/muf/data/muf-date.ts'],
+  ['muf-story.ts',                  'dairy_farm/client/src/muf/data/muf-story.ts',                  'flock_farm/client/src/muf/data/muf-story.ts'],
+  ['muf-telegram.mjs',              'dairy_farm/backend/muf-telegram.mjs',                 'flock_farm/backend/muf-telegram.mjs'],
+  ['muf-supplier.ts',               'dairy_farm/client/src/muf/domain/muf-supplier.ts',               'flock_farm/client/src/muf/domain/muf-supplier.ts'],
+  ['muf-motion.ts',                 'dairy_farm/client/src/muf/core/muf-motion.ts',                 'flock_farm/client/src/muf/core/muf-motion.ts'],
+  ['muf-modal.tsx',                 'dairy_farm/client/src/muf/core/muf-modal.tsx',                 'flock_farm/client/src/muf/core/muf-modal.tsx'],
+  ['muf-confirm.tsx',               'dairy_farm/client/src/muf/core/muf-confirm.tsx',               'flock_farm/client/src/muf/core/muf-confirm.tsx'],
+  ['muf-portal.tsx',                'dairy_farm/client/src/muf/core/muf-portal.tsx',                'flock_farm/client/src/muf/core/muf-portal.tsx'],
+  ['muf-offline-banner.tsx',      'dairy_farm/client/src/muf/core/muf-offline-banner.tsx',      'flock_farm/client/src/muf/core/muf-offline-banner.tsx'],
+  ['muf-avatar.tsx',              'dairy_farm/client/src/muf/ui/muf-avatar.tsx',              'flock_farm/client/src/muf/ui/muf-avatar.tsx'],
+  ['muf-farm-profile.tsx',        'dairy_farm/client/src/muf/ui/muf-farm-profile.tsx',        'flock_farm/client/src/muf/ui/muf-farm-profile.tsx'],
+  ['muf-header-search.tsx',       'dairy_farm/client/src/muf/ui/muf-header-search.tsx',       'flock_farm/client/src/muf/ui/muf-header-search.tsx'],
+  ['muf-telegram-panel.tsx',      'dairy_farm/client/src/muf/ui/muf-telegram-panel.tsx',      'flock_farm/client/src/muf/ui/muf-telegram-panel.tsx'],
+  ['muf-form-overlay.tsx',          'dairy_farm/client/src/muf/core/muf-form-overlay.tsx',          'flock_farm/client/src/muf/core/muf-form-overlay.tsx'],
+  ['muf-scroll-lock.ts',            'dairy_farm/client/src/muf/core/muf-scroll-lock.ts',            'flock_farm/client/src/muf/core/muf-scroll-lock.ts'],
+  ['muf-card-qr.tsx',            'dairy_farm/client/src/muf/ui/muf-card-qr.tsx',            'flock_farm/client/src/muf/ui/muf-card-qr.tsx'],
+  ['muf-entity-grid.tsx',        'dairy_farm/client/src/muf/ui/muf-entity-grid.tsx',        'flock_farm/client/src/muf/ui/muf-entity-grid.tsx'],
+  ['muf-diary-media.tsx',        'dairy_farm/client/src/muf/ui/muf-diary-media.tsx',        'flock_farm/client/src/muf/ui/muf-diary-media.tsx'],
+  ['muf-login-lang.tsx',        'dairy_farm/client/src/muf/ui/muf-login-lang.tsx',        'flock_farm/client/src/muf/ui/muf-login-lang.tsx'],
+  ['muf-login.tsx',              'dairy_farm/client/src/muf/ui/muf-login.tsx',              'flock_farm/client/src/muf/ui/muf-login.tsx'],
+  ['muf-a11y.ts',               'dairy_farm/client/src/muf/core/muf-a11y.ts',               'flock_farm/client/src/muf/core/muf-a11y.ts'],
+  ['muf-worker-panel.tsx',      'dairy_farm/client/src/muf/ui/muf-worker-panel.tsx',      'flock_farm/client/src/muf/ui/muf-worker-panel.tsx'],
+];
+// muf-style.css must be byte-identical in ALL THREE apps (plain CSS, no TS/JS split)
+const cssA = read('dairy_farm/client/src/muf-style.css');
+const cssB = read('flock_farm/client/src/muf-style.css');
+const cssC = read('agri_farm/frontend/src/muf-style.css');
+if (cssA === null || cssB === null || cssC === null) {
+  console.log(`  ⚠️  ${pad('muf-style.css', 30)} missing file`);
+  failures++;
+} else if (cssA === cssB && cssA === cssC) {
+  console.log(`  ✅ ${pad('muf-style.css (all 3)', 30)} identical`);
+} else {
+  const da = cssA === cssB ? 0 : diffCount(cssA, cssB);
+  const dc = cssA === cssC ? 0 : diffCount(cssA, cssC);
+  console.log(`  ❌ ${pad('muf-style.css (all 3)', 30)} dairy↔flock ${da} · dairy↔agri ${dc} differing line(s)`);
+  failures++;
+}
+const loginA = read('dairy_farm/client/src/muf/ui/muf-login.tsx');
+const loginB = read('flock_farm/client/src/muf/ui/muf-login.tsx');
+const loginC = read('agri_farm/frontend/src/muf/ui/muf-login.tsx');
+if (loginA !== null && loginA === loginB && loginA === loginC) { console.log(`  ✅ ${pad('muf-login.tsx (all 3)', 30)} identical`); }
+else { console.log(`  ❌ ${pad('muf-login.tsx (all 3)', 30)} copies differ or missing`); failures++; }
+for (const [label, pa, pb] of TWINS) {
+  const a = read(pa), b = read(pb);
+  if (a === null || b === null) { console.log(`  ⚠️  ${pad(label, 30)} missing file`); failures++; continue; }
+  const na = normalize(a), nb = normalize(b);
+  if (na === nb) { console.log(`  ✅ ${pad(label, 30)} identical`); }
+  else {
+    const d = diffCount(na, nb);
+    console.log(`  ❌ ${pad(label, 30)} ${d} differing line(s)`);
+    console.log(`     first difference at ${firstDiff(na, nb)}`);
+    failures++;
+  }
+}
+
+// ─── 1b. BACKEND MUF TWINS: byte-identical in all three backends ─────────────
+console.log('\n━━ Backend muf twins (byte-identical in all 3 backends) ━━');
+const BACKEND_TWINS = [
+  ['muf-telegram.mjs', 'dairy_farm/backend/muf-telegram.mjs', 'flock_farm/backend/muf-telegram.mjs', 'agri_farm/backend/muf-telegram.mjs'],
+  ['muf-email.mjs',    'dairy_farm/backend/muf-email.mjs',    'flock_farm/backend/muf-email.mjs',    'agri_farm/backend/muf-email.mjs'],
+  ['muf-date.mjs',     'dairy_farm/backend/muf-date.mjs',     'flock_farm/backend/muf-date.mjs',     'agri_farm/backend/muf-date.mjs'],
+  ['muf-query.mjs',    'dairy_farm/backend/muf-query.mjs',    'flock_farm/backend/muf-query.mjs',    'agri_farm/backend/muf-query.mjs'],
+  ['muf-env.mjs',      'dairy_farm/backend/muf-env.mjs',      'flock_farm/backend/muf-env.mjs',      'agri_farm/backend/muf-env.mjs'],
+  ['muf-card.mjs',     'dairy_farm/backend/muf-card.mjs',     'flock_farm/backend/muf-card.mjs',     'agri_farm/backend/muf-card.mjs'],
+];
+for (const [label, pa, pb, pc] of BACKEND_TWINS) {
+  const a = read(pa), b = read(pb), c = read(pc);
+  if (a === null || b === null || c === null) {
+    console.log(`  ⚠️  ${pad(label, 20)} missing file`);
+    failures++;
+    continue;
+  }
+  if (a === b && a === c) {
+    console.log(`  ✅ ${pad(label, 20)} byte-identical`);
+  } else {
+    console.log(`  ❌ ${pad(label, 20)} copies differ (dairy ${a.length}b · flock ${b.length}b · agri ${c.length}b)`);
+    failures++;
+  }
+}
+const BACKEND_TWIN_INVARIANTS = [
+  ['backend: telegram parser helper',  /export function (parseCommand)\(/],
+  ['backend: email factory helper',    /export function (createMufMailer)\(/],
+  ['backend: farm-local today helper', /export function (mufToday)\(/],
+  ['backend: query matcher helper',    /export function (mufMatches)\(/],
+  ['backend: env resolver (MUF_ENV)',  /export const (MUF_ENV)\s*=\s*\{/],
+  ['backend: card page renderer',      /export function (renderMufCard)\(/],
+];
+for (const [label, re] of BACKEND_TWIN_INVARIANTS) {
+  const src = read('dairy_farm/backend/muf-telegram.mjs') + '\n'
+    + read('dairy_farm/backend/muf-email.mjs') + '\n'
+    + read('dairy_farm/backend/muf-date.mjs') + '\n'
+    + read('dairy_farm/backend/muf-query.mjs') + '\n'
+    + read('dairy_farm/backend/muf-env.mjs') + '\n'
+    + read('dairy_farm/backend/muf-card.mjs');
+  const m = src.match(re);
+  if (m) console.log(`  ✅ ${pad(label, 34)} ${m[1]}`);
+  else { console.log(`  ❌ ${pad(label, 34)} (NOT FOUND)`); failures++; }
+}
+
+// ─── 1c. UNIFIED ENV SYSTEM: same canonical names in all three backends ──────
+console.log('\n━━ Unified env system (same names in all 3 backends) ━━');
+const ENV_EXAMPLES = {
+  dairy: read('dairy_farm/backend/.env.example') || '',
+  flock: read('flock_farm/backend/.env.example') || '',
+  agri:  read('agri_farm/backend/.env.example') || '',
+};
+const CANONICAL_ENV_NAMES = ['MONGO_URI', 'JWT_SECRET', 'APP_URL', 'FRONTEND_URL',
+  'SMTP_HOST', 'SMTP_PORT', 'SMTP_SECURE', 'SMTP_USER', 'SMTP_PASS', 'SMTP_FROM',
+  'TELEGRAM_BOT_TOKEN', 'TELEGRAM_WEBHOOK_SECRET', 'CRON_SECRET', 'MEMORY_MODE',
+  'CROSS_FARM_KEY', 'TZ_OFFSET_HOURS', 'LOG_REQUESTS', 'PORT'];
+for (const name of CANONICAL_ENV_NAMES) {
+  const present = Object.entries(ENV_EXAMPLES)
+    .filter(([, ex]) => new RegExp(`(^|\\n)\\s*#?\\s*${name}=`, 'm').test(ex));
+  const label = `env: ${name}`;
+  if (present.length === 3) console.log(`  ✅ ${pad(label, 34)} in all 3 .env.example`);
+  else {
+    const missing = present.map(([app]) => app);
+    console.log(`  ❌ ${pad(label, 34)} missing in: ${missing.join(', ') || 'ALL'}`);
+    failures++;
+  }
+}
+// No backend may read a non-canonical env var directly (muf-env.mjs is the only reader)
+const NON_CANONICAL_RE = /process\.env\.(MONGODB_URI|SECRET_KEY|SESSION_SECRET|CORS_ORIGIN|SMTP_SENDER|MAIL_FROM|EMAIL_HOST|EMAIL_PORT|EMAIL_USER|EMAIL_PASS|ALLOW_MEMORY_MODE)\b/;
+for (const [app, dir] of [['dairy', 'dairy_farm/backend'], ['flock', 'flock_farm/backend'], ['agri', 'agri_farm/backend']]) {
+  const files = [];
+  (function walk(d) {
+    for (const e of fs.readdirSync(d, { withFileTypes: true })) {
+      const p = path.join(d, e.name);
+      if (e.isDirectory()) walk(p);
+      else if (/\.(js|mjs)$/.test(e.name)) files.push(p);
+    }
+  })(dir);
+  let bad = null;
+  for (const f of files) {
+    const m = fs.readFileSync(f, 'utf8').match(NON_CANONICAL_RE);
+    if (m) { bad = `${path.relative('.', f)} → ${m[1]}`; break; }
+  }
+  if (bad) { console.log(`  ❌ ${pad(`env: ${app} legacy read`, 34)} ${bad}`); failures++; }
+  else console.log(`  ✅ ${pad(`env: ${app} no legacy reads`, 34)} all through muf-env`);
+}
+
+// ─── 2. MUF INVARIANTS: values that must be equal in ALL THREE apps ──────────
+console.log('\n━━ muf invariants (same value required in all three apps) ━━');
+const APPS = {
+  dairy: 'dairy_farm/client/src',
+  flock: 'flock_farm/client/src',
+  agri:  'agri_farm/frontend/src',
+};
+const FILES = {
+  detailModal: { dairy: 'muf/core/muf-modal.tsx', flock: 'muf/core/muf-modal.tsx', agri: 'muf/core/muf-modal.tsx' },
+  adminShell:  { dairy: 'muf/admin/muf-admin-shell.tsx',  flock: 'muf/admin/muf-admin-shell.tsx',   agri: 'muf/admin/muf-admin-shell.tsx' },
+  confirm:     { dairy: 'muf/core/muf-confirm.tsx', flock: 'muf/core/muf-confirm.tsx', agri: 'muf/core/muf-confirm.tsx' },
+  toastHome:   { dairy: 'muf/core/muf-confirm.tsx', flock: 'muf/core/muf-confirm.tsx', agri: 'muf/core/muf-confirm.tsx' },
+  mufStyle:    { dairy: 'muf-style.css', flock: 'muf-style.css', agri: 'muf-style.css' },
+  mufPrint:    { dairy: 'muf/data/muf-print.ts',  flock: 'muf/data/muf-print.ts',  agri: 'muf/data/muf-print.ts' },
+  mufCompare:  { dairy: 'muf/data/muf-compare.ts', flock: 'muf/data/muf-compare.ts', agri: 'muf/data/muf-compare.ts' },
+  share:       { dairy: 'utils/share.ts', flock: 'utils/share.ts', agri: 'utils/share.ts' },
+  mufLabor:    { dairy: 'muf/domain/muf-labor.ts', flock: 'muf/domain/muf-labor.ts', agri: 'muf/domain/muf-labor.ts' },
+  mufZakat:    { dairy: 'muf/domain/muf-zakat.ts', flock: 'muf/domain/muf-zakat.ts', agri: 'muf/domain/muf-zakat.ts' },
+  mufPdf:      { dairy: 'muf/data/muf-pdf.ts', flock: 'muf/data/muf-pdf.ts', agri: 'muf/data/muf-pdf.ts' },
+  mufFarmbook: { dairy: 'muf/domain/muf-farmbook.ts', flock: 'muf/domain/muf-farmbook.ts', agri: 'muf/domain/muf-farmbook.ts' },
+  mufUrdu:     { dairy: 'muf/data/muf-urdu.ts', flock: 'muf/data/muf-urdu.ts', agri: 'muf/data/muf-urdu.ts' },
+  mufUrduTerms1: { dairy: 'muf/data/muf-urdu-terms-1.ts', flock: 'muf/data/muf-urdu-terms-1.ts', agri: 'muf/data/muf-urdu-terms-1.ts' },
+  mufSearch:   { dairy: 'muf/data/muf-search.ts', flock: 'muf/data/muf-search.ts', agri: 'muf/data/muf-search.ts' },
+  mufOffline:  { dairy: 'muf/data/muf-offline.ts', flock: 'muf/data/muf-offline.ts', agri: 'muf/data/muf-offline.ts' },
+  mufCharts:   { dairy: 'muf/ui/muf-charts.tsx', flock: 'muf/ui/muf-charts.tsx', agri: 'muf/ui/muf-charts.tsx' },
+  mufProfile:  { dairy: 'muf/data/muf-profile.ts', flock: 'muf/data/muf-profile.ts', agri: 'muf/data/muf-profile.ts' },
+  mufApplike:  { dairy: 'muf/core/muf-applike.tsx', flock: 'muf/core/muf-applike.tsx', agri: 'muf/core/muf-applike.tsx' },
+  mufDate:     { dairy: 'muf/data/muf-date.ts', flock: 'muf/data/muf-date.ts', agri: 'muf/data/muf-date.ts' },
+  mufStory:    { dairy: 'muf/data/muf-story.ts', flock: 'muf/data/muf-story.ts', agri: 'muf/data/muf-story.ts' },
+  mufTelegram: { dairy: '../../backend/muf-telegram.mjs', flock: '../../backend/muf-telegram.mjs', agri: '../../backend/muf-telegram.mjs' },
+  mufSupplier: { dairy: 'muf/domain/muf-supplier.ts', flock: 'muf/domain/muf-supplier.ts', agri: 'muf/domain/muf-supplier.ts' },
+  mufMotion:   { dairy: 'muf/core/muf-motion.ts', flock: 'muf/core/muf-motion.ts', agri: 'muf/core/muf-motion.ts' },
+  mufPortal:   { dairy: 'muf/core/muf-portal.tsx', flock: 'muf/core/muf-portal.tsx', agri: 'muf/core/muf-portal.tsx' },
+  mufFormOverlay: { dairy: 'muf/core/muf-form-overlay.tsx', flock: 'muf/core/muf-form-overlay.tsx', agri: 'muf/core/muf-form-overlay.tsx' },
+  mufScrollLock: { dairy: 'muf/core/muf-scroll-lock.ts', flock: 'muf/core/muf-scroll-lock.ts', agri: 'muf/core/muf-scroll-lock.ts' },
+  mufOfflineBanner: { dairy: 'muf/core/muf-offline-banner.tsx', flock: 'muf/core/muf-offline-banner.tsx', agri: 'muf/core/muf-offline-banner.tsx' },
+  mufAvatar: { dairy: 'muf/ui/muf-avatar.tsx', flock: 'muf/ui/muf-avatar.tsx' },
+  mufFarmProfile: { dairy: 'muf/ui/muf-farm-profile.tsx', flock: 'muf/ui/muf-farm-profile.tsx', agri: 'muf/ui/muf-farm-profile.tsx' },
+  mufHeaderSearch: { dairy: 'muf/ui/muf-header-search.tsx', flock: 'muf/ui/muf-header-search.tsx', agri: 'muf/ui/muf-header-search.tsx' },
+  mufTelegramPanel: { dairy: 'muf/ui/muf-telegram-panel.tsx', flock: 'muf/ui/muf-telegram-panel.tsx', agri: 'muf/ui/muf-telegram-panel.tsx' },
+  mufDiaryMedia: { dairy: 'muf/ui/muf-diary-media.tsx', flock: 'muf/ui/muf-diary-media.tsx', agri: 'muf/ui/muf-diary-media.tsx' },
+  mufDiary: { dairy: 'muf/ui/muf-diary.tsx', flock: 'muf/ui/muf-diary.tsx', agri: 'muf/ui/muf-diary.tsx' },
+  mufA11y: { dairy: 'muf/core/muf-a11y.ts', flock: 'muf/core/muf-a11y.ts', agri: 'muf/core/muf-a11y.ts' },
+};
+const INVARIANTS = [
+  // [label, file-group, regex (first capture group compared)]
+  ['popup width small (MUF token)', 'detailModal', /size === 'small'.{0,10}(muf-pup-width-sm)/],
+  ['popup width big (MUF token)',   'detailModal', /: '(muf-pup-width-lg)'/],
+  ['popup max height (MUF card)',   'detailModal', /(muf-pup-card)/],
+  ['popup mobile height token',     'mufStyle',    /--muf-popup-mobile-max-height: (70dvh)/],
+  ['form overlay mobile height cap', 'mufStyle', /\.muf-form-sheet\s*\{[^}]*?(max-height: var\(--muf-popup-mobile-max-height\) !important)/],
+  ['primary action uses canonical tokens', 'mufStyle', /\.muf-primary-action\s*\{[^}]*background:\s*linear-gradient\(135deg,\s*(var\(--muf-color-primary\)),\s*var\(--muf-color-primary-hover\)\)/],
+  ['active navigation uses canonical tokens', 'mufStyle', /\.muf-nav-link\.active\s*\{[^}]*background:\s*linear-gradient\(135deg,\s*var\(--muf-color-primary\),\s*(var\(--muf-color-primary-hover\))\)/],
+  ['detail action uses canonical tokens', 'mufStyle', /\.muf-detail-btn\s*\{[^}]*background:\s*(var\(--muf-color-primary\))/],
+  ['focus ring uses semantic success token', 'mufStyle', /--muf-ui-focus:\s*(var\(--muf-color-success\))/],
+  ['popup focus outline uses shared token', 'mufStyle', /\.muf-pup-sm textarea:focus-visible,[^}]*outline:\s*2px solid (var\(--muf-ui-focus\))/],
+  ['mobile popup stage padding token', 'mufStyle', /--muf-popup-mobile-stage-padding:\s*(10px)/],
+  ['mobile popup typography scale token', 'mufStyle', /\.muf-popup-stage \.text-2xl\s*\{\s*font-size:\s*var\(--muf-popup-mobile-text-2xl\)/],
+  ['mobile popup fields use shared tokens', 'mufStyle', /\.muf-popup-stage input,[^}]*font-size:\s*var\(--muf-popup-mobile-field-font-size\) !important;[^}]*border-radius:\s*var\(--muf-popup-mobile-field-radius\) !important;/],
+  ['popup form gap uses shared token', 'mufStyle', /--muf-ui-popup-form-gap:\s*(1rem)/],
+  ['popup field height uses shared token', 'mufStyle', /--muf-ui-popup-field-min-height:\s*(38px)/],
+  ['mobile popup field size uses shared token', 'mufStyle', /font-size:\s*(var\(--muf-ui-popup-field-font-size-mobile\))/],
+  ['primary action height token', 'mufStyle', /--muf-core-action-primary-height:\s*(47px)/],
+  ['primary action consumes height token', 'mufStyle', /\.muf-primary-action\s*\{[^}]*min-height:\s*(var\(--muf-core-action-primary-height,47px\))/],
+  ['compact action consumes sizing token', 'mufStyle', /\.muf-detail-btn,\.muf-record-btn,\.muf-mini-icon\s*\{[^}]*min-height:\s*(var\(--muf-core-action-compact-height,31px\))/],
+  ['KPI spacing consumes token', 'mufStyle', /\.muf-kpi-card\s*\{[^}]*gap:\s*(var\(--muf-core-kpi-gap,12px\))/],
+  ['KPI padding consumes token', 'mufStyle', /\.muf-kpi-card\s*\{[^}]*padding:\s*(var\(--muf-core-kpi-padding,17px 15px\))/],
+  ['panel radius consumes token', 'mufStyle', /\.muf-panel\s*\{[^}]*border-radius:\s*(var\(--muf-core-panel-radius,20px\))/],
+  ['entity card radius consumes token', 'mufStyle', /\.muf-entity-card\s*\{[^}]*border-radius:\s*(var\(--muf-core-entity-radius,17px\))/],
+  ['record action color consumes token', 'mufStyle', /\.muf-record-btn\s*\{[^}]*background:\s*(var\(--muf-core-action-record-bg,#f0f3f1\))/],
+  ['popup content: label primitive',      'mufStyle', /\.muf-pc-label \{[^}]*(font-weight: 600)/],
+  ['popup content: muted text primitive', 'mufStyle', /\.muf-pc-muted \{[^}]*(font-size: 0\.75rem)/],
+  ['popup content: form grid primitive',  'mufStyle', /\.muf-pc-form-grid \{[^}]*(gap: 0\.75rem)/],
+  ['popup content: actions primitive',    'mufStyle', /\.muf-pc-actions \{[^}]*(justify-content: flex-end)/],
+  ['popup content: mobile scale hook',    'mufStyle', /\.muf-popup-stage \.muf-pc-label,[^}]*(var\(--muf-popup-mobile-text-xs,\s*10\.5px\))/],
+  ['popup content: dark popup hook',      'mufStyle', /\.dark \.muf-popup-stage \.muf-pc-label,[^}]*(#e5edf7)/],
+  ['brand token: WhatsApp green',        'mufStyle', /--muf-brand-whatsapp:\s*(#25D366)/],
+  ['brand token: WhatsApp hover',        'mufStyle', /--muf-brand-whatsapp-hover:\s*(#1ebe5b)/],
+  ['dark popups: white panels repaired',  'mufStyle', /\.dark \.muf-pup-card :is\(\.bg-white,[^{]*:not\(\[class\*="dark:bg-"\]\)\s*\{\s*background-color: (#172337) !important/],
+  ['dark popups: dark slate text repaired', 'mufStyle', /\.dark \.muf-pup-card :is\(\.text-slate-900,[^{]*:not\(\[class\*="dark:text-"\]\)\s*\{\s*color: (#e5edf7) !important/],
+  ['photo viewer z-index token',    'mufStyle',    /--muf-z-photo: (1450)/],
+  ['Notes MUF root class',          'mufDiary',    /className="(muf-notes)"/],
+  // Both popup sizes intentionally share one CSS rule for the unified header scale.
+  ['scale: shared popup title 0.875rem', 'mufStyle', /\.muf-pup-sm\s*,\s*\.muf-pup-lg\s*\{[^}]*--pup-title:\s*(0\.875rem)/],
+  ['popup body padding',            'detailModal', /(--pup-body-pad)/],
+  ['popup rounding',                'detailModal', /(rounded-2xl sm:rounded-3xl)/],
+  ['popup backdrop',                'detailModal', /(bg-black\/50)/],
+  ['admin popup width (MUF token)', 'adminShell',  /(muf-admin-shell-card)/, (v) => 'muf-admin-shell-card'],
+  ['admin popup height (MUF token)','adminShell',  /(muf-admin-shell-card)/],
+  ['admin popup rounding (MUF)',    'adminShell',  /(muf-admin-shell-card)/],
+  ['admin stage spacing (MUF)',     'adminShell',  /className="ff-modal-host (muf-popup-stage)/],
+  ['toast z-index',                 'toastHome',   /(z-\[(?:1600|var\(--muf-z-toast\))\])/],
+  ['type scale: desktop zoom',      'mufStyle',    /zoom:\s*(0\.8)/],
+  ['print: brand title 26px',       'mufPrint',    /brand-title \{ font-size: (26px)/],
+  ['print: green rule',             'mufPrint',    /border-bottom: 2px solid (#16a34a)/],
+  ['print: logo size 56px',         'mufPrint',    /brand-logo \{ width: (56px)/],
+  ['print: dark green brand',       'mufPrint',    /brand-title[^}]*color: (#14532d)/],
+  ['compare: pctChange helper',     'mufCompare',  /function (pctChange)\(/],
+  ['compare: trendArrow helper',    'mufCompare',  /function (trendArrow)\(/],
+  ['share: backup share helper',    'share',       /function (shareBackupFile)\(/],
+  ['share: WhatsApp fallback URL',  'share',       /(https:\/\/web\.whatsapp\.com)/],
+  ['labor: half-day units 0.5',     'mufLabor',    /HALF_DAY_UNITS = (0\.5)/],
+  ['labor: wage sheet helper',      'mufLabor',    /function (buildWageSheet)\(/],
+  ['labor: post date (28th)',       'mufLabor',    /\$\{monthKey\}(-28)/],
+  ['zakat: default 2.5%',           'mufZakat',    /ZAKAT_DEFAULT_PCT = (2\.5)/],
+  ['zakat: ushr rates 10/5',        'mufZakat',    /USHR_RAIN_PCT = (10)/],
+  ['zakat: statement helper',       'mufZakat',    /function (zakatStatementBody)\(/],
+  ['zakat: download helper',        'mufZakat',    /function (downloadZakatPdf)\(/],
+  ['pdf: header helper',            'mufPdf',      /function (mufPdfHeader)\(/],
+  ['pdf: logo 17mm at 14,8',        'mufPdf',      /addImage\(logo, 'PNG', (14, 8, 17, 17)\)/],
+  ['pdf: dark green brand rgb',     'mufPdf',      /setTextColor\((20, 83, 45)\); \/\/ dark green brand/],
+  ['pdf: green rule rgb',           'mufPdf',      /setDrawColor\((22, 163, 74)\); \/\/ green rule/],
+  ['labor: advance helper',         'mufLabor',    /function (payoutAfterAdvances)\(/],
+  ['farmbook: download helper',     'mufFarmbook', /function (downloadFarmBookPdf)\(/],
+  ['urdu: dictionary helper',       'mufUrdu',     /function (mufUr)\(/],
+  ['urdu: Dashboard term',          'mufUrduTerms1', /'Dashboard': '(ڈیش بورڈ)'/],
+  ['search: ranking helper',        'mufSearch',   /function (mufSearch)\(/],
+  ['offline: watch helper',         'mufOffline',  /function (watchOffline)\(/],
+  ['charts: area chart component',  'mufCharts',   /function (MufAreaChart)\(/],
+  ['dark: shared palette vars',     'mufStyle',    /(--muf-dark-bg): #0b1220/],
+  ['profile: buyers pdf',           'mufProfile',  /function (downloadFarmProfilePdf)\(/],
+  ['applike: pull to refresh',      'mufApplike',  /function (initMufPullToRefresh)\(/],
+  ['applike: splash styles',        'mufStyle',    /(#muf-splash) \{/],
+  ['date: local today helper',      'mufDate',     /function (mufToday)\(/],
+  ['story: lifetime verdict',       'mufStory',    /function (mufVerdictText)\(/],
+  ['compare: same month last year', 'mufCompare',  /function (sameMonthLastYearKey)\(/],
+  ['telegram: doodh keyword',       'mufTelegram', /(doodh)/],
+  ['telegram: urdu hazri keyword',  'mufTelegram', /(حاضری)/],
+  ['telegram: drop check',          'mufTelegram', /(mufDropCheck|muf_drop_check)/],
+  ['telegram: drop alert text',     'mufTelegram', /(tgDropAlert|tg_drop_alert)/],
+  ['supplier: balance math',        'mufSupplier', /(supplierBalances)/],
+  ['supplier: urdu hisab text',     'mufSupplier', /(کھاتے کی تفصیل)/],
+  ['motion: single re-export',      'mufMotion',   /export \{ motion, AnimatePresence \} from ('motion\/react')/],
+  ['motion: modal spring 480/30',   'mufMotion',   /stiffness: (480), damping: 30, mass: 0\.6/],
+  ['motion: reduced-motion gate',   'mufMotion',   /function (prefersReducedMotion)/],
+  ['modal: muf-overlay class',      'detailModal', /(muf-overlay)(?:\s+muf-popup-overlay)?\s+fixed inset-0 flex/],
+  ['modal: ESC top-most close',     'detailModal', /dataset\.topModal/],
+  ['modal: body scroll lock',       'detailModal', /useBodyScrollLock\(open\)/],
+  ['confirm: prompt support',       'confirm',     /function (usePromptInput)/],
+  ['confirm: toast support',        'confirm',     /function (notify)\(/],
+  ['portal: modal root id',         'mufPortal',   /getElementById\('ff-modal-root'\)/],
+  ['form overlay uses muf modal',   'mufFormOverlay', /import DetailModal from '(\.\/muf-modal)'/],
+  ['scroll lock: stack counter',    'mufScrollLock', /lockCount = (0)/],
+];
+for (const [label, group, re, mapVal] of INVARIANTS) {
+  const values = {};
+  for (const app of Object.keys(APPS)) {
+    const p = `${APPS[app]}/${FILES[group][app]}`;
+    const src = read(p);
+    if (src === null) { values[app] = '(file missing)'; continue; }
+    const m = src.match(re);
+    const raw = m ? (m[1] || m[2] || '(matched)') : '(NOT FOUND)';
+    values[app] = (m && mapVal) ? mapVal(raw) : raw;
+  }
+  const uniq = [...new Set(Object.values(values))];
+  if (uniq.length === 1 && uniq[0] !== '(NOT FOUND)' && uniq[0] !== '(file missing)') {
+    console.log(`  ✅ ${pad(label, 30)} ${uniq[0]}`);
+  } else {
+    console.log(`  ❌ ${pad(label, 30)} dairy=${values.dairy} · flock=${values.flock} · agri=${values.agri}`);
+    failures++;
+  }
+}
+
+// ─── 3. EMAIL SHELL: key colors must match in the three mailers ──────────────
+console.log('\n━━ muf email shell (backend mailers) ━━');
+const MAILERS = {
+  dairy: 'dairy_farm/backend/muf-email.mjs',
+  flock: 'flock_farm/backend/muf-email.mjs',
+  agri:  'agri_farm/backend/muf-email.mjs',
+};
+const EMAIL_CHECKS = [
+  ['email: brand green header', /border-bottom:2px solid (#16a34a)/],
+  ['email: farm name color',    /font-size:22px;font-weight:800;color:(#14532d)/],
+  ['email: code box bg',        /background:(#f0fdf4);border:1px solid #bbf7d0/],
+  ['email: logo 56px',          /width="(56)" height="56"/],
+];
+for (const [label, re] of EMAIL_CHECKS) {
+  const values = {};
+  for (const app of Object.keys(MAILERS)) {
+    const src = read(MAILERS[app]);
+    const m = src ? src.match(re) : null;
+    values[app] = m ? m[1] : '(NOT FOUND)';
+  }
+  const uniq = [...new Set(Object.values(values))];
+  if (uniq.length === 1 && uniq[0] !== '(NOT FOUND)') {
+    console.log(`  ✅ ${pad(label, 30)} ${uniq[0]}`);
+  } else {
+    console.log(`  ❌ ${pad(label, 30)} dairy=${values.dairy} · flock=${values.flock} · agri=${values.agri}`);
+    failures++;
+  }
+}
+
+// ─── 4. SCAN RULES: patterns that must not appear in app source ─────────────
+console.log('\n━━ Scan rules (must stay clean in all three apps) ━━');
+
+function scanRule(label, apps, test) {
+  const offenders = [];
+  for (const [app, dir] of apps) {
+    const fs = require('fs');
+    const walk = (d) => {
+      for (const entry of fs.readdirSync(d, { withFileTypes: true })) {
+        if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+        const p = require('path').join(d, entry.name);
+        if (entry.isDirectory()) walk(p);
+        else if (/\.(ts|tsx|js|jsx)$/.test(entry.name)) {
+          const rel = require('path').relative(dir, p).split(require('path').sep).join('/');
+          if (test(p, rel, fs.readFileSync(p, 'utf8'))) offenders.push(`${app}:${rel}`);
+        }
+      }
+    };
+    walk(dir);
+  }
+  if (offenders.length === 0) {
+    console.log(`  ✅ ${pad(label, 44)} clean in all 3 apps`);
+  } else {
+    console.log(`  ❌ ${pad(label, 44)} ${offenders.length} offender(s):`);
+    offenders.slice(0, 10).forEach((o) => console.log(`       ${o}`));
+    failures++;
+  }
+}
+
+const MOTION_RE = /from\s+['"](?:framer-motion|motion\/react|motion)['"]/;
+scanRule('motion imported only via muf-motion', Object.entries(APPS),
+  (abs, rel) => !/muf-motion\.(ts|js)$/.test(rel) && MOTION_RE.test(require('fs').readFileSync(abs, 'utf8')));
+
+// ─── muf-urdu: the canonical Urdu dictionary must keep its shared helpers ───
+console.log('\n━━ muf-urdu shared helpers (all 3 apps) ━━');
+[['urdu: mufUr helper', /export function mufUr\(/],
+ ['urdu: mufFill helper', /export function mufFill\(/],
+ ['urdu: mufL helper', /export function mufL\(/]].forEach(([label, re]) => {
+  const ok3 = ['dairy_farm/client/src/muf/data/muf-urdu.ts', 'flock_farm/client/src/muf/data/muf-urdu.ts', 'agri_farm/frontend/src/muf/data/muf-urdu.ts']
+    .every((p) => re.test(read(p)));
+  if (ok3) console.log('  ✅ ' + pad(label, 36) + '(all 3)');
+  else { console.log('  ❌ ' + pad(label, 36) + 'missing in at least one app'); failures++; }
+});
+
+// ─── scan: ALL Urdu lives in muf-urdu ─────────────────────────────────────────
+// Only the WhatsApp/share message builders keep Urdu as content data (exception):
+//   muf-khata / muf-supplier (message templates), utils/share (months),
+//   AdminPanel + BuyerKhata + CustomerLedger (WhatsApp rate/khata message bodies)
+const URDU_ALLOWED = /muf-urdu|muf-khata|muf-supplier|utils\/share|AdminPanel|BuyerKhata|CustomerLedger/;
+scanRule('Urdu only in muf-urdu + message builders', Object.entries(APPS),
+  (abs, rel, src) => /[\u0600-\u06FF]/.test(src) && !URDU_ALLOWED.test(rel));
+
+
+// ─── scan: display date formatting lives in muf-date ──────────────────────────
+// (utils/date is the thin legacy wrapper that delegates to muf-date)
+const DATEFMT_ALLOWED = /muf-date|utils\/date/;
+scanRule('toLocaleDateString only in muf-date (+ legacy wrapper)', Object.entries(APPS),
+  (abs, rel, src) => src.includes('toLocaleDateString') && !DATEFMT_ALLOWED.test(rel));
+
+
+// ─── scan: popup sizes are only 'small' | 'big' ───────────────────────────────
+{
+  const oldSizes = /\bsize="(?:sm|md|lg|xl)"/;
+  const offenders = [];
+  const tagEnd = (src, start) => {
+    let depth = 0;
+    for (let j = start; j < src.length; j++) {
+      const c = src[j];
+      if (c === '{') depth++;
+      else if (c === '}') depth--;
+      else if (c === '>' && depth === 0) return j;
+    }
+    return -1;
+  };
+  for (const [app, dir] of Object.entries(APPS)) {
+    const walk = (d) => {
+      for (const entry of require('fs').readdirSync(d, { withFileTypes: true })) {
+        if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+        const p = require('path').join(d, entry.name);
+        if (entry.isDirectory()) walk(p);
+        else if (/\.(ts|tsx|js|jsx)$/.test(entry.name)) {
+          const src = require('fs').readFileSync(p, 'utf8');
+          for (const marker of ['<DetailModal', '<FormOverlay']) {
+            let i = -1;
+            while ((i = src.indexOf(marker, i + 1)) >= 0) {
+              const end = tagEnd(src, i);
+              if (end < 0) break;
+              // keep only the text OUTSIDE {…} so nested component props (e.g. icon size) are ignored
+              let depth = 0;
+              let flat = '';
+              for (const ch of src.slice(i, end + 1)) {
+                if (ch === '{') depth++;
+                else if (ch === '}') depth = Math.max(0, depth - 1);
+                else if (depth === 0) flat += ch;
+              }
+              if (oldSizes.test(flat)) { offenders.push(`${app}:${require('path').relative(dir, p)}:${marker.slice(1)}`); break; }
+              i = end + 1;
+            }
+          }
+        }
+      }
+    };
+    walk(dir);
+  }
+  if (offenders.length === 0) console.log('  ✅ ' + pad('popup size only small|big', 44) + 'clean in all 3 apps');
+  else {
+    console.log(`  ❌ popup size only small|big               ${offenders.length} offender(s):`);
+    offenders.slice(0, 10).forEach((o) => console.log(`       ${o}`));
+    failures++;
+  }
+}
+
+// ─── 5. BACKEND INVARIANTS: security + parity across the 3 server.js ─────────
+console.log('\n━━ backend invariants (mongoSanitize + JSON body limit, all 3 apps) ━━');
+const BACKEND_SERVERS = {
+  dairy: 'dairy_farm/backend/server.js',
+  flock: 'flock_farm/backend/server.js',
+  agri:  'agri_farm/backend/server.js',
+};
+const BACKEND_CHECKS = [
+  // [label, regex (first capture group compared), extractor-optional]
+  ['mongoSanitize imported',  /import\s+mongoSanitize\s+from\s+['"]express-mongo-sanitize['"]/],
+  ['mongoSanitize mounted',   /app\.use\(mongoSanitize\(\)\)/],
+  ['JSON body limit 10mb',    /express\.json\(\{\s*limit:\s*['"](10mb)['"]/],
+];
+for (const [label, re] of BACKEND_CHECKS) {
+  const values = {};
+  for (const app of Object.keys(BACKEND_SERVERS)) {
+    const src = read(BACKEND_SERVERS[app]);
+    const m = src ? src.match(re) : null;
+    values[app] = m ? (m[1] || '(matched)') : '(NOT FOUND)';
+  }
+  const uniq = [...new Set(Object.values(values))];
+  if (uniq.length === 1 && uniq[0] !== '(NOT FOUND)') {
+    console.log(`  ✅ ${pad(label, 34)} ${uniq[0]}`);
+  } else {
+    console.log(`  ❌ ${pad(label, 34)} dairy=${values.dairy} · flock=${values.flock} · agri=${values.agri}`);
+    failures++;
+  }
+}
+
+// ─── 6. PDF TWIN HELPER: mufLastAutoTableY must exist in all 3 muf-pdf twins ─
+console.log('\n━━ muf-pdf: typed finalY helper present in all 3 apps ━━');
+const MUF_PDF_FILES = {
+  dairy: 'dairy_farm/client/src/muf/data/muf-pdf.ts',
+  flock: 'flock_farm/client/src/muf/data/muf-pdf.ts',
+  agri:  'agri_farm/frontend/src/muf/data/muf-pdf.ts',
+};
+const PDF_HELPER_CHECKS = [
+  // The helper itself — single `any` escape hatch per TS twin.
+  ['mufLastAutoTableY exported', /export\s+function\s+(mufLastAutoTableY)\s*\(/],
+  // mufPdfTable must delegate to the helper (no inline `(doc as any).lastAutoTable`).
+  ['mufPdfTable delegates to helper', /return\s+(mufLastAutoTableY)\(doc\)\s*\+\s*8/],
+];
+for (const [label, re] of PDF_HELPER_CHECKS) {
+  const values = {};
+  for (const app of Object.keys(MUF_PDF_FILES)) {
+    const src = read(MUF_PDF_FILES[app]);
+    const m = src ? src.match(re) : null;
+    values[app] = m ? (m[1] || '(matched)') : '(NOT FOUND)';
+  }
+  const uniq = [...new Set(Object.values(values))];
+  if (uniq.length === 1 && uniq[0] !== '(NOT FOUND)') {
+    console.log(`  ✅ ${pad(label, 34)} ${uniq[0]}`);
+  } else {
+    console.log(`  ❌ ${pad(label, 34)} dairy=${values.dairy} · flock=${values.flock} · agri=${values.agri}`);
+    failures++;
+  }
+}
+
+// Scan rule: nobody outside muf-pdf.{ts,js} may write `(doc as any).lastAutoTable`
+// or `doc.lastAutoTable` directly — they must call mufLastAutoTableY(doc) instead.
+// This keeps the `any` escape hatch in exactly one place per app twin.
+scanRule('lastAutoTable only via mufLastAutoTableY helper', Object.entries(APPS),
+  (abs, rel, src) => {
+    if (/muf-pdf\.(ts|js)$/.test(rel)) return false;          // the helper itself
+    if (/reportExport\.(ts|js)$/.test(rel)) return false;     // already migrated to use the helper
+    return /lastAutoTable/.test(src);
+  });
+
+// ─── 7. muf-image twin parity: file must exist in all 3 apps ────────────────
+console.log('\n━━ muf-image twin present in all 3 apps ━━');
+const MUF_IMAGE_FILES = {
+  dairy: 'dairy_farm/client/src/muf/data/muf-image.ts',
+  flock: 'flock_farm/client/src/muf/data/muf-image.ts',
+  agri:  'agri_farm/frontend/src/muf/data/muf-image.ts',
+};
+const IMAGE_TWIN_CHECKS = [
+  ['muf-image: compressGalleryImage exported', /export\s+function\s+(compressGalleryImage)\s*\(/],
+  ['muf-image: GALLERY_MAX_PHOTOS = 10',        /GALLERY_MAX_PHOTOS\s*=\s*(10)/],
+];
+for (const [label, re] of IMAGE_TWIN_CHECKS) {
+  const values = {};
+  for (const app of Object.keys(MUF_IMAGE_FILES)) {
+    const src = read(MUF_IMAGE_FILES[app]);
+    const m = src ? src.match(re) : null;
+    values[app] = m ? (m[1] || '(matched)') : '(NOT FOUND)';
+  }
+  const uniq = [...new Set(Object.values(values))];
+  if (uniq.length === 1 && uniq[0] !== '(NOT FOUND)') {
+    console.log(`  ✅ ${pad(label, 34)} ${uniq[0]}`);
+  } else {
+    console.log(`  ❌ ${pad(label, 34)} dairy=${values.dairy} · flock=${values.flock} · agri=${values.agri}`);
+    failures++;
+  }
+}
+
+// ─── 8. muf-voice twin parity: file must exist in all 3 apps ────────────────
+console.log('\n━━ muf-voice twin present in all 3 apps ━━');
+const MUF_VOICE_FILES = {
+  dairy: 'dairy_farm/client/src/muf/data/muf-voice.ts',
+  flock: 'flock_farm/client/src/muf/data/muf-voice.ts',
+  agri:  'agri_farm/frontend/src/muf/data/muf-voice.ts',
+};
+const VOICE_TWIN_CHECKS = [
+  ['muf-voice: isVoiceSupported exported',  /export\s+function\s+(isVoiceSupported)\s*\(/],
+  ['muf-voice: startVoiceRecording exported', /export\s+async\s+function\s+(startVoiceRecording)\s*\(/],
+  ['muf-voice: MAX_VOICE_SECONDS = 60',      /MAX_VOICE_SECONDS\s*=\s*(60)/],
+];
+for (const [label, re] of VOICE_TWIN_CHECKS) {
+  const values = {};
+  for (const app of Object.keys(MUF_VOICE_FILES)) {
+    const src = read(MUF_VOICE_FILES[app]);
+    const m = src ? src.match(re) : null;
+    values[app] = m ? (m[1] || '(matched)') : '(NOT FOUND)';
+  }
+  const uniq = [...new Set(Object.values(values))];
+  if (uniq.length === 1 && uniq[0] !== '(NOT FOUND)') {
+    console.log(`  ✅ ${pad(label, 34)} ${uniq[0]}`);
+  } else {
+    console.log(`  ❌ ${pad(label, 34)} dairy=${values.dairy} · flock=${values.flock} · agri=${values.agri}`);
+    failures++;
+  }
+}
+
+// ─── result ───────────────────────────────────────────────────────────────────
+console.log('');
+if (failures === 0) {
+  console.log('🎉 All muf checks passed — the three apps are in sync.\n');
+} else {
+  console.log(`⚠️  ${failures} muf drift issue(s) found — fix the ❌ lines above (keep the three apps matched).\n`);
+  process.exitCode = 1;
+}

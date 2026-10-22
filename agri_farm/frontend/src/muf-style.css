@@ -1,0 +1,19 @@
+/* ============================================================
+   muf-style.css — MUF SHARED DESIGN SYSTEM entry point (Malik Usman Farms)
+   The rules live in ./muf/styles/*.css. The @import order below IS the
+   cascade order (same as the old single file) — do not reorder.
+   Keep all three apps' copies of this file and of ./muf/styles/ identical
+   (checked by check-muf-sync).
+   ============================================================ */
+@import './muf/styles/01-core-layout.css';
+@import './muf/styles/02-entity-grid.css';
+@import './muf/styles/03-layout-responsive.css';
+@import './muf/styles/04-popups-mobile-and-size.css';
+@import './muf/styles/05-density-footer-typography.css';
+@import './muf/styles/06-micro-interactions.css';
+@import './muf/styles/07-responsive-repair.css';
+@import './muf/styles/08-canonical-ui.css';
+@import './muf/styles/09-tokens-and-safeguards.css';
+@import './muf/styles/10-popup-content-primitives.css';
+@import './muf/styles/11-dark-popup-repair.css';
+@import './muf/styles/12-shared-controls.css';

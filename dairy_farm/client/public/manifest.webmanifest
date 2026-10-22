@@ -1,0 +1,31 @@
+{
+  "short_name": "Dairy Farm",
+  "name": "Usman Dairy Farm",
+  "description": "Usman Dairy Farm Management System",
+  "icons": [
+    {
+      "src": "/dairy-farm-logo-round-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any"
+    },
+    {
+      "src": "/dairy-farm-logo-round-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any"
+    },
+    {
+      "src": "/dairy-farm-logo-round-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
+    }
+  ],
+  "start_url": "/",
+  "scope": "/",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "any"
+}

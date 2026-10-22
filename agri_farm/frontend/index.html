@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      // Local Vite testing: remove stale PWA shells before React starts.
+      if (location.hostname === 'localhost' || location.hostname === '127.0.0.1' || location.hostname.endsWith('.e2b.app')) {
+        if ('serviceWorker' in navigator) navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister())).catch(() => {});
+        if ('caches' in window) caches.keys().then(keys => keys.filter(k => k.startsWith('agrifarm-')).forEach(k => caches.delete(k))).catch(() => {});
+      }
+    </script>
+
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <title>Usman Agri Farm</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+      /* Custom Scrollbar - Light Mode */
+      ::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f5f9;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+      /* Custom Scrollbar - Dark Mode */
+      .dark ::-webkit-scrollbar-track {
+        background: #0f172a;
+      }
+      .dark ::-webkit-scrollbar-thumb {
+        background: #1e293b;
+        border-radius: 4px;
+      }
+      .dark ::-webkit-scrollbar-thumb:hover {
+        background: #334155;
+      }
+    </style>
+    <!-- Synchronous FOUC theme shield -->
+    <script>
+      (function() {
+        const theme = localStorage.getItem('theme') || 'light';
+        if (theme === 'dark') {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+      })();
+    </script>
+  </head>
+  <body class="text-slate-800 dark:text-slate-100 bg-[#fcfaf2] dark:bg-[#070b13] transition-colors duration-300">
+    <a class="muf-skip-link" href="#main-content">Skip to content</a>
+    <div id="root"></div>
+    <!-- muf-applike splash — removed by hideMufSplash() once the app mounts -->
+    <div id="muf-splash"><img src="/logo-round-192.png" alt="" /><p>Usman Agri Farm</p></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

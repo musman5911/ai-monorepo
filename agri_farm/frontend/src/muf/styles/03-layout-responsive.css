@@ -1,0 +1,714 @@
+/* ============================================================
+   USMAN AGRI FARM - CONSOLIDATED IMAGE 02 LAYOUT & RESPONSIVENESS
+   Replaces the legacy desktop/mobile sidebar with a single responsive top navigation.
+   ============================================================ */
+.muf-layout {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+
+
+.muf-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+  min-width: 0;
+}
+
+.muf-top-nav {
+  position: sticky;
+  top: 78px;
+  z-index: 35;
+  width: 100%;
+  min-height: 58px;
+  padding: 7px clamp(10px, 2.5vw, 32px);
+  background: #faf9f6 !important;
+  border-bottom: 1px solid #e8e5dc !important;
+  box-shadow: 0 4px 15px rgba(34, 65, 42, 0.06);
+  backdrop-filter: blur(14px);
+}
+
+.muf-top-nav-scroll {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  /* Never wrap tabs to a second row — scroll horizontally instead
+     (scrollbar is hidden; swipe/scroll still works on mobile & PC). */
+  flex-wrap: nowrap;
+  overflow-x: visible;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  gap: 6px;
+  padding: 1px 1px 3px;
+}
+.muf-top-nav-scroll::-webkit-scrollbar { display: none; width: 0; height: 0; }
+
+.muf-nav-link {
+  flex: 0 0 auto;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 14px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: transparent;
+  color: #113a1a;
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.muf-nav-link:hover {
+  color: var(--muf-color-primary);
+  background: #bcdbbd;
+  border-color: #a4c9a5;
+  transform: translateY(-1px);
+}
+
+.muf-nav-link.active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--muf-color-primary), var(--muf-color-primary-hover));
+  border-color: var(--muf-color-primary);
+  box-shadow: 0 6px 14px rgba(25, 113, 55, 0.18);
+}
+
+/* ── Per-tab navigation dropdowns ── */
+.muf-nav-item {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.muf-body-frame {
+  display: block !important;
+  min-height: calc(100vh - 136px) !important;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.muf-main-content {
+  width: 100%;
+  min-width: 0;
+  padding: clamp(16px, 2.6vw, 30px) clamp(12px, 3vw, 42px) 38px;
+}
+
+.muf-profile {
+  min-height: 44px;
+  border-radius: 13px;
+  padding: 5px 10px 5px 7px;
+  border: 1px solid #dbe5dc;
+  background: rgba(255, 255, 255, 0.9);
+  color: #1d3f29;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 3px 10px rgba(30, 65, 39, 0.05);
+}
+
+.muf-profile:hover {
+  border-color: #bcd2bf;
+  background: #f4faf4;
+}
+
+.muf-profile span:nth-child(2) {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  line-height: 1.05;
+}
+
+.muf-profile strong {
+  font-size: 12px;
+}
+
+.muf-profile small {
+  font-size: 10px;
+  color: #718077;
+  margin-top: 3px;
+}
+
+/* media query overrides - tablet */
+@media (max-width: 900px) {
+  .muf-header {
+    height: 70px;
+    flex-basis: 70px;
+    padding: 7px 12px;
+  }
+  .muf-header-brand {
+    min-width: 0;
+    gap: 8px;
+  }
+  .muf-brand-logo {
+    width: 46px;
+    height: 46px;
+  }
+  .muf-header-brand h1 {
+    font-size: 16px;
+  }
+  .muf-header-brand p {
+    font-size: 9px;
+  }
+  .muf-header-actions {
+    gap: 5px;
+  }
+  .muf-header-actions .muf-profile {
+    min-width: 0;
+    max-width: 145px;
+    padding-right: 7px;
+  }
+  .muf-profile span:nth-child(2) {
+    display: none;
+  }
+  .muf-profile img {
+    border-radius: 9999px !important;
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .muf-profile .muf-avatar {
+    display: grid;
+  }
+  .muf-top-nav {
+    position: sticky;
+    top: 70px !important;
+    min-height: 52px;
+    padding: 5px 8px;
+  }
+  .muf-nav-link {
+    height: 40px;
+    padding: 0 11px;
+    font-size: 12px;
+  }
+  .muf-body-frame {
+    min-height: calc(100vh - 122px) !important;
+  }
+}
+
+/* media query overrides - mobile */
+
+.muf-header {
+  padding-top: max(8px, env(safe-area-inset-top));
+}
+.muf-top-nav {
+  padding-left: max(8px, env(safe-area-inset-left));
+  padding-right: max(8px, env(safe-area-inset-right));
+}
+.muf-main-content {
+  padding-bottom: max(28px, env(safe-area-inset-bottom));
+}
+
+/* Dark mode overrides */
+.dark .muf-profile,
+.dark .muf-icon-button {
+  background: #0f1d13 !important;
+  border-color: #29402f !important;
+  color: #dcecdf !important;
+}
+
+
+
+
+@media (max-width: 640px) {
+  /* Establish perfect, robust, unified mobile layout & stacking contexts */
+  .muf-header {
+    height: auto !important;
+    min-height: 56px !important;
+    flex-basis: auto !important;
+    padding: 6px 10px !important;
+    padding-top: max(6px, env(safe-area-inset-top)) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 200 !important;
+  }
+  .muf-top-nav {
+    position: relative !important;
+    top: auto !important;
+    z-index: 10 !important;
+    min-height: 52px !important;
+    padding: 6px !important;
+    background: #faf9f6 !important;
+    border-bottom: 1px solid #e8e5dc !important;
+  }
+  .muf-top-nav-scroll {
+    gap: 4px !important;
+  }
+  .muf-nav-link {
+    height: 44px !important;
+    padding: 0 12px !important;
+    gap: 5px !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+  }
+  .muf-header-brand h1 {
+    font-size: 16px !important;
+    font-weight: 900 !important;
+  }
+  .muf-header-brand p {
+    display: none !important;
+  }
+  /* Theme, Admin & Signout buttons */
+  .muf-header-actions .muf-icon-button,
+  .muf-header-actions .muf-profile,
+  .muf-header-actions .muf-logout {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    border-width: 1px !important;
+    border-style: solid !important;
+    box-sizing: border-box !important;
+    flex: 0 0 44px !important;
+  }
+
+  /* Icons inside the buttons */
+  .muf-header-actions .muf-icon-button svg,
+  .muf-header-actions .muf-profile svg,
+  .muf-header-actions .muf-logout svg {
+    width: 15px !important;
+    height: 15px !important;
+    min-width: 15px !important;
+    min-height: 15px !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Admin: show only the user icon on mobile */
+
+  .muf-profile img {
+    border-radius: 9999px !important;
+    object-fit: cover !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+
+  .muf-profile .muf-avatar {
+    width: 100% !important;
+    height: 100% !important;
+    margin: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    border-radius: 9999px !important; overflow: hidden !important;
+  }
+
+  /* Space between the header buttons */
+  .muf-header-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+  }
+
+  .muf-main-content {
+    padding: 10px 8px 24px !important;
+    overflow-x: visible !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .muf-lower-grid {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+  }
+  .muf-panel {
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .overflow-x-auto {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    display: block !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  .muf-panel, .muf-kpi-card, .muf-crop-card, .muf-lower-grid {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Page hero stacks vertically on phones (title over action button) */
+  .muf-page-hero {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  /* ── MOBILE-SPECIFIC SCALE: readable type, tappable cards & forms ── */
+  /* 1. Global typography — keep at least 14px so iOS does not zoom on focus */
+  body, .muf-app, .muf-main-content {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+  }
+  
+  /* 2. Page titles & headers */
+  .muf-page-title h2 {
+    font-size: 20px !important;
+    letter-spacing: -0.02em !important;
+  }
+  .muf-page-title p {
+    font-size: 13px !important;
+    margin-top: 2px !important;
+  }
+  .muf-title-icon {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 10px !important;
+  }
+  .muf-title-icon svg {
+    width: 20px !important;
+    height: 20px !important;
+  }
+  
+  /* 3. Panel Headings */
+  .muf-panel-heading {
+    padding: 10px 12px !important;
+  }
+  .muf-panel-heading h3 {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+  }
+  .muf-panel-heading h3 svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .muf-panel-heading p {
+    font-size: 12px !important;
+  }
+
+  /* 4. KPI Cards */
+  .muf-kpi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .muf-kpi-card {
+    min-height: 72px !important;
+    padding: 10px !important;
+    border-radius: 12px !important;
+    gap: 8px !important;
+  }
+  .muf-kpi-icon {
+    width: 32px !important;
+    height: 32px !important;
+    flex: 0 0 32px !important;
+    border-radius: 9999px !important; overflow: hidden !important;
+  }
+  .muf-kpi-icon svg {
+    width: 15px !important;
+    height: 15px !important;
+  }
+  .muf-kpi-card small {
+    font-size: 11px !important;
+    margin-bottom: 2px !important;
+  }
+  .muf-kpi-card strong {
+    font-size: 16px !important;
+  }
+  .muf-kpi-card strong em {
+    font-size: 12px !important;
+  }
+  .muf-kpi-card p {
+    font-size: 11px !important;
+    margin-top: 2px !important;
+  }
+
+  /* 5. Crop cards and grids */
+  .muf-crop-grid {
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    padding: 10px !important;
+  }
+  .muf-crop-card {
+    border-radius: 12px !important;
+  }
+  .muf-crop-photo {
+    height: 96px !important;
+  }
+  .muf-crop-card-body {
+    padding: 15px 10px 10px !important;
+  }
+  .muf-crop-name h4 {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+  }
+  .muf-crop-name p {
+    font-size: 12px !important;
+  }
+  .muf-season {
+    font-size: 11px !important;
+  }
+  .muf-crop-stats {
+    margin: 8px 0 !important;
+    gap: 4px !important;
+    font-size: 12px !important;
+  }
+  .muf-crop-stats svg {
+    width: 11px !important;
+    height: 11px !important;
+  }
+  .muf-progress {
+    margin-top: 4px !important;
+  }
+  .muf-progress-track {
+    height: 5px !important;
+  }
+  .muf-progress > div:first-child {
+    font-size: 11px !important;
+  }
+  .muf-crop-actions {
+    margin-top: 8px !important;
+    gap: 6px !important;
+  }
+  .muf-detail-btn, .muf-record-btn, .muf-mini-icon {
+    min-height: 44px !important;
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    gap: 4px !important;
+  }
+  .muf-detail-btn svg, .muf-record-btn svg, .muf-mini-icon svg {
+    width: 14px !important;
+    height: 14px !important;
+  }
+  .muf-mini-icon {
+    width: 44px !important;
+  }
+
+  /* 6. Form Fields & Action buttons on mobile */
+  input, select, textarea {
+    font-size: 16px !important;
+    padding: 10px 12px !important;
+    border-radius: 8px !important;
+    min-height: 44px !important;
+    box-sizing: border-box !important;
+  }
+  .muf-primary-action {
+    min-height: 44px !important;
+    padding: 0 14px !important;
+    font-size: 13px !important;
+    border-radius: 9999px !important; overflow: hidden !important;
+    width: auto !important;
+    margin-left: auto;
+  }
+  .muf-primary-action svg {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
+  /* 7. Popups & Modals on mobile */
+  /* Target the Modal container elements */
+  .relative.w-full.max-w-2xl, .relative.w-full.max-w-lg, .relative.w-full.max-w-md {
+    max-height: 90vh !important;
+    border-radius: 16px !important;
+  }
+  .relative.w-full.max-w-2xl > div:first-child, .relative.w-full.max-w-lg > div:first-child {
+    padding: 12px 16px !important;
+  }
+  .relative.w-full.max-w-2xl > div:first-child h3, .relative.w-full.max-w-lg > div:first-child h3 {
+    font-size: 14px !important;
+  }
+  .relative.w-full.max-w-2xl > div:first-child p, .relative.w-full.max-w-lg > div:first-child p {
+    font-size: 9px !important;
+  }
+  
+  /* Scrollable modal content area inside popups */
+  .flex-1.overflow-y-auto {
+    padding: 12px 16px !important;
+  }
+  .space-y-6 > div.p-5, .space-y-4 > div.p-5 {
+    padding: 12px !important;
+    border-radius: 12px !important;
+    margin: 0 !important;
+  }
+  
+  /* Lists inside Modals */
+  .divide-y > div {
+    padding: 10px !important;
+  }
+  .divide-y p {
+    font-size: 11px !important;
+  }
+  .divide-y span {
+    font-size: 8px !important;
+  }
+
+  /* 8. Lower grid spacing on mobile */
+  .muf-lower-grid {
+    gap: 10px !important;
+    margin-top: 10px !important;
+  }
+
+  /* 9. Header icons — keep 44px tap targets (do not shrink later) */
+  .muf-icon-button {
+    width: 44px !important;
+    height: 44px !important;
+    border-radius: 12px !important;
+  }
+  .muf-icon-button svg {
+    width: 18px !important;
+    height: 18px !important;
+  }
+  .muf-brand-logo {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  /* 10. Forms / select inputs label scaling */
+  label {
+    font-size: 12px !important;
+    margin-bottom: 3px !important;
+  }
+
+  /* 12. Wide data tables: pin the first column so the row label stays visible
+     while scrolling sideways. Solid backgrounds cover content scrolling under. */
+  .muf-main-content .overflow-x-auto { position: relative; }
+  .muf-main-content .overflow-x-auto table thead th:first-child,
+  .muf-main-content .overflow-x-auto table tbody td:first-child {
+    position: sticky !important;
+    left: 0;
+    z-index: 2;
+    background-color: #fffefb;
+    box-shadow: inset -1px 0 0 0 rgba(0,0,0,0.06);
+  }
+  .muf-main-content .overflow-x-auto table thead th:first-child {
+    z-index: 3;
+    background-color: #f0f4ed;
+  }
+  .muf-main-content .overflow-x-auto table tbody tr:hover td:first-child {
+    background-color: #eef2ed;
+  }
+  .dark .muf-main-content .overflow-x-auto table thead th:first-child { background-color: #14251a; }
+  .dark .muf-main-content .overflow-x-auto table tbody td:first-child { background-color: #0d1a11; }
+  .dark .muf-main-content .overflow-x-auto table tbody tr:hover td:first-child { background-color: #14251a; }
+}
+
+/* Entry form sheets: always centered, compact on phones */
+.muf-form-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(2px);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.muf-form-sheet {
+  position: relative;
+  width: 100%;
+  max-width: 32rem;
+  max-height: min(82dvh, 640px);
+  overflow-y: auto;
+  margin: auto;
+  flex-shrink: 0;
+}
+.muf-popup-stage {
+  align-items: center !important;
+  justify-content: center !important;
+  padding: max(12px, env(safe-area-inset-top)) max(12px, env(safe-area-inset-right)) max(12px, env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left)) !important;
+}
+
+
+
+
+@media (max-width: 640px) {
+  .muf-header {
+    min-height: 48px !important;
+    padding: 4px 8px !important;
+    padding-top: max(4px, env(safe-area-inset-top)) !important;
+  }
+  .muf-header-brand h1 {
+    font-size: 14px !important;
+  }
+  .muf-header-actions {
+    gap: 4px !important;
+  }
+  .muf-header-actions .muf-icon-button,
+  .muf-header-actions .muf-profile,
+  .muf-header-actions .muf-logout,
+  .muf-icon-button {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+    min-height: 30px !important;
+    padding: 0 !important;
+    border-radius: 8px !important;
+    flex: 0 0 30px !important;
+  }
+  .muf-header-actions .muf-icon-button svg,
+  .muf-header-actions .muf-profile svg,
+  .muf-header-actions .muf-logout svg,
+  .muf-icon-button svg {
+    width: 13px !important;
+    height: 13px !important;
+    min-width: 13px !important;
+    min-height: 13px !important;
+  }
+  .muf-notif-badge {
+    top: -4px;
+    right: -4px;
+    min-width: 13px;
+    height: 13px;
+    font-size: 8px;
+  }
+  .muf-top-nav {
+    min-height: 36px !important;
+    padding: 3px 6px !important;
+  }
+  .muf-nav-link {
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 8px !important;
+    gap: 4px !important;
+    border-radius: 7px !important;
+    font-size: 11px !important;
+  }
+  .muf-nav-link svg {
+    width: 12px !important;
+    height: 12px !important;
+  }
+  .muf-form-overlay {
+    padding: 10px !important;
+  }
+  .muf-form-sheet {
+    max-width: calc(100vw - 20px) !important;
+    max-height: min(72dvh, 520px) !important;
+    padding: 12px 12px 10px !important;
+    border-radius: 14px !important;
+  }
+  .muf-form-sheet > button {
+    top: 8px !important;
+    right: 8px !important;
+  }
+  .muf-form-sheet > h3 {
+    font-size: 14px !important;
+    margin-bottom: 10px !important;
+    padding-right: 28px;
+  }
+  .muf-form-sheet form.space-y-4 {
+    gap: 0;
+  }
+  .muf-form-sheet form.space-y-4 > * + * {
+    margin-top: 0.65rem !important;
+  }
+}
+
