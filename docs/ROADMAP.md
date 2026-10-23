@@ -1,6 +1,6 @@
 # Roadmap
 
-Last reviewed: 2026-10-23. CI is manual-only and should run at deliberate testing checkpoints, not on every commit. Owner-reported local checks before the latest Dashboard change: all three frontend builds, farm-scope checks, MUF sync checks, UI safety checks, 89 unit tests and 8 workbench runtime checks passed. The latest Phase 2 batch-first navigation, inventory-lock and backup changes have not yet been built or tested. Per owner direction, browser and end-to-end role testing will be consolidated into one final verification pass after all planned phases. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-23. CI is manual-only and should run at deliberate testing checkpoints, not on every commit. Latest owner-reported local checks: farm-scope, MUF sync, UI safety and workbench source checks passed; Dairy frontend build passed; root suite reported 134 passed and one timeout in the real-Mongoose query-contract test (no assertion failure reported). The test timeout was raised from 5 to 20 seconds in commit dc01ba84baa13f946a9dd940b85b5ff2f5f00ec9; rerun is pending. Per owner direction, browser and end-to-end role testing will be consolidated into one final verification pass after all planned phases. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
@@ -21,8 +21,8 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 | 0 | Docs reset and repository cleanup | Repository | Low (done, see PROGRESS) |
 | 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Implementation done; copy-migration checks and final integrated browser pass pending |
 | 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | Implementation checkpoint delivered: batch-first panels, source-batch egg allocation validation, batch-linked labor, cross-process inventory locking, and complete batch backup fields. Local tests/builds and disposable-copy backup/restore verification are pending before phase sign-off |
-| 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | Medium |
-| 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | Medium to high |
+| 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | In progress: opt-in Dairy cows/milk pagination API done; incremental UI loading and bulk entry remain |
+| 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | In progress: optional cow lineage fields and ear-tag index added; workflows and disposable-MongoDB index verification remain |
 | 5 | Photo storage adapter and Cloudinary | All three | Medium |
 | 6 | Super Admin upgrade (Owner-only, per-farm summaries) | All three | Low to medium |
 | 7 | MU Farms shop | Parent | Medium |
@@ -60,6 +60,13 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 - **CI passed:** GitHub Actions run [39906778407](https://github.com/musman5911/ai-monorepo/actions/runs/39906778407) completed successfully on commit `d63d719`; root tests, farm scope, MUF parity, UI safety, workbench checks/runtime, design audit and all three app builds passed. `tests/flock-batch-math.test.ts` was included in the passing root test run. Still required: inspect backup/restore compatibility and fix any failures. No migration has been run; new collections are additive, but copy-based backup/restore validation is still required.
 - Browser and end-to-end role verification are deferred to the final pass after all phases, per owner direction.
 - Done when: Batches is the clear primary workflow, Home Birds exposes only the approved features, relevant automated checks pass, and any required copy-based migration/backup checks pass.
+
+### Latest verification checkpoint (2026-10-23)
+
+- The owner-reported Dairy production build completed successfully. The mixed static/dynamic import warning for `api.ts` is advisory, not a build failure.
+- Root tests reported 134 passed and one timeout in `tests/muf-farms.test.ts` while loading the installed Mongoose package. The test's assertions did not report a failure. A targeted 20-second timeout was committed; rerun the suite before treating it as verified.
+- Farm scope, shared MUF parity, UI safety, and workbench source checks passed locally.
+- Do not run a production migration or index build to verify Phase 4. Use a disposable database copy and first check for duplicate non-empty ear tags within each farm.
 
 ### Phase 3: Bulk entry, scroll loading, server totals
 
