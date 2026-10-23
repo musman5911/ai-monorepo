@@ -125,3 +125,8 @@ Daily labor attendance can now be assigned to a batch, displays that assignment 
 ### Phase 2 implementation update (2026-10-23): available egg supply in incubation
 
 Batch summary now includes net eggs after sales, home use and waste. Incubation shows net supply, linked allocations and estimated unallocated eggs by batch, including the current record's allocation when editing. Validator tests and a batch-math assertion were added, but tests/builds remain unrun. Remaining stock-integrity work includes preventing races between an incubation save and egg-log deletion with transaction or serialization support, plus integration coverage. This environment has no GitHub Actions workflow-dispatch action, so CI cannot be started directly here; keep the workflow manual-only and run it at the deliberate Phase 2 checkpoint.
+
+
+### Phase 2 implementation update (2026-10-23): destructive batch replacement guards
+
+Batch import-all and wipe-all now return HTTP 409 if incubation or labor attendance records reference a batch, preventing those bulk operations from silently orphaning history. A new batch-math test covers net egg availability after sales, home use and waste. These tests and builds remain unrun; the GitHub Actions connector cannot dispatch the manual workflow. Still open: race protection between allocation writes and egg-log deletion, concurrency/integration coverage, and coordinated full backup restore when linked history exists.
