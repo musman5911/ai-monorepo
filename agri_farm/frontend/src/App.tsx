@@ -817,11 +817,12 @@ function App() {
       // Compatibility fallback for older servers without pagination headers.
       // A short page proves completion; a full page means another request is needed.
       let skip = all.length;
-      while (Array.isArray(first.data) && first.data.length === pageSize) {
+      let previousPageSize = Array.isArray(first.data) ? first.data.length : 0;
+      while (previousPageSize === pageSize) {
         const res = await fetchFn(skip, pageSize);
         if (!Array.isArray(res.data)) throw new Error('Paginated API returned a non-array payload.');
         all.push(...res.data);
-        if (res.data.length < pageSize) break;
+        previousPageSize = res.data.length;
         skip += res.data.length;
       }
       return all;
