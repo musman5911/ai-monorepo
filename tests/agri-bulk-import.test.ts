@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseCsvRows, previewCsvImport, validateCropImport } from "../agri_farm/frontend/src/components/app/agriBulkImport";
+import { parseCsvRows, parseXlsxRows, previewCsvImport, rowsToCsv, validateCropImport } from "../agri_farm/frontend/src/components/app/agriBulkImport";
 
 describe("Agri CSV bulk import parsing", () => {
   it("parses quoted commas, escaped quotes, and line breaks inside quoted fields", () => {
@@ -49,7 +49,6 @@ describe("Agri CSV bulk import parsing", () => {
   });
   
   it("round-trips CSV-special characters and rejects oversized row counts", () => {
-    const { rowsToCsv } = require("../agri_farm/frontend/src/components/app/agriBulkImport");
     const source = [["name", "notes"], ["Wheat", 'North, east says "grow"'], ["Corn", "line one\nline two"]];
     expect(parseCsvRows(rowsToCsv(source))).toEqual(source);
     const thousandRows = ["name", ...Array.from({ length: 1000 }, (_, i) => `Crop ${i}`)].join("\n");
@@ -57,7 +56,6 @@ describe("Agri CSV bulk import parsing", () => {
   });
 
   it("rejects a non-ZIP workbook before attempting XML or decompression", async () => {
-    const { parseXlsxRows } = await import("../agri_farm/frontend/src/components/app/agriBulkImport");
     await expect(parseXlsxRows(new TextEncoder().encode("not an xlsx file").buffer)).rejects.toThrow(/not a valid XLSX/i);
   });
 
