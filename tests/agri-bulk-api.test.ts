@@ -9,7 +9,7 @@ const read = (file: string) => readFileSync(path.join(root, file), "utf8");
 describe("Agri task and finance bulk-import API contracts", () => {
   it("validates task rows and enforces the 200-row limit before insertMany", () => {
     const source = read("agri_farm/backend/routes/tasks.js");
-    const bulk = source.slice(source.indexOf("router.post('/bulk'"), source.indexOf("// Keep only valid, existing laborer ids"));
+    const bulk = source.slice(source.indexOf("router.post('/tasks/bulk'"), source.indexOf("// Keep only valid, existing laborer ids"));
     expect(bulk).toContain("rows.length > 200");
     expect(bulk).toContain("if (errors.length) return res.status(400)");
     expect(bulk.indexOf("if (errors.length) return res.status(400)")).toBeLessThan(bulk.indexOf("Task.insertMany(prepared)"));
@@ -21,7 +21,7 @@ describe("Agri task and finance bulk-import API contracts", () => {
 
   it("validates finance rows and restricts imported fields before insertMany", () => {
     const source = read("agri_farm/backend/routes/finance.js");
-    const bulk = source.slice(source.indexOf("router.post('/bulk'"), source.indexOf("router.post('/finance'"));
+    const bulk = source.slice(source.indexOf("router.post('/bulk'"), source.indexOf("router.post('/finance/bulk'"));
     expect(bulk).toContain("rows.length > 200");
     expect(bulk).toContain("if (errors.length) return res.status(400)");
     expect(bulk.indexOf("if (errors.length) return res.status(400)")).toBeLessThan(bulk.indexOf("Finance.insertMany(prepared)"));
@@ -49,7 +49,7 @@ describe("Agri task and finance bulk-import API contracts", () => {
     expect(ui).toContain("setPreview({ ...parsed, errors }");
     expect(api).toContain("api.post('/tasks/bulk', { rows })");
     expect(api).toContain("api.post('/finance/bulk', { rows })");
-    expect(app).toContain("api.addTasksBulk(normalized)");
-    expect(app).toContain("api.addFinanceBulk(normalized)");
+    expect(app).toContain("api.addTasksBulk(chunk)");
+    expect(app).toContain("api.addFinanceBulk(chunk)");
   });
 });
