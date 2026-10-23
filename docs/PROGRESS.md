@@ -39,6 +39,18 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 
 - **Flock step 1B-2 implementation:** approved after a read-only audit of the existing layout. Legacy `DataStore` uses globally keyed documents whose values contain arrays/objects; Flock also has `Batch`, five batch-log collections, and `Image`. Preserve existing records and response shapes while adding server-enforced farm scope. No Flock code has been changed yet.
 
+## Phase 1 step 1B-2: Flock backend (in progress, 2026-10-23)
+
+Commits are on `muf-monorepo`; no production data was accessed or migrated.
+
+- Added `Farm`; added optional `farmId` paths to `DataStore`, `Batch`, all five batch-log models and `Image`. `DataStore` now has a compound unique index on `farmId + key`; the migration removes the old globally-unique `key_1` index only after tagging existing records.
+- Wired the byte-identical shared `muf-farms.mjs` into Flock authentication and database setup. Farm access comes from the authenticated user's assignments and `X-Farm-Id`; model queries are scoped server-side. The client cannot choose a record's `farmId`.
+- Added `/api/farms`, a Flock migration script, `migrate:farms:dry` and `migrate:farms` backend scripts. Demo memory data migrates at startup; real MongoDB data is not migrated at startup.
+- Updated bucket permissions to use farm roles, preserved the legacy `role` response, assigned new workers to the selected farm, kept password recovery/backup emails working for migrated owners, and added Flock checks to `tools/check-farm-scope.js`.
+- Backup payload work now records the farms and per-farm bucket values, keeps the older `buckets` field for compatibility, includes the labor buckets, and restricts backup/restore to owners. Telegram system jobs explicitly use the default farm when outside a request.
+
+**Not verified yet:** no local Node test/build could run in this session; the container could not reach GitHub to clone the branch. The new Flock HTTP checks have been added but not executed. No real MongoDB copy was available, so neither migration dry-run nor apply was tested against MongoDB. The new backup format/restore path, image access behavior, first-time setup after signup, and manager permissions still require automated and browser validation. Do not apply the migration to live data. First take a fresh backup, test on a database copy, and confirm the results.
+
 ## Phase 1 step 1B-1: Agri backend (built 2026-10-23)
 
 Design record: [PHASE1_PLAN.md](PHASE1_PLAN.md). Backend only; no screens changed.
