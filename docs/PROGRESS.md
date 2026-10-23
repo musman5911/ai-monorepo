@@ -6,8 +6,9 @@ Last updated: 2026-10-23 (Agri task and finance bulk-import code committed; loca
 
 - Added admin-only `POST /api/tasks/bulk` and `POST /api/finance/bulk` endpoints. Each validates the full payload before the first insert, caps each request at 200 rows, returns row-specific validation errors, and uses farm-scoped models. Task imports normalize status to Pending and resolve assigned laborer IDs server-side; finance imports allow only category, amount, type, date, crop link and notes.
 - Added preview-first CSV/XLSX import UI for tasks and finance. Files are capped at 5 MB and 1,000 data rows. The UI validates supported headers and values, previews the first 20 rows, and requires confirmation. Valid rows are submitted in sequential chunks of at most 200; failed chunks are reported and are not retried automatically.
-- Added source-contract tests for row bounds, validate-before-write ordering, finance field allowlisting and UI wiring. Extended the memory-mode HTTP farm-scope checker to verify invalid bulk task payload rejection and that task/finance bulk rows written in farm B are not visible in farm A. Tests/builds have not been run in this editing session.
-- Commits: `6c89fcd`, `18c190f`, `f441ccf`, `a14c106`, `0a679b4`, `0bd82f0`, `ba75d04`.
+- Added source-contract tests for row bounds, validate-before-write ordering, finance field allowlisting and UI wiring. Extended the memory-mode HTTP farm-scope checker to verify invalid bulk task payload rejection and that task/finance bulk rows written in farm B are not visible in farm A.
+- Hardened XLSX import to resolve the first worksheet through the workbook's declared relationship rather than sorting worksheet filenames. Added guards for 5 MB input, archive entry count, decompressed entry size and worksheet path validation. Source-contract tests cover these safeguards; no local tests/builds have been run in this editing session.
+- Commits: `6c89fcd`, `18c190f`, `f441ccf`, `a14c106`, `0a679b4`, `0bd82f0`, `ba75d04`, `ab3095e`, `7e66680`, `ff737f3`, `abec802`.
 - Remaining major Phase 3 blocker: true network-level Agri on-demand pagination without changing dashboard/report totals. Large API fixtures, farm-isolation coverage for imports, browser review and consolidated verification remain open.
 
 
