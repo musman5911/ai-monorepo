@@ -11,6 +11,7 @@ import BatchWeightLog from '../models/BatchWeightLog.js';
 import BatchEggLog from '../models/BatchEggLog.js';
 import BatchVaccinationLog from '../models/BatchVaccinationLog.js';
 import { MUF_ENV } from '../muf-env.mjs';
+import { calculateBatchSummary, validateBatchEggLog } from '../batch-math.mjs';
 
 const router = express.Router();
 
@@ -55,44 +56,15 @@ async function computeBatchSummary(batchId) {
   ]);
   if (!batch) return null;
 
-  const intake_cost = (batch.intake_count || 0) * (batch.cost_per_bird || 0);
-  const total_feed_cost = feedLogs.reduce((sum, log) => sum + (log.quantity_kg || 0) * (log.rate_rs_per_kg || 0), 0);
-  const logged_expense_cost = expenseLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
-  const total_vaccination_cost = vaccinationLogs.reduce((sum, log) => sum + (log.cost || 0), 0);
-  const total_expense_cost = logged_expense_cost + total_vaccination_cost;
-  const total_eggs_collected = eggLogs.reduce((sum, log) => sum + (log.collected || 0), 0);
-  const total_eggs_sold = eggLogs.reduce((sum, log) => sum + (log.sold || 0), 0);
-  const total_egg_income = eggLogs.reduce((sum, log) => sum + (log.sold || 0) * (log.price_per_egg || 0), 0);
-  const total_mortality_count = mortalityLogs.reduce((sum, log) => sum + (log.count || 0), 0);
-  const total_sold_count = salesLogs.reduce((sum, log) => sum + (log.count || 0), 0);
-  const total_revenue = salesLogs.reduce((sum, log) => sum + (log.amount || 0), 0) + total_egg_income;
-  const total_cost = intake_cost + total_feed_cost + total_expense_cost;
-  const live_count = Math.max(0, (batch.intake_count || 0) - total_mortality_count - total_sold_count);
-  const profit_loss = total_revenue - total_cost;
-  const mortality_pct = batch.intake_count > 0 ? (total_mortality_count / batch.intake_count) * 100 : 0;
-  const cost_per_bird = live_count > 0
-    ? total_cost / live_count
-    : batch.intake_count > 0
-      ? total_cost / batch.intake_count
-      : 0;
-
-  return {
-    intake_cost,
-    total_feed_cost,
-    total_expense_cost,
-    total_vaccination_cost,
-    total_eggs_collected,
-    total_eggs_sold,
-    total_egg_income,
-    total_mortality_count,
-    total_sold_count,
-    total_revenue,
-    total_cost,
-    live_count,
-    profit_loss,
-    mortality_pct,
-    cost_per_bird,
-  };
+  return calculateBatchSummary({
+    batch,
+    feedLogs,
+    mortalityLogs,
+    expenseLogs,
+    salesLogs,
+    eggLogs,
+    vaccinationLogs,
+  });
 }
 
 async function syncBatchStatus(batch) {
@@ -454,14 +426,8 @@ router.post('/batches/:batchId/egg-logs', authRequired, async (req, res) => {
     const broken_wasted = Number(req.body?.broken_wasted || 0);
     const price_per_egg = Number(req.body?.price_per_egg || 0);
     const notes = cleanText(req.body?.notes);
-    if (!date) return res.status(400).json({ error: 'date is required' });
-    if (![collected, sold, home_use, broken_wasted, price_per_egg].every(Number.isFinite) ||
-        [collected, sold, home_use, broken_wasted, price_per_egg].some((value) => value < 0)) {
-      return res.status(400).json({ error: 'Egg counts and price must be 0 or greater' });
-    }
-    if (sold + home_use + broken_wasted > collected) {
-      return res.status(400).json({ error: 'Sold, home-use and broken eggs cannot exceed collected eggs' });
-    }
+    const validationError = validateBatchEggLog({ date, collected, sold, home_use, broken_wasted, price_per_egg });
+    if (validationError) return res.status(400).json({ error: validationError });
 
     const log = await BatchEggLog.create({
       batch_id: batch.batch_id, farmId: batch.farmId, date, collected, sold, home_use, broken_wasted, price_per_egg, notes,
