@@ -66,6 +66,13 @@ describe('Phase 3 bounded Dairy milk bulk-entry contract', () => {
     expect(source).toContain('forceOverwrite');
   });
 
+  it('supports reading paginated milk response metadata in the Dairy client API', () => {
+    const source = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
+    expect(source).toContain('includeMeta?: boolean');
+    expect(source).toContain('getMilkPage:');
+    expect(source).toContain("res.headers.get('X-Total-Count'");
+  });
+
   it('exposes the bounded bulk endpoint in the Dairy client API', () => {
     const source = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
     expect(source).toContain("req('/milk/bulk'");
