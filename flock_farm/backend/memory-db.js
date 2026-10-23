@@ -218,6 +218,11 @@ export function makeMemoryModel(name, schema) {
       if (timestamps) doc.updatedAt = new Date();
       return doc;
     },
+    async findOneAndDelete(filter = {}) {
+      const doc = store.find((d) => matches(d, filter));
+      if (doc) await doc.deleteOne();
+      return doc || null;
+    },
     async findByIdAndDelete(id) {
       const doc = store.find((d) => eq(d._id, id));
       if (doc) await doc.deleteOne();
