@@ -190,6 +190,15 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(app).toContain('buildMonthlyComparisonRows(finance, crops');
   });
 
+  it('uses Agri server-reported totals and removes the hard 10,000-row stop', () => {
+    const app = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/App.tsx'), 'utf8');
+    expect(app).toContain("first.headers?.['x-total-count']");
+    expect(app).toContain('const pageSize = 500');
+    expect(app).toContain('Math.ceil(total / pageSize)');
+    expect(app).not.toContain('all.length >= 10000');
+    expect(app).toContain('Paginated API returned');
+  });
+
   it('pages a stable 1,250-row fixture without duplicates or missing rows', () => {
     const rows = Array.from({ length: 1250 }, (_, index) => ({ id: index + 1 }));
     const pageSize = 100;
