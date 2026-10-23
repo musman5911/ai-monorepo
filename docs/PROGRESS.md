@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Phase 1C frontend implementation started on `muf-monorepo`; automated validation and owner testing pending).
+Last updated: 2026-10-23 (owner-reported checks received; fixed unused switcher import pushed, clean rebuild pending).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
@@ -209,3 +209,22 @@ After each change: move the phase to done with the date, record real check resul
 - Added a three-app byte-identity check for the shared switcher.
 - **Not verified:** builds, automated checks, backend behavior, visual/browser behavior and migration-on-copy tests. These require the owner's local checkout. Live/browser testing remains deferred until the end.
 - **Permission caveat:** legacy `admin` role checks still need review; this UI does not replace server-side authorization.
+
+
+### Phase 1C owner validation (2026-10-23; Windows output supplied by owner)
+
+| Check | Result |
+|---|---|
+| `npm run check-farms` | Passed for Agri, Flock and Dairy |
+| `npm run check-sync` | Passed, including byte-identical switcher check |
+| `npm run check-ui` | Passed |
+| `npm test` | 84 passed across 8 files; real Mongoose query test skipped conditionally because Dairy backend packages may be absent |
+| `npm run check-workbench` | 23 source checks passed; does not replace browser testing |
+| `tools\\build-all.bat` | Flock and Agri built. Dairy TypeScript check failed because `RefreshCw` was unused; script then built Dairy with Vite only, skipping type checking |
+| `git diff --check` | Passed |
+| Root `npm install` | Completed; reported 5 vulnerabilities (1 moderate, 2 high, 2 critical) |
+| Real MongoDB copy migration / browser review | Not run |
+
+The unused `RefreshCw` import was removed from all three identical switcher copies and pushed to `muf-monorepo`. Re-run the full builds to verify the fix. Do not call Phase 1C complete until TypeScript builds pass, endpoint/permission behavior is reviewed, and migration dry-runs are tested on database copies.
+
+The existing local change to `flock_farm/backend/package-lock.json` is owner-local and not part of the pushed implementation. Review its diff separately; do not discard it or commit it automatically.
