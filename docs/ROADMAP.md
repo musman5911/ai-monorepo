@@ -176,3 +176,12 @@ The owner's latest local run found one failing root test and a Flock farm-scope 
 - CI is manually triggered at the deliberate checkpoint, and the exact commit and actual result are recorded.
 
 For every following implementation step, update both this roadmap and `PROGRESS.md`, add/extend automated regression tests, and record reproducible Windows CMD commands. Phase 3 should include automated tests for bulk request validation, farm isolation in bulk reads/writes, pagination/filter correctness, server-side totals, and a 1,000-row save/performance fixture before its UI is considered done.
+
+
+## Latest local verification update (2026-10-23)
+
+The owner reports root unit tests passing (**115/115**), MUF sync/UI/workbench checks passing, and the Flock client production build passing. The farm-scope script passed Agri and Dairy but received Flock's intentional startup 503 at login: its HTTP health route can respond before asynchronous database initialization and farm migration finish.
+
+The harness has been updated to retry only that exact startup response for up to 30 seconds; role checks remain strict and other failures remain visible. Commit: `9a3eeb5`. This change is awaiting the owner's local rerun.
+
+**Phase 2 is still open.** After the farm-scope check passes, remaining sign-off gates are real-MongoDB inventory-lock concurrency and repeatable backup/restore compatibility tests on disposable data. The Vite chunk-size warning is a performance follow-up, not the cause of the farm-scope failure.
