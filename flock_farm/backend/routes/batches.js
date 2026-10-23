@@ -478,6 +478,65 @@ router.post('/batches/:batchId/egg-logs', authRequired, async (req, res) => {
   }
 });
 
+router.post('/batches/:batchId/egg-logs/bulk', authRequired, async (req, res) => {
+  let releaseInventoryLock;
+  try {
+    const rows = req.body?.entries;
+    if (!Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'entries must be a non-empty array' });
+    if (rows.length > 200) return res.status(413).json({ error: 'bulk request is limited to 200 entries' });
+
+    const batch = await getBatchByCode(req.params.batchId);
+    if (!batch) return res.status(404).json({ error: 'Batch not found' });
+    if (!ensureBatchOpen(batch, res)) return;
+
+    const normalized = [];
+    const errors = [];
+    const dates = new Set();
+    rows.forEach((row, index) => {
+      if (!row || typeof row !== 'object' || Array.isArray(row)) {
+        errors.push(`row ${index + 1}: entry must be an object`);
+        return;
+      }
+      const date = cleanText(row.date);
+      const collected = Number(row.collected);
+      const sold = Number(row.sold || 0);
+      const home_use = Number(row.home_use || 0);
+      const broken_wasted = Number(row.broken_wasted || 0);
+      const price_per_egg = Number(row.price_per_egg || 0);
+      const validationError = validateBatchEggLog({ date, collected, sold, home_use, broken_wasted, price_per_egg });
+      if (validationError) errors.push(`row ${index + 1}: ${validationError}`);
+      if (dates.has(date)) errors.push(`row ${index + 1}: duplicate date in this batch`);
+      dates.add(date);
+      normalized.push({ index, date, collected, sold, home_use, broken_wasted, price_per_egg, notes: cleanText(row.notes) });
+    });
+    if (errors.length) return res.status(400).json({ error: errors.join('; '), errors });
+
+    releaseInventoryLock = await acquireEggInventoryLock(DataStore);
+    const results = [];
+    for (const row of normalized) {
+      try {
+        const log = await BatchEggLog.create({
+          batch_id: batch.batch_id, farmId: batch.farmId, date: row.date,
+          collected: row.collected, sold: row.sold, home_use: row.home_use,
+          broken_wasted: row.broken_wasted, price_per_egg: row.price_per_egg, notes: row.notes,
+        });
+        results.push({ index: row.index, ok: true, log });
+      } catch {
+        results.push({ index: row.index, ok: false, error: 'Could not save this egg row' });
+      }
+    }
+    const saved = results.filter((row) => row.ok).length;
+    const failed = results.length - saved;
+    res.status(failed ? 207 : 200).json({ saved, failed, results, summary: await computeBatchSummary(batch.batch_id) });
+  } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
+    console.error('POST batch bulk egg logs error:', err);
+    res.status(500).json({ error: 'Failed to create batch egg logs' });
+  } finally {
+    if (releaseInventoryLock) { try { await releaseInventoryLock(); } catch (e) { console.error('Failed to release egg inventory lock:', e); } }
+  }
+});
+
 router.post('/batches/:batchId/vaccination-logs', authRequired, async (req, res) => {
   try {
     const batch = await getBatchByCode(req.params.batchId);
