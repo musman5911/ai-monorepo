@@ -9,6 +9,7 @@ import {
   readNonNegativeNumber,
   sendValidationError,
   parsePagination,
+  parsePagePagination,
   applyPagination,
 } from './input.js';
 
@@ -48,8 +49,23 @@ router.get('/', protect, async (req, res) => {
       const endDate = `${y}-${String(m).padStart(2, '0')}-${endDay}`;
       filter.date = { $gte: startDate, $lte: endDate };
     }
+    const page = parsePagePagination(req.query);
+    if (page.enabled) {
+      if (page.error) return res.status(400).json({ error: page.error });
+      // Keep the legacy array response. Paging metadata is carried in headers
+      // so existing clients continue to work unchanged.
+      const [rows, total] = await Promise.all([
+        Milk.find(filter).sort({ date: -1, _id: -1 }).skip(page.skip).limit(page.limit),
+        Milk.countDocuments(filter),
+      ]);
+      res.set('X-Total-Count', String(total));
+      res.set('X-Page', String(page.page));
+      res.set('X-Page-Size', String(page.limit));
+      res.set('X-Total-Pages', String(Math.ceil(total / page.limit)));
+      return res.json(rows);
+    }
     const pagination = parsePagination(req.query);
-    const rows = await applyPagination(Milk.find(filter).sort({ date: -1 }), pagination);
+    const rows = await applyPagination(Milk.find(filter).sort({ date: -1, _id: -1 }), pagination);
     res.json(rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
