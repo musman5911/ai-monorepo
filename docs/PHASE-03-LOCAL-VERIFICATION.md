@@ -63,3 +63,26 @@ Not yet verified in this checkpoint:
 Root `npm ci` reported five dependency vulnerabilities (1 moderate, 2 high, 2 critical). Do not apply a blanket `npm audit fix --force`; investigate the dependency tree and handle upgrades separately.
 
 The first root test run exposed an over-escaped regex in the adjacent-page metadata test. Commit `757e11e` fixes it; the focused integration suite and complete root suite passed after pulling that commit.
+
+
+## Farm, sync, UI and workbench follow-up (2026-10-23)
+
+Owner-reported Windows checks after commit `93d38fa`:
+
+- `npm run check-farms`: passed for all three apps, including Agri bulk task/finance scope checks.
+- `npm run check-sync`: passed; shared files, backend twins, env names, MUF tokens and invariants are in sync.
+- `npm run check-ui`: passed all UI safety checks.
+- `npm run check-workbench`: all 23 static/source checks passed.
+- `npm run check-workbench-runtime`: failed to connect because the Dairy Vite server was not running at the expected `http://127.0.0.1:5000`. To run it, use one Command Prompt:
+  ```bat
+  cd /d F:\PROJECTS\dairy\muf-monorepo\dairy_farm\client
+  npm run dev
+  ```
+  Leave that terminal running, then in a second Command Prompt:
+  ```bat
+  cd /d F:\PROJECTS\dairy\muf-monorepo
+  npm run check-workbench-runtime
+  ```
+- Dairy client build is still pending; the confirmed path is `dairy_farm/client`.
+
+These checks do not close the Phase 3 acceptance gates for Agri on-demand network paging, large-dataset runtime coverage, cross-farm aggregate runtime fixtures, or the final browser/isolated-database pass.
