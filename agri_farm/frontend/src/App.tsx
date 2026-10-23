@@ -803,30 +803,47 @@ function App() {
     const fetchAllPages = async (fetchFn) => {
       const pageSize = 500;
       const first = await fetchFn(0, pageSize);
-      const all = [...(Array.isArray(first.data) ? first.data : [])];
+      if (!Array.isArray(first.data)) throw new Error('Paginated API returned a non-array payload.');
+      const all = [...first.data];
       const rawTotal = first.headers?.['x-total-count'] ?? first.headers?.['X-Total-Count'];
       const total = Number(rawTotal);
+      const appendUnique = (rows) => {
+        // A concurrent insert/delete can shift offset pages while a refresh is in
+        // progress. Deduplicate stable IDs so the UI never renders the same record
+        // twice; retain ID-less legacy records rather than dropping valid data.
+        const seen = new Set(all.filter((row) => row?._id != null).map((row) => String(row._id)));
+        for (const row of rows) {
+          if (row?._id == null || !seen.has(String(row._id))) {
+            all.push(row);
+            if (row?._id != null) seen.add(String(row._id));
+          }
+        }
+      };
       if (Number.isFinite(total) && total >= 0) {
         const pageCount = Math.ceil(total / pageSize);
         for (let page = 1; page < pageCount; page += 1) {
           const res = await fetchFn(page * pageSize, pageSize);
           if (!Array.isArray(res.data)) throw new Error('Paginated API returned a non-array payload.');
-          all.push(...res.data);
+          const reportedTotal = Number(res.headers?.['x-total-count'] ?? res.headers?.['X-Total-Count']);
+          if (Number.isFinite(reportedTotal) && reportedTotal !== total) {
+            throw new Error(`Pagination total changed during refresh (${total} to ${reportedTotal}); retry the refresh.`);
+          }
+          appendUnique(res.data);
         }
         if (all.length < total) {
-          throw new Error(`Paginated API returned ${all.length} of ${total} records.`);
+          throw new Error(`Paginated API returned ${all.length} unique records for a reported total of ${total}. The dataset may have changed during refresh; retry.`);
         }
         return all.slice(0, total);
       }
 
       // Compatibility fallback for older servers without pagination headers.
       // A short page proves completion; a full page means another request is needed.
-      let skip = all.length;
-      let previousPageSize = Array.isArray(first.data) ? first.data.length : 0;
+      let skip = first.data.length;
+      let previousPageSize = first.data.length;
       while (previousPageSize === pageSize) {
         const res = await fetchFn(skip, pageSize);
         if (!Array.isArray(res.data)) throw new Error('Paginated API returned a non-array payload.');
-        all.push(...res.data);
+        appendUnique(res.data);
         previousPageSize = res.data.length;
         skip += res.data.length;
       }
