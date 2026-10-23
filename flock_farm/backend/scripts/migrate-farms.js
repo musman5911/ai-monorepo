@@ -39,6 +39,9 @@ if (!dryRun) {
     if (err.codeName !== 'IndexNotFound' && err.code !== 27) throw err;
   }
   await collection.createIndex({ farmId: 1, key: 1 }, { unique: true, name: 'datastore_farm_key_unique' });
+  for (const name of MUF_FARM_SCOPED_NAMES) {
+    if (name !== 'DataStore') await MUF_FARM_MODELS[name].collection.createIndex({ farmId: 1 });
+  }
   console.log(JSON.stringify({ applied: result }, null, 2));
 }
 await mongoose.disconnect();
