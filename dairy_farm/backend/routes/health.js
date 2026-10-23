@@ -59,6 +59,53 @@ router.get('/upcoming', protect, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+router.post('/bulk', protect, workerOrAdmin, async (req, res) => {
+  try {
+    const rows = req.body?.entries;
+    if (!Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'entries must be a non-empty array' });
+    if (rows.length > 200) return res.status(413).json({ error: 'bulk request is limited to 200 entries' });
+
+    const normalized = [];
+    const errors = [];
+    rows.forEach((row, index) => {
+      if (!row || typeof row !== 'object' || Array.isArray(row)) {
+        errors.push(`row ${index + 1}: entry must be an object`);
+        return;
+      }
+      const { payload, errors: rowErrors } = healthPayload(row, { requireBasics: true });
+      if (rowErrors.length) errors.push(`row ${index + 1}: ${rowErrors.join(', ')}`);
+      normalized.push({ index, payload });
+    });
+    if (errors.length) return res.status(400).json({ error: errors.join('; '), errors });
+
+    const results = [];
+    for (const row of normalized) {
+      try {
+        const id = randomUUID();
+        const record = await Health.create({ ...row.payload, _id: id });
+        if (row.payload.cost && row.payload.cost > 0) {
+          const expenseNote = `${row.payload.type}: ${row.payload.description}${row.payload.medicine ? ' — ' + row.payload.medicine : ''}`;
+          await Expense.create({
+            _id: randomUUID(),
+            cowId: row.payload.cowId || null,
+            date: row.payload.date,
+            type: 'medicine',
+            amount: row.payload.cost,
+            note: expenseNote,
+            _healthId: id,
+          });
+        }
+        results.push({ index: row.index, ok: true, record });
+      } catch {
+        results.push({ index: row.index, ok: false, error: 'Could not save this health row' });
+      }
+    }
+    const saved = results.filter((row) => row.ok).length;
+    const failed = results.length - saved;
+    res.status(failed ? 207 : 200).json({ saved, failed, results });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 router.post('/', protect, workerOrAdmin, async (req, res) => {
   try {
     const { payload, errors } = healthPayload(req.body, { requireBasics: true });
