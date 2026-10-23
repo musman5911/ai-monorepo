@@ -51,6 +51,17 @@ describe('batch financial summary', () => {
     });
   });
 
+  it('deducts sales, home use and waste from available eggs', () => {
+    const summary = calculateBatchSummary({
+      batch: { intake_count: 10, cost_per_bird: 100 },
+      eggLogs: [
+        { collected: 100, sold: 20, home_use: 5, broken_wasted: 3 },
+        { collected: 40, sold: 10, home_use: 2, broken_wasted: 1 },
+      ],
+    });
+    expect(summary.total_eggs_available).toBe(99);
+  });
+
   it('returns null for a missing batch', () => {
     expect(calculateBatchSummary({ batch: null })).toBeNull();
   });
