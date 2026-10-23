@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (owner reran npm test: 17 files and 135/135 tests passed; Phase 3 Dairy paging and bounded bulk milk implementation now in progress)
+Last updated: 2026-10-23 (owner's Phase 3 checkpoint found one CSV-preview contract failure, two frontend build blockers, and one Flock memory-pagination issue; corrective commits are pushed but await local rerun)
 
 
 ## Phase 3 implementation update (2026-10-23): Dairy paging and bounded bulk milk entry
@@ -15,7 +15,8 @@ Last updated: 2026-10-23 (owner reran npm test: 17 files and 135/135 tests passe
 - Flock now has a bounded batch-list page API/UI and preview-first per-batch egg CSV import, serialized under the existing inventory lock. Agri crops, finance and tasks now validate skip/limit inputs and return stable sort order plus page-count headers while preserving the legacy array response. Dairy Health has preview-first CSV import backed by the bounded health bulk API.
 - Added Phase 3 contract tests for paging APIs, server summaries, bulk validation, CSV preview flows, Flock page loading, and partial-write reporting.
 - Commits are on muf-monorepo: 28a599b, 2f9d26c, 96388fb, 21d1565, 07f011d, 2e283ee, ecaaa34, 15aa67a, b50ac87, 141838e, db02717, 87af32c, 90a57b5, 4afcced, 6a6b7d4.
-- Still required for Phase 3: run root tests and all three builds locally; finish Agri UI incremental loading and bulk/import workflows; extend Flock bulk entry beyond egg logs; add Excel import support; validate 1,000-row fixtures, stable pagination under changing data, and farm isolation for bulk writes and totals. The current Agri server headers are additive but its UI still fetches every page in sequence. Phase 3 is not signed off yet.
+- Owner's local checkpoint on the Phase 3 branch reported 149/150 tests passing; the remaining contract failure was a missing rendered Dairy milk CSV preview modal. Dairy and Flock builds also exposed unused/missing state setters. The farm-scope script found Flock's paginated batch route failing in memory mode because the memory query adapter lacked working skip/limit support. Corrective commits now render the milk preview modal, remove unused rate state, fix the Flock pagination setter, implement skip/limit in the Flock memory adapter, and add a regression contract test. These corrections have not yet been verified by the owner.
+- Still required for Phase 3: rerun root tests, farm-scope check and all three builds locally; finish Agri UI incremental loading and bulk/import workflows; extend Flock bulk entry beyond egg logs; add Excel import support; validate 1,000-row fixtures, stable pagination under changing data, and farm isolation for bulk writes and totals. The current Agri server headers are additive but its UI still fetches every page in sequence. Phase 3 is not signed off yet.
 - Per owner direction, Phase 2's real-MongoDB concurrency and disposable-copy backup/restore sign-off is deferred to the final consolidated verification pass after all planned phases. Continue implementation in Phase 3 now, but do not connect to or mutate production data.
 
 ## Owner verification checkpoint (2026-10-23, commit d629392 and follow-up)
