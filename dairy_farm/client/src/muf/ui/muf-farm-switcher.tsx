@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Archive, Building2, ChevronDown, Plus, RefreshCw, RotateCcw, Save, Settings, Users } from 'lucide-react';
+import { Archive, Building2, ChevronDown, Plus, RotateCcw, Save, Settings, Users } from 'lucide-react';
 import { L } from '../../i18n';
 
 type Farm = { _id: string; name: string; location?: string; archived?: boolean };
