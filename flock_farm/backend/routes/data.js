@@ -12,6 +12,9 @@ import express from 'express';
 import mongoose from 'mongoose';
 import DataStore from '../models/DataStore.js';
 import Image from '../models/Image.js';
+import Batch from '../models/Batch.js';
+import BatchEggLog from '../models/BatchEggLog.js';
+import { validateIncubationAllocations } from '../incubation-allocation.mjs';
 import { authRequired } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -215,6 +218,23 @@ router.put('/data/:key', authRequired, async (req, res) => {
       if (!validation.ok) {
         return res.status(403).json({ error: validation.error });
       }
+    }
+
+    // Incubation source-batch links are a real allocation, not just display metadata.
+    // Queries inherit the active farm context from auth middleware. The datastore
+    // version compare below prevents two clients saving against the same old bucket.
+    if (key === 'incubation') {
+      const linkedBatchIds = Array.isArray(value)
+        ? [...new Set(value.map((record) => String(record?.sourceBatchId || '').trim()).filter(Boolean))]
+        : [];
+      const [batches, eggLogs] = linkedBatchIds.length
+        ? await Promise.all([
+          Batch.find({ batch_id: { $in: linkedBatchIds } }),
+          BatchEggLog.find({ batch_id: { $in: linkedBatchIds } }),
+        ])
+        : [[], []];
+      const allocationError = validateIncubationAllocations(value, batches, eggLogs);
+      if (allocationError) return res.status(400).json({ error: allocationError, code: 'INCUBATION_EGG_ALLOCATION' });
     }
 
     // Conditional write: only succeeds if version is still what we read.
