@@ -109,8 +109,10 @@ function ensureBatchOpen(batch, res) {
   return true;
 }
 
-async function listWithSummary() {
-  const batches = await Batch.find().sort({ start_date: -1, createdAt: -1 });
+async function listWithSummary(skip = 0, limit = null) {
+  let query = Batch.find().sort({ start_date: -1, createdAt: -1, _id: -1 }).skip(skip);
+  if (limit != null) query = query.limit(limit);
+  const batches = await query;
   return Promise.all(
     batches.map(async (batch) => ({
       ...batch.toObject(),
@@ -119,10 +121,27 @@ async function listWithSummary() {
   );
 }
 
-router.get('/batches', authRequired, async (_req, res) => {
+router.get('/batches', authRequired, async (req, res) => {
   try {
-    const batches = await listWithSummary();
-    res.json({ batches });
+    if (req.query.page === undefined) {
+      const batches = await listWithSummary();
+      return res.json({ batches });
+    }
+    const rawPage = Array.isArray(req.query.page) ? NaN : Number(req.query.page);
+    const rawLimit = req.query.limit === undefined ? 20 : (Array.isArray(req.query.limit) ? NaN : Number(req.query.limit));
+    if (!Number.isSafeInteger(rawPage) || rawPage < 1) return res.status(400).json({ error: 'page must be a positive integer' });
+    if (!Number.isSafeInteger(rawLimit) || rawLimit < 1) return res.status(400).json({ error: 'limit must be a positive integer' });
+    const limit = Math.min(rawLimit, 100);
+    const skip = (rawPage - 1) * limit;
+    if (!Number.isSafeInteger(skip)) return res.status(400).json({ error: 'page is too large' });
+    const [batches, total] = await Promise.all([listWithSummary(skip, limit), Batch.countDocuments({})]);
+    const totalPages = Math.ceil(total / limit);
+    res.set('Access-Control-Expose-Headers', 'X-Total-Count, X-Page, X-Page-Size, X-Total-Pages');
+    res.set('X-Total-Count', String(total));
+    res.set('X-Page', String(rawPage));
+    res.set('X-Page-Size', String(limit));
+    res.set('X-Total-Pages', String(totalPages));
+    return res.json({ batches, total, page: rawPage, limit, totalPages });
   } catch (err) {
     console.error('GET /api/batches error:', err);
     res.status(500).json({ error: 'Failed to load batches' });
