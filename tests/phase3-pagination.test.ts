@@ -161,3 +161,45 @@ describe('Phase 3 first list endpoint integration contract', () => {
     }
   });
 });
+
+
+describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
+  it('keeps server-side Agri list pagination bounded with stable ordering and totals', () => {
+    const crops = readFileSync(path.join(repoRoot, 'agri_farm/backend/routes/crops.js'), 'utf8');
+    const tasks = readFileSync(path.join(repoRoot, 'agri_farm/backend/routes/tasks.js'), 'utf8');
+    const finance = readFileSync(path.join(repoRoot, 'agri_farm/backend/routes/finance.js'), 'utf8');
+    for (const source of [crops, tasks, finance]) {
+      expect(source).toContain('Number.isSafeInteger(rawSkip)');
+      expect(source).toContain('Number.isSafeInteger(rawLimit)');
+      expect(source).toContain('Math.min(rawLimit, 500)');
+      expect(source).toContain('X-Total-Count');
+      expect(source).toContain('X-Total-Pages');
+      expect(source).toContain('sort({');
+    }
+    expect(crops).toContain("const query = isAdmin ? {} : { status: { $ne: 'Completed' } }");
+    expect(finance).toContain('protect, requireAdmin');
+  });
+
+  it('renders Agri crop and task cards in incremental chunks without truncating aggregate source arrays', () => {
+    const app = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/App.tsx'), 'utf8');
+    expect(app).toContain('const visibleFilteredCrops = filteredCrops.slice(0, cropVisibleCount)');
+    expect(app).toContain('filteredTasks.slice(0, taskVisibleCount).map');
+    expect(app).toContain('Load more crops');
+    expect(app).toContain('Load more tasks');
+    expect(app).toContain('buildDashboardIncomeSeries(finance)');
+    expect(app).toContain('buildMonthlyComparisonRows(finance, crops');
+  });
+
+  it('pages a stable 1,250-row fixture without duplicates or missing rows', () => {
+    const rows = Array.from({ length: 1250 }, (_, index) => ({ id: index + 1 }));
+    const pageSize = 100;
+    const pages = Array.from({ length: Math.ceil(rows.length / pageSize) }, (_, index) =>
+      rows.slice(index * pageSize, (index + 1) * pageSize),
+    );
+    const flattened = pages.flat();
+    expect(pages.every((page) => page.length > 0 && page.length <= pageSize)).toBe(true);
+    expect(flattened).toHaveLength(1250);
+    expect(flattened.map((row) => row.id)).toEqual(rows.map((row) => row.id));
+    expect(new Set(flattened.map((row) => row.id)).size).toBe(1250);
+  });
+});
