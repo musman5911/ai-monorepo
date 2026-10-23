@@ -80,8 +80,8 @@ router.post('/bulk', protect, workerOrAdmin, async (req, res) => {
 
     const results = [];
     for (const row of normalized) {
+      const id = randomUUID();
       try {
-        const id = randomUUID();
         const record = await Health.create({ ...row.payload, _id: id });
         if (row.payload.cost && row.payload.cost > 0) {
           const expenseNote = `${row.payload.type}: ${row.payload.description}${row.payload.medicine ? ' — ' + row.payload.medicine : ''}`;
@@ -97,6 +97,10 @@ router.post('/bulk', protect, workerOrAdmin, async (req, res) => {
         }
         results.push({ index: row.index, ok: true, record });
       } catch {
+        await Promise.all([
+          Health.deleteOne({ _id: id }).catch(() => null),
+          Expense.deleteOne({ _healthId: id }).catch(() => null),
+        ]);
         results.push({ index: row.index, ok: false, error: 'Could not save this health row' });
       }
     }
