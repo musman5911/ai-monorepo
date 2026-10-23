@@ -24,12 +24,25 @@ describe('incubation batch egg allocations', () => {
     )).toContain('available eggs');
   });
 
-  it('does not let a negative-net legacy egg log reduce other days supply', () => {
+  it('clamps a negative-net legacy egg log to zero instead of subtracting valid supply', () => {
+    const logsWithNegativeLegacyRecord = [
+      ...eggLogs,
+      { batch_id: 'BAT-LAYER-1', collected: 5, sold: 99, home_use: 0, broken_wasted: 0 },
+    ];
+
+    // Net supply is 70 + 30 + max(0, 5 - 99) = 100 eggs.
     expect(validateIncubationAllocations(
-      [{ id: 1, sourceBatchId: 'BAT-LAYER-1', eggsSet: 110 }],
+      [{ id: 1, sourceBatchId: 'BAT-LAYER-1', eggsSet: 100 }],
       batches,
-      [...eggLogs, { batch_id: 'BAT-LAYER-1', collected: 5, sold: 99, home_use: 0, broken_wasted: 0 }],
+      logsWithNegativeLegacyRecord,
     )).toBeNull();
+
+    // The malformed legacy row must not create room for a 101st egg.
+    expect(validateIncubationAllocations(
+      [{ id: 1, sourceBatchId: 'BAT-LAYER-1', eggsSet: 101 }],
+      batches,
+      logsWithNegativeLegacyRecord,
+    )).toContain('100 available eggs');
   });
 
   it('rejects a source batch that is not present in the selected farm', () => {
