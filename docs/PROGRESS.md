@@ -518,3 +518,12 @@ Added `tests/phase4-breeding-lineage.test.ts` to guard the additive sire/ear-tag
 - Added source-contract coverage for the additional import controls. These changes have not yet been built or tested in a local checkout; the owner should pull the branch and run the full checks before treating them as verified.
 - New commits: `7a7175c` (UI import), `b27a78e` (test).
 - Remaining Phase 3 work still includes Agri incremental UI and bulk/import workflows, Excel workbook import, stronger real route/API scale and farm-isolation tests, and a full verification pass. Mortality and sale CSV bulk import is intentionally not exposed because these records depend on sequential live-bird validation.
+
+
+### Phase 3 Agri list rendering and scale fixtures (2026-10-23)
+
+- Agri crop and task cards now render in chunks of 40 with Load More controls. The underlying complete arrays remain intact for dashboard calculations, crop selectors and report totals; this is incremental rendering, not yet network-level lazy loading.
+- Added regression/source-contract checks for Agri list pagination headers, worker crop visibility, finance admin-only access, preserved aggregate inputs, and stable paging of a 1,250-row fixture.
+- Commits: `20a94e7` (Agri incremental card rendering), `fd45009` (tests).
+- Verification has not been run against this commit batch. The source-contract and synthetic fixture tests do not replace live route integration tests.
+- Phase 3 is still open: Agri needs network-level Load More with correct full-dataset summary totals, preview-first CSV bulk import workflows, and Excel workbook parsing/import. Stronger farm-isolation and real route/API scale fixtures also remain. No production database was accessed.
