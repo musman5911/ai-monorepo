@@ -598,7 +598,7 @@ router.post('/signup/verify', signupVerifyLimiter, async (req, res) => {
       email,
       passwordHash,
       displayName: displayName || '',
-      role: 'admin',
+      role: 'owner',
       active: true,
     });
     user.lastLoginAt = new Date();
