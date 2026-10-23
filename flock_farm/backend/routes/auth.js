@@ -1,6 +1,7 @@
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import User from '../models/User.js';
+import Farm from '../models/Farm.js';
 import PasswordReset from '../models/PasswordReset.js';
 import { signToken, authRequired, requireRole } from '../middleware/auth.js';
 import { sendVerificationCodeEmail, mailConfigured } from '../mailer.js';
@@ -226,13 +227,13 @@ router.post('/users', authRequired, requireRole('owner'), async (req, res) => {
       return res.status(409).json({ error: 'A user with that username already exists' });
     }
     let cleanEmail = null;
-    const chosenRole = role === 'admin' || role === 'owner' ? 'owner' : 'worker';
+    const chosenRole = role === 'manager' ? 'manager' : (role === 'admin' || role === 'owner') ? 'owner' : 'worker';
     // Administrator accounts must have an email
     // (needed for password recovery and profile verification codes).
-    if (chosenRole === 'owner' && !String(email || '').trim()) {
+    if (chosenRole !== 'worker' && !String(email || '').trim()) {
       return res.status(400).json({ error: 'Email address is mandatory for administrator accounts' });
     }
-    if (chosenRole === 'owner' && email) {
+    if (chosenRole !== 'worker' && email) {
       cleanEmail = String(email).trim().toLowerCase();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
         return res.status(400).json({ error: 'Invalid email format' });
@@ -245,7 +246,7 @@ router.post('/users', authRequired, requireRole('owner'), async (req, res) => {
       username: normalized,
       passwordHash,
       role: chosenRole,
-      farmIds: chosenRole === 'worker' && req.farmContext?.farmId ? [String(req.farmContext.farmId)] : [],
+      farmIds: ['worker', 'manager'].includes(chosenRole) && req.farmContext?.farmId ? [String(req.farmContext.farmId)] : [],
       displayName: displayName || '',
       email: cleanEmail,
       active: true,
@@ -260,7 +261,7 @@ router.post('/users', authRequired, requireRole('owner'), async (req, res) => {
 router.patch('/users/:id', authRequired, requireRole('owner'), async (req, res) => {
   try {
     const updates = {};
-    const { password, role, displayName, active, email, username, adminPassword } = req.body || {};
+    const { password, role, displayName, active, email, username, adminPassword, farmIds } = req.body || {};
 
     // Destructive user edits require the admin to
     // re-confirm their own password, so a hijacked session can't quietly
@@ -303,7 +304,16 @@ router.patch('/users/:id', authRequired, requireRole('owner'), async (req, res) 
       }
       updates.passwordHash = await User.hashPassword(String(password));
     }
-    if (role !== undefined) updates.role = role === 'admin' || role === 'owner' ? 'owner' : 'worker';
+    if (role !== undefined) updates.role = role === 'manager' ? 'manager' : (role === 'admin' || role === 'owner') ? 'owner' : 'worker';
+    if (farmIds !== undefined) {
+      if (!Array.isArray(farmIds)) return res.status(400).json({ error: 'farmIds must be an array' });
+      const requestedIds = [...new Set(farmIds.map((id) => String(id)))];
+      const knownFarms = await Farm.find({}).lean();
+      if (requestedIds.some((id) => !knownFarms.some((farm) => String(farm._id) === id))) {
+        return res.status(400).json({ error: 'One or more farms do not exist' });
+      }
+      updates.farmIds = requestedIds;
+    }
     if (displayName !== undefined) updates.displayName = String(displayName);
     if (active !== undefined) updates.active = Boolean(active);
     if (email !== undefined) {
