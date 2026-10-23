@@ -1,4 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 // @ts-expect-error JavaScript helper module has no TypeScript declarations
 import { parsePagePagination } from '../dairy_farm/backend/routes/input.js';
 
@@ -33,6 +38,13 @@ describe('Phase 3 page-pagination contract', () => {
     expect(parsePagePagination({ page: '1', limit }).error).toMatch(/limit must be a positive integer/);
   });
 
+  it.each([
+    { page: ['1', '2'] },
+    { page: '2', limit: ['10', '20'] },
+  ])('rejects array-valued query parameters safely: %j', (query) => {
+    expect(parsePagePagination(query).error).toMatch(/page must be a positive integer|limit must be a positive integer/);
+  });
+
   it('rejects unsafe page offsets instead of overflowing arithmetic', () => {
     expect(parsePagePagination({ page: '9007199254740991', limit: '200' }).error).toBe('page is too large');
   });
@@ -40,11 +52,8 @@ describe('Phase 3 page-pagination contract', () => {
 
 describe('Phase 3 first list endpoint integration contract', () => {
   it('Dairy cow and milk lists keep array payloads and expose page metadata headers', () => {
-    const fs = require('node:fs');
-    const path = require('node:path');
-    const root = path.resolve(__dirname, '..');
     for (const file of ['dairy_farm/backend/routes/cows.js', 'dairy_farm/backend/routes/milk.js']) {
-      const source = fs.readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
+      const source = readFileSync(path.join(repoRoot, file), 'utf8').replace(/\r\n/g, '\n');
       expect(source).toContain('parsePagePagination(req.query)');
       expect(source).toContain('countDocuments(filter)');
       expect(source).toContain("res.set('X-Total-Count'");
