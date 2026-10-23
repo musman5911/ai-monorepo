@@ -24,6 +24,14 @@ describe('incubation batch egg allocations', () => {
     )).toContain('available eggs');
   });
 
+  it('does not let a negative-net legacy egg log reduce other days supply', () => {
+    expect(validateIncubationAllocations(
+      [{ id: 1, sourceBatchId: 'BAT-LAYER-1', eggsSet: 110 }],
+      batches,
+      [...eggLogs, { batch_id: 'BAT-LAYER-1', collected: 5, sold: 99, home_use: 0, broken_wasted: 0 }],
+    )).toBeNull();
+  });
+
   it('rejects a source batch that is not present in the selected farm', () => {
     expect(validateIncubationAllocations(
       [{ id: 1, sourceBatchId: 'OTHER-FARM-BATCH', eggsSet: 1 }],
