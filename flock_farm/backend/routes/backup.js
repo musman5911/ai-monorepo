@@ -142,7 +142,7 @@ export async function maybeRunMonthlyAutoBackup(force = false) {
   // database. Failures never block the backup itself.
   try {
     if (mailConfigured()) {
-      const admin = await User.findOne({ role: 'admin', email: { $nin: [null, ''] } });
+      const admin = await User.findOne({ role: { $in: ['owner', 'admin'] }, email: { $nin: [null, ''] } });
       if (admin && admin.email) {
         await sendBackupEmail({ to: admin.email, name, json: JSON.stringify(stored.payload, null, 2) });
         stored.emailedTo = admin.email;
