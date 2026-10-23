@@ -77,8 +77,8 @@ async function restoreBackupPayload(payload) {
     for (const farm of payload.farms) {
       const name = String(farm.name || '').trim();
       if (!name) continue;
-      const existing = await Farm.findOne({ name });
-      if (!existing) await Farm.create({ name, location: farm.location || '', archived: Boolean(farm.archived) });
+      const existing = farm.id ? await Farm.findById(farm.id) : await Farm.findOne({ name });
+      if (!existing) await Farm.create({ ...(farm.id ? { _id: farm.id } : {}), name, location: farm.location || '', archived: Boolean(farm.archived) });
       else {
         existing.location = farm.location || '';
         existing.archived = Boolean(farm.archived);
