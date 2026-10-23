@@ -3198,7 +3198,7 @@ function App() {
                   }} />
                 )}
                 {crops.length === 0 ? (
-                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crop records yet')}</h4><p>Add your first wheat, corn, bajra, mattar, jundra, or any other crop.</p>{userRole === 'admin' && (<button onClick={() => { setEditingCrop(null); setCropForm(getEmptyCropForm()); setShowCropModal(true); }} className="muf-primary-action small"><Plus size={16}/> {L('Add Crop')}</button><button type="button" onClick={() => setShowCropImport(open => !open)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold">Import CSV / Excel</button>)}</div>
+                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crop records yet')}</h4><p>Add your first wheat, corn, bajra, mattar, jundra, or any other crop.</p>{userRole === 'admin' && (<><button onClick={() => { setEditingCrop(null); setCropForm(getEmptyCropForm()); setShowCropModal(true); }} className="muf-primary-action small"><Plus size={16}/> {L('Add Crop')}</button><button type="button" onClick={() => setShowCropImport(open => !open)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold">Import CSV / Excel</button></>)}</div>
                   ) : filteredCrops.length === 0 ? (
                     <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crops match this filter')}</h4><p>{L('Change the crop phase filter to see other records.')}</p></div>
                   ) : (
