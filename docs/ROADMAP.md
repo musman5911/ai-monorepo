@@ -120,3 +120,8 @@ Incubation records linked to a batch now pass server validation against egg supp
 ### Phase 2 implementation update (2026-10-23): batch-linked labor and egg-history protection
 
 Daily labor attendance can now be assigned to a batch, displays that assignment in history, and summarizes assigned workers by active batch for the selected month. Server validation rejects attendance writes linked to batches outside the active farm. Batch deletion is blocked while incubation or labor history references it; deleting an egg log is blocked if it would make current incubation allocations exceed remaining supply. Added validator unit tests for labor assignment and incubation allocation, but they have not yet been executed. The UI still needs a clear per-batch available-egg figure, and Dashboard/Health/Summary need a final review for batch-first workflows. The workflow remains manual-only; run it at the Phase 2 checkpoint, not per commit.
+
+
+### Phase 2 implementation update (2026-10-23): available egg supply in incubation
+
+Batch summary now includes net eggs after sales, home use and waste. Incubation shows net supply, linked allocations and estimated unallocated eggs by batch, including the current record's allocation when editing. Validator tests and a batch-math assertion were added, but tests/builds remain unrun. Remaining stock-integrity work includes preventing races between an incubation save and egg-log deletion with transaction or serialization support, plus integration coverage. This environment has no GitHub Actions workflow-dispatch action, so CI cannot be started directly here; keep the workflow manual-only and run it at the deliberate Phase 2 checkpoint.
