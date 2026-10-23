@@ -28,6 +28,14 @@ describe("Agri task and finance bulk-import API contracts", () => {
     expect(bulk).not.toContain("...row");
   });
 
+  it("extends the HTTP farm-scope checker to cover validation and cross-farm import isolation", () => {
+    const checker = read("tools/check-farm-scope.js");
+    expect(checker).toContain("'/api/tasks/bulk'");
+    expect(checker).toContain("'/api/finance/bulk'");
+    expect(checker).toContain("bulk task row is hidden from farm A");
+    expect(checker).toContain("bulk finance row is hidden from farm A");
+  });
+
   it("wires preview-first CSV/XLSX imports to both bulk endpoints", () => {
     const ui = read("agri_farm/frontend/src/components/AgriBulkCsvImport.tsx");
     const api = read("agri_farm/frontend/src/api.ts");
