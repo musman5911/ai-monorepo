@@ -610,3 +610,10 @@ Additional Windows Command Prompt results reported by the owner after pulling co
 - Dairy client directory is confirmed as `dairy_farm/client`; it contains `package.json` and `package-lock.json`, so the production build can be run there.
 
 Phase 3 remains open. The core unresolved implementation is genuine Agri on-demand network paging that preserves complete dashboard/report aggregates. Also pending: realistic large-dataset runtime paging, dedicated cross-farm aggregate runtime fixtures beyond existing memory-mode farm checks, Dairy build, workbench runtime smoke test, and the consolidated browser/isolated-database final pass.
+
+
+## Phase 3 implementation follow-up (2026-10-23)
+
+- Commit `3e50f9d` makes the workbench runtime smoke test start/stop its own local Dairy Vite server when the default port is unavailable, avoiding the previously reported false-negative caused by a server that had not been started.
+- Commit `7245abb` adds a real-HTTP Agri integration test that bulk-creates 1,001 tasks in bounded chunks, walks all API pages using server metadata, asserts exact fixture coverage and unique IDs, then removes the synthetic fixture.
+- These two changes are committed but have **not yet been run locally**. The full Phase 3 implementation remains incomplete until true Agri on-demand list fetching is implemented without breaking full dashboard/report totals. Dairy build, workbench runtime rerun, new large-fixture integration test, and final browser/isolated-database validation remain pending.
