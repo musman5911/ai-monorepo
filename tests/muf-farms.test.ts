@@ -44,6 +44,7 @@ describe('farm deletion safety', () => {
     const store = createStore({ Farm: { paths: {}, options: { timestamps: true } }, User: { paths: {} }, Crop: { paths: {} } });
     await store.Farm.create({ _id: 'source-farm', name: 'Source farm', archived: false });
     await store.Farm.create({ _id: 'archived-farm', name: 'Old farm', archived: true });
+    await store.Farm.create({ _id: 'active-target', name: 'Active target', archived: false });
     await store.Crop.create({ _id: 'crop-1', name: 'Wheat', farmId: 'source-farm' });
     const res = mockResponse();
     await createFarmDeleteHandler(store)({ params: { id: 'source-farm' }, body: { confirmName: 'Source farm', moveToFarmId: 'archived-farm' } }, res);
