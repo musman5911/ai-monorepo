@@ -606,62 +606,6 @@ export default function App() {
     return list;
   }, [isLoaded, birds, settings, feedRecords, eggProduction, lang]);
   const [quickOpenLedgerTab, setQuickOpenLedgerTab] = useState<'feed' | 'expense' | 'egg' | 'customers' | 'suppliers' | null>(null);
-  const [financeMenuOpen, setFinanceMenuOpen] = useState(false);
-  const financeMenuAnchorRef = useRef<HTMLDivElement | null>(null);
-  const financeMenuTriggerRef = useRef<HTMLButtonElement | null>(null);
-  const [financeMenuPosition, setFinanceMenuPosition] = useState({ top: 8, left: 8 });
-
-  const toggleFinanceMenu = () => {
-    if (financeMenuOpen) {
-      setFinanceMenuOpen(false);
-      return;
-    }
-    const anchor = financeMenuAnchorRef.current?.getBoundingClientRect();
-    const menuWidth = Math.min(208, Math.max(0, window.innerWidth - 16));
-    const maxMenuHeight = Math.min(window.innerHeight * 0.7, 416);
-    if (anchor) {
-      setFinanceMenuPosition({
-        top: Math.max(8, Math.min(anchor.bottom + 8, window.innerHeight - maxMenuHeight - 8)),
-        left: Math.max(8, Math.min(anchor.left, window.innerWidth - menuWidth - 8)),
-      });
-    }
-    setFinanceMenuOpen(true);
-  };
-
-  // Body portal escapes the horizontally scrolling navigation and its clipping.
-  // Keep outside-pointer, Escape, resize and page-scroll dismissal consistent.
-  useEffect(() => {
-    if (!financeMenuOpen) return;
-    const closeOnOutsidePointer = (event: PointerEvent) => {
-      const target = event.target;
-      if (target instanceof Element &&
-        !target.closest('.muf-finance-nav-item') &&
-        !target.closest('.muf-finance-menu')) {
-        setFinanceMenuOpen(false);
-      }
-    };
-    const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key !== 'Escape') return;
-      event.preventDefault();
-      setFinanceMenuOpen(false);
-      financeMenuTriggerRef.current?.focus({ preventScroll: true });
-    };
-    const closeOnScroll = (event: Event) => {
-      const target = event.target;
-      if (target instanceof Element && target.closest('.muf-finance-menu')) return;
-      setFinanceMenuOpen(false);
-    };
-    document.addEventListener('pointerdown', closeOnOutsidePointer);
-    document.addEventListener('keydown', closeOnEscape);
-    window.addEventListener('resize', closeOnScroll);
-    window.addEventListener('scroll', closeOnScroll, true);
-    return () => {
-      document.removeEventListener('pointerdown', closeOnOutsidePointer);
-      document.removeEventListener('keydown', closeOnEscape);
-      window.removeEventListener('resize', closeOnScroll);
-      window.removeEventListener('scroll', closeOnScroll, true);
-    };
-  }, [financeMenuOpen]);
 
   const handleQuickAction = (actionType: 'bird' | 'egg' | 'expense' | 'feed') => {
     if (actionType === 'bird') {
@@ -861,7 +805,7 @@ export default function App() {
             return (
               <div className="muf-nav-item relative" key={id}>
                 <div className="flex items-center">
-                  <button type="button" className={`muf-nav-link ${active ? 'active' : ''}`} onClick={() => { setActiveTab(id); setFinanceMenuOpen(false); }} id={`nav-${id}`}><Icon size={15} /><span>{label}</span></button>
+                  <button type="button" className={`muf-nav-link ${active ? 'active' : ''}`} onClick={() => { setActiveTab(id); }} id={`nav-${id}`}><Icon size={15} /><span>{label}</span></button>
                 </div>
               </div>
             );
@@ -884,7 +828,6 @@ export default function App() {
                 onClick={() => {
                   setActiveTab(id);
                   if (id === 'ledger') setQuickOpenLedgerTab('egg');
-                  setFinanceMenuOpen(false);
                 }}
               >
                 <Icon size={15} /><span>{label}</span>
