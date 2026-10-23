@@ -80,7 +80,7 @@ Implementation order:
 
 ### Phase 4: Dairy breeding and Agri structure
 
-**First implementation slice (2026-10-23, local verification pending):** Dairy cow records now have additive `earTag`, `fatherId`, `fatherType` (`farm` or `outside`) and `fatherName` fields, with a partial unique index scoped by farm for non-empty ear tags. This preserves existing records that have no tag. Before rollout, verify index creation against a disposable MongoDB copy and detect any existing duplicate tags within a farm.
+**First implementation slice (2026-10-23, local verification pending):** Dairy cow records now have additive `earTag`, `fatherId`, `fatherType` (`farm` or `outside`) and `fatherName` fields, with a partial unique index scoped by farm for non-empty ear tags. This preserves existing records that have no tag. Added source-contract tests in `tests/phase4-breeding-lineage.test.ts`. Before rollout, verify index creation against a disposable MongoDB copy and detect any existing duplicate tags within a farm.
 
 Remaining work:
 - Dairy: sire selection and validation in the UI/API, breeding-event history, automatic calf creation with gender and mother/father links (farm bull or outside straw), tests for lineage and per-farm tag uniqueness.
