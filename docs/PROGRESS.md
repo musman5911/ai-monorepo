@@ -314,3 +314,11 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - Updated the selector warning to explain that the server validates allocations, while the incubation ledger does not physically transfer egg records. Existing unlinked records remain supported.
 - Updated the batch-math test to assert net available eggs. New allocation and labor-validator tests are present but **none of the new tests or frontend builds have been run yet**. GitHub Actions is configured for manual dispatch only; this connection exposes no workflow-dispatch action, so I cannot start a run from this chat. No local Windows commands, browser tests, or live-data changes were performed.
 - **Important limitation:** incubation saves use optimistic concurrency on the incubation bucket, and egg-log deletion checks allocations before deleting, but allocation writes and egg-log deletion are not one cross-collection atomic transaction. A concurrent allocation and egg-log deletion could race. This must be closed with transaction/serialization support and integration coverage before calling egg inventory fully race-safe.
+
+
+## Phase 2 implementation update (2026-10-23): protect destructive batch replacement
+
+- Batch backup import and wipe-all endpoints now refuse to replace/delete batch data while any incubation or labor attendance record is linked to a batch. The response is HTTP 409 with linked-record counts and a reconciliation message. This closes two destructive paths that bypassed the per-batch delete guard.
+- Added a batch-math unit case proving that sold, home-use and broken/wasted eggs are all deducted from net availability across multiple egg logs.
+- **Not verified by execution:** tests and builds remain unrun for the latest commits. The manual-only GitHub Actions workflow cannot be dispatched with the GitHub actions available in this environment. No live data was touched.
+- **Remaining Phase 2 risks:** allocation writes and egg-log deletion are still separate operations and can race; integration-level concurrency tests are needed. Backup restore now intentionally refuses batch-only replacement when linked history exists, so a full restore process must restore or reconcile the linked incubation/labor buckets as well.
