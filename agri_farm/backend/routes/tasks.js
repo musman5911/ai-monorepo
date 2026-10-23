@@ -29,6 +29,51 @@ router.get('/tasks', protect, asyncHandler(async (req, res) => {
   return res.json(data.map((d) => ({ ...d, _id: String(d._id) })));
 }));
 
+
+router.post('/bulk', protect, requireAdmin, asyncHandler(async (req, res) => {
+  const rows = req.body?.rows;
+  if (!Array.isArray(rows) || rows.length < 1) return res.status(400).json({ error: 'rows must be a non-empty array' });
+  if (rows.length > 200) return res.status(400).json({ error: 'A task bulk request is limited to 200 rows' });
+
+  const errors = [];
+  const allowedPriorities = new Set(['Low', 'Medium', 'High']);
+  const prepared = rows.map((raw, index) => {
+    const rowNumber = index + 2;
+    const row = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+    const title = String(row.title || '').trim();
+    const priority = String(row.priority || 'Medium').trim();
+    const dueDate = String(row.due_date || '').trim();
+    const laborCost = row.labor_cost === undefined || row.labor_cost === '' ? 0 : Number(row.labor_cost);
+    if (!title) errors.push({ row: rowNumber, message: 'Task title is required.' });
+    if (!allowedPriorities.has(priority)) errors.push({ row: rowNumber, message: 'Priority must be Low, Medium, or High.' });
+    if (dueDate && Number.isNaN(Date.parse(dueDate))) errors.push({ row: rowNumber, message: 'Due date must be valid.' });
+    if (!Number.isFinite(laborCost) || laborCost < 0) errors.push({ row: rowNumber, message: 'Labor cost must be a non-negative number.' });
+    return {
+      title,
+      due_date: dueDate,
+      assigned_to: String(row.assigned_to || '').trim(),
+      priority,
+      notes: String(row.notes || ''),
+      labor_cost: laborCost,
+      crop_id: String(row.crop_id || '').trim() || null,
+      inventory_item_id: String(row.inventory_item_id || '').trim() || null,
+      inventory_qty_consumed: row.inventory_qty_consumed === undefined || row.inventory_qty_consumed === '' ? 0 : Number(row.inventory_qty_consumed),
+      laborer_ids: Array.isArray(row.laborer_ids) ? row.laborer_ids : [],
+      status: 'Pending',
+    };
+  });
+  prepared.forEach((row, index) => {
+    if (!Number.isFinite(row.inventory_qty_consumed) || row.inventory_qty_consumed < 0) errors.push({ row: index + 2, message: 'Inventory quantity must be a non-negative number.' });
+  });
+  if (errors.length) return res.status(400).json({ error: 'Bulk task validation failed', details: errors });
+
+  for (const task of prepared) {
+    [task.laborer_ids, task.laborer_names] = await cleanLaborerIds(task.laborer_ids);
+  }
+  const inserted = await Task.insertMany(prepared);
+  return res.status(201).json({ status: 'ok', inserted: inserted.length });
+}));
+
 // Keep only valid, existing laborer ids (deduped, max 30). Names are
 // resolved server-side so task cards can display the crew without needing
 // wage-bearing /laborers access.
