@@ -74,13 +74,16 @@ Implementation order:
 5. **Bulk entry/import:** Dairy milk sheet and bulk health, Flock per-batch bulk entry, then CSV/Excel import with column validation, row-level errors and bounded payload sizes. Start with preview/validate before committing writes; bulk writes must be atomic where practical or report partial outcomes explicitly.
 6. **Scale verification:** fixtures at 1,000+ rows; query/payload limits; pagination no gaps/duplicates under stable data; farm isolation for rows and totals; all three builds and shared-MUF checks. Add focused tests for each increment.
 
-**Phase 3 first step (implemented, local verification pending):** added an opt-in 1-based paging contract to Dairy cow and milk list APIs. It validates page/limit, defaults to 50 rows, caps at 200, uses stable sort keys, returns total/page metadata headers, and retains legacy array behavior when `page` is omitted. Added `tests/phase3-pagination.test.ts`. Farm-scoped model wrappers scope both list and count queries. No frontend has been switched to paging yet. Pull and run tests/builds before continuing; next step is to wire one Dairy list UI to append pages with loading/error/empty states. See `PROGRESS.md` for commit references.
+**Phase 3 first step (implemented; owner reported the initial test/build checkpoint passed):** added an opt-in 1-based paging contract to Dairy cow and milk list APIs. It validates page/limit, defaults to 50 rows, caps at 200, uses stable sort keys, returns total/page metadata headers, and retains legacy array behavior when `page` is omitted. Added `tests/phase3-pagination.test.ts`. Farm-scoped model wrappers scope both list and count queries. No frontend has been switched to paging yet. Pull and run tests/builds before continuing; next step is to wire one Dairy list UI to append pages with loading/error/empty states. See `PROGRESS.md` for commit references.
 
 **Done when:** a 1,000-row import has a documented bounded request/response strategy; large lists load incrementally with server filters and stable totals; the three apps build; root, farm-scope, UI and MUF parity tests pass; and a 1,000-row fixture demonstrates acceptable behavior without loading the whole dataset into the browser.
 
 ### Phase 4: Dairy breeding and Agri structure
 
-- Dairy: breeding events, automatic calf creation with gender and mother/father links (farm bull or outside straw), ear tag unique per farm.
+**First implementation slice (2026-10-23, local verification pending):** Dairy cow records now have additive `earTag`, `fatherId`, `fatherType` (`farm` or `outside`) and `fatherName` fields, with a partial unique index scoped by farm for non-empty ear tags. This preserves existing records that have no tag. Before rollout, verify index creation against a disposable MongoDB copy and detect any existing duplicate tags within a farm.
+
+Remaining work:
+- Dairy: sire selection and validation in the UI/API, breeding-event history, automatic calf creation with gender and mother/father links (farm bull or outside straw), tests for lineage and per-farm tag uniqueness.
 - Agri: Farm → Field (acres) → Crop cycle (season); finance linked to farm, field and cycle; archive finished crops; data checks and indexes.
 
 ### Phase 5: Photo storage
