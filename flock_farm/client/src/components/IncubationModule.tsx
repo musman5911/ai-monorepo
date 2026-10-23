@@ -81,6 +81,19 @@ export default function IncubationModule({
     return () => { cancelled = true; };
   }, []);
   const canChange = canEdit ?? canDelete;
+  const allocatedEggsByBatch = useMemo(() => {
+    const totals: Record<string, number> = {};
+    for (const record of records) {
+      const batchId = String(record.sourceBatchId || '').trim();
+      if (batchId) totals[batchId] = (totals[batchId] || 0) + Number(record.eggsSet || 0);
+    }
+    return totals;
+  }, [records]);
+  const totalEggsAvailableBeforeIncubation = incubationBatchRows.reduce(
+    (sum, batch) => sum + (batch.summary?.total_eggs_available || 0),
+    0,
+  );
+  const totalEggsAllocated = Object.values(allocatedEggsByBatch).reduce((sum, count) => sum + count, 0);
   const [startDate, setStartDate] = useState(todayStr());
   const [sourceBatchId, setSourceBatchId] = useState('');
   const [eggsSet, setEggsSet] = useState('');
@@ -315,11 +328,12 @@ export default function IncubationModule({
         {incubationBatchUnavailable ? <p role="status" className="text-xs text-amber-700 dark:text-amber-300">{L('Batch egg data is unavailable right now.')}</p> : <>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Active batches')}</p><p className="text-xl font-bold mt-1">{incubationBatchRows.filter(b => b.status === 'Active').length}</p></div>
-            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Batch eggs collected')}</p><p className="text-xl font-bold mt-1">{incubationBatchRows.reduce((sum, b) => sum + (b.summary?.total_eggs_collected || 0), 0).toLocaleString()}</p></div>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Net eggs before incubation')}</p><p className="text-xl font-bold mt-1">{totalEggsAvailableBeforeIncubation.toLocaleString()}</p></div>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Eggs allocated to incubation')}</p><p className="text-xl font-bold mt-1">{totalEggsAllocated.toLocaleString()}</p></div>
             <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Incubation records')}</p><p className="text-xl font-bold mt-1">{records.length}</p></div>
           </div>
-          {incubationBatchRows.filter(b => (b.summary?.total_eggs_collected || 0) > 0).slice(0, 4).map(batch => <div key={batch.batch_id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2">
-            <span className="min-w-0 text-xs font-semibold truncate">{batch.name}</span><span className="text-xs text-slate-500 whitespace-nowrap">{(batch.summary?.total_eggs_collected || 0).toLocaleString()} {L('eggs collected')}</span>
+          {incubationBatchRows.filter(b => (b.summary?.total_eggs_available || 0) > 0 || (allocatedEggsByBatch[b.batch_id] || 0) > 0).slice(0, 4).map(batch => <div key={batch.batch_id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2">
+            <span className="min-w-0 text-xs font-semibold truncate">{batch.name}</span><span className="text-right text-xs text-slate-500 whitespace-nowrap">{Math.max(0, (batch.summary?.total_eggs_available || 0) - (allocatedEggsByBatch[batch.batch_id] || 0)).toLocaleString()} {L('unallocated eggs')}</span>
           </div>)}
           <p className="text-[10px] text-slate-500">{L('Batch egg collection and incubation records are currently tracked separately; automatic egg transfer is not yet enabled.')}</p>
         </>}
@@ -497,7 +511,7 @@ export default function IncubationModule({
               This hatch has already been added to the flock registry, so core hatch counts are locked to keep flock totals consistent.
             </div>
           )}
-          <label className="block space-y-1"><span className="text-slate-600 dark:text-slate-300">{L('Source batch (optional for legacy records)')}</span><select disabled={isTransferredRecord} value={sourceBatchId} onChange={(e) => setSourceBatchId(e.target.value)} className="muf-field"><option value="">{L('Not linked / legacy record')}</option>{incubationBatchRows.filter(batch => (batch.summary?.total_eggs_collected || 0) > 0).map(batch => <option key={batch.batch_id} value={batch.batch_id}>{batch.name} · {batch.batch_id} · {batch.summary?.total_eggs_collected || 0} {L('eggs collected')}</option>)}</select><span className="text-[10px] text-amber-700 dark:text-amber-300">{L('Linking records the source batch only. Egg availability is not reserved or deducted automatically yet.')}</span></label>
+          <label className="block space-y-1"><span className="text-slate-600 dark:text-slate-300">{L('Source batch (optional for legacy records)')}</span><select disabled={isTransferredRecord} value={sourceBatchId} onChange={(e) => setSourceBatchId(e.target.value)} className="muf-field"><option value="">{L('Not linked / legacy record')}</option>{incubationBatchRows.filter(batch => (batch.summary?.total_eggs_available || 0) > 0 || batch.batch_id === sourceBatchId).map(batch => { const ownAllocation = editRecord?.sourceBatchId === batch.batch_id ? Number(editRecord.eggsSet || 0) : 0; const unallocated = Math.max(0, (batch.summary?.total_eggs_available || 0) - (allocatedEggsByBatch[batch.batch_id] || 0) + ownAllocation); return <option key={batch.batch_id} value={batch.batch_id}>{batch.name} · {unallocated.toLocaleString()} {L('eggs available for this record')}</option>; })}</select><span className="text-[10px] text-amber-700 dark:text-amber-300">{L('The server validates total allocations against net batch eggs. Egg counts are not physically moved between ledgers.')}</span></label>
           <div className="grid grid-cols-2 gap-2">
             <input type="date" required disabled={isTransferredRecord} value={startDate} onChange={(e) => setStartDate(e.target.value)} className="muf-field" />
             <input type="date" disabled={isTransferredRecord} value={hatchDate} onChange={(e) => setHatchDate(e.target.value)} className="muf-field" />
