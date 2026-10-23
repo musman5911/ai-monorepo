@@ -258,5 +258,6 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - **Batch operations added:** new batch egg-production and vaccination log models/APIs/forms/detail tables; batch summary now includes egg counts, egg income and vaccination costs. Egg sales revenue contributes to batch revenue/profit calculations.
 - **Existing systems reused:** current `BatchesTab`, `FlockRegister`, `FinancialLedger`, `MonthlySummary` and `HealthPortal`; no parallel batch system was created.
 - **Backup support updated:** batch export/import, detail reads, batch deletion and wipe handling include the new log collections.
+- **Tests added:** `tests/flock-batch-math.test.ts` covers valid/invalid egg counts and batch revenue/expense/profit calculations. These tests have not been executed yet.
 - **Not run by assistant:** frontend build, root tests, farm-scope check, MUF sync/UI checks. Source changes have not yet been compiled or executed locally.
-- No data migration has been run and no live data was touched. New log collections are additive; verify the existing backup/restore tests before treating this phase as complete.
+- No data migration has been run and no live data was touched. New log collections are additive; verify backup/restore compatibility before treating this phase as complete.
