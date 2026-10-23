@@ -1,3 +1,11 @@
+## Phase 03 follow-up: pagination refresh hardening (2026-10-23)
+
+- Agri's shared full-dataset pagination helper now validates that each response is an array, checks that reported totals remain stable while fetching pages, and deduplicates records by stable `_id` if offset pages overlap while records change. If concurrent mutations make the fetched unique count inconsistent with the reported total, refresh fails visibly rather than silently presenting incomplete data.
+- The 1,001-row real-HTTP task fixture now cleans up its uniquely prefixed records in a `finally` path, including when insert/page assertions fail, and rediscovers created rows before deletion to reduce leaked test data.
+- Commits: `ba68052` (Agri pagination refresh hardening), `b4d144b` (large fixture cleanup guarantee).
+- Verification: these remote edits have not been executed in the local Windows checkout or through CI. Do not interpret them as test/build passes.
+- Still open and blocking Phase 03 sign-off: actual user-triggered network pagination for Agri crop/task/finance lists while preserving complete dashboard/report aggregates; cross-farm runtime fixtures for bulk writes and totals; any unresolved Flock bulk-entry acceptance scope; all-three-app test/build checkpoint; browser role review; and isolated real-MongoDB/disposable-copy checks at the final project verification stage.
+
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
