@@ -53,10 +53,64 @@ async function get(pathname, label) {
   return response;
 }
 
+async function ensureDevServer() {
+  try {
+    const response = await fetch(makeUrl(routePath), { signal: AbortSignal.timeout(750) });
+    if (response.ok) return;
+  } catch {
+    // No server is listening yet. Start the isolated Dairy Vite dev server below.
+  }
+
+  if (!ownsDevServer) {
+    throw new Error('Custom MUF_WORKBENCH_URL is unreachable: ' + baseUrl.origin);
+  }
+
+  const viteEntry = path.join(dairyClient, 'node_modules', 'vite', 'bin', 'vite.js');
+  devServer = spawn(process.execPath, [viteEntry, '--host', '127.0.0.1', '--port', '5000', '--strictPort'], {
+    cwd: dairyClient,
+    stdio: 'ignore',
+    windowsHide: true,
+  });
+
+  const deadline = Date.now() + 30_000;
+  let lastError = 'server did not start';
+  while (Date.now() < deadline) {
+    if (devServer.exitCode !== null) {
+      throw new Error('Dairy Vite dev server exited early with code ' + devServer.exitCode +
+        '. Ensure dependencies are installed in dairy_farm/client.');
+    }
+    try {
+      const response = await fetch(makeUrl(routePath), { signal: AbortSignal.timeout(timeoutMs) });
+      if (response.ok) return;
+      lastError = 'HTTP ' + response.status;
+    } catch (error) {
+      lastError = error instanceof Error ? error.message : String(error);
+    }
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  throw new Error('Dairy Vite dev server did not become ready within 30 seconds: ' + lastError);
+}
+
+async function stopOwnedDevServer() {
+  if (!devServer || devServer.exitCode !== null) return;
+  devServer.kill('SIGTERM');
+  await new Promise((resolve) => {
+    const timeout = setTimeout(() => {
+      if (devServer && devServer.exitCode === null) devServer.kill('SIGKILL');
+      resolve();
+    }, 2_000);
+    devServer.once('exit', () => {
+      clearTimeout(timeout);
+      resolve();
+    });
+  });
+}
+
 async function main() {
   console.log('\nMUF workbench runtime smoke test');
   console.log('  Base URL: ' + baseUrl.origin);
 
+  await ensureDevServer();
   const pageResponse = await get(routePath, 'workbench page');
   const contentType = pageResponse.headers.get('content-type') || '';
   const html = await pageResponse.text();
@@ -99,4 +153,4 @@ async function main() {
 main().catch(error => {
   console.error('\nFAIL: ' + (error instanceof Error ? error.message : String(error)));
   process.exitCode = 1;
-});
+}).finally(stopOwnedDevServer);
