@@ -4,7 +4,7 @@ on:
   push:
     branches: [main, muf-monorepo]
   pull_request:
-    branches: [main]
+    branches: [main, muf-monorepo]
   workflow_dispatch:
 
 permissions:
