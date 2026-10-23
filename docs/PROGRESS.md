@@ -527,3 +527,11 @@ Added `tests/phase4-breeding-lineage.test.ts` to guard the additive sire/ear-tag
 - Commits: `20a94e7` (Agri incremental card rendering), `fd45009` (tests).
 - Verification has not been run against this commit batch. The source-contract and synthetic fixture tests do not replace live route integration tests.
 - Phase 3 is still open: Agri needs network-level Load More with correct full-dataset summary totals, preview-first CSV bulk import workflows, and Excel workbook parsing/import. Stronger farm-isolation and real route/API scale fixtures also remain. No production database was accessed.
+
+
+## Phase 3 work checkpoint (2026-10-23)
+
+- **Agri pagination improvement committed:** frontend list fetches now request bounded pages of 500, use the server's `X-Total-Count` metadata when available, validate that the expected number of rows was received, and no longer silently stop at 10,000 records. A compatibility fallback remains for servers without count headers. This preserves full-data consumers used by dashboard/report aggregates, but it is not yet true list-on-demand loading: the current app still fetches all pages for those consumers.
+- **Agri crop CSV import committed:** admin crop workflow now offers a preview-first CSV importer, limits files to 1,000 data rows, validates headers and row widths, checks crop name/date/area, displays a preview and row errors, and requires explicit confirmation before writes. Partial write failures are reported rather than hidden. This currently covers crop CSV only; XLSX, task/finance imports, and broader Flock bulk workflows remain outstanding.
+- **Regression coverage added:** parser tests cover quoted commas, escaped quotes, embedded newlines, BOMs, duplicate/missing headers, row limits, malformed row widths, and crop validation. Pagination contract test asserts server totals are used and the hard 10,000-row cap is absent.
+- **Verification status:** changes have been committed to `muf-monorepo`. Automated tests and production builds have not yet been run in this environment; do not treat these changes as verified until the root suite, farm/sync/UI/workbench checks, and all three builds pass. Browser and real database checks remain deferred per project rules.
