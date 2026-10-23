@@ -1,5 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Egg, Plus, Pencil, Bird as BirdIcon, Eye } from 'lucide-react';
+import { listBatches } from '../api';
+import type { BatchWithSummary } from '../types';
 import { Bird, BirdBreed, IncubationRecord, Lang } from '../types';
 import { t } from '../i18n';
 import { todayStr } from '../utils/calculations';
@@ -69,6 +71,15 @@ export default function IncubationModule({
   canTransferToFlock,
 }: IncubationModuleProps) {
   const confirmAction = useConfirm();
+  const [incubationBatchRows, setIncubationBatchRows] = useState<BatchWithSummary[]>([]);
+  const [incubationBatchUnavailable, setIncubationBatchUnavailable] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    listBatches().then(rows => {
+      if (!cancelled) { setIncubationBatchRows(rows); setIncubationBatchUnavailable(false); }
+    }).catch(() => { if (!cancelled) setIncubationBatchUnavailable(true); });
+    return () => { cancelled = true; };
+  }, []);
   const canChange = canEdit ?? canDelete;
   const [startDate, setStartDate] = useState(todayStr());
   const [eggsSet, setEggsSet] = useState('');
@@ -292,6 +303,23 @@ export default function IncubationModule({
 
   return (
     <div className="space-y-6 muf-incubation-redesign">
+      <section className="rounded-2xl border border-orange-200 dark:border-orange-900 bg-white dark:bg-slate-900 p-4 space-y-3">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{L('Batch egg supply')}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{L('Egg collection recorded against flock batches')}</p>
+        </div>
+        {incubationBatchUnavailable ? <p role="status" className="text-xs text-amber-700 dark:text-amber-300">{L('Batch egg data is unavailable right now.')}</p> : <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Active batches')}</p><p className="text-xl font-bold mt-1">{incubationBatchRows.filter(b => b.status === 'Active').length}</p></div>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Batch eggs collected')}</p><p className="text-xl font-bold mt-1">{incubationBatchRows.reduce((sum, b) => sum + (b.summary?.total_eggs_collected || 0), 0).toLocaleString()}</p></div>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Incubation records')}</p><p className="text-xl font-bold mt-1">{records.length}</p></div>
+          </div>
+          {incubationBatchRows.filter(b => (b.summary?.total_eggs_collected || 0) > 0).slice(0, 4).map(batch => <div key={batch.batch_id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2">
+            <span className="min-w-0 text-xs font-semibold truncate">{batch.name}</span><span className="text-xs text-slate-500 whitespace-nowrap">{(batch.summary?.total_eggs_collected || 0).toLocaleString()} {L('eggs collected')}</span>
+          </div>)}
+          <p className="text-[10px] text-slate-500">{L('Batch egg collection and incubation records are currently tracked separately; automatic egg transfer is not yet enabled.')}</p>
+        </>}
+      </section>
       <div className="muf-incubation-heading muf-section-head">
         <div>
           <h2 className="text-xl font-bold font-display text-slate-800 dark:text-slate-100 flex items-center gap-2">
