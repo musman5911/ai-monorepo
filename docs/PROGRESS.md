@@ -1,16 +1,15 @@
-## Phase 3 implementation update (2026-10-23): Agri task and finance bulk imports
-
-- Added admin-only `POST /api/tasks/bulk` and `POST /api/finance/bulk` endpoints. Each validates the full payload before the first insert, caps each request at 200 rows, returns row-specific validation errors, and uses farm-scoped models. Task imports normalize status to Pending and resolve assigned laborer IDs server-side; finance imports allow only category, amount, type, date, crop link and notes.
-- Added an Agri preview-first CSV/XLSX import component for tasks and finance. It caps files at 5 MB and 1,000 rows, checks supported headers and row values, previews up to 20 rows, and only submits after an explicit confirmation. Writes are chunked by the client into a single request only when there are at most 200 rows; the UI currently previews 1,000 rows, so the next implementation step must split valid imports into ordered chunks of at most 200 and report per-chunk outcomes before this is ready for owner verification.
-- Added source-contract tests for bounds, validate-before-write ordering, restricted finance fields, and UI wiring.
-- Commits: `6c89fcd`, `18c190f`, `f441ccf`, `a14c106`, `0a679b4`, `[test commit pending]`.
-- Not yet verified by running the local test suite or Agri build. The remaining major Phase 3 blocker is genuine Agri network-level on-demand pagination without changing dashboard/report totals; this import work does not close Phase 3.
-
-
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (owner pulled through d7321fb and reported 151 passing tests plus passing farm-scope, shared-MUF sync, UI-safety and workbench checks; all three frontend production builds succeeded. Phase 3 implementation remains open.)
+Last updated: 2026-10-23 (Agri task and finance bulk-import code committed; local verification pending.)
+## Phase 3 implementation update: Agri task and finance bulk imports
+
+- Added admin-only `POST /api/tasks/bulk` and `POST /api/finance/bulk` endpoints. Each validates the full payload before the first insert, caps each request at 200 rows, returns row-specific validation errors, and uses farm-scoped models. Task imports normalize status to Pending and resolve assigned laborer IDs server-side; finance imports allow only category, amount, type, date, crop link and notes.
+- Added preview-first CSV/XLSX import UI for tasks and finance. Files are capped at 5 MB and 1,000 data rows. The UI validates supported headers and values, previews the first 20 rows, and requires confirmation. Valid rows are submitted in sequential chunks of at most 200; failed chunks are reported and are not retried automatically.
+- Added source-contract tests for row bounds, validate-before-write ordering, finance field allowlisting and UI wiring. Tests/builds have not been run in this editing session.
+- Commits: `6c89fcd`, `18c190f`, `f441ccf`, `a14c106`, `0a679b4`, `0bd82f0`, `ba75d04`.
+- Remaining major Phase 3 blocker: true network-level Agri on-demand pagination without changing dashboard/report totals. Large API fixtures, farm-isolation coverage for imports, browser review and consolidated verification remain open.
+
 
 
 ## Phase 3 implementation update (2026-10-23): Dairy paging and bounded bulk milk entry
