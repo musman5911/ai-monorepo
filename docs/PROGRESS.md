@@ -572,3 +572,27 @@ Added `tests/phase4-breeding-lineage.test.ts` to guard the additive sire/ear-tag
   9. `cd ..\\..\\flock_farm\\client && npm ci && npm run build`
   10. Return to repo root and run `git status --short`.
 - Browser role testing and real MongoDB tests are still deferred to the final consolidated verification pass. Do not mark Phase 3 complete until tests/builds pass and Agri list-on-demand work is finished.
+
+
+## Phase 3 owner verification checkpoint (2026-10-23, commit 757e11e)
+
+The owner pulled the pagination assertion fix and reported these local results from Windows Command Prompt:
+
+- Focused Agri runtime HTTP integration suite: **1 test file passed, 6/6 tests passed**.
+- Root `npm test`: **21 test files passed, 186/186 tests passed**.
+- Agri frontend `npm run build`: passed. Non-fatal warnings: deprecated Vite/Rolldown `advancedChunks` option and a minified JS chunk above 500 kB.
+- Flock client `npm run build`: passed, including `tsc --noEmit`. Non-fatal warning: main JS chunk above 500 kB.
+- Dairy frontend build is **not verified**. The attempted `cd ..\..\dairy_farm\frontend` from `agri_farm\frontend` failed because that path does not exist; the following build command consequently rebuilt Agri a second time. Earlier roadmap commands used `dairy_farm/client`, so inspect the actual folder layout before retrying.
+- `npm ci` at repository root reported 5 dependency vulnerabilities (1 moderate, 2 high, 2 critical). No audit fix was applied.
+- `npm run check-farms`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, and `npm run check-workbench-runtime` were not run in this checkpoint.
+- Browser role review and real-MongoDB/disposable-copy checks remain deferred to the consolidated final pass. No production data was accessed by the reported tests/builds.
+
+The first full-suite run had one failing test due to an over-escaped digit regex in the new pagination assertion. Fixed in commit `757e11e`; the owner's rerun passed. This verifies the reported test/build commands only, not all Phase 3 acceptance criteria.
+
+### Next Phase 3 actions
+
+1. From the repository root, inspect available Dairy frontend directories with `dir dairy_farm` and `dir dairy_farm\client` (and check for a `package.json` before building).
+2. Run the missing farm/sync/UI/workbench checks from root.
+3. Add or strengthen dedicated runtime fixtures for cross-farm bulk writes and aggregate totals, plus realistic 1,000+ row API paging checks.
+4. Implement true Agri list-on-demand network paging while keeping dashboard/report totals correct, using server summaries or explicitly deferred complete-data fetches.
+5. Run the consolidated browser/role matrix and isolated real-MongoDB plus disposable-copy checks only after implementation work is complete.
