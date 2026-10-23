@@ -1,6 +1,6 @@
 # Roadmap
 
-Last reviewed: 2026-10-23. CI is manual-only and should run at deliberate testing checkpoints, not on every commit. The owner previously reported a green Windows root suite: 135/135 tests passed across 17 files. On the latest Phase 3 checkpoint, 149/150 tests passed; the Dairy CSV-preview assertion, Dairy/Flock TypeScript builds, and Flock memory-mode farm-scope check exposed issues. Corrective commits have been pushed but await local verification. Per owner direction, Phase 2 real-MongoDB concurrency and disposable-copy backup/restore verification is deferred to the consolidated final verification pass after all planned phases; it does not block continued Phase 3 implementation. Browser and end-to-end role testing are also deferred to that final pass. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-23. CI is manual-only and should run at deliberate testing checkpoints, not on every commit. Latest owner-reported Windows checkpoint after pulling through d7321fb: 151 tests passed; farm-scope, shared-MUF sync, UI-safety and workbench checks passed; Dairy, Flock and Agri production builds succeeded. The pasted console output interleaves the root test summary with the next command, so capture a clean standalone `npm test` summary at the next checkpoint. Build warnings were advisory. Per owner direction, Phase 2 real-MongoDB concurrency and disposable-copy backup/restore verification is deferred to the consolidated final verification pass after all planned phases; it does not block continued Phase 3 implementation. Browser and end-to-end role testing are also deferred to that final pass. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
@@ -21,7 +21,7 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 | 0 | Docs reset and repository cleanup | Repository | Low (done, see PROGRESS) |
 | 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Implementation done; copy-migration checks and final integrated browser pass pending |
 | 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | Implementation checkpoint delivered: batch-first panels, source-batch egg allocation validation, batch-linked labor, cross-process inventory locking, and complete batch backup fields. Local tests/builds and disposable-copy backup/restore verification are pending before phase sign-off |
-| 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | In progress: opt-in Dairy cows/milk pagination API done; incremental UI loading and bulk entry remain |
+| 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | In progress: Dairy cows/milk pagination and CSV imports, Flock batch pagination/egg import, and Agri server pagination contracts are implemented; Agri incremental UI, more Flock bulk workflows, Excel import and scale/isolation fixtures remain |
 | 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | In progress: optional cow lineage fields and ear-tag index added; workflows and disposable-MongoDB index verification remain |
 | 5 | Photo storage adapter and Cloudinary | All three | Medium |
 | 6 | Super Admin upgrade (Owner-only, per-farm summaries) | All three | Low to medium |
@@ -63,9 +63,9 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 
 ### Latest verification checkpoint (2026-10-23)
 
-- The owner-reported Dairy production build completed successfully. The mixed static/dynamic import warning for `api.ts` is advisory, not a build failure.
-- Root tests reported 134 passed and one timeout in `tests/muf-farms.test.ts` while loading the installed Mongoose package. The test's assertions did not report a failure. A targeted 20-second timeout was committed; rerun the suite before treating it as verified.
-- Farm scope, shared MUF parity, UI safety, and workbench source checks passed locally.
+- The owner pulled through `d7321fb` and reported 151 passing tests in the latest console output. Because command output is interleaved, capture a clean standalone root `npm test` summary at the next checkpoint.
+- `npm run check-farms`, `npm run check-sync`, `npm run check-ui`, and `npm run check-workbench` passed locally.
+- Dairy, Flock and Agri production builds succeeded. Dairy's mixed static/dynamic import warning, Flock/Agri large-chunk warnings, and Agri's deprecated `advancedChunks` warning are advisory, not build failures.
 - Do not run a production migration or index build to verify Phase 4. Use a disposable database copy and first check for duplicate non-empty ear tags within each farm.
 
 ### Phase 3: Bulk entry, scroll loading, server totals
