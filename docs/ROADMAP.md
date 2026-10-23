@@ -156,3 +156,5 @@ The Home Birds navigation is secondary and scoped to Bird List, Eggs, Monthly Re
 - The memory-mode adapter lacks compound-index enforcement, so the lock helper also applies a per-process farm guard for local development. Deployed MongoDB uses the persisted unique key to coordinate across processes. See `docs/FLOCK_EGG_INVENTORY_LOCK.md` for stale-lock recovery.
 - The shared lock also covers labor-attendance bucket writes so batch deletion/replacement cannot race a new batch-linked attendance record.
 - Route-level tests now cover both incubation allocation writes and batch-linked labor-attendance writes against the shared lock helper.
+
+- Main navigation now exposes Batches, Dashboard, Health, Labor, Incubation and Summary. Dedicated batch-first Health and Summary portals are separate from the smaller Home Birds workflows; the legacy bird-led monthly report and vaccination tracker remain under Home Birds.
