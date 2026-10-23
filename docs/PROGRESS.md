@@ -409,3 +409,14 @@ Commit: `9a3eeb5` (`test(flock): wait for backend readiness in farm scope check`
 Pull `9a3eeb5` and rerun `npm run check-farms`. If Flock then passes its owner-role and farm migration checks, the harness continues to exercise buckets, batches, linked logs, worker farm access and backup scope. If a different failure appears, fix that actual contract/security issue before Phase 2 sign-off.
 
 The inventory lock still needs disposable-MongoDB concurrency verification, and Phase 2 backup/restore compatibility still needs a dedicated repeatable test. These are not proven by the current memory-mode HTTP test. Keep Phase 2 open until those gates are complete.
+
+
+### Follow-up verification results: Flock backup assertion (2026-10-23)
+
+The owner pulled the startup-retry fix and reran the checks. Root tests remain green (**115/115**), as do MUF sync, UI safety, and all 23 workbench source checks. Agri and Dairy farm-scope checks pass. Flock now reaches the backup assertion, where `owner backup includes both farms` fails; the earlier startup 503 is resolved.
+
+Root cause found in the Flock development memory adapter: the shared egg-inventory lock's release path calls Mongoose's `findOneAndDelete`, but the adapter did not implement that method. The backup route acquires locks for all farms and releases them in a `finally` block, so this missing adapter method causes the otherwise-built backup request to fail in the memory-mode integration check. Added `findOneAndDelete(filter)` to the memory adapter, with the same filter semantics and returned deleted document as the adapter's other delete methods.
+
+Fix commit: `1d71319` (`fix(flock): support findOneAndDelete in memory adapter`).
+
+**Awaiting owner verification:** pull the latest `muf-monorepo` branch and rerun `npm run check-farms`. This is an implementation diagnosis, not a claimed test pass. The HTTP farm-scope check exercises the backup path and lock release in memory mode, but it does not replace the required real-MongoDB multi-process concurrency test or disposable-database backup/restore compatibility test.
