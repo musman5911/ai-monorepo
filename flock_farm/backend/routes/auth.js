@@ -345,6 +345,12 @@ router.patch('/users/:id', authRequired, requireRole('owner'), async (req, res) 
       }
     }
 
+    const nextRole = updates.role ?? user.role;
+    const nextEmail = updates.email ?? user.email;
+    if (['owner', 'manager'].includes(nextRole) && !String(nextEmail || '').trim()) {
+      return res.status(400).json({ error: 'Email address is mandatory for owner and manager accounts' });
+    }
+
     const adminSafetyErr = await ensureAdminSafety(user, updates);
     if (adminSafetyErr) {
       return res.status(400).json({ error: adminSafetyErr });
