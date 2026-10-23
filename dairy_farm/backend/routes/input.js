@@ -114,6 +114,37 @@ function parsePagination(query, { defaultLimit = null, maxLimit = 10000 } = {}) 
   return { limit: null, skip, paginate: false };
 }
 
+
+
+/**
+ * Opt-in page-based pagination for incremental clients.
+ * Legacy callers that omit `page` retain the existing array response and
+ * skip/limit behavior. Page numbers are 1-based; invalid inputs fail closed.
+ */
+function parsePagePagination(query, { defaultLimit = 50, maxLimit = 200 } = {}) {
+  if (query.page === undefined) {
+    return { enabled: false, page: null, limit: null, skip: 0, error: null };
+  }
+
+  const rawPage = String(query.page).trim();
+  if (!/^\\d+$/.test(rawPage) || Number(rawPage) < 1 || !Number.isSafeInteger(Number(rawPage))) {
+    return { enabled: true, page: null, limit: null, skip: 0, error: 'page must be a positive integer' };
+  }
+
+  const page = Number(rawPage);
+  const rawLimit = query.limit === undefined ? defaultLimit : Number(query.limit);
+  if (!Number.isInteger(rawLimit) || rawLimit < 1) {
+    return { enabled: true, page, limit: null, skip: 0, error: 'limit must be a positive integer' };
+  }
+
+  const limit = Math.min(rawLimit, maxLimit);
+  const skip = (page - 1) * limit;
+  if (!Number.isSafeInteger(skip)) {
+    return { enabled: true, page, limit, skip: 0, error: 'page is too large' };
+  }
+  return { enabled: true, page, limit, skip, error: null };
+}
+
 /** Apply skip/limit to a mongoose query only when pagination is active. */
 function applyPagination(query, { limit, skip, paginate }) {
   let q = query.skip(skip);
@@ -131,5 +162,6 @@ export {
   readEnum,
   sendValidationError,
   parsePagination,
+  parsePagePagination,
   applyPagination,
 };
