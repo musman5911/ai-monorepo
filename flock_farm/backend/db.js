@@ -1,16 +1,6 @@
 import mongoose from 'mongoose';
 import { enableMemoryDb } from './memory-db.js';
 import { MUF_ENV } from './muf-env.mjs';
-import DataStore from './models/DataStore.js';
-import Batch from './models/Batch.js';
-import BatchFeedLog from './models/BatchFeedLog.js';
-import BatchMortalityLog from './models/BatchMortalityLog.js';
-import BatchExpenseLog from './models/BatchExpenseLog.js';
-import BatchSaleLog from './models/BatchSaleLog.js';
-import BatchWeightLog from './models/BatchWeightLog.js';
-import Image from './models/Image.js';
-import User from './models/User.js';
-import Farm from './models/Farm.js';
 import { mufScopeModels, mufMigrateFarms, mufLoadDefaultFarm } from './muf-farms.mjs';
 
 // ---------------------------------------------------------------------------
@@ -21,6 +11,18 @@ import { mufScopeModels, mufMigrateFarms, mufLoadDefaultFarm } from './muf-farms
 // ---------------------------------------------------------------------------
 const memoryMode = MUF_ENV.memoryMode && !MUF_ENV.mongoUri;
 if (memoryMode) enableMemoryDb();
+
+// Register models only after the memory adapter has patched mongoose.model().
+const DataStore = (await import('./models/DataStore.js')).default;
+const Batch = (await import('./models/Batch.js')).default;
+const BatchFeedLog = (await import('./models/BatchFeedLog.js')).default;
+const BatchMortalityLog = (await import('./models/BatchMortalityLog.js')).default;
+const BatchExpenseLog = (await import('./models/BatchExpenseLog.js')).default;
+const BatchSaleLog = (await import('./models/BatchSaleLog.js')).default;
+const BatchWeightLog = (await import('./models/BatchWeightLog.js')).default;
+const Image = (await import('./models/Image.js')).default;
+const User = (await import('./models/User.js')).default;
+const Farm = (await import('./models/Farm.js')).default;
 
 const MUF_FARM_SCOPED_NAMES = ['DataStore', 'Batch', 'BatchFeedLog', 'BatchMortalityLog', 'BatchExpenseLog', 'BatchSaleLog', 'BatchWeightLog', 'Image'];
 const MUF_FARM_MODELS = { DataStore, Batch, BatchFeedLog, BatchMortalityLog, BatchExpenseLog, BatchSaleLog, BatchWeightLog, Image };
