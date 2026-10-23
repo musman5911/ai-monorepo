@@ -245,6 +245,7 @@ router.post('/users', authRequired, requireRole('admin'), async (req, res) => {
       username: normalized,
       passwordHash,
       role: chosenRole,
+      farmIds: chosenRole === 'worker' && req.farmContext?.farmId ? [String(req.farmContext.farmId)] : [],
       displayName: displayName || '',
       email: cleanEmail,
       active: true,
