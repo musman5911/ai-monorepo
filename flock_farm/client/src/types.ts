@@ -249,10 +249,41 @@ export interface BatchSaleLog {
   updatedAt?: string;
 }
 
+export interface BatchEggLog {
+  _id: string;
+  batch_id: string;
+  date: string;
+  collected: number;
+  sold: number;
+  home_use: number;
+  broken_wasted: number;
+  price_per_egg: number;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface BatchVaccinationLog {
+  _id: string;
+  batch_id: string;
+  date: string;
+  vaccine_name: string;
+  dose?: string;
+  bird_count: number;
+  cost: number;
+  notes?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 export interface BatchSummary {
   intake_cost: number;
   total_feed_cost: number;
   total_expense_cost: number;
+  total_vaccination_cost: number;
+  total_eggs_collected: number;
+  total_eggs_sold: number;
+  total_egg_income: number;
   total_mortality_count: number;
   total_sold_count: number;
   total_revenue: number;
@@ -274,6 +305,8 @@ export interface BatchDetail {
   expense_logs: BatchExpenseLog[];
   sales_logs: BatchSaleLog[];
   weight_logs: BatchWeightLog[];
+  egg_logs: BatchEggLog[];
+  vaccination_logs: BatchVaccinationLog[];
 }
 
 export interface BatchBackupBundle {
@@ -283,6 +316,8 @@ export interface BatchBackupBundle {
   expense_logs: BatchExpenseLog[];
   sales_logs: BatchSaleLog[];
   weight_logs?: BatchWeightLog[];
+  egg_logs?: BatchEggLog[];
+  vaccination_logs?: BatchVaccinationLog[];
 }
 
 // Field labor — named wage workers (NOT app logins) + daily attendance.
