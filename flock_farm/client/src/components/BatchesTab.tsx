@@ -30,6 +30,7 @@ import {
   createBatchExpenseLog,
   createBatchFeedLog,
   createBatchEggLog,
+  createBatchEggLogsBulk,
   createBatchVaccinationLog,
   createBatchMortalityLog,
   createBatchSaleLog,
@@ -73,6 +74,27 @@ type ModalKind = 'create' | 'edit' | 'intake' | 'feed' | 'mortality' | 'expense'
 
 // formatRs + normalizePublicAssetPath extracted to ./batches/batchUtils
 // (pure functions, no component state).
+
+type EggBulkPreviewRow = {
+  rowNumber: number;
+  entry: { date: string; collected: number; sold: number; home_use: number; broken_wasted: number; price_per_egg: number; notes?: string };
+  error: string;
+};
+
+function parseBatchCsvLine(line: string): string[] {
+  const values: string[] = [];
+  let value = '';
+  let quoted = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"' && quoted && line[i + 1] === '"') { value += '"'; i++; }
+    else if (char === '"') quoted = !quoted;
+    else if (char === ',' && !quoted) { values.push(value.trim()); value = ''; }
+    else value += char;
+  }
+  values.push(value.trim());
+  return values;
+}
 
 export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
   const confirmAction = useConfirm();
@@ -120,6 +142,9 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
   const [expenseForm, setExpenseForm] = useState({ date: todayStr(), category: 'Medicine' as BatchExpenseLog['category'], detail: '', amount: '', notes: '' });
   const [saleForm, setSaleForm] = useState({ date: todayStr(), count: '', amount: '', buyer: '', notes: '' });
   const [submitting, setSubmitting] = useState(false);
+  const [showEggBulkModal, setShowEggBulkModal] = useState(false);
+  const [eggBulkPreview, setEggBulkPreview] = useState<EggBulkPreviewRow[]>([]);
+  const [eggBulkBusy, setEggBulkBusy] = useState(false);
 
   const loadBatches = useCallback(async () => {
     setLoading(true);
@@ -149,6 +174,70 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
   useEffect(() => {
     loadBatches();
   }, [loadBatches]);
+
+  const handleEggBulkCsv = async (file?: File | null) => {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { notify('CSV files must be 2 MB or smaller.', 'error'); return; }
+    try {
+      const lines = (await file.text()).replace(/\r\n?/g, '\n').split('\n').filter(line => line.trim());
+      if (lines.length < 2) throw new Error('CSV needs a header and at least one data row.');
+      if (lines.length > 1001) throw new Error('Import is limited to 1,000 rows.');
+      const headers = parseBatchCsvLine(lines[0]).map(value => value.toLowerCase().replace(/\s+/g, ''));
+      const at = (name: string) => headers.indexOf(name);
+      for (const required of ['date', 'collected']) if (at(required) < 0) throw new Error(`Missing required CSV column: ${required}`);
+      const seen = new Set<string>();
+      const preview = lines.slice(1).map((line, index) => {
+        const cells = parseBatchCsvLine(line);
+        const get = (name: string) => cells[at(name)] || '';
+        const date = get('date');
+        const collectedText = get('collected');
+        const collected = Number(collectedText);
+        const sold = get('sold') === '' ? 0 : Number(get('sold'));
+        const home_use = get('home_use') === '' ? 0 : Number(get('home_use'));
+        const broken_wasted = get('broken_wasted') === '' ? 0 : Number(get('broken_wasted'));
+        const price_per_egg = get('price_per_egg') === '' ? 0 : Number(get('price_per_egg'));
+        const problems: string[] = [];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(date + 'T00:00:00Z').getTime()) || new Date(date + 'T00:00:00Z').toISOString().slice(0, 10) !== date) problems.push('Invalid date');
+        if (collectedText === '' || !Number.isInteger(collected) || collected < 0) problems.push('Collected must be a non-negative integer');
+        if (![sold, home_use, broken_wasted].every(value => Number.isInteger(value) && value >= 0)) problems.push('Egg counts must be non-negative integers');
+        if (!Number.isFinite(price_per_egg) || price_per_egg < 0) problems.push('Price must be non-negative');
+        if (sold + home_use + broken_wasted > collected) problems.push('Sold, home use and waste exceed collected eggs');
+        if (seen.has(date)) problems.push('Duplicate date in CSV');
+        seen.add(date);
+        return { rowNumber: index + 2, entry: { date, collected, sold, home_use, broken_wasted, price_per_egg, notes: get('notes') || undefined }, error: problems.join('; ') };
+      });
+      setEggBulkPreview(preview);
+      setShowEggBulkModal(true);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Could not read egg CSV', 'error');
+    }
+  };
+
+  const submitEggBulkCsv = async () => {
+    if (!selectedBatch) return;
+    if (eggBulkPreview.some(row => row.error)) { notify('Fix invalid CSV rows before importing.', 'error'); return; }
+    setEggBulkBusy(true);
+    try {
+      let saved = 0;
+      let failed = 0;
+      for (let start = 0; start < eggBulkPreview.length; start += 200) {
+        const result = await createBatchEggLogsBulk(selectedBatch.batch_id, eggBulkPreview.slice(start, start + 200).map(row => row.entry));
+        saved += result.saved;
+        failed += result.failed;
+      }
+      if (failed) notify(`${saved} egg logs saved; ${failed} failed. Check the response and retry only failed rows.`, 'error');
+      else {
+        notify(`${saved} egg logs imported.`, 'success');
+        setShowEggBulkModal(false);
+        setEggBulkPreview([]);
+      }
+      await refreshAfterMutation(selectedBatch.batch_id);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Egg CSV import failed', 'error');
+    } finally {
+      setEggBulkBusy(false);
+    }
+  };
 
   const handleBatchImageUpload = async (file?: File | null, target: 'create' | 'edit' = 'create') => {
     if (!file) return;
@@ -896,9 +985,33 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
           </div>
           <input type="number" min="0" step="0.01" placeholder={L('Price per egg')} value={eggForm.price_per_egg} onChange={(e) => setEggForm({ ...eggForm, price_per_egg: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
           <textarea value={eggForm.notes} onChange={(e) => setEggForm({ ...eggForm, notes: e.target.value })} placeholder={L('Notes')} className="w-full px-3 py-2 border rounded-xl h-20 resize-none" />
+          <label className="block rounded-xl border border-dashed border-amber-300 p-3 text-center cursor-pointer text-amber-800 dark:text-amber-300">
+            Import egg log CSV (preview first)
+            <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; e.currentTarget.value = ''; void handleEggBulkCsv(file); }} />
+          </label>
           <ModalActions submitting={submitting} onCancel={closeModal} submitLabel={L('Save Egg Log')} />
         </form>
       </BatchLogModal>
+
+      <DetailModal open={showEggBulkModal} onClose={() => { if (!eggBulkBusy) setShowEggBulkModal(false); }}
+        title="Preview Batch Egg CSV" size="big">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-500">Required columns: date, collected. Optional: sold, home_use, broken_wasted, price_per_egg, notes. Dates must be unique within this batch. Up to 1,000 rows per file.</p>
+          <div className="max-h-80 overflow-auto border rounded-xl">
+            <table className="w-full text-left text-xs">
+              <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800"><tr><th className="p-2">Row</th><th className="p-2">Date</th><th className="p-2">Collected</th><th className="p-2">Sold</th><th className="p-2">Home</th><th className="p-2">Waste</th><th className="p-2">Validation</th></tr></thead>
+              <tbody>{eggBulkPreview.map(row => <tr key={row.rowNumber} className={row.error ? 'bg-red-50 dark:bg-red-900/20' : 'border-t'}>
+                <td className="p-2">{row.rowNumber}</td><td className="p-2">{row.entry.date}</td><td className="p-2">{row.entry.collected}</td><td className="p-2">{row.entry.sold}</td><td className="p-2">{row.entry.home_use}</td><td className="p-2">{row.entry.broken_wasted}</td><td className="p-2">{row.error || 'Ready'}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-slate-500">{eggBulkPreview.length} rows · {eggBulkPreview.filter(row => row.error).length} invalid</p>
+            <button type="button" onClick={submitEggBulkCsv} disabled={eggBulkBusy || !eggBulkPreview.length || eggBulkPreview.some(row => row.error)}
+              className="rounded-xl bg-amber-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">{eggBulkBusy ? 'Importing...' : 'Import Egg Logs'}</button>
+          </div>
+        </div>
+      </DetailModal>
 
       <BatchLogModal open={activeModal === 'vaccination'} onClose={closeModal} title={L('Log Vaccination')} subtitle={selectedBatch?.name} icon={<Syringe className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700">
         <form onSubmit={(e) => submitBatchLog(e, 'vaccination')} className="space-y-3 text-xs">
