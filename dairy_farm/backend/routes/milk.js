@@ -91,6 +91,11 @@ router.post('/bulk', protect, workerOrAdmin, async (req, res) => {
     const normalized = [];
     const errors = [];
     rows.forEach((row, index) => {
+      if (!row || typeof row !== 'object' || Array.isArray(row)) {
+        errors.push(`row ${index + 1}: entry must be an object`);
+        normalized.push({ index, payload: {}, forceOverwrite: false });
+        return;
+      }
       const { payload, errors: rowErrors } = milkPayload(row, { requireBasics: true });
       if (rowErrors.length) errors.push(`row ${index + 1}: ${rowErrors.join(', ')}`);
       if (payload.cowId && payload.date) {
