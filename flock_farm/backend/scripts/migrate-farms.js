@@ -1,8 +1,13 @@
 import mongoose from 'mongoose';
 import { connectDB, Farm, User, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
 import { mufMigrateFarms, mufRunUnscoped } from '../muf-farms.mjs';
+import { MUF_ENV } from '../muf-env.mjs';
 
 const dryRun = process.argv.includes('--dry-run');
+if (MUF_ENV.memoryMode && !MUF_ENV.mongoUri) {
+  console.error('This script requires a real MongoDB URI. Memory/demo data migrates automatically and is not persistent.');
+  process.exit(2);
+}
 await connectDB();
 
 const report = await mufRunUnscoped(async () => {
