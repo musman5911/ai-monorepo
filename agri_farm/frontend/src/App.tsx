@@ -791,16 +791,38 @@ function App() {
   }, [token]);
 
   const refreshData = async () => {
-    // Fetch ALL records (paginating through the server's 100-per-request cap) so
-    // dashboard KPIs, reports, and aggregates never silently only see page 1.
+    // Read the backend's page metadata rather than assuming a fixed total or
+    // stopping at an arbitrary 10,000-row ceiling. Aggregate/report consumers
+    // still receive the complete scoped dataset; the list endpoints remain
+    // bounded at 500 records per request.
     const fetchAllPages = async (fetchFn) => {
-      const all = [];
-      let skip = 0;
-      while (true) {
-        const res = await fetchFn(skip, 100);
+      const pageSize = 500;
+      const first = await fetchFn(0, pageSize);
+      const all = [...(Array.isArray(first.data) ? first.data : [])];
+      const rawTotal = first.headers?.['x-total-count'] ?? first.headers?.['X-Total-Count'];
+      const total = Number(rawTotal);
+      if (Number.isFinite(total) && total >= 0) {
+        const pageCount = Math.ceil(total / pageSize);
+        for (let page = 1; page < pageCount; page += 1) {
+          const res = await fetchFn(page * pageSize, pageSize);
+          if (!Array.isArray(res.data)) throw new Error('Paginated API returned a non-array payload.');
+          all.push(...res.data);
+        }
+        if (all.length < total) {
+          throw new Error(`Paginated API returned ${all.length} of ${total} records.`);
+        }
+        return all.slice(0, total);
+      }
+
+      // Compatibility fallback for older servers without pagination headers.
+      // A short page proves completion; a full page means another request is needed.
+      let skip = all.length;
+      while (Array.isArray(first.data) && first.data.length === pageSize) {
+        const res = await fetchFn(skip, pageSize);
+        if (!Array.isArray(res.data)) throw new Error('Paginated API returned a non-array payload.');
         all.push(...res.data);
-        if (res.data.length < 100 || all.length >= 10000) break;
-        skip += 100;
+        if (res.data.length < pageSize) break;
+        skip += res.data.length;
       }
       return all;
     };
