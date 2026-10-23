@@ -52,10 +52,10 @@ async function ensureAdminSafety(targetUser, updates = {}) {
   const nextRole = updates.role ?? targetUser.role;
   const nextActive = updates.active ?? targetUser.active;
 
-  if (targetUser.role === 'admin' && targetUser.active && (nextRole !== 'admin' || nextActive === false)) {
+  if (['owner', 'admin'].includes(targetUser.role) && targetUser.active && (!['owner', 'admin'].includes(nextRole) || nextActive === false)) {
     const otherAdmins = await countOtherActiveAdmins(targetUser._id);
     if (otherAdmins === 0) {
-      return 'At least one active admin must remain.';
+      return 'At least one active owner must remain.';
     }
   }
 
