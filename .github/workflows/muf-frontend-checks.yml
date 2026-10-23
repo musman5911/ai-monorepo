@@ -41,6 +41,18 @@ jobs:
         working-directory: dairy_farm/client
         run: npm ci
 
+      - name: Install Agri backend dependencies for farm-scope check
+        working-directory: agri_farm/backend
+        run: npm ci
+
+      - name: Install Dairy backend dependencies for farm-scope check
+        working-directory: dairy_farm/backend
+        run: npm ci
+
+      - name: Install Flock backend dependencies for farm-scope check
+        working-directory: flock_farm/backend
+        run: npm ci
+
       - name: Run root regression tests
         run: npm test
 
