@@ -1,16 +1,16 @@
 # Roadmap
 
-Last reviewed: 2026-10-23. Owner-reported local checks before the latest Dashboard change: all three frontend builds, farm-scope checks, MUF sync checks, UI safety checks, 89 unit tests and 8 workbench runtime checks passed. The latest Dashboard batch-first change has not yet been built or tested. Per owner direction, browser and end-to-end role testing will be consolidated into one final verification pass after all planned phases. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-23. CI is manual-only and should run at deliberate testing checkpoints, not on every commit. Owner-reported local checks before the latest Dashboard change: all three frontend builds, farm-scope checks, MUF sync checks, UI safety checks, 89 unit tests and 8 workbench runtime checks passed. The latest Dashboard batch-first change has not yet been built or tested. Per owner direction, browser and end-to-end role testing will be consolidated into one final verification pass after all planned phases. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
 ## How every phase runs
 
-1. Claude sends a read-only plan: files, collections and migration steps. No code yet.
-2. The owner approves, changes or rejects the plan.
-3. Claude delivers the change as one zip, and runs the checks that can run, reporting honestly which did and did not.
-4. For data/migration changes, test the migration on a disposable database copy before any live application. Browser and end-to-end role testing are deferred to one consolidated final pass after all planned phases, per owner direction.
-5. Record implementation and automated checks in `PROGRESS.md`. Start the next phase only after the owner approves its read-only plan. Never apply a migration to live data without explicit approval.
+1. Work directly on the `muf-monorepo` branch in small, ordered implementation steps; do not modify `main`.
+2. Continue through the approved roadmap without asking for repeated approval. Inspect existing schemas, APIs and data flows before changing them; preserve historical data unless a safe replacement is explicit.
+3. Update both `PROGRESS.md` and `ROADMAP.md` after each work step, and state clearly what is implemented versus verified.
+4. GitHub Actions is manual-only (`workflow_dispatch`). Do not run a workflow for every commit. Trigger it deliberately at a useful testing checkpoint, and report only checks that actually ran.
+5. For data/migration changes, use disposable database copies and backups before considering any live application. Never run migrations against live data. Browser and end-to-end role testing are deferred to one consolidated final pass after all planned phases.
 
 Rules for every phase come from `RULES.md`: back up before migrations, ask before removing anything, keep the three projects separate, keep shared MUF files identical.
 
