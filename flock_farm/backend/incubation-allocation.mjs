@@ -26,7 +26,9 @@ export function validateIncubationAllocations(records, batches, eggLogs) {
       - Number(log.sold || 0)
       - Number(log.home_use || 0)
       - Number(log.broken_wasted || 0);
-    availableByBatch.set(batchId, availableByBatch.get(batchId) + net);
+    // Match batch summaries: a malformed/legacy log cannot create negative
+    // inventory that offsets valid supply from another day.
+    availableByBatch.set(batchId, availableByBatch.get(batchId) + Math.max(0, net));
   }
 
   const allocatedByBatch = new Map();
