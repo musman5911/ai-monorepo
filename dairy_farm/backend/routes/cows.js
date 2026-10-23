@@ -113,6 +113,7 @@ router.get('/', protect, async (req, res) => {
         Cow.find(filter).sort({ name: 1, _id: 1 }).skip(page.skip).limit(page.limit),
         Cow.countDocuments(filter),
       ]);
+      res.set('Access-Control-Expose-Headers', 'X-Total-Count, X-Page, X-Page-Size, X-Total-Pages');
       res.set('X-Total-Count', String(total));
       res.set('X-Page', String(page.page));
       res.set('X-Page-Size', String(page.limit));
