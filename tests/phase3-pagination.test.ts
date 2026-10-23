@@ -78,6 +78,16 @@ describe('Phase 3 bounded Dairy milk bulk-entry contract', () => {
     expect(component).toContain('of {totalCount} animals loaded');
   });
 
+  it('bounds bulk health requests and validates rows before writes', () => {
+    const source = readFileSync(path.join(repoRoot, 'dairy_farm/backend/routes/health.js'), 'utf8');
+    const client = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
+    expect(source).toContain("router.post('/bulk', protect, workerOrAdmin");
+    expect(source).toContain("rows.length > 200");
+    expect(source).toContain("if (errors.length) return res.status(400)");
+    expect(source).toContain("_healthId: id");
+    expect(client).toContain("req('/health/bulk'");
+  });
+
   it('supports reading paginated milk response metadata in the Dairy client API', () => {
     const source = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
     expect(source).toContain('includeMeta?: boolean');
