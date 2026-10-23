@@ -286,7 +286,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
       const last = pages[pages.length - 1];
       setBatchTotal(last.total);
       setBatchPage(last.page);
-      setHasMore(last.page < last.totalPages);
+      setHasMoreBatches(last.page < last.totalPages);
     } catch {
       await loadBatches();
     }
