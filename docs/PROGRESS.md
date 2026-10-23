@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Phase 0 applied and verified by the owner; Phase 1 steps 1A and 1B-1 delivered; Flock 1B-2 waiting for the owner's layout decision; the rest not started).
+Last updated: 2026-10-23 (owner reported Windows checks/builds passed; Phase 1 step 1B-2 approved for implementation; the rest not started).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
@@ -12,7 +12,7 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 | Phase | State |
 |---|---|
 | 0. Docs reset and repository cleanup | Done. Applied by the owner, pushed to the `muf-monorepo` branch, owner's checks and builds all passed |
-| 1. Farms and roles (MUF) | In progress. 1A done (shared core + Dairy backend); 1B-1 done (Agri backend); 1B-2 Flock backend waiting for a layout decision; 1C screens and 1D wrap-up not started |
+| 1. Farms and roles (MUF) | In progress. 1A done (shared core + Dairy backend); 1B-1 done (Agri backend); 1B-2 Flock backend approved for implementation; 1C screens and 1D wrap-up not started |
 | 2. Flock restructure and Home Birds | Not started |
 | 3. Bulk entry, scroll loading, server totals | Not started |
 | 4. Dairy breeding; Agri fields and seasons | Not started |
@@ -37,7 +37,7 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 
 ## Waiting for the owner
 
-- **Flock data layout (blocks step 1B-2).** Claude proposed one stored list per farm and key. The owner answered "Flock layout - no we will do …" and the message was cut off, so the alternative is unknown. No Flock code has been written.
+- **Flock step 1B-2 implementation:** approved after a read-only audit of the existing layout. Legacy `DataStore` uses globally keyed documents whose values contain arrays/objects; Flock also has `Batch`, five batch-log collections, and `Image`. Preserve existing records and response shapes while adding server-enforced farm scope. No Flock code has been changed yet.
 
 ## Phase 1 step 1B-1: Agri backend (built 2026-10-23)
 
@@ -114,6 +114,16 @@ Design record: [PHASE1_PLAN.md](PHASE1_PLAN.md). Backend only; no screens change
 
 Owner's machine, 2026-10-22, Phase 0 branch: `npm test` 61 of 61, sync, UI safety and workbench checks passed, and `tools\build-all.bat` built Dairy, Flock and Agri.
 
+### Owner verification (2026-10-23, Windows; reported by owner, not independently rerun here)
+
+| Check | Result |
+|---|---|
+| `npm test` | 84 of 84 pass |
+| `npm run check-farms` | Agri and Dairy passed |
+| `npm run check-muf-sync`, `npm run check-ui-safety`, `npm run check-workbench` | Passed |
+| `tools\\build-all.bat` | All three apps built |
+| Independently verified in this session | No; these are owner-reported results |
+
 ### Phase 1 step 1B-1 (2026-10-23, Linux sandbox)
 
 | Check | Result |
@@ -171,7 +181,7 @@ Removed in Phase 0. The old 40-image candidate set was never approved and has ex
 ## Next
 
 1. Owner applies the 1B-1 zip and runs the commands in `docs/README.md` (including `npm run check-farms`; run `npm ci` in `agri_farm\backend` first).
-2. Owner decides Flock's data store layout, then step 1B-2 wires the Flock backend.
+2. Step 1B-2 wires farm scoping into the existing Flock data layout; plan approved, implementation pending.
 3. Step 1C: farm switcher and Farms & Access popup in all three apps.
 
 ## How to update this file
