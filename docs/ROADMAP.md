@@ -140,3 +140,8 @@ The import/wipe guard is now a pure tested helper with coverage for empty, incub
 ### Phase 2 implementation update (2026-10-23): allocation math consistency
 
 Incubation validation now clamps each egg-log's net supply at zero, matching the batch summary calculation and preventing negative-net legacy records from reducing valid supply on other dates. Added a regression unit test, not yet executed. Cross-request allocation/deletion concurrency and integration coverage remain open. The connected GitHub tools do not expose workflow dispatch, so the manual-only Actions checkpoint has not run; Phase 2 remains in progress until those risks and verification are addressed.
+
+
+### Phase 2 verification checkpoint (2026-10-23): atomicity and current-test evidence
+
+The Home Birds navigation is secondary and scoped to Bird List, Eggs, Monthly Report and Vaccination; bird details are reached from Bird List. Batch panels are present across the requested screens, but some legacy health/summary calculations still depend on individual-bird ledgers, so batch-first review is not complete. Allocation validation and egg-log deletion still need shared database atomic coordination and route-level integration tests. No simplistic in-process lock was added because it would not safely cover multiple server processes. The latest visible Actions success (`39909652206`, commit `6c7b3e95d5264f09e347ea66eb3d30e1ce77048c`) predates current changes and is not current verification. Workflow dispatch is unavailable through the connected GitHub tool. Phase 2 remains in progress until atomicity, integration tests, current Actions verification, and disposable-copy backup/restore validation are complete.
