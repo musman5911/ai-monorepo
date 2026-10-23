@@ -1,6 +1,6 @@
 # Roadmap
 
-Last reviewed: 2026-10-23. Owner reports all three frontend builds, farm-scope checks, MUF sync checks, UI safety checks, 84 unit tests and 23 workbench source checks pass on `muf-monorepo`. End-to-end browser/API behavior, role-permission review and copy-based migration testing remain required. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-23. Owner reports all three frontend builds, farm-scope checks, MUF sync checks, UI safety checks, 84 unit tests and 23 workbench source checks pass on `muf-monorepo`. Per owner direction, browser and end-to-end role testing will be consolidated into one final verification pass after all planned phases. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
@@ -9,8 +9,8 @@ The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md).
 1. Claude sends a read-only plan: files, collections and migration steps. No code yet.
 2. The owner approves, changes or rejects the plan.
 3. Claude delivers the change as one zip, and runs the checks that can run, reporting honestly which did and did not.
-4. The owner takes a backup, tries it on a copy, tests in the browser, and only then applies it to live data.
-5. The result is recorded in `PROGRESS.md`. The next phase does not start until the owner says so.
+4. For data/migration changes, test the migration on a disposable database copy before any live application. Browser and end-to-end role testing are deferred to one consolidated final pass after all planned phases, per owner direction.
+5. Record implementation and automated checks in `PROGRESS.md`. Start the next phase only after the owner approves its read-only plan. Never apply a migration to live data without explicit approval.
 
 Rules for every phase come from `RULES.md`: back up before migrations, ask before removing anything, keep the three projects separate, keep shared MUF files identical.
 
@@ -19,8 +19,8 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 | Phase | What | Projects | Risk |
 |---|---|---|---|
 | 0 | Docs reset and repository cleanup | Repository | Low (done, see PROGRESS) |
-| 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D wrap-up) | Agri, Dairy, Flock | High (migration of live data) |
-| 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | High |
+| 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Implementation done; copy-migration checks and final integrated browser pass pending |
+| 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | Plan drafted; awaiting owner approval |
 | 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | Medium |
 | 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | Medium to high |
 | 5 | Photo storage adapter and Cloudinary | All three | Medium |
@@ -39,7 +39,7 @@ Built in four steps so each zip can be checked on its own. The design record is 
 - **1B-1 (delivered):** the same core wired into the Agri backend: 14 farm-owned collections, three roles, farms API, owner-only backups, migration script, tests.
 - **1B-2 (in progress):** farm fields, `Farm` model/API, auth scope wiring, migration script and per-farm backup payload work have been committed. Still needs role/assignment review, complete backup/restore validation, Flock-specific HTTP scope checks, automated validation, and copy-based migration test before delivery. See `PHASE1_PLAN.md` and `PROGRESS.md`.
 - **1C:** screens in all three apps: header farm switcher, owner-only Farms & Access popup, role labels.
-- **1D:** wrap-up: migration dry runs on copies, docs, CI job for `check-farms`.
+- **1D:** migration dry-runs on copies and CI job for `check-farms`. The cross-app browser/end-to-end role pass is consolidated at the end of all phases, not repeated after each phase.
 
 - A `farms` collection per project; a `farmId` on every farm-owned record; indexes led by `farmId`.
 - Roles `owner`, `manager`, `worker`, each user with assigned farms; scope enforced on the server.
@@ -55,7 +55,8 @@ Built in four steps so each zip can be checked on its own. The design record is 
 - Old per-bird system becomes the slim **Home Birds** tab.
 - Move the old big-list data into collections with `farmId` and `batchId`.
 - The plan must list exactly which Home Birds features are kept and which are removed.
-- Done when: migration passes on a copy, the old data is intact under Home Birds and Batches, and the owner confirms.
+- Migration/copy checks are run before any production migration. Final browser and end-to-end role confirmation happens once after all phases are implemented.
+- Done when: the old data is preserved under Home Birds and Batches, automated checks pass, and final integrated owner verification confirms the complete system.
 
 ### Phase 3: Bulk entry, scroll loading, server totals
 
