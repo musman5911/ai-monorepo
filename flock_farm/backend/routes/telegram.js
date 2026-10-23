@@ -10,6 +10,7 @@ import express from 'express';
 import { timingSafeEqual } from 'crypto';
 import { authRequired, requireRole } from '../middleware/auth.js';
 import DataStore from '../models/DataStore.js';
+import { mufGetDefaultFarmId, mufGetFarmContext } from '../muf-farms.mjs';
 import User from '../models/User.js';
 import { buildDailySummary } from '../utils/summary.js';
 import {
@@ -35,15 +36,19 @@ const todayLocal = mufToday;
 const daysAgoLocal = mufDaysAgo;
 
 async function readStore(key, fallback) {
-  const doc = await DataStore.findOne({ key });
+  const filter = { key };
+  if (!mufGetFarmContext() && mufGetDefaultFarmId()) filter.farmId = mufGetDefaultFarmId();
+  const doc = await DataStore.findOne(filter);
   return doc?.value ?? fallback;
 }
 // Version-bumped write — same contract the app's PUT /api/data uses,
 // so optimistic-concurrency clients see a fresh version after bot writes.
 async function writeStore(key, value) {
-  const current = await DataStore.findOne({ key });
+  const filter = { key };
+  if (!mufGetFarmContext() && mufGetDefaultFarmId()) filter.farmId = mufGetDefaultFarmId();
+  const current = await DataStore.findOne(filter);
   const version = (current?.version || 0) + 1;
-  await DataStore.findOneAndUpdate({ key }, { $set: { key, value, version } }, { upsert: true, new: true });
+  await DataStore.findOneAndUpdate(filter, { $set: { key, value, version } }, { upsert: true, new: true });
 }
 
 // ── Admin: status ──
