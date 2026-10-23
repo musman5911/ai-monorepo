@@ -201,6 +201,8 @@ export const api = {
 
   // Milk
   getMilk: (p?: { cowId?: string; from?: string; to?: string; month?: string }) => req('/milk' + qs(p)),
+  bulkMilk: (entries: Array<{ cowId: string; date: string; morning: number; evening: number; calfMilk: number; buyerId?: string; forceOverwrite?: boolean }>) =>
+    req('/milk/bulk', { method: 'POST', body: JSON.stringify({ entries }) }),
   addMilk: (data: object) => req('/milk', { method: 'POST', body: JSON.stringify(data) }),
   deleteMilk: (id: string) => req(`/milk/${id}`, { method: 'DELETE' }),
   updateMilk: (id: string, data: object) => req(`/milk/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
