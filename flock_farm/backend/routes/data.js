@@ -15,6 +15,7 @@ import Image from '../models/Image.js';
 import Batch from '../models/Batch.js';
 import BatchEggLog from '../models/BatchEggLog.js';
 import { validateIncubationAllocations } from '../incubation-allocation.mjs';
+import { validateLaborBatchAssignments } from '../batch-labor.mjs';
 import { authRequired } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -218,6 +219,19 @@ router.put('/data/:key', authRequired, async (req, res) => {
       if (!validation.ok) {
         return res.status(403).json({ error: validation.error });
       }
+    }
+
+    // Labor attendance may be linked to a batch, but the server must reject
+    // batch IDs outside the selected farm even if the client bypasses the UI.
+    if (key === 'laborAttendance') {
+      const linkedBatchIds = Array.isArray(value)
+        ? [...new Set(value.map((record) => String(record?.batchId || '').trim()).filter(Boolean))]
+        : [];
+      const batches = linkedBatchIds.length
+        ? await Batch.find({ batch_id: { $in: linkedBatchIds } })
+        : [];
+      const assignmentError = validateLaborBatchAssignments(value, batches);
+      if (assignmentError) return res.status(400).json({ error: assignmentError, code: 'LABOR_BATCH_ASSIGNMENT' });
     }
 
     // Incubation source-batch links are a real allocation, not just display metadata.
