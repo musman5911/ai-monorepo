@@ -71,7 +71,8 @@ export async function authRequired(req, res, next) {
       ...safeUser,
       _id: String(user._id),
       id: String(user._id),
-      role: mufLegacyRole(farmRole),
+      role: farmRole,
+      legacyRole: mufLegacyRole(farmRole),
       farmRole,
       farmIds: (user.farmIds || []).map(String),
     };
