@@ -113,7 +113,7 @@ function client(base) {
 async function checkFlock(project, call, owner, farmA) {
   console.log('  Flock: legacy buckets and batches');
   const baseline = (await call('GET', '/api/data/eggs', { token: owner, farm: farmA })).json;
-  ok(baseline && baseline.key === 'eggs', 'legacy egg bucket still returns its established response shape');
+  ok(baseline && baseline.key === 'eggs' && typeof baseline.version === 'number' && Object.prototype.hasOwnProperty.call(baseline, 'exists'), 'legacy egg bucket keeps its established response shape');
 
   const created = await call('POST', '/api/farms', { token: owner, body: { name: 'Flock Farm B', location: 'Check' } });
   ok(created.status === 201, 'owner can create a second poultry farm');
@@ -141,6 +141,13 @@ async function checkFlock(project, call, owner, farmA) {
   ok(!(batchA.json.batches || []).some((row) => row.batch_id === batch.json.batch?.batch_id), 'farm A cannot see farm B batches');
   const batchB = await call('GET', '/api/batches', { token: owner, farm: farmB });
   ok((batchB.json.batches || []).some((row) => row.batch_id === batch.json.batch?.batch_id), 'farm B can see its own batch');
+  const feedLog = await call('POST', `/api/batches/${batch.json.batch?.batch_id}/feed-logs`, {
+    token: owner, farm: farmB,
+    body: { date: '2099-01-02', feed_type: 'Scope Check Feed', quantity_kg: 2, rate_rs_per_kg: 3 },
+  });
+  ok(feedLog.status === 201 && feedLog.json.log?.farmId === farmB, 'batch logs are stamped with the same farm');
+  const foreignDetail = await call('GET', `/api/batches/${batch.json.batch?.batch_id}`, { token: owner, farm: farmA });
+  ok(foreignDetail.status === 404, 'batch details and their logs are hidden from another farm');
 
   const workerCreate = await call('POST', '/api/auth/users', {
     token: owner, farm: farmB,
