@@ -48,8 +48,6 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
   const [saving, setSaving] = useState<string | null>(null);
   const [historyMonth, setHistoryMonth] = useState(monthKey(todayStr()));
   const [historyCowFilter, setHistoryCowFilter] = useState('');
-  const [rate, setRate] = useState(0);
-  const [rateDate, setRateDate] = useState('');
   const [historyPage, setHistoryPage] = useState(1);
   const [historyTotalCount, setHistoryTotalCount] = useState(0);
   const [historySummary, setHistorySummary] = useState({ count: 0, totalLiters: 0, saleableLiters: 0, revenue: 0 });
@@ -72,12 +70,11 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
         ? { month: historyMonth, cowId: historyCowFilter || undefined }
         : { from: selectedDate, to: selectedDate };
 
-      const [cowsData, milkResult, rateData, buyersData, summaryResult] = await Promise.all([
+      const [cowsData, milkResult, buyersData, summaryResult] = await Promise.all([
         api.getCows(),
         viewMode === 'history'
           ? api.getMilkPage({ month: historyMonth, cowId: historyCowFilter || undefined, page: 1, limit: 50 })
           : api.getMilk(fetchOpts),
-        api.getRate(),
         api.getBuyers().catch(() => []),
         viewMode === 'history'
           ? api.getMilkSummary({ month: historyMonth, cowId: historyCowFilter || undefined })
@@ -98,8 +95,6 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
         setHistorySummary({ count: 0, totalLiters: 0, saleableLiters: 0, revenue: 0 });
         setHistoryHasMore(false);
       }
-      setRate(rateData?.value || 0);
-      setRateDate(rateData?.date || '');
       setBuyers(buyersData);
 
       if (viewMode === 'daily') {
@@ -508,6 +503,33 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
               </tfoot>
             </table>
           </div>
+      </DetailModal>
+
+      <DetailModal open={showImportModal} onClose={() => { if (!importing) setShowImportModal(false); }}
+        title="Preview Milk CSV Import" size="big">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-500">Required columns: cowId, date, morning, evening. Optional: calfMilk, buyerId. Existing cow/date records are not overwritten. Up to 1,000 rows per file.</p>
+          <div className="max-h-80 overflow-auto border border-slate-200 dark:border-slate-700 rounded-lg">
+            <table className="w-full text-left text-xs">
+              <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800">
+                <tr><th className="p-2">Row</th><th className="p-2">Cow ID</th><th className="p-2">Date</th><th className="p-2">Morning</th><th className="p-2">Evening</th><th className="p-2">Validation</th></tr>
+              </thead>
+              <tbody>{importPreview.map(row => <tr key={row.rowNumber} className={row.error ? 'bg-red-50 dark:bg-red-900/20' : 'border-t'}>
+                <td className="p-2">{row.rowNumber}</td><td className="p-2 font-mono">{row.entry.cowId}</td><td className="p-2">{row.entry.date}</td><td className="p-2">{row.entry.morning}</td><td className="p-2">{row.entry.evening}</td><td className="p-2">{row.error || 'Ready'}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-slate-500">{importPreview.length} rows · {importPreview.filter(row => row.error).length} invalid</p>
+            <div className="flex gap-2">
+              <button type="button" onClick={() => setShowImportModal(false)} disabled={importing} className="px-4 py-2 text-sm border rounded-lg disabled:opacity-50">Cancel</button>
+              <button type="button" onClick={handleImportMilkCsv} disabled={importing || !importPreview.length || importPreview.some(row => row.error)}
+                className="bg-farm-600 hover:bg-farm-700 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50">
+                {importing ? L('Importing...') : L('Import Milk Records')}
+              </button>
+            </div>
+          </div>
+        </div>
       </DetailModal>
 
       {/* ── History View ──────────────────────── */}
