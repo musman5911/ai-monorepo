@@ -35,7 +35,7 @@ Last updated: 2026-10-23 (Phase 03 runtime regression coverage and documentation
 - Added source-contract tests for row bounds, validate-before-write ordering, finance field allowlisting and UI wiring. Extended the memory-mode HTTP farm-scope checker to verify invalid bulk task payload rejection and that task/finance bulk rows written in farm B are not visible in farm A.
 - Hardened XLSX import to resolve the first worksheet through the workbook's declared relationship rather than sorting worksheet filenames. Added guards for 5 MB input, archive entry count, decompressed entry size and worksheet path validation. Source-contract tests cover these safeguards; no local tests/builds have been run in this editing session.
 - Commits: `6c89fcd`, `18c190f`, `f441ccf`, `a14c106`, `0a679b4`, `0bd82f0`, `ba75d04`, `ab3095e`, `7e66680`, `ff737f3`, `abec802`, `40581af`.
-- Remaining major Phase 3 blocker: true network-level Agri on-demand pagination without changing dashboard/report totals. Large API fixtures, farm-isolation coverage for imports, browser review and consolidated verification remain open.
+- Remaining major Phase 3 blockers: rerun the test/build checkpoint for the new on-demand list implementation, finish large API and farm-isolation coverage for imports, and complete consolidated verification. Aggregate dashboard/report arrays are preserved; replacing their full transfer with summary endpoints remains a separate optimization.
 
 
 
