@@ -683,15 +683,14 @@ export default function App() {
     }
   };
 
+  const homeBirdTabs = ['flock', 'ledger', 'summary', 'health'];
+  const homeBirdsActive = homeBirdTabs.includes(activeTab);
+
   const navItems = [
     { id: 'batches', label: 'Batches', icon: Package },
     { id: 'flock', label: 'Home Birds', icon: BirdIcon },
     { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'ledger', label: 'Finance', icon: DollarSign },
-    { id: 'health', label: 'Health', icon: HeartPulse },
     ...(isAdmin ? [{ id: 'labor', label: 'Labor', icon: HardHat }] : []),
-    { id: 'incubation', label: 'Incubation', icon: Egg },
-    { id: 'summary', label: 'Summary', icon: BarChart2 },
     ...(isAdmin ? [{ id: 'super_admin', label: 'Super Admin', icon: Shield }] : []),
   ];
 
@@ -858,28 +857,42 @@ export default function App() {
       <nav className="muf-top-nav" aria-label={L('Primary navigation')} id="tab-navigation">
         <div className="muf-top-nav-scroll">
           {navItems.map(({ id, label, icon: Icon }) => {
-            const active = activeTab === id;
+            const active = id === 'flock' ? homeBirdsActive : activeTab === id;
             return (
-              <div className={`muf-nav-item relative ${id === 'ledger' ? 'muf-finance-nav-item' : ''}`} ref={id === 'ledger' ? financeMenuAnchorRef : undefined} key={id}>
+              <div className="muf-nav-item relative" key={id}>
                 <div className="flex items-center">
                   <button type="button" className={`muf-nav-link ${active ? 'active' : ''}`} onClick={() => { setActiveTab(id); setFinanceMenuOpen(false); }} id={`nav-${id}`}><Icon size={15} /><span>{label}</span></button>
-                  {id === 'ledger' && <button type="button" ref={financeMenuTriggerRef} aria-label={L('Open Finance sections')} aria-expanded={financeMenuOpen} aria-controls="muf-finance-menu" onClick={toggleFinanceMenu} className="muf-nav-link !px-2"><ChevronDown size={14}/></button>}
                 </div>
-                {id === 'ledger' && financeMenuOpen && createPortal(
-                <div
-                  id="muf-finance-menu"
-                  className="muf-finance-menu"
-                  role="group"
-                  aria-label={L('Finance sections')}
-                  style={financeMenuPosition}
-                >{[{label:'Feed',value:'feed'},{label:'Expenses',value:'expense'},{label:'Eggs',value:'egg'},{label:'Customers',value:'customers'},{label:'Suppliers',value:'suppliers'}].map(item => <button key={item.value} type="button" onClick={() => { setActiveTab('ledger'); setQuickOpenLedgerTab(item.value as 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers'); setFinanceMenuOpen(false); }} className="muf-finance-menu-item">{item.label}</button>)}</div>,
-                document.body
-              )}
               </div>
             );
           })}
         </div>
       </nav>
+      {homeBirdsActive && (
+        <nav className="muf-top-nav border-t border-slate-200/70 dark:border-slate-800/70" aria-label={L('Home Birds sections')}>
+          <div className="muf-top-nav-scroll">
+            {[
+              { id: 'flock', label: 'Bird List', icon: BirdIcon },
+              { id: 'ledger', label: 'Eggs', icon: Egg },
+              { id: 'summary', label: 'Monthly Report', icon: BarChart2 },
+              { id: 'health', label: 'Vaccination', icon: HeartPulse },
+            ].map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                type="button"
+                className={`muf-nav-link ${activeTab === id ? 'active' : ''}`}
+                onClick={() => {
+                  setActiveTab(id);
+                  if (id === 'ledger') setQuickOpenLedgerTab('egg');
+                  setFinanceMenuOpen(false);
+                }}
+              >
+                <Icon size={15} /><span>{label}</span>
+              </button>
+            ))}
+          </div>
+        </nav>
+      )}
 </div>
 
       <div className="w-full p-3 sm:p-6 flex-1 flex flex-col gap-4 md:gap-6">
