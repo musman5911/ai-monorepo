@@ -155,3 +155,4 @@ The Home Birds navigation is secondary and scoped to Bird List, Eggs, Monthly Re
 - Final scoping review added the batch egg-log and vaccination-log models to Flock's server-enforced farm-scoped registry. The lock recovery runbook is `docs/FLOCK_EGG_INVENTORY_LOCK.md`. Local checks remain required; this is implementation status, not a test-pass claim.
 - The memory-mode adapter lacks compound-index enforcement, so the lock helper also applies a per-process farm guard for local development. Deployed MongoDB uses the persisted unique key to coordinate across processes. See `docs/FLOCK_EGG_INVENTORY_LOCK.md` for stale-lock recovery.
 - The shared lock also covers labor-attendance bucket writes so batch deletion/replacement cannot race a new batch-linked attendance record.
+- Route-level tests now cover both incubation allocation writes and batch-linked labor-attendance writes against the shared lock helper.
