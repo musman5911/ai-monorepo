@@ -238,7 +238,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
           </div>
           {laborBatchRows.filter(b => b.status === 'Active').length > 0 && <div className="space-y-2">
             {laborBatchRows.filter(b => b.status === 'Active').slice(0, 4).map(batch => <div key={batch.batch_id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2">
-              <span className="min-w-0 text-xs font-semibold truncate">{batch.name}</span><span className="text-xs text-slate-500 whitespace-nowrap">{(batch.summary?.live_count || 0).toLocaleString()} {L('live birds')}</span>
+              <span className="min-w-0 text-xs font-semibold truncate">{batch.name}</span><span className="text-right text-xs text-slate-500 whitespace-nowrap">{(batch.summary?.live_count || 0).toLocaleString()} {L('live birds')} · {new Set(rowsThisMonth.filter((row) => row.batchId === batch.batch_id).map((row) => row.workerId)).size} {L('assigned workers this month')}</span>
             </div>)}
           </div>}
         </>}
