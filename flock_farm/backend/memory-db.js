@@ -47,14 +47,22 @@ class Query {
   constructor(exec) {
     this._exec = exec;
     this._sort = null;
+    this._skip = 0;
+    this._limit = null;
   }
   sort(spec) { this._sort = spec; return this; }
   select() { return this; }
-  limit() { return this; }
+  skip(count) { this._skip = Math.max(0, Number(count) || 0); return this; }
+  limit(count) { this._limit = Math.max(0, Number(count) || 0); return this; }
   lean() { return this; }
   then(resolve, reject) {
-    try { return Promise.resolve(this._exec(this._sort)).then(resolve, reject); }
-    catch (err) { return Promise.reject(err).then(resolve, reject); }
+    try {
+      let result = this._exec(this._sort);
+      if (Array.isArray(result)) {
+        result = result.slice(this._skip, this._limit == null ? undefined : this._skip + this._limit);
+      }
+      return Promise.resolve(result).then(resolve, reject);
+    } catch (err) { return Promise.reject(err).then(resolve, reject); }
   }
   catch(fn) { return this.then((v) => v, fn); }
 }
