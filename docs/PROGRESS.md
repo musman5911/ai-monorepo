@@ -259,6 +259,7 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - **Existing systems reused:** current `BatchesTab`, `FlockRegister`, `FinancialLedger`, `MonthlySummary` and `HealthPortal`; no parallel batch system was created.
 - **Backup support updated:** batch export/import, detail reads, batch deletion and wipe handling include the new log collections.
 - **Tests added:** `tests/flock-batch-math.test.ts` covers valid/invalid egg counts and batch revenue/expense/profit calculations.
-- **CI enabled on `muf-monorepo`:** `.github/workflows/muf-frontend-checks.yml` now triggers on pushes and pull requests for this branch and includes `npm run check-farms`. A GitHub Actions run was triggered; its result must be checked before claiming the new code passes.
-- Local Windows build/tests have not been run by the assistant. No result is claimed until CI and owner-side validation finish.
+- **CI passed on GitHub Actions:** run [39906778407](https://github.com/musman5911/ai-monorepo/actions/runs/39906778407), commit `d63d719`, completed successfully. Root tests, `check-farms`, MUF parity, UI safety, workbench checks/runtime, design-system audit, and all three app builds passed.
+- The first CI pass caught and led to fixes for the missing `Egg` icon import and an outdated UI-safety expectation for the intentionally simplified Flock navigation. Those fixes are included in the passing run.
+- Browser/end-to-end role testing remains deferred to the final project-wide pass. No data migration has been run.
 - No data migration has been run and no live data was touched. New log collections are additive; verify backup/restore compatibility before treating this phase as complete.
