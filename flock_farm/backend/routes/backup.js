@@ -15,6 +15,8 @@ import BatchMortalityLog from '../models/BatchMortalityLog.js';
 import BatchExpenseLog from '../models/BatchExpenseLog.js';
 import BatchSaleLog from '../models/BatchSaleLog.js';
 import BatchWeightLog from '../models/BatchWeightLog.js';
+import Farm from '../models/Farm.js';
+import { mufGetDefaultFarmId } from '../muf-farms.mjs';
 
 const router = express.Router();
 
@@ -38,12 +40,23 @@ async function collectBackupPayload() {
   const payload = {
     exportDate: new Date().toISOString(),
     farmName: 'Usman Flock Farm',
-    version: 1,
+    version: 2,
+    farms: [],
     buckets: {},
+    farmBuckets: {},
   };
+  payload.farms = (await Farm.find({}).lean()).map((farm) => {
+    const out = { ...farm };
+    delete out._id;
+    delete out.__v;
+    return { ...out, id: String(farm._id) };
+  });
+  const defaultFarmId = mufGetDefaultFarmId();
   for (const key of BUCKET_KEYS) {
-    const doc = await DataStore.findOne({ key });
-    payload.buckets[key] = doc ? doc.value : null;
+    const docs = await DataStore.find({ key }).lean();
+    payload.farmBuckets[key] = docs.map((doc) => ({ farmId: String(doc.farmId || defaultFarmId || ''), value: doc.value, version: doc.version || 0 }));
+    const defaultDoc = docs.find((doc) => String(doc.farmId || '') === String(defaultFarmId || '')) || docs[0];
+    payload.buckets[key] = defaultDoc ? defaultDoc.value : null;
   }
   for (const [name, Model] of Object.entries(BATCH_MODELS)) {
     const docs = await Model.find().lean();
@@ -55,16 +68,34 @@ async function collectBackupPayload() {
 async function restoreBackupPayload(payload) {
   // Buckets: overwrite each present bucket, bumping the version so any
   // logged-in clients get a clean 409 + reload instead of silent overwrite.
+  if (Array.isArray(payload.farms)) {
+    for (const farm of payload.farms) {
+      const name = String(farm.name || '').trim();
+      if (!name) continue;
+      const existing = await Farm.findOne({ name });
+      if (!existing) await Farm.create({ name, location: farm.location || '', archived: Boolean(farm.archived) });
+      else {
+        existing.location = farm.location || '';
+        existing.archived = Boolean(farm.archived);
+        await existing.save();
+      }
+    }
+  }
   for (const key of BUCKET_KEYS) {
-    if (!payload.buckets || payload.buckets[key] === undefined || payload.buckets[key] === null) continue;
-    const current = await DataStore.findOne({ key });
-    if (current) {
-      await DataStore.findOneAndUpdate(
-        { key },
-        { $set: { value: payload.buckets[key], version: (current.version || 0) + 1 } }
-      );
-    } else {
-      await DataStore.create({ key, value: payload.buckets[key], version: 1 });
+    const farmRows = payload.farmBuckets?.[key];
+    if (Array.isArray(farmRows)) {
+      for (const row of farmRows) {
+        if (!row?.farmId) continue;
+        const current = await DataStore.findOne({ key, farmId: String(row.farmId) });
+        if (current) await DataStore.findOneAndUpdate({ key, farmId: String(row.farmId) }, { $set: { value: row.value, version: (current.version || 0) + 1 } });
+        else await DataStore.create({ key, farmId: String(row.farmId), value: row.value, version: 1 });
+      }
+    } else if (payload.buckets && payload.buckets[key] !== undefined && payload.buckets[key] !== null) {
+      const farmId = mufGetDefaultFarmId();
+      if (!farmId) continue;
+      const current = await DataStore.findOne({ key, farmId });
+      if (current) await DataStore.findOneAndUpdate({ key, farmId }, { $set: { value: payload.buckets[key], version: (current.version || 0) + 1 } });
+      else await DataStore.create({ key, farmId, value: payload.buckets[key], version: 1 });
     }
   }
   // Batch collections: full replace
