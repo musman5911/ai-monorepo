@@ -201,7 +201,7 @@ router.patch('/me', authRequired, async (req, res) => {
 
 // --------- Admin-only user management ---------
 
-router.get('/users', authRequired, requireRole('admin'), async (_req, res) => {
+router.get('/users', authRequired, requireRole('owner'), async (_req, res) => {
   try {
     const users = await User.find().sort({ createdAt: -1 });
     res.json({ users: users.map((u) => u.toSafeJSON()) });
@@ -211,7 +211,7 @@ router.get('/users', authRequired, requireRole('admin'), async (_req, res) => {
   }
 });
 
-router.post('/users', authRequired, requireRole('admin'), async (req, res) => {
+router.post('/users', authRequired, requireRole('owner'), async (req, res) => {
   try {
     const { username, password, role, displayName, email } = req.body || {};
     if (!username || !password) {
@@ -257,7 +257,7 @@ router.post('/users', authRequired, requireRole('admin'), async (req, res) => {
   }
 });
 
-router.patch('/users/:id', authRequired, requireRole('admin'), async (req, res) => {
+router.patch('/users/:id', authRequired, requireRole('owner'), async (req, res) => {
   try {
     const updates = {};
     const { password, role, displayName, active, email, username, adminPassword } = req.body || {};
@@ -332,7 +332,7 @@ router.patch('/users/:id', authRequired, requireRole('admin'), async (req, res) 
   }
 });
 
-router.delete('/users/:id', authRequired, requireRole('admin'), async (req, res) => {
+router.delete('/users/:id', authRequired, requireRole('owner'), async (req, res) => {
   try {
     if (req.params.id === req.user._id.toString()) {
       return res.status(400).json({ error: 'You cannot delete your own account' });
