@@ -3,8 +3,10 @@
 // muf-labor twin so all three farm apps count days and wages identically.
 // Data lives in the 'laborers' + 'laborAttendance' buckets (admin-only write);
 // posting a month appends ONE labor expense to the normal expenses ledger.
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { mufL } from '../muf/data/muf-urdu';
+import { listBatches } from '../api';
+import type { BatchWithSummary } from '../types';
 import { HardHat, Plus, Trash2, CheckCircle2, QrCode, Pencil } from 'lucide-react';
 import MufCardQr from '../muf/ui/muf-card-qr';
 import DetailModal from '../muf/core/muf-modal';
@@ -49,6 +51,15 @@ const toMufRow = (r: LaborAttendanceEntry): MufAttendanceRow => ({ id: r.id, wor
 export default function LaborTab({ lang, workers, attendance, advances, onChangeWorkers, onChangeAttendance, onChangeAdvances, onAddExpense }: LaborTabProps) {
   const L = (en: string, urOrVars?: string | Record<string, string | number | null>) => mufL(lang, en, urOrVars);
   const confirmAction = useConfirm();
+  const [laborBatchRows, setLaborBatchRows] = useState<BatchWithSummary[]>([]);
+  const [laborBatchUnavailable, setLaborBatchUnavailable] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    listBatches().then(rows => {
+      if (!cancelled) { setLaborBatchRows(rows); setLaborBatchUnavailable(false); }
+    }).catch(() => { if (!cancelled) setLaborBatchUnavailable(true); });
+    return () => { cancelled = true; };
+  }, []);
   const [month, setMonth] = useState(monthStr());
   const [workerForm, setWorkerForm] = useState({ name: '', dailyWage: '', notes: '' });
   const [markForm, setMarkForm] = useState({ workerId: '', date: todayStr(), dayType: 'full' as 'full' | 'half', notes: '' });
@@ -214,6 +225,24 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
 
   return (
     <div className="space-y-5">
+      <section className="rounded-2xl border border-amber-200 dark:border-amber-900 bg-white dark:bg-slate-900 p-4 space-y-3">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{L('Batch workload context')}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{L('Use current batch size when planning daily farm labor')}</p>
+        </div>
+        {laborBatchUnavailable ? <p role="status" className="text-xs text-amber-700 dark:text-amber-300">{L('Batch workload data is unavailable right now.')}</p> : <>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Active batches')}</p><p className="text-xl font-bold mt-1">{laborBatchRows.filter(b => b.status === 'Active').length}</p></div>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Live birds')}</p><p className="text-xl font-bold mt-1">{laborBatchRows.reduce((sum, b) => sum + (b.summary?.live_count || 0), 0).toLocaleString()}</p></div>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Workers')}</p><p className="text-xl font-bold mt-1">{workers.filter(w => w.active !== false).length}</p></div>
+          </div>
+          {laborBatchRows.filter(b => b.status === 'Active').length > 0 && <div className="space-y-2">
+            {laborBatchRows.filter(b => b.status === 'Active').slice(0, 4).map(batch => <div key={batch.batch_id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2">
+              <span className="min-w-0 text-xs font-semibold truncate">{batch.name}</span><span className="text-xs text-slate-500 whitespace-nowrap">{(batch.summary?.live_count || 0).toLocaleString()} {L('live birds')}</span>
+            </div>)}
+          </div>}
+        </>}
+      </section>
       <div className="muf-page-hero">
         <div className="muf-page-title">
           <div className="muf-title-icon"><HardHat size={28}/></div>
