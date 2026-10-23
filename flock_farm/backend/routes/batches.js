@@ -593,15 +593,22 @@ router.delete('/batches/:batchId', authRequired, requireRole('admin'), async (re
     const batch = await getBatchByCode(req.params.batchId);
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
 
-    const incubation = await DataStore.findOne({ key: 'incubation' });
-    const linkedRecords = Array.isArray(incubation?.value)
+    const [incubation, laborAttendance] = await Promise.all([
+      DataStore.findOne({ key: 'incubation' }),
+      DataStore.findOne({ key: 'laborAttendance' }),
+    ]);
+    const linkedIncubation = Array.isArray(incubation?.value)
       ? incubation.value.filter((record) => String(record?.sourceBatchId || '') === batch.batch_id)
       : [];
-    if (linkedRecords.length) {
+    const linkedAttendance = Array.isArray(laborAttendance?.value)
+      ? laborAttendance.value.filter((record) => String(record?.batchId || '') === batch.batch_id)
+      : [];
+    if (linkedIncubation.length || linkedAttendance.length) {
       return res.status(409).json({
-        error: 'This batch is linked to incubation records. Reassign or unlink those records before deleting the batch.',
-        code: 'BATCH_HAS_INCUBATION_ALLOCATIONS',
-        linkedIncubationRecords: linkedRecords.length,
+        error: 'This batch is linked to incubation or labor history. Reassign or unlink those records before deleting the batch.',
+        code: 'BATCH_HAS_LINKED_HISTORY',
+        linkedIncubationRecords: linkedIncubation.length,
+        linkedLaborRecords: linkedAttendance.length,
       });
     }
 
