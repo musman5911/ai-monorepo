@@ -64,10 +64,12 @@ app.use(cookieParser());
 app.use(mongoSanitize());
 
 // Broad API rate limiter: authenticated data routes still need a safety net
-// in case a token leaks or a script loops.
+// in case a token leaks or a script loops. Integration tests exercise large
+// paginated fixtures and their cleanup over HTTP, so use a higher test-only
+// ceiling; the production/default limit remains 300 requests per 15 minutes.
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300,
+  max: MUF_ENV.nodeEnv === 'test' ? 5000 : 300,
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => res.status(429).json({ detail: 'Too many request attempts. Please wait a few minutes before trying again.' }),
