@@ -126,6 +126,16 @@ describe('Phase 3 Flock bulk logs beyond egg collection', () => {
     expect(api).toContain('createBatchLogsBulk');
   });
 
+  it('provides preview-first CSV import for the additional bounded bulk log types', () => {
+    const source = readFileSync(path.join(repoRoot, 'flock_farm/client/src/components/BatchesTab.tsx'), 'utf8');
+    expect(source).toContain('handleGenericBulkCsv');
+    expect(source).toContain('Preview Batch');
+    expect(source).toContain('lines.length > 1001');
+    expect(source).toContain('2 * 1024 * 1024');
+    expect(source).toContain('Fix invalid CSV rows before importing.');
+    expect(source).toContain('createBatchLogsBulk');
+  });
+
   it('keeps mortality and sales on sequential validation paths', () => {
     const route = readFileSync(path.join(repoRoot, 'flock_farm/backend/routes/batches.js'), 'utf8');
     const bulkStart = route.indexOf("router.post('/batches/:batchId/logs/:logType/bulk'");
