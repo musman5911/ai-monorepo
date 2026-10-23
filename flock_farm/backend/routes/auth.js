@@ -67,6 +67,17 @@ async function activeAdminCount() {
   return User.countDocuments({ role: { $in: ['owner', 'admin'] }, active: true });
 }
 
+function userListAccess(req, res, next) {
+  if (['owner', 'manager'].includes(req.user?.farmRole)) return next();
+  return res.status(403).json({ error: 'Owner or manager only' });
+}
+
+function userCreateAccess(req, res, next) {
+  if (req.user?.farmRole === 'owner') return next();
+  if (req.user?.farmRole === 'manager' && (!req.body?.role || req.body.role === 'worker')) return next();
+  return res.status(403).json({ error: 'Managers may create workers only' });
+}
+
 // Parse max-age (in ms) from JWT_EXPIRES_IN (supports '7d', '24h', '3600', etc.)
 function maxAgeFromExpiresIn(exp) {
   const match = String(exp || '7d').match(/^(\d+)([smhd])?$/);
@@ -202,17 +213,23 @@ router.patch('/me', authRequired, async (req, res) => {
 
 // --------- Admin-only user management ---------
 
-router.get('/users', authRequired, requireRole('owner'), async (_req, res) => {
+router.get('/users', authRequired, userListAccess, async (req, res) => {
   try {
     const users = await User.find().sort({ createdAt: -1 });
-    res.json({ users: users.map((u) => u.toSafeJSON()) });
+    const visibleFarmIds = req.farmContext?.mode === 'single'
+      ? [String(req.farmContext.farmId)]
+      : (req.user.farmIds || []).map(String);
+    const visible = req.user.farmRole === 'owner'
+      ? users
+      : users.filter((u) => u.role === 'worker' && (u.farmIds || []).some((id) => visibleFarmIds.includes(String(id))));
+    res.json({ users: visible.map((u) => u.toSafeJSON()) });
   } catch (err) {
     console.error('GET /auth/users error:', err);
     res.status(500).json({ error: 'Failed to list users' });
   }
 });
 
-router.post('/users', authRequired, requireRole('owner'), async (req, res) => {
+router.post('/users', authRequired, userCreateAccess, async (req, res) => {
   try {
     const { username, password, role, displayName, email } = req.body || {};
     if (!username || !password) {
