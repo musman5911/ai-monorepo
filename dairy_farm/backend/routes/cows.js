@@ -107,12 +107,46 @@ function cowPayload(body, { requireBasics = false } = {}) {
   return { payload, errors };
 }
 
+router.get('/stats', protect, async (_req, res) => {
+  try {
+    const [total, female, male, active, pregnant, dry, calf, sold] = await Promise.all([
+      Cow.countDocuments({}),
+      Cow.countDocuments({ gender: { $ne: 'male' } }),
+      Cow.countDocuments({ gender: 'male' }),
+      Cow.countDocuments({ status: 'active' }),
+      Cow.countDocuments({ status: 'pregnant' }),
+      Cow.countDocuments({ status: 'dry' }),
+      Cow.countDocuments({ status: 'calf' }),
+      Cow.countDocuments({ status: 'sold' }),
+    ]);
+    res.json({ total, female, male, active, pregnant, dry, calf, sold });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.get('/mothers', protect, async (_req, res) => {
+  try {
+    const rows = await Cow.find({ status: { $in: ['active', 'dry'] }, gender: { $ne: 'male' } }).sort({ name: 1, _id: 1 });
+    res.json(rows);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
 router.get('/', protect, async (req, res) => {
   try {
     const filter = {};
-    if (req.query.batch) filter.batch = req.query.batch;
+    if (req.query.batch) filter.batch = String(req.query.batch);
+    if (req.query.status) filter.status = String(req.query.status);
+    if (req.query.gender) filter.gender = String(req.query.gender);
+    if (req.query.motherId) filter.motherId = String(req.query.motherId);
+    if (req.query.search) {
+      const search = String(req.query.search).trim().slice(0, 100);
+      if (search) {
+        const escaped = search.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\    if (req.query.batch) filter.batch = req.query.batch;
     if (req.query.status) filter.status = req.query.status;
     if (req.query.motherId) filter.motherId = req.query.motherId;
+    const page = parsePagePagination(req.query);');
+        filter.$or = [{ name: { $regex: escaped, $options: 'i' } }, { _id: { $regex: escaped, $options: 'i' } }];
+      }
+    }
     const page = parsePagePagination(req.query);
     if (page.enabled) {
       if (page.error) return res.status(400).json({ error: page.error });
