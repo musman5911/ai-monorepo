@@ -1847,6 +1847,7 @@ function App() {
   // Tasks matching the dashboard crop filter (title-name heuristic, same as the task board)
   const taskMatchesCrop = (t, cropId) => {
     if (cropId === 'all') return true;
+    if (String(t.crop_id || '') === String(cropId)) return true;
     const sel = crops.find(c => c._id === cropId);
     if (!sel) return false;
     return cropNameInText(t.title, sel.name) || cropNameInText(t.notes, sel.name) || cropNameInText(t.title, sel.variety);
