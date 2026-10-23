@@ -189,12 +189,21 @@ async function checkProject(name, project, port) {
   try {
     const login = await call('POST', A.login, { body: project.owner });
     const owner = A.tokenOf(login.json);
-    ok(login.status === 200 && login.json.farmRole === 'owner', 'legacy admin account is now an owner');
-    ok(login.json.role === 'admin', 'old screens still receive role "admin" for owners');
+    ok(login.status === 200 && login.json?.farmRole === 'owner', 'legacy admin account is now an owner');
+    ok(login.json?.role === 'admin', 'old screens still receive role "admin" for owners');
+    if (login.status !== 200 || !owner) {
+      console.log(`  Login diagnostic: HTTP ${login.status}; response: ${JSON.stringify(login.json)}`);
+      return;
+    }
 
     const farms1 = await call('GET', '/api/farms', { token: owner });
-    ok(farms1.status === 200 && farms1.json.farms.length === 1, 'migration created exactly one farm');
-    const farmA = farms1.json.farms[0].id;
+    const farmRows = Array.isArray(farms1.json?.farms) ? farms1.json.farms : [];
+    ok(farms1.status === 200 && farmRows.length === 1, 'migration creates exactly one farm');
+    if (farms1.status !== 200 || farmRows.length === 0) {
+      console.log(`  Farms diagnostic: HTTP ${farms1.status}; response: ${JSON.stringify(farms1.json)}`);
+      return;
+    }
+    const farmA = farmRows[0].id;
 
     if (project.kind === 'flock') {
       await checkFlock(project, call, owner, farmA);
