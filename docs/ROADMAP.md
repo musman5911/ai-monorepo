@@ -185,3 +185,12 @@ The owner reports root unit tests passing (**115/115**), MUF sync/UI/workbench c
 The harness has been updated to retry only that exact startup response for up to 30 seconds; role checks remain strict and other failures remain visible. Commit: `9a3eeb5`. This change is awaiting the owner's local rerun.
 
 **Phase 2 is still open.** After the farm-scope check passes, remaining sign-off gates are real-MongoDB inventory-lock concurrency and repeatable backup/restore compatibility tests on disposable data. The Vite chunk-size warning is a performance follow-up, not the cause of the farm-scope failure.
+
+
+### Latest verification update (2026-10-23): Flock backup path
+
+The startup retry worked: Agri and Dairy farm-scope checks pass, and Flock progresses through bucket, batch, linked-log and worker checks. Its owner-backup assertion then fails. Root tests (115/115), MUF sync, UI safety and 23 workbench source checks pass.
+
+The cause identified is a missing `findOneAndDelete` operation in Flock's in-memory Mongoose adapter, used by the shared egg-inventory lock cleanup in the backup route. Fix committed as `1d71319`. This is awaiting local verification; do not count Flock farm-scope as passed yet.
+
+Next: pull and rerun `npm run check-farms`; if it passes, rerun the root checks and builds at the checkpoint. Real-MongoDB cross-process inventory concurrency and disposable-copy backup/restore compatibility remain mandatory before Phase 2 sign-off. Phase 3 stays blocked until all Phase 2 gates pass.
