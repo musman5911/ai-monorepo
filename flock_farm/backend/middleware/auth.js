@@ -1,6 +1,8 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/User.js';
 import { MUF_ENV } from '../muf-env.mjs';
+import Farm from '../models/Farm.js';
+import { mufNormalizeRole, mufLegacyRole, mufIsFullRole, mufApplyFarmContext } from '../muf-farms.mjs';
 
 // In production, require JWT_SECRET to be explicitly set (server.js already
 // refuses to boot if it's missing in prod). In dev, fall back to a clearly
@@ -63,9 +65,18 @@ export async function authRequired(req, res, next) {
       return res.status(401).json({ error: 'User no longer exists or is deactivated' });
     }
 
-    req.user = user.toSafeJSON();
+    const safeUser = user.toSafeJSON();
+    const farmRole = mufNormalizeRole(user.role);
+    req.user = {
+      ...safeUser,
+      _id: String(user._id),
+      id: String(user._id),
+      role: mufLegacyRole(farmRole),
+      farmRole,
+      farmIds: (user.farmIds || []).map(String),
+    };
     req.token = token;
-    next();
+    return mufApplyFarmContext(req, res, next, { Farm });
   } catch (err) {
     console.error('auth middleware error:', err);
     return res.status(500).json({ error: 'Authentication failure' });
@@ -80,7 +91,8 @@ export function requireRole(role) {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
     }
-    if (req.user.role !== role) {
+    const allowed = role === 'admin' ? mufIsFullRole(req.user.farmRole || req.user.role) : (req.user.farmRole || req.user.role) === role;
+    if (!allowed) {
       return res.status(403).json({ error: `Forbidden: ${role} role required` });
     }
     next();
