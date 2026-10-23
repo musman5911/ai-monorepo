@@ -238,49 +238,62 @@ describe.sequential('Agri runtime API integration', () => {
       priority: 'Low',
       status: 'Pending',
     }));
+    const fixtureIds = new Set();
 
-    for (let offset = 0; offset < fixtureRows.length; offset += 200) {
-      const batch = fixtureRows.slice(offset, offset + 200);
-      const inserted = await request('/tasks/bulk', {
-        method: 'POST',
-        token: ownerToken,
-        body: { rows: batch },
-      });
-      expect(inserted.response.status).toBe(201);
-      expect(inserted.data.inserted).toBe(batch.length);
-    }
+    try {
+      for (let offset = 0; offset < fixtureRows.length; offset += 200) {
+        const batch = fixtureRows.slice(offset, offset + 200);
+        const inserted = await request('/tasks/bulk', {
+          method: 'POST',
+          token: ownerToken,
+          body: { rows: batch },
+        });
+        expect(inserted.response.status).toBe(201);
+        expect(inserted.data.inserted).toBe(batch.length);
+      }
 
-    const first = await request('/tasks?skip=0&limit=200', { token: ownerToken });
-    expect(first.response.status).toBe(200);
-    const reportedTotal = Number(first.response.headers.get('x-total-count'));
-    expect(Number.isInteger(reportedTotal)).toBe(true);
-    expect(reportedTotal).toBeGreaterThanOrEqual(1001);
-    expect(Number(first.response.headers.get('x-total-pages'))).toBe(Math.ceil(reportedTotal / 200));
+      const first = await request('/tasks?skip=0&limit=200', { token: ownerToken });
+      expect(first.response.status).toBe(200);
+      const reportedTotal = Number(first.response.headers.get('x-total-count'));
+      expect(Number.isInteger(reportedTotal)).toBe(true);
+      expect(reportedTotal).toBeGreaterThanOrEqual(1001);
+      expect(Number(first.response.headers.get('x-total-pages'))).toBe(Math.ceil(reportedTotal / 200));
 
-    const allRows = [...first.data];
-    for (let skip = 200; skip < reportedTotal; skip += 200) {
-      const page = await request(`/tasks?skip=${skip}&limit=200`, { token: ownerToken });
-      expect(page.response.status).toBe(200);
-      expect(Number(page.response.headers.get('x-total-count'))).toBe(reportedTotal);
-      expect(Number(page.response.headers.get('x-page'))).toBe(Math.floor(skip / 200) + 1);
-      expect(page.data.length).toBeLessThanOrEqual(200);
-      allRows.push(...page.data);
-    }
+      const allRows = [...first.data];
+      for (let skip = 200; skip < reportedTotal; skip += 200) {
+        const page = await request(`/tasks?skip=${skip}&limit=200`, { token: ownerToken });
+        expect(page.response.status).toBe(200);
+        expect(Number(page.response.headers.get('x-total-count'))).toBe(reportedTotal);
+        expect(Number(page.response.headers.get('x-page'))).toBe(Math.floor(skip / 200) + 1);
+        expect(page.data.length).toBeLessThanOrEqual(200);
+        allRows.push(...page.data);
+      }
 
-    const fixture = allRows.filter((row) => String(row.title || '').startsWith(suffix));
-    const fixtureIds = fixture.map((row) => String(row._id));
-    expect(fixture).toHaveLength(1001);
-    expect(new Set(fixtureIds).size).toBe(1001);
-    expect(fixture.map((row) => row.title).sort()).toEqual(fixtureRows.map((row) => row.title).sort());
-
-    // Clean the generated fixture promptly; do not leave synthetic records in the
-    // memory-mode runtime server or rely only on afterAll cleanup.
-    for (let offset = 0; offset < fixtureIds.length; offset += 25) {
-      const batch = fixtureIds.slice(offset, offset + 25);
-      await Promise.all(batch.map((id) => request(`/tasks/${id}`, {
-        method: 'DELETE',
-        token: ownerToken,
-      })));
+      const fixture = allRows.filter((row) => String(row.title || '').startsWith(suffix));
+      for (const row of fixture) fixtureIds.add(String(row._id));
+      expect(fixture).toHaveLength(1001);
+      expect(fixtureIds.size).toBe(1001);
+      expect(fixture.map((row) => row.title).sort()).toEqual(fixtureRows.map((row) => row.title).sort());
+    } finally {
+      // Always clean the generated fixture, even when a pagination assertion fails.
+      // Discover by unique prefix so a failed insert assertion cannot leak rows.
+      const first = await request('/tasks?skip=0&limit=500', { token: ownerToken }).catch(() => null);
+      const reportedTotal = Number(first?.response.headers.get('x-total-count')) || 0;
+      const cleanupRows = [...(first?.data || [])];
+      for (let skip = 500; skip < reportedTotal; skip += 500) {
+        const page = await request(`/tasks?skip=${skip}&limit=500`, { token: ownerToken }).catch(() => null);
+        if (page?.response.ok && Array.isArray(page.data)) cleanupRows.push(...page.data);
+      }
+      for (const row of cleanupRows) {
+        if (String(row.title || '').startsWith(suffix) && row._id) fixtureIds.add(String(row._id));
+      }
+      for (let offset = 0; offset < fixtureIds.size; offset += 25) {
+        const batch = [...fixtureIds].slice(offset, offset + 25);
+        await Promise.all(batch.map((id) => request(`/tasks/${id}`, {
+          method: 'DELETE',
+          token: ownerToken,
+        }).catch(() => null)));
+      }
     }
   });
 
