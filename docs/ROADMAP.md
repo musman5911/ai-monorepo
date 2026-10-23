@@ -1,6 +1,6 @@
 # Roadmap
 
-Last reviewed: 2026-10-23. Phase 1C frontend implementation has started on `muf-monorepo`; delivery awaits automated checks, permission review and copy-based migration testing. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-23. Phase 1C frontend implementation is in validation on `muf-monorepo`; owner-reported source checks and unit tests pass, but the first Dairy TypeScript build failed on an unused import, now fixed in source. A clean rebuild, endpoint/permission review and copy-based migration testing remain required. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
@@ -105,4 +105,4 @@ Not planned until the scale-up phases are done: lazy-loading PDF and charts (C1)
 
 The first frontend integration adds a shared farm switcher to all three app headers and attaches the selected farm ID to API requests. The owner panel uses existing APIs for farm maintenance and role/farm assignment. Permanent deletion and “All farms” mode are intentionally not exposed.
 
-This is implementation in progress, not acceptance. Run farm-scope, MUF-sync, UI-safety, tests and builds locally. Review role-based navigation and verify against a database copy before any live migration. Never run migrations against live data. Browser testing remains deferred until final review.
+Owner-reported local results: farm-scope, MUF-sync, UI-safety, 84 unit tests and 23 workbench source checks passed. The first all-app build exposed an unused `RefreshCw` import in the shared switcher; that import has been removed from all three copies and pushed, but a clean rebuild has not yet been reported. Review actual endpoint compatibility and role-based access, then test migration dry-runs on database copies. Never run migrations against live data. Browser testing remains deferred until final review.
