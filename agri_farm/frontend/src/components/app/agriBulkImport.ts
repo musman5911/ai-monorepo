@@ -79,7 +79,8 @@ export function validateCropImport(preview: CsvImportPreview): CsvImportPreview 
     if (row.plant_date && Number.isNaN(Date.parse(row.plant_date))) {
       errors.push({ row: rowNumber, message: "Plant date must be a valid date." });
     }
-    if (row.area_acres && (!Number.isFinite(Number(row.area_acres)) || Number(row.area_acres) < 0)) {
+    const area = row.area_kanal ?? row.area_acres;
+    if (area && (!Number.isFinite(Number(area)) || Number(area) < 0)) {
       errors.push({ row: rowNumber, message: "Area must be a non-negative number." });
     }
   });
