@@ -159,3 +159,4 @@ The Home Birds navigation is secondary and scoped to Bird List, Eggs, Monthly Re
 
 - Main navigation now exposes Batches, Dashboard, Health, Labor, Incubation and Summary. Dedicated batch-first Health and Summary portals are separate from the smaller Home Birds workflows; the legacy bird-led monthly report and vaccination tracker remain under Home Birds.
 - Batch Health displays the 20 most recent batch vaccination/mortality events and computes headline totals from the full loaded history, with a visible warning when any batch detail could not be loaded.
+- The Home Birds Monthly Report is now bird-focused again; batch financials live in the dedicated top-level Summary. No legacy bird report data was deleted.
