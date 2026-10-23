@@ -7,7 +7,8 @@
     "check-sync": "node tools/check-muf-sync.js",
     "check-ui": "node tools/check-ui-safety.js",
     "check-workbench": "node tools/check-muf-workbench.js",
-    "check-workbench-runtime": "node tools/check-muf-workbench-runtime.js"
+    "check-workbench-runtime": "node tools/check-muf-workbench-runtime.js",
+    "check-farms": "node tools/check-farm-scope.js"
   },
   "devDependencies": {
     "vitest": "^3.0.0"

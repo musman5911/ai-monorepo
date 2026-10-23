@@ -3,8 +3,9 @@
 // the deployed field crew's attendance for today.
 import express from 'express';
 import { Task, Finance, Inventory, Laborer, Attendance } from '../db.js';
+import { mufIsFullRole } from '../muf-farms.mjs';
 import { protect, requireAdmin } from '../middleware/auth.js';
-import { notFound, forbidden, parseOid, asyncHandler } from '../utils/helpers.js';
+import { notFound, forbidden, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
 
 const router = express.Router();
@@ -47,7 +48,7 @@ router.put('/tasks/:taskId', protect, requireAdmin, asyncHandler(async (req, res
   const oid = parseOid(req.params.taskId, 'task ID');
   const task = { ...(req.body || {}) };
   [task.laborer_ids, task.laborer_names] = await cleanLaborerIds(task.laborer_ids);
-  const result = await Task.replaceOne({ _id: oid }, task);
+  const result = await replaceFarmRecord(Task, oid, task);
   if (!result.matchedCount) return notFound(res, 'Task not found');
   return res.json({ status: 'ok' });
 }));
@@ -59,7 +60,7 @@ router.patch('/tasks/:taskId', protect, asyncHandler(async (req, res) => {
 
   // Authorization: admins can complete any task; a worker may only complete
   // tasks assigned to them.
-  if (req.user.role !== 'admin') {
+  if (!mufIsFullRole(req.user.role)) {
     const assignedTo = String(task.assigned_to || '').toLowerCase().trim();
     if (assignedTo !== String(req.user.username || '').toLowerCase().trim()) {
       return forbidden(res, 'You can only complete tasks that are assigned to you.');

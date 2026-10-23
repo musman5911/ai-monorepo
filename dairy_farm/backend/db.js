@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 import crypto from 'crypto';
 import { seedDemoData } from './demo-data.js';
 import { createStore } from './memory-db.js';
+import { mufScopeModels, mufMigrateFarms, mufLoadDefaultFarm } from './muf-farms.mjs';
 import { MUF_ENV } from './muf-env.mjs';
 
 // Memory mode is DEV/DEMO only. If MONGO_URI is set, the real database
@@ -19,12 +20,23 @@ const connectDB = async () => {
       Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User,
       PasswordReset, RateHistory, DailyLog, Sale, Meta,
     });
+    // Demo data is disposable, so the farms migration runs automatically here.
+    await mufMigrateFarms({
+      Farm, User, models: MUF_FARM_MODELS, names: MUF_FARM_SCOPED_NAMES,
+      log: (m) => console.log(`[farms] ${m}`),
+    });
     return;
   }
   try {
     const conn = await mongoose.connect(MUF_ENV.mongoUri);
     console.log(`MongoDB Connected: ${conn.connection.host}`);
     await ensureIndexes();
+    // Real data is never migrated automatically. Run `npm run migrate:farms`
+    // (see docs/DEPLOYMENT.md) after taking a backup.
+    const defaultFarm = await mufLoadDefaultFarm(Farm);
+    if (!defaultFarm) {
+      console.warn('[farms] No farms exist yet. Take a backup, then run: npm run migrate:farms');
+    }
   } catch (error) {
     console.error('MongoDB connection error:', error);
     process.exit(1);
@@ -36,6 +48,8 @@ async function ensureIndexes() {
     await Promise.all([
       Milk.collection.createIndex({ cowId: 1, date: 1 }, { unique: true, name: 'milk_cow_date_unique' }),
       Milk.collection.createIndex({ date: -1 }, { name: 'milk_date' }),
+      Milk.collection.createIndex({ farmId: 1, date: -1 }, { name: 'milk_farm_date' }),
+      Expense.collection.createIndex({ farmId: 1, date: -1 }, { name: 'expense_farm_date' }),
       Expense.collection.createIndex({ date: -1 }, { name: 'expense_date' }),
       Expense.collection.createIndex({ cowId: 1, date: -1 }, { name: 'expense_cow_date' }),
       Expense.collection.createIndex({ _healthId: 1 }, { name: 'expense_health', sparse: true }),
@@ -232,7 +246,10 @@ const SupplierPaymentSchema = new mongoose.Schema({
 const UserSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true, trim: true, lowercase: true },
   password: { type: String, required: true },
-  role: { type: String, enum: ['admin', 'worker'], default: 'worker' },
+  // owner / manager / worker (legacy 'admin' is converted to owner by the farms migration)
+  role: { type: String, enum: ['owner', 'manager', 'worker', 'admin'], default: 'worker' },
+  // Farms a manager or worker is assigned to. Owners see every farm.
+  farmIds: { type: [String], default: [] },
   displayName: { type: String, default: '' },
   email: { type: String, default: '', trim: true, lowercase: true },
   // Profile avatar stored as a compressed base64 data-URL directly on the
@@ -327,8 +344,30 @@ const MetaSchema = new mongoose.Schema({
   value: { type: mongoose.Schema.Types.Mixed },
 }, { timestamps: true });
 
+// Farms of this project (dairy farms only). See docs/FARMS_AND_ROLES.md.
+const FarmSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  location: { type: String, default: '' },
+  archived: { type: Boolean, default: false },
+  createdBy: { type: String, default: '' },
+}, { timestamps: true });
+
+// Every record below belongs to exactly one farm. User, PasswordReset, Meta and
+// Farm stay global. The server adds the farmId; clients can never set it.
+const FARM_SCOPED = {
+  Cow: CowSchema, Milk: MilkSchema, Expense: ExpenseSchema, Laborer: LaborerSchema,
+  LaborAttendance: LaborAttendanceSchema, LaborAdvance: LaborAdvanceSchema, Rate: RateSchema,
+  Health: HealthSchema, Buyer: BuyerSchema, BuyerPayment: BuyerPaymentSchema,
+  Supplier: SupplierSchema, SupplierPayment: SupplierPaymentSchema, RateHistory: RateHistorySchema,
+  DailyLog: DailyLogSchema, Sale: SaleSchema,
+};
+export const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
+for (const schema of Object.values(FARM_SCOPED)) {
+  schema.add({ farmId: { type: String, index: true } });
+}
+
 // ─── Models ──────────────────────────────────────────────────────────────────
-let Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, Meta;
+let Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, Meta, Farm;
 
 if (USE_MEMORY) {
   const models = createStore({
@@ -350,6 +389,7 @@ if (USE_MEMORY) {
     DailyLog: DailyLogSchema,
     Sale: SaleSchema,
     Meta: MetaSchema,
+    Farm: FarmSchema,
   });
   Cow = models.Cow;
   Milk = models.Milk;
@@ -369,6 +409,7 @@ if (USE_MEMORY) {
   DailyLog = models.DailyLog;
   Sale = models.Sale;
   Meta = models.Meta;
+  Farm = models.Farm;
 } else {
   Cow = mongoose.model('Cow', CowSchema);
   Milk = mongoose.model('Milk', MilkSchema);
@@ -388,6 +429,11 @@ if (USE_MEMORY) {
   DailyLog = mongoose.model('DailyLog', DailyLogSchema);
   Sale = mongoose.model('Sale', SaleSchema);
   Meta = mongoose.model('Meta', MetaSchema);
+  Farm = mongoose.model('Farm', FarmSchema);
 }
 
-export { connectDB, Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, Meta };
+// Server-side farm scoping for every farm-owned model (works for MongoDB and memory mode).
+const MUF_FARM_MODELS = { Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, RateHistory, DailyLog, Sale };
+mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
+
+export { MUF_FARM_MODELS, Farm, connectDB, Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, Meta };

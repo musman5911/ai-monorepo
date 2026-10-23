@@ -288,7 +288,7 @@ async function pushDailySummary(force = false) {
   for (const [chatId, link] of Object.entries(links)) {
     if (!link.userId) continue;
     const u = await User.findById(link.userId);
-    if (u && u.role === 'admin') chatIds.push(chatId);
+    if (u && ['owner', 'manager', 'admin'].includes(u.role)) chatIds.push(chatId);
   }
   if (chatIds.length === 0) return { sent: 0, reason: 'no linked admin chat' };
   const text = await buildDailyText();

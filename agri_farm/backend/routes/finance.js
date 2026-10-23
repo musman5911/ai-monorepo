@@ -2,7 +2,7 @@
 import express from 'express';
 import { Finance } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
-import { notFound, parseOid, asyncHandler } from '../utils/helpers.js';
+import { notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
 
 const router = express.Router();
@@ -25,7 +25,7 @@ router.put('/finance/:financeId', protect, requireAdmin, asyncHandler(async (req
   const oid = parseOid(req.params.financeId, 'finance ID');
   const entry = { ...(req.body || {}) };
   if (!entry.date) entry.date = todayStr();
-  const result = await Finance.replaceOne({ _id: oid }, entry);
+  const result = await replaceFarmRecord(Finance, oid, entry);
   if (!result.matchedCount) return notFound(res, 'Finance entry not found');
   return res.json({ status: 'ok' });
 }));

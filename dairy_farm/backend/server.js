@@ -27,6 +27,7 @@ import breedingRoutes from './routes/breeding.js';
 import suppliersRoutes from './routes/suppliers.js';
 import cardsRoutes from './routes/cards.js';
 import settingsRoutes from './routes/settings.js';
+import farmsRoutes from './routes/farms.js';
 import { MUF_ENV } from './muf-env.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -52,7 +53,7 @@ if (MUF_ENV.nodeEnv === 'production' && !allowedOrigins.length) {
 app.use(cors({
   origin: allowedOrigins.length ? allowedOrigins : (MUF_ENV.nodeEnv === 'production' ? false : true),
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Cron-Secret'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Cron-Secret', 'X-Farm-Id'],
 }));
 app.use(express.json({ limit: '10mb' }));
 app.use(cookieParser());
@@ -111,6 +112,7 @@ app.use('/api/breeding', breedingRoutes);
 app.use('/api/suppliers', suppliersRoutes);
 app.use('/api/cards', cardsRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/farms',    farmsRoutes);
 
 // Cross-farm summary — tiny read-only aggregates for the "My Farms" tab in
 // the sibling apps. Protected by the shared CROSS_FARM_KEY; CORS-open.

@@ -19,7 +19,7 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 | Phase | What | Projects | Risk |
 |---|---|---|---|
 | 0 | Docs reset and repository cleanup | Repository | Low (done, see PROGRESS) |
-| 1 | Farms and roles in the MUF layer | Agri, Dairy, Flock | High (migration of live data) |
+| 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D wrap-up) | Agri, Dairy, Flock | High (migration of live data) |
 | 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | High |
 | 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | Medium |
 | 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | Medium to high |
@@ -32,6 +32,14 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 Removed the old progress, roadmap, deployment and audit documents, the screenshot-regression setup (it will be rebuilt after the screens settle), and the Playwright dependency. Wrote the new docs and updated `RULES.md`. Details and check results are in `PROGRESS.md`.
 
 ### Phase 1: Farms and roles
+
+Built in four steps so each zip can be checked on its own. The design record is `PHASE1_PLAN.md`.
+
+- **1A (delivered):** shared server core `muf-farms.mjs` in all three backends, wired fully into Dairy: farms collection, `farmId` on farm-owned records, the three roles, server-side scoping, farms API, owner-only backups, migration script, tests.
+- **1B-1 (delivered):** the same core wired into the Agri backend: 14 farm-owned collections, three roles, farms API, owner-only backups, migration script, tests.
+- **1B-2:** the same for the Flock backend (Flock's data store layout is still to be decided with the owner, see `PHASE1_PLAN.md`).
+- **1C:** screens in all three apps: header farm switcher, owner-only Farms & Access popup, role labels.
+- **1D:** wrap-up: migration dry runs on copies, docs, CI job for `check-farms`.
 
 - A `farms` collection per project; a `farmId` on every farm-owned record; indexes led by `farmId`.
 - Roles `owner`, `manager`, `worker`, each user with assigned farms; scope enforced on the server.

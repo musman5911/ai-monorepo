@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import { createStore } from './memory-db.js';
 import { MUF_ENV, mufEnvHasMongo } from './muf-env.mjs';
+import { mufScopeModels, mufMigrateFarms, mufLoadDefaultFarm } from './muf-farms.mjs';
 
 // ---------------------------------------------------------------------------
 // Database selection rule (same across all three farm apps):
@@ -54,10 +55,33 @@ const SupplierPaymentSchema = looseSchema('supplier_payments');
 const SettingSchema = looseSchema('settings');
 const DiaryMediaSchema = looseSchema('diary_media');
 
+// Farms of this project (crop land only). See docs/FARMS_AND_ROLES.md.
+// Timestamps matter here: the oldest farm is the default farm.
+const FarmSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true },
+  location: { type: String, default: '' },
+  archived: { type: Boolean, default: false },
+  createdBy: { type: String, default: '' },
+}, { timestamps: true, versionKey: false, collection: 'farms' });
+
+// Every record below belongs to exactly one farm. User, Reset, TelegramMeta,
+// Setting and Farm stay global. The server adds the farmId; clients can never set it.
+const FARM_SCOPED = {
+  Crop: CropSchema, Finance: FinanceSchema, Task: TaskSchema, Inventory: InventorySchema,
+  Liability: LiabilitySchema, Irrigation: IrrigationSchema, CropPhoto: CropPhotoSchema,
+  Spray: SpraySchema, Laborer: LaborerSchema, Attendance: AttendanceSchema,
+  LaborAdvance: LaborAdvanceSchema, Supplier: SupplierSchema,
+  SupplierPayment: SupplierPaymentSchema, DiaryMedia: DiaryMediaSchema,
+};
+const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
+for (const schema of Object.values(FARM_SCOPED)) {
+  schema.add({ farmId: { type: String, index: true } });
+}
+
 // ─── Models ─────────────────────────────────────────────────────────────────
 let User, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
-  Supplier, SupplierPayment, Setting, DiaryMedia;
+  Supplier, SupplierPayment, Setting, DiaryMedia, Farm;
 
 if (useMock) {
   const models = createStore({
@@ -79,10 +103,11 @@ if (useMock) {
     SupplierPayment: SupplierPaymentSchema,
     Setting: SettingSchema,
     DiaryMedia: DiaryMediaSchema,
+    Farm: FarmSchema,
   });
   ({ User, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
     CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
-    Supplier, SupplierPayment, Setting, DiaryMedia } = models);
+    Supplier, SupplierPayment, Setting, DiaryMedia, Farm } = models);
 } else {
   User = mongoose.model('User', UserSchema);
   Crop = mongoose.model('Crop', CropSchema);
@@ -102,7 +127,16 @@ if (useMock) {
   SupplierPayment = mongoose.model('SupplierPayment', SupplierPaymentSchema);
   Setting = mongoose.model('Setting', SettingSchema);
   DiaryMedia = mongoose.model('DiaryMedia', DiaryMediaSchema);
+  Farm = mongoose.model('Farm', FarmSchema);
 }
+
+// Server-side farm scoping: inside a request every query of these models is limited
+// to the selected farm(s) and every create is stamped with it (see muf-farms.mjs).
+const MUF_FARM_MODELS = {
+  Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer,
+  Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia,
+};
+mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
 
 const connectDB = async () => {
   if (useMock) {
@@ -118,6 +152,11 @@ const connectDB = async () => {
         Supplier, SupplierPayment,
       });
     }
+    // Demo data is disposable, so the farms migration runs automatically here.
+    await mufMigrateFarms({
+      Farm, User, models: MUF_FARM_MODELS, names: MUF_FARM_SCOPED_NAMES,
+      log: (m) => console.log(`[farms] ${m}`),
+    });
     return;
   }
 
@@ -140,6 +179,12 @@ const connectDB = async () => {
   try {
     const conn = await mongoose.connect(uri, { serverSelectionTimeoutMS: timeoutMs });
     console.log(`✅ [Database] Connected successfully to real MongoDB server. Database in use: '${conn.connection.name || dbName}'`);
+    // Real data is never migrated automatically. Run `npm run migrate:farms`
+    // (see docs/DEPLOYMENT.md) after taking a backup.
+    const defaultFarm = await mufLoadDefaultFarm(Farm);
+    if (!defaultFarm) {
+      console.warn('[farms] No farms exist yet. Take a backup, then run: npm run migrate:farms');
+    }
   } catch (error) {
     // Production must fail loudly so a typo'd MONGO_URI / Atlas allowlist
     // problem is noticed immediately — never silently boot an empty
@@ -155,5 +200,6 @@ export {
   connectDB, useMock,
   User, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
-  Supplier, SupplierPayment, Setting, DiaryMedia,
+  Supplier, SupplierPayment, Setting, DiaryMedia, Farm,
+  MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES,
 };

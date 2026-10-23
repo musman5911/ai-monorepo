@@ -1,6 +1,7 @@
 // ─── Crop logs: irrigation + crop photo diary + spray/pesticide logs ────────
 import express from 'express';
 import { Irrigation, CropPhoto, Spray, Crop, Finance, Inventory } from '../db.js';
+import { mufIsFullRole } from '../muf-farms.mjs';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { HttpError, badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
@@ -28,7 +29,7 @@ router.get('/irrigation', protect, asyncHandler(async (req, res) => {
   const out = data.map((d) => {
     const doc = { ...d, _id: String(d._id) };
     // Workers may see watering hours/dates but not the money side.
-    if (req.user.role !== 'admin') {
+    if (!mufIsFullRole(req.user.role)) {
       delete doc.hourly_rate;
       delete doc.amount;
       delete doc.finance_id;

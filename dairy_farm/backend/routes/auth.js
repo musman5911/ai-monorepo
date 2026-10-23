@@ -3,8 +3,11 @@ const router = express.Router();
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
-import { User, PasswordReset } from '../db.js';
+import { User, PasswordReset, Farm, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
 import { protect, adminOnly } from '../middleware/auth.js';
+import {
+  mufNormalizeRole, mufLegacyRole, mufIsOwner, MUF_FULL_ROLE_VALUES, mufMigrateFarms,
+} from '../muf-farms.mjs';
 import { sendVerificationCodeEmail, sendProfileCodeEmail, mailConfigured } from '../utils/mailer.js';
 import { MUF_ENV } from '../muf-env.mjs';
 
@@ -54,8 +57,24 @@ const resetLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-function normalizeRole(role) {
-  return role === 'admin' ? 'admin' : 'worker';
+// owner / manager / worker (a legacy 'admin' account counts as owner).
+const normalizeRole = mufNormalizeRole;
+
+// Farm ids that exist, from a client-supplied list.
+async function validFarmIds(input) {
+  const wanted = [...new Set((Array.isArray(input) ? input : []).map((v) => String(v)))];
+  if (!wanted.length) return [];
+  const farms = await Farm.find({}).lean();
+  const known = new Set(farms.map((f) => String(f._id)));
+  return wanted.filter((id) => known.has(id));
+}
+
+// Managers may only handle workers who share at least one of their farms.
+function managerCanHandle(req, target) {
+  if (mufIsOwner(req.user.role)) return true;
+  if (normalizeRole(target.role) !== 'worker') return false;
+  const mine = new Set((req.user.farmIds || []).map(String));
+  return (target.farmIds || []).some((id) => mine.has(String(id)));
 }
 
 function normalizeUsername(username) {
@@ -72,7 +91,11 @@ function toSafeUser(user) {
   return {
     _id: String(user._id),
     username: user.username,
-    role: normalizeRole(user.role),
+    // `role` keeps the old admin/worker values so existing screens keep working;
+    // `farmRole` is the real owner/manager/worker role.
+    role: mufLegacyRole(user.role),
+    farmRole: normalizeRole(user.role),
+    farmIds: (user.farmIds || []).map(String),
     displayName: user.displayName || '',
     email: user.email || '',
     avatarBase64: user.avatarBase64 || '',
@@ -95,7 +118,7 @@ function signFor(user) {
 
 const MIN_PASSWORD_LENGTH = 8;
 
-async function createUser({ username, password, role, displayName = '', email = '' }) {
+async function createUser({ username, password, role, displayName = '', email = '', farmIds = [] }) {
   const cleanUsername = normalizeUsername(username);
   if (!cleanUsername || cleanUsername.length < 3) {
     const err = new Error('Username must be at least 3 characters');
@@ -140,6 +163,7 @@ async function createUser({ username, password, role, displayName = '', email = 
     email: cleanEmail,
     active: true,
     farmName: 'Usman Dairy Farm',
+    farmIds: chosenRole === 'owner' ? [] : farmIds,
   });
 }
 
@@ -152,16 +176,18 @@ router.post('/setup', setupLimiter, async (req, res) => {
     const user = await createUser({
       username: req.body?.username || 'admin',
       password: req.body?.password,
-      role: 'admin',
+      role: 'owner',
       displayName: req.body?.displayName || '',
       email: req.body?.email || '',
     });
 
     user.lastLoginAt = new Date();
     await user.save();
+    // First farm for a brand-new installation.
+    await mufMigrateFarms({ Farm, User, models: MUF_FARM_MODELS, names: MUF_FARM_SCOPED_NAMES });
 
     const token = signFor(user);
-    res.json({ token, role: normalizeRole(user.role), username: user.username, user: toSafeUser(user) });
+    res.json({ token, role: mufLegacyRole(user.role), farmRole: normalizeRole(user.role), username: user.username, user: toSafeUser(user) });
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message });
   }
@@ -179,13 +205,11 @@ router.post('/login', loginLimiter, async (req, res) => {
     const match = await bcrypt.compare(String(req.body?.password || ''), user.password);
     if (!match) return res.status(401).json({ error: 'Invalid credentials' });
 
-    // Normalize any non-admin account into the worker role.
-    if (user.role !== 'admin') user.role = 'worker';
     user.lastLoginAt = new Date();
     await user.save();
 
     const token = signFor(user);
-    res.json({ token, role: normalizeRole(user.role), username: user.username, user: toSafeUser(user) });
+    res.json({ token, role: mufLegacyRole(user.role), farmRole: normalizeRole(user.role), username: user.username, user: toSafeUser(user) });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -257,9 +281,9 @@ router.patch('/me', protect, async (req, res) => {
 });
 
 // GET /api/auth/users — admin-only user list
-router.get('/users', protect, adminOnly, async (_req, res) => {
+router.get('/users', protect, adminOnly, async (req, res) => {
   try {
-    const users = await User.find().sort({ createdAt: -1 });
+    const users = (await User.find().sort({ createdAt: -1 })).filter((u) => managerCanHandle(req, u) || String(u._id) === String(req.user.id));
     res.json({ users: users.map(toSafeUser) });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -271,10 +295,22 @@ router.post('/users', userLimiter, protect, adminOnly, async (req, res) => {
   try {
     // Administrator accounts must have an email
     // (needed for password recovery and profile verification codes).
-    if (normalizeRole(req.body?.role) === 'admin' && !String(req.body?.email || '').trim()) {
-      return res.status(400).json({ error: 'Email address is mandatory for administrator accounts' });
+    const role = normalizeRole(req.body?.role);
+    if (role !== 'worker' && !String(req.body?.email || '').trim()) {
+      return res.status(400).json({ error: 'Email address is mandatory for owner and manager accounts' });
     }
-    const user = await createUser(req.body || {});
+    if (role !== 'worker' && !mufIsOwner(req.user.role)) {
+      return res.status(403).json({ error: 'Only an owner can create owner or manager accounts' });
+    }
+    let farmIds = await validFarmIds(req.body?.farmIds);
+    if (!mufIsOwner(req.user.role)) {
+      const mine = new Set((req.user.farmIds || []).map(String));
+      farmIds = farmIds.filter((id) => mine.has(id));
+    }
+    if (role !== 'owner' && farmIds.length === 0) {
+      return res.status(400).json({ error: 'Assign at least one farm to this account' });
+    }
+    const user = await createUser({ ...(req.body || {}), role, farmIds });
     res.status(201).json({ user: toSafeUser(user) });
   } catch (err) {
     res.status(err.status || 500).json({ error: err.message });
@@ -298,6 +334,7 @@ router.patch('/users/:id', userLimiter, protect, adminOnly, async (req, res) => 
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const isSelf = String(user._id) === String(req.user.id);
+    if (!isSelf && !managerCanHandle(req, user)) return res.status(403).json({ error: 'You can only manage workers in your own farms' });
 
     if (req.body?.username !== undefined) {
       const cleanUsername = normalizeUsername(req.body.username);
@@ -316,7 +353,20 @@ router.patch('/users/:id', userLimiter, protect, adminOnly, async (req, res) => 
 
     if (req.body?.role !== undefined) {
       if (isSelf) return res.status(400).json({ error: "You can't change your own role" });
+      if (!mufIsOwner(req.user.role)) return res.status(403).json({ error: 'Only an owner can change roles' });
       user.role = normalizeRole(req.body.role);
+    }
+
+    if (req.body?.farmIds !== undefined) {
+      let farmIds = await validFarmIds(req.body.farmIds);
+      if (!mufIsOwner(req.user.role)) {
+        const mine = new Set((req.user.farmIds || []).map(String));
+        farmIds = farmIds.filter((id) => mine.has(id));
+      }
+      if (normalizeRole(user.role) !== 'owner' && farmIds.length === 0) {
+        return res.status(400).json({ error: 'Assign at least one farm to this account' });
+      }
+      user.farmIds = farmIds;
     }
 
     if (req.body?.displayName !== undefined) user.displayName = String(req.body.displayName || '').trim();
@@ -360,8 +410,10 @@ router.delete('/users/:id', userLimiter, protect, adminOnly, async (req, res) =>
     if (String(req.params.id) === String(req.user.id)) {
       return res.status(400).json({ error: 'You cannot delete your own account' });
     }
-    const user = await User.findByIdAndDelete(req.params.id);
-    if (!user) return res.status(404).json({ error: 'User not found' });
+    const target = await User.findById(req.params.id);
+    if (!target) return res.status(404).json({ error: 'User not found' });
+    if (!managerCanHandle(req, target)) return res.status(403).json({ error: 'You can only manage workers in your own farms' });
+    await User.findByIdAndDelete(req.params.id);
     res.json({ ok: true });
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -468,7 +520,7 @@ router.post('/forgot-password', resetLimiter, async (req, res) => {
       return res.status(400).json({ error: 'A valid email is required' });
     }
 
-    const user = await User.findOne({ email, role: 'admin', active: { $ne: false } });
+    const user = await User.findOne({ email, role: { $in: MUF_FULL_ROLE_VALUES }, active: { $ne: false } });
     if (user) {
       const code = await PasswordReset.createCode({ userId: user._id });
       try {
@@ -501,7 +553,7 @@ router.post('/reset-password', resetLimiter, async (req, res) => {
       return res.status(400).json({ error: `New password must be at least ${MIN_PASSWORD_LENGTH} characters` });
     }
 
-    const user = await User.findOne({ email, role: 'admin', active: { $ne: false } });
+    const user = await User.findOne({ email, role: { $in: MUF_FULL_ROLE_VALUES }, active: { $ne: false } });
     if (!user) return res.status(400).json({ error: 'Invalid or expired code' });
 
     const reset = await PasswordReset.findOne({

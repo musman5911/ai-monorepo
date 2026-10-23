@@ -70,7 +70,30 @@ function createModel(name, schema) {
       if (d[k] === undefined) d[k] = typeof v === 'function' ? v.call(null) : cloneValue(v);
     }
     if (d._id === undefined || d._id === null) d._id = generateId();
+    // Only schemas that ask for timestamps get them (Farm: the oldest farm is the default).
+    if (schema.options && schema.options.timestamps) {
+      if (d.createdAt === undefined) d.createdAt = new Date();
+      if (d.updatedAt === undefined) d.updatedAt = new Date();
+    }
     return d;
+  };
+
+  // Documents handed out by findOne/findById/create get a non-enumerable save(),
+  // so `{ ...doc }` and JSON output stay exactly as before. Used by the farms router.
+  const attachSave = (clone) => {
+    Object.defineProperty(clone, 'save', {
+      enumerable: false,
+      configurable: true,
+      value: async function save() {
+        const idx = store.findIndex((x) => String(x._id) === String(this._id));
+        const copy = cloneValue({ ...this });
+        if (schema.options && schema.options.timestamps) copy.updatedAt = new Date();
+        if (idx === -1) store.push(copy);
+        else store[idx] = copy;
+        return this;
+      },
+    });
+    return clone;
   };
 
   const model = {
@@ -89,7 +112,7 @@ function createModel(name, schema) {
       if (limit != null) rows = rows.slice(0, limit);
       if (op === 'findOne' || op === 'findById') {
         const one = rows[0] || null;
-        return one ? cloneValue(one) : null;
+        return one ? attachSave(cloneValue(one)) : null;
       }
       if (select) rows = rows.map((d) => project(d, select));
       return rows.map((d) => cloneValue(d));
@@ -108,7 +131,7 @@ function createModel(name, schema) {
     async create(doc) {
       const d = toDoc(doc || {});
       store.push(d);
-      return cloneValue(d);
+      return attachSave(cloneValue(d));
     },
 
     async insertOne(doc) {
@@ -149,6 +172,21 @@ function createModel(name, schema) {
       replacement._id = store[idx]._id; // _id is immutable in MongoDB replaceOne
       store[idx] = replacement;
       return { matchedCount: 1, modifiedCount: 1 };
+    },
+
+    async findByIdAndUpdate(id, update, opts = {}) {
+      const d = store.find((x) => String(x._id) === String(id)) || null;
+      if (!d) return null;
+      applyUpdate(d, update || {});
+      if (schema.options && schema.options.timestamps) d.updatedAt = new Date();
+      return opts.new === false ? null : attachSave(cloneValue(d));
+    },
+
+    async findByIdAndDelete(id) {
+      const idx = store.findIndex((x) => String(x._id) === String(id));
+      if (idx === -1) return null;
+      const [gone] = store.splice(idx, 1);
+      return cloneValue(gone);
     },
 
     async deleteOne(filter) {

@@ -1,13 +1,31 @@
 import express from 'express';
 const router = express.Router();
 import mongoose from 'mongoose';
-import { Cow, Milk, Expense, Rate, Health, Buyer, BuyerPayment, RateHistory, DailyLog, Sale, Meta, Laborer, LaborAttendance, LaborAdvance, User } from '../db.js';
-import { protect, adminOnly } from '../middleware/auth.js';
+import { Cow, Milk, Expense, Rate, Health, Buyer, BuyerPayment, RateHistory, DailyLog, Sale, Meta, Laborer, LaborAttendance, LaborAdvance, User, Farm, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
+import { protect, ownerOnly } from '../middleware/auth.js';
+import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
+
+// A backup covers every farm of this project, so only owners may take or restore
+// one, and the handlers run outside any single-farm scope.
+const adminOnly = [ownerOnly, (_req, _res, next) => mufRunUnscoped(() => next())];
+
+// Old backups have no farmId: tag whatever is untagged with the default farm.
+const tagAfterRestore = () => mufMigrateFarms({ Farm, User, models: MUF_FARM_MODELS, names: MUF_FARM_SCOPED_NAMES });
+
+// Restore farms that exist in the backup but not in the database (same ids).
+async function restoreMissingFarms(payload) {
+  if (!Array.isArray(payload?.farms)) return;
+  for (const f of payload.farms) {
+    if (f && f._id && !(await Farm.findById(String(f._id)))) {
+      await Farm.create({ _id: f._id, name: f.name || 'Farm', location: f.location || '', archived: Boolean(f.archived) });
+    }
+  }
+}
 import { sendMail, mailConfigured, mufEmail } from '../utils/mailer.js';
 import { MUF_ENV } from '../muf-env.mjs';
 
 // GET /api/backup — download full database as JSON
-router.get('/', protect, adminOnly, async (req, res) => {
+router.get('/', protect, ...adminOnly, async (req, res) => {
   try {
     const [cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances] = await Promise.all([
       Cow.find().lean(),
@@ -24,10 +42,12 @@ router.get('/', protect, adminOnly, async (req, res) => {
       LaborAttendance.find().lean(),
       LaborAdvance.find().lean(),
     ]);
+    const farms = await Farm.find().lean();
     const backup = {
       exportDate: new Date().toISOString(),
       farmName: 'Usman Dairy Farm',
-      version: 2,
+      version: 3,
+      farms,
       cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances
     };
     res.setHeader('Content-Disposition', `attachment; filename=usman-dairy-backup-${new Date().toISOString().slice(0,10)}.json`);
@@ -74,7 +94,7 @@ async function restoreCollections(payload, session) {
 // POST /api/backup/restore — restore from JSON backup
 // Uses a transaction when the deployment supports it (replica set / Atlas).
 // Falls back to sequential restore on standalone MongoDB.
-router.post('/restore', protect, adminOnly, async (req, res) => {
+router.post('/restore', protect, ...adminOnly, async (req, res) => {
   const payload = req.body;
   if (!payload || typeof payload !== 'object') {
     return res.status(400).json({ error: 'Invalid backup payload' });
@@ -104,6 +124,7 @@ router.post('/restore', protect, adminOnly, async (req, res) => {
       try { session = await mongoose.startSession(); } catch { session = null; }
     }
 
+    await restoreMissingFarms(payload);
     if (session) {
       try {
         await session.withTransaction(async () => {
@@ -130,6 +151,7 @@ router.post('/restore', protect, adminOnly, async (req, res) => {
       await restoreCollections(payload, null);
     }
 
+    await tagAfterRestore();
     res.json({
       success: true,
       message: usedTransaction
@@ -156,7 +178,9 @@ async function collectBackupPayload() {
     Health.find().lean(), Buyer.find().lean(), BuyerPayment.find().lean(), RateHistory.find().lean(), DailyLog.find().lean(), Sale.find().lean(),
     Laborer.find().lean(), LaborAttendance.find().lean(), LaborAdvance.find().lean(),
   ]);
+  const farms = await Farm.find().lean();
   return {
+    farms,
     exportDate: new Date().toISOString(),
     farmName: 'Usman Dairy Farm',
     version: 2,
@@ -189,7 +213,7 @@ async function maybeRunMonthlyAutoBackup(force = false) {
   // database. Failures never block the backup itself.
   try {
     if (mailConfigured()) {
-      const admin = await User.findOne({ role: 'admin', email: { $nin: [null, ''] } });
+      const admin = await User.findOne({ role: { $in: MUF_FULL_ROLE_VALUES }, email: { $nin: [null, ''] } });
       if (admin && admin.email) {
         await sendMail({
           to: admin.email,
@@ -221,7 +245,7 @@ async function maybeRunMonthlyAutoBackup(force = false) {
 }
 
 // GET /api/backup/auto — info + payload of the stored monthly auto-backup
-router.get('/auto', protect, adminOnly, async (_req, res) => {
+router.get('/auto', protect, ...adminOnly, async (_req, res) => {
   try {
     const existing = await Meta.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
@@ -231,7 +255,7 @@ router.get('/auto', protect, adminOnly, async (_req, res) => {
 });
 
 // POST /api/backup/auto/run — force-refresh this month's snapshot now
-router.post('/auto/run', protect, adminOnly, async (_req, res) => {
+router.post('/auto/run', protect, ...adminOnly, async (_req, res) => {
   try {
     const stored = await maybeRunMonthlyAutoBackup(true);
     res.json({ ok: true, name: stored.name, createdAt: stored.createdAt });
@@ -239,12 +263,14 @@ router.post('/auto/run', protect, adminOnly, async (_req, res) => {
 });
 
 // POST /api/backup/restore-auto — restore the DB from the monthly auto-backup
-router.post('/restore-auto', protect, adminOnly, async (_req, res) => {
+router.post('/restore-auto', protect, ...adminOnly, async (_req, res) => {
   try {
     const existing = await Meta.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
     if (!value || !value.payload) return res.status(404).json({ error: 'No auto-backup available yet' });
+    await restoreMissingFarms(value.payload);
     await restoreCollections(value.payload, null);
+    await tagAfterRestore();
     res.json({ success: true, message: `Restored from ${value.name}` });
   } catch (e) { res.status(500).json({ error: `Restore failed: ${e.message}` }); }
 });

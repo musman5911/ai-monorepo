@@ -2,14 +2,15 @@
 import express from 'express';
 import { Crop, CropPhoto, Spray } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
-import { badRequest, notFound, parseOid, asyncHandler } from '../utils/helpers.js';
+import { badRequest, notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
+import { mufIsFullRole } from '../muf-farms.mjs';
 
 const router = express.Router();
 
 router.get('/crops', protect, asyncHandler(async (req, res) => {
   const skip = Math.max(0, Number(req.query.skip) || 0);
   const limit = Math.max(1, Math.min(Number(req.query.limit) || 100, 500));
-  const isAdmin = req.user.role === 'admin';
+  const isAdmin = mufIsFullRole(req.user.role);
   // Workers only see CURRENT crop cycles — completed/history records
   // (and their harvest totals) are the owner's business.
   const query = isAdmin ? {} : { status: { $ne: 'Completed' } };
@@ -36,7 +37,7 @@ router.post('/crops', protect, requireAdmin, asyncHandler(async (req, res) => {
 
 router.put('/crops/:cropId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.cropId, 'crop ID');
-  const result = await Crop.replaceOne({ _id: oid }, req.body || {});
+  const result = await replaceFarmRecord(Crop, oid, req.body || {});
   if (!result.matchedCount) return notFound(res, 'Crop not found');
   return res.json({ ...(req.body || {}), _id: oid });
 }));

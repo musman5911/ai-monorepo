@@ -110,6 +110,15 @@ Phases 1, 2 and 4 change data. Follow these steps for each project separately, a
 4. **Publish** following the checklist above, then test: login as an owner, a manager and a worker; confirm a worker sees only assigned farms; add, rename and archive a farm; make one safe record save in each farm.
 5. **Rollback** means restoring the backup and republishing the previous commit. Keep the backup until the owner has used the new version for a while.
 
+Phase 1 migration commands, run inside each project's backend folder with that project's `MONGO_URI` set (Dairy and Agri have the script today; Flock gets it in step 1B-2):
+
+```
+npm run migrate:farms:dry     shows what would change and changes nothing
+npm run migrate:farms         creates "Farm 1", tags every record, converts admin to owner
+```
+
+The migration is safe to run twice. The server does not run it for you: until it has been run on real data, every request that needs a farm returns `MIGRATION_REQUIRED`. Demo (memory) mode runs it automatically.
+
 Never run a migration against live data from a developer machine without the owner's go-ahead.
 
 ## Free-tier limits to watch

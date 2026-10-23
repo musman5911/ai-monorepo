@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
-import { User } from '../db.js';
+import { User, Farm } from '../db.js';
+import { mufNormalizeRole, mufIsOwner, mufIsFullRole, mufApplyFarmContext } from '../muf-farms.mjs';
 import { MUF_ENV } from '../muf-env.mjs';
 
 // In dev mode (no NODE_ENV=production), fall back to a dev secret so the
@@ -39,34 +40,46 @@ const protect = async (req, res, next) => {
     // Re-check the backing user on every request so deleted/deactivated users
     // lose access immediately instead of keeping access until JWT expiry.
     // _id is indexed by MongoDB, and lean() avoids Mongoose document overhead.
-    const user = await User.findById(decoded.id).select('_id username role active').lean();
+    const user = await User.findById(decoded.id).select('_id username role active farmIds').lean();
     if (!user || user.active === false) {
       if (MUF_ENV.logRequests) console.log(`[AUTH] ${req.method} ${req.originalUrl} -> 401 (user ${user ? 'inactive' : 'NOT FOUND'} for id ${decoded.id})`);
       return res.status(401).json({ error: 'User is not active' });
     }
 
-    const role = user.role === 'admin' ? 'admin' : 'worker';
+    // owner / manager / worker (a legacy 'admin' account counts as owner)
+    const role = mufNormalizeRole(user.role);
     req.user = {
       id: String(user._id),
       _id: String(user._id),
       username: user.username,
       role,
+      farmIds: (user.farmIds || []).map(String),
     };
-    return next();
+    // Resolve the selected farm (X-Farm-Id header) and run the rest of the
+    // request inside that farm's scope. Every farm-owned query is filtered by it.
+    return mufApplyFarmContext(req, res, next, { Farm });
   } catch (err) {
     console.error('Auth user lookup failed:', err);
     return res.status(500).json({ error: 'Authentication check failed' });
   }
 };
 
+// adminOnly keeps its old name so every route stays unchanged: it now means
+// "owner or manager" (full control inside the selected farm).
 const adminOnly = (req, res, next) => {
-  if (req.user?.role !== 'admin') return res.status(403).json({ error: 'Admin only' });
+  if (!mufIsFullRole(req.user?.role)) return res.status(403).json({ error: 'Owner or manager only' });
+  next();
+};
+
+// Farm management, backups and the Super Admin tab: owners only.
+const ownerOnly = (req, res, next) => {
+  if (!mufIsOwner(req.user?.role)) return res.status(403).json({ error: 'Owner only' });
   next();
 };
 
 const workerOrAdmin = (req, res, next) => {
-  if (!['admin', 'worker'].includes(req.user?.role)) return res.status(403).json({ error: 'Worker or admin only' });
+  if (!['owner', 'manager', 'worker'].includes(req.user?.role)) return res.status(403).json({ error: 'Not allowed' });
   next();
 };
 
-export { protect, adminOnly, workerOrAdmin };
+export { protect, adminOnly, ownerOnly, workerOrAdmin };

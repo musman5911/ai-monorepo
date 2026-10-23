@@ -37,6 +37,7 @@ Exactly three roles. Do not add others.
 - A worker only enters data (milk, eggs, feed, expenses and similar) in assigned farms.
 - Every user has a list of assigned farms. Owners implicitly have all farms.
 - Today's apps have only `admin` and `worker`. In the Phase 1 migration every existing `admin` becomes `owner`, and existing workers are assigned to "Farm 1".
+- Until the screens are updated (step 1C), the API also returns the old `role` value (`admin` for owners and managers) next to the real `farmRole`.
 
 ## 3. Farm rules
 
@@ -69,7 +70,7 @@ Shared code is identical in all three apps and guarded by `tools/check-muf-sync.
 
 | Kind | Planned location |
 |---|---|
-| Backend: farm rules, scope filter, roles | `backend/muf-farms.mjs` |
+| Backend: farm rules, scope filter, roles, farms API, migration | `backend/muf-farms.mjs` (built, step 1A) |
 | Backend: save many rows at once | `backend/muf-bulk.mjs` |
 | Backend: scroll loading and filters | `backend/muf-paging.mjs` |
 | Backend: photo storage adapter | `backend/muf-storage.mjs` |

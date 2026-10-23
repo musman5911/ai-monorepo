@@ -1,4 +1,5 @@
 // Shared route helpers for the agri backend (error format + id validation).
+import { mufRunUnscoped } from '../muf-farms.mjs';
 
 // FastAPI-style error payload: { detail: '...' } — the React frontend reads
 // err.response.data.detail everywhere.
@@ -28,6 +29,19 @@ export function parseOid(value, label = 'ID') {
     throw new HttpError(400, `Invalid ${label} format`);
   }
   return s;
+}
+
+// Replace a whole record (PUT) inside the selected farm. replaceOne is refused in a
+// farm-scoped request (it could move a record to another farm), so: find the record
+// within the farm first (404 if it belongs elsewhere), then replace it while keeping
+// its farmId. Returns { matchedCount } like replaceOne.
+export async function replaceFarmRecord(Model, oid, doc) {
+  const existing = await Model.findOne({ _id: oid });
+  if (!existing) return { matchedCount: 0, modifiedCount: 0 };
+  const next = { ...doc };
+  delete next.farmId;
+  if (existing.farmId) next.farmId = existing.farmId;
+  return mufRunUnscoped(() => Model.replaceOne({ _id: oid }, next));
 }
 
 // Wrap a route handler so thrown HttpError / unexpected errors become JSON.

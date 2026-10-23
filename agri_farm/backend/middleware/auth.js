@@ -3,9 +3,10 @@ import path from 'path';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { fileURLToPath } from 'url';
-import { User } from '../db.js';
+import { User, Farm } from '../db.js';
 import { sendHttpError } from '../utils/helpers.js';
 import { MUF_ENV } from '../muf-env.mjs';
+import { mufNormalizeRole, mufIsOwner, mufIsFullRole, mufApplyFarmContext } from '../muf-farms.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -79,6 +80,17 @@ async function resolveUser(req) {
   return findUserForSub(sub);
 }
 
+// The user doc as routes see it: owner / manager / worker (a legacy 'admin'
+// account counts as owner) plus the farms the account is assigned to.
+function toRequestUser(user) {
+  return {
+    ...user,
+    _id: String(user._id),
+    role: mufNormalizeRole(user.role),
+    farmIds: (user.farmIds || []).map(String),
+  };
+}
+
 export async function protect(req, res, next) {
   const user = await resolveUser(req);
   if (!user) {
@@ -87,21 +99,34 @@ export async function protect(req, res, next) {
   }
   // Attach the full user doc (like FastAPI's get_current_user); routes read
   // username/email/role/password and _id.
-  req.user = { ...user, _id: String(user._id) };
-  return next();
+  req.user = toRequestUser(user);
+  // Resolve the selected farm (X-Farm-Id header) and run the rest of the
+  // request inside that farm's scope. Every farm-owned query is filtered by it.
+  return mufApplyFarmContext(req, res, next, { Farm });
 }
 
 // Same lookup but never rejects — used by /signup where an optional admin
-// token decides whether registration is allowed.
+// token decides whether registration is allowed. No farm scope here: signup
+// only touches the global User collection.
 export async function protectOptional(req, res, next) {
   const user = await resolveUser(req);
-  if (user) req.user = { ...user, _id: String(user._id) };
+  if (user) req.user = toRequestUser(user);
   return next();
 }
 
+// requireAdmin keeps its old name so every route stays unchanged: it now means
+// "owner or manager" (full control inside the selected farm).
 export function requireAdmin(req, res, next) {
-  if (!req.user || req.user.role !== 'admin') {
-    return sendHttpError(res, 403, 'Admin authorization required');
+  if (!req.user || !mufIsFullRole(req.user.role)) {
+    return sendHttpError(res, 403, 'Owner or manager authorization required');
+  }
+  return next();
+}
+
+// Farm management, backups and the Super Admin tab: owners only.
+export function ownerOnly(req, res, next) {
+  if (!req.user || !mufIsOwner(req.user.role)) {
+    return sendHttpError(res, 403, 'Owner authorization required');
   }
   return next();
 }

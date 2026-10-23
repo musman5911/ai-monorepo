@@ -13,6 +13,7 @@ import { protect, requireAdmin } from '../middleware/auth.js';
 import { parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
 import { MUF_ENV } from '../muf-env.mjs';
+import { mufIsFullRole } from '../muf-farms.mjs';
 
 let mufTelegram = null; // ESM twin, loaded once on first use
 async function muf() {
@@ -252,7 +253,7 @@ async function tgPushDaily(force = false) {
     try {
       u = await User.findOne({ _id: parseOid(uid, 'user ID') });
     } catch { u = null; }
-    if (u && u.role === 'admin') chatIds.push(chatId);
+    if (u && mufIsFullRole(u.role)) chatIds.push(chatId);
   }
   if (!chatIds.length) return { sent: 0, reason: 'no linked admin chat' };
   const text = await tgDailyText(date);

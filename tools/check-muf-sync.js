@@ -173,6 +173,7 @@ const BACKEND_TWINS = [
   ['muf-query.mjs',    'dairy_farm/backend/muf-query.mjs',    'flock_farm/backend/muf-query.mjs',    'agri_farm/backend/muf-query.mjs'],
   ['muf-env.mjs',      'dairy_farm/backend/muf-env.mjs',      'flock_farm/backend/muf-env.mjs',      'agri_farm/backend/muf-env.mjs'],
   ['muf-card.mjs',     'dairy_farm/backend/muf-card.mjs',     'flock_farm/backend/muf-card.mjs',     'agri_farm/backend/muf-card.mjs'],
+  ['muf-farms.mjs',    'dairy_farm/backend/muf-farms.mjs',    'flock_farm/backend/muf-farms.mjs',    'agri_farm/backend/muf-farms.mjs'],
 ];
 for (const [label, pa, pb, pc] of BACKEND_TWINS) {
   const a = read(pa), b = read(pb), c = read(pc);

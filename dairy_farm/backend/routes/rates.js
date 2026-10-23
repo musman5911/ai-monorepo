@@ -6,9 +6,10 @@ import { todayStr } from '../utils/date.js';
 import { readPositiveNumber, sendValidationError } from './input.js';
 
 async function getOrCreateRate() {
-  let rate = await Rate.findById('1');
+  // One rate record per farm (the old fixed id '1' now belongs to the first farm).
+  let rate = await Rate.findOne({});
   if (!rate) {
-    rate = await Rate.create({ _id: '1', value: 130, date: todayStr() });
+    rate = await Rate.create({ _id: 'rate-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8), value: 130, date: todayStr() });
   }
   return rate;
 }
@@ -31,7 +32,7 @@ router.put('/1', protect, adminOnly, async (req, res) => {
     const value = readPositiveNumber(req.body || {}, 'value', errors, { required: true });
     if (errors.length) return sendValidationError(res, errors);
 
-    const old = await Rate.findById('1');
+    const old = await Rate.findOne({});
     const now = todayStr();
 
     // Save previous rate into history (keep the date the old rate started)
@@ -44,11 +45,9 @@ router.put('/1', protect, adminOnly, async (req, res) => {
       });
     }
 
-    const rate = await Rate.findByIdAndUpdate(
-      '1',
-      { value, date: now },
-      { new: true, upsert: true }
-    );
+    const rate = old
+      ? await Rate.findByIdAndUpdate(old._id, { value, date: now }, { new: true })
+      : await Rate.create({ _id: 'rate-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8), value, date: now });
     res.json(rate);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

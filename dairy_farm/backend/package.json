@@ -5,7 +5,9 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "nodemon server.js"
+    "dev": "nodemon server.js",
+    "migrate:farms": "node scripts/migrate-farms.js",
+    "migrate:farms:dry": "node scripts/migrate-farms.js --dry-run"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",

@@ -25,9 +25,10 @@ From the repository root, run these in order after pulling `main`. All helper sc
 5. npm run check-workbench
 6. node --check tools/audit-muf-design-system.mjs
 7. node tools/audit-muf-design-system.mjs
-8. tools\build-all.bat
-9. npm test
-10. tools\start-all.bat
+8. tools\build-all.bat (installs every app's packages)
+9. npm test (needs step 8 first: some tests import code from the Dairy app, which needs its packages)
+10. npm run check-farms (needs `npm ci` inside `dairy_farm\backend` and `agri_farm\backend`; no database required). To check one project: `node tools/check-farm-scope.js agri`
+11. tools\start-all.bat
 
 Run the design audit with `node tools/audit-muf-design-system.mjs`. It writes local reports to `.audit-output`, which is intentionally ignored by Git.
 

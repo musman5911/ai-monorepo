@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-22 (Phase 0 delivered; Phases 1 to 7 not started).
+Last updated: 2026-10-23 (Phase 0 applied and verified by the owner; Phase 1 steps 1A and 1B-1 delivered; Flock 1B-2 waiting for the owner's layout decision; the rest not started).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
@@ -11,8 +11,8 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 
 | Phase | State |
 |---|---|
-| 0. Docs reset and repository cleanup | Done in the delivered zip; owner has not applied it yet |
-| 1. Farms and roles (MUF) | Not started. Plan not yet written |
+| 0. Docs reset and repository cleanup | Done. Applied by the owner, pushed to the `muf-monorepo` branch, owner's checks and builds all passed |
+| 1. Farms and roles (MUF) | In progress. 1A done (shared core + Dairy backend); 1B-1 done (Agri backend); 1B-2 Flock backend waiting for a layout decision; 1C screens and 1D wrap-up not started |
 | 2. Flock restructure and Home Birds | Not started |
 | 3. Bulk entry, scroll loading, server totals | Not started |
 | 4. Dairy breeding; Agri fields and seasons | Not started |
@@ -34,6 +34,50 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 - **Backups:** the owner already took a database backup on 2026-10-22. Take a fresh one before each migration.
 - **Hosting:** the owner uses the free MongoDB tier and Replit, so size and quota limits matter (see `DEPLOYMENT.md`).
 - **MU Farms shop:** later. There is no budget for a new domain; where it lives is decided in Phase 7.
+
+## Waiting for the owner
+
+- **Flock data layout (blocks step 1B-2).** Claude proposed one stored list per farm and key. The owner answered "Flock layout - no we will do …" and the message was cut off, so the alternative is unknown. No Flock code has been written.
+
+## Phase 1 step 1B-1: Agri backend (built 2026-10-23)
+
+Design record: [PHASE1_PLAN.md](PHASE1_PLAN.md). Backend only; no screens changed.
+
+- **Agri backend:** `Farm` model; `farmId` on the 14 farm-owned collections; users get `farmIds`; roles owner, manager, worker; server-side scoping from the `X-Farm-Id` header (no header = default farm, `all` = read-only); `/api/farms` (owner only to change); owner-only backup and restore covering all farms; `npm run migrate:farms:dry` and `npm run migrate:farms` in `agri_farm/backend`.
+- **Changed behavior to know about:** managers can no longer download or restore backups (owners only, as decided); the first sign-up is the owner; four PUT routes (crops, finance, tasks, suppliers) now go through `replaceFarmRecord` because `replaceOne` is refused inside a farm-scoped request.
+- **Checks added or extended:** `tests/muf-farms-agri.test.ts` (10 tests); `tools/check-farm-scope.js` now works per project and has `agri` (and, for both Agri and Dairy: same-farm update, and backup then restore keeps every record in its farm).
+- **Small fix in Dairy:** `X-Farm-Id` added to the allowed CORS headers.
+
+**Not done or not verified (Agri):**
+
+- The migration has only run against demo (memory) data, never on a real MongoDB copy. No real database was available here, so no real read or write through MongoDB was exercised for Agri.
+- No screens (step 1C). The old Agri screens keep working through the default farm, but errors from the farm layer use `{ error, code }` while Agri screens read `{ detail }`, so a farm error shows only a generic message until 1C.
+- Telegram bot records, the daily summary and `/api/farm-summary` run unscoped over the whole project; per-farm Telegram links and summaries come later.
+- The Agri frontend was not rebuilt (no frontend file changed).
+
+## Phase 1 step 1A: what was built
+
+Design record: [PHASE1_PLAN.md](PHASE1_PLAN.md). Backend only; no screens changed.
+
+- **Shared core** `backend/muf-farms.mjs`, a byte-identical twin in all three backends (guarded by `check-muf-sync`). Only Dairy uses it so far.
+- **Dairy backend:**
+  - `Farm` model; `farmId` on the 15 farm-owned collections; users get `farmIds`; roles owner, manager, worker.
+  - Server-side scoping of every farm-owned query and create, driven by the `X-Farm-Id` header (no header = default farm, `all` = read-only).
+  - `/api/farms`: list, create, rename, archive, restore, delete (owner only; deleting a farm with data needs the name typed plus move-or-delete).
+  - Users: owners create any role; managers create only workers in their own farms.
+  - Backup and restore: owner only, all farms, farms included in the file, untagged records tagged after a restore.
+  - Rate and daily log no longer share ids between farms.
+  - `npm run migrate:farms:dry` and `npm run migrate:farms` in `dairy_farm/backend`.
+- **Checks added:** `tests/muf-farms.test.ts` (13 tests) and `tools/check-farm-scope.js` / `npm run check-farms` (42 checks over real HTTP against the Dairy backend in memory mode).
+- **Old screens still work:** the API returns the old `role` (`admin` or `worker`) next to the real `farmRole`.
+
+**Not done or not verified:**
+
+- Agri and Flock backends were not wired in 1A. Agri was done in step 1B-1; Flock (step 1B-2) still needs a data layout decision (see the design record).
+- No screens: no farm switcher, no Farms & Access popup (step 1C).
+- The migration has only run against demo (memory) data. It has not been run on a real MongoDB copy.
+- The model wrapper was checked against real MongoDB query objects, but no real database was available here, so no real write or read through MongoDB was exercised.
+- Telegram bot records and the daily summary email run unscoped and use the default farm; per-farm Telegram links are not built.
 
 ## Phase 0: what changed
 
@@ -66,7 +110,30 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 | `node tools/check-muf-workbench.js` | 23 of 23 pass |
 | `node --check tools/audit-muf-design-system.mjs` and the audit itself | Ran. Agri 36, Dairy 38, Flock 70 popups; 0 missing sizes |
 | Dairy frontend production build (`npm run build` in `dairy_farm/client`) | Built successfully |
-| Not run | The Agri and Flock builds, the workbench runtime check, the GitHub Actions workflow after the edit, any live Replit, MongoDB, SMTP or Telegram test |
+| Not run | The workbench runtime check, the GitHub Actions workflow after the edit, any live Replit, MongoDB, SMTP or Telegram test |
+
+Owner's machine, 2026-10-22, Phase 0 branch: `npm test` 61 of 61, sync, UI safety and workbench checks passed, and `tools\build-all.bat` built Dairy, Flock and Agri.
+
+### Phase 1 step 1B-1 (2026-10-23, Linux sandbox)
+
+| Check | Result |
+|---|---|
+| `npm test` | 84 of 84 pass (8 files), including 10 new Agri tests |
+| `node tools/check-farm-scope.js agri` | All pass (49 checks) |
+| `node tools/check-farm-scope.js dairy` | All pass (49 checks; seven new generic checks added) |
+| `check-muf-sync`, `check-ui-safety`, `check-workbench` | All pass |
+| Frontend builds | Not re-run: no frontend file changed |
+| Not run | A real MongoDB migration, the screens, the Flock backend |
+
+### Phase 1 step 1A (2026-10-22, Linux sandbox)
+
+| Check | Result |
+|---|---|
+| `npm test` | 74 of 74 pass (7 files), including the new 13 farm tests |
+| `node tools/check-farm-scope.js dairy` | 42 of 42 pass |
+| `check-muf-sync`, `check-ui-safety`, `check-workbench` | All pass |
+| Frontend builds | Not re-run: no frontend file changed in 1A |
+| Not run | A real MongoDB migration, the screens, Agri and Flock backends |
 
 Phase 0 changed no application code, but the Agri and Flock builds and the edited workflow should still be run on the owner's side once the zip is applied.
 
@@ -103,8 +170,9 @@ Removed in Phase 0. The old 40-image candidate set was never approved and has ex
 
 ## Next
 
-1. Owner applies the Phase 0 zip, runs `npm ci`, `npm test`, the checks and `tools\build-all.bat`, and confirms.
-2. Claude writes the read-only Phase 1 plan (collections, farm-owned versus global, API shape, migration steps) for approval.
+1. Owner applies the 1B-1 zip and runs the commands in `docs/README.md` (including `npm run check-farms`; run `npm ci` in `agri_farm\backend` first).
+2. Owner decides Flock's data store layout, then step 1B-2 wires the Flock backend.
+3. Step 1C: farm switcher and Farms & Access popup in all three apps.
 
 ## How to update this file
 

@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "node server.js"
+    "dev": "node server.js",
+    "migrate:farms": "node scripts/migrate-farms.js",
+    "migrate:farms:dry": "node scripts/migrate-farms.js --dry-run"
   },
   "engines": {
     "node": ">=18.0.0"

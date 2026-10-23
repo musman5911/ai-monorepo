@@ -5,7 +5,7 @@
 import express from 'express';
 import { Supplier, SupplierPayment } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
-import { badRequest, notFound, parseOid, asyncHandler } from '../utils/helpers.js';
+import { badRequest, notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 
 const router = express.Router();
 
@@ -21,7 +21,7 @@ router.post('/suppliers', protect, requireAdmin, asyncHandler(async (req, res) =
 
 router.put('/suppliers/:supplierId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.supplierId, 'supplier ID');
-  const result = await Supplier.replaceOne({ _id: oid }, req.body || {});
+  const result = await replaceFarmRecord(Supplier, oid, req.body || {});
   if (!result.matchedCount) return notFound(res, 'Supplier not found');
   return res.json({ status: 'ok' });
 }));

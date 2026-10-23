@@ -6,10 +6,10 @@ async function buildSummaryData(dateStr) {
     Cow.find(),
     Milk.find({ date: dateStr }),
     Expense.find({ date: dateStr }),
-    Rate.findById('1'),
+    Rate.findOne({}),
     Health.find({ nextDueDate: { $exists: true, $ne: '' } }),
     Sale.find({ date: dateStr }),
-    DailyLog.findById(dateStr),
+    DailyLog.findOne({ date: dateStr }),
     Buyer.find(),
   ]);
 

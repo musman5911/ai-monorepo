@@ -1,11 +1,32 @@
 // ─── Backup & restore (admin only) + monthly auto-backup ────────────────────
 import express from 'express';
-import { Setting, User, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer, Attendance, LaborAdvance, Supplier, SupplierPayment } from '../db.js';
-import { protect, requireAdmin } from '../middleware/auth.js';
+import { Setting, User, Farm, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer, Attendance, LaborAdvance, Supplier, SupplierPayment } from '../db.js';
+import { protect, ownerOnly } from '../middleware/auth.js';
+import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
 import { HttpError, badRequest, notFound, asyncHandler } from '../utils/helpers.js';
 import { sendEmail, mufEmail, mailConfigured } from '../utils/mailer.js';
 
 const router = express.Router();
+
+// A backup covers every farm of this project, so only owners may take or restore
+// one, and the handlers run outside any single-farm scope.
+const requireAdmin = [ownerOnly, (_req, _res, next) => mufRunUnscoped(() => next())];
+
+// Old backups have no farmId: tag whatever is untagged with the default farm.
+const tagAfterRestore = () => mufMigrateFarms({ Farm, User, models: MUF_FARM_MODELS, names: MUF_FARM_SCOPED_NAMES });
+
+// Restore farms that exist in the backup but not in the database (same ids).
+async function restoreMissingFarms(payload) {
+  if (!Array.isArray(payload?.farms)) return;
+  for (const f of payload.farms) {
+    if (f && f._id && !(await Farm.findById(String(f._id)))) {
+      await Farm.create({
+        _id: String(f._id), name: f.name || 'Farm', location: f.location || '',
+        archived: Boolean(f.archived), createdAt: f.createdAt,
+      });
+    }
+  }
+}
 
 const MONTHLY_AUTO_BACKUP_KEY = 'monthly_auto_backup';
 const BACKUP_COLLECTIONS = [
@@ -38,6 +59,7 @@ async function collectBackupPayload() {
     const docs = await Model.find({}).limit(100000);
     payload[key] = stringifyDocs(docs);
   }
+  payload.farms = stringifyDocs(await Farm.find({}).limit(10000));
   const usersList = await User.find({}).limit(100000);
   payload.users = usersList.map((u) => {
     const d = { ...u, _id: String(u._id) };
@@ -69,12 +91,14 @@ async function restoreCollection(Model, data) {
 
 async function applyBackupPayload(payload) {
   let restoredAny = false;
+  await restoreMissingFarms(payload);
   for (const [key, Model] of BACKUP_COLLECTIONS) {
     if (key in payload) {
       await restoreCollection(Model, payload[key] || []);
       restoredAny = true;
     }
   }
+  if (restoredAny) await tagAfterRestore();
   return restoredAny;
 }
 
@@ -103,7 +127,7 @@ async function maybeRunMonthlyAutoBackup(force = false) {
 
   try {
     if (mailConfigured()) {
-      const admin = await User.findOne({ role: 'admin', email: { $nin: [null, ''] } });
+      const admin = await User.findOne({ role: { $in: MUF_FULL_ROLE_VALUES }, email: { $nin: [null, ''] } });
       const adminEmail = (admin || {}).email;
       if (adminEmail) {
         const sent = await sendEmail(
@@ -156,11 +180,11 @@ function validateBackupPayload(payload) {
 }
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
-router.get('/backup', protect, requireAdmin, asyncHandler(async (_req, res) => {
+router.get('/backup', protect, ...requireAdmin, asyncHandler(async (_req, res) => {
   return res.json(await collectBackupPayload());
 }));
 
-router.post('/restore', protect, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/restore', protect, ...requireAdmin, asyncHandler(async (req, res) => {
   const payload = req.body || {};
   validateBackupPayload(payload);
   // Safety net: snapshot current data into the auto-backup slot before the
@@ -176,7 +200,7 @@ router.post('/restore', protect, requireAdmin, asyncHandler(async (req, res) => 
   return res.json({ status: 'ok' });
 }));
 
-router.get('/backup/auto', protect, requireAdmin, asyncHandler(async (_req, res) => {
+router.get('/backup/auto', protect, ...requireAdmin, asyncHandler(async (_req, res) => {
   const existing = await Setting.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
   const value = (existing && existing.value) || {};
   if (!value.name) {
@@ -191,7 +215,7 @@ router.get('/backup/auto', protect, requireAdmin, asyncHandler(async (_req, res)
   });
 }));
 
-router.post('/restore/auto', protect, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/restore/auto', protect, ...requireAdmin, asyncHandler(async (req, res) => {
   const existing = await Setting.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
   const value = (existing && existing.value) || {};
   const payload = value.payload;

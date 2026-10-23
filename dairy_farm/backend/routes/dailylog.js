@@ -31,7 +31,7 @@ router.get('/entries', protect, async (req, res) => {
 // GET /api/dailylog/:date -> one daily log (existing checklist API preserved)
 router.get('/:date', protect, async (req, res) => {
   try {
-    const log = await DailyLog.findById(req.params.date);
+    const log = await DailyLog.findOne({ date: req.params.date });
     if (!log) {
       return res.json({ _id: req.params.date, date: req.params.date, checklist: [], notes: '', voiceNotes: [], photos: [], diaryEntries: [] });
     }
@@ -99,11 +99,11 @@ router.put('/:date', protect, async (req, res) => {
       update.voiceNotes = clips;
     }
 
-    const log = await DailyLog.findByIdAndUpdate(
-      req.params.date,
-      { $set: update },
-      { new: true, upsert: true, setDefaultsOnInsert: true }
-    );
+    // One log per farm and date: look it up by date, never by a shared id.
+    const existing = await DailyLog.findOne({ date: req.params.date });
+    const log = existing
+      ? await DailyLog.findByIdAndUpdate(existing._id, { $set: update }, { new: true })
+      : await DailyLog.create({ _id: `${req.farmContext.farmId}:${req.params.date}`, ...update });
     res.json(log);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

@@ -27,7 +27,9 @@ import telegramRoutes, { initTelegram } from './routes/telegram.js';
 import backupRoutes, { maybeRunMonthlyAutoBackup } from './routes/backup.js';
 import cardsRoutes from './routes/cards.js';
 import diaryMediaRoutes from './routes/diary-media.js';
+import farmsRoutes from './routes/farms.js';
 import { MUF_ENV } from './muf-env.mjs';
+import { MUF_FULL_ROLE_VALUES } from './muf-farms.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -50,7 +52,7 @@ app.use(cors({
   origin: allowedOrigin.length ? allowedOrigin : (MUF_ENV.nodeEnv === 'production' ? false : true),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Access-Token', 'X-Cron-Secret'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Access-Token', 'X-Cron-Secret', 'X-Farm-Id'],
 }));
 
 // 10mb JSON limit — unified across all 3 farm backends (dairy, flock, agri).
@@ -118,6 +120,9 @@ app.use('/telegram', telegramRoutes);
 app.use('/api/telegram', telegramRoutes);
 app.use('/cards', cardsRoutes);
 app.use('/api/cards', cardsRoutes);
+// Farms of this project: list for everyone (own farms), manage for owners only.
+app.use('/farms', farmsRoutes);
+app.use('/api/farms', farmsRoutes);
 
 // Cross-farm summary — tiny read-only aggregates for the "My Farms" tab in
 // the sibling apps. Protected by the shared CROSS_FARM_KEY; CORS-open.
@@ -203,7 +208,7 @@ listenPorts.forEach((p, i) => {
 connectDB().then(async () => {
   // Startup status + admin check (same boot report as before)
   try {
-    const adminUser = await (await import('./db.js')).User.findOne({ role: 'admin' });
+    const adminUser = await (await import('./db.js')).User.findOne({ role: { $in: MUF_FULL_ROLE_VALUES } });
     console.log(adminUser
       ? '👑 [Status] Administrator account verified.'
       : '👑 [Status] No administrator account is registered yet. First-time setup is active.');
