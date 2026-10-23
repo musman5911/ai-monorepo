@@ -43,3 +43,23 @@ For crops, tasks and finance, use enough disposable records to exceed one server
 ## Release gate
 
 Do not mark Phase 03 complete until automated checks and all role rows above have been reviewed. The current Agri frontend still hydrates the full crop/task/finance datasets by walking every server page during refresh; server pagination exists, but true on-demand network paging is not yet complete. Keep this acceptance item open until list screens request later pages only when the user asks for more and dashboard/report totals are preserved through complete-data or summary endpoints. Record any environment-dependent skips explicitly rather than treating them as passes.
+
+
+## Owner-reported local checkpoint (2026-10-23, commit 757e11e)
+
+Verified on Windows Command Prompt:
+
+- `npx vitest run tests/agri-runtime-api.integration.test.ts`: **6/6 tests passed**.
+- `npm test`: **21/21 test files passed, 186/186 tests passed**.
+- `agri_farm/frontend npm run build`: passed with non-fatal deprecated `advancedChunks` and large-chunk warnings.
+- `flock_farm/client npm run build`: passed TypeScript and Vite build with a non-fatal large-chunk warning.
+
+Not yet verified in this checkpoint:
+
+- Dairy frontend build. The attempted relative path failed, and Agri was built a second time by mistake. Inspect the real Dairy frontend directory and its `package.json` before running the build.
+- Root `check-farms`, `check-sync`, `check-ui`, `check-workbench`, and `check-workbench-runtime` checks.
+- Browser role matrix, genuine Agri network-on-demand paging, large-dataset/cross-farm bulk and aggregate fixtures, and real-MongoDB/disposable-copy validation.
+
+Root `npm ci` reported five dependency vulnerabilities (1 moderate, 2 high, 2 critical). Do not apply a blanket `npm audit fix --force`; investigate the dependency tree and handle upgrades separately.
+
+The first root test run exposed an over-escaped regex in the adjacent-page metadata test. Commit `757e11e` fixes it; the focused integration suite and complete root suite passed after pulling that commit.
