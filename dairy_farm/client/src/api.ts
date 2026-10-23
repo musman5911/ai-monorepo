@@ -201,6 +201,10 @@ export const api = {
 
   // Cows
   getCows: (p?: { batch?: string; status?: string; motherId?: string }) => req('/cows' + qs(p)),
+  getCowPage: (p: { batch?: string; status?: string; gender?: string; motherId?: string; search?: string; page: number; limit?: number }) =>
+    req('/cows' + qs({ ...p, page: String(p.page), limit: String(p.limit || 50) }), {}, { includeMeta: true }),
+  getCowStats: () => req('/cows/stats'),
+  getCowMothers: () => req('/cows/mothers'),
   getCowBatches: () => req('/cows/batches'),
   getCowSummary: (id: string, p?: { days?: number }) =>
     req(`/cows/${id}/summary` + qs(p?.days != null ? { days: String(p.days) } : undefined)),
