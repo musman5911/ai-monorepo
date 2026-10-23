@@ -551,6 +551,12 @@ export async function signupVerify(code: string): Promise<{ token: string; user:
 
 // ----- Batch Management API -----
 
+export async function listBatchesPage(page: number, limit = 20): Promise<{ batches: BatchWithSummary[]; total: number; page: number; limit: number; totalPages: number }> {
+  return authedJson<{ batches: BatchWithSummary[]; total: number; page: number; limit: number; totalPages: number }>(
+    `${BATCH_BASE}?page=${encodeURIComponent(String(page))}&limit=${encodeURIComponent(String(limit))}`,
+  );
+}
+
 export async function listBatches(): Promise<BatchWithSummary[]> {
   const data = await authedJson<{ batches: BatchWithSummary[] }>(BATCH_BASE);
   return data.batches;
