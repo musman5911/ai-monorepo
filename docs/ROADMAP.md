@@ -20,7 +20,7 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 |---|---|---|---|
 | 0 | Docs reset and repository cleanup | Repository | Low (done, see PROGRESS) |
 | 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Implementation done; copy-migration checks and final integrated browser pass pending |
-| 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | In progress; default workflow switched, Home Birds consolidation and batch feature gaps remain |
+| 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | In progress; default workflow, Home Birds sub-sections, batch egg/vaccination logs and financial summary are implemented in source; checks pending |
 | 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | Medium |
 | 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | Medium to high |
 | 5 | Photo storage adapter and Cloudinary | All three | Medium |
@@ -53,12 +53,11 @@ Built in four steps so each zip can be checked on its own. The design record is 
 
 Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthly reports and vaccination only. Other individual-bird workflow features can be removed from the Home Birds navigation/workflow where they are no longer needed, but historical data must not be silently deleted.
 
-- **Started:** Batches is now the first navigation item and the default screen after login; the former Birds item is relabelled Home Birds.
-- Batches become the main project: daily eggs, deaths, feed and weight per batch; vaccination records per batch; profit and loss per batch and per farm. Extend the existing batch system rather than creating duplicate collections/models.
-- Consolidate the retained Home Birds features into one tab and remove unrelated legacy navigation from the main workflow.
-- Inspect current schemas and records before deciding whether any migration is needed. No live migration without explicit approval; any required migration must be tested on a disposable database copy.
-- Automated tests and builds run during this phase. Browser and end-to-end role verification are deferred to the final pass after all phases, per owner direction.
-- Done when: Batches is the clear primary workflow, Home Birds exposes only the approved features, relevant automated checks pass, and any required copy-based migration passes.
+- **Implemented in source:** Batches is first and is the default after login. Home Birds exposes nested Bird List, Eggs, Monthly Report and Vaccination sections. Egg entry is constrained to egg production; its vaccination view hides mortality tools.
+- **Implemented in source:** new per-batch egg and vaccination log models, authenticated API routes, frontend entry forms and history tables. Batch summary includes egg totals, egg income and vaccination costs, with egg income included in revenue/profit. Batch detail, export/import, deletion and wipe paths include the new collections.
+- **Still required:** compile and run automated checks, inspect backup/restore compatibility, and add targeted tests for egg-count validation and summary math. No migration has been run; new collections are additive, but copy-based backup/restore validation is still required.
+- Browser and end-to-end role verification are deferred to the final pass after all phases, per owner direction.
+- Done when: Batches is the clear primary workflow, Home Birds exposes only the approved features, relevant automated checks pass, and any required copy-based migration/backup checks pass.
 
 ### Phase 3: Bulk entry, scroll loading, server totals
 
