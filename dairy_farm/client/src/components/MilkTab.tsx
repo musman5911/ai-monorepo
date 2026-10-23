@@ -107,21 +107,41 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
   const handleSaveAll = async () => {
     try {
       setSaving('all');
-      const eligible = cows.filter(isMilkEligible);
-      await Promise.all(eligible.map(cow => {
+      const rows = cows.filter(isMilkEligible).flatMap(cow => {
         const entry = dailyEntries[cow._id];
-        if (!entry || (entry.morning === '' && entry.evening === '' && entry.calfMilk === '')) return Promise.resolve();
-        return api.addMilk({
-          cowId: cow._id, date: selectedDate,
+        if (!entry || (entry.morning === '' && entry.evening === '' && entry.calfMilk === '')) return [];
+        return [{
+          cowId: cow._id,
+          date: selectedDate,
           morning: parseFloat(entry.morning) || 0,
           evening: parseFloat(entry.evening) || 0,
           calfMilk: parseFloat(entry.calfMilk) || 0,
           buyerId: entry.buyerId || '',
           forceOverwrite: true,
-        });
-      }));
-      setShowEntryPopup(false);
-      fetchData();
+        }];
+      });
+      if (!rows.length) {
+        notify('Enter at least one milk quantity before saving.', 'info');
+        return;
+      }
+
+      // Keep request bodies bounded. The API validates each chunk before its
+      // first write and reports row-level outcomes for any partial failure.
+      let saved = 0;
+      let failed = 0;
+      for (let start = 0; start < rows.length; start += 200) {
+        const result = await api.bulkMilk(rows.slice(start, start + 200));
+        saved += Number(result.saved || 0);
+        failed += Number(result.failed || 0);
+      }
+
+      if (failed) {
+        notify(`${saved} milk records saved; ${failed} failed. Review the rows and retry.`, 'error');
+      } else {
+        setShowEntryPopup(false);
+        notify(`${saved} milk records saved.`, 'success');
+      }
+      await fetchData();
     } catch (error) { notify(error instanceof Error ? error.message : 'Failed to save all', 'error'); }
     finally { setSaving(null); }
   };
