@@ -1,10 +1,7 @@
 name: MUF frontend checks
 
 on:
-  push:
-    branches: [main, muf-monorepo]
-  pull_request:
-    branches: [main, muf-monorepo]
+  # Run only on demand when a deliberate verification pass is needed.
   workflow_dispatch:
 
 permissions:
