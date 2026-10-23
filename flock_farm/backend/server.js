@@ -141,8 +141,8 @@ app.get('/api/farm-summary', async (req, res) => {
     if (String(req.query.key || '') !== key) return res.status(401).json({ error: 'Bad key' });
     const DataStore = (await import('./models/DataStore.js')).default;
     const bucket = async (k) => {
-      const doc = await DataStore.findOne({ key: k });
-      return Array.isArray(doc?.value) ? doc.value : [];
+      const docs = await DataStore.find({ key: k });
+      return docs.flatMap((doc) => Array.isArray(doc?.value) ? doc.value : []);
     };
     const [birds, eggs, expenses] = await Promise.all([bucket('birds'), bucket('eggs'), bucket('expenses')]);
     const today = mufToday();
