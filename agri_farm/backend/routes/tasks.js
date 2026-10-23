@@ -30,7 +30,7 @@ router.get('/tasks', protect, asyncHandler(async (req, res) => {
 }));
 
 
-router.post('/bulk', protect, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/tasks/bulk', protect, requireAdmin, asyncHandler(async (req, res) => {
   const rows = req.body?.rows;
   if (!Array.isArray(rows) || rows.length < 1) return res.status(400).json({ error: 'rows must be a non-empty array' });
   if (rows.length > 200) return res.status(400).json({ error: 'A task bulk request is limited to 200 rows' });
