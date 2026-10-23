@@ -272,7 +272,24 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
   };
 
   const refreshAfterMutation = async (batchId?: string) => {
-    await loadBatches();
+    try {
+      const pages = await Promise.all(
+        Array.from({ length: Math.max(1, batchPage) }, (_, index) => listBatchesPage(index + 1, 20)),
+      );
+      const seen = new Set<string>();
+      const loaded = pages.flatMap(result => result.batches).filter(batch => {
+        if (seen.has(batch.batch_id)) return false;
+        seen.add(batch.batch_id);
+        return true;
+      });
+      setBatches(loaded);
+      const last = pages[pages.length - 1];
+      setBatchTotal(last.total);
+      setBatchPage(last.page);
+      setHasMore(last.page < last.totalPages);
+    } catch {
+      await loadBatches();
+    }
     if (batchId) await loadDetail(batchId);
   };
 
