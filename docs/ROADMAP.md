@@ -1,6 +1,6 @@
 # Roadmap
 
-Last reviewed: 2026-10-23. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-23. Phase 1B-2 implementation is underway on `muf-monorepo`; it is not delivered until checks and copy-based migration testing are recorded. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
@@ -37,7 +37,7 @@ Built in four steps so each zip can be checked on its own. The design record is 
 
 - **1A (delivered):** shared server core `muf-farms.mjs` in all three backends, wired fully into Dairy: farms collection, `farmId` on farm-owned records, the three roles, server-side scoping, farms API, owner-only backups, migration script, tests.
 - **1B-1 (delivered):** the same core wired into the Agri backend: 14 farm-owned collections, three roles, farms API, owner-only backups, migration script, tests.
-- **1B-2 (approved, implementation pending):** wire farm scoping into Flock's existing legacy `DataStore` layout plus `Batch`, five batch-log collections, and `Image`. Preserve legacy data and API response shapes where possible; enforce farm scope on the server. See `PHASE1_PLAN.md` and `PROGRESS.md`.
+- **1B-2 (in progress):** farm fields, `Farm` model/API, auth scope wiring, migration script and per-farm backup payload work have been committed. Still needs role/assignment review, complete backup/restore validation, Flock-specific HTTP scope checks, automated validation, and copy-based migration test before delivery. See `PHASE1_PLAN.md` and `PROGRESS.md`.
 - **1C:** screens in all three apps: header farm switcher, owner-only Farms & Access popup, role labels.
 - **1D:** wrap-up: migration dry runs on copies, docs, CI job for `check-farms`.
 
