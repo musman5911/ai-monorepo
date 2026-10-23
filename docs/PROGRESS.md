@@ -286,3 +286,14 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - Existing batch egg logs remain the source for collected/sold/home-use/wasted counts; the existing incubation datastore remains separate. No automatic egg transfer or database migration was introduced.
 - **Verification:** source edits were pushed to `muf-monorepo`. No build, unit test, browser check, or GitHub Actions run has been executed for this step. CI remains manual-only.
 - **Next:** add server-enforced, farm-scoped egg allocation/transfer with duplicate and over-allocation protection before claiming stock traceability complete; then replace additive Labor context with batch-linked work assignments. Preserve unlinked legacy records.
+
+
+## Phase 2 implementation update (2026-10-23): server-enforced incubation egg allocation
+
+- Added a pure allocation validator and unit tests for the rules.
+- Incubation writes now validate linked source batches against the active farm's batch records and egg logs. The server calculates available eggs as collected minus sold, home use and broken/wasted; it sums every linked incubation record for each batch and rejects unknown batches, non-positive/non-integer linked counts, and allocations above supply.
+- Validation runs before the datastore's conditional versioned write. Concurrent writes using the same bucket version cannot both overwrite the same snapshot; stale writes continue to receive the existing HTTP 409 conflict response.
+- Legacy incubation records without `sourceBatchId` remain accepted. No records are migrated or removed.
+- This is server-side validation for the existing farm-scoped incubation bucket, not a separate physical egg ledger. Egg logs can still be edited independently after an allocation; preventing later edits from reducing supply below existing allocations is a follow-up requirement before claiming fully reconciled stock accounting.
+- **Tests added but not run:** `tests/flock-incubation-allocation.test.ts` covers valid supply, over-allocation, unknown source batch, combined allocations, legacy records and invalid counts. No GitHub Actions run was triggered yet; workflow remains manual-only. No build, browser check or live-data operation was performed.
+- **Next within Phase 2:** protect egg-log edits against reducing available supply below existing allocations, then implement batch-linked labor assignments and replace the current Labor context panel with an actual workflow. After Phase 2 implementation is complete, run the deliberate GitHub Actions checkpoint and defer browser/role end-to-end testing to the final project-wide pass.
