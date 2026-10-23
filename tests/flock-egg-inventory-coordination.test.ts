@@ -44,7 +44,7 @@ describe('Flock egg inventory coordination contract', () => {
       status: 409,
       code: 'EGG_INVENTORY_BUSY',
     });
-    await releaseAllocation;
+    await releaseAllocation();
   });
 
   it('revalidates a deletion after the allocation lock is released', async () => {
