@@ -126,6 +126,14 @@ describe('Phase 3 Flock bulk logs beyond egg collection', () => {
     expect(api).toContain('createBatchLogsBulk');
   });
 
+  it('uses the authenticated JSON helper and the backend bulk-log route', () => {
+    const source = readFileSync(path.join(repoRoot, 'flock_farm/client/src/api.ts'), 'utf8');
+    expect(source).toContain('return authedJson<{ saved: number; failed: number; logs: unknown[] }>');
+    expect(source).toContain('`${BATCH_BASE}/${encodeURIComponent(batchId)}/logs/${logType}/bulk`');
+    expect(source).toContain("method: 'POST', body: JSON.stringify({ entries })");
+    expect(source).not.toContain('await api.post(`/batches/');
+  });
+
   it('provides preview-first CSV import for the additional bounded bulk log types', () => {
     const source = readFileSync(path.join(repoRoot, 'flock_farm/client/src/components/BatchesTab.tsx'), 'utf8');
     expect(source).toContain('handleGenericBulkCsv');
