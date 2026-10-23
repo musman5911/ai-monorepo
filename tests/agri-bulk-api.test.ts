@@ -21,7 +21,7 @@ describe("Agri task and finance bulk-import API contracts", () => {
 
   it("validates finance rows and restricts imported fields before insertMany", () => {
     const source = read("agri_farm/backend/routes/finance.js");
-    const bulk = source.slice(source.indexOf("router.post('/bulk'"), source.indexOf("router.post('/finance/bulk'"));
+    const bulk = source.slice(source.indexOf("router.post('/finance/bulk'"), source.indexOf("router.post('/finance'"));
     expect(bulk).toContain("rows.length > 200");
     expect(bulk).toContain("if (errors.length) return res.status(400)");
     expect(bulk.indexOf("if (errors.length) return res.status(400)")).toBeLessThan(bulk.indexOf("Finance.insertMany(prepared)"));
