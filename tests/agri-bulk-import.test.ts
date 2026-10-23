@@ -32,6 +32,7 @@ describe("Agri CSV bulk import parsing", () => {
   it("validates crop-specific required fields and numeric/date inputs before import", () => {
     const preview = previewCsvImport("name,plant_date,area_acres\n,not-a-date,-1", ["name"]);
     expect(validateCropImport(preview).errors.map((error) => error.message)).toEqual([
+      "This row has fewer values than the header row.",
       "Crop name is required.",
       "Plant date must be a valid date.",
       "Area must be a non-negative number.",
