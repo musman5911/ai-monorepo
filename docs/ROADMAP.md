@@ -3,7 +3,7 @@ Last reviewed: 2026-10-23. CI is manual-only and should run at deliberate testin
 
 ### Phase 3 step: Agri task and finance bulk imports
 
-Added admin-only bulk endpoints and preview-first CSV/XLSX import UI for task and finance records. The endpoints reject malformed rows before writing, enforce a 200-record request cap, and restrict finance imports to an explicit field allowlist. The frontend accepts up to 1,000 rows per file and submits sequential chunks of at most 200, reporting failed chunks without automatically retrying them. Source-contract tests and the memory-mode HTTP farm-scope checker now cover validation and cross-farm visibility, but local tests, production build and browser review remain pending.
+Added admin-only bulk endpoints and preview-first CSV/XLSX import UI for task and finance records. The endpoints reject malformed rows before writing, enforce a 200-record request cap, and restrict finance imports to an explicit field allowlist. The frontend accepts up to 1,000 rows per file and submits sequential chunks of at most 200, reporting failed chunks without automatically retrying them. The XLSX parser now resolves the actual first worksheet through workbook relationships and bounds archive/file sizes. Source-contract tests and the memory-mode HTTP farm-scope checker cover validation and cross-farm visibility, but local tests, production build and browser review remain pending.
 
 The primary Phase 3 blocker remains true network-level Agri on-demand pagination with aggregate/report correctness. Keep Phase 3 open until that is implemented and verified alongside large dataset and farm-isolation tests.
 
