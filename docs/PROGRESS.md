@@ -1,7 +1,16 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Agri task and finance bulk-import code committed; local verification pending.)
+Last updated: 2026-10-23 (Phase 03 runtime regression coverage and documentation reconciled; on-demand Agri UI paging and consolidated verification remain open.)
+## Phase 3 follow-up: runtime pagination and task-bulk regression coverage (2026-10-23)
+
+- Added runtime HTTP integration coverage that requests adjacent one-record pages from Agri crops, tasks and finance, checks stable total/page metadata across requests, and rejects duplicate IDs across the page boundary.
+- Added a task bulk-import regression test proving Worker writes are forbidden and a malformed mixed batch is rejected without inserting its otherwise-valid row.
+- Updated the Phase 03 local verification checklist and roadmap to distinguish API pagination support from genuine on-demand UI pagination. The Agri frontend currently walks every server page during refresh to populate arrays used by dashboard/report calculations; this is bounded per request but is not yet on-demand network loading.
+- Commits: `56fa5df` (runtime tests), `41a6e84` (verification checklist), `dbca9e8` (roadmap).
+- Verification status: tests and production builds were not run during this remote-editing step. These commits are implementation changes, not a passing release checkpoint.
+- Still open: implement on-demand Agri list requests while preserving complete aggregate/report calculations; add dedicated cross-farm fixtures for task/finance/crop bulk imports and aggregate totals; review remaining Flock bulk-entry/Excel acceptance scope; run the root test/check suite and all three frontend production builds. Browser review and real-MongoDB/copy-based checks remain deferred to the consolidated final pass.
+
 ## Phase 3 implementation update: Agri task and finance bulk imports
 
 - Added admin-only `POST /api/tasks/bulk` and `POST /api/finance/bulk` endpoints. Each validates the full payload before the first insert, caps each request at 200 rows, returns row-specific validation errors, and uses farm-scoped models. Task imports normalize status to Pending, resolve assigned laborer IDs server-side, and reject crop/inventory references outside the selected farm; finance imports allow only category, amount, type, date, crop link and notes and validate crop links against the selected farm.
