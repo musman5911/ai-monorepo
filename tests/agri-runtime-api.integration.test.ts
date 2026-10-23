@@ -95,9 +95,9 @@ describe.sequential('Agri runtime API integration', () => {
 
     const farms = await request('/farms', { token: ownerToken });
     expect(farms.response.status).toBe(200);
-    expect(Array.isArray(farms.data)).toBe(true);
-    expect(farms.data.length).toBeGreaterThan(0);
-    const farmIds = [String(farms.data[0]._id)];
+    expect(Array.isArray(farms.data.farms)).toBe(true);
+    expect(farms.data.farms.length).toBeGreaterThan(0);
+    const farmIds = [String(farms.data.farms[0]._id)];
 
     const managerSignup = await request('/signup', {
       method: 'POST',
