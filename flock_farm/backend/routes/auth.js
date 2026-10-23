@@ -464,7 +464,7 @@ router.post('/forgot-password', passwordResetRequestLimiter, async (req, res) =>
       return res.status(400).json({ error: 'A valid email is required' });
     }
     // Only admins may reset via email
-    const user = await User.findOne({ email, role: 'admin', active: true });
+    const user = await User.findOne({ email, role: { $in: ['owner', 'admin'] }, active: true });
     if (user) {
       const code = await PasswordReset.createCode({ purpose: 'reset_password', userId: user._id });
       try {
