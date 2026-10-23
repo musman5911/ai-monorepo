@@ -66,6 +66,18 @@ describe('Phase 3 bounded Dairy milk bulk-entry contract', () => {
     expect(source).toContain('forceOverwrite');
   });
 
+  it('supports paged cow search, server totals, and eligible-mother lookup', () => {
+    const route = readFileSync(path.join(repoRoot, 'dairy_farm/backend/routes/cows.js'), 'utf8');
+    const client = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
+    const component = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/components/CowsTab.tsx'), 'utf8');
+    expect(route).toContain("router.get('/stats'");
+    expect(route).toContain("router.get('/mothers'");
+    expect(route).toContain("filter.$or = [{ name:");
+    expect(client).toContain('getCowPage:');
+    expect(component).toContain('Load 50 More Animals');
+    expect(component).toContain('of {totalCount} animals loaded');
+  });
+
   it('supports reading paginated milk response metadata in the Dairy client API', () => {
     const source = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
     expect(source).toContain('includeMeta?: boolean');
