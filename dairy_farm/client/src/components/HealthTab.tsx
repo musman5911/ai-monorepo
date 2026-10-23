@@ -88,7 +88,7 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
         const problems: string[] = [];
         const validDate = (value: string) => !value || (/^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value + 'T00:00:00Z').getTime()) && new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) === value);
         if (!cows.some(cow => cow._id === cowId)) problems.push('Unknown cow ID');
-        if (!validDate(date)) problems.push('Invalid date');
+        if (!date || !validDate(date)) problems.push('Invalid date');
         if (nextDueDate && !validDate(nextDueDate)) problems.push('Invalid next due date');
         if (!validTypes.includes(type)) problems.push('Invalid health type');
         if (!description) problems.push('Description is required');
