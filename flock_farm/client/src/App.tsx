@@ -75,7 +75,7 @@ const EMPTY_SETTINGS: GlobalSettings = {
 
 export default function App() {
   const confirmAction = useConfirm();
-  const [activeTab, setActiveTab] = useState<string>('dashboard');
+  const [activeTab, setActiveTab] = useState<string>('batches');
 
   const [isDark, setIsDark] = useState<boolean>(() => localStorage.getItem('flockfarm_dark_mode') === 'true');
   const [lang, setLang] = useState<Lang>(() => getLang());
@@ -151,7 +151,7 @@ export default function App() {
   const handleLoginSuccess = useCallback(() => {
     const u = getStoredUser();
     setCurrentUser(u ?? false);
-    setActiveTab('dashboard');
+    setActiveTab('batches');
     setLoadError(null);
     setIsLoaded(false);
   }, []);
@@ -684,9 +684,9 @@ export default function App() {
   };
 
   const navItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home },
-    { id: 'flock', label: 'Birds', icon: BirdIcon },
     { id: 'batches', label: 'Batches', icon: Package },
+    { id: 'flock', label: 'Home Birds', icon: BirdIcon },
+    { id: 'dashboard', label: 'Dashboard', icon: Home },
     { id: 'ledger', label: 'Finance', icon: DollarSign },
     { id: 'health', label: 'Health', icon: HeartPulse },
     ...(isAdmin ? [{ id: 'labor', label: 'Labor', icon: HardHat }] : []),
