@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Dashboard batch-first overview added on muf-monorepo; automated checks for this new commit have not yet run).
+Last updated: 2026-10-23 (Dashboard, Health and Summary now expose batch-derived primary operational/financial panels; automated verification for this latest set is pending).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
