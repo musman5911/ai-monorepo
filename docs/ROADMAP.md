@@ -115,3 +115,8 @@ Owner-reported local results before the latest Dashboard change: all three front
 ### Phase 2 implementation update (2026-10-23): server-enforced incubation allocation
 
 Incubation records linked to a batch now pass server validation against egg supply in the selected farm. Availability is calculated from batch egg logs after sold, home-use and waste counts; all linked incubation records are summed before accepting a write. Unknown batches and over-allocation are rejected. Legacy unlinked records remain valid. The validator has six unit cases added, but no tests/build/workflow have been run for this update yet. Egg-log edits can still reduce supply below existing allocations, so stock reconciliation is not complete. Next: prevent that case, then implement real batch-linked labor assignments. GitHub Actions stays manual-only and should be triggered at the Phase 2 testing checkpoint, not on each commit.
+
+
+### Phase 2 implementation update (2026-10-23): batch-linked labor and egg-history protection
+
+Daily labor attendance can now be assigned to a batch, displays that assignment in history, and summarizes assigned workers by active batch for the selected month. Server validation rejects attendance writes linked to batches outside the active farm. Batch deletion is blocked while incubation or labor history references it; deleting an egg log is blocked if it would make current incubation allocations exceed remaining supply. Added validator unit tests for labor assignment and incubation allocation, but they have not yet been executed. The UI still needs a clear per-batch available-egg figure, and Dashboard/Health/Summary need a final review for batch-first workflows. The workflow remains manual-only; run it at the Phase 2 checkpoint, not per commit.
