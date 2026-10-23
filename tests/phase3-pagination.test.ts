@@ -190,6 +190,19 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(app).toContain('buildMonthlyComparisonRows(finance, crops');
   });
 
+  it('wires Agri crop CSV preview, bounded rows, validation, and explicit confirmation', () => {
+    const component = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/components/AgriCropCsvImport.tsx'), 'utf8');
+    const parser = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/components/app/agriBulkImport.ts'), 'utf8');
+    const app = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/App.tsx'), 'utf8');
+    expect(component).toContain('Preview Crop CSV Import');
+    expect(component).toContain('onImportRows(preview.rows)');
+    expect(component).toContain('preview.errors.length > 0');
+    expect(component).toContain('endsWith(".csv")');
+    expect(parser).toContain('previewCsvImport(text, REQUIRED_HEADERS');
+    expect(app).toContain('<AgriCropCsvImport onImportRows={async (rows) =>');
+    expect(app).toContain('await api.addCrop({');
+  });
+
   it('uses Agri server-reported totals and removes the hard 10,000-row stop', () => {
     const app = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/App.tsx'), 'utf8');
     expect(app).toContain("first.headers?.['x-total-count']");
