@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (owner's local checks verified on muf-monorepo; Phase 2 remains partial because the five main Flock sections are not yet fully batch-driven).
+Last updated: 2026-10-23 (Dashboard batch-first overview added on muf-monorepo; automated checks for this new commit have not yet run).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
@@ -38,7 +38,8 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 ## Current status and next action
 
 - The owner synced local `muf-monorepo` to `2d4d788` and reported a clean working tree. `npm test` passed 89 tests across 9 files; `npm run check-farms`, `npm run check-ui`, `npm run check-sync`, and `npm run check-workbench` passed; the Flock client `npm run build` passed; and `npm run check-workbench-runtime` passed all 8 checks after starting the Dairy Vite server on port 5000. These are local results supplied by the owner, not a claim that every workflow was browser-tested.
-- Continue Phase 2 implementation: make Dashboard, Health, Labors, Incubation and Summary derive their primary information from batches; keep Home Birds secondary with Bird List, Bird Details, Eggs, Monthly Report and Vaccination only. Inspect batch backup/restore compatibility and validate on a disposable copy.
+- Phase 2 implementation step: Dashboard now loads its operational KPIs and recent-batch list from the authenticated batch API, with an explicit loading-failure message and a shortcut to Batches. Commit `d2939da` on `muf-monorepo`. This is source-level work only; no build/test has run against this commit yet.
+- Continue Phase 2: make Health, Labors, Incubation and Summary derive their primary information from batches; keep Home Birds secondary with Bird List, Bird Details, Eggs, Monthly Report and Vaccination only. Inspect batch backup/restore compatibility and validate on a disposable copy.
 - Phase 1 still needs disposable database-copy migration tests and backup/restore review. Per owner direction, defer all browser/end-to-end role testing to one final pass after every planned phase. Never run migrations against live data without explicit approval.
 - Dependency audit warnings were reported by `npm ci`: root 5 vulnerabilities (1 moderate, 2 high, 2 critical), Flock backend 6 (4 moderate, 2 high), Flock client 3 (2 high, 1 critical). Investigate with targeted updates in the planned security work; do not use blanket `npm audit fix --force`.
 
