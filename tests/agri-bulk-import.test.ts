@@ -1,4 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import { parseCsvRows, parseXlsxRows, previewCsvImport, rowsToCsv, validateCropImport } from "../agri_farm/frontend/src/components/app/agriBulkImport";
 
 describe("Agri CSV bulk import parsing", () => {
@@ -68,4 +71,23 @@ describe("Agri CSV bulk import parsing", () => {
     expect(malformed.errors).toEqual([{ row: 2, message: "This row has more values than the header row." }]);
   });
 
+});
+
+describe("Agri XLSX workbook safety contracts", () => {
+  it("resolves the workbook's declared first worksheet instead of sorting sheet filenames", () => {
+    const source = readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../agri_farm/frontend/src/components/app/agriBulkImport.ts"), "utf8");
+    expect(source).toContain('readEntry("xl/workbook.xml")');
+    expect(source).toContain('readEntry("xl/_rels/workbook.xml.rels")');
+    expect(source).toContain('getAttribute("Target")');
+    expect(source).toContain('first worksheet target is outside the workbook worksheet directory');
+    expect(source).not.toContain('filter((name) => /^xl\\/worksheets\\/sheet\\d+\\.xml$/.test(name)).sort()[0]');
+  });
+
+  it("caps workbook input, archive entries, and decompressed entry sizes", () => {
+    const source = readFileSync(path.resolve(path.dirname(fileURLToPath(import.meta.url)), "../agri_farm/frontend/src/components/app/agriBulkImport.ts"), "utf8");
+    expect(source).toContain("bytes.length > 5 * 1024 * 1024");
+    expect(source).toContain("entryCount > 2048");
+    expect(source).toContain("uncompressedSize > 10 * 1024 * 1024");
+    expect(source).toContain("expanded.byteLength !== entry.uncompressedSize");
+  });
 });
