@@ -34,6 +34,7 @@ import SupplierKhata from './components/SupplierKhata';
 import { useConfirm } from './muf/core/muf-confirm';
 import MufEntityGrid from './muf/ui/muf-entity-grid';
 import AgriCropCsvImport from './components/AgriCropCsvImport';
+import AgriBulkCsvImport from './components/AgriBulkCsvImport';
 import {
   getEmptyCropForm, getEmptyFinForm, getEmptyTaskForm,
   formatCurrency, cropImageMap, getCropImage, getCropProgress,
@@ -400,6 +401,8 @@ function App() {
   // Modals
   const [showCropModal, setShowCropModal] = useState(false);
   const [showCropImport, setShowCropImport] = useState(false);
+  const [showTaskImport, setShowTaskImport] = useState(false);
+  const [showFinanceImport, setShowFinanceImport] = useState(false);
   const [showFinanceModal, setShowFinanceModal] = useState(false);
   const [financeBookTab, setFinanceBookTab] = useState('ledger');
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -3260,6 +3263,18 @@ function App() {
               {/* ── LEDGER SUB-TAB ── */}
               {agriFinanceSubTab === 'ledger' && (
                 <>
+              <div className="flex justify-end">
+                <button type="button" onClick={() => setShowFinanceImport((open) => !open)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold">
+                  {showFinanceImport ? 'Hide bulk import' : 'Import finance CSV / Excel'}
+                </button>
+              </div>
+              {showFinanceImport && <AgriBulkCsvImport kind="finance" onImportRows={async (rows) => {
+                const normalized = rows.map((row) => Object.fromEntries(Object.entries(row).filter(([, value]) => value !== '')));
+                const response = await api.addFinanceBulk(normalized);
+                await refreshData();
+                setShowFinanceImport(false);
+                showAlert(`Finance import complete: ${response.data?.inserted ?? normalized.length} records saved.`);
+              }} />}
               {/* Financial Breakdown Panel */}
               <div className="muf-kpi-grid">
                 <div 
@@ -3706,6 +3721,20 @@ function App() {
                 )}
               </div>
 
+              {userRole === 'admin' && (
+                <div className="flex justify-end">
+                  <button type="button" onClick={() => setShowTaskImport((open) => !open)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold">
+                    {showTaskImport ? 'Hide bulk import' : 'Import tasks CSV / Excel'}
+                  </button>
+                </div>
+              )}
+              {showTaskImport && userRole === 'admin' && <AgriBulkCsvImport kind="tasks" onImportRows={async (rows) => {
+                const normalized = rows.map((row) => Object.fromEntries(Object.entries(row).filter(([, value]) => value !== '')));
+                const response = await api.addTasksBulk(normalized);
+                await refreshData();
+                setShowTaskImport(false);
+                showAlert(`Task import complete: ${response.data?.inserted ?? normalized.length} records saved.`);
+              }} />}
               {rainForecast24h > 5 && (
                 <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 text-xs md:text-sm flex items-start gap-3 animate-fade-in shadow-xs">
                   <span className="text-xl">🌧️</span>
