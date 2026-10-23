@@ -1,4 +1,9 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 import { acquireEggInventoryLock } from '../flock_farm/backend/egg-inventory-lock.mjs';
 import { validateIncubationAllocations } from '../flock_farm/backend/incubation-allocation.mjs';
 
