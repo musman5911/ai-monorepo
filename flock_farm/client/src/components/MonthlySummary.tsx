@@ -1,6 +1,8 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { mufL } from '../muf/data/muf-urdu';
 import { mufMonthLabel } from '../muf/data/muf-date';
+import { listBatches } from '../api';
+import type { BatchWithSummary } from '../types';
 import {
   Calendar,
   ChevronLeft,
@@ -170,6 +172,16 @@ export default function MonthlySummary({
 }: MonthlySummaryProps) {
   const L = (en: string, urOrVars?: string | Record<string, string | number | null>) => mufL(lang, en, urOrVars);
   const currentMonth = monthKey(todayStr());
+  const [batchSummaryRows, setBatchSummaryRows] = useState<BatchWithSummary[]>([]);
+  const [batchSummaryUnavailable, setBatchSummaryUnavailable] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    listBatches().then(rows => {
+      if (!cancelled) { setBatchSummaryRows(rows); setBatchSummaryUnavailable(false); }
+    }).catch(() => { if (!cancelled) setBatchSummaryUnavailable(true); });
+    return () => { cancelled = true; };
+  }, []);
 
   const historyMonths = useMemo(() => {
     const monthsSet = new Set<string>();
@@ -379,6 +391,31 @@ export default function MonthlySummary({
 
   return (
     <div className="space-y-6 pb-10" id="reports-tab">
+      <section className="rounded-2xl border border-emerald-200 dark:border-emerald-900 bg-white dark:bg-slate-900 p-4 space-y-4">
+        <div>
+          <h3 className="text-sm font-bold text-slate-900 dark:text-slate-100">{L('Batch financial summary')}</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">{L('Primary financial view for managed flock batches')}</p>
+        </div>
+        {batchSummaryUnavailable ? (
+          <p role="status" className="text-xs text-amber-700 dark:text-amber-300">{L('Batch financial data is unavailable right now.')}</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Batches')}</p><p className="text-xl font-bold mt-1">{batchSummaryRows.length}</p></div>
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Live birds')}</p><p className="text-xl font-bold mt-1">{batchSummaryRows.reduce((sum, b) => sum + (b.summary?.live_count || 0), 0).toLocaleString()}</p></div>
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Batch revenue')}</p><p className="text-xl font-bold mt-1">Rs {Math.round(batchSummaryRows.reduce((sum, b) => sum + (b.summary?.total_revenue || 0), 0)).toLocaleString()}</p></div>
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Batch profit / loss')}</p><p className={`text-xl font-bold mt-1 ${batchSummaryRows.reduce((sum, b) => sum + (b.summary?.profit_loss || 0), 0) < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>Rs {Math.round(batchSummaryRows.reduce((sum, b) => sum + (b.summary?.profit_loss || 0), 0)).toLocaleString()}</p></div>
+            </div>
+            {batchSummaryRows.length > 0 && <div className="space-y-2">
+              {batchSummaryRows.slice(0, 5).map(batch => <div key={batch.batch_id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2">
+                <div className="min-w-0"><p className="text-xs font-semibold truncate">{batch.name}</p><p className="text-[11px] text-slate-500">{batch.summary?.live_count || 0} {L('live birds')} · {batch.status}</p></div>
+                <span className={`text-xs font-semibold whitespace-nowrap ${(batch.summary?.profit_loss || 0) < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>Rs {Math.round(batch.summary?.profit_loss || 0).toLocaleString()}</span>
+              </div>)}
+            </div>}
+            {batchSummaryRows.length === 0 && <p className="text-xs text-slate-500">{L('No batch records yet. Batch financials will appear after the first batch is created.')}</p>}
+          </>
+        )}
+      </section>
       <div className="muf-page-hero">
         <div className="muf-page-title">
           <div className="muf-title-icon"><BarChart2 size={28}/></div>
