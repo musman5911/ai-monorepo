@@ -517,7 +517,7 @@ router.post('/reset-password', passwordResetVerifyLimiter, async (req, res) => {
     if (passwordTooShort(newPassword)) {
       return res.status(400).json({ error: `New password must be at least ${MIN_PASSWORD_LENGTH} characters` });
     }
-    const user = await User.findOne({ email, role: 'admin', active: true });
+    const user = await User.findOne({ email, role: { $in: ['owner', 'admin'] }, active: true });
     if (!user) return res.status(400).json({ error: 'Invalid or expired code' });
 
     const reset = await PasswordReset.findOne({
