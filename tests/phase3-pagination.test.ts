@@ -90,6 +90,14 @@ describe('Phase 3 bounded Dairy milk bulk-entry contract', () => {
     expect(component).toContain('setHistorySummary(summaryResult)');
   });
 
+  it('provides preview-first bulk health CSV import with bounded row count', () => {
+    const component = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/components/HealthTab.tsx'), 'utf8');
+    expect(component).toContain('Preview Health CSV Import');
+    expect(component).toContain('lines.length > 1001');
+    expect(component).toContain('handleHealthCsvFile');
+    expect(component).toContain('api.bulkHealth');
+  });
+
   it('provides preview-first Dairy milk CSV import with bounded row count', () => {
     const component = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/components/MilkTab.tsx'), 'utf8');
     expect(component).toContain('Preview Milk CSV Import');
