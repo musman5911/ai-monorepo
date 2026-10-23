@@ -130,3 +130,8 @@ Batch summary now includes net eggs after sales, home use and waste. Incubation 
 ### Phase 2 implementation update (2026-10-23): destructive batch replacement guards
 
 Batch import-all and wipe-all now return HTTP 409 if incubation or labor attendance records reference a batch, preventing those bulk operations from silently orphaning history. A new batch-math test covers net egg availability after sales, home use and waste. These tests and builds remain unrun; the GitHub Actions connector cannot dispatch the manual workflow. Still open: race protection between allocation writes and egg-log deletion, concurrency/integration coverage, and coordinated full backup restore when linked history exists.
+
+
+### Phase 2 implementation update (2026-10-23): linked-history guard tests
+
+The import/wipe guard is now a pure tested helper with coverage for empty, incubation-linked and labor-linked history. The route uses the helper. Tests/builds remain unrun; manual workflow dispatch is unavailable through this connector. Allocation-vs-egg-log deletion race protection and integration coverage remain unresolved before Phase 2 can be considered fully verified.
