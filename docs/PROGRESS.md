@@ -535,3 +535,22 @@ Added `tests/phase4-breeding-lineage.test.ts` to guard the additive sire/ear-tag
 - **Agri crop CSV import committed:** admin crop workflow now offers a preview-first CSV importer, limits files to 1,000 data rows, validates headers and row widths, checks crop name/date/area, displays a preview and row errors, and requires explicit confirmation before writes. Partial write failures are reported rather than hidden. This currently covers crop CSV only; XLSX, task/finance imports, and broader Flock bulk workflows remain outstanding.
 - **Regression coverage added:** parser tests cover quoted commas, escaped quotes, embedded newlines, BOMs, duplicate/missing headers, row limits, malformed row widths, and crop validation. Pagination contract test asserts server totals are used and the hard 10,000-row cap is absent.
 - **Verification status:** changes have been committed to `muf-monorepo`. Automated tests and production builds have not yet been run in this environment; do not treat these changes as verified until the root suite, farm/sync/UI/workbench checks, and all three builds pass. Browser and real database checks remain deferred per project rules.
+ 
+
+## Phase 3 checkpoint (2026-10-23, Agri XLSX and regression additions)
+- Added native browser XLSX import for the first worksheet, with shared CSV preview/validation, 1,000-row and 5 MB caps, and Excel serial date normalization for plant/harvest dates. Import stays preview-first and only writes after explicit confirmation.
+- Agri crop imports now convert acres to kanal where needed and report saved/failed row counts.
+- Added Agri import parser tests and farm-scope regression contracts. Existing memory-mode HTTP farm isolation check remains the integration-level test for create/read/update/delete.
+- Important open item: Agri startup still downloads all crop, task, and finance pages because existing dashboard and report logic uses full arrays. Genuine on-demand list loading cannot safely replace these arrays until global totals/report data are moved to server summaries or report fetches are deferred. This is deliberately still open to avoid corrupting totals/history.
+- Execution: tests/builds have NOT been run in this editing session. After pulling, run from Windows CMD at `F:\\PROJECTS\\dairy\\muf-monorepo`:
+  1. `npm ci`
+  2. `npm test`
+  3. `npm run check-farms`
+  4. `npm run check-sync`
+  5. `npm run check-ui`
+  6. `npm run check-workbench`
+  7. `cd agri_farm\\frontend && npm ci && npm run build`
+  8. `cd ..\\..\\dairy_farm\\client && npm ci && npm run build`
+  9. `cd ..\\..\\flock_farm\\client && npm ci && npm run build`
+  10. Return to repo root and run `git status --short`.
+- Browser role testing and real MongoDB tests are still deferred to the final consolidated verification pass. Do not mark Phase 3 complete until tests/builds pass and Agri list-on-demand work is finished.
