@@ -27,6 +27,15 @@ function cowPayload(body, { requireBasics = false } = {}) {
 
   const gender = readEnum(body, 'gender', ['female', 'male'], errors);
   if (gender !== undefined) payload.gender = gender;
+
+  const earTag = readString(body, 'earTag', errors);
+  if (earTag !== undefined) payload.earTag = earTag;
+  const fatherId = readString(body, 'fatherId', errors);
+  if (fatherId !== undefined) payload.fatherId = fatherId;
+  const fatherType = readEnum(body, 'fatherType', ['farm', 'outside'], errors);
+  if (fatherType !== undefined) payload.fatherType = fatherType;
+  const fatherName = readString(body, 'fatherName', errors);
+  if (fatherName !== undefined) payload.fatherName = fatherName;
   const status = readEnum(body, 'status', ['active', 'inactive', 'dry', 'pregnant', 'sold', 'calf'], errors);
   if (status !== undefined) payload.status = status;
 
