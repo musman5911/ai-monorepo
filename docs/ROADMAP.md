@@ -135,3 +135,8 @@ Batch import-all and wipe-all now return HTTP 409 if incubation or labor attenda
 ### Phase 2 implementation update (2026-10-23): linked-history guard tests
 
 The import/wipe guard is now a pure tested helper with coverage for empty, incubation-linked and labor-linked history. The route uses the helper. Tests/builds remain unrun; manual workflow dispatch is unavailable through this connector. Allocation-vs-egg-log deletion race protection and integration coverage remain unresolved before Phase 2 can be considered fully verified.
+
+
+### Phase 2 implementation update (2026-10-23): allocation math consistency
+
+Incubation validation now clamps each egg-log's net supply at zero, matching the batch summary calculation and preventing negative-net legacy records from reducing valid supply on other dates. Added a regression unit test, not yet executed. Cross-request allocation/deletion concurrency and integration coverage remain open. The connected GitHub tools do not expose workflow dispatch, so the manual-only Actions checkpoint has not run; Phase 2 remains in progress until those risks and verification are addressed.
