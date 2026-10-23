@@ -45,6 +45,87 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
   const [editingId, setEditingId] = useState<string | null>(null);
   const [selectedRecord, setSelectedRecord] = useState<HealthRecord | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'grid'>('table');
+  const [showBulkImport, setShowBulkImport] = useState(false);
+  const [bulkPreview, setBulkPreview] = useState<Array<{ rowNumber: number; entry: { cowId: string; date: string; type: HealthType; description: string; medicine?: string; vet?: string; nextDueDate?: string; cost?: number; notes?: string }; error: string }>>([]);
+  const [bulkImporting, setBulkImporting] = useState(false);
+
+  const parseHealthCsvLine = (line: string): string[] => {
+    const values: string[] = [];
+    let value = '';
+    let quoted = false;
+    for (let i = 0; i < line.length; i++) {
+      const char = line[i];
+      if (char === '"' && quoted && line[i + 1] === '"') { value += '"'; i++; }
+      else if (char === '"') quoted = !quoted;
+      else if (char === ',' && !quoted) { values.push(value.trim()); value = ''; }
+      else value += char;
+    }
+    values.push(value.trim());
+    return values;
+  };
+
+  const handleHealthCsvFile = async (file?: File | null) => {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { notify('CSV files must be 2 MB or smaller.', 'error'); return; }
+    try {
+      const lines = (await file.text()).replace(/\r\n?/g, '\n').split('\n').filter(line => line.trim());
+      if (lines.length < 2) throw new Error('CSV needs a header and at least one data row.');
+      if (lines.length > 1001) throw new Error('Import is limited to 1,000 rows.');
+      const headers = parseHealthCsvLine(lines[0]).map(value => value.toLowerCase().replace(/\s+/g, ''));
+      const at = (name: string) => headers.indexOf(name);
+      for (const required of ['cowid', 'date', 'type', 'description']) if (at(required) < 0) throw new Error(`Missing required CSV column: ${required}`);
+      const validTypes: HealthType[] = ['vaccination', 'treatment', 'checkup', 'deworming', 'other'];
+      const preview = lines.slice(1).map((line, index) => {
+        const cells = parseHealthCsvLine(line);
+        const get = (name: string) => cells[at(name)] || '';
+        const cowId = get('cowid');
+        const date = get('date');
+        const type = get('type') as HealthType;
+        const description = get('description');
+        const nextDueDate = get('nextduedate');
+        const costText = get('cost');
+        const cost = costText === '' ? undefined : Number(costText);
+        const problems: string[] = [];
+        const validDate = (value: string) => !value || (/^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(new Date(value + 'T00:00:00Z').getTime()) && new Date(value + 'T00:00:00Z').toISOString().slice(0, 10) === value);
+        if (!cows.some(cow => cow._id === cowId)) problems.push('Unknown cow ID');
+        if (!validDate(date)) problems.push('Invalid date');
+        if (nextDueDate && !validDate(nextDueDate)) problems.push('Invalid next due date');
+        if (!validTypes.includes(type)) problems.push('Invalid health type');
+        if (!description) problems.push('Description is required');
+        if (cost !== undefined && (!Number.isFinite(cost) || cost < 0)) problems.push('Cost must be non-negative');
+        return { rowNumber: index + 2, entry: { cowId, date, type, description, medicine: get('medicine') || undefined, vet: get('vet') || undefined, nextDueDate: nextDueDate || undefined, cost, notes: get('notes') || undefined }, error: problems.join('; ') };
+      });
+      setBulkPreview(preview);
+      setShowBulkImport(true);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Could not read health CSV', 'error');
+    }
+  };
+
+  const submitHealthCsv = async () => {
+    if (bulkPreview.some(row => row.error)) { notify('Fix invalid CSV rows before importing.', 'error'); return; }
+    try {
+      setBulkImporting(true);
+      let saved = 0;
+      let failed = 0;
+      for (let start = 0; start < bulkPreview.length; start += 200) {
+        const result = await api.bulkHealth(bulkPreview.slice(start, start + 200).map(row => row.entry));
+        saved += Number(result.saved || 0);
+        failed += Number(result.failed || 0);
+      }
+      if (failed) notify(`${saved} health records saved; ${failed} failed. Review and retry failed rows.`, 'error');
+      else {
+        notify(`${saved} health records imported.`, 'success');
+        setShowBulkImport(false);
+        setBulkPreview([]);
+      }
+      await fetchData();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Health CSV import failed', 'error');
+    } finally {
+      setBulkImporting(false);
+    }
+  };
 
   const genderLabel = (cow: Cow) => cow.gender === 'male' ? '🐂' : '🐄';
 
@@ -171,12 +252,19 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
           </div>
         </div>
         {isAdmin && (
-          <button
-            onClick={() => { setShowForm(true); setEditingId(null); }}
-            className="muf-primary-action"
-          >
-            <Plus size={19}/> {L('Add Health Record')}
-          </button>
+          <div className="flex flex-wrap gap-2">
+            <button onClick={() => { setShowForm(true); setEditingId(null); }} className="muf-primary-action">
+              <Plus size={19}/> {L('Add Health Record')}
+            </button>
+            <label className="muf-primary-action cursor-pointer">
+              Import Health CSV
+              <input type="file" accept=".csv,text/csv" className="hidden" onChange={event => {
+                const file = event.target.files?.[0];
+                event.currentTarget.value = '';
+                void handleHealthCsvFile(file);
+              }} />
+            </label>
+          </div>
         )}
       </div>
 
@@ -248,6 +336,28 @@ const HealthTab: React.FC<HealthTabProps> = ({ isAdmin, canDelete = isAdmin }) =
           })}
         </div>
       </div>
+
+      <DetailModal open={showBulkImport} onClose={() => { if (!bulkImporting) setShowBulkImport(false); }}
+        title="Preview Health CSV Import" size="big">
+        <div className="space-y-4">
+          <p className="text-sm text-slate-500">Required columns: cowId, date, type, description. Optional: medicine, vet, nextDueDate, cost, notes. Supported types: vaccination, treatment, checkup, deworming, other. Up to 1,000 rows per file.</p>
+          <div className="max-h-80 overflow-auto border border-slate-200 dark:border-slate-700 rounded-lg">
+            <table className="w-full text-left text-xs">
+              <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800"><tr><th className="p-2">Row</th><th className="p-2">Cow ID</th><th className="p-2">Date</th><th className="p-2">Type</th><th className="p-2">Description</th><th className="p-2">Validation</th></tr></thead>
+              <tbody>{bulkPreview.map(row => <tr key={row.rowNumber} className={row.error ? 'bg-red-50 dark:bg-red-900/20' : 'border-t'}>
+                <td className="p-2">{row.rowNumber}</td><td className="p-2 font-mono">{row.entry.cowId}</td><td className="p-2">{row.entry.date}</td><td className="p-2">{row.entry.type}</td><td className="p-2">{row.entry.description}</td><td className="p-2">{row.error || 'Ready'}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-xs text-slate-500">{bulkPreview.length} rows · {bulkPreview.filter(row => row.error).length} invalid</p>
+            <button type="button" onClick={submitHealthCsv} disabled={bulkImporting || !bulkPreview.length || bulkPreview.some(row => row.error)}
+              className="bg-farm-600 hover:bg-farm-700 text-white rounded-lg px-4 py-2 text-sm font-medium disabled:opacity-50">
+              {bulkImporting ? L('Importing...') : L('Import Health Records')}
+            </button>
+          </div>
+        </div>
+      </DetailModal>
 
       <DetailModal open={showForm} onClose={() => { setShowForm(false); setEditingId(null); }}
         title={editingId ? L('Edit Health Record') : L('Add Health Record')}
