@@ -596,3 +596,17 @@ The first full-suite run had one failing test due to an over-escaped digit regex
 3. Add or strengthen dedicated runtime fixtures for cross-farm bulk writes and aggregate totals, plus realistic 1,000+ row API paging checks.
 4. Implement true Agri list-on-demand network paging while keeping dashboard/report totals correct, using server summaries or explicitly deferred complete-data fetches.
 5. Run the consolidated browser/role matrix and isolated real-MongoDB plus disposable-copy checks only after implementation work is complete.
+
+
+## Phase 3 owner verification follow-up (2026-10-23)
+
+Additional Windows Command Prompt results reported by the owner after pulling commit `93d38fa`:
+
+- `npm run check-farms`: **passed** for Agri, Flock, and Dairy. Output includes farm separation and Agri bulk task/finance import scope checks.
+- `npm run check-sync`: **passed**. Shared MUF client/backend twins, environment names, style tokens, helper exports, and security invariants matched.
+- `npm run check-ui`: **passed**. UI safety and cross-app component parity checks passed.
+- `npm run check-workbench`: **23/23 source checks passed**. This is static/source validation only.
+- `npm run check-workbench-runtime`: **not passed** because `http://127.0.0.1:5000/__muf-workbench` was unreachable. The script explicitly requires the Dairy Vite development server to be started first. This is pending runtime verification, not a source-check failure.
+- Dairy client directory is confirmed as `dairy_farm/client`; it contains `package.json` and `package-lock.json`, so the production build can be run there.
+
+Phase 3 remains open. The core unresolved implementation is genuine Agri on-demand network paging that preserves complete dashboard/report aggregates. Also pending: realistic large-dataset runtime paging, dedicated cross-farm aggregate runtime fixtures beyond existing memory-mode farm checks, Dairy build, workbench runtime smoke test, and the consolidated browser/isolated-database final pass.
