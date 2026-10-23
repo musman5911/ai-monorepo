@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { previewCsvImport, validateCropImport } from "./agriBulkImport";
+import { parseXlsxRows, previewCsvImport, rowsToCsv, validateCropImport } from "./app/agriBulkImport";
 
 type CropImportRow = Record<string, string>;
 type Props = {
@@ -9,7 +9,7 @@ type Props = {
 const REQUIRED_COLUMNS = ["name"];
 const ALLOWED_COLUMNS = new Set([
   "name", "variety", "status", "plant_date", "harvest_date", "field",
-  "yield_kg", "yield_unit", "area_kanal", "notes", "season", "crop_year",
+  "yield_kg", "yield_unit", "area_kanal", "area_acres", "notes", "season", "crop_year",
 ]);
 
 export default function AgriCropCsvImport({ onImportRows }: Props) {
@@ -21,13 +21,22 @@ export default function AgriCropCsvImport({ onImportRows }: Props) {
   const loadFile = async (file?: File) => {
     setError("");
     setPreview(null);
+    setFileName("");
     if (!file) return;
-    if (!file.name.toLowerCase().endsWith(".csv")) {
-      setError("Please choose a CSV file. Excel workbook import is not enabled in this build.");
+    const name = file.name.toLowerCase();
+    if (!name.endsWith(".csv") && !name.endsWith(".xlsx")) {
+      setError("Choose a CSV file or an Excel .xlsx workbook.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Import files must be 5 MB or smaller.");
       return;
     }
     try {
-      const text = await file.text();
+      const rows = name.endsWith(".xlsx")
+        ? await parseXlsxRows(await file.arrayBuffer())
+        : undefined;
+      const text = rows ? rowsToCsv(rows) : await file.text();
       const parsed = validateCropImport(previewCsvImport(text, REQUIRED_COLUMNS, 1000));
       const unsupported = parsed.headers.filter((header) => !ALLOWED_COLUMNS.has(header));
       if (unsupported.length) {
@@ -37,7 +46,7 @@ export default function AgriCropCsvImport({ onImportRows }: Props) {
       setFileName(file.name);
       setPreview(parsed);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not read this CSV file.");
+      setError(err instanceof Error ? err.message : "Could not read this import file.");
     }
   };
 
@@ -59,10 +68,10 @@ export default function AgriCropCsvImport({ onImportRows }: Props) {
   return (
     <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-4 space-y-3">
       <div>
-        <h3 className="font-bold">Preview Crop CSV Import</h3>
-        <p className="text-xs opacity-70">Up to 1,000 rows. Nothing is saved until you confirm a valid preview.</p>
+        <h3 className="font-bold">Preview Crop CSV / Excel Import</h3>
+        <p className="text-xs opacity-70">CSV or first worksheet of an .xlsx workbook, up to 1,000 rows and 5 MB. Nothing is saved until you confirm a valid preview.</p>
       </div>
-      <input type="file" accept=".csv,text/csv" disabled={busy} onChange={(event) => void loadFile(event.target.files?.[0])} />
+      <input type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" disabled={busy} onChange={(event) => void loadFile(event.target.files?.[0])} />
       {fileName && <p className="text-xs">File: {fileName}</p>}
       {error && <p role="alert" className="text-sm text-red-600">{error}</p>}
       {preview && (
