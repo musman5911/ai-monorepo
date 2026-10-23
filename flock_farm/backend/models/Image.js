@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 const imageSchema = new mongoose.Schema(
   {
     kind: { type: String, enum: ['bird', 'batch', 'diary'], required: true },
+    farmId: { type: String, index: true },
     contentType: { type: String, required: true },
     data: { type: Buffer, required: true },
     size: { type: Number, default: 0 },
