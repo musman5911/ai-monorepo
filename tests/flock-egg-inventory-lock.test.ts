@@ -88,6 +88,21 @@ describe('Flock egg inventory lock', () => {
     };
     await expect(acquireEggInventoryLock(store)).rejects.toThrow('database unavailable');
   });
+
+  it('still serializes when the backing adapter does not enforce unique indexes', async () => {
+    let nextId = 1;
+    const store = {
+      create: async (doc) => ({ ...doc, _id: String(nextId++) }),
+      findOneAndDelete: async () => null,
+    };
+    const release = await acquireEggInventoryLock(store, 'farm-memory');
+    await expect(acquireEggInventoryLock(store, 'farm-memory')).rejects.toMatchObject({
+      status: 409,
+      code: 'EGG_INVENTORY_BUSY',
+    });
+    await release();
+  });
+
   it('acquires whole-farm lock sets in a stable deduplicated order and releases all', async () => {
     const store = createFarmStore();
     const release = await acquireEggInventoryLocks(store, ['farm-b', 'farm-a', 'farm-b']);
