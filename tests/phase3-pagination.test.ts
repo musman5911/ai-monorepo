@@ -50,6 +50,29 @@ describe('Phase 3 page-pagination contract', () => {
   });
 });
 
+describe('Phase 3 bounded Dairy milk bulk-entry contract', () => {
+  it('validates the whole request before writes and caps payloads at 200 entries', () => {
+    const source = readFileSync(path.join(repoRoot, 'dairy_farm/backend/routes/milk.js'), 'utf8');
+    expect(source).toContain("router.post('/bulk', protect, workerOrAdmin");
+    expect(source).toContain("rows.length > 200");
+    expect(source).toContain("if (errors.length) return res.status(400)");
+    expect(source).toContain('duplicate cow/date in this batch');
+  });
+
+  it('returns explicit per-row outcomes for partial writes and retries', () => {
+    const source = readFileSync(path.join(repoRoot, 'dairy_farm/backend/routes/milk.js'), 'utf8');
+    expect(source).toContain('const saved = results.filter((row) => row.ok).length');
+    expect(source).toContain('status(failed ? 207 : 200)');
+    expect(source).toContain('forceOverwrite');
+  });
+
+  it('exposes the bounded bulk endpoint in the Dairy client API', () => {
+    const source = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
+    expect(source).toContain("req('/milk/bulk'");
+    expect(source).toContain('bulkMilk:');
+  });
+});
+
 describe('Phase 3 first list endpoint integration contract', () => {
   it('Dairy cow and milk lists keep array payloads and expose page metadata headers', () => {
     for (const file of ['dairy_farm/backend/routes/cows.js', 'dairy_farm/backend/routes/milk.js']) {
