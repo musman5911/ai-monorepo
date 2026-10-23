@@ -193,9 +193,11 @@ router.put('/data/:key', authRequired, async (req, res) => {
       }
     }
 
-    // Serialize incubation allocation writes with every batch egg-supply mutation.
-    // The lock is farm-scoped by the DataStore model and enforced by Mongo's unique index.
-    if (key === 'incubation') releaseInventoryLock = await acquireEggInventoryLock(DataStore);
+    // Serialize linked-history writes with batch deletion/replacement and serialize
+    // incubation allocations with egg-supply mutations. The shared lock is farm-scoped.
+    if (key === 'incubation' || key === 'laborAttendance') {
+      releaseInventoryLock = await acquireEggInventoryLock(DataStore);
+    }
 
     const current = await DataStore.findOne({ key });
     const currentVersion = current ? (current.version || 0) : 0;
