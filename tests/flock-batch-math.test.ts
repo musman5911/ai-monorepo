@@ -42,6 +42,7 @@ describe('batch financial summary', () => {
       total_expense_cost: 50,
       total_eggs_collected: 20,
       total_eggs_sold: 10,
+      total_eggs_available: 10,
       total_egg_income: 50,
       total_revenue: 450,
       total_cost: 1150,
