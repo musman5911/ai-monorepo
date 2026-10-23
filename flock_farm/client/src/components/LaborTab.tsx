@@ -62,7 +62,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
   }, []);
   const [month, setMonth] = useState(monthStr());
   const [workerForm, setWorkerForm] = useState({ name: '', dailyWage: '', notes: '' });
-  const [markForm, setMarkForm] = useState({ workerId: '', date: todayStr(), dayType: 'full' as 'full' | 'half', notes: '' });
+  const [markForm, setMarkForm] = useState({ workerId: '', date: todayStr(), dayType: 'full' as 'full' | 'half', batchId: '', notes: '' });
   const [advanceFor, setAdvanceFor] = useState<string | null>(null);
   const [qrFor, setQrFor] = useState<{ id: string; name: string } | null>(null);
   const [advForm, setAdvForm] = useState({ date: todayStr(), amount: '', notes: '' });
@@ -70,7 +70,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
   const [editWorkerForm, setEditWorkerForm] = useState({ name: '', dailyWage: '', notes: '' });
   const [editAdvId, setEditAdvId] = useState<string | null>(null);
   const [editAtt, setEditAtt] = useState<LaborAttendanceEntry | null>(null);
-  const [editAttForm, setEditAttForm] = useState({ date: '', dayType: 'full' as 'full' | 'half', notes: '' });
+  const [editAttForm, setEditAttForm] = useState({ date: '', dayType: 'full' as 'full' | 'half', batchId: '', notes: '' });
   const [showAddWorkerModal, setShowAddWorkerModal] = useState(false);
   const [showMarkAttModal, setShowMarkAttModal] = useState(false);
 
@@ -120,7 +120,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
     const date = editAttForm.date;
     const clash = attendance.find((r) => r.workerId === editAtt.workerId && r.date === date && r.id !== editAtt.id);
     if (clash) { notify(L('This worker already has attendance on that date.'), 'error'); return; }
-    onChangeAttendance(attendance.map((r) => (r.id === editAtt.id ? { ...r, date, dayType: editAttForm.dayType, notes: editAttForm.notes.trim() } : r)));
+    onChangeAttendance(attendance.map((r) => (r.id === editAtt.id ? { ...r, date, dayType: editAttForm.dayType, batchId: editAttForm.batchId || undefined, notes: editAttForm.notes.trim() } : r)));
     setEditAtt(null);
     notify(L('Attendance updated.'));
   }
@@ -174,11 +174,11 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
     const existing = attendance.find((r) => r.workerId === markForm.workerId && r.date === date);
     if (existing?.posted) { notify(L('This day is already posted to the wages ledger.'), 'error'); return; }
     if (existing) {
-      onChangeAttendance(attendance.map((r) => (r.id === existing.id ? { ...r, dayType: markForm.dayType, notes: markForm.notes.trim() } : r)));
+      onChangeAttendance(attendance.map((r) => (r.id === existing.id ? { ...r, dayType: markForm.dayType, batchId: markForm.batchId || undefined, notes: markForm.notes.trim() } : r)));
     } else {
       onChangeAttendance([
         ...attendance,
-        { id: `la-${Date.now()}`, workerId: markForm.workerId, date, dayType: markForm.dayType, posted: false, notes: markForm.notes.trim() },
+        { id: `la-${Date.now()}`, workerId: markForm.workerId, date, dayType: markForm.dayType, batchId: markForm.batchId || undefined, posted: false, notes: markForm.notes.trim() },
       ]);
     }
     setShowMarkAttModal(false);
@@ -353,11 +353,11 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
                 <div key={row.id} className="flex justify-between items-center gap-2 p-2.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/40 text-xs">
                   <div>
                     <p className="font-bold text-slate-700 dark:text-slate-200">{row.date} · {worker?.name || L('Worker')} · {row.dayType === 'half' ? L('Half') : L('Full')}</p>
-                    <p className="text-[10px] text-slate-500">{row.notes || ''}{row.posted ? (row.notes ? ' · ' : '') + L('posted') : ''}</p>
+                    <p className="text-[10px] text-slate-500">{row.batchId ? `${L('Batch')}: ${laborBatchRows.find((b) => b.batch_id === row.batchId)?.name || row.batchId} · ` : ''}{row.notes || ''}{row.posted ? (row.notes ? ' · ' : '') + L('posted') : ''}</p>
                   </div>
                   {!row.posted && (
                     <span className="flex items-center gap-0.5">
-                      <button type="button" onClick={() => { setEditAtt(row); setEditAttForm({ date: row.date, dayType: row.dayType, notes: row.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label={L('Edit attendance')} title={L('Edit attendance')}>
+                      <button type="button" onClick={() => { setEditAtt(row); setEditAttForm({ date: row.date, dayType: row.dayType, batchId: row.batchId || '', notes: row.notes || '' }); }} className="p-1 rounded text-slate-400 hover:text-emerald-600 transition" aria-label={L('Edit attendance')} title={L('Edit attendance')}>
                         <Pencil className="w-3.5 h-3.5" />
                       </button>
                       <button type="button" onClick={() => handleDeleteAttendance(row.id)} className="p-1 rounded text-slate-400 hover:text-red-500 transition" aria-label={L('Delete attendance')}>
@@ -431,6 +431,13 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
             </select>
           </div>
           <div>
+            <label className={labelClass}>{L('Batch assignment')}</label>
+            <select className={fieldClass} value={editAttForm.batchId} onChange={(e) => setEditAttForm({ ...editAttForm, batchId: e.target.value })}>
+              <option value="">{L('No batch / general work')}</option>
+              {laborBatchRows.map((batch) => <option key={batch.batch_id} value={batch.batch_id}>{batch.name} · {batch.batch_id}</option>)}
+            </select>
+          </div>
+          <div>
             <label className={labelClass}>{L('Notes')}</label>
             <input className={fieldClass} value={editAttForm.notes} onChange={(e) => setEditAttForm({ ...editAttForm, notes: e.target.value })} />
           </div>
@@ -486,6 +493,13 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
             <select className={fieldClass} value={markForm.dayType} onChange={(e) => setMarkForm({ ...markForm, dayType: e.target.value as 'full' | 'half' })}>
               <option value="full">{L('Full day')}</option>
               <option value="half">{L('Half day')}</option>
+            </select>
+          </div>
+          <div>
+            <label className={labelClass}>{L('Batch assignment')}</label>
+            <select className={fieldClass} value={markForm.batchId} onChange={(e) => setMarkForm({ ...markForm, batchId: e.target.value })}>
+              <option value="">{L('No batch / general work')}</option>
+              {laborBatchRows.map((batch) => <option key={batch.batch_id} value={batch.batch_id}>{batch.name} · {batch.batch_id}</option>)}
             </select>
           </div>
           <div>
