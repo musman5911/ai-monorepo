@@ -126,14 +126,14 @@ function parsePagePagination(query, { defaultLimit = 50, maxLimit = 200 } = {}) 
     return { enabled: false, page: null, limit: null, skip: 0, error: null };
   }
 
-  const rawPage = String(query.page).trim();
+  const rawPage = Array.isArray(query.page) ? '' : String(query.page).trim();
   if (!/^\d+$/.test(rawPage) || Number(rawPage) < 1 || !Number.isSafeInteger(Number(rawPage))) {
     return { enabled: true, page: null, limit: null, skip: 0, error: 'page must be a positive integer' };
   }
 
   const page = Number(rawPage);
-  const rawLimit = query.limit === undefined ? defaultLimit : Number(query.limit);
-  if (!Number.isInteger(rawLimit) || rawLimit < 1) {
+  const rawLimit = query.limit === undefined ? defaultLimit : (Array.isArray(query.limit) ? NaN : Number(query.limit));
+  if (!Number.isSafeInteger(rawLimit) || rawLimit < 1) {
     return { enabled: true, page, limit: null, skip: 0, error: 'limit must be a positive integer' };
   }
 
