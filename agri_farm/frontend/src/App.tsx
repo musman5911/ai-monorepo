@@ -3170,9 +3170,16 @@ function App() {
                     for (const row of rows) {
                       const payload = Object.fromEntries(Object.entries(row).filter(([key, value]) => value !== ''));
                       try {
-                        await api.addCrop({
-                          ...payload,
-                          area_kanal: payload.area_kanal === undefined ? '1.0' : payload.area_kanal,
+                        const cropPayload = { ...payload };
+                      delete cropPayload.area_acres;
+                      const areaKanal = payload.area_kanal !== undefined
+                        ? payload.area_kanal
+                        : payload.area_acres !== undefined
+                          ? String(Number(payload.area_acres) * 8)
+                          : '1.0';
+                      await api.addCrop({
+                          ...cropPayload,
+                          area_kanal: areaKanal,
                           status: payload.status || 'Growing',
                           yield_unit: payload.yield_unit || 'kg',
                           season: payload.season || 'Rabi',
@@ -3187,11 +3194,11 @@ function App() {
                     const saved = outcomes.filter((item) => item.ok).length;
                     const failed = outcomes.length - saved;
                     setShowCropImport(false);
-                    showAlert(failed ? `Crop CSV import: ${saved} saved, ${failed} failed. Review the server logs and retry only the failed rows.` : `Crop CSV import complete: ${saved} crops saved.`);
+                    showAlert(failed ? `Crop CSV/Excel import: ${saved} saved, ${failed} failed. Review the server logs and retry only the failed rows.` : `Crop CSV/Excel import complete: ${saved} crops saved.`);
                   }} />
                 )}
                 {crops.length === 0 ? (
-                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crop records yet')}</h4><p>Add your first wheat, corn, bajra, mattar, jundra, or any other crop.</p>{userRole === 'admin' && (<button onClick={() => { setEditingCrop(null); setCropForm(getEmptyCropForm()); setShowCropModal(true); }} className="muf-primary-action small"><Plus size={16}/> {L('Add Crop')}</button><button type="button" onClick={() => setShowCropImport(open => !open)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold">Import CSV</button>)}</div>
+                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crop records yet')}</h4><p>Add your first wheat, corn, bajra, mattar, jundra, or any other crop.</p>{userRole === 'admin' && (<button onClick={() => { setEditingCrop(null); setCropForm(getEmptyCropForm()); setShowCropModal(true); }} className="muf-primary-action small"><Plus size={16}/> {L('Add Crop')}</button><button type="button" onClick={() => setShowCropImport(open => !open)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold">Import CSV / Excel</button>)}</div>
                   ) : filteredCrops.length === 0 ? (
                     <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crops match this filter')}</h4><p>{L('Change the crop phase filter to see other records.')}</p></div>
                   ) : (
