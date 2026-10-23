@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Phase 2 implementation checkpoint: batch-first primary navigation, linked inventory/history locking, complete batch backup fields and regression tests added; local verification pending)
+Last updated: 2026-10-23 (owner verification checkpoint: corrected incubation allocation regression test; farm-scope check now reports setup responses instead of crashing; local rerun pending)
 
 ## Workflow execution policy update (2026-10-23)
 
@@ -361,3 +361,27 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - The Health portal derives batch vaccination and mortality activity from batch detail APIs. The main Summary uses batch revenue, cost, profit/loss and net egg availability; the legacy Home Birds monthly report remains available separately rather than being silently deleted.
 - The new batch-first Health portal now reports partial batch-detail failures instead of silently presenting incomplete activity; its totals use all loaded history while the feed shows the 20 most recent events.
 - Removed the duplicate batch-financial panel from Home Birds Monthly Report after creating the dedicated top-level batch Summary. The Home Birds report remains focused on individual home-bird records; historical data and calculations are retained.
+
+
+## Owner verification checkpoint and next actions (2026-10-23)
+
+The owner pulled commit `e49317e` and ran the local checks. These are owner-reported results, not CI results:
+
+- Root `npm test`: **114 passed, 1 failed** across 15 test files. The failing test incorrectly expected 110 incubation eggs to be accepted when net supply is 100. The validator's rejection is correct; the regression test is corrected to accept exactly 100 and reject 101 even when a legacy log has negative net values.
+- `npm run check-farms`: Agri and Dairy passed. Flock reported failures for legacy admin/owner role mapping, old-screen role compatibility, farm migration setup, then crashed while reading the missing farms array. The farm-scope harness now stops after a failed login/setup and prints the HTTP status and response, rather than cascading into an unhelpful TypeError. **This is diagnostic hardening, not proof that the underlying Flock failure is fixed.**
+- `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`: passed.
+- Flock client `npm run build`: passed; Vite warned that the main JavaScript chunk exceeds 500 kB.
+- `npm ci` reported audit findings: root 5 (1 moderate, 2 high, 2 critical), Flock backend 6 (4 moderate, 2 high), Flock client 3 (2 high, 1 critical). Counts may overlap across dependency trees. Review with targeted updates; do not run `npm audit fix --force` blindly.
+
+### Immediate gate before Phase 2 sign-off
+
+1. Pull the latest `muf-monorepo` branch and rerun the root test and farm-scope check. Capture the new Flock login/farms diagnostic if it still fails.
+2. Fix the actual Flock startup/login/farm migration defect exposed by that diagnostic; do not weaken role or isolation assertions to make the check green.
+3. Run inventory-lock concurrency tests against a disposable real MongoDB database, including concurrent incubation saves, an incubation save racing an egg-log deletion, lock cleanup on success/failure, and two backend processes. Memory mode alone is not evidence of cross-process lock correctness.
+4. Test backup/restore on a disposable database copy, including legacy backup payloads, all Phase 2 collections, IDs/relationships, and failure behavior. Never test destructive restore against production data.
+5. Re-run all automated checks and builds, then manually trigger CI at the verification checkpoint. Record only checks that actually ran.
+6. Only after those gates pass, mark Phase 2 verified and start Phase 3.
+
+### Ongoing automation and documentation rule
+
+Each implementation step must update both `PROGRESS.md` and `ROADMAP.md`, add or extend automated regression tests, and document exact Windows CMD commands and expected outcomes. Prefer tests for business rules, farm isolation, API contracts, concurrency, backup compatibility, and bulk/pagination limits. Do not mark a phase complete based on source inspection alone.
