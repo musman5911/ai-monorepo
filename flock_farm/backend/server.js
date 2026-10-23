@@ -21,6 +21,7 @@ import dataRoutes from './routes/data.js';
 import telegramRoutes, { initTelegram } from './routes/telegram.js';
 import cardsRoutes from './routes/cards.js';
 import settingsRoutes from './routes/settings.js';
+import farmsRoutes from './routes/farms.js';
 import { MUF_ENV } from './muf-env.mjs';
 
 dotenv.config();
@@ -163,6 +164,7 @@ app.get('/api/farm-summary', async (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
+app.use('/api/farms', farmsRoutes);
 app.use('/api', uploadRoutes);
 app.use('/api', backupRoutes);
 app.use('/api', batchRoutes);
