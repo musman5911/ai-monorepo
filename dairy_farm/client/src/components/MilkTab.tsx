@@ -55,6 +55,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
   const [rateHistory, setRateHistory] = useState<RateHistory[]>([]);
   const [historyPage, setHistoryPage] = useState(1);
   const [historyTotalCount, setHistoryTotalCount] = useState(0);
+  const [historySummary, setHistorySummary] = useState({ count: 0, totalLiters: 0, saleableLiters: 0, revenue: 0 });
   const [historyHasMore, setHistoryHasMore] = useState(false);
   const [loadingMoreHistory, setLoadingMoreHistory] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -74,7 +75,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
         ? { month: historyMonth, cowId: historyCowFilter || undefined }
         : { from: selectedDate, to: selectedDate };
 
-      const [cowsData, milkResult, rateData, rateHist, buyersData] = await Promise.all([
+      const [cowsData, milkResult, rateData, rateHist, buyersData, summaryResult] = await Promise.all([
         api.getCows(),
         viewMode === 'history'
           ? api.getMilkPage({ month: historyMonth, cowId: historyCowFilter || undefined, page: 1, limit: 50 })
@@ -82,6 +83,9 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
         api.getRate(),
         api.getRateHistory(),
         api.getBuyers().catch(() => []),
+        viewMode === 'history'
+          ? api.getMilkSummary({ month: historyMonth, cowId: historyCowFilter || undefined })
+          : Promise.resolve(null),
       ]);
       const milkData: MilkEntry[] = viewMode === 'history' ? milkResult.data : milkResult;
 
@@ -89,11 +93,13 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
       setMilkRecords(milkData);
       if (viewMode === 'history') {
         setHistoryPage(1);
-        setHistoryTotalCount(milkResult.total);
+        setHistoryTotalCount(summaryResult.count);
+        setHistorySummary(summaryResult);
         setHistoryHasMore(milkResult.page < milkResult.totalPages);
       } else {
         setHistoryPage(1);
         setHistoryTotalCount(0);
+        setHistorySummary({ count: 0, totalLiters: 0, saleableLiters: 0, revenue: 0 });
         setHistoryHasMore(false);
       }
       setRate(rateData?.value || 0);
@@ -342,9 +348,9 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
     : milkRecords;
 
   const buyerRates = Object.fromEntries(buyers.map(b => [b._id, b.defaultRate || 0]));
-  const historyTotal = historyByCow.reduce((a, m) => a + (m.morning || 0) + (m.evening || 0), 0);
-  const historySaleable = historyByCow.reduce((a, m) => a + saleableMilkLiters(m), 0);
-  const historyRevenue = calcRevenueWithHistory(historyByCow, rateHistory, rate, rateDate, buyerRates);
+  const historyTotal = historySummary.totalLiters;
+  const historySaleable = historySummary.saleableLiters;
+  const historyRevenue = historySummary.revenue;
   const eligibleCows = cows.filter(isMilkEligible);
 
   const months = lastNMonths(6);
@@ -521,7 +527,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
                 <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{monthLabel(historyMonth)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">{L('Loaded Milk')}</p>
+                <p className="text-xs text-slate-400 uppercase">{L('Total Milk')}</p>
                 <p className="text-lg font-bold text-farm-600">{fmtL(historyTotal)}</p>
                 <p className="text-[10px] text-slate-400">Saleable {fmtL(historySaleable)}</p>
               </div>
@@ -530,7 +536,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
                 <p className="text-lg font-bold text-emerald-600">{fmtPKR(historyRevenue)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">{L('Records Loaded')}</p>
+                <p className="text-xs text-slate-400 uppercase">{L('Records')}</p>
                 <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{historyByCow.length} / {historyTotalCount}</p>
               </div>
             </div>
