@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Dashboard, Health and Summary now expose batch-derived primary operational/financial panels; automated verification for this latest set is pending)
+Last updated: 2026-10-23 (Phase 2 implementation checkpoint: batch-first primary navigation, linked inventory/history locking, complete batch backup fields and regression tests added; local verification pending)
 
 ## Workflow execution policy update (2026-10-23)
 
