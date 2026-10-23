@@ -23,4 +23,6 @@ const dataStoreSchema = new mongoose.Schema(
 
 dataStoreSchema.index({ farmId: 1, key: 1 }, { unique: true, name: 'datastore_farm_key_unique' });
 
+dataStoreSchema.index({ farmId: 1, key: 1 }, { unique: true, name: 'datastore_farm_key_unique' });
+
 export default mongoose.model('DataStore', dataStoreSchema);
