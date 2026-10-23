@@ -12,7 +12,7 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 | Phase | State |
 |---|---|
 | 0. Docs reset and repository cleanup | Done. Applied by the owner, pushed to the `muf-monorepo` branch, owner's checks and builds all passed |
-| 1. Farms and roles (MUF) | In progress. 1A done (shared core + Dairy backend); 1B-1 done (Agri backend); 1B-2 Flock backend approved for implementation; 1C screens and 1D wrap-up not started |
+| 1. Farms and roles (MUF) | In progress. 1A done (shared core + Dairy backend); 1B-1 done (Agri backend); 1B-2 Flock backend in progress; validation pending; 1C screens and 1D wrap-up not started |
 | 2. Flock restructure and Home Birds | Not started |
 | 3. Bulk entry, scroll loading, server totals | Not started |
 | 4. Dairy breeding; Agri fields and seasons | Not started |
@@ -35,9 +35,9 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 - **Hosting:** the owner uses the free MongoDB tier and Replit, so size and quota limits matter (see `DEPLOYMENT.md`).
 - **MU Farms shop:** later. There is no budget for a new domain; where it lives is decided in Phase 7.
 
-## Waiting for the owner
+## Current owner action
 
-- **Flock step 1B-2 implementation:** approved after a read-only audit of the existing layout. Legacy `DataStore` uses globally keyed documents whose values contain arrays/objects; Flock also has `Batch`, five batch-log collections, and `Image`. Preserve existing records and response shapes while adding server-enforced farm scope. No Flock code has been changed yet.
+- **Flock step 1B-2 validation:** implementation is underway. Do not run the migration on live data. Take a fresh backup, test on a database copy, run the automated checks listed in `RULES.md`, and review the Flock HTTP scope results before applying anything to production.
 
 ## Phase 1 step 1B-2: Flock backend (in progress, 2026-10-23)
 
@@ -85,7 +85,7 @@ Design record: [PHASE1_PLAN.md](PHASE1_PLAN.md). Backend only; no screens change
 
 **Not done or not verified:**
 
-- Agri and Flock backends were not wired in 1A. Agri was done in step 1B-1; Flock (step 1B-2) still needs a data layout decision (see the design record).
+- Agri was completed in step 1B-1. Flock step 1B-2 is now in progress; the per-farm bucket layout is recorded in `PHASE1_PLAN.md`.
 - No screens: no farm switcher, no Farms & Access popup (step 1C).
 - The migration has only run against demo (memory) data. It has not been run on a real MongoDB copy.
 - The model wrapper was checked against real MongoDB query objects, but no real database was available here, so no real write or read through MongoDB was exercised.
