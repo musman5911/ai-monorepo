@@ -589,10 +589,12 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 lg:grid-cols-5 gap-3">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                   <OverviewCard label={L('Live Birds')} value={`${detail.batch.summary.live_count}`} icon={<Users className="w-4 h-4" />} />
                   <OverviewCard label={L('Mortality')} value={`${detail.batch.summary.total_mortality_count}`} helper={`${detail.batch.summary.mortality_pct.toFixed(1)}%`} icon={<Skull className="w-4 h-4" />} />
                   <OverviewCard label={L('Sales')} value={`${detail.batch.summary.total_sold_count}`} helper={formatRs(detail.batch.summary.total_revenue)} icon={<ShoppingBag className="w-4 h-4" />} />
+                  <OverviewCard label={L('Eggs Collected')} value={`${detail.batch.summary.total_eggs_collected}`} helper={`${detail.batch.summary.total_eggs_sold} sold`} icon={<Egg className="w-4 h-4" />} />
+                  <OverviewCard label={L('Egg Income')} value={formatRs(detail.batch.summary.total_egg_income)} icon={<ShoppingBag className="w-4 h-4" />} />
                   <OverviewCard label={L('Total Cost')} value={formatRs(detail.batch.summary.total_cost)} icon={<Wheat className="w-4 h-4" />} />
                   <OverviewCard label={L('Profit/Loss')} value={formatRs(detail.batch.summary.profit_loss)} icon={detail.batch.summary.profit_loss >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />} />
                 </div>
@@ -609,6 +611,8 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
                     <InfoRow label={L('Intake Cost')} value={formatRs(detail.batch.summary.intake_cost)} />
                     <InfoRow label={L('Feed Cost')} value={formatRs(detail.batch.summary.total_feed_cost)} />
                     <InfoRow label={L('Batch Expenses')} value={formatRs(detail.batch.summary.total_expense_cost)} />
+                    <InfoRow label={L('Vaccination Cost (included)')} value={formatRs(detail.batch.summary.total_vaccination_cost)} />
+                    <InfoRow label={L('Egg Income (included)')} value={formatRs(detail.batch.summary.total_egg_income)} />
                     <InfoRow label={L('Revenue')} value={formatRs(detail.batch.summary.total_revenue)} />
                     <InfoRow label={L('Cost/Bird')} value={formatRs(detail.batch.summary.cost_per_bird)} />
                     <InfoRow label={L('Auto Close Rule')} value={L('Batch auto-closes when live count reaches 0.')} />
