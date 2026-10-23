@@ -82,6 +82,7 @@ export default function IncubationModule({
   }, []);
   const canChange = canEdit ?? canDelete;
   const [startDate, setStartDate] = useState(todayStr());
+  const [sourceBatchId, setSourceBatchId] = useState('');
   const [eggsSet, setEggsSet] = useState('');
   const [hatchDate, setHatchDate] = useState('');
   const [hatched, setHatched] = useState('');
@@ -118,6 +119,7 @@ export default function IncubationModule({
 
   const resetForm = () => {
     setStartDate(todayStr());
+    setSourceBatchId('');
     setEggsSet('');
     setHatchDate('');
     setHatched('');
@@ -163,6 +165,7 @@ export default function IncubationModule({
 
     const payload = {
       startDate,
+      sourceBatchId: sourceBatchId || undefined,
       eggsSet: set,
       hatchDate: hatchDate || undefined,
       hatched: hatchedN,
@@ -190,6 +193,7 @@ export default function IncubationModule({
   const startEdit = (record: IncubationRecord) => {
     setEditId(record.id);
     setStartDate(record.startDate);
+    setSourceBatchId(record.sourceBatchId || '');
     setEggsSet(String(record.eggsSet));
     setHatchDate(record.hatchDate ?? '');
     setHatched(String(record.hatched));
@@ -359,6 +363,7 @@ export default function IncubationModule({
                   <th className="p-3">{L('Start')}</th>
                   <th className="p-3">{L('Hatch')}</th>
                   <th className="p-3">{L('Status')}</th>
+                  <th className="p-3">{L('Source batch')}</th>
                   <th className="p-3">{L('Set')}</th>
                   <th className="p-3">{L('Hatched')}</th>
                   <th className="p-3 sm:hidden text-right"></th>
@@ -377,13 +382,14 @@ export default function IncubationModule({
                       <td className="p-3 font-mono whitespace-nowrap dark:text-slate-200">{record.startDate}</td>
                       <td className="p-3 font-mono whitespace-nowrap dark:text-slate-200">{record.hatchDate || '—'}</td>
                       <td className="p-3"><span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-semibold border ${status.className}`}>{status.label}</span></td>
+                      <td className="p-3 dark:text-slate-200">{incubationBatchRows.find(batch => batch.batch_id === record.sourceBatchId)?.name || (record.sourceBatchId || L('Legacy / not linked'))}</td>
                       <td className="p-3 dark:text-slate-200">{record.eggsSet}</td>
                       <td className="p-3 font-semibold text-emerald-700 dark:text-emerald-400">{record.hatched}</td>
                       <td className="p-3 sm:hidden text-right text-slate-400"><Eye className="w-4 h-4 inline-block" /></td>
                     </tr>
                   );
                 })}
-                {records.length === 0 && <tr><td colSpan={6} className="p-8 text-center text-slate-400 italic">{L('No incubation records')}</td></tr>}
+                {records.length === 0 && <tr><td colSpan={7} className="p-8 text-center text-slate-400 italic">{L('No incubation records')}</td></tr>}
               </tbody>
             </table>
           </div>
@@ -408,6 +414,7 @@ export default function IncubationModule({
             <div className="space-y-4 text-sm">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <IncubationDetailTile label={L('Start Date')} value={activeDetailRecord.startDate} />
+                <IncubationDetailTile label={L('Source Batch')} value={incubationBatchRows.find(batch => batch.batch_id === activeDetailRecord.sourceBatchId)?.name || activeDetailRecord.sourceBatchId || L('Legacy / not linked')} />
                 <IncubationDetailTile label={L('Hatch Date')} value={activeDetailRecord.hatchDate || '—'} />
                 <IncubationDetailTile label="Eggs Set" value={`${activeDetailRecord.eggsSet}`} />
                 <IncubationDetailTile label="Hatched" value={`${activeDetailRecord.hatched}`} />
@@ -490,6 +497,7 @@ export default function IncubationModule({
               This hatch has already been added to the flock registry, so core hatch counts are locked to keep flock totals consistent.
             </div>
           )}
+          <label className="block space-y-1"><span className="text-slate-600 dark:text-slate-300">{L('Source batch (optional for legacy records)')}</span><select disabled={isTransferredRecord} value={sourceBatchId} onChange={(e) => setSourceBatchId(e.target.value)} className="muf-field"><option value="">{L('Not linked / legacy record')}</option>{incubationBatchRows.filter(batch => (batch.summary?.total_eggs_collected || 0) > 0).map(batch => <option key={batch.batch_id} value={batch.batch_id}>{batch.name} · {batch.batch_id} · {batch.summary?.total_eggs_collected || 0} {L('eggs collected')}</option>)}</select><span className="text-[10px] text-amber-700 dark:text-amber-300">{L('Linking records the source batch only. Egg availability is not reserved or deducted automatically yet.')}</span></label>
           <div className="grid grid-cols-2 gap-2">
             <input type="date" required disabled={isTransferredRecord} value={startDate} onChange={(e) => setStartDate(e.target.value)} className="muf-field" />
             <input type="date" disabled={isTransferredRecord} value={hatchDate} onChange={(e) => setHatchDate(e.target.value)} className="muf-field" />
