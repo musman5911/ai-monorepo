@@ -216,6 +216,7 @@ export const api = {
   getMilk: (p?: { cowId?: string; from?: string; to?: string; month?: string }) => req('/milk' + qs(p)),
   getMilkPage: (p: { cowId?: string; month?: string; page: number; limit?: number }) =>
     req('/milk' + qs({ ...p, page: String(p.page), limit: String(p.limit || 50) }), {}, { includeMeta: true }),
+  getMilkSummary: (p: { cowId?: string; month?: string }) => req('/milk/summary' + qs(p)),
   bulkMilk: (entries: Array<{ cowId: string; date: string; morning: number; evening: number; calfMilk: number; buyerId?: string; forceOverwrite?: boolean }>) =>
     req('/milk/bulk', { method: 'POST', body: JSON.stringify({ entries }) }),
   addMilk: (data: object) => req('/milk', { method: 'POST', body: JSON.stringify(data) }),
