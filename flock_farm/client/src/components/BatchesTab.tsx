@@ -28,6 +28,8 @@ import {
   updateBatch,
   createBatchExpenseLog,
   createBatchFeedLog,
+  createBatchEggLog,
+  createBatchVaccinationLog,
   createBatchMortalityLog,
   createBatchSaleLog,
   deleteBatch,
@@ -42,6 +44,8 @@ import {
 import type {
   BatchDetail,
   BatchExpenseLog,
+  BatchEggLog,
+  BatchVaccinationLog,
   BatchFeedLog,
   BatchWeightLog,
   BatchMortalityLog,
@@ -62,9 +66,9 @@ interface BatchesTabProps {
   currentUser: AuthUser | null;
 }
 
-type DetailTab = 'overview' | 'feed' | 'mortality' | 'expense' | 'sales' | 'weight';
+type DetailTab = 'overview' | 'feed' | 'mortality' | 'expense' | 'sales' | 'weight' | 'eggs' | 'vaccination';
 
-type ModalKind = 'create' | 'edit' | 'intake' | 'feed' | 'mortality' | 'expense' | 'sale' | 'weight' | 'close' | 'delete';
+type ModalKind = 'create' | 'edit' | 'intake' | 'feed' | 'mortality' | 'expense' | 'sale' | 'weight' | 'egg' | 'vaccination' | 'close' | 'delete';
 
 // formatRs + normalizePublicAssetPath extracted to ./batches/batchUtils
 // (pure functions, no component state).
@@ -109,6 +113,8 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
   const [intakeForm, setIntakeForm] = useState({ count: '', cost_per_bird: '' });
   const [feedForm, setFeedForm] = useState({ date: todayStr(), feed_type: '', quantity_kg: '', rate_rs_per_kg: '', notes: '' });
   const [weightForm, setWeightForm] = useState({ date: todayStr(), avg_weight_g: '', sample_size: '', notes: '' });
+  const [eggForm, setEggForm] = useState({ date: todayStr(), collected: '', sold: '', home_use: '', broken_wasted: '', price_per_egg: '', notes: '' });
+  const [vaccinationForm, setVaccinationForm] = useState({ date: todayStr(), vaccine_name: '', dose: '', bird_count: '', cost: '', notes: '' });
   const [mortalityForm, setMortalityForm] = useState({ date: todayStr(), count: '', reason: '', notes: '' });
   const [expenseForm, setExpenseForm] = useState({ date: todayStr(), category: 'Medicine' as BatchExpenseLog['category'], detail: '', amount: '', notes: '' });
   const [saleForm, setSaleForm] = useState({ date: todayStr(), count: '', amount: '', buyer: '', notes: '' });
@@ -259,6 +265,29 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
         });
         setFeedForm({ date: todayStr(), feed_type: '', quantity_kg: '', rate_rs_per_kg: '', notes: '' });
       }
+      if (kind === 'egg') {
+        await createBatchEggLog(selectedBatch.batch_id, {
+          date: eggForm.date,
+          collected: parseInt(eggForm.collected) || 0,
+          sold: parseInt(eggForm.sold) || 0,
+          home_use: parseInt(eggForm.home_use) || 0,
+          broken_wasted: parseInt(eggForm.broken_wasted) || 0,
+          price_per_egg: parseFloat(eggForm.price_per_egg) || 0,
+          notes: eggForm.notes.trim() || undefined,
+        });
+        setEggForm({ date: todayStr(), collected: '', sold: '', home_use: '', broken_wasted: '', price_per_egg: '', notes: '' });
+      }
+      if (kind === 'vaccination') {
+        await createBatchVaccinationLog(selectedBatch.batch_id, {
+          date: vaccinationForm.date,
+          vaccine_name: vaccinationForm.vaccine_name.trim(),
+          dose: vaccinationForm.dose.trim() || undefined,
+          bird_count: parseInt(vaccinationForm.bird_count) || 0,
+          cost: parseFloat(vaccinationForm.cost) || 0,
+          notes: vaccinationForm.notes.trim() || undefined,
+        });
+        setVaccinationForm({ date: todayStr(), vaccine_name: '', dose: '', bird_count: '', cost: '', notes: '' });
+      }
       if (kind === 'weight') {
         await createBatchWeightLog(selectedBatch.batch_id, {
           date: weightForm.date,
@@ -336,7 +365,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
     }
   };
 
-  const handleDeleteLog = async (kind: 'feed' | 'mortality' | 'expense' | 'sale' | 'weight', logId: string) => {
+  const handleDeleteLog = async (kind: 'feed' | 'mortality' | 'expense' | 'sale' | 'weight' | 'egg' | 'vaccination', logId: string) => {
     if (!selectedBatch) return;
     const ok = await confirmAction({
       title: L('Delete Log Entry'),
@@ -500,6 +529,8 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
               {([
                 ['overview', L('Overview')],
                 ['feed', L('Feed Log')],
+                ['eggs', L('Eggs')],
+                ['vaccination', L('Vaccination')],
                 ['weight', L('Weight Log')],
                 ['mortality', L('Mortality Log')],
                 ['expense', L('Expense Log')],
@@ -605,6 +636,8 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
                   {canLog && detail.batch.status === 'Active' && (
                     <>
                       <button onClick={() => { setSelectedBatch(detail.batch); setActiveModal('feed'); }} className="px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">{L('Log Feed')}</button>
+                      <button onClick={() => { setSelectedBatch(detail.batch); setActiveModal('egg'); }} className="px-3 py-2 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold">{L('Log Eggs')}</button>
+                      <button onClick={() => { setSelectedBatch(detail.batch); setActiveModal('vaccination'); }} className="px-3 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">{L('Log Vaccination')}</button>
                       <button onClick={() => { setSelectedBatch(detail.batch); setActiveModal('weight'); }} className="px-3 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold">{L('Log Weight')}</button>
                       <button onClick={() => { setSelectedBatch(detail.batch); setActiveModal('mortality'); }} className="px-3 py-2 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold">{L('Log Mortality')}</button>
                       <button onClick={() => { setSelectedBatch(detail.batch); setActiveModal('expense'); }} className="px-3 py-2 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold">{L('Log Expense')}</button>
@@ -684,6 +717,39 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
               ['Buyer', (row: BatchSaleLog) => row.buyer || '—'],
               ['Notes', (row: BatchSaleLog) => row.notes || '—'],
             ]} />}
+            {detailTab === 'eggs' && (
+              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                <table className="w-full text-xs">
+                  <thead><tr className="bg-slate-50 dark:bg-slate-800 text-left">
+                    {['Date', 'Collected', 'Sold', 'Home use', 'Broken', 'Egg income', 'Notes', ''].map((label) => <th key={label} className="p-3">{label}</th>)}
+                  </tr></thead>
+                  <tbody>{detail.egg_logs.map((log: BatchEggLog) => (
+                    <tr key={log._id} className="border-t border-slate-100 dark:border-slate-800">
+                      <td className="p-3">{log.date}</td><td className="p-3">{log.collected}</td><td className="p-3">{log.sold}</td>
+                      <td className="p-3">{log.home_use}</td><td className="p-3">{log.broken_wasted}</td>
+                      <td className="p-3">{formatRs(log.sold * log.price_per_egg)}</td><td className="p-3">{log.notes || '—'}</td>
+                      <td className="p-3">{isAdmin && <button onClick={() => handleDeleteLog('egg', log._id)} className="text-rose-600 hover:text-rose-800">{L('Delete')}</button>}</td>
+                    </tr>
+                  ))}{detail.egg_logs.length === 0 && <tr><td colSpan={8} className="p-6 text-center text-slate-400">{L('No egg records yet.')}</td></tr>}</tbody>
+                </table>
+              </div>
+            )}
+            {detailTab === 'vaccination' && (
+              <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700">
+                <table className="w-full text-xs">
+                  <thead><tr className="bg-slate-50 dark:bg-slate-800 text-left">
+                    {['Date', 'Vaccine', 'Dose', 'Birds', 'Cost', 'Notes', ''].map((label) => <th key={label} className="p-3">{label}</th>)}
+                  </tr></thead>
+                  <tbody>{detail.vaccination_logs.map((log: BatchVaccinationLog) => (
+                    <tr key={log._id} className="border-t border-slate-100 dark:border-slate-800">
+                      <td className="p-3">{log.date}</td><td className="p-3">{log.vaccine_name}</td><td className="p-3">{log.dose || '—'}</td>
+                      <td className="p-3">{log.bird_count}</td><td className="p-3">{formatRs(log.cost)}</td><td className="p-3">{log.notes || '—'}</td>
+                      <td className="p-3">{isAdmin && <button onClick={() => handleDeleteLog('vaccination', log._id)} className="text-rose-600 hover:text-rose-800">{L('Delete')}</button>}</td>
+                    </tr>
+                  ))}{detail.vaccination_logs.length === 0 && <tr><td colSpan={7} className="p-6 text-center text-slate-400">{L('No vaccination records yet.')}</td></tr>}</tbody>
+                </table>
+              </div>
+            )}
           </div>
         )}
       </DetailModal>
@@ -811,6 +877,33 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
           </div>
           <textarea value={feedForm.notes} onChange={(e) => setFeedForm({ ...feedForm, notes: e.target.value })} placeholder={L('Notes')} className="w-full px-3 py-2 border rounded-xl h-20 resize-none" />
           <ModalActions submitting={submitting} onCancel={closeModal} submitLabel={L('Save Feed Log')} />
+        </form>
+      </BatchLogModal>
+
+      <BatchLogModal open={activeModal === 'egg'} onClose={closeModal} title={L('Log Egg Production')} subtitle={selectedBatch?.name} icon={<ShoppingBag className="w-5 h-5" />} iconBg="bg-amber-100 text-amber-700">
+        <form onSubmit={(e) => submitBatchLog(e, 'egg')} className="space-y-3 text-xs">
+          <input type="date" required value={eggForm.date} onChange={(e) => setEggForm({ ...eggForm, date: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+          <input type="number" min="0" required placeholder={L('Eggs collected')} value={eggForm.collected} onChange={(e) => setEggForm({ ...eggForm, collected: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+          <div className="grid grid-cols-3 gap-2">
+            <input type="number" min="0" placeholder={L('Sold')} value={eggForm.sold} onChange={(e) => setEggForm({ ...eggForm, sold: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+            <input type="number" min="0" placeholder={L('Home use')} value={eggForm.home_use} onChange={(e) => setEggForm({ ...eggForm, home_use: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+            <input type="number" min="0" placeholder={L('Broken / wasted')} value={eggForm.broken_wasted} onChange={(e) => setEggForm({ ...eggForm, broken_wasted: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+          </div>
+          <input type="number" min="0" step="0.01" placeholder={L('Price per egg')} value={eggForm.price_per_egg} onChange={(e) => setEggForm({ ...eggForm, price_per_egg: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+          <textarea value={eggForm.notes} onChange={(e) => setEggForm({ ...eggForm, notes: e.target.value })} placeholder={L('Notes')} className="w-full px-3 py-2 border rounded-xl h-20 resize-none" />
+          <ModalActions submitting={submitting} onCancel={closeModal} submitLabel={L('Save Egg Log')} />
+        </form>
+      </BatchLogModal>
+
+      <BatchLogModal open={activeModal === 'vaccination'} onClose={closeModal} title={L('Log Vaccination')} subtitle={selectedBatch?.name} icon={<Syringe className="w-5 h-5" />} iconBg="bg-indigo-100 text-indigo-700">
+        <form onSubmit={(e) => submitBatchLog(e, 'vaccination')} className="space-y-3 text-xs">
+          <input type="date" required value={vaccinationForm.date} onChange={(e) => setVaccinationForm({ ...vaccinationForm, date: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+          <input required placeholder={L('Vaccine name')} value={vaccinationForm.vaccine_name} onChange={(e) => setVaccinationForm({ ...vaccinationForm, vaccine_name: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+          <input placeholder={L('Dose')} value={vaccinationForm.dose} onChange={(e) => setVaccinationForm({ ...vaccinationForm, dose: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+          <input type="number" min="0" placeholder={L('Birds vaccinated')} value={vaccinationForm.bird_count} onChange={(e) => setVaccinationForm({ ...vaccinationForm, bird_count: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+          <input type="number" min="0" step="0.01" placeholder={L('Cost')} value={vaccinationForm.cost} onChange={(e) => setVaccinationForm({ ...vaccinationForm, cost: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
+          <textarea value={vaccinationForm.notes} onChange={(e) => setVaccinationForm({ ...vaccinationForm, notes: e.target.value })} placeholder={L('Notes')} className="w-full px-3 py-2 border rounded-xl h-20 resize-none" />
+          <ModalActions submitting={submitting} onCancel={closeModal} submitLabel={L('Save Vaccination')} />
         </form>
       </BatchLogModal>
 
