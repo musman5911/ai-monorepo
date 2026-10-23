@@ -23,7 +23,7 @@ cd ../../flock_farm/client && npm ci && npm run build
 cd ../../agri_farm/frontend && npm ci && npm run build
 ```
 
-The `tests/agri-runtime-api.integration.test.ts` test starts an isolated Agri backend in memory mode and exercises live HTTP requests for authentication, Owner/Manager/Worker authorization, farm reads, pagination headers and limits, invalid query handling, worker crop visibility, and all-or-nothing validation of finance bulk imports.
+The `tests/agri-runtime-api.integration.test.ts` test starts an isolated Agri backend in memory mode and exercises live HTTP requests for authentication, Owner/Manager/Worker authorization, farm reads, pagination headers and limits, invalid query handling, worker crop visibility, and all-or-nothing validation of finance bulk imports. It also checks that crop/task/finance page metadata stays consistent across adjacent requests, IDs do not duplicate across page boundaries, and unauthorized or invalid task bulk imports do not create partial records. These are runtime HTTP tests against the in-memory adapter, not production-MongoDB verification.
 
 ## Browser review matrix
 
@@ -42,4 +42,4 @@ For crops, tasks and finance, use enough disposable records to exceed one server
 
 ## Release gate
 
-Do not mark Phase 03 complete until automated checks and all role rows above have been reviewed. Record any environment-dependent skips explicitly rather than treating them as passes.
+Do not mark Phase 03 complete until automated checks and all role rows above have been reviewed. The current Agri frontend still hydrates the full crop/task/finance datasets by walking every server page during refresh; server pagination exists, but true on-demand network paging is not yet complete. Keep this acceptance item open until list screens request later pages only when the user asks for more and dashboard/report totals are preserved through complete-data or summary endpoints. Record any environment-dependent skips explicitly rather than treating them as passes.
