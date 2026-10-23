@@ -183,6 +183,16 @@ describe.sequential('Agri runtime API integration', () => {
     expect(cropPage.response.headers.get('x-total-pages')).toMatch(/^\d+$/);
     expect(cropPage.data).toHaveLength(2);
 
+    // Exercise a real second API page, not a sliced in-memory fixture.
+    const cropPageTwo = await request('/crops?skip=2&limit=2', { token: ownerToken });
+    expect(cropPageTwo.response.status).toBe(200);
+    expect(cropPageTwo.response.headers.get('x-page')).toBe('2');
+    expect(cropPageTwo.response.headers.get('x-page-size')).toBe('2');
+    expect(cropPageTwo.response.headers.get('x-total-count')).toBe(cropPage.response.headers.get('x-total-count'));
+    expect(cropPageTwo.data.length).toBeGreaterThan(0);
+    const cropIds = [...cropPage.data, ...cropPageTwo.data].map((row) => String(row._id));
+    expect(new Set(cropIds).size).toBe(cropIds.length);
+
     const taskPage = await request('/tasks?skip=0&limit=1', { token: ownerToken });
     expect(taskPage.response.status).toBe(200);
     expect(taskPage.response.headers.get('x-total-count')).toMatch(/^\d+$/);
@@ -202,10 +212,24 @@ describe.sequential('Agri runtime API integration', () => {
   });
 
   it('rejects invalid pagination and validates bulk rows before writing any of them', async () => {
-    for (const query of ['skip=-1&limit=10', 'skip=0&limit=0', 'skip=1.5&limit=10', 'skip=0&limit=abc']) {
-      const result = await request(`/crops?${query}`, { token: ownerToken });
-      expect(result.response.status, query).toBe(400);
+    for (const route of ['/crops', '/tasks', '/finance']) {
+      for (const query of ['skip=-1&limit=10', 'skip=0&limit=0', 'skip=1.5&limit=10', 'skip=0&limit=abc']) {
+        const result = await request(`${route}?${query}`, { token: ownerToken });
+        expect(result.response.status, `${route}? ${query}`).toBe(400);
+      }
     }
+
+    const oversized = await request('/tasks?skip=0&limit=999999', { token: ownerToken });
+    expect(oversized.response.status).toBe(200);
+    expect(oversized.response.headers.get('x-page-size')).toBe('500');
+    expect(oversized.data.length).toBeLessThanOrEqual(500);
+
+    const workerCannotWriteFinance = await request('/finance', {
+      method: 'POST',
+      token: workerToken,
+      body: { category: 'forbidden write', type: 'expense', amount: 1, date: '2026-10-23' },
+    });
+    expect(workerCannotWriteFinance.response.status).toBe(403);
 
     const before = await request('/finance?skip=0&limit=500', { token: ownerToken });
     const invalid = await request('/finance/bulk', {
@@ -222,12 +246,55 @@ describe.sequential('Agri runtime API integration', () => {
     expect(Number(after.response.headers.get('x-total-count'))).toBe(Number(before.response.headers.get('x-total-count')));
   });
 
-  it('filters completed crop history from worker responses and allows assigned-farm reads', async () => {
+  it('filters completed crop history and enforces worker task-assignment authorization', async () => {
     const workerCrops = await request('/crops?skip=0&limit=500', { token: workerToken });
     expect(workerCrops.response.status).toBe(200);
     expect(workerCrops.data.every((crop) => crop.status !== 'Completed')).toBe(true);
-    const workerTasks = await request('/tasks?skip=0&limit=1', { token: workerToken });
-    expect(workerTasks.response.status).toBe(200);
-    expect(workerTasks.data.length).toBeLessThanOrEqual(1);
+
+    const suffix = `runtime-auth-${process.pid}-${Date.now()}`;
+    const unassignedTask = await request('/tasks', {
+      method: 'POST',
+      token: ownerToken,
+      body: { title: `${suffix}-unassigned`, assigned_to: 'someone-else', priority: 'Medium' },
+    });
+    expect(unassignedTask.response.status).toBe(201);
+
+    const taskRows = await request('/tasks?skip=0&limit=500', { token: ownerToken });
+    const unassigned = taskRows.data.find((row) => row.title === `${suffix}-unassigned`);
+    expect(unassigned).toBeTruthy();
+    if (unassigned) {
+      created.tasks.push(String(unassigned._id));
+      const forbiddenCompletion = await request(`/tasks/${unassigned._id}`, {
+        method: 'PATCH',
+        token: workerToken,
+      });
+      expect(forbiddenCompletion.response.status).toBe(403);
+    }
+
+    const assignedTask = await request('/tasks', {
+      method: 'POST',
+      token: ownerToken,
+      body: { title: `${suffix}-assigned`, assigned_to: 'worker', priority: 'Medium' },
+    });
+    expect(assignedTask.response.status).toBe(201);
+    const refreshedTasks = await request('/tasks?skip=0&limit=500', { token: ownerToken });
+    const assigned = refreshedTasks.data.find((row) => row.title === `${suffix}-assigned`);
+    expect(assigned).toBeTruthy();
+    if (assigned) {
+      created.tasks.push(String(assigned._id));
+      const allowedCompletion = await request(`/tasks/${assigned._id}`, {
+        method: 'PATCH',
+        token: workerToken,
+      });
+      expect(allowedCompletion.response.status).toBe(200);
+      expect(allowedCompletion.data.status).toBe('ok');
+      expect(allowedCompletion.data.already_completed).not.toBe(true);
+      const repeatedCompletion = await request(`/tasks/${assigned._id}`, {
+        method: 'PATCH',
+        token: workerToken,
+      });
+      expect(repeatedCompletion.response.status).toBe(200);
+      expect(repeatedCompletion.data.already_completed).toBe(true);
+    }
   });
 });
