@@ -43,7 +43,7 @@ function buildMilkFilter(query) {
   }
   if (query.month) {
     const month = String(query.month);
-    if (!/^\\d{4}-\\d{2}$/.test(month)) throw new Error('month must use YYYY-MM');
+    if (!/^\d{4}-\d{2}$/.test(month)) throw new Error('month must use YYYY-MM');
     const [y, m] = month.split('-').map(Number);
     if (m < 1 || m > 12) throw new Error('month must use YYYY-MM');
     const startDate = `${y}-${String(m).padStart(2, '0')}-01`;
@@ -64,11 +64,11 @@ router.get('/summary', protect, async (req, res) => {
       Buyer.find().lean(),
     ]);
     const timeline = [];
-    if (currentRate?.date && /^\\d{4}-\\d{2}-\\d{2}$/.test(currentRate.date) && Number.isFinite(currentRate.value)) {
+    if (currentRate?.date && /^\d{4}-\d{2}-\d{2}$/.test(currentRate.date) && Number.isFinite(currentRate.value)) {
       timeline.push({ date: currentRate.date, value: currentRate.value });
     }
     for (const item of history || []) {
-      if (item?.date && /^\\d{4}-\\d{2}-\\d{2}$/.test(item.date) && Number.isFinite(item.value)) {
+      if (item?.date && /^\d{4}-\d{2}-\d{2}$/.test(item.date) && Number.isFinite(item.value)) {
         timeline.push({ date: item.date, value: item.value });
       }
     }
