@@ -2,7 +2,7 @@ name: MUF frontend checks
 
 on:
   push:
-    branches: [main]
+    branches: [main, muf-monorepo]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -43,6 +43,9 @@ jobs:
 
       - name: Run root regression tests
         run: npm test
+
+      - name: Check farm scoping
+        run: npm run check-farms
 
       - name: Check shared MUF parity
         run: node tools/check-muf-sync.js
