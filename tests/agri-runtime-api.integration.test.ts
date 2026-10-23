@@ -211,6 +211,52 @@ describe.sequential('Agri runtime API integration', () => {
     }
   });
 
+  it('keeps page metadata and row identities consistent across every Agri list endpoint', async () => {
+    for (const route of ['/crops', '/tasks', '/finance']) {
+      const first = await request(`${route}?skip=0&limit=1`, { token: ownerToken });
+      const second = await request(`${route}?skip=1&limit=1`, { token: ownerToken });
+      expect(first.response.status, route).toBe(200);
+      expect(second.response.status, route).toBe(200);
+      expect(first.response.headers.get('x-total-count'), route).toMatch(/^\\d+$/);
+      expect(second.response.headers.get('x-total-count'), route).toBe(first.response.headers.get('x-total-count'));
+      expect(first.response.headers.get('x-page'), route).toBe('1');
+      expect(second.response.headers.get('x-page'), route).toBe('2');
+      expect(first.response.headers.get('x-page-size'), route).toBe('1');
+      expect(second.response.headers.get('x-page-size'), route).toBe('1');
+      expect(first.response.headers.get('x-total-pages'), route).toBe(second.response.headers.get('x-total-pages'));
+      expect(Array.isArray(first.data), route).toBe(true);
+      expect(Array.isArray(second.data), route).toBe(true);
+      const ids = [...first.data, ...second.data].map((row) => String(row._id));
+      expect(new Set(ids).size, route).toBe(ids.length);
+    }
+  });
+
+  it('rejects unauthorized and invalid task bulk imports without creating partial records', async () => {
+    const suffix = `runtime-task-bulk-${process.pid}-${Date.now()}`;
+    const denied = await request('/tasks/bulk', {
+      method: 'POST',
+      token: workerToken,
+      body: { rows: [{ title: `${suffix}-worker`, priority: 'Low' }] },
+    });
+    expect(denied.response.status).toBe(403);
+
+    const before = await request('/tasks?skip=0&limit=500', { token: ownerToken });
+    const invalid = await request('/tasks/bulk', {
+      method: 'POST',
+      token: ownerToken,
+      body: { rows: [
+        { title: `${suffix}-valid`, priority: 'Low' },
+        { title: '', priority: 'Impossible', labor_cost: -1 },
+      ] },
+    });
+    expect(invalid.response.status).toBe(400);
+    expect(invalid.data.details.length).toBeGreaterThan(0);
+    const after = await request('/tasks?skip=0&limit=500', { token: ownerToken });
+    expect(after.response.status).toBe(200);
+    expect(Number(after.response.headers.get('x-total-count'))).toBe(Number(before.response.headers.get('x-total-count')));
+    expect(after.data.some((row) => String(row.title || '').startsWith(suffix))).toBe(false);
+  });
+
   it('rejects invalid pagination and validates bulk rows before writing any of them', async () => {
     for (const route of ['/crops', '/tasks', '/finance']) {
       for (const query of ['skip=-1&limit=10', 'skip=0&limit=0', 'skip=1.5&limit=10', 'skip=0&limit=abc']) {
