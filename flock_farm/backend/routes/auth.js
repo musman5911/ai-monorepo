@@ -303,7 +303,7 @@ router.patch('/users/:id', authRequired, requireRole('owner'), async (req, res) 
       }
       updates.passwordHash = await User.hashPassword(String(password));
     }
-    if (role !== undefined) updates.role = role === 'admin' ? 'admin' : 'worker';
+    if (role !== undefined) updates.role = role === 'admin' || role === 'owner' ? 'owner' : 'worker';
     if (displayName !== undefined) updates.displayName = String(displayName);
     if (active !== undefined) updates.active = Boolean(active);
     if (email !== undefined) {
