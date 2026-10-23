@@ -132,7 +132,7 @@ router.post('/login', async (req, res) => {
 
 // GET /api/auth/me -> current user
 router.get('/me', authRequired, (req, res) => {
-  res.json({ user: req.user });
+  res.json({ user: { ...req.user, role: req.user.legacyRole || req.user.role } });
 });
 
 // POST /api/auth/logout -> clear cookie
