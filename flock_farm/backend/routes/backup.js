@@ -15,6 +15,9 @@ import BatchMortalityLog from '../models/BatchMortalityLog.js';
 import BatchExpenseLog from '../models/BatchExpenseLog.js';
 import BatchSaleLog from '../models/BatchSaleLog.js';
 import BatchWeightLog from '../models/BatchWeightLog.js';
+import BatchEggLog from '../models/BatchEggLog.js';
+import BatchVaccinationLog from '../models/BatchVaccinationLog.js';
+import { acquireEggInventoryLocks } from '../egg-inventory-lock.mjs';
 import Farm from '../models/Farm.js';
 import { mufGetDefaultFarmId, mufIsOwner, mufRunUnscoped } from '../muf-farms.mjs';
 
@@ -40,9 +43,14 @@ const BATCH_MODELS = {
   batchExpenseLogs: BatchExpenseLog,
   batchSaleLogs: BatchSaleLog,
   batchWeightLogs: BatchWeightLog,
+  batchEggLogs: BatchEggLog,
+  batchVaccinationLogs: BatchVaccinationLog,
 };
 
 async function collectBackupPayload() {
+  const farmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
+  const releaseLocks = await acquireEggInventoryLocks(DataStore, farmIds);
+  try {
   const payload = {
     exportDate: new Date().toISOString(),
     farmName: 'Usman Flock Farm',
@@ -69,6 +77,9 @@ async function collectBackupPayload() {
     payload[name] = docs.map((d) => { const o = { ...d }; delete o._id; delete o.__v; return o; });
   }
   return payload;
+  } finally {
+    await releaseLocks();
+  }
 }
 
 async function restoreBackupPayload(payload) {
@@ -198,15 +209,29 @@ router.post('/backup/auto/run', authRequired, ownerUnscoped, async (_req, res) =
 
 // POST /api/backup/restore-auto — restore the whole DB from the auto-backup
 router.post('/backup/restore-auto', authRequired, ownerUnscoped, async (_req, res) => {
+  let releaseLocks;
   try {
     const existing = await DataStore.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
     if (!value || !value.payload) return res.status(404).json({ error: 'No auto-backup available yet' });
-    await restoreBackupPayload(value.payload);
+    const payload = value.payload;
+    const existingFarmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
+    const backupFarmIds = [
+      ...(Array.isArray(payload.farms) ? payload.farms.map((farm) => farm.id || farm._id) : []),
+      ...Object.values(payload.farmBuckets || {}).flatMap((rows) => Array.isArray(rows) ? rows.map((row) => row?.farmId) : []),
+    ];
+    releaseLocks = await acquireEggInventoryLocks(DataStore, [...existingFarmIds, ...backupFarmIds]);
+    await restoreBackupPayload(payload);
     res.json({ ok: true, message: `Restored from ${value.name}` });
   } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
     console.error('POST /api/backup/restore-auto error:', err);
     res.status(500).json({ error: `Restore failed: ${err.message}` });
+  } finally {
+    if (releaseLocks) {
+      try { await releaseLocks(); }
+      catch (releaseError) { console.error('Failed to release egg inventory locks after restore:', releaseError); }
+    }
   }
 });
 
