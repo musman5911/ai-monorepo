@@ -634,6 +634,21 @@ export async function createBatchEggLog(batchId: string, payload: {
   return data.log;
 }
 
+export async function createBatchEggLogsBulk(batchId: string, entries: Array<{
+  date: string;
+  collected: number;
+  sold: number;
+  home_use: number;
+  broken_wasted: number;
+  price_per_egg: number;
+  notes?: string;
+}>): Promise<{ saved: number; failed: number; results: Array<{ index: number; ok: boolean; error?: string }> }> {
+  return authedJson<{ saved: number; failed: number; results: Array<{ index: number; ok: boolean; error?: string }> }>(
+    `${BATCH_BASE}/${encodeURIComponent(batchId)}/egg-logs/bulk`,
+    { method: 'POST', body: JSON.stringify({ entries }) },
+  );
+}
+
 export async function createBatchVaccinationLog(batchId: string, payload: {
   date: string;
   vaccine_name: string;
