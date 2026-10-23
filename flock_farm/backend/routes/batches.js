@@ -46,6 +46,31 @@ async function getBatchByCode(batchId) {
   return Batch.findOne({ batch_id: batchId });
 }
 
+async function findLinkedBatchHistory() {
+  const [incubation, laborAttendance] = await Promise.all([
+    DataStore.findOne({ key: 'incubation' }),
+    DataStore.findOne({ key: 'laborAttendance' }),
+  ]);
+  const linkedIncubation = Array.isArray(incubation?.value)
+    ? incubation.value.filter((record) => String(record?.sourceBatchId || '').trim())
+    : [];
+  const linkedAttendance = Array.isArray(laborAttendance?.value)
+    ? laborAttendance.value.filter((record) => String(record?.batchId || '').trim())
+    : [];
+  return { linkedIncubation: linkedIncubation.length, linkedAttendance: linkedAttendance.length };
+}
+
+function linkedHistoryConflict(counts) {
+  const total = counts.linkedIncubation + counts.linkedAttendance;
+  return total ? {
+    error: 'Batch data cannot be replaced or wiped while incubation or labor history is linked to batches. Unlink or export and reconcile those records first.',
+    code: 'BATCH_HAS_LINKED_HISTORY',
+    linkedIncubationRecords: counts.linkedIncubation,
+    linkedLaborRecords: counts.linkedAttendance,
+  } : null;
+}
+
+
 async function computeBatchSummary(batchId) {
   const [batch, feedLogs, mortalityLogs, expenseLogs, salesLogs, eggLogs, vaccinationLogs] = await Promise.all([
     getBatchByCode(batchId),
@@ -137,6 +162,8 @@ function stripMeta({ _id, __v, ...rest }) {
 
 router.post('/batches/import-all', authRequired, requireRole('admin'), async (req, res) => {
   try {
+    const historyConflict = linkedHistoryConflict(await findLinkedBatchHistory());
+    if (historyConflict) return res.status(409).json(historyConflict);
     const batches = Array.isArray(req.body?.batches) ? req.body.batches.map(stripMeta) : [];
     const feed_logs = Array.isArray(req.body?.feed_logs) ? req.body.feed_logs.map(stripMeta) : [];
     const mortality_logs = Array.isArray(req.body?.mortality_logs) ? req.body.mortality_logs.map(stripMeta) : [];
@@ -219,6 +246,8 @@ router.post('/batches/import-all', authRequired, requireRole('admin'), async (re
 
 router.delete('/batches/wipe-all', authRequired, requireRole('admin'), async (_req, res) => {
   try {
+    const historyConflict = linkedHistoryConflict(await findLinkedBatchHistory());
+    if (historyConflict) return res.status(409).json(historyConflict);
     await Promise.all([
       Batch.deleteMany({}),
       BatchFeedLog.deleteMany({}),
