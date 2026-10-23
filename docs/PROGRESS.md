@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Phase 2 implementation started: Flock now opens on Batches; final browser/role review remains deferred until all phases are complete).
+Last updated: 2026-10-23 (owner's local checks verified on muf-monorepo; Phase 2 remains partial because the five main Flock sections are not yet fully batch-driven).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
@@ -12,8 +12,8 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 | Phase | State |
 |---|---|
 | 0. Docs reset and repository cleanup | Done. Applied by the owner, pushed to the `muf-monorepo` branch, owner's checks and builds all passed |
-| 1. Farms and roles (MUF) | In progress. Backend phases 1A/1B exist; Phase 1C farm switcher/screens added to source; automated validation, permission review, migration-on-copy checks and Phase 1D wrap-up remain open |
-| 2. Flock restructure and Home Birds | In progress. Batches default; Home Birds navigation narrowed; batch egg and vaccination logs added to source. Build/tests pending |
+| 1. Farms and roles (MUF) | Implementation substantially delivered; local farm-scope, shared-MUF and UI checks pass. Disposable database-copy migration/backup checks remain open; final browser/role review is deferred until all phases finish |
+| 2. Flock restructure and Home Birds | Partial. Batches default and batch egg/vaccination logs plus calculations are implemented and automated checks pass. Dashboard, Health, Labors, Incubation and Summary are not yet all batch-driven; backup/restore copy validation remains open |
 | 3. Bulk entry, scroll loading, server totals | Not started |
 | 4. Dairy breeding; Agri fields and seasons | Not started |
 | 5. Photo storage and Cloudinary | Not started. Prerequisite done: free Cloudinary account created 2026-10-22 |
@@ -35,9 +35,12 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 - **Hosting:** the owner uses the free MongoDB tier and Replit, so size and quota limits matter (see `DEPLOYMENT.md`).
 - **MU Farms shop:** later. There is no budget for a new domain; where it lives is decided in Phase 7.
 
-## Current owner action
+## Current status and next action
 
-- **Finish Phase 1 validation:** all three frontend builds and the listed automated checks are reported passing. Next, browser-test farm switching and Owner/Manager/Worker permissions in all three apps, review Flock backup/restore behavior, then run migration dry-runs against disposable database copies. Do not run migrations on live data. The local Flock lockfile diff is only a dependency-list reorder plus final newline in the supplied diff; leave it uncommitted unless a dependency install requires it.
+- The owner synced local `muf-monorepo` to `2d4d788` and reported a clean working tree. `npm test` passed 89 tests across 9 files; `npm run check-farms`, `npm run check-ui`, `npm run check-sync`, and `npm run check-workbench` passed; the Flock client `npm run build` passed; and `npm run check-workbench-runtime` passed all 8 checks after starting the Dairy Vite server on port 5000. These are local results supplied by the owner, not a claim that every workflow was browser-tested.
+- Continue Phase 2 implementation: make Dashboard, Health, Labors, Incubation and Summary derive their primary information from batches; keep Home Birds secondary with Bird List, Bird Details, Eggs, Monthly Report and Vaccination only. Inspect batch backup/restore compatibility and validate on a disposable copy.
+- Phase 1 still needs disposable database-copy migration tests and backup/restore review. Per owner direction, defer all browser/end-to-end role testing to one final pass after every planned phase. Never run migrations against live data without explicit approval.
+- Dependency audit warnings were reported by `npm ci`: root 5 vulnerabilities (1 moderate, 2 high, 2 critical), Flock backend 6 (4 moderate, 2 high), Flock client 3 (2 high, 1 critical). Investigate with targeted updates in the planned security work; do not use blanket `npm audit fix --force`.
 
 ## Phase 1 step 1B-2: Flock backend (in progress, 2026-10-23)
 
@@ -261,5 +264,7 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - **Tests added:** `tests/flock-batch-math.test.ts` covers valid/invalid egg counts and batch revenue/expense/profit calculations. `tools/check-farm-scope.js` now also exercises batch egg/vaccination creation, farm stamps, detail history and summary totals.
 - **CI passed on GitHub Actions:** run [39906995155](https://github.com/musman5911/ai-monorepo/actions/runs/39906995155), commit `50bb799`, completed successfully after the new batch-log scope assertions were added. Root tests, `check-farms` (including egg/vaccination log farm stamps and summary totals), MUF parity, UI safety, workbench checks/runtime, design-system audit, and all three app builds passed.
 - The first CI pass caught and led to fixes for the missing `Egg` icon import and an outdated UI-safety expectation for the intentionally simplified Flock navigation. Those fixes are included in the passing run.
-- Browser/end-to-end role testing remains deferred to the final project-wide pass. No data migration has been run.
-- No data migration has been run and no live data was touched. New log collections are additive; verify backup/restore compatibility before treating this phase as complete.
+- **Owner's local automated validation (2026-10-23):** `npm test` passed 89 tests across 9 files; `npm run check-farms`, `npm run check-ui`, `npm run check-sync`, and `npm run check-workbench` passed; `flock_farm/client` `npm run build` passed TypeScript and Vite production build; `npm run check-workbench-runtime` passed 8/8 checks with the Dairy Vite dev server running on port 5000. `npm run check-ui-safety` and `npm run check-muf-parity` were initially attempted as nonexistent script names; the actual `check-ui` and `check-sync` scripts then passed.
+- `npm ci` reported dependency audit findings: root 5 vulnerabilities (1 moderate, 2 high, 2 critical), Flock backend 6 (4 moderate, 2 high), and Flock client 3 (2 high, 1 critical). No automatic or forced audit fix was run.
+- **Still incomplete:** Dashboard, Health, Labors, Incubation and Summary are not yet all fully batch-driven. The current work establishes batch logs/calculations and narrows Home Birds navigation, but does not complete the user's intended primary workflow.
+- Browser/end-to-end role testing remains deferred to the final project-wide pass. No real-data migration was run and no live data was touched. New log collections are additive, but backup/restore compatibility must be checked on a disposable copy before calling Phase 2 complete.
