@@ -14,6 +14,8 @@ import DetailModal from '../muf/core/muf-modal';
 
 interface MilkTabProps { isAdmin: boolean; canDelete?: boolean; }
 
+function historyRecordsRemaining(total: number, loaded: number): number { return Math.max(0, total - loaded); }
+
 /** Cows that can appear on the daily milk sheet (not sold/inactive/male). */
 function isMilkEligible(cow: Cow): boolean {
   if (cow.gender === 'male') return false;
@@ -34,6 +36,10 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
   const [rate, setRate] = useState(0);
   const [rateDate, setRateDate] = useState('');
   const [rateHistory, setRateHistory] = useState<RateHistory[]>([]);
+  const [historyPage, setHistoryPage] = useState(1);
+  const [historyTotalCount, setHistoryTotalCount] = useState(0);
+  const [historyHasMore, setHistoryHasMore] = useState(false);
+  const [loadingMoreHistory, setLoadingMoreHistory] = useState(false);
 
   const [dailyEntries, setDailyEntries] = useState<Record<string, { morning: string; evening: string; calfMilk: string; buyerId: string; existingId?: string }>>({});
   const [showEntryPopup, setShowEntryPopup] = useState(false);
@@ -48,16 +54,28 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
         ? { month: historyMonth, cowId: historyCowFilter || undefined }
         : { from: selectedDate, to: selectedDate };
 
-      const [cowsData, milkData, rateData, rateHist, buyersData] = await Promise.all([
+      const [cowsData, milkResult, rateData, rateHist, buyersData] = await Promise.all([
         api.getCows(),
-        api.getMilk(fetchOpts),
+        viewMode === 'history'
+          ? api.getMilkPage({ month: historyMonth, cowId: historyCowFilter || undefined, page: 1, limit: 50 })
+          : api.getMilk(fetchOpts),
         api.getRate(),
         api.getRateHistory(),
         api.getBuyers().catch(() => []),
       ]);
+      const milkData: MilkEntry[] = viewMode === 'history' ? milkResult.data : milkResult;
 
       setCows(cowsData);
       setMilkRecords(milkData);
+      if (viewMode === 'history') {
+        setHistoryPage(1);
+        setHistoryTotalCount(milkResult.total);
+        setHistoryHasMore(milkResult.page < milkResult.totalPages);
+      } else {
+        setHistoryPage(1);
+        setHistoryTotalCount(0);
+        setHistoryHasMore(false);
+      }
       setRate(rateData?.value || 0);
       setRateDate(rateData?.date || '');
       setRateHistory(rateHist);
@@ -85,6 +103,30 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
   };
 
   useEffect(() => { fetchData(); }, [selectedDate, viewMode, historyMonth, historyCowFilter]);
+
+  const loadMoreHistory = async () => {
+    if (loadingMoreHistory || !historyHasMore) return;
+    try {
+      setLoadingMoreHistory(true);
+      const result = await api.getMilkPage({
+        month: historyMonth,
+        cowId: historyCowFilter || undefined,
+        page: historyPage + 1,
+        limit: 50,
+      });
+      setMilkRecords(previous => {
+        const known = new Set(previous.map(row => row._id));
+        return [...previous, ...result.data.filter((row: MilkEntry) => !known.has(row._id))];
+      });
+      setHistoryPage(result.page);
+      setHistoryTotalCount(result.total);
+      setHistoryHasMore(result.page < result.totalPages);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Failed to load more milk history', 'error');
+    } finally {
+      setLoadingMoreHistory(false);
+    }
+  };
 
   const handleSaveRow = async (cowId: string) => {
     const entry = dailyEntries[cowId];
@@ -370,7 +412,7 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
                 <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{monthLabel(historyMonth)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">{L('Total Milk')}</p>
+                <p className="text-xs text-slate-400 uppercase">{L('Loaded Milk')}</p>
                 <p className="text-lg font-bold text-farm-600">{fmtL(historyTotal)}</p>
                 <p className="text-[10px] text-slate-400">Saleable {fmtL(historySaleable)}</p>
               </div>
@@ -379,8 +421,8 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
                 <p className="text-lg font-bold text-emerald-600">{fmtPKR(historyRevenue)}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-400 uppercase">{L('Records')}</p>
-                <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{historyByCow.length}</p>
+                <p className="text-xs text-slate-400 uppercase">{L('Records Loaded')}</p>
+                <p className="text-lg font-bold text-slate-800 dark:text-slate-100">{historyByCow.length} / {historyTotalCount}</p>
               </div>
             </div>
           </div>
@@ -442,6 +484,14 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
               </table>
             </div>
           </div>
+          {historyHasMore && (
+            <div className="flex justify-center">
+              <button type="button" onClick={loadMoreHistory} disabled={loadingMoreHistory}
+                className="muf-btn muf-btn-secondary disabled:opacity-50">
+                {loadingMoreHistory ? L('Loading...') : L('Load 50 More')} ({historyRecordsRemaining(historyTotalCount, milkRecords.length)} {L('remaining')})
+              </button>
+            </div>
+          )}
         </div>
       )}
 
