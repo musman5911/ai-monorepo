@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { acquireEggInventoryLock, FLOCK_EGG_INVENTORY_LOCK_KEY } from '../flock_farm/backend/egg-inventory-lock.mjs';
+import { acquireEggInventoryLock, acquireEggInventoryLocks, FLOCK_EGG_INVENTORY_LOCK_KEY } from '../flock_farm/backend/egg-inventory-lock.mjs';
 
 function createAtomicStore() {
   let lock = null;
@@ -24,6 +24,35 @@ function createAtomicStore() {
       return null;
     },
     hasLock() { return Boolean(lock); },
+  };
+}
+
+
+function createFarmStore() {
+  const locks = new Map();
+  let nextId = 1;
+  return {
+    async create(doc) {
+      const key = String(doc.farmId || 'default');
+      if (locks.has(key)) {
+        const error = new Error('duplicate key');
+        error.code = 11000;
+        throw error;
+      }
+      const created = { ...doc, _id: String(nextId++) };
+      locks.set(key, created);
+      return created;
+    },
+    async findOneAndDelete(filter) {
+      const key = String(filter.farmId || 'default');
+      const current = locks.get(key);
+      if (current && current._id === filter._id) {
+        locks.delete(key);
+        return current;
+      }
+      return null;
+    },
+    hasFarm(farmId) { return locks.has(String(farmId || 'default')); },
   };
 }
 
@@ -59,4 +88,26 @@ describe('Flock egg inventory lock', () => {
     };
     await expect(acquireEggInventoryLock(store)).rejects.toThrow('database unavailable');
   });
+  it('acquires whole-farm lock sets in a stable deduplicated order and releases all', async () => {
+    const store = createFarmStore();
+    const release = await acquireEggInventoryLocks(store, ['farm-b', 'farm-a', 'farm-b']);
+    expect(store.hasFarm('farm-a')).toBe(true);
+    expect(store.hasFarm('farm-b')).toBe(true);
+    await release();
+    expect(store.hasFarm('farm-a')).toBe(false);
+    expect(store.hasFarm('farm-b')).toBe(false);
+  });
+
+  it('rolls back earlier locks when a later farm lock is already held', async () => {
+    const store = createFarmStore();
+    const releaseExisting = await acquireEggInventoryLock(store, 'farm-b');
+    await expect(acquireEggInventoryLocks(store, ['farm-a', 'farm-b'])).rejects.toMatchObject({
+      status: 409,
+      code: 'EGG_INVENTORY_BUSY',
+    });
+    expect(store.hasFarm('farm-a')).toBe(false);
+    expect(store.hasFarm('farm-b')).toBe(true);
+    await releaseExisting();
+  });
+
 });
