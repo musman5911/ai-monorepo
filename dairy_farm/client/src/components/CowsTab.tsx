@@ -34,6 +34,12 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
   const confirmAction = useConfirm();
   const [cows, setCows] = useState<Cow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [page, setPage] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [statsData, setStatsData] = useState({ total: 0, female: 0, male: 0, active: 0, pregnant: 0, dry: 0, calf: 0, sold: 0 });
+  const [mothers, setMothers] = useState<Cow[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [showCalfForm, setShowCalfForm] = useState(false);
   const [editingCow, setEditingCow] = useState<Cow | null>(null);
@@ -61,26 +67,54 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
     weight: '', notes: '', nursingMonths: 2.5, purchasePrice: '',
   });
 
-  const loadCows = async () => {
+  const loadCows = async (append = false) => {
     try {
-      setLoading(true);
-      const [data, batchData] = await Promise.all([api.getCows(), api.getCowBatches()]);
-      setCows(data);
+      if (append) setLoadingMore(true);
+      else setLoading(true);
+      const query = {
+        page: append ? page + 1 : 1,
+        limit: 50,
+        search: search.trim() || undefined,
+        batch: batchFilter || undefined,
+        status: statusFilter !== 'all' && statusFilter !== 'female' && statusFilter !== 'male' ? statusFilter : undefined,
+        gender: statusFilter === 'female' ? 'female' : statusFilter === 'male' ? 'male' : undefined,
+      };
+      const [pageData, batchData, stats, motherData] = await Promise.all([
+        api.getCowPage(query),
+        api.getCowBatches(),
+        api.getCowStats(),
+        api.getCowMothers(),
+      ]);
+      setCows(previous => {
+        if (!append) return pageData.data;
+        const known = new Set(previous.map(cow => cow._id));
+        return [...previous, ...pageData.data.filter((cow: Cow) => !known.has(cow._id))];
+      });
+      setPage(pageData.page);
+      setTotalCount(pageData.total);
+      setHasMore(pageData.page < pageData.totalPages);
       setBatches(batchData);
+      setStatsData(stats);
+      setMothers(motherData);
     } catch (error) {
       console.error('Failed to load cows:', error);
+      if (!append) notify(error instanceof Error ? error.message : 'Failed to load animals', 'error');
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  useEffect(() => { loadCows(); }, []);
+  useEffect(() => {
+    const timer = window.setTimeout(() => { void loadCows(false); }, 250);
+    return () => window.clearTimeout(timer);
+  }, [search, statusFilter, batchFilter]);
 
   useEffect(() => {
-    const handleOfflineSynced = () => { void loadCows(); };
+    const handleOfflineSynced = () => { void loadCows(false); };
     window.addEventListener('dm:offline-synced', handleOfflineSynced);
     return () => window.removeEventListener('dm:offline-synced', handleOfflineSynced);
-  }, []);
+  }, [search, statusFilter, batchFilter, page]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -189,16 +223,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
     setEditingCow(null);
   };
 
-  const stats = {
-    total: cows.length,
-    female: cows.filter(c => c.gender !== 'male').length,
-    male: cows.filter(c => c.gender === 'male').length,
-    active: cows.filter(c => c.status === 'active').length,
-    pregnant: cows.filter(c => c.status === 'pregnant').length,
-    dry: cows.filter(c => c.status === 'dry').length,
-    calf: cows.filter(c => c.status === 'calf').length,
-    sold: cows.filter(c => c.status === 'sold').length,
-  };
+  const stats = statsData;
 
   const statCards = [
     { label: 'Total', value: stats.total, filter: 'all' as const, icon: Tag, color: 'text-slate-600' },
@@ -211,24 +236,16 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
     { label: 'Sold', value: stats.sold, filter: 'sold' as const, icon: Banknote, color: 'text-purple-600' },
   ];
 
-  const filteredCows = cows.filter(cow => {
-    const matchesSearch = cow.name.toLowerCase().includes(search.toLowerCase()) || cow._id.toLowerCase().includes(search.toLowerCase());
-    let matchesFilter = true;
-    if (statusFilter === 'female') matchesFilter = cow.gender !== 'male';
-    else if (statusFilter === 'male') matchesFilter = cow.gender === 'male';
-    else if (statusFilter !== 'all') matchesFilter = cow.status === statusFilter;
-    const matchesBatch = !batchFilter || cow.batch === batchFilter;
-    return matchesSearch && matchesFilter && matchesBatch;
-  });
+  const filteredCows = cows;
 
-  const activeMothers = cows.filter(c => (c.status === 'active' || c.status === 'dry') && c.gender !== 'male');
+  const activeMothers = mothers;
 
   // ── Grid view items (muf-entity-grid) ─────────────
   const statusToneMap: Record<CowStatus, 'good' | 'warn' | 'bad' | 'info' | 'muted'> = {
     active: 'good', pregnant: 'info', dry: 'warn', calf: 'good', sold: 'muted', inactive: 'muted',
   };
   const gridItems = filteredCows.map((cow) => {
-    const mother = cow.motherId ? cows.find(c => c._id === cow.motherId) : null;
+    const mother = cow.motherId ? [...cows, ...mothers].find(c => c._id === cow.motherId) : null;
     const dayDiff = (a: string, b: string) => Math.round((new Date(b).getTime() - new Date(a).getTime()) / 86400000);
     const today = todayStr();
     const ageMonths = cow.birthDate ? Math.max(1, Math.round(dayDiff(cow.birthDate, today) / 30.44)) : 0;
@@ -495,6 +512,16 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
           </table>
         </div>
       </div>
+      )}
+
+      {hasMore && (
+        <div className="flex flex-col items-center gap-2 py-3">
+          <p className="text-xs text-slate-500">{cows.length} of {totalCount} animals loaded</p>
+          <button type="button" onClick={() => { void loadCows(true); }} disabled={loadingMore || loading}
+            className="muf-btn muf-btn-secondary disabled:opacity-50">
+            {loadingMore ? L('Loading...') : L('Load 50 More Animals')}
+          </button>
+        </div>
       )}
 
       {/* ── Sale Modal ────────────────────────── */}
