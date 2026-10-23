@@ -211,6 +211,13 @@ export function makeMemoryModel(name, schema) {
       if (timestamps) doc.updatedAt = new Date();
       return doc;
     },
+    async findByIdAndUpdate(id, update, options = {}) {
+      const doc = store.find((d) => eq(d._id, id));
+      if (!doc) return null;
+      applyUpdate(doc, update);
+      if (timestamps) doc.updatedAt = new Date();
+      return doc;
+    },
     async findByIdAndDelete(id) {
       const doc = store.find((d) => eq(d._id, id));
       if (doc) await doc.deleteOne();
