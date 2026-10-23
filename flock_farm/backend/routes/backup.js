@@ -5,7 +5,7 @@
 // exists, nothing happens. Admins can download it, force-refresh it, or
 // restore the entire database from it.
 import express from 'express';
-import { authRequired, requireRole } from '../middleware/auth.js';
+import { authRequired } from '../middleware/auth.js';
 import { mailConfigured, sendBackupEmail } from '../mailer.js';
 import User from '../models/User.js';
 import DataStore from '../models/DataStore.js';
