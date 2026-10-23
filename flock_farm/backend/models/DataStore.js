@@ -7,7 +7,10 @@ import mongoose from 'mongoose';
 // a drop-in replacement without needing to redesign the whole schema.
 const dataStoreSchema = new mongoose.Schema(
   {
-    key: { type: String, required: true, unique: true }, // e.g. 'birds'
+    key: { type: String, required: true, index: true }, // e.g. 'birds'
+    // Each bucket is isolated per farm. The migration tags existing buckets before
+    // this compound unique index is created in MongoDB.
+    farmId: { type: String, required: true, index: true },
     value: { type: mongoose.Schema.Types.Mixed, required: true }, // the actual data
     // Optimistic-concurrency version. Every successful write increments it.
     // Clients send the version they loaded; a mismatch means someone else
@@ -17,5 +20,7 @@ const dataStoreSchema = new mongoose.Schema(
   },
   { timestamps: true }
 );
+
+dataStoreSchema.index({ farmId: 1, key: 1 }, { unique: true, name: 'datastore_farm_key_unique' });
 
 export default mongoose.model('DataStore', dataStoreSchema);
