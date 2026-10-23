@@ -370,6 +370,8 @@ function App() {
   const [crops, setCrops] = useState([]);
   const [finance, setFinance] = useState([]);
   const [tasks, setTasks] = useState([]);
+  const [cropVisibleCount, setCropVisibleCount] = useState(40);
+  const [taskVisibleCount, setTaskVisibleCount] = useState(40);
   const [inventory, setInventory] = useState([]);
   const [liabilities, setLiabilities] = useState([]);
   // Supplier khata (dealers we buy from on credit)
@@ -1878,7 +1880,8 @@ function App() {
   });
 
   // ── Grid view items (muf-entity-grid) — replaces inline crop cards ──
-  const gridCrops = filteredCrops.map((c) => {
+  const visibleFilteredCrops = filteredCrops.slice(0, cropVisibleCount);
+  const gridCrops = visibleFilteredCrops.map((c) => {
     const progress = getCropProgress(c);
     const cropDay = c.plant_date ? Math.max(0, Math.floor((Date.now() - new Date(c.plant_date + 'T00:00:00').getTime()) / 86400000)) : null;
     const dayText = c.status === 'Completed' ? (c.harvest_date ? `Harvested ${c.harvest_date}` : 'Completed') : cropDay != null ? `Day ${cropDay + 1}` : 'Not planted';
@@ -3152,6 +3155,14 @@ function App() {
                       emptyHint="Try clearing the filters or add your first crop."
                     />
                   )}
+                  {filteredCrops.length > visibleFilteredCrops.length && (
+                    <div className="flex justify-center py-4">
+                      <button type="button" onClick={() => setCropVisibleCount(count => count + 40)}
+                        className="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800">
+                        Load more crops ({visibleFilteredCrops.length} of {filteredCrops.length})
+                      </button>
+                    </div>
+                  )}
               </section>
 
               {/* FAB — Add New Crop */}
@@ -3752,7 +3763,7 @@ function App() {
                       <h4>{L('No duties match filter')}</h4>
                       <p>{L('Try switching to another status or scheduled care assignment filter.')}</p>
                     </div>
-                  ) : filteredTasks.map((t, idx) => (
+                  ) : filteredTasks.slice(0, taskVisibleCount).map((t, idx) => (
                     <article 
                       key={t._id} 
                       className="muf-crop-card cursor-pointer hover:scale-[1.01] transition-transform" 
@@ -3858,6 +3869,14 @@ function App() {
                     </article>
                   ))}
                 </div>
+                {filteredTasks.length > taskVisibleCount && (
+                  <div className="flex justify-center py-4">
+                    <button type="button" onClick={() => setTaskVisibleCount(count => count + 40)}
+                      className="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800">
+                      Load more tasks ({Math.min(taskVisibleCount, filteredTasks.length)} of {filteredTasks.length})
+                    </button>
+                  </div>
+                )}
 
               </section>
 
