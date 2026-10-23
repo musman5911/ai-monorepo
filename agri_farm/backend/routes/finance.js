@@ -27,7 +27,7 @@ router.get('/finance', protect, requireAdmin, asyncHandler(async (req, res) => {
 }));
 
 
-router.post('/bulk', protect, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/finance/bulk', protect, requireAdmin, asyncHandler(async (req, res) => {
   const rows = req.body?.rows;
   if (!Array.isArray(rows) || rows.length < 1) return res.status(400).json({ error: 'rows must be a non-empty array' });
   if (rows.length > 200) return res.status(400).json({ error: 'A finance bulk request is limited to 200 rows' });
