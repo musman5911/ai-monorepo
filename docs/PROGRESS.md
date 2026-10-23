@@ -420,3 +420,23 @@ Root cause found in the Flock development memory adapter: the shared egg-invento
 Fix commit: `1d71319` (`fix(flock): support findOneAndDelete in memory adapter`).
 
 **Awaiting owner verification:** pull the latest `muf-monorepo` branch and rerun `npm run check-farms`. This is an implementation diagnosis, not a claimed test pass. The HTTP farm-scope check exercises the backup path and lock release in memory mode, but it does not replace the required real-MongoDB multi-process concurrency test or disposable-database backup/restore compatibility test.
+
+
+## Owner verification checkpoint and Phase 3 start (2026-10-23)
+
+The owner confirmed the local checkout uses memory mode and contains no real farm data; the live websites use their own MongoDB deployments. The latest local verification reported:
+
+- `npm run check-farms`: all Agri, Flock and Dairy farm-scope checks passed.
+- `npm test`: 15 test files, 115 tests passed.
+- `npm run check-sync`: all shared MUF and cross-app parity checks passed.
+- `npm run check-ui`: all UI safety checks passed.
+- `npm run check-workbench`: all 23 source checks passed.
+- `flock_farm/client npm run build`: TypeScript and Vite build passed. Vite emitted a non-fatal large-chunk warning for the ~954 kB main JS bundle.
+
+These results validate the local memory-mode test run only. They do not exercise live MongoDB, and no live data was intentionally accessed by these commands. Before any Mongo integration test, the test harness must fail closed unless its URI/database name is explicitly identified as a disposable test target; never use the production website URI.
+
+**Phase 2 status:** owner-reported local checks are green. Final sign-off remains pending isolated real-MongoDB multi-process inventory-lock tests and backup/restore compatibility tests on a disposable database copy. This does not block planning and test-first implementation of Phase 3.
+
+**Phase 3 started:** expanded `ROADMAP.md` with a staged, test-first plan for server-side pagination/filtering, scroll loading, farm-scoped totals, bulk entry/import, and 1,000-row scale fixtures. The first code step is to define and test a reusable pagination contract and prove it on one representative list endpoint before rolling the pattern across Dairy, Flock and Agri. Existing single-record flows must remain compatible; server-side farm scope must be applied before filtering, totals, and pagination.
+
+Roadmap update commit: `e4411d0`. No application code changed in this documentation step; no tests were run for it.
