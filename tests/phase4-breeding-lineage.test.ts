@@ -10,11 +10,12 @@ describe('Phase 4 Dairy breeding lineage foundation', () => {
     const db = readFileSync(path.join(root, 'dairy_farm/backend/db.js'), 'utf8');
     const route = readFileSync(path.join(root, 'dairy_farm/backend/routes/cows.js'), 'utf8');
 
-    for (const field of ['earTag', 'fatherId', 'fatherType', 'fatherName']) {
+    for (const field of ['earTag', 'fatherId', 'fatherName']) {
       expect(db).toContain(field);
       expect(route).toContain(`readString(body, '${field}'`);
     }
     expect(db).toContain("enum: ['farm', 'outside']");
+    expect(route).toContain("readEnum(body, 'fatherType', ['farm', 'outside'], errors)");
   });
 
   it('defines a farm-scoped unique index only for non-empty ear tags', () => {
