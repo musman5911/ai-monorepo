@@ -35,7 +35,7 @@ export default function BatchHealthPortal() {
         });
         if (!cancelled) {
           setBatches(rows);
-          setEvents(combined.sort((a, b) => b.date.localeCompare(a.date)).slice(0, 20));
+          setEvents(combined.sort((a, b) => b.date.localeCompare(a.date)));
           setLoadFailed(false);
         }
       } catch {
@@ -84,7 +84,7 @@ export default function BatchHealthPortal() {
           <p className="text-sm text-slate-500">No batch vaccination or mortality logs recorded yet.</p>
         ) : (
           <div className="space-y-2">
-            {events.map((event) => (
+            {events.slice(0, 20).map((event) => (
               <div key={`${event.kind}-${event.id}`} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-3">
                 <div className="flex min-w-0 items-start gap-2">
                   {event.kind === 'mortality' ? <AlertTriangle size={16} className="mt-0.5 text-rose-600 shrink-0" /> : <Syringe size={16} className="mt-0.5 text-indigo-600 shrink-0" />}
