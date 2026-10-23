@@ -196,6 +196,18 @@ export async function parseXlsxRows(buffer: ArrayBuffer): Promise<string[][]> {
     result.push(Array.from({ length: row.length }, (_, index) => row[index] ?? ""));
   }
   if (!result.length) throw new Error("The first worksheet is empty.");
+  const headerIndexes = new Map(result[0].map((header, index) => [normalizeHeader(header), index]));
+  for (const dateHeader of ["plant_date", "harvest_date"]) {
+    const dateIndex = headerIndexes.get(dateHeader);
+    if (dateIndex === undefined) continue;
+    for (const row of result.slice(1)) {
+      const serial = Number(row[dateIndex]);
+      if (row[dateIndex] && Number.isFinite(serial) && serial >= 1 && serial <= 2958465) {
+        const date = new Date(Date.UTC(1899, 11, 30) + Math.floor(serial) * 86400000);
+        row[dateIndex] = date.toISOString().slice(0, 10);
+      }
+    }
+  }
   return result;
 }
 
