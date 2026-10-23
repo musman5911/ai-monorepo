@@ -61,3 +61,21 @@ describe('Flock egg inventory coordination contract', () => {
     )).toContain('available eggs');
   });
 });
+
+
+describe('Phase 3 Flock bounded per-batch egg bulk entry', () => {
+  it('validates and caps all rows before acquiring the inventory lock and writing', () => {
+    const source = readFileSync(path.join(repoRoot, 'flock_farm/backend/routes/batches.js'), 'utf8');
+    expect(source).toContain("router.post('/batches/:batchId/egg-logs/bulk'");
+    expect(source).toContain("rows.length > 200");
+    expect(source).toContain("if (errors.length) return res.status(400)");
+    expect(source).toContain('duplicate date in this batch');
+    expect(source).toContain('acquireEggInventoryLock(DataStore)');
+  });
+
+  it('exposes the bounded batch egg bulk API to the Flock client', () => {
+    const source = readFileSync(path.join(repoRoot, 'flock_farm/client/src/api.ts'), 'utf8');
+    expect(source).toContain('createBatchEggLogsBulk');
+    expect(source).toContain('/egg-logs/bulk');
+  });
+});
