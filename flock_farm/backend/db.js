@@ -63,3 +63,5 @@ export async function connectDB() {
   const defaultFarmId = await mufLoadDefaultFarm(Farm);
   if (!defaultFarmId) console.warn('[farms] No farms yet. Back up the database, then run npm run migrate:farms.');
 }
+
+export { Farm, User, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES };
