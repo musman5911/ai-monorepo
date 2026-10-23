@@ -958,6 +958,7 @@ export default function App() {
                   onDeleteVaccination={handleDeleteVaccination}
                   canDelete={canDelete}
                   isAdmin={isAdmin}
+                  vaccinationOnly
                 />
               )}
 
