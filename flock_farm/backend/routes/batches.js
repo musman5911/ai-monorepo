@@ -688,13 +688,19 @@ router.delete('/batches/logs/:kind/:logId', authRequired, requireRole('admin'), 
     if (!log) return res.status(404).json({ error: 'Log not found' });
 
     if (req.params.kind === 'egg') {
-      const [batch, remainingLogs, incubation] = await Promise.all([
-        getBatchByCode(log.batch_id),
-        BatchEggLog.find({ batch_id: log.batch_id, _id: { $ne: log._id } }),
-        DataStore.findOne({ key: 'incubation' }),
-      ]);
+      const incubation = await DataStore.findOne({ key: 'incubation' });
       const records = Array.isArray(incubation?.value) ? incubation.value : [];
-      const allocationError = validateIncubationAllocations(records, batch ? [batch] : [], remainingLogs);
+      const linkedBatchIds = [...new Set(
+        records.map((record) => String(record?.sourceBatchId || '').trim()).filter(Boolean),
+      )];
+      const [batches, eggLogs] = linkedBatchIds.length
+        ? await Promise.all([
+          Batch.find({ batch_id: { $in: linkedBatchIds } }),
+          BatchEggLog.find({ batch_id: { $in: linkedBatchIds } }),
+        ])
+        : [[], []];
+      const remainingLogs = eggLogs.filter((item) => String(item._id) !== String(log._id));
+      const allocationError = validateIncubationAllocations(records, batches, remainingLogs);
       if (allocationError) {
         return res.status(409).json({
           error: `Cannot delete this egg log because it would invalidate an incubation allocation. ${allocationError}`,
