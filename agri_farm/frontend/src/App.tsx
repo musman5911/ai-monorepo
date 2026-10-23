@@ -959,8 +959,20 @@ function App() {
 
   const openLedgerGroup = (group) => {
     setSelectedLedgerGroup(group);
-    void fetchLedgerPage(group, 0, true, financeFilter);
   };
+
+  useEffect(() => {
+    if (!selectedLedgerGroup) {
+      ledgerPageRequestRef.current += 1;
+      setLedgerPageRows([]);
+      setLedgerPageNextSkip(0);
+      setLedgerPageTotal(0);
+      setLedgerPageError('');
+      return undefined;
+    }
+    void fetchLedgerPage(selectedLedgerGroup, 0, true, financeFilter);
+    return () => { ledgerPageRequestRef.current += 1; };
+  }, [selectedLedgerGroup?.id, financeFilter, listRefreshKey]);
 
   const performLogout = () => {
     // Preserve theme preference and the offline request queue on sign-out
