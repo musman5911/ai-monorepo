@@ -276,3 +276,13 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - `npm ci` reported dependency audit findings: root 5 vulnerabilities (1 moderate, 2 high, 2 critical), Flock backend 6 (4 moderate, 2 high), and Flock client 3 (2 high, 1 critical). No automatic or forced audit fix was run.
 - **Still incomplete:** Dashboard, Health, Labors, Incubation and Summary are not yet all fully batch-driven. The current work establishes batch logs/calculations and narrows Home Birds navigation, but does not complete the user's intended primary workflow.
 - Browser/end-to-end role testing remains deferred to the final project-wide pass. No real-data migration was run and no live data was touched. New log collections are additive, but backup/restore compatibility must be checked on a disposable copy before calling Phase 2 complete.
+
+
+## Phase 2 step update (2026-10-23): incubation source-batch traceability
+
+- Added optional `sourceBatchId` to `IncubationRecord`, preserving existing historical records without a source link.
+- Incubation add/edit form now lets the user associate a record with a batch that has egg collection; list and detail views display the selected source batch.
+- The UI explicitly warns that this is provenance tracking only. It does not reserve or deduct eggs, and must not be treated as a stock ledger or as proof that the batch had sufficient unallocated eggs.
+- Existing batch egg logs remain the source for collected/sold/home-use/wasted counts; the existing incubation datastore remains separate. No automatic egg transfer or database migration was introduced.
+- **Verification:** source edits were pushed to `muf-monorepo`. No build, unit test, browser check, or GitHub Actions run has been executed for this step. CI remains manual-only.
+- **Next:** add server-enforced, farm-scoped egg allocation/transfer with duplicate and over-allocation protection before claiming stock traceability complete; then replace additive Labor context with batch-linked work assignments. Preserve unlinked legacy records.
