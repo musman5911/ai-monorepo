@@ -226,13 +226,13 @@ router.post('/users', authRequired, requireRole('owner'), async (req, res) => {
       return res.status(409).json({ error: 'A user with that username already exists' });
     }
     let cleanEmail = null;
-    const chosenRole = role === 'admin' ? 'admin' : 'worker';
+    const chosenRole = role === 'admin' || role === 'owner' ? 'owner' : 'worker';
     // Administrator accounts must have an email
     // (needed for password recovery and profile verification codes).
-    if (chosenRole === 'admin' && !String(email || '').trim()) {
+    if (chosenRole === 'owner' && !String(email || '').trim()) {
       return res.status(400).json({ error: 'Email address is mandatory for administrator accounts' });
     }
-    if (chosenRole === 'admin' && email) {
+    if (chosenRole === 'owner' && email) {
       cleanEmail = String(email).trim().toLowerCase();
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
         return res.status(400).json({ error: 'Invalid email format' });
