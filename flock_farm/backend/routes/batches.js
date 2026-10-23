@@ -485,10 +485,6 @@ router.post('/batches/:batchId/egg-logs/bulk', authRequired, async (req, res) =>
     if (!Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'entries must be a non-empty array' });
     if (rows.length > 200) return res.status(413).json({ error: 'bulk request is limited to 200 entries' });
 
-    const batch = await getBatchByCode(req.params.batchId);
-    if (!batch) return res.status(404).json({ error: 'Batch not found' });
-    if (!ensureBatchOpen(batch, res)) return;
-
     const normalized = [];
     const errors = [];
     const dates = new Set();
@@ -512,6 +508,9 @@ router.post('/batches/:batchId/egg-logs/bulk', authRequired, async (req, res) =>
     if (errors.length) return res.status(400).json({ error: errors.join('; '), errors });
 
     releaseInventoryLock = await acquireEggInventoryLock(DataStore);
+    const batch = await getBatchByCode(req.params.batchId);
+    if (!batch) return res.status(404).json({ error: 'Batch not found' });
+    if (!ensureBatchOpen(batch, res)) return;
     const results = [];
     for (const row of normalized) {
       try {
