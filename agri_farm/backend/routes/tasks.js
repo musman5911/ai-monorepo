@@ -2,7 +2,7 @@
 // Completing a task auto-logs a Labor expense, deducts inventory, and marks
 // the deployed field crew's attendance for today.
 import express from 'express';
-import { Task, Finance, Inventory, Laborer, Attendance } from '../db.js';
+import { Task, Finance, Inventory, Laborer, Attendance, Crop } from '../db.js';
 import { mufIsFullRole } from '../muf-farms.mjs';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { notFound, forbidden, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
@@ -62,9 +62,22 @@ router.post('/bulk', protect, requireAdmin, asyncHandler(async (req, res) => {
       status: 'Pending',
     };
   });
-  prepared.forEach((row, index) => {
-    if (!Number.isFinite(row.inventory_qty_consumed) || row.inventory_qty_consumed < 0) errors.push({ row: index + 2, message: 'Inventory quantity must be a non-negative number.' });
-  });
+  for (let index = 0; index < prepared.length; index += 1) {
+    const row = prepared[index];
+    if (!Number.isFinite(row.inventory_qty_consumed) || row.inventory_qty_consumed < 0) {
+      errors.push({ row: index + 2, message: 'Inventory quantity must be a non-negative number.' });
+    }
+    if (row.crop_id) {
+      if (!/^[0-9a-fA-F]{24}$/.test(row.crop_id) || !(await Crop.findOne({ _id: row.crop_id }))) {
+        errors.push({ row: index + 2, message: 'Crop must exist in the selected farm.' });
+      }
+    }
+    if (row.inventory_item_id) {
+      if (!/^[0-9a-fA-F]{24}$/.test(row.inventory_item_id) || !(await Inventory.findOne({ _id: row.inventory_item_id }))) {
+        errors.push({ row: index + 2, message: 'Inventory item must exist in the selected farm.' });
+      }
+    }
+  }
   if (errors.length) return res.status(400).json({ error: 'Bulk task validation failed', details: errors });
 
   for (const task of prepared) {
