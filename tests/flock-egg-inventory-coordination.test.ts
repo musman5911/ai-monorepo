@@ -78,6 +78,17 @@ describe('Phase 3 Flock bounded per-batch egg bulk entry', () => {
     expect(source).toContain('acquireEggInventoryLock(DataStore)');
   });
 
+  it('supports stable paged Flock batch lists with a bounded page size', () => {
+    const route = readFileSync(path.join(repoRoot, 'flock_farm/backend/routes/batches.js'), 'utf8');
+    const api = readFileSync(path.join(repoRoot, 'flock_farm/client/src/api.ts'), 'utf8');
+    const component = readFileSync(path.join(repoRoot, 'flock_farm/client/src/components/BatchesTab.tsx'), 'utf8');
+    expect(route).toContain("req.query.page === undefined");
+    expect(route).toContain('Math.min(rawLimit, 100)');
+    expect(route).toContain('Batch.countDocuments({})');
+    expect(api).toContain('listBatchesPage');
+    expect(component).toContain('Load 20 More Batches');
+  });
+
   it('offers preview-first CSV import and row-level validation in the batch UI', () => {
     const source = readFileSync(path.join(repoRoot, 'flock_farm/client/src/components/BatchesTab.tsx'), 'utf8');
     expect(source).toContain('Preview Batch Egg CSV');
