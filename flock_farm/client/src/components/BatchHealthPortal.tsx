@@ -36,7 +36,7 @@ export default function BatchHealthPortal() {
         if (!cancelled) {
           setBatches(rows);
           setEvents(combined.sort((a, b) => b.date.localeCompare(a.date)));
-          setLoadFailed(false);
+          setLoadFailed(details.some((detail) => !detail));
         }
       } catch {
         if (!cancelled) setLoadFailed(true);
