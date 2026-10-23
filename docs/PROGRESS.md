@@ -1,7 +1,16 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (owner verification checkpoint: corrected incubation allocation regression test; farm-scope check now reports setup responses instead of crashing; local rerun pending)
+Last updated: 2026-10-23 (owner reported 134/135 tests passed; real-Mongoose query test hit Vitest's 5-second timeout without an assertion failure; targeted timeout raised to 20 seconds; rerun pending)
+
+
+## Owner verification checkpoint (2026-10-23, commit d629392 and follow-up)
+
+- Owner pulled through the Phase 3 pagination and Phase 4 breeding-lineage foundation and reported a clean working tree.
+- Local root suite result: **134 passed, 1 failed out of 135**. The only failure was the optional real-Mongoose query-contract test in `tests/muf-farms.test.ts`, which timed out at Vitest's default 5 seconds while importing the installed backend Mongoose package. Its assertions were not reported as failing. A targeted 20-second timeout is now committed as `dc01ba84baa13f946a9dd940b85b5ff2f5f00ec9`; the owner must rerun `npm test` to verify this diagnosis.
+- Owner-reported checks passed: `npm run check-farms`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, and the Dairy client `npm run build`. The build emitted a non-fatal warning because `api.ts` is both dynamically and statically imported; this does not fail the build.
+- The pagination and breeding-lineage tests passed in the reported suite (17 pagination tests and 3 lineage contract tests). These are source/contract checks, not proof of live MongoDB index creation or visual browser behavior.
+- Phase 3/4 remain in progress. Do not claim Phase 2 signed off: real-MongoDB inventory-lock concurrency and backup/restore tests on an explicitly disposable database copy remain open. No live database was accessed for this checkpoint.
 
 ## Workflow execution policy update (2026-10-23)
 
@@ -21,8 +30,8 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 | 0. Docs reset and repository cleanup | Done. Applied by the owner, pushed to the `muf-monorepo` branch, owner's checks and builds all passed |
 | 1. Farms and roles (MUF) | Implementation substantially delivered; local farm-scope, shared-MUF and UI checks pass. Disposable database-copy migration/backup checks remain open; final browser/role review is deferred until all phases finish |
 | 2. Flock restructure and Home Birds | Partial. Batches default and batch egg/vaccination logs plus calculations are implemented and automated checks pass. Dashboard, Health, Labors, Incubation and Summary are not yet all batch-driven; backup/restore copy validation remains open |
-| 3. Bulk entry, scroll loading, server totals | Not started |
-| 4. Dairy breeding; Agri fields and seasons | Not started |
+| 3. Bulk entry, scroll loading, server totals | In progress: opt-in Dairy cows/milk API pagination and query validation are implemented; UI incremental loading and bulk entry remain |
+| 4. Dairy breeding; Agri fields and seasons | In progress: optional Dairy lineage fields and farm-scoped ear-tag unique index are implemented; sire workflow, lineage automation, Agri fields/seasons and MongoDB index verification remain |
 | 5. Photo storage and Cloudinary | Not started. Prerequisite done: free Cloudinary account created 2026-10-22 |
 | 6. Super Admin upgrade | Not started. The tab and farm-summary endpoints already exist |
 | 7. MU Farms shop | Not started |
