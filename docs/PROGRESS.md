@@ -501,3 +501,12 @@ The owner pulled commit `5f7a963` and reported the following local results: `npm
 ### Phase 4 test coverage added (2026-10-23)
 
 Added `tests/phase4-breeding-lineage.test.ts` to guard the additive sire/ear-tag schema fields, farm-scoped partial unique index, and backward compatibility for records without lineage values. These are source-contract tests only; they do not prove MongoDB index creation or reject duplicate tags at runtime. Disposable-database index verification and actual sire-selection/API validation remain required.
+
+
+### Phase 3 follow-on (2026-10-23): additional Flock bulk-log API
+
+- Added a bounded per-batch bulk endpoint for feed, weight, vaccination and expense logs. Requests are capped at 200 rows, all entries are validated before the first write, batch existence/open status is checked, and the batch's farm ID is attached server-side. Unsupported types are rejected.
+- Kept mortality and sales on their single-row endpoints because those operations depend on the remaining live-bird count and require sequential checks. Egg bulk entry continues to use the inventory lock.
+- Added a client API wrapper and contract coverage, including a 1,000-row paging fixture. These tests are source/fixture checks and do not replace API integration tests or browser validation.
+- Commit sequence: `83f2759` (route), `b6e56ec` (client API), `3af8f5a` (tests).
+- Not yet complete: bulk CSV controls for the new log types, Agri user-driven incremental loading and bulk/import UI, Excel workbook import, and stronger 1,000-row server/API plus farm-isolation integration fixtures. Do not treat Phase 3 as complete yet.
