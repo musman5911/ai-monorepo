@@ -135,7 +135,8 @@ router.get('/', protect, async (req, res) => {
     const filter = {};
     if (req.query.batch) filter.batch = String(req.query.batch);
     if (req.query.status) filter.status = String(req.query.status);
-    if (req.query.gender) filter.gender = String(req.query.gender);
+    if (req.query.gender === 'female') filter.gender = { $ne: 'male' };
+    else if (req.query.gender) filter.gender = String(req.query.gender);
     if (req.query.motherId) filter.motherId = String(req.query.motherId);
     if (req.query.search) {
       const search = String(req.query.search).trim().slice(0, 100);
