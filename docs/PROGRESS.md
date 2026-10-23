@@ -440,3 +440,19 @@ These results validate the local memory-mode test run only. They do not exercise
 **Phase 3 started:** expanded `ROADMAP.md` with a staged, test-first plan for server-side pagination/filtering, scroll loading, farm-scoped totals, bulk entry/import, and 1,000-row scale fixtures. The first code step is to define and test a reusable pagination contract and prove it on one representative list endpoint before rolling the pattern across Dairy, Flock and Agri. Existing single-record flows must remain compatible; server-side farm scope must be applied before filtering, totals, and pagination.
 
 Roadmap update commit: `e4411d0`. No application code changed in this documentation step; no tests were run for it.
+
+
+### Phase 3 step 1: opt-in paginated Dairy list APIs (2026-10-23)
+
+Implemented the first bounded-pagination contract and wired it into Dairy cow and milk list routes:
+
+- New `parsePagePagination` helper uses 1-based pages, a default page size of 50, a maximum page size of 200, and rejects invalid/unsafe page or limit values.
+- `GET /api/cows?page=N` and `GET /api/milk?page=N` now use stable sort keys, run a matching `countDocuments` query, and expose `X-Total-Count`, `X-Page`, `X-Page-Size`, and `X-Total-Pages` response headers.
+- The farm-scoped model wrapper applies the request's farm filter to both list and count operations. Browser clients are explicitly allowed to read the pagination headers.
+- Legacy requests without `page` keep the existing array response and skip/limit behavior. No frontend has been switched to paging yet, so this is additive.
+
+Added `tests/phase3-pagination.test.ts` with cases for legacy compatibility, 1-based offsets, default and capped limits, invalid values, overflow protection, and source contracts for the two routes.
+
+Relevant commits: `df43183`, `f64cb48`, `17b0c9f`, `87f3781`, `70fbd2b`, `ea5fd3d`, `f030d66`.
+
+**Verification status:** tests/builds have not been run after these commits in the owner's local checkout. The owner must pull the latest branch and run `npm test` and the Dairy backend/client build before this step is considered verified. Next implementation step after that checkpoint: switch one Dairy list UI to request pages and append results with loading/error/empty states, then generalize the proven pattern.
