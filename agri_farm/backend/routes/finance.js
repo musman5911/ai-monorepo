@@ -10,7 +10,15 @@ const router = express.Router();
 router.get('/finance', protect, requireAdmin, asyncHandler(async (req, res) => {
   const skip = Math.max(0, Number(req.query.skip) || 0);
   const limit = Math.max(1, Math.min(Number(req.query.limit) || 100, 500));
-  const data = await Finance.find({}).skip(skip).limit(limit);
+  const [data, total] = await Promise.all([
+    Finance.find({}).sort({ date: -1, _id: -1 }).skip(skip).limit(limit),
+    Finance.countDocuments({}),
+  ]);
+  res.set('Access-Control-Expose-Headers', 'X-Total-Count, X-Page, X-Page-Size, X-Total-Pages');
+  res.set('X-Total-Count', String(total));
+  res.set('X-Page', String(Math.floor(skip / limit) + 1));
+  res.set('X-Page-Size', String(limit));
+  res.set('X-Total-Pages', String(Math.ceil(total / limit)));
   return res.json(data.map((d) => ({ ...d, _id: String(d._id) })));
 }));
 
