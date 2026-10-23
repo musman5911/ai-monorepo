@@ -71,6 +71,69 @@ router.get('/', protect, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+
+/**
+ * Bounded bulk daily-entry endpoint. Validation is completed for every row
+ * before the first write; writes then return explicit per-row outcomes so a
+ * partial batch can be retried without guessing which rows succeeded.
+ */
+router.post('/bulk', protect, workerOrAdmin, async (req, res) => {
+  try {
+    const rows = req.body?.entries;
+    if (!Array.isArray(rows) || rows.length === 0) {
+      return res.status(400).json({ error: 'entries must be a non-empty array' });
+    }
+    if (rows.length > 200) {
+      return res.status(413).json({ error: 'bulk request is limited to 200 entries' });
+    }
+
+    const seen = new Set();
+    const normalized = [];
+    const errors = [];
+    rows.forEach((row, index) => {
+      const { payload, errors: rowErrors } = milkPayload(row, { requireBasics: true });
+      if (rowErrors.length) errors.push(`row ${index + 1}: ${rowErrors.join(', ')}`);
+      if (payload.cowId && payload.date) {
+        const key = `${payload.cowId}\u0000${payload.date}`;
+        if (seen.has(key)) errors.push(`row ${index + 1}: duplicate cow/date in this batch`);
+        seen.add(key);
+      }
+      normalized.push({ index, payload, forceOverwrite: row?.forceOverwrite === true });
+    });
+    if (errors.length) return res.status(400).json({ error: errors.join('; '), errors });
+
+    const results = [];
+    for (const row of normalized) {
+      try {
+        const { payload, forceOverwrite } = row;
+        const existing = await Milk.findOne({ cowId: payload.cowId, date: payload.date });
+        if (existing) {
+          if (!forceOverwrite) {
+            results.push({ index: row.index, cowId: payload.cowId, date: payload.date, ok: false, status: 409, error: 'Duplicate entry' });
+            continue;
+          }
+          const updated = await Milk.findByIdAndUpdate(existing._id, { $set: payload }, { new: true });
+          results.push({ index: row.index, cowId: payload.cowId, date: payload.date, ok: true, record: updated });
+        } else {
+          const record = await Milk.create({ ...payload, _id: randomUUID() });
+          results.push({ index: row.index, cowId: payload.cowId, date: payload.date, ok: true, record });
+        }
+      } catch (error) {
+        if (error && (error.code === 11000 || error.codeName === 'DuplicateKey')) {
+          results.push({ index: row.index, cowId: row.payload.cowId, date: row.payload.date, ok: false, status: 409, error: 'Duplicate entry' });
+        } else {
+          results.push({ index: row.index, cowId: row.payload.cowId, date: row.payload.date, ok: false, status: 500, error: 'Could not save this row' });
+        }
+      }
+    }
+    const saved = results.filter((row) => row.ok).length;
+    const failed = results.length - saved;
+    return res.status(failed ? 207 : 200).json({ saved, failed, results });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.post('/', protect, workerOrAdmin, async (req, res) => {
   try {
     const { payload, errors } = milkPayload(req.body, { requireBasics: true });
