@@ -15,6 +15,7 @@ import { MUF_ENV } from '../muf-env.mjs';
 import { calculateBatchSummary, validateBatchEggLog } from '../batch-math.mjs';
 import { validateIncubationAllocations } from '../incubation-allocation.mjs';
 import { linkedBatchHistoryConflict } from '../batch-history-guards.mjs';
+import { acquireEggInventoryLock } from '../egg-inventory-lock.mjs';
 
 const router = express.Router();
 
@@ -153,7 +154,9 @@ function stripMeta({ _id, __v, ...rest }) {
 }
 
 router.post('/batches/import-all', authRequired, requireRole('admin'), async (req, res) => {
+  let releaseInventoryLock;
   try {
+    releaseInventoryLock = await acquireEggInventoryLock(DataStore);
     const historyConflict = linkedBatchHistoryConflict(await findLinkedBatchHistory());
     if (historyConflict) return res.status(409).json(historyConflict);
     const batches = Array.isArray(req.body?.batches) ? req.body.batches.map(stripMeta) : [];
@@ -231,13 +234,18 @@ router.post('/batches/import-all', authRequired, requireRole('admin'), async (re
 
     res.json({ ok: true });
   } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
     console.error('POST /api/batches/import-all error:', err);
     res.status(500).json({ error: 'Failed to import batch data' });
+  } finally {
+    if (releaseInventoryLock) { try { await releaseInventoryLock(); } catch (e) { console.error('Failed to release egg inventory lock:', e); } }
   }
 });
 
 router.delete('/batches/wipe-all', authRequired, requireRole('admin'), async (_req, res) => {
+  let releaseInventoryLock;
   try {
+    releaseInventoryLock = await acquireEggInventoryLock(DataStore);
     const historyConflict = linkedBatchHistoryConflict(await findLinkedBatchHistory());
     if (historyConflict) return res.status(409).json(historyConflict);
     await Promise.all([
@@ -254,8 +262,11 @@ router.delete('/batches/wipe-all', authRequired, requireRole('admin'), async (_r
     ]);
     res.json({ ok: true });
   } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
     console.error('DELETE /api/batches/wipe-all error:', err);
     res.status(500).json({ error: 'Failed to wipe batch data' });
+  } finally {
+    if (releaseInventoryLock) { try { await releaseInventoryLock(); } catch (e) { console.error('Failed to release egg inventory lock:', e); } }
   }
 });
 
@@ -437,7 +448,9 @@ router.post('/batches/:batchId/feed-logs', authRequired, async (req, res) => {
 });
 
 router.post('/batches/:batchId/egg-logs', authRequired, async (req, res) => {
+  let releaseInventoryLock;
   try {
+    releaseInventoryLock = await acquireEggInventoryLock(DataStore);
     const batch = await getBatchByCode(req.params.batchId);
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
     if (!ensureBatchOpen(batch, res)) return;
@@ -457,8 +470,11 @@ router.post('/batches/:batchId/egg-logs', authRequired, async (req, res) => {
     });
     res.status(201).json({ log, summary: await computeBatchSummary(batch.batch_id) });
   } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
     console.error('POST batch egg log error:', err);
     res.status(500).json({ error: 'Failed to create batch egg log' });
+  } finally {
+    if (releaseInventoryLock) { try { await releaseInventoryLock(); } catch (e) { console.error('Failed to release egg inventory lock:', e); } }
   }
 });
 
@@ -610,7 +626,9 @@ router.patch('/batches/:batchId/close', authRequired, requireRole('admin'), asyn
 });
 
 router.delete('/batches/:batchId', authRequired, requireRole('admin'), async (req, res) => {
+  let releaseInventoryLock;
   try {
+    releaseInventoryLock = await acquireEggInventoryLock(DataStore);
     const batch = await getBatchByCode(req.params.batchId);
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
 
@@ -650,8 +668,11 @@ router.delete('/batches/:batchId', authRequired, requireRole('admin'), async (re
 
     res.json({ ok: true });
   } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
     console.error('DELETE /api/batches/:batchId error:', err);
     res.status(500).json({ error: 'Failed to delete batch' });
+  } finally {
+    if (releaseInventoryLock) { try { await releaseInventoryLock(); } catch (e) { console.error('Failed to release egg inventory lock:', e); } }
   }
 });
 
