@@ -194,7 +194,7 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     const component = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/components/AgriCropCsvImport.tsx'), 'utf8');
     const parser = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/components/app/agriBulkImport.ts'), 'utf8');
     const app = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/App.tsx'), 'utf8');
-    expect(component).toContain('Preview Crop CSV Import');
+    expect(component).toContain('Preview Crop CSV / Excel Import');
     expect(component).toContain('onImportRows(preview.rows)');
     expect(component).toContain('preview.errors.length > 0');
     expect(component).toContain('endsWith(".csv")');
