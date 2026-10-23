@@ -466,6 +466,101 @@ router.post('/batches/:batchId/feed-logs', authRequired, async (req, res) => {
   }
 });
 
+// Bounded bulk entry for log types whose rows can be validated independently.
+// Mortality and sales stay on their single-row paths because each row depends on
+// the remaining live-bird count and needs sequential inventory validation.
+router.post('/batches/:batchId/logs/:logType/bulk', authRequired, async (req, res) => {
+  try {
+    const rows = req.body?.entries;
+    if (!Array.isArray(rows) || rows.length === 0) return res.status(400).json({ error: 'entries must be a non-empty array' });
+    if (rows.length > 200) return res.status(413).json({ error: 'bulk request is limited to 200 entries' });
+
+    const type = cleanText(req.params.logType);
+    const configs = {
+      feed: {
+        Model: BatchFeedLog,
+        normalize(row) {
+          const date = cleanText(row.date);
+          const feed_type = cleanText(row.feed_type);
+          const quantity_kg = Number(row.quantity_kg);
+          const rate_rs_per_kg = Number(row.rate_rs_per_kg ?? 0);
+          if (!date || !feed_type) return 'date and feed_type are required';
+          if (!Number.isFinite(quantity_kg) || quantity_kg <= 0) return 'quantity_kg must be greater than 0';
+          if (!Number.isFinite(rate_rs_per_kg) || rate_rs_per_kg < 0) return 'rate_rs_per_kg must be 0 or greater';
+          return { date, feed_type, quantity_kg, rate_rs_per_kg, notes: cleanText(row.notes) };
+        },
+      },
+      weight: {
+        Model: BatchWeightLog,
+        normalize(row) {
+          const date = cleanText(row.date);
+          const avg_weight_g = Number(row.avg_weight_g);
+          const sample_size = Number(row.sample_size ?? 0);
+          if (!date) return 'date is required';
+          if (!Number.isFinite(avg_weight_g) || avg_weight_g <= 0) return 'avg_weight_g must be greater than 0';
+          if (!Number.isFinite(sample_size) || sample_size < 0) return 'sample_size must be 0 or greater';
+          return { date, avg_weight_g, sample_size, notes: cleanText(row.notes) };
+        },
+      },
+      vaccination: {
+        Model: BatchVaccinationLog,
+        normalize(row) {
+          const date = cleanText(row.date);
+          const vaccine_name = cleanText(row.vaccine_name);
+          const dose = cleanText(row.dose);
+          const bird_count = Number(row.bird_count ?? 0);
+          const cost = Number(row.cost ?? 0);
+          if (!date || !vaccine_name) return 'date and vaccine_name are required';
+          if (![bird_count, cost].every(Number.isFinite) || bird_count < 0 || cost < 0) return 'bird_count and cost must be 0 or greater';
+          return { date, vaccine_name, dose, bird_count, cost, notes: cleanText(row.notes) };
+        },
+      },
+      expense: {
+        Model: BatchExpenseLog,
+        normalize(row) {
+          const date = cleanText(row.date);
+          const category = cleanText(row.category);
+          const detail = cleanText(row.detail);
+          const amount = Number(row.amount);
+          if (!date || !detail) return 'date and detail are required';
+          if (!['Medicine', 'Vaccination', 'Misc', 'Other'].includes(category)) return 'Invalid expense category';
+          if (!Number.isFinite(amount) || amount <= 0) return 'amount must be greater than 0';
+          return { date, category, detail, amount, notes: cleanText(row.notes) };
+        },
+      },
+    };
+    const config = configs[type];
+    if (!config) return res.status(400).json({ error: 'Unsupported bulk log type' });
+
+    const normalized = [];
+    const errors = [];
+    rows.forEach((row, index) => {
+      if (!row || typeof row !== 'object' || Array.isArray(row)) {
+        errors.push(`row ${index + 1}: entry must be an object`);
+        return;
+      }
+      const result = config.normalize(row);
+      if (typeof result === 'string') errors.push(`row ${index + 1}: ${result}`);
+      else normalized.push({ index, entry: result });
+    });
+    if (errors.length) return res.status(400).json({ error: errors.join('; '), errors });
+
+    const batch = await getBatchByCode(req.params.batchId);
+    if (!batch) return res.status(404).json({ error: 'Batch not found' });
+    if (!ensureBatchOpen(batch, res)) return;
+
+    // All rows are validated before the first write. insertMany is ordered so a
+    // database-level failure is surfaced rather than silently skipping entries.
+    const docs = normalized.map(({ entry }) => ({ ...entry, batch_id: batch.batch_id, farmId: batch.farmId }));
+    const logs = await config.Model.insertMany(docs, { ordered: true });
+    await syncBatchStatus(batch);
+    return res.status(201).json({ saved: logs.length, failed: 0, logs });
+  } catch (err) {
+    console.error('POST batch bulk log error:', err);
+    return res.status(500).json({ error: 'Failed to create batch logs' });
+  }
+});
+
 router.post('/batches/:batchId/egg-logs', authRequired, async (req, res) => {
   let releaseInventoryLock;
   try {
