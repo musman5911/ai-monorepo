@@ -187,12 +187,19 @@ async function checkProject(name, project, port) {
   const call = client(base);
   const A = project.api;
   try {
-    const login = await call('POST', A.login, { body: project.owner });
-    const owner = A.tokenOf(login.json);
-    ok(login.status === 200 && login.json?.farmRole === 'owner', 'legacy admin account is now an owner');
-    ok(login.json?.role === 'admin', 'old screens still receive role "admin" for owners');
-    if (login.status !== 200 || !owner) {
-      console.log(`  Login diagnostic: HTTP ${login.status}; response: ${JSON.stringify(login.json)}`);
+    // Health can respond before the asynchronous database/demo-data startup finishes.
+    // Retry only the known startup 503; do not mistake it for a login/role failure.
+    let login;
+    for (let attempt = 0; attempt < 60; attempt += 1) {
+      login = await call('POST', A.login, { body: project.owner });
+      if (login.status !== 503 || login.json?.error !== 'Server is starting, please retry in a few seconds.') break;
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+    const owner = A.tokenOf(login?.json);
+    ok(login?.status === 200 && login.json?.farmRole === 'owner', 'legacy admin account is now an owner');
+    ok(login?.json?.role === 'admin', 'old screens still receive role "admin" for owners');
+    if (login?.status !== 200 || !owner) {
+      console.log(`  Login diagnostic: HTTP ${login?.status ?? 'no response'}; response: ${JSON.stringify(login?.json ?? null)}`);
       return;
     }
 
