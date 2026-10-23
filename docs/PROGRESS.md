@@ -356,3 +356,6 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - The in-memory development adapter does not enforce compound unique indexes, so the lock helper now also guards each farm with a process-local set. MongoDB remains the cross-process authority in deployed mode; a regression test covers the in-memory fallback.
 - Extended the same shared lock to `laborAttendance` writes, closing the matching race where batch deletion/replacement could check for linked labor history immediately before a concurrent attendance save.
 - Extended route-level regression coverage to verify `laborAttendance` writes also acquire and release the shared lock.
+
+- Finished the main-navigation restructure: Batches, Dashboard, Health, Labor, Incubation and Summary are now primary tabs. Health and Summary have dedicated batch-first portals; the previous bird-led health and monthly-report views remain under Home Birds as Vaccination and Monthly Report. Home Birds is limited to Bird List, Eggs, Monthly Report and Vaccination, with bird details reached from Bird List.
+- The Health portal derives batch vaccination and mortality activity from batch detail APIs. The main Summary uses batch revenue, cost, profit/loss and net egg availability; the legacy Home Birds monthly report remains available separately rather than being silently deleted.
