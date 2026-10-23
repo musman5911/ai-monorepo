@@ -8,6 +8,8 @@ import BatchMortalityLog from '../models/BatchMortalityLog.js';
 import BatchExpenseLog from '../models/BatchExpenseLog.js';
 import BatchSaleLog from '../models/BatchSaleLog.js';
 import BatchWeightLog from '../models/BatchWeightLog.js';
+import BatchEggLog from '../models/BatchEggLog.js';
+import BatchVaccinationLog from '../models/BatchVaccinationLog.js';
 import { MUF_ENV } from '../muf-env.mjs';
 
 const router = express.Router();
@@ -42,21 +44,28 @@ async function getBatchByCode(batchId) {
 }
 
 async function computeBatchSummary(batchId) {
-  const [batch, feedLogs, mortalityLogs, expenseLogs, salesLogs] = await Promise.all([
+  const [batch, feedLogs, mortalityLogs, expenseLogs, salesLogs, eggLogs, vaccinationLogs] = await Promise.all([
     getBatchByCode(batchId),
     BatchFeedLog.find({ batch_id: batchId }),
     BatchMortalityLog.find({ batch_id: batchId }),
     BatchExpenseLog.find({ batch_id: batchId }),
     BatchSaleLog.find({ batch_id: batchId }),
+    BatchEggLog.find({ batch_id: batchId }),
+    BatchVaccinationLog.find({ batch_id: batchId }),
   ]);
   if (!batch) return null;
 
   const intake_cost = (batch.intake_count || 0) * (batch.cost_per_bird || 0);
   const total_feed_cost = feedLogs.reduce((sum, log) => sum + (log.quantity_kg || 0) * (log.rate_rs_per_kg || 0), 0);
-  const total_expense_cost = expenseLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
+  const logged_expense_cost = expenseLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
+  const total_vaccination_cost = vaccinationLogs.reduce((sum, log) => sum + (log.cost || 0), 0);
+  const total_expense_cost = logged_expense_cost + total_vaccination_cost;
+  const total_eggs_collected = eggLogs.reduce((sum, log) => sum + (log.collected || 0), 0);
+  const total_eggs_sold = eggLogs.reduce((sum, log) => sum + (log.sold || 0), 0);
+  const total_egg_income = eggLogs.reduce((sum, log) => sum + (log.sold || 0) * (log.price_per_egg || 0), 0);
   const total_mortality_count = mortalityLogs.reduce((sum, log) => sum + (log.count || 0), 0);
   const total_sold_count = salesLogs.reduce((sum, log) => sum + (log.count || 0), 0);
-  const total_revenue = salesLogs.reduce((sum, log) => sum + (log.amount || 0), 0);
+  const total_revenue = salesLogs.reduce((sum, log) => sum + (log.amount || 0), 0) + total_egg_income;
   const total_cost = intake_cost + total_feed_cost + total_expense_cost;
   const live_count = Math.max(0, (batch.intake_count || 0) - total_mortality_count - total_sold_count);
   const profit_loss = total_revenue - total_cost;
@@ -71,6 +80,10 @@ async function computeBatchSummary(batchId) {
     intake_cost,
     total_feed_cost,
     total_expense_cost,
+    total_vaccination_cost,
+    total_eggs_collected,
+    total_eggs_sold,
+    total_egg_income,
     total_mortality_count,
     total_sold_count,
     total_revenue,
@@ -126,15 +139,17 @@ router.get('/batches', authRequired, async (_req, res) => {
 
 router.get('/batches/export-all', authRequired, requireRole('admin'), async (_req, res) => {
   try {
-    const [batches, feed_logs, mortality_logs, expense_logs, sales_logs, weight_logs] = await Promise.all([
+    const [batches, feed_logs, mortality_logs, expense_logs, sales_logs, weight_logs, egg_logs, vaccination_logs] = await Promise.all([
       Batch.find().sort({ createdAt: 1 }),
       BatchFeedLog.find().sort({ createdAt: 1 }),
       BatchMortalityLog.find().sort({ createdAt: 1 }),
       BatchExpenseLog.find().sort({ createdAt: 1 }),
       BatchSaleLog.find().sort({ createdAt: 1 }),
       BatchWeightLog.find().sort({ createdAt: 1 }),
+      BatchEggLog.find().sort({ createdAt: 1 }),
+      BatchVaccinationLog.find().sort({ createdAt: 1 }),
     ]);
-    res.json({ batches, feed_logs, mortality_logs, expense_logs, sales_logs, weight_logs });
+    res.json({ batches, feed_logs, mortality_logs, expense_logs, sales_logs, weight_logs, egg_logs, vaccination_logs });
   } catch (err) {
     console.error('GET /api/batches/export-all error:', err);
     res.status(500).json({ error: 'Failed to export batch data' });
@@ -154,6 +169,8 @@ router.post('/batches/import-all', authRequired, requireRole('admin'), async (re
     const expense_logs = Array.isArray(req.body?.expense_logs) ? req.body.expense_logs.map(stripMeta) : [];
     const sales_logs = Array.isArray(req.body?.sales_logs) ? req.body.sales_logs.map(stripMeta) : [];
     const weight_logs = Array.isArray(req.body?.weight_logs) ? req.body.weight_logs.map(stripMeta) : [];
+    const egg_logs = Array.isArray(req.body?.egg_logs) ? req.body.egg_logs.map(stripMeta) : [];
+    const vaccination_logs = Array.isArray(req.body?.vaccination_logs) ? req.body.vaccination_logs.map(stripMeta) : [];
 
     // --- VALIDATE EVERYTHING FIRST, before touching existing data ---
     // A malformed backup file must never wipe the database: build all
@@ -170,6 +187,8 @@ router.post('/batches/import-all', authRequired, requireRole('admin'), async (re
       [BatchExpenseLog, expense_logs, 'expense_logs'],
       [BatchSaleLog, sales_logs, 'sales_logs'],
       [BatchWeightLog, weight_logs, 'weight_logs'],
+      [BatchEggLog, egg_logs, 'egg_logs'],
+      [BatchVaccinationLog, vaccination_logs, 'vaccination_logs'],
     ];
     for (const [Model, records, label] of kinds) {
       const docs = [];
@@ -208,6 +227,8 @@ router.post('/batches/import-all', authRequired, requireRole('admin'), async (re
       BatchExpenseLog.deleteMany({}),
       BatchSaleLog.deleteMany({}),
       BatchWeightLog.deleteMany({}),
+      BatchEggLog.deleteMany({}),
+      BatchVaccinationLog.deleteMany({}),
       // wipe stored batch photos too — free the space
       Image.deleteMany({ kind: 'batch' }),
     ]);
@@ -246,13 +267,15 @@ router.get('/batches/:batchId', authRequired, async (req, res) => {
     const batch = await getBatchByCode(req.params.batchId);
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
 
-    const [summary, feed_logs, mortality_logs, expense_logs, sales_logs, weight_logs] = await Promise.all([
+    const [summary, feed_logs, mortality_logs, expense_logs, sales_logs, weight_logs, egg_logs, vaccination_logs] = await Promise.all([
       computeBatchSummary(batch.batch_id),
       BatchFeedLog.find({ batch_id: batch.batch_id }).sort({ date: -1, createdAt: -1 }),
       BatchMortalityLog.find({ batch_id: batch.batch_id }).sort({ date: -1, createdAt: -1 }),
       BatchExpenseLog.find({ batch_id: batch.batch_id }).sort({ date: -1, createdAt: -1 }),
       BatchSaleLog.find({ batch_id: batch.batch_id }).sort({ date: -1, createdAt: -1 }),
       BatchWeightLog.find({ batch_id: batch.batch_id }).sort({ date: -1, createdAt: -1 }),
+      BatchEggLog.find({ batch_id: batch.batch_id }).sort({ date: -1, createdAt: -1 }),
+      BatchVaccinationLog.find({ batch_id: batch.batch_id }).sort({ date: -1, createdAt: -1 }),
     ]);
 
     res.json({
@@ -262,6 +285,8 @@ router.get('/batches/:batchId', authRequired, async (req, res) => {
       expense_logs,
       sales_logs,
       weight_logs,
+      egg_logs,
+      vaccination_logs,
     });
   } catch (err) {
     console.error('GET /api/batches/:batchId error:', err);
@@ -414,6 +439,65 @@ router.post('/batches/:batchId/feed-logs', authRequired, async (req, res) => {
   }
 });
 
+router.post('/batches/:batchId/egg-logs', authRequired, async (req, res) => {
+  try {
+    const batch = await getBatchByCode(req.params.batchId);
+    if (!batch) return res.status(404).json({ error: 'Batch not found' });
+    if (!ensureBatchOpen(batch, res)) return;
+
+    const date = cleanText(req.body?.date);
+    const collected = Number(req.body?.collected);
+    const sold = Number(req.body?.sold || 0);
+    const home_use = Number(req.body?.home_use || 0);
+    const broken_wasted = Number(req.body?.broken_wasted || 0);
+    const price_per_egg = Number(req.body?.price_per_egg || 0);
+    const notes = cleanText(req.body?.notes);
+    if (!date) return res.status(400).json({ error: 'date is required' });
+    if (![collected, sold, home_use, broken_wasted, price_per_egg].every(Number.isFinite) ||
+        [collected, sold, home_use, broken_wasted, price_per_egg].some((value) => value < 0)) {
+      return res.status(400).json({ error: 'Egg counts and price must be 0 or greater' });
+    }
+    if (sold + home_use + broken_wasted > collected) {
+      return res.status(400).json({ error: 'Sold, home-use and broken eggs cannot exceed collected eggs' });
+    }
+
+    const log = await BatchEggLog.create({
+      batch_id: batch.batch_id, farmId: batch.farmId, date, collected, sold, home_use, broken_wasted, price_per_egg, notes,
+    });
+    res.status(201).json({ log, summary: await computeBatchSummary(batch.batch_id) });
+  } catch (err) {
+    console.error('POST batch egg log error:', err);
+    res.status(500).json({ error: 'Failed to create batch egg log' });
+  }
+});
+
+router.post('/batches/:batchId/vaccination-logs', authRequired, async (req, res) => {
+  try {
+    const batch = await getBatchByCode(req.params.batchId);
+    if (!batch) return res.status(404).json({ error: 'Batch not found' });
+    if (!ensureBatchOpen(batch, res)) return;
+
+    const date = cleanText(req.body?.date);
+    const vaccine_name = cleanText(req.body?.vaccine_name);
+    const dose = cleanText(req.body?.dose);
+    const bird_count = Number(req.body?.bird_count || 0);
+    const cost = Number(req.body?.cost || 0);
+    const notes = cleanText(req.body?.notes);
+    if (!date || !vaccine_name) return res.status(400).json({ error: 'date and vaccine_name are required' });
+    if (![bird_count, cost].every(Number.isFinite) || bird_count < 0 || cost < 0) {
+      return res.status(400).json({ error: 'bird_count and cost must be 0 or greater' });
+    }
+
+    const log = await BatchVaccinationLog.create({
+      batch_id: batch.batch_id, farmId: batch.farmId, date, vaccine_name, dose, bird_count, cost, notes,
+    });
+    res.status(201).json({ log, summary: await computeBatchSummary(batch.batch_id) });
+  } catch (err) {
+    console.error('POST batch vaccination log error:', err);
+    res.status(500).json({ error: 'Failed to create batch vaccination log' });
+  }
+});
+
 router.post('/batches/:batchId/weight-logs', authRequired, async (req, res) => {
   try {
     const batch = await getBatchByCode(req.params.batchId);
@@ -549,6 +633,8 @@ router.delete('/batches/:batchId', authRequired, requireRole('admin'), async (re
       BatchExpenseLog.deleteMany({ batch_id: batch.batch_id }),
       BatchSaleLog.deleteMany({ batch_id: batch.batch_id }),
       BatchWeightLog.deleteMany({ batch_id: batch.batch_id }),
+      BatchEggLog.deleteMany({ batch_id: batch.batch_id }),
+      BatchVaccinationLog.deleteMany({ batch_id: batch.batch_id }),
       batch.deleteOne(),
     ]);
 
@@ -610,6 +696,8 @@ router.delete('/batches/logs/:kind/:logId', authRequired, requireRole('admin'), 
       expense: BatchExpenseLog,
       sale: BatchSaleLog,
       weight: BatchWeightLog,
+      egg: BatchEggLog,
+      vaccination: BatchVaccinationLog,
     };
     const Model = models[req.params.kind];
     if (!Model) return res.status(400).json({ error: 'Unknown log type' });
