@@ -51,9 +51,16 @@ The wrapper works on real MongoDB models and on the memory-mode demo models, so 
 - **In-memory demo store:** now supports `save()`, `findByIdAndUpdate`, `findByIdAndDelete` and timestamps on Farm. These were needed by the shared farms router and change nothing for other models.
 - Also: `X-Farm-Id` was added to the allowed CORS headers (Agri and Dairy), so a frontend served from another origin can send it.
 
-## Flock (step 1B-2, provisional)
+## Flock (step 1B-2, implementation in progress)
 
-- **Flock farm-owned:** Batch and its five log collections, and Image, are farm-owned. The old data store keeps whole lists (birds, eggs, feed, expenses, vaccinations) in one document per key. **Open decision for 1B-2:** the first proposal was one document per farm and key, so each farm has its own lists (with the unique `key` index becoming `farmId` + `key`). The owner replied "Flock layout - no we will do …" and the rest of the message did not arrive, so the layout is not decided and no Flock code was written. Phase 2 moves these lists into proper collections later.
+- **Farm-owned:** `DataStore` buckets, `Batch`, all five batch-log collections, and `Image`. `User`, `PasswordReset`, and `Farm` remain global.
+- **Legacy bucket layout:** one document per `farmId + key`. The existing bucket `value` and optimistic-concurrency `version` remain intact. The migration tags existing documents into the default farm, then drops the old globally-unique `key_1` index and creates the compound unique `farmId + key` index. The new `farmId` schema path stays optional until migration so old documents can be read and tagged.
+- **Batches/logs/images:** keep the existing collections and record shapes, adding server-owned `farmId`. Batch IDs remain project-wide unique for compatibility. Batch summary queries are scoped because each model query is wrapped by the shared MUF farm helper.
+- **Roles:** legacy `admin` accounts migrate to `owner`; `manager` and `worker` use the shared farm rules. The API preserves the legacy `role` response while exposing `farmRole` and `farmIds`.
+- **Migration:** `flock_farm/backend/scripts/migrate-farms.js`; `npm run migrate:farms:dry` reports untagged records and legacy roles without applying the farm migration, while `npm run migrate:farms` applies it. Real data is never migrated at startup. Memory/demo data is disposable and migrates automatically.
+- Phase 2 will later move the large legacy bucket lists into proper collections; that restructure is not part of 1B-2.
+
+**Still pending:** run the Flock HTTP scope checks, automated tests/builds, and migration against a backup copy. Review backup/restore, image access, and manager assignment behavior before declaring the phase done.
 
 ## What is checked
 
