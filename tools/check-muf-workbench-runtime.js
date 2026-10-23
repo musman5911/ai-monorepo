@@ -9,6 +9,9 @@
  */
 'use strict';
 
+const { spawn } = require('node:child_process');
+const path = require('node:path');
+
 const routePath = '/__muf-workbench';
 const editorModulePath = '/src/editing-x-projetcs.tsx';
 const stylesheetPath = '/src/muf-workbench.css';
@@ -16,6 +19,10 @@ const viteClientPath = '/@vite/client';
 const reactRefreshPath = '/@react-refresh';
 const baseUrl = new URL(process.env.MUF_WORKBENCH_URL || 'http://127.0.0.1:5000');
 const timeoutMs = Number(process.env.MUF_WORKBENCH_TIMEOUT_MS || 5000);
+const repoRoot = path.resolve(__dirname, '..');
+const dairyClient = path.join(repoRoot, 'dairy_farm', 'client');
+const ownsDevServer = baseUrl.origin === 'http://127.0.0.1:5000';
+let devServer = null;
 let passed = 0;
 
 function check(condition, message) {
