@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 const batchSchema = new mongoose.Schema(
   {
     batch_id: { type: String, required: true, unique: true, index: true },
+    farmId: { type: String, index: true },
     name: { type: String, required: true, trim: true },
     type: { type: String, enum: ['Broiler', 'Layer', 'Breeder', 'Custom'], required: true },
     start_date: { type: String, required: true },
