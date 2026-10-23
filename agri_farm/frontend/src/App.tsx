@@ -33,6 +33,7 @@ import LedgerBookForm from './components/LedgerBookForm';
 import SupplierKhata from './components/SupplierKhata';
 import { useConfirm } from './muf/core/muf-confirm';
 import MufEntityGrid from './muf/ui/muf-entity-grid';
+import AgriCropCsvImport from './components/AgriCropCsvImport';
 import {
   getEmptyCropForm, getEmptyFinForm, getEmptyTaskForm,
   formatCurrency, cropImageMap, getCropImage, getCropProgress,
@@ -398,6 +399,7 @@ function App() {
   
   // Modals
   const [showCropModal, setShowCropModal] = useState(false);
+  const [showCropImport, setShowCropImport] = useState(false);
   const [showFinanceModal, setShowFinanceModal] = useState(false);
   const [financeBookTab, setFinanceBookTab] = useState('ledger');
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -3162,8 +3164,35 @@ function App() {
                   </div>
                 </div>
 
+                {showCropImport && userRole === 'admin' && (
+                  <AgriCropCsvImport onImportRows={async (rows) => {
+                    const outcomes = [];
+                    for (const row of rows) {
+                      const payload = Object.fromEntries(Object.entries(row).filter(([key, value]) => value !== ''));
+                      try {
+                        await api.addCrop({
+                          ...payload,
+                          area_kanal: payload.area_kanal === undefined ? '1.0' : payload.area_kanal,
+                          status: payload.status || 'Growing',
+                          yield_unit: payload.yield_unit || 'kg',
+                          season: payload.season || 'Rabi',
+                          crop_year: payload.crop_year || String(new Date().getFullYear()),
+                        });
+                        outcomes.push({ ok: true });
+                      } catch (error) {
+                        outcomes.push({ ok: false, error });
+                      }
+                    }
+                    await refreshData();
+                    const saved = outcomes.filter((item) => item.ok).length;
+                    const failed = outcomes.length - saved;
+                    setShowCropImport(false);
+                    showAlert(failed ? `Crop CSV import: ${saved} saved, ${failed} failed. Check the rows and retry failed entries.` : `Crop CSV import complete: ${saved} crops saved.`);
+                    if (failed) throw new Error(`${saved} rows saved; ${failed} rows failed. Refresh completed; review the results before retrying.`);
+                  }} />
+                )}
                 {crops.length === 0 ? (
-                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crop records yet')}</h4><p>Add your first wheat, corn, bajra, mattar, jundra, or any other crop.</p>{userRole === 'admin' && (<button onClick={() => { setEditingCrop(null); setCropForm(getEmptyCropForm()); setShowCropModal(true); }} className="muf-primary-action small"><Plus size={16}/> {L('Add Crop')}</button>)}</div>
+                    <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crop records yet')}</h4><p>Add your first wheat, corn, bajra, mattar, jundra, or any other crop.</p>{userRole === 'admin' && (<button onClick={() => { setEditingCrop(null); setCropForm(getEmptyCropForm()); setShowCropModal(true); }} className="muf-primary-action small"><Plus size={16}/> {L('Add Crop')}</button><button type="button" onClick={() => setShowCropImport(open => !open)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-3 py-2 text-xs font-bold">Import CSV</button>)}</div>
                   ) : filteredCrops.length === 0 ? (
                     <div className="muf-empty-crops"><div><Sprout size={36}/></div><h4>{L('No crops match this filter')}</h4><p>{L('Change the crop phase filter to see other records.')}</p></div>
                   ) : (
