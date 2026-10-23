@@ -13,7 +13,7 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 |---|---|
 | 0. Docs reset and repository cleanup | Done. Applied by the owner, pushed to the `muf-monorepo` branch, owner's checks and builds all passed |
 | 1. Farms and roles (MUF) | In progress. Backend phases 1A/1B exist; Phase 1C farm switcher/screens added to source; automated validation, permission review, migration-on-copy checks and Phase 1D wrap-up remain open |
-| 2. Flock restructure and Home Birds | Not started |
+| 2. Flock restructure and Home Birds | In progress. Batches default; Home Birds navigation narrowed; batch egg and vaccination logs added to source. Build/tests pending |
 | 3. Bulk entry, scroll loading, server totals | Not started |
 | 4. Dairy breeding; Agri fields and seasons | Not started |
 | 5. Photo storage and Cloudinary | Not started. Prerequisite done: free Cloudinary account created 2026-10-22 |
@@ -253,8 +253,10 @@ The previously reported Dairy unused-import TypeScript error is resolved in the 
 
 Owner approved simplifying the old individual-bird workflow. The retained Home Birds scope is: home-animal list/details, eggs, monthly report and vaccination. Batches must become the primary Flock workflow. Browser and end-to-end role testing are consolidated at the end of all phases, not repeated per phase.
 
-- **Implemented and pushed:** Flock now defaults to the Batches tab after login and the Batches navigation item is first. The existing Birds navigation item is relabelled Home Birds.
-- **Existing systems reused:** the current `BatchesTab`, `FlockRegister`, `FinancialLedger`, `MonthlySummary` and `HealthPortal` components. No parallel batch model or collections added.
-- **Not yet implemented:** combining the retained Home Birds features into one tab, reducing Home Birds to only the approved features, expanding batch daily-egg/vaccination reporting where missing, and targeted Phase 2 tests.
-- **Not run by assistant:** frontend build, root tests, farm-scope check, MUF sync/UI checks. Owner should run the usual checks after the next implementation increment is pushed.
-- No data migration has been run and no live data was touched.
+- **Implemented and pushed:** Flock defaults to Batches after login; Batches is first in navigation. Home Birds has nested Bird List, Eggs, Monthly Report and Vaccination sections.
+- **Home Birds narrowed:** its egg screen is restricted to egg production; the vaccination screen hides mortality tools and retains vaccine schedule/history. Existing bird list/detail, monthly report and vaccination records remain backed by their existing stores.
+- **Batch operations added:** new batch egg-production and vaccination log models/APIs/forms/detail tables; batch summary now includes egg counts, egg income and vaccination costs. Egg sales revenue contributes to batch revenue/profit calculations.
+- **Existing systems reused:** current `BatchesTab`, `FlockRegister`, `FinancialLedger`, `MonthlySummary` and `HealthPortal`; no parallel batch system was created.
+- **Backup support updated:** batch export/import, detail reads, batch deletion and wipe handling include the new log collections.
+- **Not run by assistant:** frontend build, root tests, farm-scope check, MUF sync/UI checks. Source changes have not yet been compiled or executed locally.
+- No data migration has been run and no live data was touched. New log collections are additive; verify the existing backup/restore tests before treating this phase as complete.
