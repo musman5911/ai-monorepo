@@ -1,6 +1,6 @@
 # Roadmap
 
-Last reviewed: 2026-10-23. Owner reports all three frontend builds, farm-scope checks, MUF sync checks, UI safety checks, 84 unit tests and 23 workbench source checks pass on `muf-monorepo`. Per owner direction, browser and end-to-end role testing will be consolidated into one final verification pass after all planned phases. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-23. Owner-reported local checks before the latest Dashboard change: all three frontend builds, farm-scope checks, MUF sync checks, UI safety checks, 89 unit tests and 8 workbench runtime checks passed. The latest Dashboard batch-first change has not yet been built or tested. Per owner direction, browser and end-to-end role testing will be consolidated into one final verification pass after all planned phases. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
@@ -20,7 +20,7 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 |---|---|---|---|
 | 0 | Docs reset and repository cleanup | Repository | Low (done, see PROGRESS) |
 | 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Implementation done; copy-migration checks and final integrated browser pass pending |
-| 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | In progress; default workflow, Home Birds sub-sections, batch egg/vaccination logs and financial summary are implemented in source; checks pending |
+| 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | In progress; batch API logs/calculations and a Dashboard batch-first overview are implemented; Health, Labor, Incubation and Summary still need batch-first integration; checks pending |
 | 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | Medium |
 | 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | Medium to high |
 | 5 | Photo storage adapter and Cloudinary | All three | Medium |
@@ -54,6 +54,7 @@ Built in four steps so each zip can be checked on its own. The design record is 
 Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthly reports and vaccination only. Other individual-bird workflow features can be removed from the Home Birds navigation/workflow where they are no longer needed, but historical data must not be silently deleted.
 
 - **Implemented in source:** Batches is first and is the default after login. Home Birds exposes nested Bird List, Eggs, Monthly Report and Vaccination sections. Egg entry is constrained to egg production; its vaccination view hides mortality tools.
+- **New step on 2026-10-23:** Dashboard loads active-batch count, live bird count, batch revenue, combined batch profit/loss and a short recent-batch list from the authenticated batch API. Build/test verification for this latest change is pending.
 - **Implemented in source:** new per-batch egg and vaccination log models, authenticated API routes, frontend entry forms and history tables. Batch summary includes egg totals, egg income and vaccination costs, with egg income included in revenue/profit. Batch detail, export/import, deletion and wipe paths include the new collections.
 - **CI passed:** GitHub Actions run [39906778407](https://github.com/musman5911/ai-monorepo/actions/runs/39906778407) completed successfully on commit `d63d719`; root tests, farm scope, MUF parity, UI safety, workbench checks/runtime, design audit and all three app builds passed. `tests/flock-batch-math.test.ts` was included in the passing root test run. Still required: inspect backup/restore compatibility and fix any failures. No migration has been run; new collections are additive, but copy-based backup/restore validation is still required.
 - Browser and end-to-end role verification are deferred to the final pass after all phases, per owner direction.
@@ -107,4 +108,4 @@ Not planned until the scale-up phases are done: lazy-loading PDF and charts (C1)
 
 The first frontend integration adds a shared farm switcher to all three app headers and attaches the selected farm ID to API requests. The owner panel uses existing APIs for farm maintenance and role/farm assignment. Permanent deletion and “All farms” mode are intentionally not exposed.
 
-Owner-reported local results: all three frontend builds, farm-scope, MUF-sync, UI-safety, 84 unit tests and 23 workbench source checks passed. Build warnings remain for large chunks and a mixed static/dynamic import; they did not fail the builds. Review actual endpoint compatibility and role-based access, then test migration dry-runs on database copies. Never run migrations against live data. Browser testing remains deferred until final review.
+Owner-reported local results before the latest Dashboard change: all three frontend builds, farm-scope, MUF-sync, UI-safety, 89 unit tests and 8 workbench runtime checks passed. The latest Dashboard change is not yet verified. Build warnings remain for large chunks and a mixed static/dynamic import; they did not fail the builds. Review actual endpoint compatibility and role-based access, then test migration dry-runs on database copies. Never run migrations against live data. Browser testing remains deferred until final review.
