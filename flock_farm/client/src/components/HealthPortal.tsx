@@ -17,6 +17,8 @@ import { todayStr, diffDateOnlyDays } from '../utils/calculations';
 import { useConfirm, notify } from '../muf/core/muf-confirm';
 import DetailModal from '../muf/core/muf-modal';
 import { L } from '../i18n';
+import { getBatchDetail, listBatches } from '../api';
+import type { BatchVaccinationLog } from '../types';
 
 interface HealthPortalProps {
   birds: Bird[];
@@ -45,6 +47,25 @@ export default function HealthPortal({
   vaccinationOnly = false,
 }: HealthPortalProps) {
   const confirmAction = useConfirm();
+  const [batchVaccinationLogs, setBatchVaccinationLogs] = useState<Array<BatchVaccinationLog & { batchName: string }>>([]);
+  const [batchHealthLoadFailed, setBatchHealthLoadFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const batches = await listBatches();
+        const details = await Promise.all(batches.map(batch => getBatchDetail(batch.batch_id).catch(() => null)));
+        const logs = details.flatMap((detail, index) => detail
+          ? detail.vaccination_logs.map(log => ({ ...log, batchName: detail.batch.name || batches[index].name }))
+          : []);
+        if (!cancelled) { setBatchVaccinationLogs(logs.sort((a, b) => b.date.localeCompare(a.date))); setBatchHealthLoadFailed(false); }
+      } catch {
+        if (!cancelled) setBatchHealthLoadFailed(true);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
   // --- B. MORTALITY ENGINE ---
   const deadBirds = birds.filter(b => b.status === 'Dead');
   const totalDeadCount = deadBirds.length;
@@ -228,7 +249,35 @@ export default function HealthPortal({
   };
 
   return (
-    <div className="space-y-6 muf-health-redesign muf-flock-health" id="health-portal-tab">
+    <section className="mb-5 rounded-2xl border border-indigo-200 dark:border-indigo-900 bg-white dark:bg-slate-900 p-4 space-y-3">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">{L('Batch health')}</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{L('Vaccination history grouped by flock batch')}</p>
+          </div>
+          <span className="rounded-full bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 text-[10px] font-semibold text-indigo-700 dark:text-indigo-300">{batchVaccinationLogs.length} {L('records')}</span>
+        </div>
+        {batchHealthLoadFailed ? (
+          <p role="status" className="text-xs text-amber-700 dark:text-amber-300">{L('Could not load batch vaccination history. Retry by reopening Health.')}</p>
+        ) : batchVaccinationLogs.length ? (
+          <div className="space-y-2">
+            {batchVaccinationLogs.slice(0, 5).map(log => (
+              <div key={log._id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2">
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold truncate">{log.vaccine_name} · {log.batchName}</p>
+                  <p className="text-[11px] text-slate-500">{log.date}{log.dose ? ` · ${log.dose}` : ''}</p>
+                </div>
+                <div className="text-right shrink-0">
+                  <p className="text-xs font-semibold">{log.bird_count || 0} {L('birds')}</p>
+                  <p className="text-[11px] text-slate-500">Rs {Math.round(log.cost || 0).toLocaleString()}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-xs text-slate-500">{L('No batch vaccination logs recorded yet.')}</p>
+        )}
+      </section><div className="space-y-6 muf-health-redesign muf-flock-health" id="health-portal-tab">
       {/* Header */}
       <div className="muf-page-hero">
         <div className="muf-page-title">
