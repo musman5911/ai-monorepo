@@ -14,7 +14,15 @@ router.get('/crops', protect, asyncHandler(async (req, res) => {
   // Workers only see CURRENT crop cycles — completed/history records
   // (and their harvest totals) are the owner's business.
   const query = isAdmin ? {} : { status: { $ne: 'Completed' } };
-  const data = await Crop.find(query).skip(skip).limit(limit);
+  const [data, total] = await Promise.all([
+    Crop.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit),
+    Crop.countDocuments(query),
+  ]);
+  res.set('Access-Control-Expose-Headers', 'X-Total-Count, X-Page, X-Page-Size, X-Total-Pages');
+  res.set('X-Total-Count', String(total));
+  res.set('X-Page', String(Math.floor(skip / limit) + 1));
+  res.set('X-Page-Size', String(limit));
+  res.set('X-Total-Pages', String(Math.ceil(total / limit)));
   const out = data.map((d) => {
     const doc = { ...d, _id: String(d._id) };
     if (!isAdmin) {
