@@ -82,11 +82,35 @@ describe('Flock egg inventory lock', () => {
     expect(store.hasLock()).toBe(false);
   });
 
-  it('does not swallow unexpected storage errors', async () => {
+  it('clears the local guard after a storage error so the next attempt can succeed', async () => {
+    let failCreate = true;
+    let held = false;
     const store = {
-      create: async () => { throw new Error('database unavailable'); },
+      create: async (doc) => {
+        if (failCreate) throw new Error('database unavailable');
+        if (held) { const error = new Error('duplicate key'); error.code = 11000; throw error; }
+        held = true; return { ...doc, _id: 'retry-lock' };
+      },
+      findOneAndDelete: async () => { held = false; return { _id: 'retry-lock' }; },
     };
-    await expect(acquireEggInventoryLock(store)).rejects.toThrow('database unavailable');
+    await expect(acquireEggInventoryLock(store, 'retry-after-storage-error')).rejects.toThrow('database unavailable');
+    failCreate = false;
+    const release = await acquireEggInventoryLock(store, 'retry-after-storage-error');
+    expect(held).toBe(true);
+    await release();
+    expect(held).toBe(false);
+  });
+
+  it('allows independent farms to hold separate inventory locks concurrently', async () => {
+    const store = createFarmStore();
+    const releaseA = await acquireEggInventoryLock(store, 'independent-farm-a');
+    const releaseB = await acquireEggInventoryLock(store, 'independent-farm-b');
+    expect(store.hasFarm('independent-farm-a')).toBe(true);
+    expect(store.hasFarm('independent-farm-b')).toBe(true);
+    await releaseA();
+    expect(store.hasFarm('independent-farm-a')).toBe(false);
+    expect(store.hasFarm('independent-farm-b')).toBe(true);
+    await releaseB();
   });
 
   it('still serializes when the backing adapter does not enforce unique indexes', async () => {

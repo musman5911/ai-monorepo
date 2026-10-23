@@ -1,3 +1,9 @@
+## Additional edge-case safety (2026-10-23)
+
+Incubation allocation now counts egg-log rows as usable supply only when collected, sold, home-use and waste quantities are absent or valid non-negative safe integers. A malformed field makes that row contribute zero supply, preventing NaN from bypassing the allocation comparison. Tests cover malformed numeric strings, negative/unsafe counts, independent per-farm locks and retry after a storage acquisition error. Tests have not been run for this batch. Real MongoDB multi-process contention and backup/restore must still be verified on a disposable copy, never production.
+
+---
+
 # Flock egg-inventory lock recovery
 
 The backend uses a farm-scoped DataStore sentinel named `__flock_egg_inventory_lock__` to serialize incubation allocation writes, batch egg-log changes, destructive batch operations, and full backup/restore. A concurrent request receives HTTP 409 with code `EGG_INVENTORY_BUSY`.

@@ -7,11 +7,63 @@ import { createStore } from '../dairy_farm/backend/memory-db.js';
 const {
   mufNormalizeRole, mufLegacyRole, mufIsFullRole, mufResolveFarmAccess, mufScopeFilter,
   mufStripFarmId, mufScopeModel, mufRunWithFarmContext, mufRunUnscoped, mufSetDefaultFarmId,
-  mufMigrateFarms,
+  mufMigrateFarms, mufCreateFarmsRouter,
 } = farms;
 
 const F = (id: string, createdAt: string, archived = false) => ({ _id: id, createdAt, archived });
 const farmList = [F('b', '2026-02-01'), F('a', '2026-01-01'), F('c', '2026-03-01', true)];
+
+function createFarmDeleteHandler(store, names = ['Crop']) {
+  const express = { Router() {
+    const routes = [];
+    const router = { stack: routes };
+    for (const method of ['get', 'post', 'put', 'patch', 'delete']) router[method] = (...args) => {
+      routes.push({ route: { path: args[0], methods: { [method]: true } }, handlers: args.slice(1) }); return router;
+    };
+    return router;
+  } };
+  const noop = (_req, _res, next) => next();
+  return mufCreateFarmsRouter({ express, Farm: store.Farm, User: store.User, models: store, names, protect: noop, ownerOnly: noop })
+    .stack.find((layer) => layer.route?.path === '/:id' && layer.route.methods.delete).handlers.at(-1);
+}
+function mockResponse() {
+  return { statusCode: 200, body: undefined, status(code) { this.statusCode = code; return this; }, json(body) { this.body = body; return this; } };
+}
+describe('farm deletion safety', () => {
+  it('refuses to delete the final active farm when archived farms remain', async () => {
+    const store = createStore({ Farm: { paths: {}, options: { timestamps: true } }, User: { paths: {} }, Crop: { paths: {} } });
+    await store.Farm.create({ _id: 'active-farm', name: 'Active farm', archived: false });
+    await store.Farm.create({ _id: 'archived-farm', name: 'Old farm', archived: true });
+    const res = mockResponse();
+    await createFarmDeleteHandler(store)({ params: { id: 'active-farm' }, body: {} }, res);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.code).toBe('LAST_ACTIVE_FARM');
+    expect(await store.Farm.findById('active-farm')).not.toBeNull();
+  });
+  it('rejects moving populated records to an archived farm without mutation', async () => {
+    const store = createStore({ Farm: { paths: {}, options: { timestamps: true } }, User: { paths: {} }, Crop: { paths: {} } });
+    await store.Farm.create({ _id: 'source-farm', name: 'Source farm', archived: false });
+    await store.Farm.create({ _id: 'archived-farm', name: 'Old farm', archived: true });
+    await store.Crop.create({ _id: 'crop-1', name: 'Wheat', farmId: 'source-farm' });
+    const res = mockResponse();
+    await createFarmDeleteHandler(store)({ params: { id: 'source-farm' }, body: { confirmName: 'Source farm', moveToFarmId: 'archived-farm' } }, res);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.code).toBe('INVALID_MOVE_TARGET');
+    expect(await store.Farm.findById('source-farm')).not.toBeNull();
+    expect(await store.Crop.findById('crop-1')).toMatchObject({ farmId: 'source-farm' });
+  });
+  it('requires the typed farm name before deleting populated records', async () => {
+    const store = createStore({ Farm: { paths: {}, options: { timestamps: true } }, User: { paths: {} }, Crop: { paths: {} } });
+    await store.Farm.create({ _id: 'source-farm', name: 'Source farm', archived: false });
+    await store.Farm.create({ _id: 'target-farm', name: 'Target farm', archived: false });
+    await store.Crop.create({ _id: 'crop-1', name: 'Wheat', farmId: 'source-farm' });
+    const res = mockResponse();
+    await createFarmDeleteHandler(store)({ params: { id: 'source-farm' }, body: { confirmName: 'wrong name' } }, res);
+    expect(res.statusCode).toBe(400);
+    expect(res.body.code).toBe('CONFIRM_NAME');
+    expect(await store.Crop.findById('crop-1')).toMatchObject({ farmId: 'source-farm' });
+  });
+});
 
 describe('roles', () => {
   it('maps the legacy admin to owner and unknown values to worker', () => {

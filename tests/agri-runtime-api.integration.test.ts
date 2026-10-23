@@ -231,6 +231,59 @@ describe.sequential('Agri runtime API integration', () => {
     }
   });
 
+  it('filters crop, task and ledger pages server-side while preserving worker visibility rules', async () => {
+    const suffix = `runtime-filter-${process.pid}-${Date.now()}-[literal]`;
+    const crop = await request('/crops', { method: 'POST', token: ownerToken, body: {
+      name: `${suffix}-wheat`, variety: 'Local wheat', status: 'Growing', season: 'Rabi', crop_year: '2026', field: 'North Plot',
+    } });
+    const completed = await request('/crops', { method: 'POST', token: ownerToken, body: {
+      name: `${suffix}-corn`, variety: 'Hybrid', status: 'Completed', season: 'Kharif', crop_year: '2025', field: 'South Plot',
+    } });
+    expect(crop.response.status).toBe(201);
+    expect(completed.response.status).toBe(201);
+    created.crops.push(String(crop.data._id), String(completed.data._id));
+    const cropPage = await request(`/crops?skip=0&limit=10&status=Growing&season=Rabi&crop_year=2026&field=North%20Plot&search=${encodeURIComponent(suffix)}`, { token: ownerToken });
+    expect(cropPage.response.status).toBe(200);
+    expect(cropPage.response.headers.get('x-total-count')).toBe('1');
+    expect(String(cropPage.data[0]._id)).toBe(String(crop.data._id));
+    const workerHistory = await request(`/crops?skip=0&limit=10&status=Completed&search=${encodeURIComponent(suffix)}`, { token: workerToken });
+    expect(workerHistory.response.status).toBe(200);
+    expect(workerHistory.data).toEqual([]);
+
+    const task = await request('/tasks', { method: 'POST', token: ownerToken, body: {
+      title: `${suffix}-wheat scouting`, notes: 'North Plot', crop_id: String(crop.data._id), priority: 'Medium',
+    } });
+    expect(task.response.status).toBe(201);
+    created.tasks.push(String(task.data._id));
+    const taskPage = await request(`/tasks?skip=0&limit=10&status=Pending&crop_id=${crop.data._id}&crop_search=${encodeURIComponent('Local wheat')}`, { token: ownerToken });
+    expect(taskPage.response.status).toBe(200);
+    expect(taskPage.response.headers.get('x-total-count')).toBe('1');
+    expect(taskPage.data[0].title).toContain('wheat scouting');
+
+    const income = await request('/finance', { method: 'POST', token: ownerToken, body: {
+      category: `${suffix}-income`, type: 'income', amount: 100, date: '2026-10-23', crop_id: String(crop.data._id), notes: suffix,
+    } });
+    const farmWide = await request('/finance', { method: 'POST', token: ownerToken, body: {
+      category: `${suffix}-farm-wide`, type: 'expense', amount: 15, date: '2026-10-23', notes: suffix,
+    } });
+    const cropExpense = await request('/finance', { method: 'POST', token: ownerToken, body: {
+      category: `${suffix}-crop-expense`, type: 'expense', amount: 5, date: '2026-10-23', crop_id: String(crop.data._id), notes: suffix,
+    } });
+    expect(income.response.status).toBe(201);
+    expect(farmWide.response.status).toBe(201);
+    expect(cropExpense.response.status).toBe(201);
+    const incomePage = await request(`/finance?skip=0&limit=10&type=income&crop_id=${crop.data._id}&search=${encodeURIComponent(suffix)}`, { token: ownerToken });
+    expect(incomePage.response.status).toBe(200);
+    expect(incomePage.response.headers.get('x-total-count')).toBe('1');
+    expect(incomePage.data[0].category).toContain('-income');
+    const farmWidePage = await request(`/finance?skip=0&limit=10&farm_wide=true&type=expense&search=${encodeURIComponent(suffix)}`, { token: ownerToken });
+    expect(farmWidePage.response.status).toBe(200);
+    expect(farmWidePage.response.headers.get('x-total-count')).toBe('1');
+    expect(farmWidePage.data[0].category).toContain('-farm-wide');
+    const financeRows = await request(`/finance?skip=0&limit=500&search=${encodeURIComponent(suffix)}`, { token: ownerToken });
+    for (const row of financeRows.data || []) created.finance.push(String(row._id));
+  });
+
   it('pages a 1,001-row task fixture over real HTTP without missing or duplicating records', async () => {
     const suffix = `runtime-large-page-${process.pid}-${Date.now()}`;
     const fixtureRows = Array.from({ length: 1001 }, (_, index) => ({

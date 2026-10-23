@@ -42,7 +42,11 @@ For crops, tasks and finance, use enough disposable records to exceed one server
 
 ## Release gate
 
-Do not mark Phase 03 complete until automated checks and all role rows above have been reviewed. The current Agri frontend still hydrates the full crop/task/finance datasets by walking every server page during refresh; server pagination exists, but true on-demand network paging is not yet complete. Keep this acceptance item open until list screens request later pages only when the user asks for more and dashboard/report totals are preserved through complete-data or summary endpoints. Record any environment-dependent skips explicitly rather than treating them as passes.
+The Agri crop and task screens now fetch a filtered first page when their view or filters change and fetch later pages only on Load More. Ledger-folder details page transactions by crop or farm-wide grouping and finance type. Server filters are applied before row selection and total-count calculation.
+
+The existing refresh still retrieves complete crop/task/finance arrays for current dashboard/report calculations. Thus the list UI is network-paged, but aggregate startup transfer remains a known scalability item until farm-scoped summary endpoints replace the arrays without changing totals. Tests/builds have not been rerun for this batch.
+
+Keep Phase 03 open until automated tests and all three frontend builds are rerun, filters/Load More and aggregate totals are checked locally, and the final browser-role and disposable real-database checks are recorded. Browser/live UI and real-database checks remain deliberately postponed until the planned phases are implemented. Never treat environment-dependent skips as passes.
 
 
 ## Owner-reported local checkpoint (2026-10-23, commit 757e11e)

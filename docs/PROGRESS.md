@@ -1,3 +1,12 @@
+## Consolidated phase follow-up (2026-10-23)
+
+- Phase 01: shared farm deletion blocks deleting the last active farm and moving populated records into an archived destination. Regression coverage includes these safeguards and typed-name confirmation. Migration/backup-restore on disposable copies and browser role review remain deferred; no live database was accessed.
+- Phase 02: incubation allocation treats malformed, negative, fractional or unsafe egg-log counts as zero usable supply, preventing NaN from bypassing allocation checks. Regression cases cover malformed inputs and lock lifecycle/isolation. Real MongoDB multi-process contention and disposable-copy backup/restore remain unverified.
+- Phase 03: Agri crop/task/finance endpoints now accept server-side filters before paging and counting. Crop/task lists load 40-row pages on demand, and ledger details page per crop/farm-wide group and income/expense type. Complete datasets are still refreshed for existing dashboard/report calculations, so aggregate-array transfer remains a known optimization.
+- Tests/builds have not been rerun for this follow-up; prior owner-reported results do not verify these changes. Browser/live UI and real-database checks remain postponed until the planned implementation is complete.
+
+---
+
 ## Phase 03 follow-up: pagination refresh hardening (2026-10-23)
 
 - Agri's shared full-dataset pagination helper now validates that each response is an array, checks that reported totals remain stable while fetching pages, and deduplicates records by stable `_id` if offset pages overlap while records change. If concurrent mutations make the fetched unique count inconsistent with the reported total, refresh fails visibly rather than silently presenting incomplete data.

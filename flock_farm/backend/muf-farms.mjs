@@ -365,7 +365,11 @@ export function mufCreateFarmsRouter({ express, Farm, User, models, names, prote
       const farm = await Farm.findById(req.params.id);
       if (!farm) return res.status(404).json({ error: 'Farm not found' });
       const all = await Farm.find({}).lean();
-      if (all.length <= 1) return res.status(400).json({ error: 'You cannot delete the last farm' });
+      if (all.length <= 1) return res.status(400).json({ error: 'You cannot delete the last farm', code: 'LAST_FARM' });
+      const active = all.filter((item) => !item.archived);
+      if (!farm.archived && active.length <= 1) {
+        return res.status(400).json({ error: 'You cannot delete the last active farm', code: 'LAST_ACTIVE_FARM' });
+      }
       const { total } = await mufCountFarmRecords(models, names, farm._id);
       if (total > 0) {
         if (cleanName(req.body?.confirmName) !== cleanName(farm.name)) {
@@ -373,8 +377,9 @@ export function mufCreateFarmsRouter({ express, Farm, User, models, names, prote
         }
         const moveTo = sid(req.body?.moveToFarmId);
         if (moveTo) {
-          if (moveTo === sid(farm._id) || !all.some((f) => sid(f._id) === moveTo)) {
-            return res.status(400).json({ error: 'Choose a different existing farm to move the records to' });
+          const destination = all.find((item) => sid(item._id) === moveTo);
+          if (moveTo === sid(farm._id) || !destination || destination.archived) {
+            return res.status(400).json({ error: 'Choose a different active farm to move the records to', code: 'INVALID_MOVE_TARGET' });
           }
           await mufRunUnscoped(async () => {
             for (const n of names) await models[n].updateMany({ farmId: sid(farm._id) }, { $set: { farmId: moveTo } });

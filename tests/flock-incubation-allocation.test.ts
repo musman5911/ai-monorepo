@@ -45,6 +45,16 @@ describe('incubation batch egg allocations', () => {
     )).toContain('100 available eggs');
   });
 
+  it.each([
+    ['non-numeric collection', { batch_id: 'BAT-LAYER-1', collected: 'bad', sold: 0, home_use: 0, broken_wasted: 0 }],
+    ['non-numeric deduction', { batch_id: 'BAT-LAYER-1', collected: 1000, sold: 'bad', home_use: 0, broken_wasted: 0 }],
+    ['negative collection', { batch_id: 'BAT-LAYER-1', collected: -10, sold: 0, home_use: 0, broken_wasted: 0 }],
+    ['negative deduction', { batch_id: 'BAT-LAYER-1', collected: 1000, sold: -1, home_use: 0, broken_wasted: 0 }],
+    ['unsafe count', { batch_id: 'BAT-LAYER-1', collected: Number.MAX_SAFE_INTEGER + 1, sold: 0, home_use: 0, broken_wasted: 0 }],
+  ])('treats %s as zero usable supply', (_label, invalidLog) => {
+    expect(validateIncubationAllocations([{ id: 1, sourceBatchId: 'BAT-LAYER-1', eggsSet: 101 }], batches, [...eggLogs, invalidLog])).toContain('100 available eggs');
+  });
+
   it('rejects a source batch that is not present in the selected farm', () => {
     expect(validateIncubationAllocations(
       [{ id: 1, sourceBatchId: 'OTHER-FARM-BATCH', eggsSet: 1 }],

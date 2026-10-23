@@ -14,9 +14,38 @@ router.get('/finance', protect, requireAdmin, asyncHandler(async (req, res) => {
   if (!Number.isSafeInteger(rawLimit) || rawLimit < 1) return res.status(400).json({ error: 'limit must be a positive integer' });
   const skip = rawSkip;
   const limit = Math.min(rawLimit, 500);
+  const readFilter = (value) => typeof value === 'string' ? value.trim() : '';
+  const escapeRegex = (value) => Array.from(value, (char) => {
+    const code = char.charCodeAt(0);
+    return [36, 46, 42, 43, 63, 94, 123, 125, 40, 41, 124, 91, 93, 92].includes(code)
+      ? String.fromCharCode(92) + char : char;
+  }).join('');
+  const clauses = [];
+  const type = readFilter(req.query.type);
+  const cropId = readFilter(req.query.crop_id);
+  const search = readFilter(req.query.search).slice(0, 100);
+  const farmWide = ['1', 'true'].includes(readFilter(req.query.farm_wide).toLowerCase());
+  if (type && type !== 'all') {
+    if (type !== 'income' && type !== 'expense') return res.status(400).json({ error: 'type must be income or expense' });
+    clauses.push({ type });
+  }
+  if (cropId && cropId !== 'all') clauses.push({ crop_id: cropId });
+  else if (farmWide) {
+    const cropRows = await Crop.find({}).lean();
+    const existingCropIds = cropRows.map((crop) => String(crop._id));
+    clauses.push({ crop_id: { $nin: existingCropIds } });
+  }
+  if (search) {
+    const pattern = escapeRegex(search);
+    clauses.push({ $or: [
+      { category: { $regex: pattern, $options: 'i' } },
+      { notes: { $regex: pattern, $options: 'i' } },
+    ] });
+  }
+  const query = clauses.length === 0 ? {} : clauses.length === 1 ? clauses[0] : { $and: clauses };
   const [data, total] = await Promise.all([
-    Finance.find({}).sort({ date: -1, _id: -1 }).skip(skip).limit(limit),
-    Finance.countDocuments({}),
+    Finance.find(query).sort({ date: -1, _id: -1 }).skip(skip).limit(limit),
+    Finance.countDocuments(query),
   ]);
   res.set('Access-Control-Expose-Headers', 'X-Total-Count, X-Page, X-Page-Size, X-Total-Pages');
   res.set('X-Total-Count', String(total));

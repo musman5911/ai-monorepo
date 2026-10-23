@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from './muf/core/muf-motion';
 import * as api from './api';
+import { AGRI_LIST_PAGE_SIZE, mergeAgriPageRows, getAgriPageTotal } from './components/app/agri-list-paging';
 import DetailModal from './muf/core/muf-modal';
 import MufDiary, { type MufDiaryEntry } from './muf/ui/muf-diary';
 import AdminMenu from './components/AdminMenu';
@@ -372,8 +373,25 @@ function App() {
   const [crops, setCrops] = useState([]);
   const [finance, setFinance] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [cropVisibleCount, setCropVisibleCount] = useState(40);
-  const [taskVisibleCount, setTaskVisibleCount] = useState(40);
+  const [cropPageRows, setCropPageRows] = useState([]);
+  const [cropPageNextSkip, setCropPageNextSkip] = useState(0);
+  const [cropPageTotal, setCropPageTotal] = useState(0);
+  const [cropPageLoading, setCropPageLoading] = useState(false);
+  const [cropPageError, setCropPageError] = useState('');
+  const [taskPageRows, setTaskPageRows] = useState([]);
+  const [taskPageNextSkip, setTaskPageNextSkip] = useState(0);
+  const [taskPageTotal, setTaskPageTotal] = useState(0);
+  const [taskPageLoading, setTaskPageLoading] = useState(false);
+  const [taskPageError, setTaskPageError] = useState('');
+  const [ledgerPageRows, setLedgerPageRows] = useState([]);
+  const [ledgerPageNextSkip, setLedgerPageNextSkip] = useState(0);
+  const [ledgerPageTotal, setLedgerPageTotal] = useState(0);
+  const [ledgerPageLoading, setLedgerPageLoading] = useState(false);
+  const [ledgerPageError, setLedgerPageError] = useState('');
+  const [listRefreshKey, setListRefreshKey] = useState(0);
+  const cropPageRequestRef = useRef(0);
+  const taskPageRequestRef = useRef(0);
+  const ledgerPageRequestRef = useRef(0);
   const [inventory, setInventory] = useState([]);
   const [liabilities, setLiabilities] = useState([]);
   // Supplier khata (dealers we buy from on credit)
@@ -885,6 +903,63 @@ function App() {
       console.error("Data refresh failed:", err);
       if (err.response?.status === 401) performLogout();
     }
+    setListRefreshKey((value) => value + 1);
+  };
+
+  const fetchCropPage = async (skip, filters, reset = false) => {
+    const id = ++cropPageRequestRef.current;
+    if (reset) { setCropPageRows([]); setCropPageNextSkip(0); setCropPageTotal(0); }
+    setCropPageLoading(true); setCropPageError('');
+    try {
+      const res = await api.getCrops(skip, AGRI_LIST_PAGE_SIZE, filters);
+      if (id !== cropPageRequestRef.current) return;
+      if (!Array.isArray(res.data)) throw new Error('Crop page response was not an array.');
+      setCropPageRows((rows) => mergeAgriPageRows(reset ? [] : rows, res.data));
+      setCropPageNextSkip(skip + res.data.length);
+      setCropPageTotal(getAgriPageTotal(res.headers, skip + res.data.length));
+    } catch (err) {
+      if (id === cropPageRequestRef.current) setCropPageError(err?.response?.data?.error || err?.message || 'Could not load crop records.');
+    } finally { if (id === cropPageRequestRef.current) setCropPageLoading(false); }
+  };
+
+  const fetchTaskPage = async (skip, filters, reset = false) => {
+    const id = ++taskPageRequestRef.current;
+    if (reset) { setTaskPageRows([]); setTaskPageNextSkip(0); setTaskPageTotal(0); }
+    setTaskPageLoading(true); setTaskPageError('');
+    try {
+      const res = await api.getTasks(skip, AGRI_LIST_PAGE_SIZE, filters);
+      if (id !== taskPageRequestRef.current) return;
+      if (!Array.isArray(res.data)) throw new Error('Task page response was not an array.');
+      setTaskPageRows((rows) => mergeAgriPageRows(reset ? [] : rows, res.data));
+      setTaskPageNextSkip(skip + res.data.length);
+      setTaskPageTotal(getAgriPageTotal(res.headers, skip + res.data.length));
+    } catch (err) {
+      if (id === taskPageRequestRef.current) setTaskPageError(err?.response?.data?.error || err?.message || 'Could not load task records.');
+    } finally { if (id === taskPageRequestRef.current) setTaskPageLoading(false); }
+  };
+
+  const fetchLedgerPage = async (group, skip, reset = false, type = financeFilter) => {
+    if (!group) return;
+    const id = ++ledgerPageRequestRef.current;
+    if (reset) { setLedgerPageRows([]); setLedgerPageNextSkip(0); setLedgerPageTotal(0); }
+    setLedgerPageLoading(true); setLedgerPageError('');
+    const filters = { type };
+    if (group.id === 'farm-wide') filters.farm_wide = 'true'; else filters.crop_id = group.id;
+    try {
+      const res = await api.getFinance(skip, AGRI_LIST_PAGE_SIZE, filters);
+      if (id !== ledgerPageRequestRef.current) return;
+      if (!Array.isArray(res.data)) throw new Error('Ledger page response was not an array.');
+      setLedgerPageRows((rows) => mergeAgriPageRows(reset ? [] : rows, res.data));
+      setLedgerPageNextSkip(skip + res.data.length);
+      setLedgerPageTotal(getAgriPageTotal(res.headers, skip + res.data.length));
+    } catch (err) {
+      if (id === ledgerPageRequestRef.current) setLedgerPageError(err?.response?.data?.error || err?.message || 'Could not load ledger entries.');
+    } finally { if (id === ledgerPageRequestRef.current) setLedgerPageLoading(false); }
+  };
+
+  const openLedgerGroup = (group) => {
+    setSelectedLedgerGroup(group);
+    void fetchLedgerPage(group, 0, true, financeFilter);
   };
 
   const performLogout = () => {
@@ -1925,7 +2000,7 @@ function App() {
   });
 
   // ── Grid view items (muf-entity-grid) — replaces inline crop cards ──
-  const visibleFilteredCrops = filteredCrops.slice(0, cropVisibleCount);
+  const visibleFilteredCrops = cropPageRows;
   const gridCrops = visibleFilteredCrops.map((c) => {
     const progress = getCropProgress(c);
     const cropDay = c.plant_date ? Math.max(0, Math.floor((Date.now() - new Date(c.plant_date + 'T00:00:00').getTime()) / 86400000)) : null;
@@ -2017,16 +2092,26 @@ function App() {
   }, [crops, filteredFinance, financeCropFilter]);
 
   const filteredTasks = tasks.filter(t => {
-    // 1. Task Status Filter
     if (taskFilter !== 'all') {
       if (taskFilter === 'Pending' && t.status !== 'Pending') return false;
       if (taskFilter === 'Completed' && t.status !== 'Completed') return false;
     }
-    
-    // 2. Crop filter (per-tab filter)
     if (taskCropFilter !== 'all' && !taskMatchesCrop(t, taskCropFilter)) return false;
     return true;
   });
+  const cropListFilters = { status: cropFilter, season: cropSeasonFilter, crop_year: cropYearFilter, field: cropFieldFilter, crop_id: cropIdFilter, search: cropSearch };
+  const selectedTaskCrop = taskCropFilter === 'all' ? null : crops.find((crop) => crop._id === taskCropFilter);
+  const taskListFilters = { status: taskFilter, crop_id: taskCropFilter === 'all' ? '' : taskCropFilter, crop_search: selectedTaskCrop ? [selectedTaskCrop.name, selectedTaskCrop.variety].filter(Boolean).join('|') : '' };
+  useEffect(() => {
+    if (!token || activeTab !== 'crops') return undefined;
+    void fetchCropPage(0, cropListFilters, true);
+    return () => { cropPageRequestRef.current += 1; };
+  }, [token, activeTab, cropFilter, cropSeasonFilter, cropYearFilter, cropFieldFilter, cropIdFilter, cropSearch, listRefreshKey]);
+  useEffect(() => {
+    if (!token || activeTab !== 'tasks') return undefined;
+    void fetchTaskPage(0, taskListFilters, true);
+    return () => { taskPageRequestRef.current += 1; };
+  }, [token, activeTab, taskFilter, taskCropFilter, selectedTaskCrop?.name, selectedTaskCrop?.variety, listRefreshKey]);
 
   const openLedgerProfitModal = (source, cardType = 'profit') => {
     if (userRole !== 'admin') return; // money popups are admin-only
@@ -3233,14 +3318,9 @@ function App() {
                       emptyHint="Try clearing the filters or add your first crop."
                     />
                   )}
-                  {filteredCrops.length > visibleFilteredCrops.length && (
-                    <div className="flex justify-center py-4">
-                      <button type="button" onClick={() => setCropVisibleCount(count => count + 40)}
-                        className="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800">
-                        Load more crops ({visibleFilteredCrops.length} of {filteredCrops.length})
-                      </button>
-                    </div>
-                  )}
+                  {cropPageError && <div role="alert" className="my-3 flex items-center justify-between gap-3 rounded-xl border border-red-300/60 p-3 text-xs text-red-700"><span>{cropPageError}</span><button type="button" onClick={() => fetchCropPage(cropPageNextSkip, cropListFilters, cropPageNextSkip === 0)} className="font-bold underline">Retry</button></div>}
+                  {cropPageLoading && cropPageRows.length === 0 && <p role="status" className="py-5 text-center text-xs text-slate-500">Loading crop records…</p>}
+                  {cropPageRows.length < cropPageTotal && <div className="flex justify-center py-4"><button type="button" disabled={cropPageLoading} onClick={() => fetchCropPage(cropPageNextSkip, cropListFilters, false)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold disabled:opacity-50">{cropPageLoading ? 'Loading crops…' : 'Load more crops (' + cropPageRows.length + ' of ' + cropPageTotal + ')'}</button></div>}
               </section>
 
               {/* FAB — Add New Crop */}
@@ -3379,7 +3459,7 @@ function App() {
                     <section key={group.id} className="muf-panel overflow-hidden">
                       {/* Folder Header */}
                       <div
-                        onClick={() => setSelectedLedgerGroup(group)}
+                        onClick={() => openLedgerGroup(group)}
                         className="muf-panel-heading cursor-pointer hover:bg-slate-100/40 dark:hover:bg-slate-900/10 transition-colors flex items-center justify-between"
                       >
                         <div className="flex items-center gap-2.5">
@@ -3874,6 +3954,8 @@ function App() {
                   </div>
                 </div>
 
+                {taskPageError && <div role="alert" className="my-3 flex items-center justify-between gap-3 rounded-xl border border-red-300/60 p-3 text-xs text-red-700"><span>{taskPageError}</span><button type="button" onClick={() => fetchTaskPage(taskPageNextSkip, taskListFilters, taskPageNextSkip === 0)} className="font-bold underline">Retry</button></div>}
+                {taskPageLoading && taskPageRows.length === 0 && <p role="status" className="py-5 text-center text-xs text-slate-500">Loading task records…</p>}
                 <div className="muf-crop-grid">
                   {tasks.length === 0 ? (
                     <div className="muf-empty-crops">
@@ -3887,7 +3969,7 @@ function App() {
                       <h4>{L('No duties match filter')}</h4>
                       <p>{L('Try switching to another status or scheduled care assignment filter.')}</p>
                     </div>
-                  ) : filteredTasks.slice(0, taskVisibleCount).map((t, idx) => (
+                  ) : taskPageRows.map((t, idx) => (
                     <article 
                       key={t._id} 
                       className="muf-crop-card cursor-pointer hover:scale-[1.01] transition-transform" 
@@ -3993,14 +4075,7 @@ function App() {
                     </article>
                   ))}
                 </div>
-                {filteredTasks.length > taskVisibleCount && (
-                  <div className="flex justify-center py-4">
-                    <button type="button" onClick={() => setTaskVisibleCount(count => count + 40)}
-                      className="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold hover:bg-slate-50 dark:hover:bg-slate-800">
-                      Load more tasks ({Math.min(taskVisibleCount, filteredTasks.length)} of {filteredTasks.length})
-                    </button>
-                  </div>
-                )}
+                {taskPageRows.length < taskPageTotal && <div className="flex justify-center py-4"><button type="button" disabled={taskPageLoading} onClick={() => fetchTaskPage(taskPageNextSkip, taskListFilters, false)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold disabled:opacity-50">{taskPageLoading ? 'Loading tasks…' : 'Load more tasks (' + taskPageRows.length + ' of ' + taskPageTotal + ')'}</button></div>}
 
               </section>
 
@@ -5515,7 +5590,7 @@ function App() {
         open={!!selectedLedgerGroup}
         onClose={closePopup}
         title={selectedLedgerGroup ? selectedLedgerGroup.name : "Ledger Folder"}
-        subtitle={selectedLedgerGroup ? `Plot: ${selectedLedgerGroup.plot} • ${selectedLedgerGroup.transactions.length} entries` : ""}
+        subtitle={selectedLedgerGroup ? `Plot: ${selectedLedgerGroup.plot} • ${ledgerPageTotal} entries` : ""}
         icon={<Database size={16} />}
        size="big">
         {selectedLedgerGroup && (
@@ -5527,6 +5602,8 @@ function App() {
               </strong>
             </div>
 
+            {ledgerPageError && <div role="alert" className="flex items-center justify-between gap-3 rounded-xl border border-red-300/60 p-3 text-xs text-red-700"><span>{ledgerPageError}</span><button type="button" onClick={() => fetchLedgerPage(selectedLedgerGroup, ledgerPageNextSkip, ledgerPageNextSkip !== 0, financeFilter)} className="font-bold underline">Retry</button></div>}
+            {ledgerPageLoading && ledgerPageRows.length === 0 && <p role="status" className="py-3 text-center text-xs text-slate-500">Loading ledger entries…</p>}
             <div className="overflow-x-auto">
               <table className="muf-reflow muf-ledger-records w-full text-left border-collapse text-xs md:text-sm">
                 <thead>
@@ -5540,7 +5617,7 @@ function App() {
                 <tbody className={`divide-y ${
                   isDark ? 'divide-slate-800 text-slate-300' : 'divide-slate-200 text-slate-700'
                 }`}>
-                  {selectedLedgerGroup.transactions.map(f => (
+                  {ledgerPageRows.map(f => (
                     <tr 
                       key={f._id}
                       onClick={() => openPopup('selectedFinance', f)}
@@ -5586,7 +5663,7 @@ function App() {
                       )}
                     </tr>
                   ))}
-                  {selectedLedgerGroup.transactions.length === 0 && (
+                  {ledgerPageTotal === 0 && !ledgerPageLoading && (
                     <tr>
                       <td colSpan={userRole === 'admin' ? 4 : 3} className="px-4 py-8 text-center text-slate-500 italic">{L('No transactions in this folder.')}</td>
                     </tr>
@@ -5594,6 +5671,7 @@ function App() {
                 </tbody>
               </table>
             </div>
+            {ledgerPageRows.length < ledgerPageTotal && <div className="flex justify-center py-2"><button type="button" disabled={ledgerPageLoading} onClick={() => fetchLedgerPage(selectedLedgerGroup, ledgerPageNextSkip, false, financeFilter)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold disabled:opacity-50">{ledgerPageLoading ? 'Loading entries…' : 'Load more ledger entries (' + ledgerPageRows.length + ' of ' + ledgerPageTotal + ')'}</button></div>}
           </div>
         )}
       </DetailModal>

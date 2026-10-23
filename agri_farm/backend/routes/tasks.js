@@ -17,9 +17,33 @@ router.get('/tasks', protect, asyncHandler(async (req, res) => {
   if (!Number.isSafeInteger(rawLimit) || rawLimit < 1) return res.status(400).json({ error: 'limit must be a positive integer' });
   const skip = rawSkip;
   const limit = Math.min(rawLimit, 500);
+  const readFilter = (value) => typeof value === 'string' ? value.trim() : '';
+  const escapeRegex = (value) => Array.from(value, (char) => {
+    const code = char.charCodeAt(0);
+    return [36, 46, 42, 43, 63, 94, 123, 125, 40, 41, 124, 91, 93, 92].includes(code)
+      ? String.fromCharCode(92) + char : char;
+  }).join('');
+  const clauses = [];
+  const status = readFilter(req.query.status);
+  const cropId = readFilter(req.query.crop_id);
+  const searchTerms = readFilter(req.query.crop_search).slice(0, 240).split('|').map((part) => part.trim()).filter(Boolean).slice(0, 4);
+  if (status && status !== 'all') clauses.push({ status });
+  if (cropId && cropId !== 'all' && !/^[0-9a-fA-F]{24}$/.test(cropId)) {
+    return res.status(400).json({ error: 'crop_id must be a valid crop ID' });
+  }
+  if (cropId && cropId !== 'all') clauses.push({ crop_id: cropId });
+  if (searchTerms.length) {
+    const matches = [];
+    for (const term of searchTerms) {
+      const pattern = escapeRegex(term.slice(0, 80));
+      matches.push({ title: { $regex: pattern, $options: 'i' } }, { notes: { $regex: pattern, $options: 'i' } });
+    }
+    clauses.push({ $or: matches });
+  }
+  const query = clauses.length === 0 ? {} : clauses.length === 1 ? clauses[0] : { $and: clauses };
   const [data, total] = await Promise.all([
-    Task.find({}).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit),
-    Task.countDocuments({}),
+    Task.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit),
+    Task.countDocuments(query),
   ]);
   res.set('Access-Control-Expose-Headers', 'X-Total-Count, X-Page, X-Page-Size, X-Total-Pages');
   res.set('X-Total-Count', String(total));

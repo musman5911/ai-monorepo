@@ -22,12 +22,17 @@ export function validateIncubationAllocations(records, batches, eggLogs) {
   for (const log of eggLogs) {
     const batchId = String(log.batch_id);
     if (!availableByBatch.has(batchId)) continue;
-    const net = Number(log.collected || 0)
-      - Number(log.sold || 0)
-      - Number(log.home_use || 0)
-      - Number(log.broken_wasted || 0);
-    // Match batch summaries: a malformed/legacy log cannot create negative
-    // inventory that offsets valid supply from another day.
+    // A malformed legacy row contributes no usable supply; NaN must never
+    // bypass the allocation comparison, and negative counts cannot inflate stock.
+    const counts = ['collected', 'sold', 'home_use', 'broken_wasted'].map((field) => {
+      const raw = log[field];
+      if (raw === undefined || raw === null || raw === '') return 0;
+      const count = Number(raw);
+      return Number.isSafeInteger(count) && count >= 0 ? count : NaN;
+    });
+    if (counts.some((count) => !Number.isSafeInteger(count))) continue;
+    const [collected, sold, homeUse, brokenWasted] = counts;
+    const net = collected - sold - homeUse - brokenWasted;
     availableByBatch.set(batchId, availableByBatch.get(batchId) + Math.max(0, net));
   }
 

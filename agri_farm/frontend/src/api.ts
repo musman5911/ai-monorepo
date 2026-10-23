@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { buildAgriPageQuery } from './components/app/agri-list-paging';
 
 const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
@@ -98,20 +99,20 @@ export const resetPassword = (email, code, newPassword) => {
 };
 
 // --- CROPS ROUTES ---
-export const getCrops = (skip = 0, limit = 100) => api.get(`/crops?skip=${skip}&limit=${limit}`);
+export const getCrops = (skip = 0, limit = 100, filters = {}) => api.get(`/crops?${buildAgriPageQuery(skip, limit, filters)}`);
 export const addCrop = (crop) => api.post('/crops', crop);
 export const updateCrop = (id, crop) => api.put(`/crops/${id}`, crop);
 export const deleteCrop = (id) => api.delete(`/crops/${id}`);
 
 // --- FINANCE ROUTES ---
-export const getFinance = (skip = 0, limit = 100) => api.get(`/finance?skip=${skip}&limit=${limit}`);
+export const getFinance = (skip = 0, limit = 100, filters = {}) => api.get(`/finance?${buildAgriPageQuery(skip, limit, filters)}`);
 export const addFinance = (entry) => api.post('/finance', entry);
 export const addFinanceBulk = (rows) => api.post('/finance/bulk', { rows });
 export const updateFinance = (id, entry) => api.put(`/finance/${id}`, entry);
 export const deleteFinance = (id) => api.delete(`/finance/${id}`);
 
 // --- TASKS ROUTES ---
-export const getTasks = (skip = 0, limit = 100) => api.get(`/tasks?skip=${skip}&limit=${limit}`);
+export const getTasks = (skip = 0, limit = 100, filters = {}) => api.get(`/tasks?${buildAgriPageQuery(skip, limit, filters)}`);
 export const addTask = (task) => api.post('/tasks', task);
 export const addTasksBulk = (rows) => api.post('/tasks/bulk', { rows });
 export const updateTask = (id, task) => api.put(`/tasks/${id}`, task);

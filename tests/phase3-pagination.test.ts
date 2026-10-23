@@ -1,4 +1,42 @@
 import { describe, expect, it } from 'vitest';
+import {
+  AGRI_LIST_PAGE_SIZE,
+  buildAgriPageQuery,
+  getAgriPageTotal,
+  mergeAgriPageRows,
+} from '../agri_farm/frontend/src/components/app/agri-list-paging';
+
+describe('Agri list page helpers', () => {
+  it('encodes page filters and omits empty or all-valued selections', () => {
+    expect(AGRI_LIST_PAGE_SIZE).toBe(40);
+    const params = new URLSearchParams(buildAgriPageQuery(40, 40, {
+      status: 'Growing', search: 'wheat [literal]', season: 'all', empty: '',
+      crop_search: ['wheat', 'local variety'],
+    }));
+    expect(params.get('skip')).toBe('40');
+    expect(params.get('limit')).toBe('40');
+    expect(params.get('status')).toBe('Growing');
+    expect(params.get('search')).toBe('wheat [literal]');
+    expect(params.has('season')).toBe(false);
+    expect(params.has('empty')).toBe(false);
+    expect(params.get('crop_search')).toBe('wheat|local variety');
+  });
+
+  it('merges pages by stable IDs without dropping ID-less legacy rows', () => {
+    expect(mergeAgriPageRows([{ _id: 'a', value: 1 }, { value: 'legacy' }], [
+      { _id: 'a', value: 9 }, { _id: 'b', value: 2 }, { value: 'second legacy' },
+    ])).toEqual([{ _id: 'a', value: 1 }, { value: 'legacy' }, { _id: 'b', value: 2 }, { value: 'second legacy' }]);
+  });
+
+  it('uses server count headers and falls back on malformed metadata', () => {
+    expect(getAgriPageTotal({ 'x-total-count': '1250' }, 40)).toBe(1250);
+    expect(getAgriPageTotal({ 'X-Total-Count': '12' }, 40)).toBe(12);
+    expect(getAgriPageTotal({ 'x-total-count': '-1' }, 40)).toBe(40);
+    expect(getAgriPageTotal({}, 40)).toBe(40);
+  });
+});
+
+
 import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -182,10 +220,13 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
 
   it('renders Agri crop and task cards in incremental chunks without truncating aggregate source arrays', () => {
     const app = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/App.tsx'), 'utf8');
-    expect(app).toContain('const visibleFilteredCrops = filteredCrops.slice(0, cropVisibleCount)');
-    expect(app).toContain('filteredTasks.slice(0, taskVisibleCount).map');
+    expect(app).toContain('const visibleFilteredCrops = cropPageRows');
+    expect(app).toContain('taskPageRows.map((t, idx)');
     expect(app).toContain('Load more crops');
     expect(app).toContain('Load more tasks');
+    expect(app).toContain('Load more ledger entries');
+    expect(app).toContain('api.getCrops(skip, AGRI_LIST_PAGE_SIZE, filters)');
+    expect(app).toContain('api.getTasks(skip, AGRI_LIST_PAGE_SIZE, filters)');
     expect(app).toContain('buildDashboardIncomeSeries(finance)');
     expect(app).toContain('buildMonthlyComparisonRows(finance, crops');
   });

@@ -1,3 +1,9 @@
+## Farm deletion safety follow-up (2026-10-23)
+
+The shared farm delete route refuses to delete an active farm if it is the last active farm, even when archived farms remain. It also verifies that a move destination exists and is active before moving populated records. Route-handler regressions cover the last-active-farm guard, archived destination and typed-name confirmation. Tests have not yet been run for this batch. Migration/backup-restore on a disposable copy and the all-role browser pass remain deferred; never use production data for those checks.
+
+---
+
 # Phase 1 design record: farms and roles
 
 Written 2026-10-22 while building step 1A. It records what was decided and why, so steps 1B to 1D follow the same rules. The rulebook is `FARMS_AND_ROLES.md`; status is in `PROGRESS.md`.

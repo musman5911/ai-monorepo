@@ -15,9 +15,37 @@ router.get('/crops', protect, asyncHandler(async (req, res) => {
   const skip = rawSkip;
   const limit = Math.min(rawLimit, 500);
   const isAdmin = mufIsFullRole(req.user.role);
-  // Workers only see CURRENT crop cycles — completed/history records
-  // (and their harvest totals) are the owner's business.
-  const query = isAdmin ? {} : { status: { $ne: 'Completed' } };
+  const readFilter = (value) => typeof value === 'string' ? value.trim() : '';
+  const escapeRegex = (value) => Array.from(value, (char) => {
+    const code = char.charCodeAt(0);
+    return [36, 46, 42, 43, 63, 94, 123, 125, 40, 41, 124, 91, 93, 92].includes(code)
+      ? String.fromCharCode(92) + char : char;
+  }).join('');
+  const clauses = [];
+  if (!isAdmin) clauses.push({ status: { $ne: 'Completed' } });
+  const status = readFilter(req.query.status);
+  const season = readFilter(req.query.season);
+  const cropYear = readFilter(req.query.crop_year);
+  const field = readFilter(req.query.field);
+  const cropId = readFilter(req.query.crop_id);
+  const search = readFilter(req.query.search).slice(0, 100);
+  if (status && status !== 'all') clauses.push({ status });
+  if (season && season !== 'all') clauses.push({ season });
+  if (cropYear && cropYear !== 'all') clauses.push({ crop_year: cropYear });
+  if (field && field !== 'all') clauses.push({ field });
+  if (cropId && cropId !== 'all') {
+    if (!/^[0-9a-fA-F]{24}$/.test(cropId)) return res.status(400).json({ error: 'crop_id must be a valid crop ID' });
+    clauses.push({ _id: cropId });
+  }
+  if (search) {
+    const pattern = escapeRegex(search);
+    clauses.push({ $or: [
+      { name: { $regex: pattern, $options: 'i' } },
+      { variety: { $regex: pattern, $options: 'i' } },
+      { field: { $regex: pattern, $options: 'i' } },
+    ] });
+  }
+  const query = clauses.length === 0 ? {} : clauses.length === 1 ? clauses[0] : { $and: clauses };
   const [data, total] = await Promise.all([
     Crop.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit),
     Crop.countDocuments(query),
