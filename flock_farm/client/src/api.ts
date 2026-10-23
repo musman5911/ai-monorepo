@@ -7,6 +7,8 @@
 import type {
   BatchBackupBundle,
   BatchDetail,
+  BatchEggLog,
+  BatchVaccinationLog,
   BatchExpenseLog,
   BatchFeedLog,
   BatchMortalityLog,
@@ -616,6 +618,37 @@ export async function createBatchFeedLog(batchId: string, payload: {
   return data.log;
 }
 
+export async function createBatchEggLog(batchId: string, payload: {
+  date: string;
+  collected: number;
+  sold: number;
+  home_use: number;
+  broken_wasted: number;
+  price_per_egg: number;
+  notes?: string;
+}): Promise<BatchEggLog> {
+  const data = await authedJson<{ log: BatchEggLog }>(`${BATCH_BASE}/${encodeURIComponent(batchId)}/egg-logs`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return data.log;
+}
+
+export async function createBatchVaccinationLog(batchId: string, payload: {
+  date: string;
+  vaccine_name: string;
+  dose?: string;
+  bird_count: number;
+  cost: number;
+  notes?: string;
+}): Promise<BatchVaccinationLog> {
+  const data = await authedJson<{ log: BatchVaccinationLog }>(`${BATCH_BASE}/${encodeURIComponent(batchId)}/vaccination-logs`, {
+    method: 'POST',
+    body: JSON.stringify(payload),
+  });
+  return data.log;
+}
+
 export async function createBatchWeightLog(batchId: string, payload: {
   date: string;
   avg_weight_g: number;
@@ -715,7 +748,7 @@ export async function deleteBatchGalleryPhoto(batchId: string, imagePath: string
   return data.gallery;
 }
 
-export async function deleteBatchLog(kind: 'feed' | 'mortality' | 'expense' | 'sale' | 'weight', logId: string): Promise<void> {
+export async function deleteBatchLog(kind: 'feed' | 'mortality' | 'expense' | 'sale' | 'weight' | 'egg' | 'vaccination', logId: string): Promise<void> {
   await authedJson<{ ok: true }>(`${BATCH_BASE}/logs/${kind}/${encodeURIComponent(logId)}`, {
     method: 'DELETE',
   });
