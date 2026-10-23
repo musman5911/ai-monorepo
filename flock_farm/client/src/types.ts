@@ -117,6 +117,8 @@ export interface EggProduction {
 export interface IncubationRecord {
   id: number;
   startDate: string;
+  /** Batch that supplied these eggs; absent on historical records created before batch traceability. */
+  sourceBatchId?: string;
   eggsSet: number;
   hatchDate?: string;
   hatched: number;
