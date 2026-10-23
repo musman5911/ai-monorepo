@@ -143,7 +143,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
 
   const handleAddCalf = async (e: React.FormEvent) => {
     e.preventDefault();
-    const mother = cows.find(c => c._id === calfForm.motherId);
+    const mother = [...cows, ...mothers].find(c => c._id === calfForm.motherId);
     if (!mother) { notify(L('Select a mother cow'), 'error'); return; }
     const nursingBase = new Date(calfForm.birthDate + 'T00:00:00');
     nursingBase.setDate(nursingBase.getDate() + Math.round(calfForm.nursingMonths * 30));
