@@ -77,6 +77,10 @@ userSchema.statics.hashPassword = async function (plain) {
 userSchema.methods.toSafeJSON = function () {
   const obj = this.toObject();
   delete obj.passwordHash;
+  const farmRole = mufNormalizeRole(obj.role);
+  obj.role = mufLegacyRole(farmRole);
+  obj.farmRole = farmRole;
+  obj.farmIds = (obj.farmIds || []).map(String);
   return obj;
 };
 
