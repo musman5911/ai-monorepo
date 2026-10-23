@@ -176,7 +176,7 @@ router.put('/data/:key', authRequired, async (req, res) => {
     const { value, baseVersion } = req.body;
 
     // Role gate first (cheap, no DB read needed for the non-birds cases)
-    if (req.user.role !== 'admin') {
+    if (req.user.farmRole === 'worker' || (!req.user.farmRole && req.user.role !== 'admin')) {
       if (key !== 'birds') {
         if (!WORKER_WRITE_KEYS.has(key)) {
           return res.status(403).json({ error: `Workers cannot modify "${key}"` });
@@ -210,7 +210,7 @@ router.put('/data/:key', authRequired, async (req, res) => {
     }
 
     // Worker bird-write validation against the same snapshot we version-check
-    if (req.user.role !== 'admin' && key === 'birds') {
+    if ((req.user.farmRole === 'worker' || (!req.user.farmRole && req.user.role !== 'admin')) && key === 'birds') {
       const validation = validateWorkerBirdWrite(current?.value ?? [], value);
       if (!validation.ok) {
         return res.status(403).json({ error: validation.error });
