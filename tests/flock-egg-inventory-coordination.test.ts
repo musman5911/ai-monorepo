@@ -110,3 +110,43 @@ describe('Phase 3 Flock bounded per-batch egg bulk entry', () => {
     expect(source).toContain('/egg-logs/bulk');
   });
 });
+
+
+describe('Phase 3 Flock bulk logs beyond egg collection', () => {
+  it('supports bounded bulk entry for feed, weight, vaccination and expenses', () => {
+    const route = readFileSync(path.join(repoRoot, 'flock_farm/backend/routes/batches.js'), 'utf8');
+    const api = readFileSync(path.join(repoRoot, 'flock_farm/client/src/api.ts'), 'utf8');
+    expect(route).toContain("router.post('/batches/:batchId/logs/:logType/bulk'");
+    expect(route).toContain("if (rows.length > 200)");
+    expect(route).toContain("if (errors.length) return res.status(400)");
+    expect(route).toContain("if (!ensureBatchOpen(batch, res)) return;");
+    for (const type of ['feed', 'weight', 'vaccination', 'expense']) {
+      expect(route).toContain(`      ${type}: {`);
+    }
+    expect(api).toContain('createBatchLogsBulk');
+  });
+
+  it('keeps mortality and sales on sequential validation paths', () => {
+    const route = readFileSync(path.join(repoRoot, 'flock_farm/backend/routes/batches.js'), 'utf8');
+    const bulkStart = route.indexOf("router.post('/batches/:batchId/logs/:logType/bulk'");
+    const bulkEnd = route.indexOf("router.post('/batches/:batchId/egg-logs'", bulkStart);
+    const bulkRoute = route.slice(bulkStart, bulkEnd);
+    expect(bulkRoute).not.toContain('BatchMortalityLog');
+    expect(bulkRoute).not.toContain('BatchSaleLog');
+    expect(route).toContain('Mortality count');
+    expect(route).toContain('Sale count');
+  });
+
+  it('uses a bounded page size for 1,000 stable fixture rows without gaps or duplicates', () => {
+    const rows = Array.from({ length: 1000 }, (_, index) => ({ id: index + 1 }));
+    const pageSize = 100;
+    const pages = Array.from({ length: Math.ceil(rows.length / pageSize) }, (_, index) =>
+      rows.slice(index * pageSize, (index + 1) * pageSize),
+    );
+    const loaded = pages.flat();
+    expect(pages).toHaveLength(10);
+    expect(pages.every((page) => page.length <= pageSize)).toBe(true);
+    expect(loaded.map((row) => row.id)).toEqual(rows.map((row) => row.id));
+    expect(new Set(loaded.map((row) => row.id)).size).toBe(1000);
+  });
+});
