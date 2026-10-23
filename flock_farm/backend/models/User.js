@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { MUF_ENV } from '../muf-env.mjs';
+import { mufNormalizeRole, mufLegacyRole } from '../muf-farms.mjs';
 
 const userSchema = new mongoose.Schema(
   {
