@@ -249,7 +249,8 @@ export default function HealthPortal({
   };
 
   return (
-    <section className="mb-5 rounded-2xl border border-indigo-200 dark:border-indigo-900 bg-white dark:bg-slate-900 p-4 space-y-3">
+    <div className="space-y-6 muf-health-redesign muf-flock-health" id="health-portal-tab">
+      <section className="mb-5 rounded-2xl border border-indigo-200 dark:border-indigo-900 bg-white dark:bg-slate-900 p-4 space-y-3">
         <div className="flex items-start justify-between gap-3">
           <div>
             <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">{L('Batch health')}</h2>
@@ -277,7 +278,7 @@ export default function HealthPortal({
         ) : (
           <p className="text-xs text-slate-500">{L('No batch vaccination logs recorded yet.')}</p>
         )}
-      </section><div className="space-y-6 muf-health-redesign muf-flock-health" id="health-portal-tab">
+      </section>
       {/* Header */}
       <div className="muf-page-hero">
         <div className="muf-page-title">
