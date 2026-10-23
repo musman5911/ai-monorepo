@@ -16,6 +16,7 @@ import Batch from '../models/Batch.js';
 import BatchEggLog from '../models/BatchEggLog.js';
 import { validateIncubationAllocations } from '../incubation-allocation.mjs';
 import { validateLaborBatchAssignments } from '../batch-labor.mjs';
+import { acquireEggInventoryLock } from '../egg-inventory-lock.mjs';
 import { authRequired } from '../middleware/auth.js';
 
 const router = express.Router();
@@ -176,6 +177,7 @@ router.put('/data/:key', authRequired, async (req, res) => {
   if (!ALLOWED_KEYS.includes(key)) {
     return res.status(400).json({ error: `Unknown data key: ${key}` });
   }
+  let releaseInventoryLock;
   try {
     const { value, baseVersion } = req.body;
 
@@ -190,6 +192,10 @@ router.put('/data/:key', authRequired, async (req, res) => {
         }
       }
     }
+
+    // Serialize incubation allocation writes with every batch egg-supply mutation.
+    // The lock is farm-scoped by the DataStore model and enforced by Mongo's unique index.
+    if (key === 'incubation') releaseInventoryLock = await acquireEggInventoryLock(DataStore);
 
     const current = await DataStore.findOne({ key });
     const currentVersion = current ? (current.version || 0) : 0;
@@ -293,8 +299,16 @@ router.put('/data/:key', authRequired, async (req, res) => {
 
     res.json({ key, exists: true, value: doc.value, version: doc.version || 0 });
   } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') {
+      return res.status(409).json({ error: err.message, code: err.code, retryable: true });
+    }
     console.error('PUT /api/data error:', err);
     res.status(500).json({ error: 'Failed to save data' });
+  } finally {
+    if (releaseInventoryLock) {
+      try { await releaseInventoryLock(); }
+      catch (releaseError) { console.error('Failed to release egg inventory lock:', releaseError); }
+    }
   }
 });
 
