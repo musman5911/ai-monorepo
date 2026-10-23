@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import MufFarmSwitcher from './muf/ui/muf-farm-switcher';
-import { Home, HardHat, Bird as BirdIcon, DollarSign, BarChart2, Egg, Shield, LogOut, Package, ChevronDown, Bell, Moon, Sun, Users, HeartPulse, BookOpen, Languages } from 'lucide-react';
+import { Home, HardHat, Bird as BirdIcon, BarChart2, Egg, Shield, LogOut, Package, ChevronDown, Bell, Moon, Sun, Users, HeartPulse, BookOpen, Languages } from 'lucide-react';
 import { motion } from './muf/core/muf-motion';
 
 import {
@@ -1007,6 +1007,7 @@ export default function App() {
                   onDeleteVaccination={handleDeleteVaccination}
                   quickOpenTab={quickOpenLedgerTab}
                   onResetQuickOpenTab={() => setQuickOpenLedgerTab(null)}
+                  homeBirdsOnly
                   isAdmin={canLogDaily}
                   canDelete={canDelete}
                   canManageCustomers={canManageStructure}
