@@ -336,6 +336,8 @@ export interface LaborAttendanceEntry {
   workerId: string;
   date: string; // YYYY-MM-DD
   dayType: 'full' | 'half';
+  /** Optional batch the worker was assigned to for this day's work. */
+  batchId?: string;
   posted?: boolean;
   notes?: string;
 }
