@@ -127,7 +127,7 @@ function parsePagePagination(query, { defaultLimit = 50, maxLimit = 200 } = {}) 
   }
 
   const rawPage = String(query.page).trim();
-  if (!/^\\d+$/.test(rawPage) || Number(rawPage) < 1 || !Number.isSafeInteger(Number(rawPage))) {
+  if (!/^\d+$/.test(rawPage) || Number(rawPage) < 1 || !Number.isSafeInteger(Number(rawPage))) {
     return { enabled: true, page: null, limit: null, skip: 0, error: 'page must be a positive integer' };
   }
 
