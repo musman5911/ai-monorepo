@@ -35,6 +35,9 @@ export function calculateBatchSummary({
   const total_expense_cost = logged_expense_cost + total_vaccination_cost;
   const total_eggs_collected = eggLogs.reduce((sum, log) => sum + (log.collected || 0), 0);
   const total_eggs_sold = eggLogs.reduce((sum, log) => sum + (log.sold || 0), 0);
+  const total_eggs_available = eggLogs.reduce((sum, log) => sum + Math.max(0,
+    Number(log.collected || 0) - Number(log.sold || 0) - Number(log.home_use || 0) - Number(log.broken_wasted || 0),
+  ), 0);
   const total_egg_income = eggLogs.reduce((sum, log) => sum + (log.sold || 0) * (log.price_per_egg || 0), 0);
   const total_mortality_count = mortalityLogs.reduce((sum, log) => sum + (log.count || 0), 0);
   const total_sold_count = salesLogs.reduce((sum, log) => sum + (log.count || 0), 0);
@@ -56,6 +59,7 @@ export function calculateBatchSummary({
     total_vaccination_cost,
     total_eggs_collected,
     total_eggs_sold,
+    total_eggs_available,
     total_egg_income,
     total_mortality_count,
     total_sold_count,
