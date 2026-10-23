@@ -472,3 +472,8 @@ The owner pulled commit `5f7a963` and reported the following local results: `npm
 
 - Added optional cow ear-tag and sire-lineage fields: `earTag`, `fatherId`, `fatherType` (`farm` or `outside`) and `fatherName`. Added a farm-scoped unique partial MongoDB index for non-empty ear tags, so old records without tags are unaffected.
 - These fields are additive; no existing record is rewritten. Full Phase 4 still requires sire selection/validation in the UI, automatic calf creation/lineage tests, and the Agri Field/Crop-cycle structure. The unique index has not been verified against a disposable MongoDB copy; if legacy data already contains duplicate non-empty ear tags within a farm, index creation will warn and must be resolved on a copy before rollout.
+
+
+### Phase 4 test coverage added (2026-10-23)
+
+Added `tests/phase4-breeding-lineage.test.ts` to guard the additive sire/ear-tag schema fields, farm-scoped partial unique index, and backward compatibility for records without lineage values. These are source-contract tests only; they do not prove MongoDB index creation or reject duplicate tags at runtime. Disposable-database index verification and actual sire-selection/API validation remain required.
