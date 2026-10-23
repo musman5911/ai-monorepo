@@ -31,15 +31,16 @@ router.get('/tasks', protect, asyncHandler(async (req, res) => {
   if (cropId && cropId !== 'all' && !/^[0-9a-fA-F]{24}$/.test(cropId)) {
     return res.status(400).json({ error: 'crop_id must be a valid crop ID' });
   }
-  if (cropId && cropId !== 'all') clauses.push({ crop_id: cropId });
-  if (searchTerms.length) {
-    const matches = [];
-    for (const term of searchTerms) {
-      const pattern = escapeRegex(term.slice(0, 80));
-      matches.push({ title: { $regex: pattern, $options: 'i' } }, { notes: { $regex: pattern, $options: 'i' } });
-    }
-    clauses.push({ $or: matches });
+  // Legacy tasks may reference crops by title/notes rather than crop_id.
+  // Treat explicit links and text matches as alternatives, while status remains
+  // an independent AND condition.
+  const cropMatches = [];
+  if (cropId && cropId !== 'all') cropMatches.push({ crop_id: cropId });
+  for (const term of searchTerms) {
+    const pattern = escapeRegex(term.slice(0, 80));
+    cropMatches.push({ title: { $regex: pattern, $options: 'i' } }, { notes: { $regex: pattern, $options: 'i' } });
   }
+  if (cropMatches.length) clauses.push({ $or: cropMatches });
   const query = clauses.length === 0 ? {} : clauses.length === 1 ? clauses[0] : { $and: clauses };
   const [data, total] = await Promise.all([
     Task.find(query).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit),

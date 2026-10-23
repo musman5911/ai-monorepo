@@ -90,7 +90,8 @@ export function mufMatchValue(docVal, cond, { loose = false } = {}) {
         case '$in': return Array.isArray(v) && v.some((x) => (loose ? mufEq(docVal, x) : docVal === x));
         case '$nin': return !(Array.isArray(v) && v.some((x) => (loose ? mufEq(docVal, x) : docVal === x)));
         case '$regex':
-          try { return new RegExp(v).test(String(docVal ?? '')); } catch { return false; }
+          try { return new RegExp(v, String(cond.$options || '')).test(String(docVal ?? '')); } catch { return false; }
+        case '$options': return true;
         case '$type': return true; // not needed in memory mode
         default: return true;
       }

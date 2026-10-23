@@ -246,6 +246,9 @@ describe.sequential('Agri runtime API integration', () => {
     expect(cropPage.response.status).toBe(200);
     expect(cropPage.response.headers.get('x-total-count')).toBe('1');
     expect(String(cropPage.data[0]._id)).toBe(String(crop.data._id));
+    const caseInsensitive = await request(`/crops?skip=0&limit=10&search=${encodeURIComponent(suffix.toUpperCase())}`, { token: ownerToken });
+    expect(caseInsensitive.response.status).toBe(200);
+    expect(caseInsensitive.response.headers.get('x-total-count')).toBe('2');
     const workerHistory = await request(`/crops?skip=0&limit=10&status=Completed&search=${encodeURIComponent(suffix)}`, { token: workerToken });
     expect(workerHistory.response.status).toBe(200);
     expect(workerHistory.data).toEqual([]);
