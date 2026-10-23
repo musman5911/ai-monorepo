@@ -26,6 +26,35 @@ router.get('/finance', protect, requireAdmin, asyncHandler(async (req, res) => {
   return res.json(data.map((d) => ({ ...d, _id: String(d._id) })));
 }));
 
+
+router.post('/bulk', protect, requireAdmin, asyncHandler(async (req, res) => {
+  const rows = req.body?.rows;
+  if (!Array.isArray(rows) || rows.length < 1) return res.status(400).json({ error: 'rows must be a non-empty array' });
+  if (rows.length > 200) return res.status(400).json({ error: 'A finance bulk request is limited to 200 rows' });
+
+  const errors = [];
+  const prepared = rows.map((raw, index) => {
+    const rowNumber = index + 2;
+    const row = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
+    const category = String(row.category || '').trim();
+    const type = String(row.type || 'expense').trim().toLowerCase();
+    const amount = row.amount === undefined || row.amount === '' ? NaN : Number(row.amount);
+    const date = String(row.date || '').trim() || todayStr();
+    if (!category) errors.push({ row: rowNumber, message: 'Category is required.' });
+    if (type !== 'income' && type !== 'expense') errors.push({ row: rowNumber, message: 'Type must be income or expense.' });
+    if (!Number.isFinite(amount) || amount < 0) errors.push({ row: rowNumber, message: 'Amount must be a non-negative number.' });
+    if (Number.isNaN(Date.parse(date))) errors.push({ row: rowNumber, message: 'Date must be valid.' });
+    return {
+      category, type, amount, date,
+      crop_id: String(row.crop_id || '').trim() || null,
+      notes: String(row.notes || '').trim(),
+    };
+  });
+  if (errors.length) return res.status(400).json({ error: 'Bulk finance validation failed', details: errors });
+  const inserted = await Finance.insertMany(prepared);
+  return res.status(201).json({ status: 'ok', inserted: inserted.length });
+}));
+
 router.post('/finance', protect, requireAdmin, asyncHandler(async (req, res) => {
   const entry = { ...(req.body || {}) };
   if (!entry.date) entry.date = todayStr();
