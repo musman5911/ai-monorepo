@@ -45,7 +45,7 @@ function passwordTooShort(password) {
 }
 
 async function countOtherActiveAdmins(userId) {
-  return User.countDocuments({ role: 'admin', active: true, _id: { $ne: userId } });
+  return User.countDocuments({ role: { $in: ['owner', 'admin'] }, active: true, _id: { $ne: userId } });
 }
 
 async function ensureAdminSafety(targetUser, updates = {}) {
@@ -63,7 +63,7 @@ async function ensureAdminSafety(targetUser, updates = {}) {
 }
 
 async function activeAdminCount() {
-  return User.countDocuments({ role: 'admin', active: true });
+  return User.countDocuments({ role: { $in: ['owner', 'admin'] }, active: true });
 }
 
 // Parse max-age (in ms) from JWT_EXPIRES_IN (supports '7d', '24h', '3600', etc.)
