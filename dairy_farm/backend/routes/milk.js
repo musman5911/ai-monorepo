@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import express from 'express';
 const router = express.Router();
-import { Milk } from '../db.js';
+import { Milk, Rate, RateHistory, Buyer } from '../db.js';
 import { protect, adminOnly, workerOrAdmin } from '../middleware/auth.js';
 import {
   readString,
@@ -33,22 +33,77 @@ function milkPayload(body, { requireBasics = false } = {}) {
   return { payload, errors };
 }
 
+function buildMilkFilter(query) {
+  const filter = {};
+  if (query.cowId) filter.cowId = String(query.cowId);
+  if (query.from || query.to) {
+    filter.date = {};
+    if (query.from) filter.date.$gte = String(query.from);
+    if (query.to) filter.date.$lte = String(query.to);
+  }
+  if (query.month) {
+    const month = String(query.month);
+    if (!/^\\d{4}-\\d{2}$/.test(month)) throw new Error('month must use YYYY-MM');
+    const [y, m] = month.split('-').map(Number);
+    if (m < 1 || m > 12) throw new Error('month must use YYYY-MM');
+    const startDate = `${y}-${String(m).padStart(2, '0')}-01`;
+    const endDay = new Date(y, m, 0).getDate();
+    filter.date = { $gte: startDate, $lte: `${y}-${String(m).padStart(2, '0')}-${endDay}` };
+  }
+  return filter;
+}
+
+router.get('/summary', protect, async (req, res) => {
+  try {
+    const filter = buildMilkFilter(req.query);
+    const [rows, count, currentRate, history, buyers] = await Promise.all([
+      Milk.find(filter),
+      Milk.countDocuments(filter),
+      Rate.findOne().lean(),
+      RateHistory.find().lean(),
+      Buyer.find().lean(),
+    ]);
+    const timeline = [];
+    if (currentRate?.date && /^\\d{4}-\\d{2}-\\d{2}$/.test(currentRate.date) && Number.isFinite(currentRate.value)) {
+      timeline.push({ date: currentRate.date, value: currentRate.value });
+    }
+    for (const item of history || []) {
+      if (item?.date && /^\\d{4}-\\d{2}-\\d{2}$/.test(item.date) && Number.isFinite(item.value)) {
+        timeline.push({ date: item.date, value: item.value });
+      }
+    }
+    timeline.sort((a, b) => b.date.localeCompare(a.date));
+    const buyerRates = Object.fromEntries((buyers || []).map((buyer) => [buyer._id, buyer.defaultRate || 0]));
+    const rateForDate = (date) => {
+      const match = timeline.find((entry) => entry.date <= date);
+      return match ? match.value : (timeline.length ? timeline[timeline.length - 1].value : (currentRate?.value || 0));
+    };
+    let totalLiters = 0;
+    let saleableLiters = 0;
+    let revenue = 0;
+    for (const row of rows) {
+      const total = (row.morning || 0) + (row.evening || 0);
+      const saleable = Math.max(0, total - (row.calfMilk || 0));
+      totalLiters += total;
+      saleableLiters += saleable;
+      const customRate = row.buyerId ? buyerRates[row.buyerId] : 0;
+      revenue += saleable * (customRate > 0 ? customRate : rateForDate(row.date));
+    }
+    res.json({
+      count,
+      totalLiters: Math.round(totalLiters * 100) / 100,
+      saleableLiters: Math.round(saleableLiters * 100) / 100,
+      revenue: Math.round(revenue * 100) / 100,
+    });
+  } catch (e) {
+    if (e.message === 'month must use YYYY-MM') return res.status(400).json({ error: e.message });
+    res.status(500).json({ error: e.message });
+  }
+});
+
 router.get('/', protect, async (req, res) => {
   try {
-    const filter = {};
-    if (req.query.cowId) filter.cowId = req.query.cowId;
-    if (req.query.from || req.query.to) {
-      filter.date = {};
-      if (req.query.from) filter.date.$gte = req.query.from;
-      if (req.query.to) filter.date.$lte = req.query.to;
-    }
-    if (req.query.month) {
-      const [y, m] = req.query.month.split('-').map(Number);
-      const startDate = `${y}-${String(m).padStart(2, '0')}-01`;
-      const endDay = new Date(y, m, 0).getDate();
-      const endDate = `${y}-${String(m).padStart(2, '0')}-${endDay}`;
-      filter.date = { $gte: startDate, $lte: endDate };
-    }
+    const filter = buildMilkFilter(req.query);
     const page = parsePagePagination(req.query);
     if (page.enabled) {
       if (page.error) return res.status(400).json({ error: page.error });
