@@ -160,3 +160,19 @@ The Home Birds navigation is secondary and scoped to Bird List, Eggs, Monthly Re
 - Main navigation now exposes Batches, Dashboard, Health, Labor, Incubation and Summary. Dedicated batch-first Health and Summary portals are separate from the smaller Home Birds workflows; the legacy bird-led monthly report and vaccination tracker remain under Home Birds.
 - Batch Health displays the 20 most recent batch vaccination/mortality events and computes headline totals from the full loaded history, with a visible warning when any batch detail could not be loaded.
 - The Home Birds Monthly Report is now bird-focused again; batch financials live in the dedicated top-level Summary. No legacy bird report data was deleted.
+
+
+## Verification checkpoint update (2026-10-23)
+
+The owner's latest local run found one failing root test and a Flock farm-scope failure. The incubation test expectation was inconsistent with the implemented rule: 100 net eggs are available, so allocation 110 must be rejected. The test now checks that exactly 100 is accepted and that a malformed negative-net legacy log cannot make 101 available. The farm-scope harness now reports login/farm setup HTTP responses and exits that project check cleanly when setup fails; this improves diagnostics but does **not** mean the underlying Flock role/migration failure is fixed.
+
+**Phase 2 remains in progress and is not signed off.** Required before Phase 3 starts:
+
+- Root unit tests pass, including the corrected legacy egg-log regression.
+- Flock farm-scope check passes without weakening authorization, role compatibility, or farm isolation assertions.
+- Inventory-lock concurrency is verified against a disposable MongoDB instance, including concurrent writes and a second backend process.
+- Phase 2 backup/restore passes on a disposable database copy, including old backup compatibility and linked batch, egg, vaccination, incubation and labor records.
+- Shared-file parity, UI safety, workbench checks and the Flock build pass after the final fixes.
+- CI is manually triggered at the deliberate checkpoint, and the exact commit and actual result are recorded.
+
+For every following implementation step, update both this roadmap and `PROGRESS.md`, add/extend automated regression tests, and record reproducible Windows CMD commands. Phase 3 should include automated tests for bulk request validation, farm isolation in bulk reads/writes, pagination/filter correctness, server-side totals, and a 1,000-row save/performance fixture before its UI is considered done.
