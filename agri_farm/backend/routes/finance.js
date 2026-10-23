@@ -8,8 +8,12 @@ import { todayStr } from '../utils/date.js';
 const router = express.Router();
 
 router.get('/finance', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const skip = Math.max(0, Number(req.query.skip) || 0);
-  const limit = Math.max(1, Math.min(Number(req.query.limit) || 100, 500));
+  const rawSkip = req.query.skip === undefined ? 0 : (Array.isArray(req.query.skip) ? NaN : Number(req.query.skip));
+  const rawLimit = req.query.limit === undefined ? 100 : (Array.isArray(req.query.limit) ? NaN : Number(req.query.limit));
+  if (!Number.isSafeInteger(rawSkip) || rawSkip < 0) return res.status(400).json({ error: 'skip must be a non-negative integer' });
+  if (!Number.isSafeInteger(rawLimit) || rawLimit < 1) return res.status(400).json({ error: 'limit must be a positive integer' });
+  const skip = rawSkip;
+  const limit = Math.min(rawLimit, 500);
   const [data, total] = await Promise.all([
     Finance.find({}).sort({ date: -1, _id: -1 }).skip(skip).limit(limit),
     Finance.countDocuments({}),
