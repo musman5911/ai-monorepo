@@ -38,7 +38,7 @@ import {
   deleteBatchLog,
   createBatchWeightLog,
   getBatchDetail,
-  listBatches,
+  listBatchesPage,
   uploadImage,
   addBatchGalleryPhoto,
   deleteBatchGalleryPhoto,
@@ -104,6 +104,10 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
 
   const [batches, setBatches] = useState<BatchWithSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMoreBatches, setLoadingMoreBatches] = useState(false);
+  const [batchPage, setBatchPage] = useState(1);
+  const [batchTotal, setBatchTotal] = useState(0);
+  const [hasMoreBatches, setHasMoreBatches] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [detail, setDetail] = useState<BatchDetail | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -146,18 +150,32 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
   const [eggBulkPreview, setEggBulkPreview] = useState<EggBulkPreviewRow[]>([]);
   const [eggBulkBusy, setEggBulkBusy] = useState(false);
 
-  const loadBatches = useCallback(async () => {
-    setLoading(true);
+  const loadBatches = useCallback(async (append = false) => {
+    if (append) setLoadingMoreBatches(true);
+    else setLoading(true);
     setError(null);
     try {
-      const list = await listBatches();
-      setBatches(list);
+      const result = await listBatchesPage(append ? batchPage + 1 : 1, 20);
+      setBatches(previous => {
+        if (!append) return result.batches;
+        const known = new Set(previous.map(batch => batch.batch_id));
+        return [...previous, ...result.batches.filter(batch => !known.has(batch.batch_id))];
+      });
+      setBatchPage(result.page);
+      setBatchTotal(result.total);
+      setHasMoreBatches(result.page < result.totalPages);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load batches');
     } finally {
       setLoading(false);
+      setLoadingMoreBatches(false);
     }
-  }, []);
+  }, [batchPage]);
+
+  const loadMoreBatches = async () => {
+    if (!hasMoreBatches || loadingMoreBatches) return;
+    await loadBatches(true);
+  };
 
   const loadDetail = useCallback(async (batchId: string) => {
     setDetailLoading(true);
@@ -567,10 +585,20 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
         </div>
       </div>
 
+      {hasMoreBatches && (
+        <div className="flex flex-col items-center gap-2 py-4">
+          <p className="text-xs text-slate-500">{batches.length} of {batchTotal} batches loaded</p>
+          <button type="button" onClick={() => { void loadMoreBatches(); }} disabled={loadingMoreBatches}
+            className="rounded-xl border px-4 py-2 text-sm font-semibold disabled:opacity-50">
+            {loadingMoreBatches ? L('Loading...') : L('Load 20 More Batches')}
+          </button>
+        </div>
+      )}
+
       <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-sm overflow-hidden">
         <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
           <h3 className="font-semibold text-sm text-slate-800 dark:text-slate-100">
-            {L('All Batches Comparison')}
+            {L('Loaded Batches Comparison')}
           </h3>
         </div>
         <div className="overflow-x-auto">
