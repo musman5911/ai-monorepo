@@ -198,7 +198,7 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(component).toContain('onImportRows(preview.rows)');
     expect(component).toContain('preview.errors.length > 0');
     expect(component).toContain('endsWith(".csv")');
-    expect(parser).toContain('previewCsvImport(text, REQUIRED_HEADERS');
+    expect(parser).toContain('previewCsvImport(text, REQUIRED_COLUMNS, 1000)');
     expect(app).toContain('<AgriCropCsvImport onImportRows={async (rows) =>');
     expect(app).toContain('await api.addCrop({');
   });
