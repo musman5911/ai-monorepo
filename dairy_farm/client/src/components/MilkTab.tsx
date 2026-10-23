@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { L } from '../i18n';
 import { api } from '../api';
 import { useConfirm, notify } from '../muf/core/muf-confirm';
-import type { Buyer, Cow, MilkEntry, RateHistory } from '../types';
+import type { Buyer, Cow, MilkEntry } from '../types';
 import { fmt, fmtL, fmtPKR, monthKey, monthLabel, lastNMonths } from '../utils/format';
-import { calcRevenueWithHistory, saleableMilkLiters } from '../utils/rates';
+import { saleableMilkLiters } from '../utils/rates';
 import { todayStr, shiftDate as shiftDateLocal, formatDate } from '../utils/date';
 import {
   Save, Trash2, History, List, Plus,
@@ -21,8 +21,6 @@ function isMilkEligible(cow: Cow): boolean {
   if (cow.gender === 'male') return false;
   return ['active', 'pregnant', 'dry', 'calf'].includes(cow.status);
 }
-
-type MilkCsvEntry = { cowId: string; date: string; morning: number; evening: number; calfMilk: number; buyerId?: string; forceOverwrite: boolean };
 
 function parseCsvLine(line: string): string[] {
   const values: string[] = [];
@@ -52,7 +50,6 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
   const [historyCowFilter, setHistoryCowFilter] = useState('');
   const [rate, setRate] = useState(0);
   const [rateDate, setRateDate] = useState('');
-  const [rateHistory, setRateHistory] = useState<RateHistory[]>([]);
   const [historyPage, setHistoryPage] = useState(1);
   const [historyTotalCount, setHistoryTotalCount] = useState(0);
   const [historySummary, setHistorySummary] = useState({ count: 0, totalLiters: 0, saleableLiters: 0, revenue: 0 });
@@ -75,13 +72,12 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
         ? { month: historyMonth, cowId: historyCowFilter || undefined }
         : { from: selectedDate, to: selectedDate };
 
-      const [cowsData, milkResult, rateData, rateHist, buyersData, summaryResult] = await Promise.all([
+      const [cowsData, milkResult, rateData, buyersData, summaryResult] = await Promise.all([
         api.getCows(),
         viewMode === 'history'
           ? api.getMilkPage({ month: historyMonth, cowId: historyCowFilter || undefined, page: 1, limit: 50 })
           : api.getMilk(fetchOpts),
         api.getRate(),
-        api.getRateHistory(),
         api.getBuyers().catch(() => []),
         viewMode === 'history'
           ? api.getMilkSummary({ month: historyMonth, cowId: historyCowFilter || undefined })
@@ -104,7 +100,6 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
       }
       setRate(rateData?.value || 0);
       setRateDate(rateData?.date || '');
-      setRateHistory(rateHist);
       setBuyers(buyersData);
 
       if (viewMode === 'daily') {
@@ -347,7 +342,6 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
     ? milkRecords.filter(m => m.cowId === historyCowFilter)
     : milkRecords;
 
-  const buyerRates = Object.fromEntries(buyers.map(b => [b._id, b.defaultRate || 0]));
   const historyTotal = historySummary.totalLiters;
   const historySaleable = historySummary.saleableLiters;
   const historyRevenue = historySummary.revenue;
