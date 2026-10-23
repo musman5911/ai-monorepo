@@ -63,7 +63,13 @@ for (const app of apps) {
   else fail(`${app.name}: QR receipt native alert remains`);
   if (/prefers-reduced-motion:\s*reduce/.test(css) && /max-width:\s*640px/.test(css)) pass(`${app.name}: responsive and reduced-motion styles present`);
   else fail(`${app.name}: responsive/reduced-motion styles missing`);
-  if (/createPortal\(/.test(appSource) && /financeMenuAnchorRef/.test(appSource) &&
+  if (app.name === 'flock') {
+    if (/Home Birds sections/.test(appSource) && /Monthly Report/.test(appSource) &&
+        /vaccinationOnly/.test(appSource) && /homeBirdsOnly/.test(appSource) &&
+        !/muf-finance-menu/.test(appSource)) {
+      pass('flock: Home Birds navigation is scoped to the approved sections');
+    } else fail('flock: Home Birds navigation scope contract missing');
+  } else if (/createPortal\(/.test(appSource) && /financeMenuAnchorRef/.test(appSource) &&
       /aria-controls="muf-finance-menu"/.test(appSource) && /className="muf-finance-menu"/.test(appSource)) {
     pass(`${app.name}: Finance dropdown uses an accessible body portal`);
   } else fail(`${app.name}: Finance dropdown portal/accessibility contract missing`);
