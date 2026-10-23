@@ -67,6 +67,10 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
     weight: '', notes: '', nursingMonths: 2.5, purchasePrice: '',
   });
 
+  const refreshCowStats = async () => {
+    try { setStatsData(await api.getCowStats()); } catch { /* keep the last known totals visible */ }
+  };
+
   const loadCows = async (append = false) => {
     try {
       if (append) setLoadingMore(true);
@@ -131,6 +135,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
         setCows(prev => [savedCow as Cow, ...prev.filter(c => c._id !== savedCow._id)]);
       }
       notify(savedCow?.offline ? 'Saved on this device. It will sync when internet returns.' : (wasEditing ? 'Animal updated successfully.' : 'Animal added successfully.'), savedCow?.offline ? 'info' : 'success');
+      void refreshCowStats();
       setShowForm(false);
       setEditingCow(null);
       resetForm();
@@ -167,6 +172,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
         setCows(prev => [savedCalf as Cow, ...prev.filter(c => c._id !== savedCalf._id)]);
       }
       notify(savedCalf?.offline ? 'Saved on this device. It will sync when internet returns.' : 'Calf added successfully.', savedCalf?.offline ? 'info' : 'success');
+      void refreshCowStats();
       setShowCalfForm(false);
       setCalfForm({ name: '', breed: '', gender: 'female', motherId: '', birthDate: todayStr(), weight: '', notes: '', nursingMonths: 2.5, purchasePrice: '' });
       // The newly-created calf is already reconciled into local state above.
@@ -189,6 +195,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
       setCows(prev => prev.filter(c => c._id !== id));
       setDetailCowId(current => current === id ? null : current);
       notify(deleteResult?.offline ? 'Delete queued on this device. It will sync when internet returns.' : 'Animal deleted successfully.', deleteResult?.offline ? 'info' : 'success');
+      void refreshCowStats();
       // Do not immediately refetch: some deployments briefly return a stale list after DELETE.
     } catch (error) {
       notify(error instanceof Error ? error.message : 'Failed to delete', 'error');
