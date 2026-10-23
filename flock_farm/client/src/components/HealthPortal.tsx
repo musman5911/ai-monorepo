@@ -258,6 +258,22 @@ export default function HealthPortal({
           </div>
           <span className="rounded-full bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 text-[10px] font-semibold text-indigo-700 dark:text-indigo-300">{batchVaccinationLogs.length} {L('records')}</span>
         </div>
+        {!batchHealthLoadFailed && (
+          <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Batch vaccination events')}</p>
+              <p className="text-lg font-bold mt-1">{batchVaccinationLogs.length}</p>
+            </div>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Recorded bird doses')}</p>
+              <p className="text-lg font-bold mt-1">{batchVaccinationLogs.reduce((sum, log) => sum + (Number(log.bird_count) || 0), 0).toLocaleString()}</p>
+            </div>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3">
+              <p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Batch vaccine cost')}</p>
+              <p className="text-lg font-bold mt-1">Rs {Math.round(batchVaccinationLogs.reduce((sum, log) => sum + (Number(log.cost) || 0), 0)).toLocaleString()}</p>
+            </div>
+          </div>
+        )}
         {batchHealthLoadFailed ? (
           <p role="status" className="text-xs text-amber-700 dark:text-amber-300">{L('Could not load batch vaccination history. Retry by reopening Health.')}</p>
         ) : batchVaccinationLogs.length ? (
