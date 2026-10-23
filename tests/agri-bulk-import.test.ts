@@ -47,4 +47,28 @@ describe("Agri CSV bulk import parsing", () => {
     expect(preview.errors).toEqual([]);
     expect(preview.rows).toEqual([{ name: "Wheat", plant_date: "2026-10-01", area_acres: "3.5" }]);
   });
+  
+  it("round-trips CSV-special characters and rejects oversized row counts", () => {
+    const { rowsToCsv } = require("../agri_farm/frontend/src/components/app/agriBulkImport");
+    const source = [["name", "notes"], ["Wheat", 'North, east says "grow"'], ["Corn", "line one\nline two"]];
+    expect(parseCsvRows(rowsToCsv(source))).toEqual(source);
+    const thousandRows = ["name", ...Array.from({ length: 1000 }, (_, i) => `Crop ${i}`)].join("\n");
+    expect(() => previewCsvImport(thousandRows, ["name"], 999)).toThrow(/limited to 999 data rows/i);
+  });
+
+  it("rejects a non-ZIP workbook before attempting XML or decompression", async () => {
+    const { parseXlsxRows } = await import("../agri_farm/frontend/src/components/app/agriBulkImport");
+    await expect(parseXlsxRows(new TextEncoder().encode("not an xlsx file").buffer)).rejects.toThrow(/not a valid XLSX/i);
+  });
+
+  it("keeps import validation strict for formula-like and unexpected columns", () => {
+    const preview = validateCropImport(previewCsvImport(
+      "name,plant_date,area_kanal\nWheat,2026-10-23,4",
+      ["name"],
+    ));
+    expect(preview.errors).toEqual([]);
+    const malformed = previewCsvImport("name,area_kanal\nWheat,4,extra", ["name"]);
+    expect(malformed.errors).toEqual([{ row: 2, message: "This row has more values than the header row." }]);
+  });
+
 });
