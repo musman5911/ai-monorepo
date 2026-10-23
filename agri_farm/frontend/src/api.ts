@@ -106,12 +106,14 @@ export const deleteCrop = (id) => api.delete(`/crops/${id}`);
 // --- FINANCE ROUTES ---
 export const getFinance = (skip = 0, limit = 100) => api.get(`/finance?skip=${skip}&limit=${limit}`);
 export const addFinance = (entry) => api.post('/finance', entry);
+export const addFinanceBulk = (rows) => api.post('/finance/bulk', { rows });
 export const updateFinance = (id, entry) => api.put(`/finance/${id}`, entry);
 export const deleteFinance = (id) => api.delete(`/finance/${id}`);
 
 // --- TASKS ROUTES ---
 export const getTasks = (skip = 0, limit = 100) => api.get(`/tasks?skip=${skip}&limit=${limit}`);
 export const addTask = (task) => api.post('/tasks', task);
+export const addTasksBulk = (rows) => api.post('/tasks/bulk', { rows });
 export const updateTask = (id, task) => api.put(`/tasks/${id}`, task);
 export const completeTask = (id) => api.patch(`/tasks/${id}`);
 export const deleteTask = (id) => api.delete(`/tasks/${id}`);
