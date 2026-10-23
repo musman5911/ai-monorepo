@@ -1,12 +1,12 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (owner's Phase 3 checkpoint found one CSV-preview contract failure, two frontend build blockers, and one Flock memory-pagination issue; corrective commits are pushed but await local rerun)
+Last updated: 2026-10-23 (owner pulled through d7321fb and reported 151 passing tests plus passing farm-scope, shared-MUF sync, UI-safety and workbench checks; all three frontend production builds succeeded. Phase 3 implementation remains open.)
 
 
 ## Phase 3 implementation update (2026-10-23): Dairy paging and bounded bulk milk entry
 
-- Owner verification of the prior checkpoint is now green: Windows npm test passed all 135 tests across 17 files, including the real-Mongoose query-contract test after its targeted timeout adjustment. This is the owner's local root test result; the current Phase 3 changes below have not yet been tested locally.
+- Owner verification update (Windows, pulled through d7321fb): the pasted run reports 151 passing tests. `npm run check-farms`, `npm run check-sync`, `npm run check-ui`, and `npm run check-workbench` all passed. Production builds succeeded for Dairy, Flock and Agri. Dairy emitted an advisory mixed static/dynamic import warning; Flock and Agri emitted advisory large-chunk warnings; Agri also reports a deprecated `advancedChunks` option. These warnings did not fail the builds. The test output is interleaved with the farm-scope command in the supplied console transcript, so the complete standalone `npm test` exit summary should still be captured at the next clean verification checkpoint.
 - Dairy cows now have opt-in server paging with stable name/ID ordering, escaped literal search, batch/status/gender filters, a farm-scoped count, and separate server totals for stat cards. Eligible mothers are loaded through a dedicated endpoint so adding calves still works when the visible cow list is paged.
 - Dairy Cows UI now requests 50 records at a time, debounces search, applies filters server-side, and offers Load 50 More without duplicate rows.
 - Dairy Milk History now requests 50 records at a time and appends further pages with ID-based deduplication. A farm-scoped server summary endpoint keeps month count, total/saleable liters, and revenue accurate across all pages.
