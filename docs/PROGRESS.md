@@ -1,8 +1,20 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (owner reported 134/135 tests passed; real-Mongoose query test hit Vitest's 5-second timeout without an assertion failure; targeted timeout raised to 20 seconds; rerun pending)
+Last updated: 2026-10-23 (owner reran npm test: 17 files and 135/135 tests passed; Phase 3 Dairy paging and bounded bulk milk implementation now in progress)
 
+
+## Phase 3 implementation update (2026-10-23): Dairy paging and bounded bulk milk entry
+
+- Owner verification of the prior checkpoint is now green: Windows npm test passed all 135 tests across 17 files, including the real-Mongoose query-contract test after its targeted timeout adjustment. This is the owner's local root test result; the current Phase 3 changes below have not yet been tested locally.
+- Dairy cows now have opt-in server paging with stable name/ID ordering, escaped literal search, batch/status/gender filters, a farm-scoped count, and separate server totals for stat cards. Eligible mothers are loaded through a dedicated endpoint so adding calves still works when the visible cow list is paged.
+- Dairy Cows UI now requests 50 records at a time, debounces search, applies filters server-side, and offers Load 50 More without duplicate rows.
+- Dairy Milk History now requests 50 records at a time and appends further pages with ID-based deduplication. The visible history totals are explicitly marked as loaded-so-far; the endpoint still exposes total matching record count through response headers.
+- Daily Milk Save All now sends bounded chunks of at most 200 rows to an authenticated bulk endpoint. The endpoint validates the entire chunk before writing, rejects duplicate cow/date pairs inside a request, caps payloads at 200, and returns per-row outcomes for partial failures so retries are explicit. It does not pretend multi-row writes are transactionally atomic.
+- Added Phase 3 contract tests for the paging APIs, client metadata, bounded bulk validation, and partial-write reporting.
+- Commits are on muf-monorepo: 28a599b, 2f9d26c, 96388fb, 21d1565, 07f011d, 2e283ee, ecaaa34, 15aa67a, b50ac87, 141838e, db02717, 87af32c, 90a57b5, 4afcced, 6a6b7d4.
+- Still required for Phase 3: run root tests and the Dairy build locally; add bulk health entry; implement Flock per-batch bulk entry and Agri list/import support; move large-list totals to server-side summary APIs; add CSV/Excel import preview and row-level validation; run 1,000-row fixtures and verify all three app builds and farm isolation. Phase 3 is not signed off yet.
+- Per owner direction, Phase 2's real-MongoDB concurrency and disposable-copy backup/restore sign-off is deferred to the final consolidated verification pass after all planned phases. Continue implementation in Phase 3 now, but do not connect to or mutate production data.
 
 ## Owner verification checkpoint (2026-10-23, commit d629392 and follow-up)
 
