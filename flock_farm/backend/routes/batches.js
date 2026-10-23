@@ -720,6 +720,7 @@ router.delete('/batches/:batchId/gallery', authRequired, requireRole('admin'), a
 });
 
 router.delete('/batches/logs/:kind/:logId', authRequired, requireRole('admin'), async (req, res) => {
+  let releaseInventoryLock;
   try {
     const models = {
       feed: BatchFeedLog,
@@ -733,6 +734,7 @@ router.delete('/batches/logs/:kind/:logId', authRequired, requireRole('admin'), 
     const Model = models[req.params.kind];
     if (!Model) return res.status(400).json({ error: 'Unknown log type' });
 
+    if (req.params.kind === 'egg') releaseInventoryLock = await acquireEggInventoryLock(DataStore);
     const log = await Model.findById(req.params.logId);
     if (!log) return res.status(404).json({ error: 'Log not found' });
 
@@ -763,8 +765,11 @@ router.delete('/batches/logs/:kind/:logId', authRequired, requireRole('admin'), 
     if (batch) await syncBatchStatus(batch);
     res.json({ ok: true });
   } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
     console.error('DELETE batch log error:', err);
     res.status(500).json({ error: 'Failed to delete batch log' });
+  } finally {
+    if (releaseInventoryLock) { try { await releaseInventoryLock(); } catch (e) { console.error('Failed to release egg inventory lock:', e); } }
   }
 });
 
