@@ -245,6 +245,33 @@ async function checkProject(name, project, port) {
     const allWrite = await call('POST', spec.path, { token: owner, farm: 'all', body: project.create('all').body });
     ok(allWrite.status === 400 && allWrite.json.code === 'FARM_REQUIRED', 'writing in All farms is refused');
 
+    if (project.kind === 'agri') {
+      const invalidTaskBulk = await call('POST', '/api/tasks/bulk', {
+        token: owner, farm: farmB, body: { rows: [{ title: '' }, { title: 'Valid-looking row' }] },
+      });
+      ok(invalidTaskBulk.status === 400, 'Agri bulk task import rejects the entire payload before writing invalid rows');
+
+      const taskBulk = await call('POST', '/api/tasks/bulk', {
+        token: owner, farm: farmB,
+        body: { rows: [{ title: 'Scope Check Bulk Task', priority: 'Medium', due_date: '2099-01-03', labor_cost: 0 }] },
+      });
+      ok(taskBulk.status === 201 && taskBulk.json.inserted === 1, 'Agri bulk task import inserts a validated row');
+      const tasksA = (await call('GET', '/api/tasks', { token: owner, farm: farmA })).json;
+      const tasksB = (await call('GET', '/api/tasks', { token: owner, farm: farmB })).json;
+      ok(Array.isArray(tasksA) && !tasksA.some((row) => row.title === 'Scope Check Bulk Task'), 'Agri bulk task row is hidden from farm A');
+      ok(Array.isArray(tasksB) && tasksB.some((row) => row.title === 'Scope Check Bulk Task'), 'Agri bulk task row belongs to farm B');
+
+      const financeBulk = await call('POST', '/api/finance/bulk', {
+        token: owner, farm: farmB,
+        body: { rows: [{ category: 'Scope Check Bulk Entry', amount: 12, type: 'expense', date: '2099-01-03', notes: 'farm isolation test' }] },
+      });
+      ok(financeBulk.status === 201 && financeBulk.json.inserted === 1, 'Agri bulk finance import inserts a validated row');
+      const financeA = (await call('GET', '/api/finance', { token: owner, farm: farmA })).json;
+      const financeB = (await call('GET', '/api/finance', { token: owner, farm: farmB })).json;
+      ok(Array.isArray(financeA) && !financeA.some((row) => row.category === 'Scope Check Bulk Entry'), 'Agri bulk finance row is hidden from farm A');
+      ok(Array.isArray(financeB) && financeB.some((row) => row.category === 'Scope Check Bulk Entry'), 'Agri bulk finance row belongs to farm B');
+    }
+
     // Cross-farm access by id.
     const upd = project.update(idB);
     const cross = await call('PUT', upd.path, { token: owner, farm: farmA, body: upd.body });
