@@ -94,7 +94,7 @@ export async function syncOfflineQueue(): Promise<[number, number]> {
   return [ok, failed.length];
 }
 
-async function req(path: string, options: RequestInit = {}, extra: { noOfflineQueue?: boolean } = {}): Promise<any> {
+async function req(path: string, options: RequestInit = {}, extra: { noOfflineQueue?: boolean; includeMeta?: boolean } = {}): Promise<any> {
   const token = getToken();
   let res: Response;
   try {
@@ -150,6 +150,15 @@ async function req(path: string, options: RequestInit = {}, extra: { noOfflineQu
     throw new Error(data.error || data.message || res.statusText);
   }
 
+  if (extra.includeMeta) {
+    return {
+      data,
+      total: Number(res.headers.get('X-Total-Count') || data.length || 0),
+      page: Number(res.headers.get('X-Page') || 1),
+      pageSize: Number(res.headers.get('X-Page-Size') || data.length || 0),
+      totalPages: Number(res.headers.get('X-Total-Pages') || 1),
+    };
+  }
   return data;
 }
 
@@ -201,6 +210,8 @@ export const api = {
 
   // Milk
   getMilk: (p?: { cowId?: string; from?: string; to?: string; month?: string }) => req('/milk' + qs(p)),
+  getMilkPage: (p: { cowId?: string; month?: string; page: number; limit?: number }) =>
+    req('/milk' + qs({ ...p, page: String(p.page), limit: String(p.limit || 50) }), {}, { includeMeta: true }),
   bulkMilk: (entries: Array<{ cowId: string; date: string; morning: number; evening: number; calfMilk: number; buyerId?: string; forceOverwrite?: boolean }>) =>
     req('/milk/bulk', { method: 'POST', body: JSON.stringify({ entries }) }),
   addMilk: (data: object) => req('/milk', { method: 'POST', body: JSON.stringify(data) }),
