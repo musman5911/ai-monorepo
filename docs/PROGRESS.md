@@ -456,3 +456,19 @@ Added `tests/phase3-pagination.test.ts` with cases for legacy compatibility, 1-b
 Relevant commits: `df43183`, `f64cb48`, `17b0c9f`, `87f3781`, `70fbd2b`, `ea5fd3d`, `f030d66`.
 
 **Verification status:** tests/builds have not been run after these commits in the owner's local checkout. The owner must pull the latest branch and run `npm test` and the Dairy backend/client build before this step is considered verified. Next implementation step after that checkpoint: switch one Dairy list UI to request pages and append results with loading/error/empty states, then generalize the proven pattern.
+
+
+## Owner verification and follow-on implementation (2026-10-23)
+
+The owner pulled commit `5f7a963` and reported the following local results: `npm test` passed **130 tests across 16 files**; `check-farms`, `check-sync`, `check-ui`, and `check-workbench` passed; the Dairy client TypeScript check and production build passed. The build emitted non-fatal warnings for large JS chunks and mixed static/dynamic imports of `api.ts`. These checks do not cover real-MongoDB cross-process locking, disposable-database backup/restore, or browser-level review.
+
+### Phase 3: pagination hardening
+
+- Hardened page/limit parsing to reject array-valued query parameters instead of coercing them into numbers. Replaced CommonJS `require/__dirname` usage in the Vitest source-contract test with ESM-safe `node:fs` and `import.meta.url` path resolution.
+- Added tests for array-valued page and limit parameters.
+- Verification: these new changes have not been executed in the owner's local environment yet.
+
+### Phase 4: breeding lineage foundation
+
+- Added optional cow ear-tag and sire-lineage fields: `earTag`, `fatherId`, `fatherType` (`farm` or `outside`) and `fatherName`. Added a farm-scoped unique partial MongoDB index for non-empty ear tags, so old records without tags are unaffected.
+- These fields are additive; no existing record is rewritten. Full Phase 4 still requires sire selection/validation in the UI, automatic calf creation/lineage tests, and the Agri Field/Crop-cycle structure. The unique index has not been verified against a disposable MongoDB copy; if legacy data already contains duplicate non-empty ear tags within a farm, index creation will warn and must be resolved on a copy before rollout.
