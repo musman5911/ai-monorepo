@@ -86,3 +86,8 @@ Owner-reported Windows checks after commit `93d38fa`:
 - Dairy client build is still pending; the confirmed path is `dairy_farm/client`.
 
 These checks do not close the Phase 3 acceptance gates for Agri on-demand network paging, large-dataset runtime coverage, cross-farm aggregate runtime fixtures, or the final browser/isolated-database pass.
+
+
+## Runtime smoke test runner update (2026-10-23)
+
+Commit `3e50f9d` updates `tools/check-muf-workbench-runtime.js` to start the Dairy Vite dev server automatically on `127.0.0.1:5000` when the default local endpoint is unavailable, wait for the workbench route, run the HTTP smoke checks, and stop only the server process it started. A custom `MUF_WORKBENCH_URL` is not auto-started. This code change has not yet been run locally; the owner must rerun the smoke test after pulling the commit.
