@@ -66,6 +66,19 @@ describe('Phase 3 bounded Dairy milk bulk-entry contract', () => {
     expect(source).toContain('forceOverwrite');
   });
 
+  it('exposes stable paginated totals for Agri crop, finance, and task lists', () => {
+    for (const [file, model] of [
+      ['agri_farm/backend/routes/crops.js', 'Crop.countDocuments(query)'],
+      ['agri_farm/backend/routes/finance.js', 'Finance.countDocuments({})'],
+      ['agri_farm/backend/routes/tasks.js', 'Task.countDocuments({})'],
+    ]) {
+      const source = readFileSync(path.join(repoRoot, file), 'utf8');
+      expect(source).toContain(model);
+      expect(source).toContain("res.set('X-Total-Count'");
+      expect(source).toContain('.sort({');
+    }
+  });
+
   it('provides server-side monthly milk summary totals for paged history', () => {
     const route = readFileSync(path.join(repoRoot, 'dairy_farm/backend/routes/milk.js'), 'utf8');
     const client = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
