@@ -13,7 +13,15 @@ const router = express.Router();
 router.get('/tasks', protect, asyncHandler(async (req, res) => {
   const skip = Math.max(0, Number(req.query.skip) || 0);
   const limit = Math.max(1, Math.min(Number(req.query.limit) || 100, 500));
-  const data = await Task.find({}).skip(skip).limit(limit);
+  const [data, total] = await Promise.all([
+    Task.find({}).sort({ createdAt: -1, _id: -1 }).skip(skip).limit(limit),
+    Task.countDocuments({}),
+  ]);
+  res.set('Access-Control-Expose-Headers', 'X-Total-Count, X-Page, X-Page-Size, X-Total-Pages');
+  res.set('X-Total-Count', String(total));
+  res.set('X-Page', String(Math.floor(skip / limit) + 1));
+  res.set('X-Page-Size', String(limit));
+  res.set('X-Total-Pages', String(Math.ceil(total / limit)));
   return res.json(data.map((d) => ({ ...d, _id: String(d._id) })));
 }));
 
