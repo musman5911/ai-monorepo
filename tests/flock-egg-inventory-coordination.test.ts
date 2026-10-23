@@ -78,6 +78,13 @@ describe('Phase 3 Flock bounded per-batch egg bulk entry', () => {
     expect(source).toContain('acquireEggInventoryLock(DataStore)');
   });
 
+  it('supports skip and limit chaining in the Flock memory query adapter', () => {
+    const memoryDb = readFileSync(path.join(repoRoot, 'flock_farm/backend/memory-db.js'), 'utf8');
+    expect(memoryDb).toContain('skip(count)');
+    expect(memoryDb).toContain('limit(count)');
+    expect(memoryDb).toContain('result.slice(this._skip');
+  });
+
   it('supports stable paged Flock batch lists with a bounded page size', () => {
     const route = readFileSync(path.join(repoRoot, 'flock_farm/backend/routes/batches.js'), 'utf8');
     const api = readFileSync(path.join(repoRoot, 'flock_farm/client/src/api.ts'), 'utf8');
