@@ -3270,10 +3270,20 @@ function App() {
               </div>
               {showFinanceImport && <AgriBulkCsvImport kind="finance" onImportRows={async (rows) => {
                 const normalized = rows.map((row) => Object.fromEntries(Object.entries(row).filter(([, value]) => value !== '')));
-                const response = await api.addFinanceBulk(normalized);
+                let saved = 0;
+                let failed = 0;
+                for (let start = 0; start < normalized.length; start += 200) {
+                  const chunk = normalized.slice(start, start + 200);
+                  try {
+                    const response = await api.addFinanceBulk(chunk);
+                    saved += response.data?.inserted ?? chunk.length;
+                  } catch {
+                    failed += chunk.length;
+                  }
+                }
                 await refreshData();
                 setShowFinanceImport(false);
-                showAlert(`Finance import complete: ${response.data?.inserted ?? normalized.length} records saved.`);
+                showAlert(failed ? `Finance import partially completed: ${saved} saved, ${failed} failed. Failed rows were not retried automatically.` : `Finance import complete: ${saved} records saved.`, failed > 0);
               }} />}
               {/* Financial Breakdown Panel */}
               <div className="muf-kpi-grid">
@@ -3730,10 +3740,20 @@ function App() {
               )}
               {showTaskImport && userRole === 'admin' && <AgriBulkCsvImport kind="tasks" onImportRows={async (rows) => {
                 const normalized = rows.map((row) => Object.fromEntries(Object.entries(row).filter(([, value]) => value !== '')));
-                const response = await api.addTasksBulk(normalized);
+                let saved = 0;
+                let failed = 0;
+                for (let start = 0; start < normalized.length; start += 200) {
+                  const chunk = normalized.slice(start, start + 200);
+                  try {
+                    const response = await api.addTasksBulk(chunk);
+                    saved += response.data?.inserted ?? chunk.length;
+                  } catch {
+                    failed += chunk.length;
+                  }
+                }
                 await refreshData();
                 setShowTaskImport(false);
-                showAlert(`Task import complete: ${response.data?.inserted ?? normalized.length} records saved.`);
+                showAlert(failed ? `Task import partially completed: ${saved} saved, ${failed} failed. Failed rows were not retried automatically.` : `Task import complete: ${saved} records saved.`, failed > 0);
               }} />}
               {rainForecast24h > 5 && (
                 <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800/40 rounded-xl text-amber-800 dark:text-amber-300 text-xs md:text-sm flex items-start gap-3 animate-fade-in shadow-xs">
