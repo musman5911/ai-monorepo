@@ -640,6 +640,15 @@ export async function createBatchEggLog(batchId: string, payload: {
   return data.log;
 }
 
+export async function createBatchLogsBulk(
+  batchId: string,
+  logType: 'feed' | 'weight' | 'vaccination' | 'expense',
+  entries: Array<Record<string, string | number | undefined>>,
+): Promise<{ saved: number; failed: number; logs: unknown[] }> {
+  const { data } = await api.post(`/batches/${encodeURIComponent(batchId)}/logs/${logType}/bulk`, { entries });
+  return data;
+}
+
 export async function createBatchEggLogsBulk(batchId: string, entries: Array<{
   date: string;
   collected: number;
