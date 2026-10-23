@@ -145,7 +145,24 @@ async function checkFlock(project, call, owner, farmA) {
     token: owner, farm: farmB,
     body: { date: '2099-01-02', feed_type: 'Scope Check Feed', quantity_kg: 2, rate_rs_per_kg: 3 },
   });
-  ok(feedLog.status === 201 && feedLog.json.log?.farmId === farmB, 'batch logs are stamped with the same farm');
+  ok(feedLog.status === 201 && feedLog.json.log?.farmId === farmB, 'batch feed logs are stamped with the selected farm');
+
+  const eggLog = await call('POST', `/api/batches/${batch.json.batch?.batch_id}/egg-logs`, {
+    token: owner, farm: farmB,
+    body: { date: '2099-01-02', collected: 12, sold: 5, home_use: 2, broken_wasted: 1, price_per_egg: 4 },
+  });
+  ok(eggLog.status === 201 && eggLog.json.log?.farmId === farmB, 'batch egg logs are stamped with the selected farm');
+
+  const vaccinationLog = await call('POST', `/api/batches/${batch.json.batch?.batch_id}/vaccination-logs`, {
+    token: owner, farm: farmB,
+    body: { date: '2099-01-02', vaccine_name: 'Scope Check Vaccine', bird_count: 10, cost: 25 },
+  });
+  ok(vaccinationLog.status === 201 && vaccinationLog.json.log?.farmId === farmB, 'batch vaccination logs are stamped with the selected farm');
+
+  const batchDetail = await call('GET', `/api/batches/${batch.json.batch?.batch_id}`, { token: owner, farm: farmB });
+  ok(batchDetail.status === 200 && batchDetail.json.egg_logs?.length === 1 && batchDetail.json.vaccination_logs?.length === 1, 'batch detail returns egg and vaccination history');
+  ok(batchDetail.json.batch?.summary?.total_egg_income === 20 && batchDetail.json.batch?.summary?.total_vaccination_cost === 25, 'batch summary includes egg income and vaccination costs');
+
   const foreignDetail = await call('GET', `/api/batches/${batch.json.batch?.batch_id}`, { token: owner, farm: farmA });
   ok(foreignDetail.status === 404, 'batch details and their logs are hidden from another farm');
 
