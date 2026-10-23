@@ -1,6 +1,6 @@
 # Roadmap
 
-Last reviewed: 2026-10-23. CI is manual-only and should run at deliberate testing checkpoints, not on every commit. Latest owner-reported local checks: farm-scope, MUF sync, UI safety and workbench source checks passed; Dairy frontend build passed; root suite reported 134 passed and one timeout in the real-Mongoose query-contract test (no assertion failure reported). The test timeout was raised from 5 to 20 seconds in commit dc01ba84baa13f946a9dd940b85b5ff2f5f00ec9; rerun is pending. Per owner direction, browser and end-to-end role testing will be consolidated into one final verification pass after all planned phases. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-23. CI is manual-only and should run at deliberate testing checkpoints, not on every commit. The owner has now reported a green Windows root suite: 135/135 tests passed across 17 files, including the real-Mongoose query-contract test. The subsequent Phase 3 Dairy paging/bulk-entry commits have not yet been run locally. Per owner direction, Phase 2 real-MongoDB concurrency and disposable-copy backup/restore verification is deferred to the consolidated final verification pass after all planned phases; it does not block continued Phase 3 implementation. Browser and end-to-end role testing are also deferred to that final pass. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
@@ -70,7 +70,15 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 
 ### Phase 3: Bulk entry, scroll loading, server totals
 
-**Status: implementation started (2026-10-23).** Phase 2 local verification checkpoint is green for the owner-reported memory-mode checks, but Phase 2 sign-off remains pending real-MongoDB concurrency and disposable-copy backup/restore compatibility tests. Those tests must use an explicitly isolated test database and must never use the live websites' database URI.
+### Phase 3 implementation update (2026-10-23): Dairy paging and bounded bulk milk entry
+
+- Dairy Cows uses 50-row server pages, stable name/ID sorting, literal search, server-side batch/status/gender filtering, a separate farm-scoped count endpoint for global stat cards, and a separate eligible-mothers endpoint. The UI debounces search, appends pages, and deduplicates records.
+- Dairy Milk History loads 50 rows initially and supports Load 50 More with stable server ordering and ID deduplication. Totals displayed on the history cards are marked as loaded-so-far; the total matching count is shown separately.
+- Daily milk Save All uses an authenticated bulk endpoint in chunks of at most 200 entries. All rows in each chunk are validated before writes begin; malformed entries and duplicate cow/date pairs within a chunk are rejected. Per-row results are returned for partial failures.
+- Contract tests were added for page metadata, filtered cow paging, bulk bounds, and partial-write reporting. Current implementation is not yet locally verified.
+- Remaining: bulk health entry, Flock per-batch bulk workflows, Agri paging/import support, CSV/Excel preview and row-level validation, server-side summary totals, 1,000-row scale fixtures, and final tests/builds across all three apps. Phase 3 remains in progress until these are complete.
+
+**Status: implementation in progress (2026-10-23).** Per owner direction, Phase 2's real-MongoDB concurrency and disposable-copy backup/restore checks are deferred to the final verification pass after all phases. Continue Phase 3 implementation without accessing production data; Phase 2 is not being marked complete early.
 
 Implementation order:
 
