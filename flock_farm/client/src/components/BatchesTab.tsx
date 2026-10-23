@@ -150,12 +150,12 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
   const [eggBulkPreview, setEggBulkPreview] = useState<EggBulkPreviewRow[]>([]);
   const [eggBulkBusy, setEggBulkBusy] = useState(false);
 
-  const loadBatches = useCallback(async (append = false) => {
+  const loadBatches = useCallback(async (targetPage = 1, append = false) => {
     if (append) setLoadingMoreBatches(true);
     else setLoading(true);
     setError(null);
     try {
-      const result = await listBatchesPage(append ? batchPage + 1 : 1, 20);
+      const result = await listBatchesPage(targetPage, 20);
       setBatches(previous => {
         if (!append) return result.batches;
         const known = new Set(previous.map(batch => batch.batch_id));
@@ -170,11 +170,11 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
       setLoading(false);
       setLoadingMoreBatches(false);
     }
-  }, [batchPage]);
+  }, []);
 
   const loadMoreBatches = async () => {
     if (!hasMoreBatches || loadingMoreBatches) return;
-    await loadBatches(true);
+    await loadBatches(batchPage + 1, true);
   };
 
   const loadDetail = useCallback(async (batchId: string) => {
