@@ -29,6 +29,7 @@ interface HealthPortalProps {
   canDelete?: boolean;
   isAdmin?: boolean;
   lang?: Lang;
+  vaccinationOnly?: boolean;
 }
 
 export default function HealthPortal({
@@ -41,6 +42,7 @@ export default function HealthPortal({
   onDeleteVaccination,
   canDelete = true,
   isAdmin = true,
+  vaccinationOnly = false,
 }: HealthPortalProps) {
   const confirmAction = useConfirm();
   // --- B. MORTALITY ENGINE ---
@@ -232,8 +234,8 @@ export default function HealthPortal({
         <div className="muf-page-title">
           <div className="muf-title-icon"><HeartPulse size={28}/></div>
           <div>
-            <h2>{L('Health')}</h2>
-            <p>Monitor mortality stats and track vaccination schedules to keep your flock immune and healthy.</p>
+            <h2>{vaccinationOnly ? L('Vaccination') : L('Health')}</h2>
+            <p>{vaccinationOnly ? L('Track vaccine schedules, due dates and vaccination history for home birds.') : 'Monitor mortality stats and track vaccination schedules to keep your flock immune and healthy.'}</p>
           </div>
         </div>
       </div>
@@ -242,11 +244,11 @@ export default function HealthPortal({
         <HealthStatCard label="Birds In Flock" value={`${activeBirds.length}`} accent="emerald" />
         <HealthStatCard label={L('Sick Birds')} value={`${birds.filter((b) => b.status === 'Sick').length}`} accent="amber" />
         <HealthStatCard label="Vaccines Overdue" value={`${vacMetrics.overdue}`} accent="rose" />
-        <HealthStatCard label="Dead Birds" value={`${deadBirds.length}`} accent="slate" />
+        {!vaccinationOnly && <HealthStatCard label="Dead Birds" value={`${deadBirds.length}`} accent="slate" />}
       </div>
 
       {/* Grid: Vaccination compliance metrics on left, Mortality overview on right */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className={vaccinationOnly ? "grid grid-cols-1 gap-6" : "grid grid-cols-1 lg:grid-cols-2 gap-6"}>
         {/* VACCINATION TRACKER PANEL */}
         <div className="muf-panel p-4 sm:p-6 space-y-5">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
@@ -328,6 +330,7 @@ export default function HealthPortal({
           </div>
         </div>
 
+        {!vaccinationOnly && (
         {/* MORTALITY LOG SUMMARY */}
         <div className="muf-panel p-4 sm:p-6 space-y-5">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
@@ -402,6 +405,7 @@ export default function HealthPortal({
             </div>
           </div>
         </div>
+        )}
       </div>
 
       {/* VACCINATION HISTORY LOG */}
