@@ -15,6 +15,7 @@ const ROOT = path.resolve(__dirname, '..');
 // plus how its auth API looks (paths and response shapes differ between projects).
 const PROJECTS = {
   agri: {
+    kind: 'agri',
     dir: 'agri_farm/backend',
     owner: { username: 'admin', password: 'admin123' },
     api: {
