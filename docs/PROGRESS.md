@@ -322,3 +322,9 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - Added a batch-math unit case proving that sold, home-use and broken/wasted eggs are all deducted from net availability across multiple egg logs.
 - **Not verified by execution:** tests and builds remain unrun for the latest commits. The manual-only GitHub Actions workflow cannot be dispatched with the GitHub actions available in this environment. No live data was touched.
 - **Remaining Phase 2 risks:** allocation writes and egg-log deletion are still separate operations and can race; integration-level concurrency tests are needed. Backup restore now intentionally refuses batch-only replacement when linked history exists, so a full restore process must restore or reconcile the linked incubation/labor buckets as well.
+
+
+## Phase 2 implementation update (2026-10-23): testable linked-history guard
+
+- Extracted the bulk-replacement linked-history decision into a pure backend helper and added three unit cases: no linked history permits replacement; linked incubation or labor history blocks it and reports counts. The batch routes now use that helper for import-all and wipe-all.
+- Tests are added but not executed. The manual-only workflow is still configured correctly; this GitHub connector does not expose workflow dispatch, so no Actions run was started. The race between allocation writes and egg-log deletion remains open, as does integration testing.
