@@ -120,3 +120,12 @@ Browser review must cover Agri, Dairy and Flock on phone, tablet and desktop; sh
 - Do not remove the existing email summary jobs, Telegram workflows, Monthly Summary PDF export, or other existing features as part of visual cleanup.
 - Do not change existing data semantics or configured farm URLs except as a roadmap phase requires, with the owner's approval.
 - Keep `docs/PROGRESS.md` updated as each phase changes state: record what changed, the validation results and anything still unverified. Keep `docs/ROADMAP.md` current with planned work.
+
+## 10. Testing checkpoints and final live verification (owner direction, 2026-10-23)
+
+- **After every phase, run automated checks by explicit commands only.** Record the exact commands and actual outcomes in `docs/PROGRESS.md`. Do not report a command as passed unless it was actually run and its result was observed.
+- **Do not perform real-time database testing or browser/live-site testing between phases.** Defer all live MongoDB concurrency checks, disposable-copy backup/restore verification that requires the final integrated system, live website checks, and browser/end-to-end role testing to one consolidated verification pass after every planned phase is implemented.
+- Until that final pass, use code review, unit tests, contract tests, deterministic fixtures, and local build/check commands. Do not connect to or query production databases, mutate live data, run live migrations, or use production credentials as a test target.
+- The final verification pass must use a clearly identified disposable database for database tests and the approved live/browser checklist for live-site checks. Never point destructive or concurrency tests at a production database. If a safe disposable target cannot be confirmed, stop that database test and report it as pending.
+- Keep implementation status separate from verification status. Passing command-line tests does not prove browser behavior or real MongoDB concurrency; deferred live checks remain pending until the final pass.
+
