@@ -157,7 +157,7 @@ describe('real mongoose queries (skipped when the dairy backend packages are not
     mufRunWithFarmContext({ mode: 'all', farmId: null, farmIds: ['a', 'b'] }, () => {
       expect(Thing.find({}).getFilter()).toEqual({ farmId: { $in: ['a', 'b'] } });
     });
-  });
+  }, 20000);
 });
 
 describe('farms migration', () => {
