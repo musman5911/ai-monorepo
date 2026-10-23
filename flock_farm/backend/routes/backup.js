@@ -30,6 +30,7 @@ const BUCKET_KEYS = [
   'birds', 'expenses', 'feed', 'eggs', 'settings',
   'vaccinations', 'customers', 'customerSales',
   'incubation', 'checklist', 'diary',
+  'laborers', 'laborAttendance', 'laborAdvances',
   'suppliers', 'supplierPayments',
 ];
 const BATCH_MODELS = {
