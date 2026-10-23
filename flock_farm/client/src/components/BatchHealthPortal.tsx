@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, HeartPulse, Syringe } from 'lucide-react';
 import { getBatchDetail, listBatches } from '../api';
 import type { BatchMortalityLog, BatchVaccinationLog, BatchWithSummary } from '../types';
