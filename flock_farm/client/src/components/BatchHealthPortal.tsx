@@ -49,7 +49,6 @@ export default function BatchHealthPortal() {
     live: batches.reduce((sum, batch) => sum + (batch.summary?.live_count || 0), 0),
     deaths: batches.reduce((sum, batch) => sum + (batch.summary?.total_mortality_count || 0), 0),
     vaccinationEvents: events.filter((event) => event.kind === 'vaccination').length,
-    birdDoses: events.filter((event) => event.kind === 'vaccination').reduce((sum, event) => sum + event.count, 0),
     vaccineCost: events.filter((event) => event.kind === 'vaccination').reduce((sum, event) => sum + event.cost, 0),
   }), [batches, events]);
 
