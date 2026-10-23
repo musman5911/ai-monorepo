@@ -140,10 +140,9 @@ router.get('/', protect, async (req, res) => {
     if (req.query.search) {
       const search = String(req.query.search).trim().slice(0, 100);
       if (search) {
-        const escaped = search.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\    if (req.query.batch) filter.batch = req.query.batch;
-    if (req.query.status) filter.status = req.query.status;
-    if (req.query.motherId) filter.motherId = req.query.motherId;
-    const page = parsePagePagination(req.query);');
+        const escaped = search.split('').map((character) =>
+          '.^$*+?()[]{}|\\'.includes(character) ? `\\${character}` : character
+        ).join('');
         filter.$or = [{ name: { $regex: escaped, $options: 'i' } }, { _id: { $regex: escaped, $options: 'i' } }];
       }
     }
