@@ -11,6 +11,7 @@ import {
   readEnum,
   sendValidationError,
   parsePagination,
+  parsePagePagination,
   applyPagination,
 } from './input.js';
 import { todayStr, daysAgoStr } from '../utils/date.js';
@@ -103,8 +104,23 @@ router.get('/', protect, async (req, res) => {
     if (req.query.batch) filter.batch = req.query.batch;
     if (req.query.status) filter.status = req.query.status;
     if (req.query.motherId) filter.motherId = req.query.motherId;
+    const page = parsePagePagination(req.query);
+    if (page.enabled) {
+      if (page.error) return res.status(400).json({ error: page.error });
+      // Farm scoping is applied by the model wrapper before both reads.
+      // _id breaks ties so consecutive pages have a stable order.
+      const [rows, total] = await Promise.all([
+        Cow.find(filter).sort({ name: 1, _id: 1 }).skip(page.skip).limit(page.limit),
+        Cow.countDocuments(filter),
+      ]);
+      res.set('X-Total-Count', String(total));
+      res.set('X-Page', String(page.page));
+      res.set('X-Page-Size', String(page.limit));
+      res.set('X-Total-Pages', String(Math.ceil(total / page.limit)));
+      return res.json(rows);
+    }
     const pagination = parsePagination(req.query);
-    const rows = await applyPagination(Cow.find(filter).sort({ name: 1 }), pagination);
+    const rows = await applyPagination(Cow.find(filter).sort({ name: 1, _id: 1 }), pagination);
     res.json(rows);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
