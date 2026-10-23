@@ -110,7 +110,7 @@ Phases 1, 2 and 4 change data. Follow these steps for each project separately, a
 4. **Publish** following the checklist above, then test: login as an owner, a manager and a worker; confirm a worker sees only assigned farms; add, rename and archive a farm; make one safe record save in each farm.
 5. **Rollback** means restoring the backup and republishing the previous commit. Keep the backup until the owner has used the new version for a while.
 
-Phase 1 migration commands, run inside each project's backend folder with that project's `MONGO_URI` set (Dairy and Agri have the script today; Flock gets it in step 1B-2):
+Phase 1 migration commands, run inside each project's backend folder with that project's MongoDB URI set (Dairy, Agri and Flock now have the script):
 
 ```
 npm run migrate:farms:dry     shows what would change and changes nothing
