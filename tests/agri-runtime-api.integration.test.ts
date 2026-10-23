@@ -217,7 +217,7 @@ describe.sequential('Agri runtime API integration', () => {
       const second = await request(`${route}?skip=1&limit=1`, { token: ownerToken });
       expect(first.response.status, route).toBe(200);
       expect(second.response.status, route).toBe(200);
-      expect(first.response.headers.get('x-total-count'), route).toMatch(/^\\d+$/);
+      expect(first.response.headers.get('x-total-count'), route).toMatch(/^\d+$/);
       expect(second.response.headers.get('x-total-count'), route).toBe(first.response.headers.get('x-total-count'));
       expect(first.response.headers.get('x-page'), route).toBe('1');
       expect(second.response.headers.get('x-page'), route).toBe('2');
