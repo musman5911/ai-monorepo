@@ -32,9 +32,11 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ['admin', 'worker'],
+      enum: ['owner', 'manager', 'worker', 'admin'],
       default: 'worker',
     },
+    // Farms assigned to a manager or worker. Owners can access every farm.
+    farmIds: { type: [String], default: [] },
     displayName: {
       type: String,
       trim: true,
