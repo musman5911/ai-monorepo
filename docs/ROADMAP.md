@@ -73,10 +73,12 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 ### Phase 3 implementation update (2026-10-23): Dairy paging and bounded bulk milk entry
 
 - Dairy Cows uses 50-row server pages, stable name/ID sorting, literal search, server-side batch/status/gender filtering, a separate farm-scoped count endpoint for global stat cards, and a separate eligible-mothers endpoint. The UI debounces search, appends pages, and deduplicates records.
-- Dairy Milk History loads 50 rows initially and supports Load 50 More with stable server ordering and ID deduplication. Totals displayed on the history cards are marked as loaded-so-far; the total matching count is shown separately.
+- Dairy Milk History loads 50 rows initially and supports Load 50 More with stable server ordering and ID deduplication. A farm-scoped summary endpoint keeps count, total/saleable liters and revenue accurate across the full matching result set.
 - Daily milk Save All uses an authenticated bulk endpoint in chunks of at most 200 entries. All rows in each chunk are validated before writes begin; malformed entries and duplicate cow/date pairs within a chunk are rejected. Per-row results are returned for partial failures.
+- Preview-first CSV import is available for Dairy milk and health (1,000-row/file cap, 2 MB cap, row-level validation and 200-row write chunks). Health bulk writes attempt to roll back a health record if its linked expense cannot be saved.
+- Flock batch listing now supports 20-row pages and Load More; batch egg logs have a lock-coordinated bulk endpoint and preview-first CSV import. Agri crop, finance and task list APIs expose stable sorting and page-count headers while preserving legacy array payloads.
 - Contract tests were added for page metadata, filtered cow paging, bulk bounds, and partial-write reporting. Current implementation is not yet locally verified.
-- Remaining: bulk health entry, Flock per-batch bulk workflows, Agri paging/import support, CSV/Excel preview and row-level validation, server-side summary totals, 1,000-row scale fixtures, and final tests/builds across all three apps. Phase 3 remains in progress until these are complete.
+- Remaining: finish Agri UI incremental loading and bulk/import workflows; extend Flock bulk entry beyond egg logs; add Excel import support; add 1,000-row fixtures and verify stable paging under mutation, all bulk-write farm isolation, server totals and all three builds. Phase 3 remains in progress until these are complete.
 
 **Status: implementation in progress (2026-10-23).** Per owner direction, Phase 2's real-MongoDB concurrency and disposable-copy backup/restore checks are deferred to the final verification pass after all phases. Continue Phase 3 implementation without accessing production data; Phase 2 is not being marked complete early.
 
