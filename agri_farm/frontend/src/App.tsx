@@ -3187,8 +3187,7 @@ function App() {
                     const saved = outcomes.filter((item) => item.ok).length;
                     const failed = outcomes.length - saved;
                     setShowCropImport(false);
-                    showAlert(failed ? `Crop CSV import: ${saved} saved, ${failed} failed. Check the rows and retry failed entries.` : `Crop CSV import complete: ${saved} crops saved.`);
-                    if (failed) throw new Error(`${saved} rows saved; ${failed} rows failed. Refresh completed; review the results before retrying.`);
+                    showAlert(failed ? `Crop CSV import: ${saved} saved, ${failed} failed. Review the server logs and retry only the failed rows.` : `Crop CSV import complete: ${saved} crops saved.`);
                   }} />
                 )}
                 {crops.length === 0 ? (
