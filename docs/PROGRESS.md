@@ -328,3 +328,10 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 
 - Extracted the bulk-replacement linked-history decision into a pure backend helper and added three unit cases: no linked history permits replacement; linked incubation or labor history blocks it and reports counts. The batch routes now use that helper for import-all and wipe-all.
 - Tests are added but not executed. The manual-only workflow is still configured correctly; this GitHub connector does not expose workflow dispatch, so no Actions run was started. The race between allocation writes and egg-log deletion remains open, as does integration testing.
+
+
+## Phase 2 implementation update (2026-10-23): allocation math consistency
+
+- Incubation allocation validation now clamps each egg-log entry's net supply at zero, matching batch summary math. A negative-net legacy/malformed log therefore cannot cancel valid supply recorded on another day.
+- Added a unit case covering that edge condition. This test has been added but not executed. Cross-request concurrency between incubation writes and egg-log deletion remains unresolved; do not treat inventory allocation as race-safe yet.
+- The manual-only GitHub Actions workflow still cannot be dispatched through the connected GitHub tools available in this session. No Actions result is claimed.
