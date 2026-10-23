@@ -15,6 +15,8 @@ describe("Agri task and finance bulk-import API contracts", () => {
     expect(bulk.indexOf("if (errors.length) return res.status(400)")).toBeLessThan(bulk.indexOf("Task.insertMany(prepared)"));
     expect(bulk).toContain("status: 'Pending'");
     expect(bulk).toContain("cleanLaborerIds");
+    expect(bulk).toContain("Crop must exist in the selected farm.");
+    expect(bulk).toContain("Inventory item must exist in the selected farm.");
   });
 
   it("validates finance rows and restricts imported fields before insertMany", () => {
@@ -26,6 +28,7 @@ describe("Agri task and finance bulk-import API contracts", () => {
     expect(bulk).toContain("type !== 'income' && type !== 'expense'");
     expect(bulk).toContain("category, type, amount, date");
     expect(bulk).not.toContain("...row");
+    expect(bulk).toContain("Crop must exist in the selected farm.");
   });
 
   it("extends the HTTP farm-scope checker to cover validation and cross-farm import isolation", () => {
