@@ -285,6 +285,8 @@ export interface BatchSummary {
   total_vaccination_cost: number;
   total_eggs_collected: number;
   total_eggs_sold: number;
+  /** Collected eggs remaining after sold, home-use and broken/wasted counts, before incubation allocations. */
+  total_eggs_available: number;
   total_egg_income: number;
   total_mortality_count: number;
   total_sold_count: number;
