@@ -66,6 +66,31 @@ describe('Phase 3 bounded Dairy milk bulk-entry contract', () => {
     expect(source).toContain('forceOverwrite');
   });
 
+  it('provides server-side monthly milk summary totals for paged history', () => {
+    const route = readFileSync(path.join(repoRoot, 'dairy_farm/backend/routes/milk.js'), 'utf8');
+    const client = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
+    const component = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/components/MilkTab.tsx'), 'utf8');
+    expect(route).toContain("router.get('/summary'");
+    expect(route).toContain('saleableLiters');
+    expect(route).toContain('buyerRates');
+    expect(client).toContain('getMilkSummary:');
+    expect(component).toContain('setHistorySummary(summaryResult)');
+  });
+
+  it('provides preview-first Dairy milk CSV import with bounded row count', () => {
+    const component = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/components/MilkTab.tsx'), 'utf8');
+    expect(component).toContain('Preview Milk CSV Import');
+    expect(component).toContain('lines.length > 1001');
+    expect(component).toContain('Duplicate cow/date in CSV');
+    expect(component).toContain('handleImportMilkCsv');
+  });
+
+  it('provides bounded bulk health writes through the client API', () => {
+    const route = readFileSync(path.join(repoRoot, 'dairy_farm/backend/routes/health.js'), 'utf8');
+    expect(route).toContain("router.post('/bulk', protect, workerOrAdmin");
+    expect(route).toContain('Health.deleteOne({ _id: id })');
+  });
+
   it('supports paged cow search, server totals, and eligible-mother lookup', () => {
     const route = readFileSync(path.join(repoRoot, 'dairy_farm/backend/routes/cows.js'), 'utf8');
     const client = readFileSync(path.join(repoRoot, 'dairy_farm/client/src/api.ts'), 'utf8');
