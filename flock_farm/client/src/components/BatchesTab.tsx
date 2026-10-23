@@ -31,6 +31,7 @@ import {
   createBatchFeedLog,
   createBatchEggLog,
   createBatchEggLogsBulk,
+  createBatchLogsBulk,
   createBatchVaccinationLog,
   createBatchMortalityLog,
   createBatchSaleLog,
@@ -74,6 +75,13 @@ type ModalKind = 'create' | 'edit' | 'intake' | 'feed' | 'mortality' | 'expense'
 
 // formatRs + normalizePublicAssetPath extracted to ./batches/batchUtils
 // (pure functions, no component state).
+
+type GenericBulkLogType = 'feed' | 'weight' | 'vaccination' | 'expense';
+type GenericBulkPreviewRow = {
+  rowNumber: number;
+  entry: Record<string, string | number | undefined>;
+  error: string;
+};
 
 type EggBulkPreviewRow = {
   rowNumber: number;
@@ -149,6 +157,10 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
   const [showEggBulkModal, setShowEggBulkModal] = useState(false);
   const [eggBulkPreview, setEggBulkPreview] = useState<EggBulkPreviewRow[]>([]);
   const [eggBulkBusy, setEggBulkBusy] = useState(false);
+  const [genericBulkType, setGenericBulkType] = useState<GenericBulkLogType>('feed');
+  const [showGenericBulkModal, setShowGenericBulkModal] = useState(false);
+  const [genericBulkPreview, setGenericBulkPreview] = useState<GenericBulkPreviewRow[]>([]);
+  const [genericBulkBusy, setGenericBulkBusy] = useState(false);
 
   const loadBatches = useCallback(async (targetPage = 1, append = false) => {
     if (append) setLoadingMoreBatches(true);
@@ -254,6 +266,87 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
       notify(error instanceof Error ? error.message : 'Egg CSV import failed', 'error');
     } finally {
       setEggBulkBusy(false);
+    }
+  };
+
+  const handleGenericBulkCsv = async (type: GenericBulkLogType, file?: File | null) => {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { notify('CSV files must be 2 MB or smaller.', 'error'); return; }
+    try {
+      const lines = (await file.text()).replace(/\r\n?/g, '\n').split('\n').filter(line => line.trim());
+      if (lines.length < 2) throw new Error('CSV needs a header and at least one data row.');
+      if (lines.length > 1001) throw new Error('Import is limited to 1,000 rows.');
+      const headers = parseBatchCsvLine(lines[0]).map(value => value.toLowerCase().replace(/[\s-]+/g, '_'));
+      const at = (name: string) => headers.indexOf(name);
+      const requiredByType: Record<GenericBulkLogType, string[]> = {
+        feed: ['date', 'feed_type', 'quantity_kg'],
+        weight: ['date', 'avg_weight_g'],
+        vaccination: ['date', 'vaccine_name'],
+        expense: ['date', 'category', 'detail', 'amount'],
+      };
+      for (const required of requiredByType[type]) if (at(required) < 0) throw new Error(`Missing required CSV column: ${required}`);
+      const preview = lines.slice(1).map((line, index) => {
+        const cells = parseBatchCsvLine(line);
+        const get = (name: string) => cells[at(name)] || '';
+        const date = get('date');
+        const problems: string[] = [];
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(date + 'T00:00:00Z').getTime()) || new Date(date + 'T00:00:00Z').toISOString().slice(0, 10) !== date) problems.push('Invalid date');
+        const entry: Record<string, string | number | undefined> = { date, notes: get('notes') || undefined };
+        const numeric = (field: string, required: boolean, min: number, integer = false) => {
+          const raw = get(field);
+          const value = raw === '' && !required ? 0 : Number(raw);
+          if ((required && raw === '') || !Number.isFinite(value) || value < min || (integer && !Number.isInteger(value))) problems.push(`${field} is invalid`);
+          else entry[field] = value;
+        };
+        if (type === 'feed') {
+          entry.feed_type = get('feed_type');
+          if (!entry.feed_type) problems.push('feed_type is required');
+          numeric('quantity_kg', true, 0.000001);
+          numeric('rate_rs_per_kg', false, 0);
+        } else if (type === 'weight') {
+          numeric('avg_weight_g', true, 0.000001);
+          numeric('sample_size', false, 0, true);
+        } else if (type === 'vaccination') {
+          entry.vaccine_name = get('vaccine_name');
+          entry.dose = get('dose') || undefined;
+          if (!entry.vaccine_name) problems.push('vaccine_name is required');
+          numeric('bird_count', false, 0, true);
+          numeric('cost', false, 0);
+        } else {
+          entry.category = get('category');
+          entry.detail = get('detail');
+          if (!['Medicine', 'Vaccination', 'Misc', 'Other'].includes(String(entry.category))) problems.push('category must be Medicine, Vaccination, Misc or Other');
+          if (!entry.detail) problems.push('detail is required');
+          numeric('amount', true, 0.000001);
+        }
+        return { rowNumber: index + 2, entry, error: problems.join('; ') };
+      });
+      setGenericBulkType(type);
+      setGenericBulkPreview(preview);
+      setShowGenericBulkModal(true);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Could not read CSV', 'error');
+    }
+  };
+
+  const submitGenericBulkCsv = async () => {
+    if (!selectedBatch) return;
+    if (genericBulkPreview.some(row => row.error)) { notify('Fix invalid CSV rows before importing.', 'error'); return; }
+    setGenericBulkBusy(true);
+    try {
+      let saved = 0;
+      for (let start = 0; start < genericBulkPreview.length; start += 200) {
+        const result = await createBatchLogsBulk(selectedBatch.batch_id, genericBulkType, genericBulkPreview.slice(start, start + 200).map(row => row.entry));
+        saved += result.saved;
+      }
+      notify(`${saved} ${genericBulkType} logs imported.`, 'success');
+      setShowGenericBulkModal(false);
+      setGenericBulkPreview([]);
+      await refreshAfterMutation(selectedBatch.batch_id);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'CSV import failed', 'error');
+    } finally {
+      setGenericBulkBusy(false);
     }
   };
 
@@ -793,6 +886,17 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
               </div>
             )}
 
+            {(['feed', 'weight', 'vaccination', 'expense'] as const).includes(detailTab as GenericBulkLogType) && (
+              <div className="mb-3 flex justify-end">
+                <label className="cursor-pointer rounded-xl border border-slate-300 dark:border-slate-600 px-3 py-2 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800">
+                  Import {detailTab} CSV (preview first)
+                  <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => {
+                    const file = e.target.files?.[0]; e.currentTarget.value = '';
+                    void handleGenericBulkCsv(detailTab as GenericBulkLogType, file);
+                  }} />
+                </label>
+              </div>
+            )}
             {detailTab === 'feed' && <LogTable kind="feed" rows={detail.feed_logs} onDelete={handleDeleteLog} canDelete={isAdmin} columns={[
               ['Date', (row: BatchFeedLog) => row.date],
               ['Feed', (row: BatchFeedLog) => row.feed_type],
@@ -1037,6 +1141,25 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
           <ModalActions submitting={submitting} onCancel={closeModal} submitLabel={L('Save Egg Log')} />
         </form>
       </BatchLogModal>
+
+      <DetailModal open={showGenericBulkModal} onClose={() => { if (!genericBulkBusy) setShowGenericBulkModal(false); }}
+        title={`Preview Batch ${genericBulkType} CSV`} size="big">
+        <div className="space-y-3">
+          <p className="text-xs text-slate-500">Review the parsed rows before import. Up to 1,000 rows and 2 MB per file; all preview errors must be fixed before writing.</p>
+          <div className="max-h-[55vh] overflow-auto rounded-xl border border-slate-200 dark:border-slate-700">
+            <table className="w-full text-xs">
+              <thead><tr className="bg-slate-50 dark:bg-slate-800 text-left"><th className="p-2">Row</th><th className="p-2">Parsed values</th><th className="p-2">Validation</th></tr></thead>
+              <tbody>{genericBulkPreview.map(row => <tr key={row.rowNumber} className={row.error ? 'bg-red-50 dark:bg-red-900/20' : 'border-t'}>
+                <td className="p-2">{row.rowNumber}</td><td className="p-2 font-mono">{Object.entries(row.entry).map(([key, value]) => `${key}=${value ?? ''}`).join(', ')}</td><td className="p-2 text-rose-600">{row.error || 'Ready'}</td>
+              </tr>)}</tbody>
+            </table>
+          </div>
+          <div className="flex items-center justify-between gap-3"><p className="text-xs text-slate-500">{genericBulkPreview.length} rows · {genericBulkPreview.filter(row => row.error).length} invalid</p>
+            <button type="button" onClick={submitGenericBulkCsv} disabled={genericBulkBusy || !genericBulkPreview.length || genericBulkPreview.some(row => row.error)}
+              className="rounded-xl bg-amber-600 px-4 py-2 text-sm font-bold text-white disabled:opacity-50">{genericBulkBusy ? 'Importing...' : `Import ${genericBulkType} Logs`}</button>
+          </div>
+        </div>
+      </DetailModal>
 
       <DetailModal open={showEggBulkModal} onClose={() => { if (!eggBulkBusy) setShowEggBulkModal(false); }}
         title="Preview Batch Egg CSV" size="big">
