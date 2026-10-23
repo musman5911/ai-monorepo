@@ -37,7 +37,7 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 
 ## Current owner action
 
-- **Flock step 1B-2 validation:** implementation is underway. Do not run the migration on live data. Take a fresh backup, test on a database copy, run the automated checks listed in `RULES.md`, and review the Flock HTTP scope results before applying anything to production.
+- **Finish Phase 1 validation:** all three frontend builds and the listed automated checks are reported passing. Next, browser-test farm switching and Owner/Manager/Worker permissions in all three apps, review Flock backup/restore behavior, then run migration dry-runs against disposable database copies. Do not run migrations on live data. The local Flock lockfile diff is only a dependency-list reorder plus final newline in the supplied diff; leave it uncommitted unless a dependency install requires it.
 
 ## Phase 1 step 1B-2: Flock backend (in progress, 2026-10-23)
 
@@ -201,13 +201,14 @@ Removed in Phase 0. The old 40-image candidate set was never approved and has ex
 After each change: move the phase to done with the date, record real check results with where they ran, list anything unverified, add removals to the Home Birds list when they happen, and keep `ROADMAP.md` in step.
 
 
-## Phase 1C implementation note (2026-10-23)
+## Phase 1C implementation note (2026-10-23; initial note superseded by validation update below)
 
 - Added a shared MUF farm switcher to the Agri, Dairy and Flock frontends and mounted it in each app header.
 - Added the selected farm ID as `X-Farm-Id` to authenticated API requests.
 - The owner panel uses existing APIs for farm create, rename, archive/restore, and role/farm assignment. Permanent deletion and “All farms” mode are not exposed in this pass.
 - Added a three-app byte-identity check for the shared switcher.
-- **Not verified:** builds, automated checks, backend behavior, visual/browser behavior and migration-on-copy tests. These require the owner's local checkout. Live/browser testing remains deferred until the end.
+- At the time of the initial note, builds and automated checks had not yet been reported. The later validation update below supersedes that status.
+- **Still unverified:** browser behavior, endpoint compatibility under real app sessions, role enforcement in UI/API flows, and migration-on-copy tests.
 - **Permission caveat:** legacy `admin` role checks still need review; this UI does not replace server-side authorization.
 
 
