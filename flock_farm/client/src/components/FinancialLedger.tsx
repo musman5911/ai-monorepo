@@ -49,6 +49,7 @@ interface FinancialLedgerProps {
   onUpdateVaccination: (id: number, v: Omit<VaccinationRecord, 'id'>) => void;
   onDeleteVaccination: (id: number) => void;
   quickOpenTab: 'feed' | 'expense' | 'egg' | 'customers' | 'suppliers' | null;
+  homeBirdsOnly?: boolean;
   onResetQuickOpenTab: () => void;
   isAdmin?: boolean;
   canDelete?: boolean;
@@ -86,6 +87,7 @@ export default function FinancialLedger({
   onUpdateVaccination,
   onDeleteVaccination,
   quickOpenTab,
+  homeBirdsOnly = false,
   onResetQuickOpenTab,
   isAdmin = true,
   canDelete = true,
@@ -104,6 +106,11 @@ export default function FinancialLedger({
 
   // Sync quickOpenTab prop from parent (e.g. Dashboard quick actions)
   useEffect(() => {
+    if (homeBirdsOnly) {
+      setActiveSubTab('egg');
+      if (quickOpenTab) onResetQuickOpenTab();
+      return;
+    }
     if (quickOpenTab) {
       if (quickOpenTab === 'feed') setActiveSubTab('feed');
       if (quickOpenTab === 'expense') setActiveSubTab('expense');
@@ -112,7 +119,7 @@ export default function FinancialLedger({
       if (quickOpenTab === 'suppliers') setActiveSubTab('suppliers');
       onResetQuickOpenTab();
     }
-  }, [quickOpenTab, onResetQuickOpenTab]);
+  }, [quickOpenTab, onResetQuickOpenTab, homeBirdsOnly]);
 
   // Form states - Feed
   const [feedDate, setFeedDate] = useState(todayStr());
@@ -423,8 +430,8 @@ export default function FinancialLedger({
         <div className="muf-page-title">
           <div className="muf-title-icon"><DollarSign size={28}/></div>
           <div>
-            <h2>{L('Finance')}<span className="mx-2 text-slate-300 dark:text-slate-600">›</span><span className="text-emerald-700 dark:text-emerald-400">{L(({ feed: 'Feed', expense: 'Expenses', egg: 'Eggs', customers: 'Customers', suppliers: 'Suppliers' } as Record<string, string>)[activeSubTab])}</span></h2>
-            <p>{L('Manage feed, expenses, egg production, customers, and health activity from one place.')}</p>
+            <h2>{homeBirdsOnly ? L('Egg Production') : <>{L('Finance')}<span className="mx-2 text-slate-300 dark:text-slate-600">›</span><span className="text-emerald-700 dark:text-emerald-400">{L(({ feed: 'Feed', expense: 'Expenses', egg: 'Eggs', customers: 'Customers', suppliers: 'Suppliers' } as Record<string, string>)[activeSubTab])}</span></>}</h2>
+            <p>{homeBirdsOnly ? L('Record daily eggs collected, sold, used at home and wasted.') : L('Manage feed, expenses, egg production, customers, and health activity from one place.')}</p>
           </div>
         </div>
       </div>
