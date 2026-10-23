@@ -36,6 +36,16 @@ const PROJECTS = {
     idOf: (row) => row._id,
     rows: (json) => (Array.isArray(json) ? json : []),
   },
+  flock: {
+    kind: 'flock',
+    dir: 'flock_farm/backend',
+    owner: { username: 'admin', password: 'admin123' },
+    api: {
+      ready: '/api/health',
+      login: '/api/auth/login',
+      tokenOf: (j) => j.token,
+    },
+  },
   dairy: {
     dir: 'dairy_farm/backend',
     owner: { username: 'admin', password: 'admin123' },
@@ -100,6 +110,53 @@ function client(base) {
   };
 }
 
+async function checkFlock(project, call, owner, farmA) {
+  console.log('  Flock: legacy buckets and batches');
+  const baseline = (await call('GET', '/api/data/eggs', { token: owner, farm: farmA })).json;
+  ok(baseline && baseline.key === 'eggs', 'legacy egg bucket still returns its established response shape');
+
+  const created = await call('POST', '/api/farms', { token: owner, body: { name: 'Flock Farm B', location: 'Check' } });
+  ok(created.status === 201, 'owner can create a second poultry farm');
+  const farmB = created.json.id;
+  const empty = await call('GET', '/api/data/eggs', { token: owner, farm: farmB });
+  ok(empty.status === 200 && empty.json.exists === false && empty.json.value === null, 'new farm has an isolated empty bucket');
+
+  const bucketWrite = await call('PUT', '/api/data/eggs', {
+    token: owner, farm: farmB, body: { value: [{ id: 'scope-check-egg', date: '2099-01-01', totalEggsCollected: 7 }], baseVersion: 0, farmId: farmA },
+  });
+  ok(bucketWrite.status === 200 && bucketWrite.json.value?.[0]?.id === 'scope-check-egg', 'bucket write succeeds in selected farm');
+  const bucketA = await call('GET', '/api/data/eggs', { token: owner, farm: farmA });
+  ok(JSON.stringify(bucketA.json.value) === JSON.stringify(baseline.value), 'farm B bucket write does not change farm A');
+  const bucketB = await call('GET', '/api/data/eggs', { token: owner, farm: farmB });
+  ok(bucketB.json.value?.[0]?.id === 'scope-check-egg', 'farm B reads only its own bucket');
+  const allWrite = await call('PUT', '/api/data/eggs', { token: owner, farm: 'all', body: { value: [] } });
+  ok(allWrite.status === 400 && allWrite.json.code === 'FARM_REQUIRED', 'All farms mode rejects bucket writes');
+
+  const batch = await call('POST', '/api/batches', {
+    token: owner, farm: farmB,
+    body: { name: 'Scope Check Batch', type: 'Broiler', start_date: '2099-01-01', intake_count: 10, cost_per_bird: 5 },
+  });
+  ok(batch.status === 201 && batch.json.batch?.farmId === farmB, 'batch creation is stamped with selected farm');
+  const batchA = await call('GET', '/api/batches', { token: owner, farm: farmA });
+  ok(!(batchA.json.batches || []).some((row) => row.batch_id === batch.json.batch?.batch_id), 'farm A cannot see farm B batches');
+  const batchB = await call('GET', '/api/batches', { token: owner, farm: farmB });
+  ok((batchB.json.batches || []).some((row) => row.batch_id === batch.json.batch?.batch_id), 'farm B can see its own batch');
+
+  const workerCreate = await call('POST', '/api/auth/users', {
+    token: owner, farm: farmB,
+    body: { username: 'scope-worker-b', password: 'scope-worker-b-pass', role: 'worker', displayName: 'Scope Worker' },
+  });
+  ok(workerCreate.status === 201 && workerCreate.json.user?.farmIds?.includes(farmB), 'new worker is assigned to the selected farm');
+  const workerLogin = await call('POST', '/api/auth/login', { body: { username: 'scope-worker-b', password: 'scope-worker-b-pass' } });
+  const worker = workerLogin.json?.token;
+  ok(workerLogin.status === 200 && !!worker, 'assigned worker can log in');
+  const forbidden = await call('GET', '/api/data/eggs', { token: worker, farm: farmA });
+  ok(forbidden.status === 403, 'worker cannot select another farm');
+
+  const backup = await call('GET', '/api/backup', { token: owner, farm: farmA });
+  ok(backup.status === 200 && Array.isArray(backup.json.farms) && backup.json.farms.length === 2, 'owner backup includes both farms');
+}
+
 async function checkProject(name, project, port) {
   console.log(`\n${name}: farm scope`);
   const { child, base } = await startServer(project, port);
@@ -114,6 +171,11 @@ async function checkProject(name, project, port) {
     const farms1 = await call('GET', '/api/farms', { token: owner });
     ok(farms1.status === 200 && farms1.json.farms.length === 1, 'migration created exactly one farm');
     const farmA = farms1.json.farms[0].id;
+
+    if (project.kind === 'flock') {
+      await checkFlock(project, call, owner, farmA);
+      return;
+    }
 
     const baseline = project.rows((await call('GET', project.list, { token: owner })).json);
     ok(baseline.length > 0, 'existing records were tagged into the first farm');
