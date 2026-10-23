@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (owner reported all three frontend builds and automated checks passing; functional/browser review and migration-copy testing remain pending).
+Last updated: 2026-10-23 (Phase 2 implementation started: Flock now opens on Batches; final browser/role review remains deferred until all phases are complete).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
@@ -247,3 +247,14 @@ The existing local change to `flock_farm/backend/package-lock.json` is owner-loc
 | `git status` | Only local `flock_farm/backend/package-lock.json` modified; not committed |
 
 The previously reported Dairy unused-import TypeScript error is resolved in the owner's new build output. These results validate builds and automated checks, not end-to-end browser/API behavior. Next: inspect the lockfile diff without discarding it, exercise farm switching and owner user/farm management in each app, verify role restrictions with test accounts, and run migration dry-runs on database copies only. No live migration or browser verification has been reported.
+
+
+## Phase 2 implementation update (2026-10-23)
+
+Owner approved simplifying the old individual-bird workflow. The retained Home Birds scope is: home-animal list/details, eggs, monthly report and vaccination. Batches must become the primary Flock workflow. Browser and end-to-end role testing are consolidated at the end of all phases, not repeated per phase.
+
+- **Implemented and pushed:** Flock now defaults to the Batches tab after login and the Batches navigation item is first. The existing Birds navigation item is relabelled Home Birds.
+- **Existing systems reused:** the current `BatchesTab`, `FlockRegister`, `FinancialLedger`, `MonthlySummary` and `HealthPortal` components. No parallel batch model or collections added.
+- **Not yet implemented:** combining the retained Home Birds features into one tab, reducing Home Birds to only the approved features, expanding batch daily-egg/vaccination reporting where missing, and targeted Phase 2 tests.
+- **Not run by assistant:** frontend build, root tests, farm-scope check, MUF sync/UI checks. Owner should run the usual checks after the next implementation increment is pushed.
+- No data migration has been run and no live data was touched.
