@@ -330,8 +330,8 @@ export default function HealthPortal({
           </div>
         </div>
 
-        {!vaccinationOnly && (
         {/* MORTALITY LOG SUMMARY */}
+        {!vaccinationOnly && (
         <div className="muf-panel p-4 sm:p-6 space-y-5">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
             <h3 className="font-bold text-sm text-slate-800 dark:text-slate-100 font-display flex items-center gap-2">
