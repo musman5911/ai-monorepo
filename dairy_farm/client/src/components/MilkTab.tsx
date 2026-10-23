@@ -22,6 +22,23 @@ function isMilkEligible(cow: Cow): boolean {
   return ['active', 'pregnant', 'dry', 'calf'].includes(cow.status);
 }
 
+type MilkCsvEntry = { cowId: string; date: string; morning: number; evening: number; calfMilk: number; buyerId?: string; forceOverwrite: boolean };
+
+function parseCsvLine(line: string): string[] {
+  const values: string[] = [];
+  let value = '';
+  let quoted = false;
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"' && quoted && line[i + 1] === '"') { value += '"'; i++; }
+    else if (char === '"') quoted = !quoted;
+    else if (char === ',' && !quoted) { values.push(value.trim()); value = ''; }
+    else value += char;
+  }
+  values.push(value.trim());
+  return values;
+}
+
 export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) {
   const confirmAction = useConfirm();
   const [viewMode, setViewMode] = useState<'daily' | 'history'>('daily');
@@ -40,6 +57,9 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
   const [historyTotalCount, setHistoryTotalCount] = useState(0);
   const [historyHasMore, setHistoryHasMore] = useState(false);
   const [loadingMoreHistory, setLoadingMoreHistory] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importPreview, setImportPreview] = useState<Array<{ rowNumber: number; entry: { cowId: string; date: string; morning: number; evening: number; calfMilk: number; buyerId?: string; forceOverwrite: boolean }; error: string }>>([]);
+  const [importing, setImporting] = useState(false);
 
   const [dailyEntries, setDailyEntries] = useState<Record<string, { morning: string; evening: string; calfMilk: string; buyerId: string; existingId?: string }>>({});
   const [showEntryPopup, setShowEntryPopup] = useState(false);
@@ -125,6 +145,85 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
       notify(error instanceof Error ? error.message : 'Failed to load more milk history', 'error');
     } finally {
       setLoadingMoreHistory(false);
+    }
+  };
+
+  const handleMilkCsvFile = async (file?: File | null) => {
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) {
+      notify('CSV files must be 2 MB or smaller.', 'error');
+      return;
+    }
+    try {
+      const lines = (await file.text()).replace(/\r\n?/g, '\n').split('\n').filter(line => line.trim());
+      if (lines.length < 2) throw new Error('CSV must include a header and at least one data row.');
+      if (lines.length > 1001) throw new Error('CSV import is limited to 1,000 data rows.');
+      const headers = parseCsvLine(lines[0]).map(header => header.toLowerCase().replace(/\s+/g, ''));
+      const indexOf = (key: string) => headers.indexOf(key);
+      for (const required of ['cowid', 'date', 'morning', 'evening']) {
+        if (indexOf(required) < 0) throw new Error(`Missing required CSV column: ${required}`);
+      }
+      const seen = new Set<string>();
+      const preview = lines.slice(1).map((line, index) => {
+        const cells = parseCsvLine(line);
+        const value = (key: string) => cells[indexOf(key)] || '';
+        const cowId = value('cowid');
+        const date = value('date');
+        const morningText = value('morning');
+        const eveningText = value('evening');
+        const calfText = value('calfmilk');
+        const morning = Number(morningText);
+        const evening = Number(eveningText);
+        const calfMilk = calfText === '' ? 0 : Number(calfText);
+        const problems: string[] = [];
+        if (!cows.some(cow => cow._id === cowId)) problems.push('Unknown cow ID');
+        if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || Number.isNaN(new Date(date + 'T00:00:00Z').getTime()) || new Date(date + 'T00:00:00Z').toISOString().slice(0, 10) !== date) problems.push('Invalid date');
+        if (morningText === '' || !Number.isFinite(morning) || morning < 0) problems.push('Morning must be non-negative');
+        if (eveningText === '' || !Number.isFinite(evening) || evening < 0) problems.push('Evening must be non-negative');
+        if (!Number.isFinite(calfMilk) || calfMilk < 0) problems.push('Calf milk must be non-negative');
+        const key = `${cowId}\u0000${date}`;
+        if (seen.has(key)) problems.push('Duplicate cow/date in CSV');
+        seen.add(key);
+        return {
+          rowNumber: index + 2,
+          entry: { cowId, date, morning, evening, calfMilk, buyerId: value('buyerid') || undefined, forceOverwrite: false },
+          error: problems.join('; '),
+        };
+      });
+      setImportPreview(preview);
+      setShowImportModal(true);
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Could not read CSV', 'error');
+    }
+  };
+
+  const handleImportMilkCsv = async () => {
+    const invalid = importPreview.filter(row => row.error);
+    if (invalid.length) {
+      notify(`Fix ${invalid.length} invalid CSV row(s) before importing.`, 'error');
+      return;
+    }
+    try {
+      setImporting(true);
+      let saved = 0;
+      let failed = 0;
+      for (let start = 0; start < importPreview.length; start += 200) {
+        const result = await api.bulkMilk(importPreview.slice(start, start + 200).map(row => row.entry));
+        saved += Number(result.saved || 0);
+        failed += Number(result.failed || 0);
+      }
+      if (failed) {
+        notify(`${saved} records imported; ${failed} failed, likely because a cow/date already exists. Review and retry.`, 'error');
+      } else {
+        notify(`${saved} milk records imported.`, 'success');
+        setShowImportModal(false);
+        setImportPreview([]);
+      }
+      await fetchData();
+    } catch (error) {
+      notify(error instanceof Error ? error.message : 'Milk CSV import failed', 'error');
+    } finally {
+      setImporting(false);
     }
   };
 
@@ -291,13 +390,23 @@ export default function MilkTab({ isAdmin, canDelete = isAdmin }: MilkTabProps) 
         )}
       </div>
 
-      {/* ── Daily Entry (popup) ────────────────── */}
+      {/* ── Daily Entry and CSV Import ──────────── */}
       {viewMode === 'daily' && (
-        <div className="muf-panel p-4">
+        <div className="muf-panel p-4 flex flex-col sm:flex-row gap-3">
           <button onClick={() => setShowEntryPopup(true)}
-            className="w-full flex items-center justify-center gap-2 bg-farm-600 hover:bg-farm-700 text-white rounded-lg px-4 py-2.5 text-sm font-medium transition">
+            className="flex-1 flex items-center justify-center gap-2 bg-farm-600 hover:bg-farm-700 text-white rounded-lg px-4 py-2.5 text-sm font-medium transition">
             <Plus className="h-4 w-4" /> {L('Add / Edit Daily Milk')} — {selectedDate}
           </button>
+          {isAdmin && (
+            <label className="flex items-center justify-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 px-4 py-2.5 text-sm font-medium cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800">
+              Import Milk CSV
+              <input type="file" accept=".csv,text/csv" className="hidden" onChange={event => {
+                const file = event.target.files?.[0];
+                event.currentTarget.value = '';
+                void handleMilkCsvFile(file);
+              }} />
+            </label>
+          )}
         </div>
       )}
 
