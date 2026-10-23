@@ -40,6 +40,8 @@ import { SuperAdminTab } from "./components/SuperAdminTab";
 import FlockRegister from './components/FlockRegister';
 import FinancialLedger from './components/FinancialLedger';
 import HealthPortal from './components/HealthPortal';
+import BatchHealthPortal from './components/BatchHealthPortal';
+import BatchSummaryPortal from './components/BatchSummaryPortal';
 import MonthlySummary from './components/MonthlySummary';
 import IncubationModule from './components/IncubationModule';
 import DailyChecklist from './components/DailyChecklist';
@@ -626,14 +628,17 @@ export default function App() {
     }
   };
 
-  const homeBirdTabs = ['flock', 'ledger', 'summary', 'health'];
+  const homeBirdTabs = ['flock', 'ledger', 'homeBirdSummary', 'homeBirdHealth'];
   const homeBirdsActive = homeBirdTabs.includes(activeTab);
 
   const navItems = [
     { id: 'batches', label: 'Batches', icon: Package },
     { id: 'flock', label: 'Home Birds', icon: BirdIcon },
     { id: 'dashboard', label: 'Dashboard', icon: Home },
+    { id: 'health', label: 'Health', icon: HeartPulse },
     ...(isAdmin ? [{ id: 'labor', label: 'Labor', icon: HardHat }] : []),
+    { id: 'incubation', label: 'Incubation', icon: Egg },
+    { id: 'summary', label: 'Summary', icon: BarChart2 }, 
     ...(isAdmin ? [{ id: 'super_admin', label: 'Super Admin', icon: Shield }] : []),
   ];
 
@@ -817,8 +822,8 @@ export default function App() {
             {[
               { id: 'flock', label: 'Bird List', icon: BirdIcon },
               { id: 'ledger', label: 'Eggs', icon: Egg },
-              { id: 'summary', label: 'Monthly Report', icon: BarChart2 },
-              { id: 'health', label: 'Vaccination', icon: HeartPulse },
+              { id: 'homeBirdSummary', label: 'Monthly Report', icon: BarChart2 },
+              { id: 'homeBirdHealth', label: 'Vaccination', icon: HeartPulse }, 
             ].map(({ id, label, icon: Icon }) => (
               <button
                 key={id}
@@ -905,7 +910,7 @@ export default function App() {
                       return;
                     }
                     if (tab === 'health') {
-                      setActiveTab('health');
+                      setActiveTab('homeBirdHealth');
                       return;
                     }
                     if (tab === 'operations') {
@@ -946,7 +951,9 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'health' && (
+              {activeTab === 'health' && <BatchHealthPortal />}
+
+              {activeTab === 'homeBirdHealth' && (
                 <HealthPortal
                   lang={lang}
                   birds={birds}
@@ -1029,7 +1036,9 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'summary' && (
+              {activeTab === 'summary' && <BatchSummaryPortal />}
+
+              {activeTab === 'homeBirdSummary' && (
                 <MonthlySummary
                   lang={lang}
                   birds={birds}
