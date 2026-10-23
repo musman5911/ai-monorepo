@@ -55,7 +55,7 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 
 - **Implemented in source:** Batches is first and is the default after login. Home Birds exposes nested Bird List, Eggs, Monthly Report and Vaccination sections. Egg entry is constrained to egg production; its vaccination view hides mortality tools.
 - **Implemented in source:** new per-batch egg and vaccination log models, authenticated API routes, frontend entry forms and history tables. Batch summary includes egg totals, egg income and vaccination costs, with egg income included in revenue/profit. Batch detail, export/import, deletion and wipe paths include the new collections.
-- **Tests added, not yet run:** `tests/flock-batch-math.test.ts` covers egg-count validation and summary calculations. Still required: compile, run automated checks, inspect backup/restore compatibility, and fix any failures. No migration has been run; new collections are additive, but copy-based backup/restore validation is still required.
+- **Tests added:** `tests/flock-batch-math.test.ts` covers egg-count validation and summary calculations. The CI workflow now runs on `muf-monorepo` and includes `check-farms`; await its result before treating source checks/builds as passing. Still required: inspect backup/restore compatibility and fix any failures. No migration has been run; new collections are additive, but copy-based backup/restore validation is still required.
 - Browser and end-to-end role verification are deferred to the final pass after all phases, per owner direction.
 - Done when: Batches is the clear primary workflow, Home Birds exposes only the approved features, relevant automated checks pass, and any required copy-based migration/backup checks pass.
 
