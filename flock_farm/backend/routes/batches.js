@@ -252,6 +252,8 @@ router.delete('/batches/wipe-all', authRequired, requireRole('admin'), async (_r
       BatchExpenseLog.deleteMany({}),
       BatchSaleLog.deleteMany({}),
       BatchWeightLog.deleteMany({}),
+      BatchEggLog.deleteMany({}),
+      BatchVaccinationLog.deleteMany({}),
       // wipe stored batch photos too — free the space
       Image.deleteMany({ kind: 'batch' }),
     ]);
