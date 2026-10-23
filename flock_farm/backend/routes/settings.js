@@ -6,7 +6,7 @@ import DataStore from '../models/DataStore.js';
 import { authRequired, requireRole } from '../middleware/auth.js';
 const router = express.Router();
 
-router.get('/location', async (req, res) => {
+router.get('/location', authRequired, async (req, res) => {
   try {
     const doc = await DataStore.findOne({ key: 'farm_location' });
     const value = (doc && doc.value) || {};
