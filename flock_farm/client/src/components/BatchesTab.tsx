@@ -3,6 +3,7 @@ import { mufL } from '../muf/data/muf-urdu';
 import { LightSparkline } from './LightChart';
 import {
   Package,
+  Egg,
   Plus,
   Pencil,
   TrendingDown,
