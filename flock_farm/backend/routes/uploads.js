@@ -8,6 +8,21 @@ const router = express.Router();
 
 const allowedKinds = new Set(['bird', 'batch', 'diary']);
 
+// Image URLs are used directly by <img> tags, which cannot attach X-Farm-Id.
+// Resolve the image's stored farm before auth, then let authRequired verify that
+// the user is assigned to that farm. No image bytes or metadata are returned here.
+async function resolveImageFarm(req, _res, next) {
+  try {
+    if (mongoose.isValidObjectId(req.params.id)) {
+      const image = await Image.findById(req.params.id);
+      if (image?.farmId) req.headers['x-farm-id'] = String(image.farmId);
+    }
+    return next();
+  } catch (err) {
+    return next(err);
+  }
+}
+
 // Images are held in memory briefly, then persisted to MongoDB — NOT to local
 // disk. Local disk is ephemeral on Replit autoscale (files vanish on every
 // redeploy), so DB storage is what makes photos survive.
@@ -64,7 +79,7 @@ router.post('/uploads/diary-image', authRequired, upload.single('image'), async 
 // purpose so plain <img src> tags work everywhere (list views, emails,
 // browsers without the auth cookie). IDs are unguessable ObjectIds and the
 // content is farm photos, so exposure risk is negligible.
-router.get('/images/:id', authRequired, async (req, res) => {
+router.get('/images/:id', resolveImageFarm, authRequired, async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.isValidObjectId(id)) {
