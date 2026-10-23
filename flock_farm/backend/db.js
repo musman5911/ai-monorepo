@@ -20,12 +20,14 @@ const BatchMortalityLog = (await import('./models/BatchMortalityLog.js')).defaul
 const BatchExpenseLog = (await import('./models/BatchExpenseLog.js')).default;
 const BatchSaleLog = (await import('./models/BatchSaleLog.js')).default;
 const BatchWeightLog = (await import('./models/BatchWeightLog.js')).default;
+const BatchEggLog = (await import('./models/BatchEggLog.js')).default;
+const BatchVaccinationLog = (await import('./models/BatchVaccinationLog.js')).default;
 const Image = (await import('./models/Image.js')).default;
 const User = (await import('./models/User.js')).default;
 const Farm = (await import('./models/Farm.js')).default;
 
-const MUF_FARM_SCOPED_NAMES = ['DataStore', 'Batch', 'BatchFeedLog', 'BatchMortalityLog', 'BatchExpenseLog', 'BatchSaleLog', 'BatchWeightLog', 'Image'];
-const MUF_FARM_MODELS = { DataStore, Batch, BatchFeedLog, BatchMortalityLog, BatchExpenseLog, BatchSaleLog, BatchWeightLog, Image };
+const MUF_FARM_SCOPED_NAMES = ['DataStore', 'Batch', 'BatchFeedLog', 'BatchMortalityLog', 'BatchExpenseLog', 'BatchSaleLog', 'BatchWeightLog', 'BatchEggLog', 'BatchVaccinationLog', 'Image'];
+const MUF_FARM_MODELS = { DataStore, Batch, BatchFeedLog, BatchMortalityLog, BatchExpenseLog, BatchSaleLog, BatchWeightLog, BatchEggLog, BatchVaccinationLog, Image };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
 
 let isConnected = false;
