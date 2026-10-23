@@ -21,14 +21,14 @@ vi.mock('../flock_farm/backend/models/DataStore.js', () => ({
       }
       return { ...doc, _id: 'created-id' };
     }),
-    findOne: vi.fn(async ({ key }) => key === 'incubation'
+    findOne: vi.fn(async ({ key }) => ['incubation', 'laborAttendance'].includes(key)
       ? { key, value: state.currentValue, version: state.datastoreVersion }
       : null),
-    findOneAndUpdate: vi.fn(async (_filter, update) => {
+    findOneAndUpdate: vi.fn(async (filter, update) => {
       state.savedValue = update.$set.value;
       state.currentValue = update.$set.value;
       state.datastoreVersion = update.$set.version;
-      return { key: 'incubation', value: state.currentValue, version: state.datastoreVersion };
+      return { key: filter.key, value: state.currentValue, version: state.datastoreVersion };
     }),
     findOneAndDelete: vi.fn(async (filter) => {
       if (filter._id === 'inventory-lock-id' && state.lockHeld) {
@@ -69,9 +69,9 @@ function makeResponse() {
   };
 }
 
-function makeRequest(value) {
+function makeRequest(value, key = 'incubation') {
   return {
-    params: { key: 'incubation' },
+    params: { key },
     body: { value, baseVersion: 1 },
     user: { role: 'owner', farmRole: 'owner' },
   };
@@ -106,6 +106,18 @@ describe('incubation data route inventory lock integration', () => {
     expect(res.body.code).toBe('EGG_INVENTORY_BUSY');
     expect(state.savedValue).toBeNull();
     await release();
+  });
+
+
+  it('also serializes batch-linked labor attendance writes with batch deletion', async () => {
+    const value = [{ id: 'att-1', batchId: 'BATCH-1' }];
+    const res = makeResponse();
+    await putIncubation(makeRequest(value, 'laborAttendance'), res);
+
+    expect(res.statusCode).toBe(200);
+    expect(state.savedValue).toEqual(value);
+    expect(state.lockHeld).toBe(false);
+    expect(DataStore.findOneAndDelete).toHaveBeenCalled();
   });
 
   it('rejects allocations above available egg supply and still releases the lock', async () => {
