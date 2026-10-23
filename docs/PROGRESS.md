@@ -510,3 +510,11 @@ Added `tests/phase4-breeding-lineage.test.ts` to guard the additive sire/ear-tag
 - Added a client API wrapper and contract coverage, including a 1,000-row paging fixture. These tests are source/fixture checks and do not replace API integration tests or browser validation.
 - Commit sequence: `83f2759` (route), `b6e56ec` (client API), `3af8f5a` (tests).
 - Not yet complete: bulk CSV controls for the new log types, Agri user-driven incremental loading and bulk/import UI, Excel workbook import, and stronger 1,000-row server/API plus farm-isolation integration fixtures. Do not treat Phase 3 as complete yet.
+
+
+### Phase 3 Flock CSV workflow follow-up (2026-10-23)
+
+- Added preview-first CSV import controls in the Flock batch detail UI for feed, weight, vaccination and expense logs, wired to the bounded bulk API. The parser caps files at 2 MB and 1,000 data rows, checks required columns, validates each row, and blocks submission while any preview row is invalid. Writes are sent in chunks of at most 200.
+- Added source-contract coverage for the additional import controls. These changes have not yet been built or tested in a local checkout; the owner should pull the branch and run the full checks before treating them as verified.
+- New commits: `7a7175c` (UI import), `b27a78e` (test).
+- Remaining Phase 3 work still includes Agri incremental UI and bulk/import workflows, Excel workbook import, stronger real route/API scale and farm-isolation tests, and a full verification pass. Mortality and sale CSV bulk import is intentionally not exposed because these records depend on sequential live-bird validation.
