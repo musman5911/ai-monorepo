@@ -16,9 +16,14 @@ import BatchExpenseLog from '../models/BatchExpenseLog.js';
 import BatchSaleLog from '../models/BatchSaleLog.js';
 import BatchWeightLog from '../models/BatchWeightLog.js';
 import Farm from '../models/Farm.js';
-import { mufGetDefaultFarmId } from '../muf-farms.mjs';
+import { mufGetDefaultFarmId, mufIsOwner, mufRunUnscoped } from '../muf-farms.mjs';
 
 const router = express.Router();
+
+const ownerUnscoped = (req, res, next) => {
+  if (!mufIsOwner(req.user?.farmRole || req.user?.role)) return res.status(403).json({ error: 'Owner only' });
+  return mufRunUnscoped(() => next());
+};
 
 const MONTHLY_AUTO_BACKUP_KEY = 'monthly_auto_backup';
 const BUCKET_KEYS = [
@@ -155,7 +160,7 @@ export async function maybeRunMonthlyAutoBackup(force = false) {
 }
 
 // GET /api/backup — download a full snapshot right now (admin only)
-router.get('/backup', authRequired, requireRole('admin'), async (_req, res) => {
+router.get('/backup', authRequired, ownerUnscoped, async (_req, res) => {
   try {
     const payload = await collectBackupPayload();
     res.setHeader('Content-Disposition', `attachment; filename=flock-farm-backup-${new Date().toISOString().slice(0, 10)}.json`);
