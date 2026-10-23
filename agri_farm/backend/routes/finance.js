@@ -1,6 +1,6 @@
 // ─── Finance ledger routes — money-sensitive, admin-only ────────────────────
 import express from 'express';
-import { Finance } from '../db.js';
+import { Finance, Crop } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
@@ -50,6 +50,12 @@ router.post('/bulk', protect, requireAdmin, asyncHandler(async (req, res) => {
       notes: String(row.notes || '').trim(),
     };
   });
+  for (let index = 0; index < prepared.length; index += 1) {
+    const row = prepared[index];
+    if (row.crop_id && (!/^[0-9a-fA-F]{24}$/.test(row.crop_id) || !(await Crop.findOne({ _id: row.crop_id })))) {
+      errors.push({ row: index + 2, message: 'Crop must exist in the selected farm.' });
+    }
+  }
   if (errors.length) return res.status(400).json({ error: 'Bulk finance validation failed', details: errors });
   const inserted = await Finance.insertMany(prepared);
   return res.status(201).json({ status: 'ok', inserted: inserted.length });
