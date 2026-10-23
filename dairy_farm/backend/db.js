@@ -59,6 +59,10 @@ async function ensureIndexes() {
       Sale.collection.createIndex({ cowId: 1 }, { name: 'sale_cow' }),
       Sale.collection.createIndex({ date: -1 }, { name: 'sale_date' }),
       Cow.collection.createIndex({ status: 1 }, { name: 'cow_status' }),
+      Cow.collection.createIndex(
+        { farmId: 1, earTag: 1 },
+        { name: 'cow_farm_ear_tag_unique', unique: true, partialFilterExpression: { earTag: { $type: 'string', $gt: '' } } }
+      ),
       Cow.collection.createIndex({ motherId: 1 }, { name: 'cow_mother', sparse: true }),
       Cow.collection.createIndex({ batch: 1 }, { name: 'cow_batch' }),
       User.collection.createIndex({ email: 1 }, { name: 'user_email', sparse: true }),
@@ -77,6 +81,12 @@ const CowSchema = new mongoose.Schema({
   name: { type: String, required: true },
   breed: { type: String, required: true },
   gender: { type: String, enum: ['female', 'male'], default: 'female' },
+  // Breeding lineage: an ear tag is unique within a farm; father can be
+  // another registered male or an outside sire/straw record.
+  earTag: { type: String, trim: true, default: '' },
+  fatherId: { type: String, default: '' },
+  fatherType: { type: String, enum: ['farm', 'outside'], default: 'farm' },
+  fatherName: { type: String, default: '' },
   birthDate: String,
   ageYears: Number,
   weight: Number,
