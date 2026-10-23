@@ -63,9 +63,20 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 
 ### Phase 3: Bulk entry, scroll loading, server totals
 
-- Dairy: milk sheet, bulk health, CSV/Excel import. Flock: bulk entry per batch, import. Agri: scroll loading with server filters by farm, season and status.
-- Lists load as you scroll with search and filters; profit and summary screens use server totals (selected farm, or all farms).
-- Done when: a 1,000-row test sheet saves in one request and the heavy screens stay fast with test data.
+**Status: implementation started (2026-10-23).** Phase 2 local verification checkpoint is green for the owner-reported memory-mode checks, but Phase 2 sign-off remains pending real-MongoDB concurrency and disposable-copy backup/restore compatibility tests. Those tests must use an explicitly isolated test database and must never use the live websites' database URI.
+
+Implementation order:
+
+1. **Baseline and safety contract:** identify large lists, current request/response shapes, pagination/filter support, and write paths. Add tests before changing API behavior. Preserve existing single-record workflows.
+2. **Server-side paging foundation:** shared per-app query parsing/validation for `page`, `limit`, sort and search/filter inputs where practical; hard cap page size; farm scoping must be applied before filters, counts and pagination. Return stable ordering and a consistent total count. Reject invalid inputs safely.
+3. **Scroll loading:** implement incremental loading in Dairy and Flock lists, then Agri, with loading/empty/error states, deduplication, stable sort, filter reset and no cross-farm cache leakage.
+4. **Server totals:** move heavy summary totals to farm-scoped aggregation endpoints, with selected-farm vs read-only All farms semantics. Test that totals agree with record fixtures and never count another farm's records.
+5. **Bulk entry/import:** Dairy milk sheet and bulk health, Flock per-batch bulk entry, then CSV/Excel import with column validation, row-level errors and bounded payload sizes. Start with preview/validate before committing writes; bulk writes must be atomic where practical or report partial outcomes explicitly.
+6. **Scale verification:** fixtures at 1,000+ rows; query/payload limits; pagination no gaps/duplicates under stable data; farm isolation for rows and totals; all three builds and shared-MUF checks. Add focused tests for each increment.
+
+**Phase 3 first work step:** add a test-first paging contract for validated pagination parameters, stable defaults, maximum page size, and farm scope applied before total/count and page selection. Then wire one representative list endpoint end-to-end before replicating the pattern. Do not bulk-edit all three apps before this contract is proven.
+
+**Done when:** a 1,000-row import has a documented bounded request/response strategy; large lists load incrementally with server filters and stable totals; the three apps build; root, farm-scope, UI and MUF parity tests pass; and a 1,000-row fixture demonstrates acceptable behavior without loading the whole dataset into the browser.
 
 ### Phase 4: Dairy breeding and Agri structure
 
