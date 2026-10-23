@@ -1,7 +1,14 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Dashboard, Health and Summary now expose batch-derived primary operational/financial panels; automated verification for this latest set is pending).
+Last updated: 2026-10-23 (Dashboard, Health and Summary now expose batch-derived primary operational/financial panels; automated verification for this latest set is pending)
+
+## Workflow execution policy update (2026-10-23)
+
+- Changed `.github/workflows/muf-frontend-checks.yml` to use only `workflow_dispatch`. Ordinary pushes and pull requests no longer start this expensive combined workflow.
+- Run CI manually only when a deliberate testing checkpoint is needed, rather than on every implementation commit. No workflow run was triggered by this change; the last completed run before this policy change was successful at `6c7b3e95d5264f09e347ea66eb3d30e1ce77048c`.
+- Continue implementation in small, ordered steps without waiting for additional approval. Update this file and `ROADMAP.md` after each work step. Browser and end-to-end role verification remains a consolidated final-stage task.
+.
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
