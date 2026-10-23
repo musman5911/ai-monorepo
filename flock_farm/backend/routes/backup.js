@@ -173,7 +173,7 @@ router.get('/backup', authRequired, ownerUnscoped, async (_req, res) => {
 });
 
 // GET /api/backup/auto — info + payload of the stored monthly auto-backup
-router.get('/backup/auto', authRequired, requireRole('admin'), async (_req, res) => {
+router.get('/backup/auto', authRequired, ownerUnscoped, async (_req, res) => {
   try {
     const existing = await DataStore.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
@@ -186,7 +186,7 @@ router.get('/backup/auto', authRequired, requireRole('admin'), async (_req, res)
 });
 
 // POST /api/backup/auto/run — force-refresh this month's snapshot now
-router.post('/backup/auto/run', authRequired, requireRole('admin'), async (_req, res) => {
+router.post('/backup/auto/run', authRequired, ownerUnscoped, async (_req, res) => {
   try {
     const stored = await maybeRunMonthlyAutoBackup(true);
     res.json({ ok: true, name: stored.name, createdAt: stored.createdAt });
@@ -197,7 +197,7 @@ router.post('/backup/auto/run', authRequired, requireRole('admin'), async (_req,
 });
 
 // POST /api/backup/restore-auto — restore the whole DB from the auto-backup
-router.post('/backup/restore-auto', authRequired, requireRole('admin'), async (_req, res) => {
+router.post('/backup/restore-auto', authRequired, ownerUnscoped, async (_req, res) => {
   try {
     const existing = await DataStore.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
