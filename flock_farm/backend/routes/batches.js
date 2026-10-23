@@ -10,8 +10,10 @@ import BatchSaleLog from '../models/BatchSaleLog.js';
 import BatchWeightLog from '../models/BatchWeightLog.js';
 import BatchEggLog from '../models/BatchEggLog.js';
 import BatchVaccinationLog from '../models/BatchVaccinationLog.js';
+import DataStore from '../models/DataStore.js';
 import { MUF_ENV } from '../muf-env.mjs';
 import { calculateBatchSummary, validateBatchEggLog } from '../batch-math.mjs';
+import { validateIncubationAllocations } from '../incubation-allocation.mjs';
 
 const router = express.Router();
 
@@ -591,6 +593,18 @@ router.delete('/batches/:batchId', authRequired, requireRole('admin'), async (re
     const batch = await getBatchByCode(req.params.batchId);
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
 
+    const incubation = await DataStore.findOne({ key: 'incubation' });
+    const linkedRecords = Array.isArray(incubation?.value)
+      ? incubation.value.filter((record) => String(record?.sourceBatchId || '') === batch.batch_id)
+      : [];
+    if (linkedRecords.length) {
+      return res.status(409).json({
+        error: 'This batch is linked to incubation records. Reassign or unlink those records before deleting the batch.',
+        code: 'BATCH_HAS_INCUBATION_ALLOCATIONS',
+        linkedIncubationRecords: linkedRecords.length,
+      });
+    }
+
     // Free the batch photos' DB space along with the batch itself
     if (batch.image_path) await deleteImageByPath(batch.image_path);
     for (const path of batch.gallery || []) await deleteImageByPath(path);
@@ -670,9 +684,26 @@ router.delete('/batches/logs/:kind/:logId', authRequired, requireRole('admin'), 
     const Model = models[req.params.kind];
     if (!Model) return res.status(400).json({ error: 'Unknown log type' });
 
-    const log = await Model.findByIdAndDelete(req.params.logId);
+    const log = await Model.findById(req.params.logId);
     if (!log) return res.status(404).json({ error: 'Log not found' });
 
+    if (req.params.kind === 'egg') {
+      const [batch, remainingLogs, incubation] = await Promise.all([
+        getBatchByCode(log.batch_id),
+        BatchEggLog.find({ batch_id: log.batch_id, _id: { $ne: log._id } }),
+        DataStore.findOne({ key: 'incubation' }),
+      ]);
+      const records = Array.isArray(incubation?.value) ? incubation.value : [];
+      const allocationError = validateIncubationAllocations(records, batch ? [batch] : [], remainingLogs);
+      if (allocationError) {
+        return res.status(409).json({
+          error: `Cannot delete this egg log because it would invalidate an incubation allocation. ${allocationError}`,
+          code: 'EGG_LOG_HAS_INCUBATION_ALLOCATIONS',
+        });
+      }
+    }
+
+    await Model.findByIdAndDelete(req.params.logId);
     const batch = await getBatchByCode(log.batch_id);
     if (batch) await syncBatchStatus(batch);
     res.json({ ok: true });
