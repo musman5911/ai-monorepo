@@ -234,7 +234,7 @@ export default function LaborTab({ lang, workers, attendance, advances, onChange
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
             <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Active batches')}</p><p className="text-xl font-bold mt-1">{laborBatchRows.filter(b => b.status === 'Active').length}</p></div>
             <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Live birds')}</p><p className="text-xl font-bold mt-1">{laborBatchRows.reduce((sum, b) => sum + (b.summary?.live_count || 0), 0).toLocaleString()}</p></div>
-            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Workers')}</p><p className="text-xl font-bold mt-1">{workers.filter(w => w.active !== false).length}</p></div>
+            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3"><p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Workers')}</p><p className="text-xl font-bold mt-1">{workers.length}</p></div>
           </div>
           {laborBatchRows.filter(b => b.status === 'Active').length > 0 && <div className="space-y-2">
             {laborBatchRows.filter(b => b.status === 'Active').slice(0, 4).map(batch => <div key={batch.batch_id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2">
