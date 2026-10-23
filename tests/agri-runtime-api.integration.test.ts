@@ -231,6 +231,59 @@ describe.sequential('Agri runtime API integration', () => {
     }
   });
 
+  it('pages a 1,001-row task fixture over real HTTP without missing or duplicating records', async () => {
+    const suffix = `runtime-large-page-${process.pid}-${Date.now()}`;
+    const fixtureRows = Array.from({ length: 1001 }, (_, index) => ({
+      title: `${suffix}-${String(index).padStart(4, '0')}`,
+      priority: 'Low',
+      status: 'Pending',
+    }));
+
+    for (let offset = 0; offset < fixtureRows.length; offset += 200) {
+      const batch = fixtureRows.slice(offset, offset + 200);
+      const inserted = await request('/tasks/bulk', {
+        method: 'POST',
+        token: ownerToken,
+        body: { rows: batch },
+      });
+      expect(inserted.response.status).toBe(201);
+      expect(inserted.data.inserted).toBe(batch.length);
+    }
+
+    const first = await request('/tasks?skip=0&limit=200', { token: ownerToken });
+    expect(first.response.status).toBe(200);
+    const reportedTotal = Number(first.response.headers.get('x-total-count'));
+    expect(Number.isInteger(reportedTotal)).toBe(true);
+    expect(reportedTotal).toBeGreaterThanOrEqual(1001);
+    expect(Number(first.response.headers.get('x-total-pages'))).toBe(Math.ceil(reportedTotal / 200));
+
+    const allRows = [...first.data];
+    for (let skip = 200; skip < reportedTotal; skip += 200) {
+      const page = await request(`/tasks?skip=${skip}&limit=200`, { token: ownerToken });
+      expect(page.response.status).toBe(200);
+      expect(Number(page.response.headers.get('x-total-count'))).toBe(reportedTotal);
+      expect(Number(page.response.headers.get('x-page'))).toBe(Math.floor(skip / 200) + 1);
+      expect(page.data.length).toBeLessThanOrEqual(200);
+      allRows.push(...page.data);
+    }
+
+    const fixture = allRows.filter((row) => String(row.title || '').startsWith(suffix));
+    const fixtureIds = fixture.map((row) => String(row._id));
+    expect(fixture).toHaveLength(1001);
+    expect(new Set(fixtureIds).size).toBe(1001);
+    expect(fixture.map((row) => row.title).sort()).toEqual(fixtureRows.map((row) => row.title).sort());
+
+    // Clean the generated fixture promptly; do not leave synthetic records in the
+    // memory-mode runtime server or rely only on afterAll cleanup.
+    for (let offset = 0; offset < fixtureIds.length; offset += 25) {
+      const batch = fixtureIds.slice(offset, offset + 25);
+      await Promise.all(batch.map((id) => request(`/tasks/${id}`, {
+        method: 'DELETE',
+        token: ownerToken,
+      })));
+    }
+  });
+
   it('rejects unauthorized and invalid task bulk imports without creating partial records', async () => {
     const suffix = `runtime-task-bulk-${process.pid}-${Date.now()}`;
     const denied = await request('/tasks/bulk', {
