@@ -64,7 +64,7 @@ router.post('/uploads/diary-image', authRequired, upload.single('image'), async 
 // purpose so plain <img src> tags work everywhere (list views, emails,
 // browsers without the auth cookie). IDs are unguessable ObjectIds and the
 // content is farm photos, so exposure risk is negligible.
-router.get('/images/:id', async (req, res) => {
+router.get('/images/:id', authRequired, async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.isValidObjectId(id)) {
