@@ -1,23 +1,37 @@
-// Cross-request lock for operations that change batch egg supply or its allocations.
-// A unique DataStore sentinel lets MongoDB enforce the lock across server processes.
-// It intentionally has no automatic expiry: after a process crash, fail closed rather
-// than silently allow concurrent stock changes. An owner can clear a stale sentinel
-// only after confirming no inventory operation is still running.
+import { mufGetDefaultFarmId, mufGetFarmContext } from './muf-farms.mjs';
+
+// Local guard is required for the disposable in-memory adapter, which does not
+// implement Mongo's compound unique indexes. Real Mongo deployments are also
+// protected by the persisted unique DataStore key, including across processes.
+const localLocks = new Set();
+
 export const FLOCK_EGG_INVENTORY_LOCK_KEY = '__flock_egg_inventory_lock__';
 
+function lockIdentity(farmId) {
+  const context = mufGetFarmContext();
+  return String(farmId ?? context?.farmId ?? mufGetDefaultFarmId() ?? '__unscoped__');
+}
+
+function busyError() {
+  const busy = new Error('Egg inventory is being updated by another request. Retry shortly.');
+  busy.status = 409;
+  busy.code = 'EGG_INVENTORY_BUSY';
+  return busy;
+}
+
 export async function acquireEggInventoryLock(DataStore, farmId) {
+  const identity = lockIdentity(farmId);
+  if (localLocks.has(identity)) throw busyError();
+  localLocks.add(identity);
+
   let lock;
   try {
     const record = { key: FLOCK_EGG_INVENTORY_LOCK_KEY, value: { acquiredAt: new Date().toISOString() } };
     if (farmId !== undefined && farmId !== null && String(farmId)) record.farmId = String(farmId);
     lock = await DataStore.create(record);
   } catch (error) {
-    if (error?.code === 11000 || error?.code === 11001) {
-      const busy = new Error('Egg inventory is being updated by another request. Retry shortly.');
-      busy.status = 409;
-      busy.code = 'EGG_INVENTORY_BUSY';
-      throw busy;
-    }
+    localLocks.delete(identity);
+    if (error?.code === 11000 || error?.code === 11001) throw busyError();
     throw error;
   }
 
@@ -27,7 +41,11 @@ export async function acquireEggInventoryLock(DataStore, farmId) {
     released = true;
     const filter = { _id: lock._id, key: FLOCK_EGG_INVENTORY_LOCK_KEY };
     if (farmId !== undefined && farmId !== null && String(farmId)) filter.farmId = String(farmId);
-    await DataStore.findOneAndDelete(filter);
+    try {
+      await DataStore.findOneAndDelete(filter);
+    } finally {
+      localLocks.delete(identity);
+    }
   };
 }
 
