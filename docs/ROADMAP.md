@@ -110,3 +110,8 @@ Not planned until the scale-up phases are done: lazy-loading PDF and charts (C1)
 The first frontend integration adds a shared farm switcher to all three app headers and attaches the selected farm ID to API requests. The owner panel uses existing APIs for farm maintenance and role/farm assignment. Permanent deletion and “All farms” mode are intentionally not exposed.
 
 Owner-reported local results before the latest Dashboard change: all three frontend builds, farm-scope, MUF-sync, UI-safety, 89 unit tests and 8 workbench runtime checks passed. The latest Dashboard change is not yet verified. Build warnings remain for large chunks and a mixed static/dynamic import; they did not fail the builds. Review actual endpoint compatibility and role-based access, then test migration dry-runs on database copies. Never run migrations against live data. Browser testing remains deferred until final review.
+
+
+### Phase 2 implementation update (2026-10-23): server-enforced incubation allocation
+
+Incubation records linked to a batch now pass server validation against egg supply in the selected farm. Availability is calculated from batch egg logs after sold, home-use and waste counts; all linked incubation records are summed before accepting a write. Unknown batches and over-allocation are rejected. Legacy unlinked records remain valid. The validator has six unit cases added, but no tests/build/workflow have been run for this update yet. Egg-log edits can still reduce supply below existing allocations, so stock reconciliation is not complete. Next: prevent that case, then implement real batch-linked labor assignments. GitHub Actions stays manual-only and should be triggered at the Phase 2 testing checkpoint, not on each commit.
