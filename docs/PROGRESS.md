@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Phase 1B-2 implementation in progress on `muf-monorepo`; code committed, validation pending).
+Last updated: 2026-10-23 (Phase 1C frontend implementation started on `muf-monorepo`; automated validation and owner testing pending).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
@@ -12,7 +12,7 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 | Phase | State |
 |---|---|
 | 0. Docs reset and repository cleanup | Done. Applied by the owner, pushed to the `muf-monorepo` branch, owner's checks and builds all passed |
-| 1. Farms and roles (MUF) | In progress. 1A done (shared core + Dairy backend); 1B-1 done (Agri backend); 1B-2 Flock backend in progress; validation pending; 1C screens and 1D wrap-up not started |
+| 1. Farms and roles (MUF) | In progress. Backend phases 1A/1B exist; Phase 1C farm switcher/screens added to source; automated validation, permission review, migration-on-copy checks and Phase 1D wrap-up remain open |
 | 2. Flock restructure and Home Birds | Not started |
 | 3. Bulk entry, scroll loading, server totals | Not started |
 | 4. Dairy breeding; Agri fields and seasons | Not started |
@@ -199,3 +199,13 @@ Removed in Phase 0. The old 40-image candidate set was never approved and has ex
 ## How to update this file
 
 After each change: move the phase to done with the date, record real check results with where they ran, list anything unverified, add removals to the Home Birds list when they happen, and keep `ROADMAP.md` in step.
+
+
+## Phase 1C implementation note (2026-10-23)
+
+- Added a shared MUF farm switcher to the Agri, Dairy and Flock frontends and mounted it in each app header.
+- Added the selected farm ID as `X-Farm-Id` to authenticated API requests.
+- The owner panel uses existing APIs for farm create, rename, archive/restore, and role/farm assignment. Permanent deletion and “All farms” mode are not exposed in this pass.
+- Added a three-app byte-identity check for the shared switcher.
+- **Not verified:** builds, automated checks, backend behavior, visual/browser behavior and migration-on-copy tests. These require the owner's local checkout. Live/browser testing remains deferred until the end.
+- **Permission caveat:** legacy `admin` role checks still need review; this UI does not replace server-side authorization.

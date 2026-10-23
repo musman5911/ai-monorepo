@@ -87,7 +87,8 @@ export function getStoredUser(): AuthUser | null {
 // Send the token in BOTH the standard Authorization header and a custom
 // X-Auth-Token header — some hosting/preview proxies strip Authorization.
 function tokenHeaders(token: string): Record<string, string> {
-  return { Authorization: `Bearer ${token}`, 'X-Auth-Token': token };
+  let farmId = ''; try { farmId = localStorage.getItem('muf_active_farm_flock') || ''; } catch { /* ignore */ }
+  return { Authorization: `Bearer ${token}`, 'X-Auth-Token': token, ...(farmId ? { 'X-Farm-Id': farmId } : {}) };
 }
 
 async function authHeaders(): Promise<Record<string, string>> {

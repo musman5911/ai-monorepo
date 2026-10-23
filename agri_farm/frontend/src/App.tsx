@@ -1,4 +1,5 @@
 import { SuperAdminTab } from './components/SuperAdminTab';
+import MufFarmSwitcher from './muf/ui/muf-farm-switcher';
 import MufLoginLang from './muf/ui/muf-login-lang';
 import { MufLoginBrand, MufLoginPanel, MufLoginScreen } from './muf/ui/muf-login';
 import React, { useState, useEffect, useRef } from 'react';
@@ -2426,6 +2427,7 @@ function App() {
               </div>
             </div>
             <div className="muf-header-actions">
+              <MufFarmSwitcher app="agri" />
               {offlineQueueSize > 0 && (
                 <button onClick={syncOfflineQueue} className="muf-icon-button muf-queue" title={L('Sync offline changes')} aria-label={L('Sync offline changes')}><Clock size={18}/><span>{offlineQueueSize}</span></button>
               )}

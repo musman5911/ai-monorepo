@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
+import MufFarmSwitcher from './muf/ui/muf-farm-switcher';
 import { createPortal } from 'react-dom';
 import { Home, HardHat, Bird as BirdIcon, DollarSign, BarChart2, Egg, Shield, LogOut, Package, ChevronDown, Bell, Moon, Sun, Users, HeartPulse, BookOpen, Languages } from 'lucide-react';
 import { motion } from './muf/core/muf-motion';
@@ -741,6 +742,7 @@ export default function App() {
           </div>
         </div>
         <div className="muf-header-actions">
+              <MufFarmSwitcher app="flock" />
           <HeaderSearch
             lang={lang}
             loadItems={async () => {

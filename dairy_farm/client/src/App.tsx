@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from "react";
+import MufFarmSwitcher from './muf/ui/muf-farm-switcher';
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, prefersReducedMotion } from './muf/core/muf-motion';
 import {
@@ -406,6 +407,7 @@ export default function App() {
         </a>
 
         <div className="muf-header-actions">
+              <MufFarmSwitcher app="dairy" />
           <HeaderSearch
             lang={lang}
             loadItems={async () => {

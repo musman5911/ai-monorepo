@@ -102,6 +102,7 @@ async function req(path: string, options: RequestInit = {}, extra: { noOfflineQu
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        ...(safeGet('muf_active_farm_dairy') ? { 'X-Farm-Id': safeGet('muf_active_farm_dairy')! } : {}),
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...(options.headers || {})
       }

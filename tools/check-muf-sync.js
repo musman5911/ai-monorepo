@@ -164,6 +164,18 @@ for (const [label, pa, pb] of TWINS) {
   }
 }
 
+// ─── Shared Farms & Roles switcher: identical in all three apps ────────────
+console.log('\n━━ Shared farm switcher (all three apps, byte-identical) ━━');
+const FARM_SWITCHER_PATHS = [
+  'agri_farm/frontend/src/muf/ui/muf-farm-switcher.tsx',
+  'dairy_farm/client/src/muf/ui/muf-farm-switcher.tsx',
+  'flock_farm/client/src/muf/ui/muf-farm-switcher.tsx',
+];
+const farmSwitcherCopies = FARM_SWITCHER_PATHS.map(read);
+if (farmSwitcherCopies.some((source) => source === null)) { console.log('  ❌ Shared farm switcher missing'); failures++; }
+else if (farmSwitcherCopies.every((source) => source === farmSwitcherCopies[0])) console.log('  ✅ Shared farm switcher identical in all three apps');
+else { console.log('  ❌ Shared farm switcher copies differ'); failures++; }
+
 // ─── 1b. BACKEND MUF TWINS: byte-identical in all three backends ─────────────
 console.log('\n━━ Backend muf twins (byte-identical in all 3 backends) ━━');
 const BACKEND_TWINS = [

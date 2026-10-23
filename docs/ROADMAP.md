@@ -1,6 +1,6 @@
 # Roadmap
 
-Last reviewed: 2026-10-23. Phase 1B-2 implementation is underway on `muf-monorepo`; it is not delivered until checks and copy-based migration testing are recorded. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-23. Phase 1C frontend implementation has started on `muf-monorepo`; delivery awaits automated checks, permission review and copy-based migration testing. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
@@ -99,3 +99,10 @@ These are still open. Each needs the owner's approval before it starts.
 ## Parked ideas
 
 Not planned until the scale-up phases are done: lazy-loading PDF and charts (C1), right-to-left logical properties (C2), accessibility pass (C3), service-worker update prompt (C4), shared form, table and icon components, a component gallery in the workbench, splitting the large components (Agri `App.tsx`, Flock `App.tsx`), one real shared MUF package instead of three copies, and clearing Agri's type errors so `tsc` can join its build.
+
+
+### Phase 1C implementation status (2026-10-23)
+
+The first frontend integration adds a shared farm switcher to all three app headers and attaches the selected farm ID to API requests. The owner panel uses existing APIs for farm maintenance and role/farm assignment. Permanent deletion and “All farms” mode are intentionally not exposed.
+
+This is implementation in progress, not acceptance. Run farm-scope, MUF-sync, UI-safety, tests and builds locally. Review role-based navigation and verify against a database copy before any live migration. Never run migrations against live data. Browser testing remains deferred until final review.

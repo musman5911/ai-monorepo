@@ -9,6 +9,7 @@ const api = axios.create({
 // Automatically add token to headers if it exists.
 // X-Access-Token is a fallback for reverse proxies that strip Authorization.
 api.interceptors.request.use((config) => {
+    try { const farmId = localStorage.getItem('muf_active_farm_agri'); if (farmId) config.headers['X-Farm-Id'] = farmId; } catch { /* storage may be unavailable */ }
     const token = localStorage.getItem('token');
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
