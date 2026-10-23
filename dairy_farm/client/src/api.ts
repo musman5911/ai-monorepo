@@ -232,6 +232,8 @@ export const api = {
   getHealth: (p?: { cowId?: string; type?: string }) => req('/health' + qs(p)),
   getUpcomingHealth: () => req('/health/upcoming'),
   addHealth: (data: object) => req('/health', { method: 'POST', body: JSON.stringify(data) }),
+  bulkHealth: (entries: Array<{ cowId: string; date: string; type: string; description: string; medicine?: string; vet?: string; nextDueDate?: string; cost?: number; notes?: string }>) =>
+    req('/health/bulk', { method: 'POST', body: JSON.stringify({ entries }) }),
   updateHealth: (id: string, data: object) => req(`/health/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
   deleteHealth: (id: string) => req(`/health/${id}`, { method: 'DELETE' }),
 
