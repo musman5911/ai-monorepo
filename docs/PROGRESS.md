@@ -13,7 +13,7 @@
 - The 1,001-row real-HTTP task fixture now cleans up its uniquely prefixed records in a `finally` path, including when insert/page assertions fail, and rediscovers created rows before deletion to reduce leaked test data.
 - Commits: `ba68052` (Agri pagination refresh hardening), `b4d144b` (large fixture cleanup guarantee).
 - Verification: these remote edits have not been executed in the local Windows checkout or through CI. Do not interpret them as test/build passes.
-- Still open and blocking Phase 03 sign-off: actual user-triggered network pagination for Agri crop/task/finance lists while preserving complete dashboard/report aggregates; cross-farm runtime fixtures for bulk writes and totals; any unresolved Flock bulk-entry acceptance scope; all-three-app test/build checkpoint; browser role review; and isolated real-MongoDB/disposable-copy checks at the final project verification stage.
+- Still open and blocking Phase 03 sign-off: rerun the root regression suite and all three frontend builds after the new Agri on-demand list paging/filter changes; verify filters, paging and aggregate totals locally; and finish the cross-farm bulk/aggregate fixture review. Browser role review and isolated real-MongoDB/disposable-copy checks remain deferred to the final project verification stage.
 
 # Progress
 
@@ -23,10 +23,10 @@ Last updated: 2026-10-23 (Phase 03 runtime regression coverage and documentation
 
 - Added runtime HTTP integration coverage that requests adjacent one-record pages from Agri crops, tasks and finance, checks stable total/page metadata across requests, and rejects duplicate IDs across the page boundary.
 - Added a task bulk-import regression test proving Worker writes are forbidden and a malformed mixed batch is rejected without inserting its otherwise-valid row.
-- Updated the Phase 03 local verification checklist and roadmap to distinguish API pagination support from genuine on-demand UI pagination. The Agri frontend currently walks every server page during refresh to populate arrays used by dashboard/report calculations; this is bounded per request but is not yet on-demand network loading.
+- Updated the Phase 03 local verification checklist and roadmap to distinguish API pagination support from genuine on-demand UI pagination. The Agri list views now request filtered pages on demand; the full refresh still walks every server page for dashboard/report arrays, so aggregate transfer remains a separate scale optimization.
 - Commits: `56fa5df` (runtime tests), `41a6e84` (verification checklist), `dbca9e8` (roadmap).
 - Verification status: tests and production builds were not run during this remote-editing step. These commits are implementation changes, not a passing release checkpoint.
-- Still open: implement on-demand Agri list requests while preserving complete aggregate/report calculations; add dedicated cross-farm fixtures for task/finance/crop bulk imports and aggregate totals; review remaining Flock bulk-entry/Excel acceptance scope; run the root test/check suite and all three frontend production builds. Browser review and real-MongoDB/copy-based checks remain deferred to the consolidated final pass.
+- Still open: rerun tests/builds for the implemented Agri list paging; add dedicated cross-farm fixtures for task/finance/crop bulk imports and aggregate totals; review remaining Flock bulk-entry/Excel acceptance scope; run the root test/check suite and all three frontend production builds. Browser review and real-MongoDB/copy-based checks remain deferred to the consolidated final pass.
 
 ## Phase 3 implementation update: Agri task and finance bulk imports
 
