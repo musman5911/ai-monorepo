@@ -21,7 +21,8 @@ import MufWeather from '../muf/ui/muf-weather';
 import MufFab from '../muf/core/muf-fab';
 import MufWorkerPanel from '../muf/ui/muf-worker-panel';
 import { loadNotifPrefs, fireNotif } from '../muf/core/muf-notifications';
-import { getFarmLocation } from '../api';
+import { getFarmLocation, listBatches } from '../api';
+import type { BatchWithSummary } from '../types';
 import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from '../muf/data/muf-compare';
 import { udhaarSummary, daysSince, udhaarReminderText } from '../muf/domain/muf-khata';
 import { shareViaWhatsAppTo } from '../utils/share';
@@ -75,6 +76,16 @@ export default function Dashboard({
   const [dropAlert, setDropAlert] = useState<{ drop: boolean; today: number; avg: number; pct: number; threshold?: number } | null>(null);
   const [showDropPopup, setShowDropPopup] = useState(false);
   const [farmLoc, setFarmLoc] = useState<{ lat?: number; lon?: number; city?: string } | null>(null);
+  const [batchRows, setBatchRows] = useState<BatchWithSummary[]>([]);
+  const [batchLoadFailed, setBatchLoadFailed] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    listBatches().then((rows) => {
+      if (!cancelled) { setBatchRows(rows); setBatchLoadFailed(false); }
+    }).catch(() => { if (!cancelled) setBatchLoadFailed(true); });
+    return () => { cancelled = true; };
+  }, []);
 
   useEffect(() => {
     getFarmLocation().then((loc: any) => {
@@ -335,6 +346,54 @@ export default function Dashboard({
 
   return (
     <div className="space-y-6 muf-dashboard-workspace" id="dashboard-tab">
+      {/* Batch-first overview: the batch API is the source of truth for commercial flock metrics. */}
+      <section className="rounded-2xl border border-farm-200 dark:border-farm-800 bg-white dark:bg-slate-900 p-4 sm:p-5 space-y-4">
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="text-sm font-bold text-slate-900 dark:text-slate-100">{L('Batch operations')}</h2>
+            <p className="text-xs text-slate-500 dark:text-slate-400">{L('Primary flock overview')}</p>
+          </div>
+          <button type="button" onClick={() => onNavigate('batches')} className="text-xs font-semibold text-farm-700 dark:text-farm-300 inline-flex items-center gap-1">
+            {L('Manage batches')} <ArrowRight size={14} />
+          </button>
+        </div>
+        {batchLoadFailed ? (
+          <p role="status" className="text-xs text-amber-700 dark:text-amber-300">{L('Batch summary is temporarily unavailable. Open Batches to retry.')}</p>
+        ) : (
+          <>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3">
+                <p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Active batches')}</p>
+                <p className="text-xl font-bold mt-1">{batchRows.filter(b => b.status === 'active' || b.status === 'open').length}</p>
+              </div>
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3">
+                <p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Live birds')}</p>
+                <p className="text-xl font-bold mt-1">{batchRows.reduce((sum, b) => sum + (b.summary?.live_count || 0), 0).toLocaleString()}</p>
+              </div>
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3">
+                <p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Batch revenue')}</p>
+                <p className="text-xl font-bold mt-1">Rs {Math.round(batchRows.reduce((sum, b) => sum + (b.summary?.total_revenue || 0), 0)).toLocaleString()}</p>
+              </div>
+              <div className="rounded-xl bg-slate-50 dark:bg-slate-800/70 p-3">
+                <p className="text-[10px] uppercase tracking-wide text-slate-500">{L('Batch profit / loss')}</p>
+                <p className={`text-xl font-bold mt-1 ${batchRows.reduce((sum, b) => sum + (b.summary?.profit_loss || 0), 0) < 0 ? 'text-rose-600' : 'text-emerald-600'}`}>Rs {Math.round(batchRows.reduce((sum, b) => sum + (b.summary?.profit_loss || 0), 0)).toLocaleString()}</p>
+              </div>
+            </div>
+            {batchRows.length > 0 && (
+              <div className="space-y-2">
+                <h3 className="text-xs font-semibold text-slate-700 dark:text-slate-300">{L('Recent batches')}</h3>
+                {batchRows.slice(0, 3).map(batch => (
+                  <button key={batch.batch_id} type="button" onClick={() => onNavigate('batches', { batchId: batch.batch_id })} className="w-full flex items-center justify-between gap-3 rounded-xl border border-slate-100 dark:border-slate-800 px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                    <span className="min-w-0"><span className="block text-xs font-semibold truncate">{batch.name}</span><span className="block text-[11px] text-slate-500">{batch.summary?.live_count || 0} {L('live birds')}</span></span>
+                    <span className="text-xs font-semibold whitespace-nowrap">Rs {Math.round(batch.summary?.profit_loss || 0).toLocaleString()}</span>
+                  </button>
+                ))}
+              </div>
+            )}
+            {batchRows.length === 0 && <p className="text-xs text-slate-500">{L('No batches yet. Create your first batch to start tracking flock performance.')}</p>}
+          </>
+        )}
+      </section>
       {/* Worker panel — shown for non-admin users */}
       {!isAdmin && (() => {
         const today = mufToday();
