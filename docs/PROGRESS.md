@@ -385,3 +385,27 @@ The owner pulled commit `e49317e` and ran the local checks. These are owner-repo
 ### Ongoing automation and documentation rule
 
 Each implementation step must update both `PROGRESS.md` and `ROADMAP.md`, add or extend automated regression tests, and document exact Windows CMD commands and expected outcomes. Prefer tests for business rules, farm isolation, API contracts, concurrency, backup compatibility, and bulk/pagination limits. Do not mark a phase complete based on source inspection alone.
+
+
+## Follow-up verification results (2026-10-23)
+
+The owner pulled commit `566f3b2` and reran the requested checks:
+
+- Root `npm test`: **15 test files passed, 115 tests passed**.
+- `npm run check-sync`: passed.
+- `npm run check-ui`: passed.
+- `npm run check-workbench`: all 23 source checks passed.
+- Flock client `npm run build`: passed TypeScript and Vite production build. Existing warning: main JS chunk is about 954 kB minified, above Vite's 500 kB advisory threshold.
+- `npm run check-farms`: Agri and Dairy passed. Flock returned HTTP 503 with `Server is starting, please retry in a few seconds.` at login. Diagnosis: Flock's HTTP health route becomes available before its asynchronous DB connection, demo seed, and farm migration complete; the checker was racing initialization. This output is not evidence of an owner-role migration defect.
+
+### Fix applied after the owner run
+
+The farm-scope harness now retries login for up to 30 seconds only when it receives the exact known startup 503 response. Other HTTP failures are reported immediately and are not retried as startup. This preserves the role assertions and makes the integration check wait for actual app readiness.
+
+Commit: `9a3eeb5` (`test(flock): wait for backend readiness in farm scope check`).
+
+### Next verification required
+
+Pull `9a3eeb5` and rerun `npm run check-farms`. If Flock then passes its owner-role and farm migration checks, the harness continues to exercise buckets, batches, linked logs, worker farm access and backup scope. If a different failure appears, fix that actual contract/security issue before Phase 2 sign-off.
+
+The inventory lock still needs disposable-MongoDB concurrency verification, and Phase 2 backup/restore compatibility still needs a dedicated repeatable test. These are not proven by the current memory-mode HTTP test. Keep Phase 2 open until those gates are complete.
