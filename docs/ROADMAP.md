@@ -1,3 +1,10 @@
+### Phase 3 step: Agri task and finance bulk imports
+
+Added admin-only bulk endpoints and preview-first CSV/XLSX import UI for task and finance records. Endpoints reject malformed rows before writing, enforce a 200-record request cap, and limit finance imports to an explicit field allowlist. The frontend parser accepts up to 1,000 rows per file, so client-side chunking and per-chunk result handling must be completed before this workflow is considered finished. Automated source-contract coverage has been added; local tests, production build, and browser review remain pending.
+
+The primary Phase 3 blocker remains true network-level Agri on-demand pagination with aggregate/report correctness. Keep Phase 3 open until that is implemented and verified alongside large dataset and farm-isolation tests.
+
+
 # Roadmap
 
 Last reviewed: 2026-10-23. CI is manual-only and should run at deliberate testing checkpoints, not on every commit. Latest owner-reported Windows checkpoint after pulling through d7321fb: 151 tests passed; farm-scope, shared-MUF sync, UI-safety and workbench checks passed; Dairy, Flock and Agri production builds succeeded. The pasted console output interleaves the root test summary with the next command, so capture a clean standalone `npm test` summary at the next checkpoint. Build warnings were advisory. Per owner direction, Phase 2 real-MongoDB concurrency and disposable-copy backup/restore verification is deferred to the consolidated final verification pass after all planned phases; it does not block continued Phase 3 implementation. Browser and end-to-end role testing are also deferred to that final pass. Migration dry-runs on database copies remain required before any production migration. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
