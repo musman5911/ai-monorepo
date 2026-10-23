@@ -124,7 +124,7 @@ router.post('/login', async (req, res) => {
 
     const token = signToken(user);
     res.cookie('token', token, cookieOptions);
-    return res.json({ token, user: user.toSafeJSON() });
+    return res.json({ token, user: user.toSafeJSON(), role: user.toSafeJSON().role, farmRole: user.toSafeJSON().farmRole });
   } catch (err) {
     console.error('POST /auth/login error:', err);
     res.status(500).json({ error: 'Login failed' });
