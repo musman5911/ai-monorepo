@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (owner-reported checks received; fixed unused switcher import pushed, clean rebuild pending).
+Last updated: 2026-10-23 (owner reported all three frontend builds and automated checks passing; functional/browser review and migration-copy testing remain pending).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
@@ -228,3 +228,21 @@ After each change: move the phase to done with the date, record real check resul
 The unused `RefreshCw` import was removed from all three identical switcher copies and pushed to `muf-monorepo`. Re-run the full builds to verify the fix. Do not call Phase 1C complete until TypeScript builds pass, endpoint/permission behavior is reviewed, and migration dry-runs are tested on database copies.
 
 The existing local change to `flock_farm/backend/package-lock.json` is owner-local and not part of the pushed implementation. Review its diff separately; do not discard it or commit it automatically.
+
+
+### Phase 1C validation update (2026-10-23; owner-provided Windows output)
+
+| Check | Result |
+|---|---|
+| Dairy `npm run build` | Passed: `tsc --noEmit && vite build`; Vite warned about mixed static/dynamic import of `src/api.ts` |
+| Flock `npm run build` | Passed: `tsc --noEmit && vite build`; Vite warned about chunks larger than 500 kB |
+| Agri `npm run build` | Passed: Vite production build; large-chunk and deprecated `advancedChunks` warnings |
+| `npm run check-farms` | Passed for all three apps |
+| `npm run check-sync` | Passed, including shared switcher byte identity |
+| `npm run check-ui` | Passed |
+| `npm test` | 84 passed across 8 test files; the Mongoose test is listed in output with its conditional-skip note |
+| `npm run check-workbench` | 23 source checks passed |
+| `git diff --check` | Passed |
+| `git status` | Only local `flock_farm/backend/package-lock.json` modified; not committed |
+
+The previously reported Dairy unused-import TypeScript error is resolved in the owner's new build output. These results validate builds and automated checks, not end-to-end browser/API behavior. Next: inspect the lockfile diff without discarding it, exercise farm switching and owner user/farm management in each app, verify role restrictions with test accounts, and run migration dry-runs on database copies only. No live migration or browser verification has been reported.
