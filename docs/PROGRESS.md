@@ -1,7 +1,7 @@
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (owner reported Windows checks/builds passed; Phase 1 step 1B-2 approved for implementation; the rest not started).
+Last updated: 2026-10-23 (Phase 1B-2 implementation in progress on `muf-monorepo`; code committed, validation pending).
 
 **Honesty rule:** a row says "verified" only for checks that actually ran, and says where they ran. Source checks and tests are automated evidence, not visual sign-off. Owner testing in a browser is recorded separately.
 
