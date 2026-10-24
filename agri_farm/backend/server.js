@@ -13,7 +13,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { connectDB, Crop, Finance, Farm } from './db.js';
-import { protect, ownerOnly } from './middleware/auth.js';
+import { protectUnscoped, ownerOnly } from './middleware/auth.js';
 import authRoutes from './routes/auth.js';
 import { automationsRouter, startScheduler } from './routes/automations.js';
 import cropsRoutes from './routes/crops.js';
@@ -200,7 +200,7 @@ async function farmSummaryHandler(req, res) {
 app.get('/farm-summary', farmSummaryHandler);
 app.get('/api/farm-summary', farmSummaryHandler);
 // The same read-only summary is owner-only when requested through the Super Admin API.
-app.get('/api/super-admin/farm-summary', protect, ownerOnly, farmSummaryHandler);
+app.get('/api/super-admin/farm-summary', protectUnscoped, ownerOnly, farmSummaryHandler);
 
 // Unknown API paths must return JSON 404 — never fall through to the SPA
 // HTML (a 200 HTML response masks bugs as JSON-parse errors in the client).
