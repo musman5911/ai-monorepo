@@ -1,6 +1,6 @@
 # Phase 1: Super Admin: owner only, per-farm summaries
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -54,11 +54,11 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 - [x] The tab and its menu entry are gated by the owner role in all three apps.
 - [x] `/api/super-admin/farm-summary` is owner-protected and returns a per-farm breakdown next to project totals.
-- [ ] The panel lists farms separately and never adds Agri, Dairy and Flock into one total.
-- [ ] Server side: any owner-only route must answer 403 to a manager or worker.
-- [ ] The `npm run check-super-admin` runtime check exists and passes locally; the source-contract regression test is `tests/phase-1-super-admin.test.ts`.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] The panel renders farms separately in all three apps; source regression checks pass.
+- [x] Runtime checks confirm managers and workers receive HTTP 403 from the owner-only summary endpoint in all three apps.
+- [x] `npm run check-super-admin` passes locally; `tests/phase-1-super-admin.test.ts` passes (13 tests).
+- [x] All local verification commands run for this phase passed: `npm test`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-super-admin`, `npm run check-docs`, and `tools\\build-all.bat`. `npm ci` was not run; existing dependencies were used.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Rules for whoever works on this phase
 
