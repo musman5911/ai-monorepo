@@ -20,7 +20,7 @@ export default function Login({
   lang,
   onToggleLang,
 }: {
-  onLogin: (t: string, r: string, u: string) => void;
+  onLogin: (t: string, r: string, u: string, farmRole: string) => void;
   sessionNotice?: string | null;
   lang?: Lang;
   onToggleLang?: () => void;
@@ -85,7 +85,10 @@ export default function Login({
 
       if (res?.token) {
         saveAuth(res.token, res.role, res.username);
-        onLogin(res.token, res.role, res.username);
+        const profile = await api.getMe().catch(() => null);
+        const farmRole = profile?.user?.farmRole || (res.role === 'admin' ? 'owner' : 'worker');
+        try { localStorage.setItem('dm_farm_role', farmRole); } catch { /* storage unavailable */ }
+        onLogin(res.token, res.role, res.username, farmRole);
       } else {
         setError('Login failed. Server returned an invalid response.');
       }
