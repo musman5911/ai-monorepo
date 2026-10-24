@@ -1,15 +1,18 @@
-## Phase 01 implementation follow-up (2026-10-24, latest source changes)
+## Current Phase 01 verification status (2026-10-24)
 
-Flock image backup/restore now preserves Mongo image IDs, farm IDs, metadata and exact binary bytes using Base64 in portable JSON; monthly auto-backups store image data in bounded sidecar chunks and reconstruct it before restore. The shared owner farm-management UI now offers permanent deletion only after a fresh backup download starts, typed-name confirmation, and an explicit move-or-delete data choice. Server-side farm deletion checks remain authoritative. Automated regression tests were added for binary round-trips and chunk integrity. These latest changes still need root tests and all three production builds rerun against this exact branch head. Browser role checks and real MongoDB/disposable-copy validation remain postponed to the consolidated final pass.
+Owner-reported local run at commit 26f6731: root tests passed (22 files, 210/210 tests); check-farms, check-sync, check-ui, check-workbench, check-workbench-runtime passed; Dairy, Flock, and Agri production builds all succeeded. Only non-fatal import/chunk/deprecation warnings were reported.
 
+The owner now wants the formerly postponed Phase 01 work completed now, not held for the all-phases final pass. Remaining tasks: fix Flock's global 10 MB JSON body-limit effect on manual image restore; complete browser role walkthroughs; test deletion on disposable data; run migrations on disposable MongoDB copies and prove idempotency; verify Agri/Dairy/Flock backup/restore; inspect indexes/query plans; test concurrent multi-farm operations; then rerun the automated gates after the code fix.
+
+Do not use production data for any migration or destructive restore test. See [PHASE-01-FINAL-VERIFICATION.md](PHASE-01-FINAL-VERIFICATION.md) for the full checklist.
 # Roadmap
 Last reviewed: 2026-10-24. Agri now has a farm-scoped analytics summary endpoint and summary-first frontend refresh, with full details retained for workspaces that require them. The new code and regression coverage still need the owner's local test/build run. GitHub Actions remains manual-only; do not start a run on every commit. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; the roadmap below covers scale-up work for the three apps.
 
 ## Verification timing policy (owner decision)
 
-For **every planned phase (0 through 7)**, browser/live UI testing (including all role walkthroughs) and every real-MongoDB or database-copy test are **POSTPONED until one consolidated project-wide verification pass after all planned phases have implementation complete**. This includes multi-process MongoDB concurrency, index/migration validation, disposable-copy backup/restore and final browser role checks. These checks do not block individual phase implementation, and must not be run independently for a phase. Never run verification against production data.
+Prior timing policy: checks for all planned phases were to wait for one consolidated final pass. The latest owner decision is an explicit Phase 01 exception: finish Phase 01 browser/role checks, disposable-copy migrations, index/query-plan inspection, backup/restore and concurrency verification now. Later phases may still use the consolidated pass. Never run verification against production data.
 
-Per-phase work must still use local automated tests, memory-mode HTTP integration fixtures, source/safety checks, shared-file parity checks and frontend production builds. Those checks are not postponed. At the final checkpoint, run the combined browser/role matrix and isolated real-database/disposable-copy suite, record exact results, and only then close the related verification gates. This decision supersedes older historical notes below that describe browser or real-MongoDB checks as immediate per-phase blockers.
+Per-phase work must use local automated tests, memory-mode HTTP integration fixtures, source/safety checks, shared-file parity checks and production builds. For Phase 01, also complete the browser and disposable-database tasks now and record evidence in the linked checklist.
 
 ## Latest local checkpoint (2026-10-24)
 
@@ -38,14 +41,14 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 
 ## Phase 01 implementation follow-up (2026-10-24)
 
-Current follow-up status: Agri DiaryMedia and Dairy supplier/payment backup registries have been added; owner All farms read-only selector is now present in all three clients; farm-first compound index definitions have been added. Remaining implementation blockers are Flock image binary backup/restore and the backup-first permanent deletion UI. Root tests and all three frontend builds must be rerun after these edits. Real MongoDB index/restore checks and browser role walkthroughs remain postponed until the consolidated final pass.
+Agri DiaryMedia, Dairy supplier/payment registries, owner All farms selector, compound index definitions, Flock image serialization, and backup-first permanent deletion UI are implemented in source. The owner then reported that the root tests, root checks, and all three frontend builds passed on 26f6731. Phase 01 remains open for the known large manual restore request-limit gap and the browser/disposable-database/index/concurrency checklist.
 
 ## Phases
 
 | Phase | What | Projects | Risk |
 |---|---|---|---|
 | 0 | Docs reset and repository cleanup | Repository | Low (done, see PROGRESS) |
-| 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Implementation delivered in source; check-farms, MUF parity and UI-safety checks passed in the 2026-10-24 capture. Production builds are not shown in that capture. Migration/backup on database copies and the final browser-role pass are postponed, not current implementation blockers |
+| 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Source implementation delivered; owner-run check-farms, MUF parity, UI safety, workbench checks, root suite (210/210) and all three builds passed on 26f6731. Remaining: Flock large restore body-limit fix, browser role matrix, disposable-copy migration/backup-restore, real index/query-plan and concurrency verification |
 | 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | Core restructure, batch logs, allocation checks and shared inventory locking are implemented. Remaining implementation: make Dashboard/Health/Summary truly batch-first, complete the batch-linked Labor workflow, and protect existing incubation allocations from egg-log edits. Local tests/builds remain gates; real-MongoDB concurrency and database-copy backup/restore are postponed |
 | 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | Implementation scope is in place, but the captured pre-repair root suite reported 202/205 tests passing. Two source-contract assertions and one cross-farm test fixture are corrected; rerun the root suite, checks and all three production builds before sign-off. Browser/live UI and real-MongoDB/database-copy checks are postponed |
 | 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | In progress: optional cow lineage fields and ear-tag index added; workflows remain. Real-MongoDB index verification is postponed to the final project-wide pass |

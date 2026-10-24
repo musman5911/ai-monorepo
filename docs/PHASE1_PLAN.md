@@ -1,14 +1,31 @@
-## Phase 01 follow-up update (2026-10-24)
+## Phase 01 status after local verification (2026-10-24)
 
-The owner-facing permanent deletion UI now requires a fresh full backup download attempt, exact farm-name confirmation, and an explicit choice to move records to another active farm or permanently delete the farm's records. The shared backend remains the authority for last-farm, destination, and populated-farm safeguards. The UI tells the owner to verify the downloaded file before continuing; a browser can confirm download initiation but cannot prove the user kept the file.
+Owner-run local checkpoint on commit 26f6731:
+- Root regression suite: 22 files passed, 210/210 tests passed.
+- Passed: check-farms, check-sync, check-ui, check-workbench, check-workbench-runtime.
+- Production builds passed: Dairy, Flock, and Agri. Non-fatal warnings were reported for Dairy mixed imports, Flock/Agri chunk sizes, and Agri's deprecated advancedChunks option.
+- Git status was clean after the checkpoint.
 
-Flock manual backup/restore now serializes image binary bytes as canonical Base64 while preserving image _id, farmId, content type, kind, size, uploader and timestamps. Monthly auto-backups store image data in bounded DataStore sidecar chunks to avoid a single oversized MongoDB document; restore validates and assembles the full image set before deleting existing images. Older monthly backups without an image chunk set remain readable and do not replace images.
+## Phase 01 final completion policy
 
-The automated regression suite now covers image byte-for-byte round trips, metadata and ID preservation, chunk assembly, malformed Base64 rejection, and route wiring. Run the root suite and all three production builds after pulling. Real MongoDB/index creation and disposable-copy restore checks, plus browser role walkthroughs, remain postponed to the consolidated final verification pass and must not use production data.
+The owner has explicitly changed the previous timing decision: finish ALL Phase 01 work now, including browser/role walkthroughs, migration/index verification, and backup/restore tests on disposable database copies. Do not defer these Phase 01 checks to the final pass for later phases. Never use production data.
 
-## Verification timing policy (owner decision)
+## Known code gap before large-image restore testing
 
-Phase 1 browser/role review and all real-MongoDB/database-copy migration, index and backup/restore checks are **POSTPONED until the consolidated final project-wide pass after all planned phases have implementation complete**. They are not Phase 1 implementation blockers. Continue local farm-scope/security tests, shared-file checks and frontend builds now. Never use production data for verification.
+Flock's server currently applies express.json({ limit: '10mb' }) globally before backup routes. The manual restore endpoint reads req.body, so an image backup larger than 10 MB is rejected before that endpoint can validate it. Fix the parser ordering/route-specific limit and add a regression covering a larger valid request before attempting a real backup restore.
+
+## Phase 01 active remaining checklist
+
+1. Fix the Flock manual restore body limit and verify the error/response path before mutation.
+2. Browser-test owner, manager, and worker flows in all three apps, including All farms read-only behavior, assigned-farm isolation, and owner-only management.
+3. Test farm deletion on disposable data: fresh backup exists, exact-name confirmation, move records to another active farm, delete records, invalid destination, wrong name, last farm/last active farm, and server-side rejection.
+4. Run real MongoDB migration dry-runs and apply migrations only to disposable copies for Agri, Dairy, and Flock. Compare before/after record counts and farm ownership, rerun migrations for idempotency, and restore a backup if validation fails.
+5. Verify backup/restore on disposable copies: Agri DiaryMedia; Dairy Supplier and SupplierPayment; Flock images with IDs, farm IDs, metadata and exact bytes, including monthly auto-backup chunk assembly.
+6. Inspect actual MongoDB indexes on the copies, confirm farmId-leading indexes match the real list/filter/sort queries, confirm Flock DataStore farmId+key uniqueness, and collect query plans for representative queries.
+7. Exercise concurrent requests across two farms against disposable MongoDB to confirm isolation and atomic farm-scoped deletion/update behavior.
+8. After the body-limit fix, rerun root tests, all root check commands, and all three frontend production builds; update this checklist with the exact final results.
+
+Historical design and migration notes follow. Any older statement below that Phase 01 browser/database checks are postponed is superseded by this status section.
 
 ## Farm deletion safety follow-up (2026-10-23)
 

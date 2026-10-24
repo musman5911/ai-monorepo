@@ -1,10 +1,24 @@
-## Phase 01 completion follow-up (2026-10-24)
+## Phase 01 active status (2026-10-24; local checkpoint 26f6731)
 
-- Implemented Flock Image backup/restore with ID, farm ID, metadata, and original binary-byte preservation; monthly image snapshots use chunked sidecar records to avoid a single oversized MongoDB document.
-- Added regression tests for image round trips, chunk assembly, invalid backup rejection, and route wiring.
-- Added owner-facing permanent deletion flow: fresh backup download, exact-name confirmation, and explicit move-to-active-farm versus delete-records choice. Existing server-side safeguards remain authoritative.
-- Still required before implementation sign-off: rerun npm test, check-farms, check-sync, check-ui, check-workbench, check-workbench-runtime, and production builds for Dairy, Flock, and Agri against this exact head. This editing session cannot execute the repository checkout locally, so do not claim those gates passed.
-- Browser role walkthroughs and real-MongoDB/disposable-copy restore/index validation remain postponed to the consolidated final project-wide pass.
+Owner supplied a local CMD log after pulling 26f6731. Results reported:
+- `npm test`: 22 test files passed, 210/210 tests passed, including the Flock image-backup helper tests.
+- Passed: `npm run check-farms`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-workbench-runtime`.
+- Passed production builds: Dairy (`dairy_farm/client`), Flock (`flock_farm/client`), and Agri (`agri_farm/frontend`). Warnings were non-fatal: Dairy mixed static/dynamic import, Flock and Agri large chunks, Agri deprecated advancedChunks option.
+- `git status --short` was clean, branch was `muf-monorepo`, and HEAD/origin HEAD were both `26f6731`.
+
+Owner has now instructed that ALL Phase 01 verification work, including the former postponed browser/role checks and real-MongoDB/disposable-copy validation, be completed as part of Phase 01. This overrides the prior Phase 01 postponement notes below; never use production data.
+
+Remaining Phase 01 items:
+1. Fix Flock manual restore request size handling. `flock_farm/backend/server.js` currently runs the 10 MB JSON parser before the restore route; manual image backups over 10 MB will be rejected before route-level validation.
+2. Complete browser owner/manager/worker and All farms read-only role walkthroughs in all three apps.
+3. Test deletion safeguards and move-vs-delete choices on disposable data, including all invalid/last-farm cases.
+4. Run Agri/Dairy/Flock migration dry-runs and applied migrations on disposable database copies; compare counts and ownership; prove rerun idempotency.
+5. Validate Agri DiaryMedia, Dairy Supplier/SupplierPayment, and Flock image manual/monthly backup-restore on copies, including exact image bytes and IDs.
+6. Verify actual compound indexes and query plans on copies; verify farmId-first query indexes and Flock DataStore unique (farmId,key).
+7. Test concurrent multi-farm HTTP operations/deletion against a disposable MongoDB instance.
+8. After fixing item 1, rerun the automated suite/checks/builds and record the results against the new commit.
+
+Phase 01 is not signed off until these remaining items are complete. Historical status and timing notes below are retained for the project record but are superseded where they conflict with this latest owner decision.
 
 ## Phase 01 implementation update (2026-10-24)
 
@@ -18,13 +32,13 @@
 
 ## Phase 01 active follow-up (2026-10-24)
 
-Owner has changed the verification policy: Phase 01 browser and role walkthroughs are now required before calling Phase 01 complete. Run them only against isolated local memory-mode instances. Real MongoDB migration/index creation and backup/restore validation on a disposable database copy remain in the consolidated final project-wide verification pass; never use production data.
+Historical note: earlier owner instructions postponed browser and database-copy verification. The latest instruction (2026-10-24) supersedes this for Phase 01: complete these checks now on isolated browser instances and disposable MongoDB copies, never production.
 
 Changes pushed after the owner-reported 205/205 test and three-build checkpoint:
 - Commit `7c6c9d8`: replaced the shared farm-scoped `findByIdAndDelete` lookup-then-unscoped-delete sequence with one farm-scoped delete query in all three identical helpers, and added a regression test.
 - Commit `ff24217`: added Agri DiaryMedia to the shared backup/restore collection registry.
 
-These follow-up commits have **not yet been locally tested or built**. Remaining Phase 01 implementation work still includes Dairy Supplier/SupplierPayment backup symmetry, Flock Image backup/restore with IDs and binary data preserved, owner-facing All farms and backup-first deletion UI, farm-first index review, and a repeatable browser role matrix. Do not mark Phase 01 complete until implementation, local gates, and the browser checklist pass.
+Historical note: this paragraph described an earlier unverified checkpoint and is superseded by the newer owner-run 26f6731 verification above. The remaining work is listed in the latest Phase 01 active status at the top of this file.
 
 ## Latest owner-run checkpoint (2026-10-24; source through dbc41f4)
 
@@ -62,7 +76,7 @@ Local unit/source tests, memory-mode HTTP integration tests, MUF parity and scop
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-24 (recorded the local test checkpoint; three brittle test/fixture failures corrected; production builds still need to run.)
+Last updated: 2026-10-24 (owner-reported 210/210 tests, all root checks and all three frontend builds passed on 26f6731; Phase 01 database-copy and browser checks are now active work).
 ## Phase 3 follow-up: runtime pagination and task-bulk regression coverage (2026-10-23)
 
 - Added runtime HTTP integration coverage that requests adjacent one-record pages from Agri crops, tasks and finance, checks stable total/page metadata across requests, and rejects duplicate IDs across the page boundary.
