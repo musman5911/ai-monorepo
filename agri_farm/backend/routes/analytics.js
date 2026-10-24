@@ -57,7 +57,7 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
       .select('_id name variety status area_kanal plant_date harvest_date field season crop_year yield_kg yield_unit createdAt')
       .lean(),
     Task.find({})
-      .select('_id title status due_date completed_at date crop_id assigned_to priority notes laborer_names createdAt')
+      .select('_id title status due_date completed_at date crop_id assigned_to priority notes laborer_ids laborer_names createdAt')
       .lean(),
     fullRole
       ? Finance.find({}).select('_id type amount date crop_id category notes buyer_name description').lean()
