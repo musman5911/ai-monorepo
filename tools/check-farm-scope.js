@@ -180,8 +180,14 @@ async function checkFlock(project, call, owner, farmA) {
 
   const farmsBeforeBackup = await call('GET', '/api/farms', { token: owner });
   const expectedFarmCount = Array.isArray(farmsBeforeBackup.json?.farms) ? farmsBeforeBackup.json.farms.length : 0;
-  const backup = await call('GET', '/api/backup', { token: owner, farm: farmA });
-  ok(backup.status === 200 && Array.isArray(backup.json.farms) && backup.json.farms.length === expectedFarmCount, 'owner backup includes every farm');
+  const backup = await call('GET', '/api/backup', { token: owner, farm: 'all' });
+  ok(backup.status === 200 && Array.isArray(backup.json.farms) && backup.json.farms.length === expectedFarmCount, 'owner can export every farm while All farms is selected');
+  const restored = await call('POST', '/api/backup/restore', { token: owner, farm: 'all', body: backup.json });
+  ok(restored.status === 200, 'owner can restore a full Flock backup while All farms is selected');
+  const farmsAfterRestore = await call('GET', '/api/farms', { token: owner });
+  ok(Array.isArray(farmsAfterRestore.json?.farms) && farmsAfterRestore.json.farms.length === expectedFarmCount, 'Flock restore preserves all farms');
+  const eggsAfterRestore = await call('GET', '/api/data/eggs', { token: owner, farm: farmB });
+  ok(eggsAfterRestore.status === 200 && eggsAfterRestore.json?.value?.some((row) => row.id === 'scope-check-egg'), 'Flock restore preserves records in their original farm');
 }
 
 async function checkProject(name, project, port) {
@@ -338,11 +344,11 @@ async function checkProject(name, project, port) {
     // Backup covers every farm (owner only).
     const farmsBeforeBackup = await call('GET', '/api/farms', { token: owner });
     const expectedFarmCount = Array.isArray(farmsBeforeBackup.json?.farms) ? farmsBeforeBackup.json.farms.length : 0;
-    const backup = await call('GET', '/api/backup', { token: owner });
-    ok(backup.status === 200 && Array.isArray(backup.json.farms) && backup.json.farms.length === expectedFarmCount, 'owner backup includes every farm');
+    const backup = await call('GET', '/api/backup', { token: owner, farm: 'all' });
+    ok(backup.status === 200 && Array.isArray(backup.json.farms) && backup.json.farms.length === expectedFarmCount, 'owner can export every farm while All farms is selected');
 
-    // Restoring a backup keeps every record and farm in place.
-    const restored = await call('POST', project.restore, { token: owner, body: backup.json });
+    // Restoring a backup while All farms is selected is a database-wide owner operation.
+    const restored = await call('POST', project.restore, { token: owner, farm: 'all', body: backup.json });
     ok(restored.status === 200, 'owner can restore the backup');
     const farmsAfter = await call('GET', '/api/farms', { token: owner });
     ok(Array.isArray(farmsAfter.json?.farms) && farmsAfter.json.farms.length === expectedFarmCount, 'all farms still exist after the restore');
