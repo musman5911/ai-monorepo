@@ -5357,10 +5357,9 @@ function App() {
         icon={<Sprout size={16} />}
        size="big">
         {selectedCrop && (
-          <div className="space-y-4">
+          <div className="space-y-6 text-slate-800 dark:text-slate-100">
             {selectedCropDetailLoading && <p role="status" className="text-xs text-slate-500">Loading complete crop history…</p>}
             {selectedCropDetailError && <p role="alert" className="text-xs text-red-600">{selectedCropDetailError}</p>}
-"space-y-6 text-slate-800 dark:text-slate-100">
             {selectedCrop.image_base64 && (
               <div className="w-full h-44 rounded-xl overflow-hidden border border-[color:var(--muf-color-border)] shadow-xs">
                 <img src={selectedCrop.image_base64} className="w-full h-full object-cover" alt={selectedCrop.name} />
