@@ -501,10 +501,19 @@ describe.sequential('Agri runtime API integration', () => {
       assignee: 'Runtime Assignee', pending: 1, completed: 0, total: 1,
     }));
     expect(afterB.data.taskSummary.recentPending.some((row) => row.title === suffix + ' valid task')).toBe(true);
+    expect(afterB.data.taskSummary.pendingWithCrewCount).toBeGreaterThanOrEqual(0);
     expect(afterB.data.financeSummary.totals.entries).toBe(beforeB.data.financeSummary.totals.entries + 1);
     expect(afterB.data.financeSummary.totals.income).toBe(beforeB.data.financeSummary.totals.income + 50);
     expect(afterB.data.financeSummary.byCrop).toContainEqual(expect.objectContaining({
-      crop_id: String(cropB.data._id), income: 50,
+      crop_id: String(cropB.data._id),
+      income: 50,
+      entryCount: 1,
+      incomeCount: 1,
+      expenseCount: 0,
+      incomeBreakdown: expect.arrayContaining([expect.objectContaining({ name: suffix + ' valid ledger', amount: 50 })]),
+    }));
+    expect(afterB.data.financeSummary.groups).toContainEqual(expect.objectContaining({
+      id: String(cropB.data._id), entryCount: 1, incomeCount: 1, expenseCount: 0, income: 50,
     }));
 
     const farmAAfter = await request('/analytics/summary', { token: ownerToken, farmId: farmA });
