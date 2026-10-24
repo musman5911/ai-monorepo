@@ -37,6 +37,10 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phases/phase-21-final-testing-live-and-signoff.md) |
 
+## Current checkpoint
+
+Phase 1 remains **In progress**. The owner has reported that the Phase 1 source regression test (13 tests), the three-app runtime authorization check, and the full Vitest suite (232 tests) pass locally. Finish the remaining shared checks and all three builds, record the output in `docs/PROGRESS.md`, and only then start Phase 2. GitHub Actions are not required for this local verification.
+
 ## Why this order
 
 - Phases 1 to 7 finish the farm-level features that already have a server foundation: Super Admin, Dairy breeding and calves, Agri fields, and Telegram per farm.
