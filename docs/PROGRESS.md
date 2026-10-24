@@ -1,3 +1,11 @@
+## Phase 01 completion follow-up (2026-10-24)
+
+- Implemented Flock Image backup/restore with ID, farm ID, metadata, and original binary-byte preservation; monthly image snapshots use chunked sidecar records to avoid a single oversized MongoDB document.
+- Added regression tests for image round trips, chunk assembly, invalid backup rejection, and route wiring.
+- Added owner-facing permanent deletion flow: fresh backup download, exact-name confirmation, and explicit move-to-active-farm versus delete-records choice. Existing server-side safeguards remain authoritative.
+- Still required before implementation sign-off: rerun npm test, check-farms, check-sync, check-ui, check-workbench, check-workbench-runtime, and production builds for Dairy, Flock, and Agri against this exact head. This editing session cannot execute the repository checkout locally, so do not claim those gates passed.
+- Browser role walkthroughs and real-MongoDB/disposable-copy restore/index validation remain postponed to the consolidated final project-wide pass.
+
 ## Phase 01 implementation update (2026-10-24)
 
 - Fixed the fake model fixture for atomic farm-scoped deletion regression coverage.
@@ -5,8 +13,8 @@
 - Added Dairy Supplier and SupplierPayment to export, monthly snapshot and restore registry.
 - Added owner-only All farms selector in all three shared farm-switcher UIs. The backend already enforces read-only behavior for All farms.
 - Added farm-first compound index definitions for Agri/Dairy query patterns and Flock batch/image access. Actual MongoDB index creation and query-plan validation remain for the consolidated final pass.
-- Still open: Flock image binary/ID backup and restore; safe permanent deletion UI requiring a fresh backup, typed-name confirmation and explicit move/delete choice; complete Phase 01 regression suite/build verification. Do not sign off until these are implemented and verified.
-- Verification: these GitHub edits have not been executed locally in this editing session. Prior owner-run results do not prove these new edits pass. Browser role walkthrough and disposable-database restore/index validation remain deferred to the consolidated final project-wide pass.
+- Implemented in follow-up commits: Flock image binary/ID backup and restore; owner permanent deletion UI with fresh backup download, typed-name confirmation, and explicit move-or-delete choice. Automated image backup regressions added. Root test suite and all three production builds still require a fresh run against the final branch before sign-off.
+- Verification: The new image backup/restore and deletion UI changes have not been executed locally in this editing session. Prior owner-run results do not prove these new edits pass. Browser role walkthrough and disposable-database restore/index validation remain deferred to the consolidated final project-wide pass.
 
 ## Phase 01 active follow-up (2026-10-24)
 

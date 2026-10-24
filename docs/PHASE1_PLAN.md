@@ -1,3 +1,11 @@
+## Phase 01 follow-up update (2026-10-24)
+
+The owner-facing permanent deletion UI now requires a fresh full backup download attempt, exact farm-name confirmation, and an explicit choice to move records to another active farm or permanently delete the farm's records. The shared backend remains the authority for last-farm, destination, and populated-farm safeguards. The UI tells the owner to verify the downloaded file before continuing; a browser can confirm download initiation but cannot prove the user kept the file.
+
+Flock manual backup/restore now serializes image binary bytes as canonical Base64 while preserving image _id, farmId, content type, kind, size, uploader and timestamps. Monthly auto-backups store image data in bounded DataStore sidecar chunks to avoid a single oversized MongoDB document; restore validates and assembles the full image set before deleting existing images. Older monthly backups without an image chunk set remain readable and do not replace images.
+
+The automated regression suite now covers image byte-for-byte round trips, metadata and ID preservation, chunk assembly, malformed Base64 rejection, and route wiring. Run the root suite and all three production builds after pulling. Real MongoDB/index creation and disposable-copy restore checks, plus browser role walkthroughs, remain postponed to the consolidated final verification pass and must not use production data.
+
 ## Verification timing policy (owner decision)
 
 Phase 1 browser/role review and all real-MongoDB/database-copy migration, index and backup/restore checks are **POSTPONED until the consolidated final project-wide pass after all planned phases have implementation complete**. They are not Phase 1 implementation blockers. Continue local farm-scope/security tests, shared-file checks and frontend builds now. Never use production data for verification.

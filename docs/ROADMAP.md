@@ -1,3 +1,7 @@
+## Phase 01 implementation follow-up (2026-10-24, latest source changes)
+
+Flock image backup/restore now preserves Mongo image IDs, farm IDs, metadata and exact binary bytes using Base64 in portable JSON; monthly auto-backups store image data in bounded sidecar chunks and reconstruct it before restore. The shared owner farm-management UI now offers permanent deletion only after a fresh backup download starts, typed-name confirmation, and an explicit move-or-delete data choice. Server-side farm deletion checks remain authoritative. Automated regression tests were added for binary round-trips and chunk integrity. These latest changes still need root tests and all three production builds rerun against this exact branch head. Browser role checks and real MongoDB/disposable-copy validation remain postponed to the consolidated final pass.
+
 # Roadmap
 Last reviewed: 2026-10-24. Agri now has a farm-scoped analytics summary endpoint and summary-first frontend refresh, with full details retained for workspaces that require them. The new code and regression coverage still need the owner's local test/build run. GitHub Actions remains manual-only; do not start a run on every commit. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; the roadmap below covers scale-up work for the three apps.
 

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Archive, Building2, ChevronDown, Plus, RotateCcw, Save, Settings, Users } from 'lucide-react';
+import { Archive, Building2, ChevronDown, Plus, RotateCcw, Save, Settings, Trash2, Users } from 'lucide-react';
 import { L } from '../../i18n';
 
 type Farm = { _id: string; name: string; location?: string; archived?: boolean };
@@ -43,6 +43,12 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
+  const [deleteTarget, setDeleteTarget] = useState<Farm | null>(null);
+  const [deleteName, setDeleteName] = useState('');
+  const [deleteMode, setDeleteMode] = useState<'move' | 'delete'>('move');
+  const [moveDestinationId, setMoveDestinationId] = useState('');
+  const [backupFarmId, setBackupFarmId] = useState('');
+  const [backupBusy, setBackupBusy] = useState(false);
 
   const request = useCallback(async (path: string, init: RequestInit = {}, includeFarm = true) => {
     const token = readToken(config.tokenKey);
@@ -173,6 +179,45 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
     finally { setBusy(false); }
   };
 
+  const beginDeleteFarm = (farm: Farm) => {
+    setDeleteTarget(farm); setDeleteName(''); setDeleteMode('move');
+    setMoveDestinationId(farms.find((item) => item._id !== farm._id && !item.archived)?._id || '');
+    setBackupFarmId(''); setError(''); setNotice('');
+  };
+
+  const downloadFreshBackup = async () => {
+    if (!deleteTarget) return;
+    setBackupBusy(true); setError(''); setNotice('');
+    try {
+      const token = readToken(config.tokenKey);
+      const response = await fetch(`${apiRoot()}/backup`, { method: 'GET', cache: 'no-store', headers: {
+        ...(token ? { Authorization: `Bearer ${token}`, 'X-Access-Token': token, 'X-Auth-Token': token } : {}), Accept: 'application/json',
+      } });
+      if (!response.ok) { const body = await response.json().catch(() => ({})); throw new Error(body.error || body.message || `Backup failed (${response.status})`); }
+      const blob = await response.blob(); if (!blob.size) throw new Error('The backup response was empty.');
+      const url = URL.createObjectURL(blob); const link = document.createElement('a');
+      link.href = url; link.download = `muf-${app}-pre-delete-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+      document.body.appendChild(link); link.click(); link.remove(); window.setTimeout(() => URL.revokeObjectURL(url), 60000);
+      setBackupFarmId(deleteTarget._id); setNotice('Backup download started. Verify the JSON file is present and readable in Downloads before continuing.');
+    } catch (e) { setBackupFarmId(''); setError(e instanceof Error ? e.message : 'Could not download a fresh backup'); }
+    finally { setBackupBusy(false); }
+  };
+
+  const permanentlyDeleteFarm = async () => {
+    if (!deleteTarget) return;
+    if (backupFarmId !== deleteTarget._id) { setError('Download a fresh backup for this farm first.'); return; }
+    if (deleteName.trim() !== deleteTarget.name.trim()) { setError('Type the exact farm name to confirm deletion.'); return; }
+    if (deleteMode === 'move' && (!moveDestinationId || moveDestinationId === deleteTarget._id || !farms.some((farm) => farm._id === moveDestinationId && !farm.archived))) { setError('Choose a different active destination farm, or select delete-data mode.'); return; }
+    setBusy(true); setError(''); setNotice('');
+    try {
+      await request(`/farms/${encodeURIComponent(deleteTarget._id)}`, { method: 'DELETE', body: JSON.stringify({ confirmName: deleteName.trim(), ...(deleteMode === 'move' ? { moveToFarmId: moveDestinationId } : { deleteData: true }) }) }, false);
+      const removedId = deleteTarget._id;
+      if (activeFarmId === removedId) { const fallback = farms.find((farm) => farm._id !== removedId && !farm.archived); if (fallback) localStorage.setItem(config.selectedKey, fallback._id); else localStorage.removeItem(config.selectedKey); }
+      setDeleteTarget(null); setNotice('Farm permanently deleted.'); await load();
+      if (activeFarmId === removedId) window.location.reload();
+    } catch (e) { setError(e instanceof Error ? e.message : 'Could not permanently delete farm'); }
+    finally { setBusy(false); }
+  };
   const saveAssignment = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!selectedUser || !adminPassword) { setError(L('Enter your current password to confirm this change')); return; }
@@ -221,11 +266,12 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
             <button disabled={busy} className="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"><Plus size={15} className="mr-1 inline" />{L('Add farm')}</button>
           </form>
           <div className="mb-6 space-y-2">
-            {farms.map((farm) => <div key={farm._id} className="grid grid-cols-1 items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 p-3 sm:grid-cols-[1fr_1fr_auto_auto]">
+            {farms.map((farm) => <div key={farm._id} className="grid grid-cols-1 items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 p-3 sm:grid-cols-[1fr_1fr_auto_auto_auto]">
               <input value={drafts[farm._id]?.name ?? farm.name} onChange={(e) => setDrafts((prev) => ({ ...prev, [farm._id]: { name: e.target.value, location: prev[farm._id]?.location || farm.location || '' } }))} aria-label={L('Farm name')} className="min-w-0 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent px-3 py-2 text-sm" />
               <input value={drafts[farm._id]?.location ?? farm.location ?? ''} onChange={(e) => setDrafts((prev) => ({ ...prev, [farm._id]: { name: prev[farm._id]?.name || farm.name, location: e.target.value } }))} aria-label={L('Farm location')} placeholder={L('Location')} className="min-w-0 rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent px-3 py-2 text-sm" />
               <button type="button" disabled={busy} onClick={() => void saveFarm(farm)} className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm disabled:opacity-50"><Save size={14} className="mr-1 inline" />{L('Save')}</button>
               <button type="button" disabled={busy} onClick={() => void setArchived(farm)} className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm disabled:opacity-50">{farm.archived ? <RotateCcw size={14} className="mr-1 inline" /> : <Archive size={14} className="mr-1 inline" />}{farm.archived ? L('Restore') : L('Archive')}</button>
+              <button type="button" disabled={busy} onClick={() => beginDeleteFarm(farm)} className="rounded-lg border border-red-300 px-3 py-2 text-sm text-red-700 disabled:opacity-50 dark:border-red-800 dark:text-red-300"><Trash2 size={14} className="mr-1 inline" />{L('Delete')}</button>
             </div>)}
           </div>
 
@@ -255,7 +301,22 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
               </>}
             </form>
           </div>
-          <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">{L('Archiving hides a farm from normal selection. Deletion is intentionally not offered here.')}</p>
+          <p className="mt-4 text-xs text-slate-500 dark:text-slate-400">{L("Archiving hides a farm from normal selection. Permanent deletion requires a fresh backup download, exact-name confirmation and an explicit data action.")}</p>
+          {deleteTarget && <div className="fixed inset-0 z-[1900] flex items-start justify-center overflow-y-auto bg-black/60 p-3 sm:p-6" role="presentation">
+            <section role="dialog" aria-modal="true" aria-labelledby="muf-delete-farm-title" className="mt-8 w-full max-w-xl rounded-2xl border border-red-300 dark:border-red-900 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-2xl">
+              <h3 id="muf-delete-farm-title" className="mb-2 flex items-center gap-2 text-lg font-bold text-red-700 dark:text-red-300"><Trash2 size={18} />{L("Permanently delete farm")}</h3>
+              <p className="mb-4 text-sm">{L("This cannot be undone. Download a fresh full backup and verify it is saved. The server also enforces last-farm and data-move safeguards.")}</p>
+              <div className="mb-4 rounded-lg border border-slate-200 dark:border-slate-700 p-3"><p className="mb-2 text-sm font-semibold">{L("Step 1: Fresh backup")}</p>
+                <button type="button" disabled={backupBusy || busy} onClick={() => void downloadFreshBackup()} className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm disabled:opacity-50">{backupBusy ? L("Preparing backup…") : L("Download fresh backup")}</button>
+                {backupFarmId === deleteTarget._id && <p role="status" className="mt-2 text-sm text-emerald-700 dark:text-emerald-300">{L("Download started. Verify the file exists before deleting.")}</p>}</div>
+              <div className="mb-4 space-y-3 rounded-lg border border-slate-200 dark:border-slate-700 p-3"><p className="text-sm font-semibold">{L("Step 2: Choose what happens to this farm’s records")}</p>
+                <label className="flex items-start gap-2 text-sm"><input type="radio" name="muf-delete-mode" checked={deleteMode === "move"} onChange={() => setDeleteMode("move")} /><span>{L("Move records to another active farm")}</span></label>
+                {deleteMode === "move" && <select value={moveDestinationId} onChange={(e) => setMoveDestinationId(e.target.value)} aria-label={L("Destination farm")} className="w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent px-3 py-2 text-sm"><option value="">{L("Choose destination farm")}</option>{farms.filter((farm) => farm._id !== deleteTarget._id && !farm.archived).map((farm) => <option key={farm._id} value={farm._id}>{farm.name}</option>)}</select>}
+                <label className="flex items-start gap-2 text-sm"><input type="radio" name="muf-delete-mode" checked={deleteMode === "delete"} onChange={() => setDeleteMode("delete")} /><span>{L("Permanently delete this farm’s records too")}</span></label></div>
+              <label className="mb-4 block text-sm">{L("Step 3: Type the exact farm name to confirm")}<input value={deleteName} onChange={(e) => setDeleteName(e.target.value)} placeholder={deleteTarget.name} className="mt-1 w-full rounded-lg border border-slate-300 dark:border-slate-600 bg-transparent px-3 py-2 text-sm" /></label>
+              <div className="flex flex-wrap justify-end gap-2"><button type="button" disabled={busy} onClick={() => setDeleteTarget(null)} className="rounded-lg border border-slate-300 dark:border-slate-600 px-3 py-2 text-sm">{L("Cancel")}</button>
+                <button type="button" disabled={busy || backupBusy || backupFarmId !== deleteTarget._id || deleteName.trim() !== deleteTarget.name.trim() || (deleteMode === "move" && !moveDestinationId)} onClick={() => void permanentlyDeleteFarm()} className="rounded-lg bg-red-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-40">{busy ? L("Deleting…") : L("Permanently delete farm")}</button></div>
+            </section></div>}
         </section>
       </div>}
       {error && !manageOpen && <span role="status" className="sr-only">{error}</span>}
