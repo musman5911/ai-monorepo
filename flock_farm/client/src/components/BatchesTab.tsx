@@ -63,6 +63,7 @@ import { todayStr } from '../utils/calculations';
 import { formatRs, normalizePublicAssetPath, sortBatchesByProfitLoss } from './batches/batchUtils';
 import { L } from '../i18n';
 import { LogTable } from './batches/LogTable';
+import { parseXlsxRows, rowsToCsv } from '../utils/flockXlsxImport';
 
 interface BatchesTabProps {
   lang: Lang;
@@ -102,6 +103,22 @@ function parseBatchCsvLine(line: string): string[] {
   }
   values.push(value.trim());
   return values;
+}
+
+async function readBatchBulkImportFile(file: File): Promise<string> {
+  const isXlsx = /\.xlsx$/i.test(file.name) ||
+    file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  const isCsv = /\.csv$/i.test(file.name) || file.type === 'text/csv';
+  if (!isXlsx && !isCsv) throw new Error('Choose a CSV or XLSX spreadsheet file.');
+  const limit = isXlsx ? 5 * 1024 * 1024 : 2 * 1024 * 1024;
+  if (file.size > limit) throw new Error(isXlsx
+    ? 'XLSX files must be 5 MB or smaller.'
+    : 'CSV files must be 2 MB or smaller.');
+  if (!isXlsx) return file.text();
+
+  const rows = await parseXlsxRows(await file.arrayBuffer());
+  if (rows.length > 1001) throw new Error('Import is limited to 1,000 data rows.');
+  return rowsToCsv(rows);
 }
 
 export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
@@ -207,14 +224,13 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
 
   const handleEggBulkCsv = async (file?: File | null) => {
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { notify('CSV files must be 2 MB or smaller.', 'error'); return; }
     try {
-      const lines = (await file.text()).replace(/\r\n?/g, '\n').split('\n').filter(line => line.trim());
+      const lines = (await readBatchBulkImportFile(file)).replace(/\r\n?/g, '\n').split('\n').filter(line => line.trim());
       if (lines.length < 2) throw new Error('CSV needs a header and at least one data row.');
       if (lines.length > 1001) throw new Error('Import is limited to 1,000 rows.');
-      const headers = parseBatchCsvLine(lines[0]).map(value => value.toLowerCase().replace(/\s+/g, ''));
+      const headers = parseBatchCsvLine(lines[0]).map(value => value.toLowerCase().replace(/[\s-]+/g, '_'));
       const at = (name: string) => headers.indexOf(name);
-      for (const required of ['date', 'collected']) if (at(required) < 0) throw new Error(`Missing required CSV column: ${required}`);
+      for (const required of ['date', 'collected']) if (at(required) < 0) throw new Error(`Missing required CSV/Excel column: ${required}`);
       const seen = new Set<string>();
       const preview = lines.slice(1).map((line, index) => {
         const cells = parseBatchCsvLine(line);
@@ -232,14 +248,14 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
         if (![sold, home_use, broken_wasted].every(value => Number.isInteger(value) && value >= 0)) problems.push('Egg counts must be non-negative integers');
         if (!Number.isFinite(price_per_egg) || price_per_egg < 0) problems.push('Price must be non-negative');
         if (sold + home_use + broken_wasted > collected) problems.push('Sold, home use and waste exceed collected eggs');
-        if (seen.has(date)) problems.push('Duplicate date in CSV');
+        if (seen.has(date)) problems.push('Duplicate date in import file');
         seen.add(date);
         return { rowNumber: index + 2, entry: { date, collected, sold, home_use, broken_wasted, price_per_egg, notes: get('notes') || undefined }, error: problems.join('; ') };
       });
       setEggBulkPreview(preview);
       setShowEggBulkModal(true);
     } catch (error) {
-      notify(error instanceof Error ? error.message : 'Could not read egg CSV', 'error');
+      notify(error instanceof Error ? error.message : 'Could not read egg CSV/Excel file', 'error');
     }
   };
 
@@ -263,7 +279,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
       }
       await refreshAfterMutation(selectedBatch.batch_id);
     } catch (error) {
-      notify(error instanceof Error ? error.message : 'Egg CSV import failed', 'error');
+      notify(error instanceof Error ? error.message : 'Egg CSV/Excel import failed', 'error');
     } finally {
       setEggBulkBusy(false);
     }
@@ -271,9 +287,8 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
 
   const handleGenericBulkCsv = async (type: GenericBulkLogType, file?: File | null) => {
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { notify('CSV files must be 2 MB or smaller.', 'error'); return; }
     try {
-      const lines = (await file.text()).replace(/\r\n?/g, '\n').split('\n').filter(line => line.trim());
+      const lines = (await readBatchBulkImportFile(file)).replace(/\r\n?/g, '\n').split('\n').filter(line => line.trim());
       if (lines.length < 2) throw new Error('CSV needs a header and at least one data row.');
       if (lines.length > 1001) throw new Error('Import is limited to 1,000 rows.');
       const headers = parseBatchCsvLine(lines[0]).map(value => value.toLowerCase().replace(/[\s-]+/g, '_'));
@@ -284,7 +299,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
         vaccination: ['date', 'vaccine_name'],
         expense: ['date', 'category', 'detail', 'amount'],
       };
-      for (const required of requiredByType[type]) if (at(required) < 0) throw new Error(`Missing required CSV column: ${required}`);
+      for (const required of requiredByType[type]) if (at(required) < 0) throw new Error(`Missing required CSV/Excel column: ${required}`);
       const preview = lines.slice(1).map((line, index) => {
         const cells = parseBatchCsvLine(line);
         const get = (name: string) => cells[at(name)] || '';
@@ -325,7 +340,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
       setGenericBulkPreview(preview);
       setShowGenericBulkModal(true);
     } catch (error) {
-      notify(error instanceof Error ? error.message : 'Could not read CSV', 'error');
+      notify(error instanceof Error ? error.message : 'Could not read CSV/Excel file', 'error');
     }
   };
 
@@ -344,7 +359,7 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
       setGenericBulkPreview([]);
       await refreshAfterMutation(selectedBatch.batch_id);
     } catch (error) {
-      notify(error instanceof Error ? error.message : 'CSV import failed', 'error');
+      notify(error instanceof Error ? error.message : 'CSV/Excel import failed', 'error');
     } finally {
       setGenericBulkBusy(false);
     }
@@ -889,8 +904,8 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
             {(['feed', 'weight', 'vaccination', 'expense'] as const).includes(detailTab as GenericBulkLogType) && (
               <div className="mb-3 flex justify-end">
                 <label className="cursor-pointer rounded-xl border border-slate-300 dark:border-slate-600 px-3 py-2 text-xs font-semibold hover:bg-slate-50 dark:hover:bg-slate-800">
-                  Import {detailTab} CSV (preview first)
-                  <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => {
+                  Import {detailTab} CSV / Excel (preview first)
+                  <input type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" className="hidden" onChange={(e) => {
                     const file = e.target.files?.[0]; e.currentTarget.value = '';
                     void handleGenericBulkCsv(detailTab as GenericBulkLogType, file);
                   }} />
@@ -1135,17 +1150,17 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
           <input type="number" min="0" step="0.01" placeholder={L('Price per egg')} value={eggForm.price_per_egg} onChange={(e) => setEggForm({ ...eggForm, price_per_egg: e.target.value })} className="w-full px-3 py-2 border rounded-xl" />
           <textarea value={eggForm.notes} onChange={(e) => setEggForm({ ...eggForm, notes: e.target.value })} placeholder={L('Notes')} className="w-full px-3 py-2 border rounded-xl h-20 resize-none" />
           <label className="block rounded-xl border border-dashed border-amber-300 p-3 text-center cursor-pointer text-amber-800 dark:text-amber-300">
-            Import egg log CSV (preview first)
-            <input type="file" accept=".csv,text/csv" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; e.currentTarget.value = ''; void handleEggBulkCsv(file); }} />
+            Import egg log CSV / Excel (preview first)
+            <input type="file" accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" className="hidden" onChange={(e) => { const file = e.target.files?.[0]; e.currentTarget.value = ''; void handleEggBulkCsv(file); }} />
           </label>
           <ModalActions submitting={submitting} onCancel={closeModal} submitLabel={L('Save Egg Log')} />
         </form>
       </BatchLogModal>
 
       <DetailModal open={showGenericBulkModal} onClose={() => { if (!genericBulkBusy) setShowGenericBulkModal(false); }}
-        title={`Preview Batch ${genericBulkType} CSV`} size="big">
+        title={`Preview Batch ${genericBulkType} CSV / Excel`} size="big">
         <div className="space-y-3">
-          <p className="text-xs text-slate-500">Review the parsed rows before import. Up to 1,000 rows and 2 MB per file; all preview errors must be fixed before writing.</p>
+          <p className="text-xs text-slate-500">Review the parsed rows before import. Up to 1,000 data rows, CSV files up to 2 MB or XLSX files up to 5 MB; all preview errors must be fixed before writing.</p>
           <div className="max-h-[55vh] overflow-auto rounded-xl border border-slate-200 dark:border-slate-700">
             <table className="w-full text-xs">
               <thead><tr className="bg-slate-50 dark:bg-slate-800 text-left"><th className="p-2">Row</th><th className="p-2">Parsed values</th><th className="p-2">Validation</th></tr></thead>
@@ -1162,9 +1177,9 @@ export default function BatchesTab({ lang, currentUser }: BatchesTabProps) {
       </DetailModal>
 
       <DetailModal open={showEggBulkModal} onClose={() => { if (!eggBulkBusy) setShowEggBulkModal(false); }}
-        title="Preview Batch Egg CSV" size="big">
+        title="Preview Batch Egg CSV / Excel" size="big">
         <div className="space-y-4">
-          <p className="text-sm text-slate-500">Required columns: date, collected. Optional: sold, home_use, broken_wasted, price_per_egg, notes. Dates must be unique within this batch. Up to 1,000 rows per file.</p>
+          <p className="text-sm text-slate-500">Required columns: date, collected. Optional: sold, home_use, broken_wasted, price_per_egg, notes. Dates must be unique within this batch. Up to 1,000 data rows; CSV up to 2 MB or XLSX up to 5 MB.</p>
           <div className="max-h-80 overflow-auto border rounded-xl">
             <table className="w-full text-left text-xs">
               <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800"><tr><th className="p-2">Row</th><th className="p-2">Date</th><th className="p-2">Collected</th><th className="p-2">Sold</th><th className="p-2">Home</th><th className="p-2">Waste</th><th className="p-2">Validation</th></tr></thead>
