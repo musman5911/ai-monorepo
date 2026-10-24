@@ -52,7 +52,11 @@ Date synchronization: latest heat event updates `Cow.heatDate`; latest service e
 
 ## New command-line check
 
-`tests/dairy-breeding-events.test.ts` plus new cases in `npm run check-farms`: events created in farm B never appear in farm A, workers cannot delete events, restore keeps events.
+`tests/dairy-breeding-events.test.ts` plus `npm run check-breeding-events` (also invoked by `npm run check-farms`): real-HTTP memory-mode checks cover create/edit, pagination, farm isolation, date validation, worker create/delete permissions, legacy date synchronization, and backup/restore retention. The checker never connects to MongoDB.
+
+## Implementation checkpoint (2026-10-24)
+
+Implemented on `muf-monorepo`, pending local execution: the farm-scoped model and indexes, additive event routes, legacy date synchronization, manual/monthly backup and restore integration, disposable demo events, Vitest source-contract tests, and a memory-mode HTTP checker. **No Phase 2 test or build results are claimed yet.**
 
 ## Command-line checks at the end of this phase
 
