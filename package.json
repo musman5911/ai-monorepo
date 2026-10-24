@@ -9,6 +9,7 @@
     "check-workbench": "node tools/check-muf-workbench.js",
     "check-workbench-runtime": "node tools/check-muf-workbench-runtime.js",
     "check-farms": "node tools/check-farm-scope.js",
+    "check-super-admin": "node tools/check-super-admin.js",
     "check-docs": "node tools/check-phase-docs.js"
   },
   "devDependencies": {
