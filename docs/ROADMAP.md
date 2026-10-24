@@ -92,7 +92,7 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 - The Flock API and UI support preview-first CSV/XLSX bulk entry for egg, feed, weight, vaccination and expense logs. Writes are bounded to 200 entries/request; imports cap CSV at 2 MB, XLSX at 5 MB and each file at 1,000 data rows. Mortality and sales remain single-row because each write depends on live-bird count.
 - Agri crop/task cards use 40-row server pages and Load More; ledger detail pages by crop/farm-wide group and finance type. `/analytics/summary` supplies farm-scoped dashboard/report totals, monthly trends, income/expense breakdowns and crop profitability. The default refresh no longer downloads full finance/task ledgers; full details load for detail workspaces, and crop profile views fetch complete linked history on demand. Memory-mode runtime tests cover aggregate accuracy, farm isolation, worker finance redaction and cross-farm task/finance bulk rejection. New source/regression tests cover safe seed-ledger lookup and Flock XLSX import parsing. Remaining local gates: run root tests/checks and all three builds. Browser and real-MongoDB/database-copy validation remains postponed to the final project-wide pass.
 
-**Status: implementation in progress (2026-10-23).** Per owner direction, Phase 2's real-MongoDB concurrency and disposable-copy backup/restore checks are deferred to the final verification pass after all phases. Continue Phase 3 implementation without accessing production data; Phase 2 is not being marked complete early.
+**Status: Phase 2 implementation delivered; final verification deferred.** Per owner direction, Phase 2's real-MongoDB concurrency and disposable-copy backup/restore checks are postponed until one consolidated verification pass after all phases have implementation complete. Continue local tests/builds and Phase 3 implementation; do not connect to or mutate production data. Phase 2 is not marked fully signed off before that final pass.
 
 Implementation order:
 
@@ -225,13 +225,13 @@ The owner reports root unit tests passing (**115/115**), MUF sync/UI/workbench c
 
 The harness has been updated to retry only that exact startup response for up to 30 seconds; role checks remain strict and other failures remain visible. Commit: `9a3eeb5`. This change is awaiting the owner's local rerun.
 
-**Phase 2 is still open.** After the farm-scope check passes, remaining sign-off gates are real-MongoDB inventory-lock concurrency and repeatable backup/restore compatibility tests on disposable data. The Vite chunk-size warning is a performance follow-up, not the cause of the farm-scope failure.
+**Historical Phase 2 checkpoint (2026-10-23):** that report listed real-MongoDB inventory-lock concurrency and disposable-copy backup/restore as pending. Per the 2026-10-24 owner decision, both checks are postponed to final project-wide verification after every phase has implementation complete.
 
 ### Latest verification update (2026-10-23): Flock backup path
 
 The startup retry worked: Agri and Dairy farm-scope checks pass, and Flock progresses through bucket, batch, linked-log and worker checks. Its owner-backup assertion then fails. Root tests (115/115), MUF sync, UI safety and 23 workbench source checks pass.
 
-This was a historical Phase 2 verification blocker identified at the 2026-10-23 checkpoint. Current owner direction is to postpone all real-MongoDB concurrency and disposable-copy checks until the single final project-wide verification pass after all phases have implementation complete.
+This was a historical Phase 2 verification blocker identified at the 2026-10-23 checkpoint. Current owner direction postpones real-MongoDB concurrency and disposable-copy checks until the single final project-wide verification pass after all phases have implementation complete.
 
 Historical next step at that checkpoint: pull and rerun local checks. Per the 2026-10-24 owner decision, real-MongoDB concurrency and disposable-copy backup/restore are postponed to the single final project-wide verification pass; Phase 3 implementation can progress while current local tests/builds are verified.
 
