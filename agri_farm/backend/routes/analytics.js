@@ -145,13 +145,17 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
   const taskSort = (a, b) => String(b.due_date || b.completed_at || b.date || b.createdAt || '')
     .localeCompare(String(a.due_date || a.completed_at || a.date || a.createdAt || ''));
   const recentTasks = [...tasks].sort(taskSort).slice(0, 40).map(asId);
-  const recentPendingTasks = tasks.filter((task) => task.status === 'Pending').sort(taskSort).slice(0, 40).map(asId);
+  const pendingTasks = tasks.filter((task) => task.status === 'Pending').sort(taskSort);
+  const recentPendingTasks = pendingTasks.slice(0, 40).map(asId);
+  const pendingTasksWithCrew = pendingTasks.filter((task) => Array.isArray(task.laborer_ids) && task.laborer_ids.length > 0);
   const taskSummary = {
     total: tasks.length,
     byStatus: taskStatuses,
     byCrop: [...taskByCrop.values()],
     byAssignee: [...taskByAssignee.values()],
     recentPending: recentPendingTasks,
+    pendingWithCrewCount: pendingTasksWithCrew.length,
+    recentPendingWithCrew: pendingTasksWithCrew.slice(0, 40).map(asId),
     dueToday,
     completedToday,
     pendingIrrigation,
