@@ -40,44 +40,6 @@ const containsName = (text, name) => {
   }
   return false;
 };
-const makeMonthlyRows = (financeRows, cropMonthCounts, cropId = '') => {
-  const months = new Map();
-  const read = (key) => {
-    if (!months.has(key)) months.set(key, { income: 0, expense: 0, cropsCount: 0 });
-    return months.get(key);
-  };
-  for (const row of financeRows) {
-    if (cropId && String(row.crop_id || '') !== cropId) continue;
-    const key = monthOf(row.date);
-    if (!key) continue;
-    const value = read(key);
-    if (row.type === 'income') value.income += amountOf(row);
-    if (row.type === 'expense') value.expense += amountOf(row);
-  }
-  for (const [key, count] of cropMonthCounts) {
-    if (!cropId || key === cropId) {
-      const month = cropId ? count.month : key;
-      if (month) read(month).cropsCount += 1;
-    }
-  }
-  return [...months.entries()].sort(([a], [b]) => a.localeCompare(b));
-};
-const makeExpenseBreakdown = (rows) => {
-  const categories = new Map();
-  for (const row of rows) {
-    if (row.type !== 'expense') continue;
-    const label = String(row.category || 'Other');
-    categories.set(label, (categories.get(label) || 0) + amountOf(row));
-  }
-  const total = [...categories.values()].reduce((sum, value) => sum + value, 0);
-  return [...categories.entries()]
-    .map(([category, amount]) => ({
-      category,
-      amount,
-      percentage: total > 0 ? Math.round((amount / total) * 100) : 0,
-    }))
-    .sort((a, b) => b.amount - a.amount);
-};
 const asId = (row) => ({ ...row, _id: String(row._id) });
 
 router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
@@ -192,9 +154,16 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
     const byCropTotals = new Map();
     const byCropMonths = new Map();
     const byCropCategories = new Map();
+    const byCropIncomeCategories = new Map();
     const expenseCategories = new Map();
+    const incomeCategories = new Map();
+    const farmWideExpenseCategories = new Map();
+    const farmWideIncomeCategories = new Map();
     let farmWideIncome = 0;
     let farmWideExpense = 0;
+    let farmWideIncomeCount = 0;
+    let farmWideExpenseCount = 0;
+    let farmWideEntryCount = 0;
 
     for (const row of ledger) {
       const amount = amountOf(row);
@@ -217,18 +186,41 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
         const category = String(row.category || 'Other');
         expenseCategories.set(category, (expenseCategories.get(category) || 0) + amount);
       }
+      if (isIncome) {
+        const buyer = String(row.buyer_name || '').trim() || String(row.category || 'General / Spot Sale');
+        incomeCategories.set(buyer, (incomeCategories.get(buyer) || 0) + amount);
+      }
 
       const cropId = String(row.crop_id || '');
       if (!cropId || !cropById.has(cropId)) {
-        if (isIncome) farmWideIncome += amount;
-        if (isExpense) farmWideExpense += amount;
+        farmWideEntryCount += 1;
+        if (isIncome) {
+          farmWideIncome += amount;
+          farmWideIncomeCount += 1;
+          const buyer = String(row.buyer_name || '').trim() || String(row.category || 'General / Spot Sale');
+          farmWideIncomeCategories.set(buyer, (farmWideIncomeCategories.get(buyer) || 0) + amount);
+        }
+        if (isExpense) {
+          farmWideExpense += amount;
+          farmWideExpenseCount += 1;
+          const category = String(row.category || 'Other');
+          farmWideExpenseCategories.set(category, (farmWideExpenseCategories.get(category) || 0) + amount);
+        }
         continue;
       }
 
-      const cropTotals = byCropTotals.get(cropId) || { income: 0, expense: 0, entryCount: 0 };
+      const cropTotals = byCropTotals.get(cropId) || {
+        income: 0, expense: 0, entryCount: 0, incomeCount: 0, expenseCount: 0,
+      };
       cropTotals.entryCount += 1;
-      if (isIncome) cropTotals.income += amount;
-      if (isExpense) cropTotals.expense += amount;
+      if (isIncome) {
+        cropTotals.income += amount;
+        cropTotals.incomeCount += 1;
+      }
+      if (isExpense) {
+        cropTotals.expense += amount;
+        cropTotals.expenseCount += 1;
+      }
       byCropTotals.set(cropId, cropTotals);
 
       if (month) {
@@ -241,6 +233,15 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
         if (isIncome) monthly.income += amount;
         if (isExpense) monthly.expense += amount;
         cropMonths.set(month, monthly);
+      }
+      if (isIncome) {
+        let categories = byCropIncomeCategories.get(cropId);
+        if (!categories) {
+          categories = new Map();
+          byCropIncomeCategories.set(cropId, categories);
+        }
+        const buyer = String(row.buyer_name || '').trim() || String(row.category || 'General / Spot Sale');
+        categories.set(buyer, (categories.get(buyer) || 0) + amount);
       }
       if (isExpense) {
         let categories = byCropCategories.get(cropId);
@@ -280,7 +281,9 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
       .map(([month, value]) => ({ label: month.slice(2), value: value.income }));
 
     const byCrop = cropRows.map((crop) => {
-      const amounts = byCropTotals.get(crop._id) || { income: 0, expense: 0, entryCount: 0 };
+      const amounts = byCropTotals.get(crop._id) || {
+        income: 0, expense: 0, entryCount: 0, incomeCount: 0, expenseCount: 0,
+      };
       const months = byCropMonths.get(crop._id) || new Map();
       const plantMonth = monthOf(crop.plant_date);
       if (plantMonth) {
@@ -293,6 +296,7 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
         .map(([month, value]) => [month, value]);
       const categoryMap = byCropCategories.get(crop._id) || new Map();
       const categoryTotal = [...categoryMap.values()].reduce((sum, value) => sum + value, 0);
+      const incomeMap = byCropIncomeCategories.get(crop._id) || new Map();
       return {
         crop_id: crop._id,
         name: crop.name || 'Crop',
@@ -300,7 +304,12 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
         expense: amounts.expense,
         net: amounts.income - amounts.expense,
         entryCount: amounts.entryCount,
+        incomeCount: amounts.incomeCount,
+        expenseCount: amounts.expenseCount,
         monthlyRows: monthlyRowsForCrop,
+        incomeBreakdown: [...incomeMap.entries()]
+          .map(([name, amount]) => ({ name, amount }))
+          .sort((a, b) => b.amount - a.amount),
         expenseBreakdown: [...categoryMap.entries()]
           .map(([category, amount]) => ({
             category, amount,
@@ -330,23 +339,34 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
         percentage: categoryTotal > 0 ? Math.round((amount / categoryTotal) * 100) : 0,
       }))
       .sort((a, b) => b.amount - a.amount);
+    const incomeBreakdown = [...incomeCategories.entries()]
+      .map(([name, amount]) => ({ name, amount }))
+      .sort((a, b) => b.amount - a.amount);
 
     const groups = [{
       id: 'farm-wide',
       name: 'General / Farm-Wide Operational',
       plot: 'General',
-      entryCount: ledger.filter((row) => !row.crop_id || !cropById.has(String(row.crop_id))).length,
+      entryCount: farmWideEntryCount,
+      incomeCount: farmWideIncomeCount,
+      expenseCount: farmWideExpenseCount,
       income: farmWideIncome,
       expense: farmWideExpense,
       net: farmWideIncome - farmWideExpense,
+      incomeBreakdown: [...farmWideIncomeCategories.entries()].map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount),
+      expenseBreakdown: [...farmWideExpenseCategories.entries()].map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount),
     }, ...byCrop.map((crop) => ({
       id: crop.crop_id,
       name: 'Crop: ' + crop.name,
       plot: cropRows.find((item) => item._id === crop.crop_id)?.field || 'Farm-wide',
       entryCount: crop.entryCount,
+      incomeCount: crop.incomeCount,
+      expenseCount: crop.expenseCount,
       income: crop.income,
       expense: crop.expense,
       net: crop.net,
+      incomeBreakdown: crop.incomeBreakdown,
+      expenseBreakdown: crop.expenseBreakdown.map((row) => ({ name: row.category, amount: row.amount })),
     }))];
 
     const recent = [...ledger]
@@ -377,6 +397,7 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
       },
       monthlyIncomeSeries,
       monthlyRows,
+      incomeBreakdown,
       expenseBreakdown,
       byCrop,
       profitability,
