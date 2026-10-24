@@ -1,3 +1,13 @@
+## Latest owner-run verification and repair (2026-10-24; source through 0a3add1)
+
+- The supplied Windows command log was captured after git pull advanced the checkout to 0a3add1. The log has now been reviewed, and result-cmd.txt is removed in this corrective commit.
+- Before these corrections, npm test reported 202 passed and 3 failed out of 205. The failures were: (1) the cross-farm fixture reused the same search suffix for Farm A's own test crop and Farm B's test crop, making the expected Farm A zero invalid; the fixture now uses a distinct Farm B tag. (2) the Agri source-contract test expected an obsolete crew-list expression; it now checks the summary-first fallback and full-detail Labor behavior. (3) the Flock source-contract test expected the old egg import label; it now matches the current CSV/Excel label.
+- In the captured run, npm run check-farms, npm run check-sync, npm run check-ui, npm run check-workbench, and npm run check-workbench-runtime all passed.
+- The log contains no Dairy, Flock, or Agri production build command. Rerun the root test suite and all three builds after this patch. This commit records fixes; it does not claim the corrected tests have already passed.
+- npm ci reported unresolved audit findings: root 5 (1 moderate, 2 high, 2 critical); Dairy backend 6 (3 moderate, 3 high), Dairy client 4 (1 moderate, 2 high, 1 critical); Flock backend 6 (3 moderate, 3 high), Flock client 3 (2 high, 1 critical); Agri backend 5 (3 moderate, 2 high), Agri frontend 6 (5 high, 1 critical). No blanket or forced audit fix was run.
+- Browser/live role checks and real-MongoDB/database-copy migration, backup/restore, index, and multi-process concurrency checks remain postponed to the single final project-wide pass. They are not listed as unfinished phase implementation work.
+
+---
 ## Owner decision: final verification timing (2026-10-24)
 
 Browser/live UI testing and role walkthroughs, plus all real-MongoDB/database-copy validation for **every phase (0–7)**, are **POSTPONED until one consolidated project-wide pass after all phases have implementation complete**. This includes multi-process concurrency, index/migration tests, backup/restore on disposable copies and the final browser matrix. They are not per-phase blockers. Never use production data.
@@ -24,7 +34,7 @@ Local unit/source tests, memory-mode HTTP integration tests, MUF parity and scop
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-24 (Agri summary-first loading, complete crop history on demand, cross-farm regression fixtures, Flock XLSX previews and final-pass deferral policy added; local verification pending.)
+Last updated: 2026-10-24 (recorded the local test checkpoint; three brittle test/fixture failures corrected; production builds still need to run.)
 ## Phase 3 follow-up: runtime pagination and task-bulk regression coverage (2026-10-23)
 
 - Added runtime HTTP integration coverage that requests adjacent one-record pages from Agri crops, tasks and finance, checks stable total/page metadata across requests, and rejects duplicate IDs across the page boundary.
@@ -367,7 +377,7 @@ Owner approved simplifying the old individual-bird workflow. The retained Home B
 - Daily labor attendance now has an optional `batchId` field. The attendance add/edit forms can assign a worker's shift to a batch, the list shows the batch, and the workload panel summarizes distinct workers assigned to each active batch during the selected month. General/unassigned work remains supported; wage calculations remain unchanged.
 - Server-side `laborAttendance` bucket validation checks linked batch IDs against the selected farm, preventing cross-farm assignments through direct API writes.
 - Added unit tests for batch labor assignment validation in `tests/flock-batch-labor.test.ts`, alongside the six incubation allocation tests. **These tests have not been run yet.** No build, API integration test, browser test or GitHub Actions run has been performed for these latest commits.
-- **Remaining Phase 2 work:** review Dashboard, Health and Summary for true batch-first workflows rather than supplementary panels; surface calculated available egg counts in the incubation UI; verify batch log deletion and linked-history behavior in tests; finish any necessary backup/restore compatibility checks. Then deliberately run the manual GitHub Actions workflow. Browser and role end-to-end testing remain deferred until all phases are complete.
+- **Remaining Phase 2 implementation work:** make Dashboard, Health and Summary genuinely batch-first; finish the batch-linked Labor workflow; guard egg-log edits against reducing net supply below existing incubation allocations. Available and unallocated egg counts are already surfaced in Incubation. The captured run passed the relevant Flock inventory-coordination and allocation suites apart from the stale import-label source assertion. Real-MongoDB concurrency and disposable-copy backup/restore are postponed to the final project-wide pass.
 
 ## Phase 2 implementation update (2026-10-23): available egg counts in incubation
 

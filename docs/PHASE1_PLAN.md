@@ -61,7 +61,7 @@ The wrapper works on real MongoDB models and on the memory-mode demo models, so 
 - **In-memory demo store:** now supports `save()`, `findByIdAndUpdate`, `findByIdAndDelete` and timestamps on Farm. These were needed by the shared farms router and change nothing for other models.
 - Also: `X-Farm-Id` was added to the allowed CORS headers (Agri and Dairy), so a frontend served from another origin can send it.
 
-## Flock (step 1B-2, implementation in progress)
+## Flock (step 1B-2, implementation delivered; final data-copy verification postponed)
 
 - **Farm-owned:** `DataStore` buckets, `Batch`, all five batch-log collections, and `Image`. `User`, `PasswordReset`, and `Farm` remain global.
 - **Legacy bucket layout:** one document per `farmId + key`. The existing bucket `value` and optimistic-concurrency `version` remain intact. The migration tags existing documents into the default farm, then drops the old globally-unique `key_1` index and creates the compound unique `farmId + key` index. The new `farmId` schema path stays optional until migration so old documents can be read and tagged.
@@ -70,7 +70,7 @@ The wrapper works on real MongoDB models and on the memory-mode demo models, so 
 - **Migration:** `flock_farm/backend/scripts/migrate-farms.js`; `npm run migrate:farms:dry` reports untagged records and legacy roles without applying the farm migration, while `npm run migrate:farms` applies it. Real data is never migrated at startup. Memory/demo data is disposable and migrates automatically.
 - Phase 2 will later move the large legacy bucket lists into proper collections; that restructure is not part of 1B-2.
 
-**Local checks still required where not yet reported:** keep Flock HTTP scope/security tests and automated builds passing. Browser review, migration against a database copy and backup/restore validation are postponed to the final project-wide verification pass after all planned phases have implementation complete.
+**Local check status (2026-10-24):** the captured npm run check-farms run passes Flock farm-scoped HTTP/role checks, and shared parity/UI safety checks also passed. The log does not show all three production builds, so the local build gate remains unverified. Browser review, migration against a database copy and backup/restore validation are postponed to the final project-wide verification pass; they are not Phase 1 implementation blockers.
 
 ## What is checked
 

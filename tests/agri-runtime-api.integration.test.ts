@@ -329,6 +329,7 @@ describe.sequential('Agri runtime API integration', () => {
     });
     expect(createFarm.response.status).toBe(201);
     const farmB = String(createFarm.data._id);
+    const farmBTag = suffix + '-farmB';
     const emptyB = await request('/analytics/summary', { token: ownerToken, farmId: farmB });
     expect(emptyB.response.status).toBe(200);
     expect(emptyB.data.cropSummary.total).toBe(0);
@@ -342,7 +343,7 @@ describe.sequential('Agri runtime API integration', () => {
       token: ownerToken,
       farmId: farmB,
       body: {
-        name: suffix + ' wheat',
+        name: farmBTag + ' wheat',
         variety: 'Local',
         status: 'Growing',
         season: 'Rabi',
@@ -360,7 +361,7 @@ describe.sequential('Agri runtime API integration', () => {
       token: ownerToken,
       farmId: farmB,
       body: {
-        title: suffix + ' irrigation',
+        title: farmBTag + ' irrigation',
         crop_id: cropId,
         status: 'Pending',
         priority: 'Medium',
@@ -373,13 +374,13 @@ describe.sequential('Agri runtime API integration', () => {
       method: 'POST',
       token: ownerToken,
       farmId: farmB,
-      body: { category: suffix + ' income', type: 'income', amount: 320, date, crop_id: cropId, notes: suffix },
+      body: { category: farmBTag + ' income', type: 'income', amount: 320, date, crop_id: cropId, notes: farmBTag },
     });
     const expense = await request('/finance', {
       method: 'POST',
       token: ownerToken,
       farmId: farmB,
-      body: { category: suffix + ' expense', type: 'expense', amount: 120, date, crop_id: cropId, notes: suffix },
+      body: { category: farmBTag + ' expense', type: 'expense', amount: 120, date, crop_id: cropId, notes: farmBTag },
     });
     expect(income.response.status).toBe(201);
     expect(expense.response.status).toBe(201);
@@ -407,23 +408,23 @@ describe.sequential('Agri runtime API integration', () => {
     expect(monthly[1]).toMatchObject({ income: 320, expense: 120, cropsCount: 1 });
 
     const [farmBPage, farmAPage] = await Promise.all([
-      request('/crops?skip=0&limit=10&search=' + encodeURIComponent(suffix), { token: ownerToken, farmId: farmB }),
-      request('/crops?skip=0&limit=10&search=' + encodeURIComponent(suffix), { token: ownerToken, farmId: farmA }),
+      request('/crops?skip=0&limit=10&search=' + encodeURIComponent(farmBTag), { token: ownerToken, farmId: farmB }),
+      request('/crops?skip=0&limit=10&search=' + encodeURIComponent(farmBTag), { token: ownerToken, farmId: farmA }),
     ]);
     expect(farmBPage.response.headers.get('x-total-count')).toBe('1');
     expect(farmAPage.response.headers.get('x-total-count')).toBe('0');
-    const farmBTasks = await request('/tasks?skip=0&limit=10&crop_search=' + encodeURIComponent(suffix), {
+    const farmBTasks = await request('/tasks?skip=0&limit=10&crop_search=' + encodeURIComponent(farmBTag), {
       token: ownerToken, farmId: farmB,
     });
-    const farmATasks = await request('/tasks?skip=0&limit=10&crop_search=' + encodeURIComponent(suffix), {
+    const farmATasks = await request('/tasks?skip=0&limit=10&crop_search=' + encodeURIComponent(farmBTag), {
       token: ownerToken, farmId: farmA,
     });
     expect(farmBTasks.response.headers.get('x-total-count')).toBe('1');
     expect(farmATasks.response.headers.get('x-total-count')).toBe('0');
-    const farmBLedger = await request('/finance?skip=0&limit=10&search=' + encodeURIComponent(suffix), {
+    const farmBLedger = await request('/finance?skip=0&limit=10&search=' + encodeURIComponent(farmBTag), {
       token: ownerToken, farmId: farmB,
     });
-    const farmALedger = await request('/finance?skip=0&limit=10&search=' + encodeURIComponent(suffix), {
+    const farmALedger = await request('/finance?skip=0&limit=10&search=' + encodeURIComponent(farmBTag), {
       token: ownerToken, farmId: farmA,
     });
     expect(farmBLedger.response.headers.get('x-total-count')).toBe('2');

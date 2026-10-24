@@ -253,7 +253,9 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(app).toContain('setExpenseCategoryRows(rows)');
     expect(app).toContain('expenseCategoryRows.map(f => (');
     expect(app).not.toContain('filteredPeriodFinance.filter(f => f.type === \'expense\' && f.category === selectedExpenseCategory.category).map(f => (');
-    expect(app).toContain('activeTab === \'labor\'\n                  ? tasks.filter(t => t.status === \'Pending\'');
+    expect(app).toContain("const pendingTasksWithCrew = activeTab === 'labor'");
+    expect(app).toContain("tasks.filter(t => t.status === 'Pending' && (t.laborer_ids || []).length > 0)");
+    expect(app).toContain('analyticsSummary?.taskSummary?.recentPendingWithCrew');
     expect(app).toContain('serverFinanceSummary?.monthlyIncomeSeries');
   });
 
