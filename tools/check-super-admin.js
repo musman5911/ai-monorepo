@@ -106,8 +106,8 @@ async function checkProject(project, port) {
   }
 }
 
-function checkSource(path, expected, label) {
-  const source = fs.readFileSync(path.join(ROOT, path), 'utf8');
+function checkSource(relativePath, expected, label) {
+  const source = fs.readFileSync(path.join(ROOT, relativePath), 'utf8');
   ok(expected.test(source), label);
 }
 
