@@ -44,10 +44,11 @@ npm run check-sync
 npm run check-ui
 npm run check-workbench
 npm run check-farms
+npm run check-super-admin
 npm run check-docs
 tools\build-all.bat
 ```
-Run the build in each app that this phase touched (or `tools\build-all.bat` for all three). `npm run check-workbench-runtime` is optional and needs port 5000 free.
+Run the build in each app that this phase touched (or `tools\build-all.bat` for all three). `npm run check-super-admin` starts all three backends in memory mode and requires their backend dependencies to be installed (`npm ci` in each backend folder). `npm run check-workbench-runtime` is optional and needs port 5000 free.
 
 ## Done checklist
 
