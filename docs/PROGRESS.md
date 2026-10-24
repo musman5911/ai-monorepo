@@ -83,9 +83,9 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 |---|---|
 | 0. Docs reset and repository cleanup | Done. Applied by the owner, pushed to the `muf-monorepo` branch, owner's checks and builds all passed |
 | 1. Farms and roles (MUF) | Implementation substantially delivered; local farm-scope, shared-MUF and UI checks pass. Disposable database-copy migration/backup and browser/role review are postponed to the final project-wide verification pass after all phases have implementation complete |
-| 2. Flock restructure and Home Birds | Partial. Batches default and batch egg/vaccination logs plus calculations are implemented and automated checks pass. Dashboard, Health, Labors, Incubation and Summary are not yet all batch-driven; backup/restore copy validation remains open |
-| 3. Bulk entry, scroll loading, server totals | In progress: opt-in Dairy cows/milk API pagination and query validation are implemented; UI incremental loading and bulk entry remain |
-| 4. Dairy breeding; Agri fields and seasons | In progress: optional Dairy lineage fields and farm-scoped ear-tag unique index are implemented; sire workflow, lineage automation, Agri fields/seasons and MongoDB index verification remain |
+| 2. Flock restructure and Home Birds | Batch-first screens, egg/vaccination logs, batch labor and inventory guards are implemented with regression coverage. Remaining workflow/code gaps stay tracked in the dated notes below. Real-MongoDB concurrency and database-copy backup/restore are postponed to final project-wide verification |
+| 3. Bulk entry, scroll loading, server totals | Implementation scope is in place, awaiting local verification: Dairy paging/imports, Flock paging and CSV/XLSX batch-log imports, and Agri paged lists, farm-scoped summaries and on-demand crop history. Root tests/checks and all three builds remain to run on the latest branch |
+| 4. Dairy breeding; Agri fields and seasons | In progress: optional Dairy lineage fields and farm-scoped ear-tag unique index are implemented; sire workflow, lineage automation and Agri fields/seasons remain. MongoDB index verification is postponed to final project-wide verification |
 | 5. Photo storage and Cloudinary | Not started. Prerequisite done: free Cloudinary account created 2026-10-22 |
 | 6. Super Admin upgrade | Not started. The tab and farm-summary endpoints already exist |
 | 7. MU Farms shop | Not started |
@@ -105,7 +105,13 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 - **Hosting:** the owner uses the free MongoDB tier and Replit, so size and quota limits matter (see `DEPLOYMENT.md`).
 - **MU Farms shop:** later. There is no budget for a new domain; where it lives is decided in Phase 7.
 
-## Current status and next action
+## Current status and next action (2026-10-24)
+
+- Phase 03 implementation scope is now in place on \`muf-monorepo\`: Agri farm-scoped summary-first dashboard/report loading, paged detail lists, full crop history and expense-category drill-downs on demand, cross-farm aggregate/bulk fixtures and safe seed-ledger lookup; Flock per-batch CSV/XLSX previews; and existing Dairy/Flock paging/import workflows.
+- The latest source/tests/docs commits have **not yet been run locally**. Next local gate: pull \`muf-monorepo\`, run \`npm test\`, all \`check-* \` scripts listed below, and production builds for Dairy, Flock and Agri. Fix any failures before treating Phase 03 as locally verified.
+- Per owner decision, browser/live UI role testing and all real-MongoDB/database-copy verification for every phase (0–7) are **postponed to a single final project-wide pass after all phases have implementation complete**. They do not block current local implementation work. Never test against production data.
+
+## Historical checkpoint (2026-10-23; superseded by the current status above)
 
 - The owner synced local `muf-monorepo` to `2d4d788` and reported a clean working tree. `npm test` passed 89 tests across 9 files; `npm run check-farms`, `npm run check-ui`, `npm run check-sync`, and `npm run check-workbench` passed; the Flock client `npm run build` passed; and `npm run check-workbench-runtime` passed all 8 checks after starting the Dairy Vite server on port 5000. These are local results supplied by the owner, not a claim that every workflow was browser-tested.
 - Phase 2 implementation step: Dashboard now loads its operational KPIs and recent-batch list from the authenticated batch API, with an explicit loading-failure message and a shortcut to Batches. Commits `d2939da` and `1df705b` on `muf-monorepo`; the active-batch KPI uses the actual `Active` enum value. Health now also shows recent batch vaccination history by batch, with record counts, bird counts, dates, doses and costs (`d3be222`, hook import fix `9815fc2` and JSX wrapper fix `4259907`). Source-level work only; automated verification is pending.
