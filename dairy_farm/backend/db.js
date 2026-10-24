@@ -395,7 +395,7 @@ const FARM_SCOPED = {
   Supplier: SupplierSchema, SupplierPayment: SupplierPaymentSchema, RateHistory: RateHistorySchema,
   DailyLog: DailyLogSchema, Sale: SaleSchema,
 };
-const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
+export const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
 for (const schema of Object.values(FARM_SCOPED)) {
   schema.add({ farmId: { type: String, index: true } });
 }
