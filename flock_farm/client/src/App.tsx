@@ -241,7 +241,15 @@ export default function App() {
     };
   }, [currentUser, loadVersion]);
 
-  const savesEnabled = !!currentUser && isLoaded;
+  // The owner can inspect every farm in All farms mode, but must not be
+  // able to mutate local state and then watch the server reject the save.
+  // The farm switcher reloads the page after selection, so this is stable
+  // for the lifetime of this app instance.
+  const isReadOnlyAll = role === 'admin' && (() => {
+    try { return localStorage.getItem('muf_active_farm_flock') === 'all'; }
+    catch { return false; }
+  })();
+  const savesEnabled = !!currentUser && isLoaded && !isReadOnlyAll;
   const sBirds = useDebouncedSave('birds', birds, savesEnabled);
   const sExpenses = useDebouncedSave('expenses', otherExpenses, savesEnabled);
   const sFeed = useDebouncedSave('feed', feedRecords, savesEnabled);
@@ -267,12 +275,12 @@ export default function App() {
 
   const isAdmin = role === 'admin';
   // Workers can add/edit daily-log records but cannot delete or manage structural data
-  const canDelete = isAdmin;
+  const canDelete = isAdmin && !isReadOnlyAll;
   // Daily-log modules (feed, eggs, expenses, vaccinations, sales, incubation,
   // checklist, diary, health updates): allowed for both admin and worker.
-  const canLogDaily = !!currentUser;
+  const canLogDaily = !!currentUser && !isReadOnlyAll;
   // Structural modules (add/delete birds, customers, settings): admin only.
-  const canManageStructure = isAdmin;
+  const canManageStructure = isAdmin && !isReadOnlyAll;
 
   const handleDatePreset = (preset: 'all' | 'month' | '30d') => {
     if (preset === 'all') {
