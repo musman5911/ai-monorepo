@@ -80,7 +80,7 @@ async function main() {
     if (!eventId) throw new Error(`Event create failed: ${JSON.stringify(eventResponse.json)}`);
 
     const cowAfterCreate = await call('GET', '/api/cows/cow8', { token: owner, farm: String(farmA._id) });
-    ok(cowAfterCreate.status === 200 && cowAfterCreate.json?.cow?.heatDate === today, 'creating a heat event synchronizes the legacy cow heatDate');
+    ok(cowAfterCreate.status === 200 && cowAfterCreate.json?.heatDate === today, 'creating a heat event synchronizes the legacy cow heatDate');
 
     const tomorrowDate = new Date();
     tomorrowDate.setUTCDate(tomorrowDate.getUTCDate() + 1);
@@ -90,7 +90,7 @@ async function main() {
     });
     ok(update.status === 200 && update.json?.date === tomorrow, 'owner can edit an existing breeding event');
     const cowAfterUpdate = await call('GET', '/api/cows/cow8', { token: owner, farm: String(farmA._id) });
-    ok(cowAfterUpdate.json?.cow?.heatDate === tomorrow, 'editing an event resynchronizes the legacy cow date');
+    ok(cowAfterUpdate.json?.heatDate === tomorrow, 'editing an event resynchronizes the legacy cow date');
 
     const service = await call('POST', '/api/breeding/events', {
       token: owner, farm: String(farmA._id),
@@ -98,7 +98,7 @@ async function main() {
     });
     ok(service.status === 201, 'service event accepts a valid in-farm bull');
     const cowAfterService = await call('GET', '/api/cows/cow2', { token: owner, farm: String(farmA._id) });
-    ok(cowAfterService.json?.cow?.pregnancyDate === today, 'service event synchronizes the legacy breeding date');
+    ok(cowAfterService.json?.pregnancyDate === today, 'service event synchronizes the legacy breeding date');
 
     const calving = await call('POST', '/api/breeding/events', {
       token: owner, farm: String(farmA._id),
@@ -106,7 +106,7 @@ async function main() {
     });
     ok(calving.status === 201, 'calving event can be recorded without automatically creating a calf');
     const cowAfterCalving = await call('GET', '/api/cows/cow1', { token: owner, farm: String(farmA._id) });
-    ok(cowAfterCalving.json?.cow?.calvingDate === today, 'calving event synchronizes the legacy cow calving date');
+    ok(cowAfterCalving.json?.calvingDate === today, 'calving event synchronizes the legacy cow calving date');
 
     const listA = await call('GET', '/api/breeding/events?page=1&limit=20&cowId=cow8', { token: owner, farm: String(farmA._id) });
     ok(listA.status === 200 && listA.json?.events?.some((event) => event._id === eventId), 'event appears in paginated list for its farm and cow');
