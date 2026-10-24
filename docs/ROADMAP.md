@@ -39,7 +39,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 
 ## Current checkpoint
 
-Phase 1 is **Done**. The owner reported passing local Windows CMD results for the 13-test Phase 1 regression test, three-app runtime authorization check, full Vitest suite (24 files, 232 tests), shared sync/UI/workbench/farm/docs checks, and all three production builds. Phase 2 is now in progress: Dairy breeding events on the server. Its schema and API contract are documented before coding. GitHub Actions are not required for local verification.
+Phase 1 is **Done**. The owner reported passing local Windows CMD results for the 13-test Phase 1 regression test, three-app runtime authorization check, full Vitest suite (24 files, 232 tests), shared sync/UI/workbench/farm/docs checks, and all three production builds. Phase 2 is now in progress: Dairy breeding events on the server. The model, API, backup/restore integration and local checks have been added to the branch; local verification is still pending. GitHub Actions are not required for local verification.
 
 ## Why this order
 
