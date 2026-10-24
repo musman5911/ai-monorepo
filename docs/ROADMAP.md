@@ -1,14 +1,18 @@
 ## Current Phase 01 verification status (2026-10-24)
 
-Phase 01 remains **OPEN**. The owner ran memory-mode farm-deletion, backup/restore and single-process concurrency checks. Those tests exposed three functional bugs and one minor migration setup issue. Fixes and regression tests are committed as `b09f9d3`, but the post-fix local test/check/build rerun has not yet been reported.
+Phase 01 remains **OPEN**. The owner’s local rerun in `F:\\PROJECTS\\dairy\\muf-monorepo` pulled through checkout `6ed7aee`, which includes source-fix commit `b09f9d3`. The post-fix local automated checks and builds passed. Real-MongoDB checks remain postponed; the custom 84-case deletion harness and endpoint-level >3.3 MB Flock image restore were not shown in the pasted rerun output.
 
-Owner evidence before fixes:
-- Farm deletion safety: **82/84 passed**. Two failures were Dairy memory-mode cow delete and Flock DataStore bucket collisions during move-delete. Disposable temporary instances passed last-farm/last-active-farm guards 12/12 across all three apps.
-- Backup validation: Agri **13/13**, Dairy **11/11**. Flock's clean-restart run passed **10/10** for cases exercised, but the coverage exposed a critical Base64 regex stack overflow on image payloads around 3.3-3.6 MB.
-- Memory-mode concurrency: 12 parallel writes across two farms per app had no cross-farm leakage; cross-farm deletes were rejected; a Flock stale-`baseVersion` race returned one 200 and one 409.
-- Static source review confirmed intended index declarations; actual MongoDB index listings/query plans were not checked.
+Latest owner-reported local verification:
+- `npm test`: **23 files passed, 219/219 tests passed**, including the new DataStore collision merge and 4 MiB Base64 regression tests.
+- `npm run check-farms`: passed for all three apps; its output includes farm isolation, roles, All farms backup/restore and standard farm move/delete flows.
+- `npm run check-sync` and `npm run check-ui`: passed.
+- `npm run check-workbench`: **23/23** source checks passed.
+- `npm run check-workbench-runtime`: **8/8** runtime smoke checks passed.
+- Production builds passed for Agri, Dairy and Flock.
+- Non-fatal build warnings: Agri deprecated `advancedChunks` plus a 659 kB chunk; Dairy mixed static/dynamic `api.ts` import and about 760 kB largest chunk; Flock about 977 kB largest chunk.
+- Earlier owner-reported tests: farm deletion 82/84 before fixes; disposable-instance `LAST_FARM`/`LAST_ACTIVE_FARM` guards 12/12; backup validation Agri 13/13, Dairy 11/11 and Flock 10/10 for their tested scenarios; memory-mode concurrency checks passed for the listed cases.
 
-Fixes in `b09f9d3`: Dairy memory DB now implements `findOneAndDelete`; shared MUF farm-deletion code merges colliding Flock DataStore buckets while preserving moved values and incrementing version; large Base64 image restore no longer uses the stack-overflowing regex; Flock migration loads `dotenv/config` before checking its environment. Regression tests were added. These new tests have not yet run locally.
+Fixes in `b09f9d3`: Dairy memory DB implements `findOneAndDelete`; shared MUF farm-deletion code merges colliding Flock DataStore buckets and advances destination version; large Base64 image restore avoids the stack-overflowing regex; Flock migration loads `dotenv/config` before checking its environment. The new source regression tests now pass in the owner’s 219/219 root test run.
 
 **POSTPONED until the consolidated project-wide verification pass:** migrations/apply/idempotency on disposable MongoDB copies, actual index/query-plan checks, persistent backup/restore and Mongo-backed chunk-corruption checks, shared-Mongo/two-process Flock egg-lock concurrency, and physical browser walkthroughs. Never use production data.
 
@@ -18,13 +22,13 @@ See [PHASE-01-FINAL-VERIFICATION.md](PHASE-01-FINAL-VERIFICATION.md) for detaile
 
 Memory-mode automated tests, farm-scope checks, shared-file parity, UI safety and production builds continue at implementation checkpoints. The owner has postponed the remaining MongoDB-dependent and physical-browser checks until one consolidated project-wide verification pass after all planned implementation phases are complete. POSTPONED means not performed, not passed. Never run migrations or destructive validation against production.
 
-## Latest owner-reported checkpoint (2026-10-24; before the current fix commit)
+## Latest owner-reported local checkpoint (2026-10-24; checkout 6ed7aee)
 
-- Root `npm test`: 23 test files, 215/215 tests passed on the prior source revision.
-- `npm run check-farms`, `npm run check-sync`, `npm run check-ui`, and `npm run check-workbench`: passed on that prior revision; workbench reported 23 source checks.
-- Agri, Dairy and Flock frontend production builds passed on that prior revision with non-fatal bundle/import/deprecation warnings.
-- Earlier memory-mode role/isolation and backup/restore HTTP checks reported 128/128 passes, but they did not cover all defects discovered in the latest deletion/image validation.
-- Post-fix tests/builds have not run. Do not carry previous results forward as proof for this fix commit.
+- Root `npm test`: 23 test files, 219/219 tests passed.
+- `npm run check-farms`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, and `npm run check-workbench-runtime`: passed; workbench reported 23/23 source checks and 8/8 runtime checks.
+- Agri, Dairy and Flock frontend production builds passed with non-fatal bundle/import/deprecation warnings listed above.
+- The custom 84-case deletion run and endpoint-level restore using an image above the previous Base64-regex crash threshold were not shown in the pasted output; do not infer those separate manual scenarios passed.
+- Persistent MongoDB/database-copy checks remain postponed.
 
 ### Phase 3 step: Agri task and finance bulk imports
 
@@ -53,7 +57,7 @@ Agri DiaryMedia, Dairy supplier/payment registries, owner All farms selector, co
 | Phase | What | Projects | Risk |
 |---|---|---|---|
 | 0 | Docs reset and repository cleanup | Repository | Low (done, see PROGRESS) |
-| 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Core implementation and fixes for Dairy memory-mode delete, Flock DataStore move collisions, large Base64 image restore and Flock migration dotenv loading. Regression tests added; current fix commit needs local test/check/build rerun. **POSTPONED:** real MongoDB migration/index/query/backup checks, shared-Mongo concurrency and physical browser walkthrough until consolidated project-wide verification |
+| 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Owner-reported post-fix local gate passes on checkout 6ed7aee: root suite 219/219, farm/sync/UI/workbench checks, runtime 8/8 and all three frontend builds. **Still open:** complete custom 84-case deletion retest and endpoint-level >3.3 MB Flock image restore not evidenced in pasted output. **POSTPONED:** real MongoDB migration/index/query/backup checks, shared-Mongo concurrency and physical browser walkthrough until consolidated project-wide verification |
 | 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | Core restructure, batch logs, allocation checks and shared inventory locking are implemented. Remaining implementation: make Dashboard/Health/Summary truly batch-first, complete the batch-linked Labor workflow, and protect existing incubation allocations from egg-log edits. Local tests/builds remain gates; real-MongoDB concurrency and database-copy backup/restore are postponed |
 | 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | Implementation scope is in place, but the captured pre-repair root suite reported 202/205 tests passing. Two source-contract assertions and one cross-farm test fixture are corrected; rerun the root suite, checks and all three production builds before sign-off. Browser/live UI and real-MongoDB/database-copy checks are postponed |
 | 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | In progress: optional cow lineage fields and ear-tag index added; workflows remain. Real-MongoDB index verification is postponed to the final project-wide pass |
@@ -67,17 +71,17 @@ Removed the old progress, roadmap, deployment and audit documents, the screensho
 
 ### Phase 1: Farms and roles
 
-The shared farm model, per-record `farmId`, owner/manager/worker roles, server-side scoping, owner All farms read-only mode, backups/restores and deletion UI are implemented in source. The latest owner validation found and reported the following defects:
+The shared farm model, per-record `farmId`, owner/manager/worker roles, server-side scoping, owner All farms read-only mode, backup/restore and deletion UI are implemented in source. Fix commit `b09f9d3` addresses the reported Dairy memory-mode delete bug, Flock DataStore move collisions, large Base64 restore stack overflow, and Flock migration dotenv loading.
 
-- Dairy memory-mode DELETE failed because its adapter lacked `findOneAndDelete`.
-- Flock move-delete could collide on the unique `(farmId, key)` DataStore index, making moved data unreachable. Collision-safe bucket merging was added to all three identical MUF farm helpers.
-- Flock image restore's Base64 regex overflowed on large valid images. It has been replaced by decode-and-round-trip validation, with a new 4 MiB byte-for-byte regression test.
-- Flock's farm migration now loads `dotenv/config` before its environment guard.
-- Fix commit: `b09f9d3`. Regression tests are added but the post-fix local test/check/build run is still pending.
+The owner’s local verification on checkout `6ed7aee` reports:
+- Root suite: 23 files, 219/219 tests passed.
+- `check-farms`, `check-sync`, `check-ui`, `check-workbench` (23 source checks), and `check-workbench-runtime` (8 checks) passed.
+- Agri, Dairy and Flock production frontend builds passed with non-fatal bundle/import/deprecation warnings.
+- Regression coverage for DataStore bucket merging and 4 MiB Base64 restoration is included in the passing root suite.
 
-The owner-reported pre-fix results were farm deletion 82/84, temporary-instance final-farm guards 12/12, Agri backup 13/13, Dairy backup 11/11, Flock backup 10/10 for the cases then exercised, and memory-mode concurrency checks with no cross-farm leakage in the stated scenarios.
+Still to confirm from the manual test results: rerun the complete custom 84-case farm-deletion safety harness after the fixes and exercise the actual Flock restore endpoint with an image above the old 3.3-3.6 MB crash threshold after a clean backend restart. The pasted command log did not show these two separate manual checks.
 
-**POSTPONED until the consolidated project-wide verification pass:** disposable MongoDB migration dry-run/apply/idempotency, real index listings and query plans, persistent backup/restore including Flock exact image bytes and monthly chunk corruption, shared-Mongo/two-process egg-lock concurrency, and physical browser walkthroughs. Never use production data. See [PHASE-01-FINAL-VERIFICATION.md](PHASE-01-FINAL-VERIFICATION.md).
+**POSTPONED until the consolidated project-wide verification pass:** disposable MongoDB migration dry-run/apply/idempotency, actual index listings and query plans, persistent backup/restore and Mongo-backed missing/corrupt monthly chunk handling, shared-Mongo/two-process egg-lock concurrency, and physical browser walkthroughs. Never use production data. See [PHASE-01-FINAL-VERIFICATION.md](PHASE-01-FINAL-VERIFICATION.md).
 
 ### Phase 2: Flock restructure
 

@@ -1,6 +1,6 @@
 # Phase 01 final verification checklist
 
-Status: OPEN. Updated 2026-10-24. Owner has now run memory-mode farm-deletion, backup/restore, and single-process concurrency checks. Those tests found three functional bugs and one minor migration setup issue. Source fixes and regression tests were committed as `b09f9d3`; the new tests/checks/builds still need to be run locally. Real-MongoDB checks remain POSTPONED until the consolidated project-wide verification pass. Never use production data.
+Status: OPEN. Updated 2026-10-24 after the owner’s local rerun on checkout `6ed7aee` (includes source-fix commit `b09f9d3`). Root tests, farm/sync/UI/workbench checks, workbench runtime smoke test, and all three frontend production builds passed. Real-MongoDB checks remain POSTPONED until the consolidated project-wide verification pass. Never use production data.
 
 ## Owner-reported results before the fix commit
 
@@ -11,14 +11,14 @@ Status: OPEN. Updated 2026-10-24. Owner has now run memory-mode farm-deletion, b
 - Disposable temporary instances on ports 5820-5822 were discarded after testing. `LAST_FARM` and `LAST_ACTIVE_FARM` guards passed 12/12 across all three apps.
 - **Bug A, Dairy memory mode:** cow DELETE returned 500 because `dairy_farm/backend/memory-db.js` lacked `findOneAndDelete`. Fixed; regression coverage now exercises the scoped by-ID delete path.
 - **Bug B, Flock farm move:** DataStore buckets with the same key were simply re-stamped with the destination `farmId`. This made moved values unreachable; on real MongoDB the unique `(farmId, key)` index would raise E11000 partway through the move. Fixed in all three byte-identical MUF farm helpers: merge colliding DataStore buckets, union array entries by stable row identity, retain object fields, increment the destination version, and only remove the source bucket after the destination write succeeds. Non-colliding buckets are moved separately.
-- Regression coverage was added for merging a colliding `birds` bucket and moving a non-colliding `eggs` bucket. **The original 82/84 run predates the fix; rerun is required.**
+- Regression coverage was added for merging a colliding `birds` bucket and moving a non-colliding `eggs` bucket. The owner’s post-fix `npm test` passed 219/219 tests, and `npm run check-farms` passed for all three apps. **The custom 84-case deletion run was not included in the pasted rerun log**, so record it as not yet rerun separately rather than claiming 84/84.
 
 ## 2. Backup and restore validation (memory mode)
 
 - **Agri: 13/13 passed.** DiaryMedia, photos, linked-entity associations, record `_id` values and `farmId` values survived backup/restore in All-Farms mode; farm isolation remained intact.
 - **Dairy: 11/11 passed.** Supplier and SupplierPayment records preserved `_id`, `supplierId` relationships and farm scope.
 - **Flock: 10/10 passed after a clean restart** for the cases exercised: a 1 MB image round trip, manual restore in All-Farms mode, a JSON payload above 10 MB, explicit 413 for payloads above the 100 MB limit without mutation, legacy backups lacking image fields not wiping images, malformed image rows rejected before mutation, and a monthly image snapshot assembled byte-for-byte from two chunks.
-- **Bug C, critical Flock image restore:** `restoreBackupImages` used a large Base64 regex that overflowed the V8 call stack at about 4.92 million characters, approximately 3.3-3.6 MB of source image bytes. This can make otherwise valid larger photo backups unrestorable. Removed the regex validation; canonical Base64 decode-and-round-trip validation remains. Added a 4 MiB byte-for-byte regression test. **The new test has not yet been run locally.**
+- **Bug C, critical Flock image restore:** `restoreBackupImages` used a large Base64 regex that overflowed the V8 call stack at about 4.92 million characters, approximately 3.3-3.6 MB of source image bytes. This can make otherwise valid larger photo backups unrestorable. Removed the regex validation; canonical Base64 decode-and-round-trip validation remains. Added a 4 MiB byte-for-byte regression test. It passed in the owner’s post-fix `npm test` run (219/219 tests). A separate endpoint-level restore using a >3.3 MB real image after a clean server restart was not shown in the pasted log and remains to be verified.
 - The user-reported corruption tests refused restore before existing image data changed. Mongo-backed missing/corrupt monthly-chunk simulation remains postponed.
 
 ## 3. Concurrency results (memory mode)
@@ -40,15 +40,23 @@ Status: OPEN. Updated 2026-10-24. Owner has now run memory-mode farm-deletion, b
 - Static source review confirmed Flock's unique `(farmId, key)` index `datastore_farm_key_unique`; the migration drops legacy `key_1` and creates the compound index. Farm-first index declarations were found for Flock batch/image access, Dairy milk/expense access and Agri farm query patterns.
 - Static definitions do not prove index creation or query plans in a real database.
 
-## Required local rerun after pulling commit `b09f9d3`
+## Post-fix local verification (2026-10-24)
 
-- [ ] `npm test`, including DataStore collision merge, Dairy scoped delete, Flock dotenv order, and 4 MiB Base64 regression tests.
-- [ ] `npm run check-farms`, including farm-move cases in all three apps.
-- [ ] `npm run check-sync` and `npm run check-ui`.
-- [ ] `npm run check-workbench` and `npm run check-workbench-runtime`.
-- [ ] Production builds for `agri_farm/frontend`, `dairy_farm/client`, and `flock_farm/client`.
-- [ ] Rerun the deletion and Flock large-image cases against a clean memory-mode restart, including byte/metadata preservation and no mutation for malformed/over-limit requests.
-- [ ] Record actual result counts, exact commit SHA, command output summaries and warnings in `docs/PROGRESS.md`.
+The owner pulled through checkout `6ed7aee` (source fixes from `b09f9d3`) in `F:\\PROJECTS\\dairy\\muf-monorepo` and reported these results:
+
+- [x] `npm test`: **23 test files passed, 219/219 tests passed**, including the DataStore bucket collision merge regression, Dairy-compatible `findOneAndDelete`, Flock dotenv-order contract, and 4 MiB Base64 image test.
+- [x] `npm run check-farms`: passed for Agri, Flock and Dairy. The harness reports farm separation, permissions, All-farms backup/restore, and baseline farm move/delete checks.
+- [x] `npm run check-sync`: all MUF shared-file, backend twin and environment parity checks passed.
+- [x] `npm run check-ui`: all MUF UI safety checks passed.
+- [x] `npm run check-workbench`: 23/23 source safety checks passed.
+- [x] `npm run check-workbench-runtime`: 8/8 runtime smoke checks passed.
+- [x] Agri frontend production build passed. Non-fatal warnings: deprecated `advancedChunks` setting and a 659 kB minified chunk.
+- [x] Dairy frontend TypeScript check and production build passed. Non-fatal warning: `api.ts` is imported both statically and dynamically; the largest displayed chunk was about 760 kB.
+- [x] Flock frontend TypeScript check and production build passed. Non-fatal warning: a 977 kB minified chunk.
+- [ ] **Not evidenced in this rerun:** repeat the complete custom 84-case deletion-safety harness after the fixes.
+- [ ] **Not evidenced in this rerun:** exercise the actual Flock restore endpoint with a valid image larger than the former 3.3-3.6 MB crash threshold after a clean backend restart, and check the bytes/metadata plus malformed/over-limit no-mutation behavior.
+
+The source regression suite, static/safety checks, memory-mode farm-scope harness and production builds are green for the current code. This does not prove persistent MongoDB behavior or complete the separate manual scenarios noted above.
 
 ## POSTPONED until the consolidated project-wide verification pass
 

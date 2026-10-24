@@ -8,7 +8,7 @@ Two deletion bugs were found:
 1. **Dairy memory-mode DELETE:** cow deletion returned 500 because `dairy_farm/backend/memory-db.js` did not implement `findOneAndDelete`. Added the Mongoose-compatible filter delete and a regression test through the farm-scoped by-ID path.
 2. **Flock DataStore move collision:** moving a farm simply rewrote `farmId` on every DataStore document. If the destination already had the same key (for example, `birds`), the source bucket's value became unreachable; with the real unique `(farmId, key)` index MongoDB would instead throw E11000. All three identical `muf-farms.mjs` helpers now move DataStore buckets individually: collision buckets are merged; array rows are unioned by stable identity; object fields are retained; destination version increments; source bucket is removed only after the merged destination write succeeds. Non-collision keys are moved directly. Added regression coverage for a colliding `birds` bucket plus a non-colliding `eggs` bucket.
 
-**Backup/restore:** Agri 13/13 passed (DiaryMedia, photos, associations, IDs and farm scope). Dairy 11/11 passed (Supplier/SupplierPayment, `_id`, `supplierId` relationship and farm scope). Flock's clean-restart run passed 10/10 for cases exercised, including 1 MB image round trip, All-Farms restore, JSON over 10 MB, >100 MB rejection without mutation, legacy backup compatibility, corrupt image refusal before mutation and monthly two-chunk assembly. It also exposed a critical issue: Base64 regex validation in `restoreBackupImages` overflowed the V8 call stack around 4.92 million Base64 characters (approximately 3.3-3.6 MB of image bytes). Removed that regex check; canonical decode-and-round-trip validation remains. Added a 4 MiB byte-for-byte regression test. This new test has not yet run locally.
+**Backup/restore:** Agri 13/13 passed (DiaryMedia, photos, associations, IDs and farm scope). Dairy 11/11 passed (Supplier/SupplierPayment, `_id`, `supplierId` relationship and farm scope). Flock's clean-restart run passed 10/10 for cases exercised, including 1 MB image round trip, All-Farms restore, JSON over 10 MB, >100 MB rejection without mutation, legacy backup compatibility, corrupt image refusal before mutation and monthly two-chunk assembly. It also exposed a critical issue: Base64 regex validation in `restoreBackupImages` overflowed the V8 call stack around 4.92 million Base64 characters (approximately 3.3-3.6 MB of image bytes). Removed that regex check; canonical decode-and-round-trip validation remains. Added a 4 MiB byte-for-byte regression test. It passed in the owner’s post-fix `npm test` run (219/219 tests). A separate endpoint-level restore with an image above the old 3.3-3.6 MB threshold after a clean restart was not shown in the pasted log.
 
 **Flock migration setup:** the migration script lacked `import 'dotenv/config'`, so the expected friendly environment guard could be preceded by a raw missing-`MONGODB_URI` error. Added the dotenv import first and a source regression check. The migration guard was safe; memory-mode migration attempts in all three apps exited nonzero and made no changes.
 
@@ -19,7 +19,10 @@ Two deletion bugs were found:
 - Fix commit: `b09f9d3` — `fix(farms): preserve moved buckets and large image restores`.
 - Code fixes: shared collision-safe DataStore move; Dairy `findOneAndDelete`; large Base64 restore validation without the problematic regex; Flock migration dotenv initialization.
 - Regression tests added: moved DataStore bucket merge, scoped Dairy-compatible memory deletion, migration dotenv order and 4 MiB binary image round trip.
-- **Not yet verified:** the updated tests, farm-scope checker, shared parity checks, workbench runtime and all three production builds have not been run after this fix commit. The previous 215/215 result and the pre-fix 82/84 deletion results are historical only; do not report them as a pass for `b09f9d3`.
+- **Post-fix local verification reported on checkout `6ed7aee` (includes `b09f9d3`):** `npm test` passed 23 files / 219/219 tests; `npm run check-farms`, `check-sync`, `check-ui`, and `check-workbench` passed; workbench source checks were 23/23; `check-workbench-runtime` passed 8/8; all three frontend builds passed.
+- Build warnings were non-fatal: Agri deprecated `advancedChunks` and a 659 kB chunk; Dairy mixed static/dynamic import of `api.ts` and a roughly 760 kB chunk; Flock a roughly 977 kB chunk.
+- The post-fix unit regression tests passed, including collision-safe DataStore merge, Dairy-compatible scoped delete, dotenv import order, and 4 MiB Base64 round trip. The custom 84-case deletion harness and actual endpoint-level restore with an image above the former 3.3-3.6 MB crash threshold were not shown in the pasted rerun output; keep those separate checks open.
+- The prior 82/84 deletion count is still the pre-fix result, not a post-fix pass.
 
 ### POSTPONED until consolidated project-wide verification
 
@@ -32,9 +35,9 @@ These remain unperformed and must not be described as passing:
 
 Never use production databases for migrations, destructive restores or farm deletion. The source index declarations were reviewed, but that is not proof of live index creation/query behavior.
 
-See `docs/PHASE-01-FINAL-VERIFICATION.md` for the complete checklist. Phase 01 remains OPEN until the new local rerun passes and postponed checks are completed at the consolidated verification pass.
+See `docs/PHASE-01-FINAL-VERIFICATION.md` for the complete checklist. The post-fix local automated gates and all three builds are reported green. Phase 01 remains OPEN until the separately unreported manual deletion/image-endpoint checks are resolved and postponed MongoDB/browser checks are completed at the consolidated verification pass.
 
-## Latest owner-run checkpoint (2026-10-24; source through dbc41f4)
+## Historical owner-run checkpoint (2026-10-24; source through dbc41f4; superseded by the post-fix checkpoint at the top)
 
 - After pulling dbc41f4, the supplied Windows run reported 204/205 tests passing. The one failure was a stale Flock source-contract expectation: the import validator says 'Duplicate date in import file', not 'Duplicate date in CSV'. The assertion is corrected in this commit.
 - The same run passed check-farms, check-sync, check-ui, check-workbench, and check-workbench-runtime.
@@ -70,7 +73,7 @@ Local unit/source tests, memory-mode HTTP integration tests, MUF parity and scop
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-24 (owner-reported deletion/backup/concurrency checks found three functional bugs plus a migration dotenv issue; fixes and regression tests committed as b09f9d3, local rerun pending; persistent MongoDB/browser checks postponed to consolidated pass).
+Last updated: 2026-10-24 (owner reports 219/219 tests, farm/sync/UI/workbench checks, workbench runtime 8/8 and all three frontend builds passed on checkout 6ed7aee; real-MongoDB/browser checks postponed; full manual deletion and large-image endpoint retests not evidenced in supplied output).
 ## Phase 3 follow-up: runtime pagination and task-bulk regression coverage (2026-10-23)
 
 - Added runtime HTTP integration coverage that requests adjacent one-record pages from Agri crops, tasks and finance, checks stable total/page metadata across requests, and rejects duplicate IDs across the page boundary.
