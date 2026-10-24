@@ -44,7 +44,7 @@ async function validateReferences(payload, res) {
   if (payload.cowId !== undefined) {
     const cow = await Cow.findById(payload.cowId).lean();
     if (!cow) { res.status(400).json({ error: 'Cow not found in the selected farm' }); return false; }
-    if (cow.gender === 'male' || cow.status === 'sold' || cow.status === 'calf' || cow.isCalf) {
+    if (cow.gender === 'male' || cow.status === 'sold' || cow.status === 'inactive' || cow.status === 'calf' || cow.isCalf) {
       res.status(400).json({ error: 'Breeding events require an active female animal, not a bull, sold animal or calf' });
       return false;
     }
@@ -56,12 +56,12 @@ async function validateReferences(payload, res) {
       return false;
     }
   }
-  if (payload.sireSource && payload.sireSource !== 'farm_bull') delete payload.bullId;
+  if (payload.sireSource && payload.sireSource !== 'farm_bull') payload.bullId = '';
   if (payload.sireSource === 'farm_bull') {
-    delete payload.bullName;
-    delete payload.semenCode;
+    payload.bullName = '';
+    payload.semenCode = '';
   }
-  if (payload.sireSource === 'outside_bull') delete payload.semenCode;
+  if (payload.sireSource === 'outside_bull') payload.semenCode = '';
   return true;
 }
 
