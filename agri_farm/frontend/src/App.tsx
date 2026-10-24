@@ -904,8 +904,13 @@ function App() {
   useEffect(() => {
     if (!token) return;
     setLoading(true);
-    refreshData(needsFullDetails).finally(() => setLoading(false));
-  }, [token, activeTab, agriFinanceSubTab]);
+    refreshData(false).finally(() => setLoading(false));
+  }, [token]);
+
+  useEffect(() => {
+    if (!token || !needsFullDetails) return;
+    void refreshData(true);
+  }, [token, needsFullDetails]);
 
   const refreshData = async (includeFullDetails = needsFullDetails) => {
     // Summary-first startup avoids downloading every ledger row just to paint
