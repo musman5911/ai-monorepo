@@ -422,6 +422,111 @@ describe.sequential('Agri runtime API integration', () => {
     });
   });
 
+  it('rejects cross-farm crop references in bulk task/finance imports without partial writes', async () => {
+    const suffix = 'runtime-cross-farm-bulk-' + process.pid + '-' + Date.now();
+    const farms = await request('/farms', { token: ownerToken });
+    expect(farms.response.status).toBe(200);
+    const farmA = String(farms.data.activeFarmId || farms.data.farms[0]._id);
+    const createFarm = await request('/farms', {
+      method: 'POST', token: ownerToken, body: { name: suffix },
+    });
+    expect(createFarm.response.status).toBe(201);
+    const farmB = String(createFarm.data._id);
+
+    const cropA = await request('/crops', {
+      method: 'POST', token: ownerToken, farmId: farmA,
+      body: { name: suffix + ' farm-a crop', status: 'Growing' },
+    });
+    const cropB = await request('/crops', {
+      method: 'POST', token: ownerToken, farmId: farmB,
+      body: { name: suffix + ' farm-b crop', status: 'Growing' },
+    });
+    expect(cropA.response.status).toBe(201);
+    expect(cropB.response.status).toBe(201);
+    created.crops.push(String(cropA.data._id), String(cropB.data._id));
+
+    const beforeB = await request('/analytics/summary', { token: ownerToken, farmId: farmB });
+    expect(beforeB.response.status).toBe(200);
+
+    const invalidTasks = await request('/tasks/bulk', {
+      method: 'POST', token: ownerToken, farmId: farmB,
+      body: { rows: [
+        { title: suffix + ' valid task', priority: 'Low', crop_id: String(cropB.data._id) },
+        { title: suffix + ' invalid cross-farm task', priority: 'Low', crop_id: String(cropA.data._id) },
+      ] },
+    });
+    expect(invalidTasks.response.status).toBe(400);
+    expect(invalidTasks.data.details.some((item) => item.message.includes('selected farm'))).toBe(true);
+    const noTaskWrite = await request('/tasks?skip=0&limit=20&crop_search=' + encodeURIComponent(suffix), {
+      token: ownerToken, farmId: farmB,
+    });
+    expect(noTaskWrite.response.headers.get('x-total-count')).toBe('0');
+
+    const invalidFinance = await request('/finance/bulk', {
+      method: 'POST', token: ownerToken, farmId: farmB,
+      body: { rows: [
+        { category: suffix + ' valid ledger', type: 'income', amount: 50, crop_id: String(cropB.data._id) },
+        { category: suffix + ' invalid cross-farm ledger', type: 'expense', amount: 10, crop_id: String(cropA.data._id) },
+      ] },
+    });
+    expect(invalidFinance.response.status).toBe(400);
+    expect(invalidFinance.data.details.some((item) => item.message.includes('selected farm'))).toBe(true);
+    const noFinanceWrite = await request('/finance?skip=0&limit=20&search=' + encodeURIComponent(suffix), {
+      token: ownerToken, farmId: farmB,
+    });
+    expect(noFinanceWrite.response.headers.get('x-total-count')).toBe('0');
+
+    const validTask = await request('/tasks/bulk', {
+      method: 'POST', token: ownerToken, farmId: farmB,
+      body: { rows: [
+        { title: suffix + ' valid task', priority: 'Low', crop_id: String(cropB.data._id), assigned_to: 'Runtime Assignee' },
+      ] },
+    });
+    expect(validTask.response.status).toBe(201);
+    expect(validTask.data.inserted).toBe(1);
+    const validFinance = await request('/finance/bulk', {
+      method: 'POST', token: ownerToken, farmId: farmB,
+      body: { rows: [
+        { category: suffix + ' valid ledger', type: 'income', amount: 50, date: beforeB.data.monthKey + '-12', crop_id: String(cropB.data._id) },
+      ] },
+    });
+    expect(validFinance.response.status).toBe(201);
+    expect(validFinance.data.inserted).toBe(1);
+
+    const afterB = await request('/analytics/summary', { token: ownerToken, farmId: farmB });
+    expect(afterB.response.status).toBe(200);
+    expect(afterB.data.cropSummary.total).toBe(1);
+    expect(afterB.data.taskSummary.total).toBe(beforeB.data.taskSummary.total + 1);
+    expect(afterB.data.taskSummary.byAssignee).toContainEqual(expect.objectContaining({
+      assignee: 'Runtime Assignee', pending: 1, completed: 0, total: 1,
+    }));
+    expect(afterB.data.taskSummary.recentPending.some((row) => row.title === suffix + ' valid task')).toBe(true);
+    expect(afterB.data.financeSummary.totals.entries).toBe(beforeB.data.financeSummary.totals.entries + 1);
+    expect(afterB.data.financeSummary.totals.income).toBe(beforeB.data.financeSummary.totals.income + 50);
+    expect(afterB.data.financeSummary.byCrop).toContainEqual(expect.objectContaining({
+      crop_id: String(cropB.data._id), income: 50,
+    }));
+
+    const farmAAfter = await request('/analytics/summary', { token: ownerToken, farmId: farmA });
+    expect(farmAAfter.response.status).toBe(200);
+    expect(farmAAfter.data.cropSummary.total).toBeGreaterThanOrEqual(1);
+    const farmAQuery = await request('/crops?skip=0&limit=10&search=' + encodeURIComponent(suffix + ' farm-b'), {
+      token: ownerToken, farmId: farmA,
+    });
+    expect(farmAQuery.response.headers.get('x-total-count')).toBe('0');
+
+    // Find created rows so the test's normal cleanup also works if this suite
+    // is later run against a persistent-but-disposable test fixture.
+    const taskRows = await request('/tasks?skip=0&limit=20&crop_search=' + encodeURIComponent(suffix), {
+      token: ownerToken, farmId: farmB,
+    });
+    for (const row of taskRows.data || []) if (String(row.title || '').startsWith(suffix)) created.tasks.push(String(row._id));
+    const financeRows = await request('/finance?skip=0&limit=20&search=' + encodeURIComponent(suffix), {
+      token: ownerToken, farmId: farmB,
+    });
+    for (const row of financeRows.data || []) created.finance.push(String(row._id));
+  });
+
   it('pages a 1,001-row task fixture over real HTTP without missing or duplicating records', async () => {
     const suffix = `runtime-large-page-${process.pid}-${Date.now()}`;
     const fixtureRows = Array.from({ length: 1001 }, (_, index) => ({
