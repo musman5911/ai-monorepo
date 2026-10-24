@@ -101,7 +101,7 @@ async function checkProject(project, port) {
     ok(managerLogin.status === 200 && manager, 'manager can log in');
     ok(workerLogin.status === 200 && worker, 'worker can log in');
 
-    const url = `/api/super-admin/farm-summary?key=${encodeURIComponent(KEY)}`;
+    const url = '/api/super-admin/farm-summary';
     const ownerSummary = await call('GET', url, { token: owner });
     ok(ownerSummary.status === 200, 'owner can read the Super Admin farm summary');
     ok(Array.isArray(ownerSummary.json?.farms) && ownerSummary.json.farms.length > 0, 'owner receives a separate entry for each active farm');
