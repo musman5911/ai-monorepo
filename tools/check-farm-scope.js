@@ -178,8 +178,10 @@ async function checkFlock(project, call, owner, farmA) {
   const forbidden = await call('GET', '/api/data/eggs', { token: worker, farm: farmA });
   ok(forbidden.status === 403, 'worker cannot select another farm');
 
+  const farmsBeforeBackup = await call('GET', '/api/farms', { token: owner });
+  const expectedFarmCount = Array.isArray(farmsBeforeBackup.json?.farms) ? farmsBeforeBackup.json.farms.length : 0;
   const backup = await call('GET', '/api/backup', { token: owner, farm: farmA });
-  ok(backup.status === 200 && Array.isArray(backup.json.farms) && backup.json.farms.length === 2, 'owner backup includes both farms');
+  ok(backup.status === 200 && Array.isArray(backup.json.farms) && backup.json.farms.length === expectedFarmCount, 'owner backup includes every farm');
 }
 
 async function checkProject(name, project, port) {
@@ -206,19 +208,21 @@ async function checkProject(name, project, port) {
 
     const farms1 = await call('GET', '/api/farms', { token: owner });
     const farmRows = Array.isArray(farms1.json?.farms) ? farms1.json.farms : [];
-    ok(farms1.status === 200 && farmRows.length === 1, 'migration creates exactly one farm');
-    if (farms1.status !== 200 || farmRows.length === 0) {
+    const seedFarmNames = new Set(farmRows.map((farm) => farm.name));
+    const demoFarmsReady = seedFarmNames.has('Farm 1') && seedFarmNames.has('Farm 2 - Access Test');
+    ok(farms1.status === 200 && farmRows.length >= 2 && demoFarmsReady, 'memory demo has separate Farm 1 and Farm 2 test farms');
+    if (farms1.status !== 200 || farmRows.length < 2 || !demoFarmsReady) {
       console.log(`  Farms diagnostic: HTTP ${farms1.status}; response: ${JSON.stringify(farms1.json)}`);
       return;
     }
-    const farmA = farmRows[0].id;
+    const farmA = farmRows.find((farm) => farm.name === 'Farm 1')?.id || farmRows[0].id;
 
     if (project.kind === 'flock') {
       await checkFlock(project, call, owner, farmA);
       return;
     }
 
-    const baseline = project.rows((await call('GET', project.list, { token: owner })).json);
+    const baseline = project.rows((await call('GET', project.list, { token: owner, farm: farmA })).json);
     ok(baseline.length > 0, 'existing records were tagged into the first farm');
 
     const created = await call('POST', '/api/farms', { token: owner, body: { name: 'Farm B', location: 'Test' } });
@@ -332,14 +336,16 @@ async function checkProject(name, project, port) {
     ok(!mList.includes('worker-b'), 'manager does not see workers of other farms');
 
     // Backup covers every farm (owner only).
+    const farmsBeforeBackup = await call('GET', '/api/farms', { token: owner });
+    const expectedFarmCount = Array.isArray(farmsBeforeBackup.json?.farms) ? farmsBeforeBackup.json.farms.length : 0;
     const backup = await call('GET', '/api/backup', { token: owner });
-    ok(backup.status === 200 && Array.isArray(backup.json.farms) && backup.json.farms.length === 2, 'owner backup includes every farm');
+    ok(backup.status === 200 && Array.isArray(backup.json.farms) && backup.json.farms.length === expectedFarmCount, 'owner backup includes every farm');
 
-    // Restoring a backup keeps every record in its own farm.
+    // Restoring a backup keeps every record and farm in place.
     const restored = await call('POST', project.restore, { token: owner, body: backup.json });
     ok(restored.status === 200, 'owner can restore the backup');
     const farmsAfter = await call('GET', '/api/farms', { token: owner });
-    ok(farmsAfter.json.farms.length === 2, 'both farms exist after the restore');
+    ok(Array.isArray(farmsAfter.json?.farms) && farmsAfter.json.farms.length === expectedFarmCount, 'all farms still exist after the restore');
     const rB = project.rows((await call('GET', project.list, { token: owner, farm: farmB })).json);
     ok(rB.some((r) => project.idOf(r) === idB), 'the farm-B record is still in farm B after the restore');
     const rA = project.rows((await call('GET', project.list, { token: owner, farm: farmA })).json);
