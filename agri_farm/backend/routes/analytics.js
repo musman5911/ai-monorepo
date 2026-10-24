@@ -117,10 +117,11 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
     if (assignee) {
       const assigneeKey = assignee.toLowerCase();
       const assigned = taskByAssignee.get(assigneeKey) || {
-        assignee, pending: 0, completed: 0, total: 0,
+        assignee, pending: 0, active: 0, completed: 0, total: 0,
       };
       assigned.total += 1;
       if (task.status === 'Pending') assigned.pending += 1;
+      if (task.status !== 'Completed') assigned.active += 1;
       if (task.status === 'Completed') assigned.completed += 1;
       taskByAssignee.set(assigneeKey, assigned);
     }
