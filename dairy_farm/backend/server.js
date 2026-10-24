@@ -8,7 +8,8 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { connectDB, Cow, Milk, Expense } from './db.js';
+import { connectDB, Cow, Milk, Expense, Farm } from './db.js';
+import { protectUnscoped, ownerOnly } from './middleware/auth.js';
 import authRoutes from './routes/auth.js';
 import cowsRoutes from './routes/cows.js';
 import milkRoutes from './routes/milk.js';
@@ -133,7 +134,7 @@ app.use('/api/farms',    farmsRoutes);
 
 // Cross-farm summary — tiny read-only aggregates for the "My Farms" tab in
 // the sibling apps. Protected by the shared CROSS_FARM_KEY; CORS-open.
-app.get('/api/farm-summary', async (req, res) => {
+async function dairyFarmSummaryHandler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*');
     const key = MUF_ENV.crossFarmKey;
@@ -141,27 +142,52 @@ app.get('/api/farm-summary', async (req, res) => {
     if (String(req.query.key || '') !== key) return res.status(401).json({ error: 'Bad key' });
     const today = new Date().toISOString().slice(0, 10);
     const month = today.slice(0, 7);
-    const [cows, milkAll, expAll] = await Promise.all([
+    const [cows, milkAll, expAll, activeFarms] = await Promise.all([
       Cow.find().lean(),
       Milk.find().lean(),
       Expense.find().lean(),
+      Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean(),
     ]);
     const milkToday = milkAll.filter(m => m.date === today);
     const milkMonth = milkAll.filter(m => String(m.date || '').startsWith(month));
     const expMonth = expAll.filter(e => String(e.date || '').startsWith(month));
-    const liters = (rows) => Math.round(rows.reduce((a, r) => a + (r.morning || 0) + (r.evening || 0), 0) * 10) / 10;
-    res.json({
+    const liters = (rows) => Math.round(rows.reduce((a, r) => a + (Number(r.morning) || 0) + (Number(r.evening) || 0), 0) * 10) / 10;
+    const perFarm = await Promise.all(activeFarms.map(async (farm) => {
+      const farmId = String(farm._id);
+      const [farmCows, farmMilk, farmExpenses] = await Promise.all([
+        Cow.find({ farmId }).lean(),
+        Milk.find({ farmId }).lean(),
+        Expense.find({ farmId }).lean(),
+      ]);
+      const todayRows = farmMilk.filter(m => m.date === today);
+      const monthRows = farmMilk.filter(m => String(m.date || '').startsWith(month));
+      const expenseRows = farmExpenses.filter(e => String(e.date || '').startsWith(month));
+      return {
+        farmId,
+        farmName: farm.name,
+        stats: [
+          { label: 'Active animals', value: farmCows.filter(c => c.status === 'active').length },
+          { label: "Today's milk", value: `${liters(todayRows)} L` },
+          { label: 'Milk this month', value: `${liters(monthRows)} L` },
+          { label: 'Expenses this month', value: `Rs ${Math.round(expenseRows.reduce((a, e) => a + (Number(e.amount) || 0), 0)).toLocaleString()}` },
+        ],
+      };
+    }));
+    return res.json({
       farm: 'dairy',
       label: 'Usman Dairy Farm',
       stats: [
         { label: 'Active animals', value: cows.filter(c => c.status === 'active').length },
         { label: "Today's milk", value: `${liters(milkToday)} L` },
         { label: 'Milk this month', value: `${liters(milkMonth)} L` },
-        { label: 'Expenses this month', value: `Rs ${Math.round(expMonth.reduce((a, e) => a + (e.amount || 0), 0)).toLocaleString()}` },
+        { label: 'Expenses this month', value: `Rs ${Math.round(expMonth.reduce((a, e) => a + (Number(e.amount) || 0), 0)).toLocaleString()}` },
       ],
+      farms: perFarm,
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
-});
+}
+app.get('/api/farm-summary', dairyFarmSummaryHandler);
+app.get('/api/super-admin/farm-summary', protectUnscoped, ownerOnly, dairyFarmSummaryHandler);
 
 // Unknown API paths must return JSON 404 — never fall through to the SPA
 // HTML (a 200 HTML response masks bugs as JSON-parse errors in the client).
