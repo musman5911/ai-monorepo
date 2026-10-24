@@ -154,9 +154,11 @@ app.post('/api/auth/login', loginLimiter);
 async function flockFarmSummaryHandler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    const key = MUF_ENV.crossFarmKey;
-    if (!key) return res.status(404).json({ error: 'Not enabled' });
-    if (String(req.query.key || '') !== key) return res.status(401).json({ error: 'Bad key' });
+    if (req.path !== '/api/super-admin/farm-summary') {
+      const key = MUF_ENV.crossFarmKey;
+      if (!key) return res.status(404).json({ error: 'Not enabled' });
+      if (String(req.query.key || '') !== key) return res.status(401).json({ error: 'Bad key' });
+    }
     const DataStore = (await import('./models/DataStore.js')).default;
     const activeFarms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
     const bucket = async (k, farmId) => {
