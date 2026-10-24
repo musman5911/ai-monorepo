@@ -244,6 +244,9 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(app).toContain('setSelectedCropFinanceRows(financeRows)');
     expect(app).toContain('setSelectedCropTaskRows(taskRows)');
     expect(app).toContain('Loading complete crop history');
+    expect(app).toContain('api.getFinance(0, 500, { crop_id: String(editingCrop._id) })');
+    expect(app).toContain('Never create a replacement unless the complete crop-linked ledger was read.');
+    expect(app).not.toContain('const existingSeedFin = finance.find(f => f.crop_id === editingCrop._id');
     expect(app).toContain('serverFinanceSummary?.monthlyIncomeSeries');
   });
 
