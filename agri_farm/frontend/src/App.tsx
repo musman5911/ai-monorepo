@@ -370,6 +370,7 @@ function App() {
   const [resetCode, setResetCode] = useState('');
   const [resetNewPw, setResetNewPw] = useState('');
   
+  const [analyticsSummary, setAnalyticsSummary] = useState(null);
   const [crops, setCrops] = useState([]);
   const [finance, setFinance] = useState([]);
   const [tasks, setTasks] = useState([]);
@@ -806,18 +807,17 @@ function App() {
     return tips.slice(0, 2).join(' ');
   };
 
-  useEffect(() => { 
-    if (token) { 
-      setLoading(true);
-      refreshData().finally(() => setLoading(false));
-    } 
-  }, [token]);
+  useEffect(() => {
+    if (!token) return;
+    setLoading(true);
+    refreshData(['finance', 'labor', 'summary'].includes(activeTab)).finally(() => setLoading(false));
+  }, [token, activeTab]);
 
-  const refreshData = async () => {
-    // Read the backend's page metadata rather than assuming a fixed total or
-    // stopping at an arbitrary 10,000-row ceiling. Aggregate/report consumers
-    // still receive the complete scoped dataset; the list endpoints remain
-    // bounded at 500 records per request.
+  const refreshData = async (includeFullDetails = ['finance', 'labor', 'summary'].includes(activeTab)) => {
+    // Summary-first startup avoids downloading every ledger row just to paint
+    // dashboard KPIs. Lists still use their independent server-paged endpoints.
+    // Full details are fetched only for workspaces that open cross-record
+    // drill-downs and editors. All data stays within the selected MUF farm.
     const fetchAllPages = async (fetchFn) => {
       const pageSize = 500;
       const first = await fetchFn(0, pageSize);
@@ -826,9 +826,6 @@ function App() {
       const rawTotal = first.headers?.['x-total-count'] ?? first.headers?.['X-Total-Count'];
       const total = Number(rawTotal);
       const appendUnique = (rows) => {
-        // A concurrent insert/delete can shift offset pages while a refresh is in
-        // progress. Deduplicate stable IDs so the UI never renders the same record
-        // twice; retain ID-less legacy records rather than dropping valid data.
         const seen = new Set(all.filter((row) => row?._id != null).map((row) => String(row._id)));
         for (const row of rows) {
           if (row?._id == null || !seen.has(String(row._id))) {
@@ -844,18 +841,15 @@ function App() {
           if (!Array.isArray(res.data)) throw new Error('Paginated API returned a non-array payload.');
           const reportedTotal = Number(res.headers?.['x-total-count'] ?? res.headers?.['X-Total-Count']);
           if (Number.isFinite(reportedTotal) && reportedTotal !== total) {
-            throw new Error(`Pagination total changed during refresh (${total} to ${reportedTotal}); retry the refresh.`);
+            throw new Error('Pagination total changed during refresh (' + total + ' to ' + reportedTotal + '); retry the refresh.');
           }
           appendUnique(res.data);
         }
         if (all.length < total) {
-          throw new Error(`Paginated API returned ${all.length} unique records for a reported total of ${total}. The dataset may have changed during refresh; retry.`);
+          throw new Error('Paginated API returned ' + all.length + ' unique records for a reported total of ' + total + '. The dataset may have changed during refresh; retry.');
         }
         return all.slice(0, total);
       }
-
-      // Compatibility fallback for older servers without pagination headers.
-      // A short page proves completion; a full page means another request is needed.
       let skip = first.data.length;
       let previousPageSize = first.data.length;
       while (previousPageSize === pageSize) {
@@ -867,15 +861,33 @@ function App() {
       }
       return all;
     };
-    try {
-      const cropsRes = await fetchAllPages(api.getCrops); setCrops(cropsRes);
-      const tasksRes = await fetchAllPages(api.getTasks); setTasks(tasksRes);
 
-      // Money/stock/roster data is admin-only — the backend returns 403 for
-      // workers, so don't even request it for them.
+    try {
+      const summaryRes = await api.getAnalyticsSummary();
+      const summary = summaryRes.data;
+      setAnalyticsSummary(summary);
+
+      if (includeFullDetails) {
+        const [cropRows, taskRows] = await Promise.all([
+          fetchAllPages(api.getCrops),
+          fetchAllPages(api.getTasks),
+        ]);
+        setCrops(cropRows);
+        setTasks(taskRows);
+      } else {
+        setCrops(Array.isArray(summary?.cropSummary?.options) ? summary.cropSummary.options : []);
+        setTasks(Array.isArray(summary?.taskSummary?.recent) ? summary.taskSummary.recent : []);
+      }
+
+      // Money, stock and roster data is admin-only. For the dashboard, only a
+      // bounded recent ledger is retained locally; totals come from the summary.
       if (userRole === 'admin') {
         const invRes = await api.getInventory(); setInventory(invRes.data);
-        const finRes = await fetchAllPages(api.getFinance); setFinance(finRes);
+        if (includeFullDetails) {
+          const ledgerRows = await fetchAllPages(api.getFinance); setFinance(ledgerRows);
+        } else {
+          setFinance(Array.isArray(summary?.financeSummary?.recent) ? summary.financeSummary.recent : []);
+        }
         const liaRes = await api.getLiabilities(); setLiabilities(liaRes.data);
         try {
           const supRes = await api.getSuppliers(); setSuppliers(supRes.data);
@@ -897,10 +909,10 @@ function App() {
         setCurrentUserAvatar(meRes.data.avatar_base64 || '');
         localStorage.setItem('avatar_base64', meRes.data.avatar_base64 || '');
       } catch (meErr) {
-        console.warn("Could not load current user profile:", meErr);
+        console.warn('Could not load current user profile:', meErr);
       }
     } catch (err) {
-      console.error("Data refresh failed:", err);
+      console.error('Data refresh failed:', err);
       if (err.response?.status === 401) performLogout();
     }
     setListRefreshKey((value) => value + 1);
@@ -1840,23 +1852,31 @@ function App() {
   };
 
   // --- Helper Calculations ---
-  const totalIncome = finance.filter(f => f.type === 'income').reduce((sum, item) => sum + item.amount, 0);
-  const totalExpense = finance.filter(f => f.type === 'expense').reduce((sum, item) => sum + item.amount, 0);
+  const serverFinanceSummary = analyticsSummary?.financeSummary;
+  const selectedDashboardCropSummary = dashboardCropFilter === 'all'
+    ? null
+    : serverFinanceSummary?.byCrop?.find((item) => String(item.crop_id) === String(dashboardCropFilter));
+  const localIncome = finance.filter(f => f.type === 'income').reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+  const localExpense = finance.filter(f => f.type === 'expense').reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+  const totalIncome = Number(serverFinanceSummary?.totals?.income ?? localIncome);
+  const totalExpense = Number(serverFinanceSummary?.totals?.expense ?? localExpense);
   const netProfit = totalIncome - totalExpense;
-
-  const dbIncome = finance.filter(f => f.type === 'income' && (dashboardCropFilter === 'all' ? true : f.crop_id === dashboardCropFilter)).reduce((sum, item) => sum + item.amount, 0);
-  const dbExpense = finance.filter(f => f.type === 'expense' && (dashboardCropFilter === 'all' ? true : f.crop_id === dashboardCropFilter)).reduce((sum, item) => sum + item.amount, 0);
+  const dbIncome = Number((dashboardCropFilter === 'all'
+    ? serverFinanceSummary?.totals?.income
+    : selectedDashboardCropSummary?.income) ?? finance.filter(f => f.type === 'income' &&
+      (dashboardCropFilter === 'all' || String(f.crop_id) === String(dashboardCropFilter)))
+      .reduce((sum, item) => sum + (Number(item.amount) || 0), 0));
+  const dbExpense = Number((dashboardCropFilter === 'all'
+    ? serverFinanceSummary?.totals?.expense
+    : selectedDashboardCropSummary?.expense) ?? finance.filter(f => f.type === 'expense' &&
+      (dashboardCropFilter === 'all' || String(f.crop_id) === String(dashboardCropFilter)))
+      .reduce((sum, item) => sum + (Number(item.amount) || 0), 0));
   const dbNetProfit = dbIncome - dbExpense;
 
-  // ── This month vs last month (muf shared card) ──
   const cmpCurKey = thisMonthKey();
   const cmpPrevKey = lastMonthKey();
-  // cmp (month-over-month + same-month-last-year comparison) extracted to
-  // ./components/app/agriHelpers as buildAgriComparison — pure function,
-  // same inputs (finance, cmpCurKey, cmpPrevKey), same output shape.
-  const cmp = buildAgriComparison(finance, cmpCurKey, cmpPrevKey);
+  const cmp = serverFinanceSummary?.comparison || buildAgriComparison(finance, cmpCurKey, cmpPrevKey);
 
-  // Tasks matching the dashboard crop filter (title-name heuristic, same as the task board)
   const taskMatchesCrop = (t, cropId) => {
     if (cropId === 'all') return true;
     if (String(t.crop_id || '') === String(cropId)) return true;
@@ -1864,8 +1884,17 @@ function App() {
     if (!sel) return false;
     return cropNameInText(t.title, sel.name) || cropNameInText(t.notes, sel.name) || cropNameInText(t.title, sel.variety);
   };
-  const dashPendingTasks = tasks.filter(t => t.status === 'Pending' && taskMatchesCrop(t, dashboardCropFilter)).length;
-  const dashCompletedTasks = tasks.filter(t => t.status === 'Completed' && taskMatchesCrop(t, dashboardCropFilter)).length;
+  const selectedDashboardTaskSummary = dashboardCropFilter === 'all'
+    ? null
+    : analyticsSummary?.taskSummary?.byCrop?.find((item) => String(item.crop_id) === String(dashboardCropFilter));
+  const localPendingTasks = tasks.filter(t => t.status === 'Pending' && taskMatchesCrop(t, dashboardCropFilter)).length;
+  const localCompletedTasks = tasks.filter(t => t.status === 'Completed' && taskMatchesCrop(t, dashboardCropFilter)).length;
+  const dashPendingTasks = dashboardCropFilter === 'all'
+    ? Number(analyticsSummary?.taskSummary?.byStatus?.Pending ?? localPendingTasks)
+    : Number(selectedDashboardTaskSummary?.pending ?? localPendingTasks);
+  const dashCompletedTasks = dashboardCropFilter === 'all'
+    ? Number(analyticsSummary?.taskSummary?.byStatus?.Completed ?? localCompletedTasks)
+    : Number(selectedDashboardTaskSummary?.completed ?? localCompletedTasks);
 
   // --- Premium Monthly Summary & Analytics ---
   const realNotifications = React.useMemo(() => {
@@ -1873,9 +1902,10 @@ function App() {
 
     // Daily entry reminder: no ledger/task activity recorded today after 8 AM
     const todayIso = mufToday();
-    const activityToday =
+    const activityToday = analyticsSummary?.activityToday ?? (
       finance.some(f => String(f.date || '').slice(0, 10) === todayIso) ||
-      tasks.some(t => String(t.completed_at || t.date || '').slice(0, 10) === todayIso);
+      tasks.some(t => String(t.completed_at || t.date || '').slice(0, 10) === todayIso)
+    );
     if (!activityToday && new Date().getHours() >= 8) {
       list.push({
         id: 'no-activity-today',
@@ -1911,13 +1941,13 @@ function App() {
     });
 
     // 3. Pending tasks alert
-    const pendingTasks = tasks.filter(t => t.status === 'Pending');
-    if (pendingTasks.length > 0) {
+    const pendingTasksCount = Number(analyticsSummary?.taskSummary?.byStatus?.Pending ?? tasks.filter(t => t.status === 'Pending').length);
+    if (pendingTasksCount > 0) {
       list.push({
         id: 'pending-tasks',
         type: 'info',
         title: '📝 Pending Care Duties',
-        desc: `There are currently ${pendingTasks.length} farm assignments marked as Pending on the Care Roster board.`,
+        desc: `There are currently ${pendingTasksCount} farm assignments marked as Pending on the Care Roster board.`,
         time: 'Care Portal'
       });
     }
@@ -1935,54 +1965,51 @@ function App() {
     }
 
     return list;
-  }, [rainForecast24h, inventory, tasks, crops, liabilities]);
+  }, [rainForecast24h, inventory, tasks, crops, liabilities, analyticsSummary]);
 
   const sortedCropsProfitability = React.useMemo(() => {
+    if (Array.isArray(serverFinanceSummary?.profitability)) return serverFinanceSummary.profitability;
     return crops.map(c => {
-      const cropExpenses = finance.filter(f => f.crop_id === c._id);
-      const spent = cropExpenses.filter(f => f.type === 'expense').reduce((sum, f) => sum + f.amount, 0);
-      const earned = cropExpenses.filter(f => f.type === 'income').reduce((sum, f) => sum + f.amount, 0);
+      const cropExpenses = finance.filter(f => String(f.crop_id) === String(c._id));
+      const spent = cropExpenses.filter(f => f.type === 'expense').reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
+      const earned = cropExpenses.filter(f => f.type === 'income').reduce((sum, f) => sum + (Number(f.amount) || 0), 0);
       const netProfit = earned - spent;
       const area = parseFloat(c.area_kanal) || 1.0;
-      const profitPerKanal = netProfit / area;
-      return {
-        ...c,
-        spent,
-        earned,
-        netProfit,
-        profitPerKanal,
-        area
-      };
+      return { ...c, spent, earned, netProfit, profitPerKanal: netProfit / area, area };
     }).sort((a, b) => b.profitPerKanal - a.profitPerKanal);
-  }, [crops, finance]);
+  }, [crops, finance, serverFinanceSummary]);
 
-  const filteredPeriodFinance = finance.filter(f => {
-    if (reportsCropFilter !== 'all' && f.crop_id !== reportsCropFilter) return false;
-    return true;
-  });
-
-  const periodIncome = filteredPeriodFinance.filter(f => f.type === 'income').reduce((sum, f) => sum + f.amount, 0);
-  const periodExpense = filteredPeriodFinance.filter(f => f.type === 'expense').reduce((sum, f) => sum + f.amount, 0);
+  const filteredPeriodFinance = finance.filter(f => (
+    reportsCropFilter === 'all' || String(f.crop_id) === String(reportsCropFilter)
+  ));
+  const selectedReportCropSummary = reportsCropFilter === 'all'
+    ? null
+    : serverFinanceSummary?.byCrop?.find((item) => String(item.crop_id) === String(reportsCropFilter));
+  const periodIncome = Number((reportsCropFilter === 'all'
+    ? serverFinanceSummary?.totals?.income
+    : selectedReportCropSummary?.income) ?? filteredPeriodFinance.filter(f => f.type === 'income').reduce((sum, f) => sum + (Number(f.amount) || 0), 0));
+  const periodExpense = Number((reportsCropFilter === 'all'
+    ? serverFinanceSummary?.totals?.expense
+    : selectedReportCropSummary?.expense) ?? filteredPeriodFinance.filter(f => f.type === 'expense').reduce((sum, f) => sum + (Number(f.amount) || 0), 0));
   const periodNet = periodIncome - periodExpense;
   const periodMargin = periodIncome > 0 ? ((periodNet / periodIncome) * 100).toFixed(1) : '0.0';
 
-  // muf-charts: monthly income series for the dashboard area chart (last 12 months)
-  // dashboardIncomeSeries extracted to ./components/app/agriHelpers as
-  // buildDashboardIncomeSeries — pure function, same input (finance).
-  const dashboardIncomeSeries = buildDashboardIncomeSeries(finance);
+  const dashboardIncomeSeries = Array.isArray(serverFinanceSummary?.monthlyIncomeSeries)
+    ? serverFinanceSummary.monthlyIncomeSeries
+    : buildDashboardIncomeSeries(finance);
+  const serverMonthlyRows = reportsCropFilter === 'all'
+    ? serverFinanceSummary?.monthlyRows
+    : selectedReportCropSummary?.monthlyRows;
+  const monthlyComparisonRows = Array.isArray(serverMonthlyRows)
+    ? [...serverMonthlyRows].sort((a, b) => sortOrder === 'oldest' ? a[0].localeCompare(b[0]) : b[0].localeCompare(a[0]))
+    : buildMonthlyComparisonRows(finance, crops, reportsCropFilter, sortOrder);
+  const expenseBreakdown = reportsCropFilter === 'all'
+    ? (serverFinanceSummary?.expenseBreakdown || buildExpenseBreakdown(filteredPeriodFinance))
+    : (selectedReportCropSummary?.expenseBreakdown || buildExpenseBreakdown(filteredPeriodFinance));
 
-  // monthlyComparisonRows extracted to ./components/app/agriHelpers as
-  // buildMonthlyComparisonRows — pure function, same inputs (finance, crops,
-  // reportsCropFilter, sortOrder).
-  const monthlyComparisonRows = buildMonthlyComparisonRows(finance, crops, reportsCropFilter, sortOrder);
-
-  // expenseBreakdown extracted to ./components/app/agriHelpers as
-  // buildExpenseBreakdown — pure function, same input (filteredPeriodFinance).
-  const expenseBreakdown = buildExpenseBreakdown(filteredPeriodFinance);
-
-  const uniqueFields = [...new Set(crops.map(c => c.field).filter(Boolean))];
-  const uniqueSeasons = [...new Set(crops.map(c => c.season).filter(Boolean))];
-  const uniqueYears = [...new Set(crops.map(c => c.crop_year).filter(Boolean))];
+  const uniqueFields = analyticsSummary?.cropSummary?.fields || [...new Set(crops.map(c => c.field).filter(Boolean))];
+  const uniqueSeasons = analyticsSummary?.cropSummary?.seasons || [...new Set(crops.map(c => c.season).filter(Boolean))];
+  const uniqueYears = analyticsSummary?.cropSummary?.years || [...new Set(crops.map(c => c.crop_year).filter(Boolean))];
 
   const filteredCrops = crops.filter(c => {
     // 0. Specific Crop Filter (Crop Manager tab)
