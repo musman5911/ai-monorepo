@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-24 (Phase 1 implementation started).
+Last updated: 2026-10-24 (Phase 1 local tests updated).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -33,7 +33,7 @@ Last updated: 2026-10-24 (Phase 1 implementation started).
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phases/phase-21-final-testing-live-and-signoff.md) |
 
-## Latest verification (2026-10-24, Linux sandbox, uploaded `muf-monorepo` snapshot)
+## Earlier baseline verification (2026-10-24, Linux sandbox, uploaded `muf-monorepo` snapshot)
 
 | Command | Result |
 |---|---|
@@ -48,7 +48,17 @@ Last updated: 2026-10-24 (Phase 1 implementation started).
 
 Not run: anything needing a real MongoDB, a browser, a phone or a live website (Phases 19 to 21).
 
-Phase 1 implementation is in progress on `muf-monorepo`: the owner-only summary routes, per-farm summary payloads, owner-only navigation gates, farm-by-farm panel rendering, and `npm run check-super-admin` have been added. These new changes have **not yet been run through the checker or builds in the Windows working tree**; the verification table above is the earlier baseline, not proof of the new Phase 1 changes. The new checker requires dependencies installed in each app's backend folder.
+Phase 1 implementation is in progress on `muf-monorepo`. The owner reported the following local Windows CMD results after pulling commit `561f571a37b7d5d0056bc8400fd98976b9df927a`. These are user-provided results, not commands run in this editing session. The new runtime checker passed against all three in-memory backends; backend dependencies were evidently available for that run.
+
+## Phase 1 local verification (2026-10-24, Windows CMD; output supplied by owner)
+
+| Command | Result |
+|---|---|
+| `npm test -- tests/phase-1-super-admin.test.ts` | Passed: 1 file, 13 tests |
+| `npm run check-super-admin` | Passed: all three apps; owners read per-farm summaries, managers and workers receive HTTP 403 |
+| `npm test` | Passed: 24 files, 232 tests |
+
+Still required before Phase 1 can be marked Done: `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs`, and `tools\\build-all.bat`. Record their actual results here after running them. Real MongoDB, browser, phone and live-site checks remain in Phases 19 to 21.
 
 ## Decisions (owner)
 
