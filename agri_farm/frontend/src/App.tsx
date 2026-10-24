@@ -855,7 +855,7 @@ function App() {
             }
           }
         }
-        if (rows.length < firstTotal) throw new Error('Crop history is incomplete. Reopen the crop to retry.');
+        if (rows.length !== firstTotal) throw new Error('Crop history is incomplete or changed while loading. Reopen the crop to retry.');
         return rows.slice(0, firstTotal);
       }
       let skip = first.data.length;
@@ -1058,7 +1058,7 @@ function App() {
             }
           }
         }
-        if (rows.length < total) throw new Error('Not all category transactions were returned. Reopen this category to retry.');
+        if (rows.length !== total) throw new Error('Category transaction results changed while loading. Reopen this category to retry.');
         return rows.filter((row) => row.type === 'expense' &&
           String(row.category || '') === category &&
           (reportsCropFilter === 'all' || String(row.crop_id || '') === String(reportsCropFilter)));
@@ -1359,7 +1359,7 @@ function App() {
                 }
               }
             }
-            if (seedRows.length < total) throw new Error('Crop seed ledger was incomplete; refusing to risk creating a duplicate seed expense.');
+            if (seedRows.length !== total) throw new Error('Crop seed ledger changed while loading; refusing to risk creating a duplicate seed expense.');
             seedLedgerLoaded = true;
           } else {
             // Compatibility fallback for older API servers without total headers.
