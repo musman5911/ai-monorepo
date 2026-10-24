@@ -36,7 +36,7 @@ function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d
 function rnd(min, max) { return Math.round((min + Math.random() * (max - min)) * 10) / 10; }
 
 async function seedDemoData(db) {
-  const { Cow, Milk, Expense, Rate, RateHistory, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, DailyLog, Sale, Laborer, LaborAttendance, Meta, Farm } = db;
+  const { Cow, BreedingEvent, Milk, Expense, Rate, RateHistory, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, DailyLog, Sale, Laborer, LaborAttendance, Meta, Farm } = db;
 
 
   const farm1 = await Farm.create({
@@ -132,6 +132,14 @@ async function seedDemoData(db) {
     ];
   }
   await Cow.insertMany(cows);
+  if (BreedingEvent) {
+    await BreedingEvent.insertMany([
+      { _id: 'be-demo-heat-cow8', cowId: 'cow8', type: 'heat', date: daysAgo(3), technician: 'Demo technician', result: 'Heat observed', notes: 'Seeded demo event' },
+      { _id: 'be-demo-service-cow2', cowId: 'cow2', type: 'service', date: daysAgo(220), sireSource: 'farm_bull', bullId: 'cow15', technician: 'Demo technician', result: 'Inseminated', notes: 'Seeded demo event' },
+      { _id: 'be-demo-calving-cow1', cowId: 'cow1', type: 'calving', date: daysAgo(190), result: 'Normal calving', notes: 'Seeded demo event' },
+      { _id: 'be-demo-pregnancy-cow4', cowId: 'cow4', type: 'pregnancy_check', date: daysAgo(100), result: 'Positive', notes: 'Seeded demo event' },
+    ]);
+  }
 
   // ────────────────────────────────────────── MILK (365 days, morning + evening)
   // Per-cow average yields; light seasonal dip in summer heat.
