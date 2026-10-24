@@ -92,6 +92,22 @@ async function main() {
     const cowAfterUpdate = await call('GET', '/api/cows/cow8', { token: owner, farm: String(farmA._id) });
     ok(cowAfterUpdate.json?.cow?.heatDate === tomorrow, 'editing an event resynchronizes the legacy cow date');
 
+    const service = await call('POST', '/api/breeding/events', {
+      token: owner, farm: String(farmA._id),
+      body: { cowId: 'cow2', type: 'service', date: today, sireSource: 'farm_bull', bullId: 'cow15', result: 'Inseminated' },
+    });
+    ok(service.status === 201, 'service event accepts a valid in-farm bull');
+    const cowAfterService = await call('GET', '/api/cows/cow2', { token: owner, farm: String(farmA._id) });
+    ok(cowAfterService.json?.cow?.pregnancyDate === today, 'service event synchronizes the legacy breeding date');
+
+    const calving = await call('POST', '/api/breeding/events', {
+      token: owner, farm: String(farmA._id),
+      body: { cowId: 'cow1', type: 'calving', date: today, result: 'Normal calving' },
+    });
+    ok(calving.status === 201, 'calving event can be recorded without automatically creating a calf');
+    const cowAfterCalving = await call('GET', '/api/cows/cow1', { token: owner, farm: String(farmA._id) });
+    ok(cowAfterCalving.json?.cow?.calvingDate === today, 'calving event synchronizes the legacy cow calving date');
+
     const listA = await call('GET', '/api/breeding/events?page=1&limit=20&cowId=cow8', { token: owner, farm: String(farmA._id) });
     ok(listA.status === 200 && listA.json?.events?.some((event) => event._id === eventId), 'event appears in paginated list for its farm and cow');
     ok(listA.json?.total >= 1 && listA.json?.page === 1, 'list response includes pagination metadata');
