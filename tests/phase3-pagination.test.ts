@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { rowsToCsv } from '../flock_farm/client/src/utils/flockXlsxImport';
 import {
   AGRI_LIST_PAGE_SIZE,
   buildAgriPageQuery,
@@ -244,6 +245,30 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(app).toContain('setSelectedCropTaskRows(taskRows)');
     expect(app).toContain('Loading complete crop history');
     expect(app).toContain('serverFinanceSummary?.monthlyIncomeSeries');
+  });
+
+  it('supports bounded preview-first XLSX imports for Flock batch logs', () => {
+    const parser = readFileSync(path.join(repoRoot, 'flock_farm/client/src/utils/flockXlsxImport.ts'), 'utf8');
+    const component = readFileSync(path.join(repoRoot, 'flock_farm/client/src/components/BatchesTab.tsx'), 'utf8');
+    expect(parser).toContain('export async function parseXlsxRows(buffer: ArrayBuffer)');
+    expect(parser).toContain('bytes.length > 5 * 1024 * 1024');
+    expect(parser).toContain('entryCount > 2048');
+    expect(parser).toContain('TargetMode');
+    expect(parser).toContain('DecompressionStream');
+    expect(parser).toContain('const dateHeader of ["date", "plant_date", "harvest_date", "start_date", "expected_end_date"]');
+    expect(component).toContain("import { parseXlsxRows, rowsToCsv } from '../utils/flockXlsxImport'");
+    expect(component).toContain('const rows = await parseXlsxRows(await file.arrayBuffer())');
+    expect(component).toContain('rows.length > 1001');
+    expect(component).toContain('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    expect(component).toContain('Preview Batch Egg CSV / Excel');
+    expect(component).toContain('CSV / Excel (preview first)');
+  });
+
+  it('quotes XLSX cell values safely for legacy Flock row validators', () => {
+    expect(rowsToCsv([
+      ['date', 'notes'],
+      ['2026-10-01', 'comma, quote " and\nnext line'],
+    ])).toBe('date,notes\n2026-10-01,"comma, quote "" and next line"');
   });
 
   it('renders Agri crop and task cards in incremental chunks without truncating aggregate source arrays', () => {
