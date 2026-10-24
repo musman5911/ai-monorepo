@@ -461,6 +461,10 @@ function App() {
   const [cropSearch, setCropSearch] = useState('');
   const [cropFieldFilter, setCropFieldFilter] = useState('all');
   const [selectedCrop, setSelectedCrop] = useState(null);
+  const [selectedCropFinanceRows, setSelectedCropFinanceRows] = useState([]);
+  const [selectedCropTaskRows, setSelectedCropTaskRows] = useState([]);
+  const [selectedCropDetailLoading, setSelectedCropDetailLoading] = useState(false);
+  const [selectedCropDetailError, setSelectedCropDetailError] = useState('');
   const [selectedFinance, setSelectedFinance] = useState(null);
   const [showCompare, setShowCompare] = useState(false);
   const [selectedTask, setSelectedTask] = useState(null);
@@ -809,6 +813,91 @@ function App() {
 
   const needsFullDetails = activeTab === 'labor' ||
     (activeTab === 'finance' && agriFinanceSubTab !== 'ledger');
+
+  useEffect(() => {
+    const cropId = selectedCrop?._id ? String(selectedCrop._id) : '';
+    if (!token || !cropId) {
+      setSelectedCropFinanceRows([]);
+      setSelectedCropTaskRows([]);
+      setSelectedCropDetailLoading(false);
+      setSelectedCropDetailError('');
+      return undefined;
+    }
+
+    let cancelled = false;
+    setSelectedCropDetailLoading(true);
+    setSelectedCropDetailError('');
+
+    const fetchAllRows = async (fetchPage) => {
+      const pageSize = 500;
+      const first = await fetchPage(0, pageSize);
+      if (!Array.isArray(first.data)) throw new Error('Crop history API returned a non-array payload.');
+      const rows = [...first.data];
+      const firstTotal = Number(first.headers?.['x-total-count'] ?? first.headers?.['X-Total-Count']);
+      if (Number.isSafeInteger(firstTotal) && firstTotal >= 0) {
+        const seen = new Set(rows.filter((row) => row?._id != null).map((row) => String(row._id)));
+        for (let skip = pageSize; skip < firstTotal; skip += pageSize) {
+          const page = await fetchPage(skip, pageSize);
+          if (!Array.isArray(page.data)) throw new Error('Crop history API returned a non-array payload.');
+          const reportedTotal = Number(page.headers?.['x-total-count'] ?? page.headers?.['X-Total-Count']);
+          if (Number.isSafeInteger(reportedTotal) && reportedTotal !== firstTotal) {
+            throw new Error('Crop history changed while loading. Reopen the crop to retry.');
+          }
+          for (const row of page.data) {
+            if (row?._id == null || !seen.has(String(row._id))) {
+              rows.push(row);
+              if (row?._id != null) seen.add(String(row._id));
+            }
+          }
+        }
+        if (rows.length < firstTotal) throw new Error('Crop history is incomplete. Reopen the crop to retry.');
+        return rows.slice(0, firstTotal);
+      }
+      let skip = first.data.length;
+      let previousCount = first.data.length;
+      while (previousCount === pageSize) {
+        const page = await fetchPage(skip, pageSize);
+        if (!Array.isArray(page.data)) throw new Error('Crop history API returned a non-array payload.');
+        rows.push(...page.data);
+        previousCount = page.data.length;
+        skip += page.data.length;
+      }
+      return rows;
+    };
+
+    const loadDetails = async () => {
+      try {
+        const cropResponse = await api.getCrops(0, 1, { crop_id: cropId, status: 'all' });
+        if (cancelled) return;
+        if (Array.isArray(cropResponse.data) && cropResponse.data[0]) {
+          const detailedCrop = cropResponse.data[0];
+          setSelectedCrop((current) => (
+            current && String(current._id) === cropId ? { ...current, ...detailedCrop } : current
+          ));
+        }
+        const [taskRows, financeRows] = await Promise.all([
+          fetchAllRows((skip, limit) => api.getTasks(skip, limit, {
+            crop_id: cropId,
+            crop_search: [selectedCrop?.name, selectedCrop?.variety].filter(Boolean).join('|'),
+          })),
+          userRole === 'admin'
+            ? fetchAllRows((skip, limit) => api.getFinance(skip, limit, { crop_id: cropId }))
+            : Promise.resolve([]),
+        ]);
+        if (cancelled) return;
+        setSelectedCropTaskRows(taskRows);
+        setSelectedCropFinanceRows(financeRows);
+      } catch (error) {
+        if (!cancelled) {
+          setSelectedCropDetailError(error?.response?.data?.error || error?.message || 'Could not load complete crop history.');
+        }
+      } finally {
+        if (!cancelled) setSelectedCropDetailLoading(false);
+      }
+    };
+    void loadDetails();
+    return () => { cancelled = true; };
+  }, [token, selectedCrop?._id, listRefreshKey, userRole]);
 
   useEffect(() => {
     if (!token) return;
@@ -5268,7 +5357,10 @@ function App() {
         icon={<Sprout size={16} />}
        size="big">
         {selectedCrop && (
-          <div className="space-y-6 text-slate-800 dark:text-slate-100">
+          <div className="space-y-4">
+            {selectedCropDetailLoading && <p role="status" className="text-xs text-slate-500">Loading complete crop history…</p>}
+            {selectedCropDetailError && <p role="alert" className="text-xs text-red-600">{selectedCropDetailError}</p>}
+"space-y-6 text-slate-800 dark:text-slate-100">
             {selectedCrop.image_base64 && (
               <div className="w-full h-44 rounded-xl overflow-hidden border border-[color:var(--muf-color-border)] shadow-xs">
                 <img src={selectedCrop.image_base64} className="w-full h-full object-cover" alt={selectedCrop.name} />
@@ -5321,8 +5413,8 @@ function App() {
               // Ledger Seed entries (auto-logged from the crop form, plus any extra
               // Seed purchases) are the source of truth. Legacy "Sowing Seed Purchase"
               // rows still count until they are rewritten as Seed.
-              const ledgerSeedCost = finance
-                .filter(f => f.crop_id === selectedCrop._id && f.type === 'expense' && isSeedLedgerCategory(f.category))
+              const ledgerSeedCost = selectedCropFinanceRows
+                .filter(f => String(f.crop_id) === String(selectedCrop._id) && f.type === 'expense' && isSeedLedgerCategory(f.category))
                 .reduce((sum, f) => sum + f.amount, 0);
               const finalTotalSeedCost = ledgerSeedCost > 0 ? ledgerSeedCost : initialSeedCost;
               const seedCostPerKanal = finalTotalSeedCost / (parseFloat(selectedCrop.area_kanal) || 1.0);
@@ -5369,7 +5461,7 @@ function App() {
                       <div className="space-y-1 p-3 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 col-span-2">
                         <p className="muf-caption flex items-center gap-1"><TrendingUp size={10} /> {L('Profit / Kanal')}</p>
                         <p className="font-extrabold text-farm-600 dark:text-farm-400">Rs. {formatCurrency(((() => {
-                          const cropExpenses = finance.filter(f => f.crop_id === selectedCrop._id);
+                          const cropExpenses = selectedCropFinanceRows.filter(f => String(f.crop_id) === String(selectedCrop._id));
                           const spent = cropExpenses.filter(f => f.type === 'expense').reduce((sum, f) => sum + f.amount, 0);
                           const earned = cropExpenses.filter(f => f.type === 'income').reduce((sum, f) => sum + f.amount, 0);
                           return ((earned - spent) / (parseFloat(selectedCrop.area_kanal) || 1.0)).toFixed(2);
@@ -5383,7 +5475,7 @@ function App() {
 
             {/* Financial Performance Cost-Center (admin-only: money data) */}
             {userRole === 'admin' && (() => {
-              const cropExpenses = finance.filter(f => f.crop_id === selectedCrop._id);
+              const cropExpenses = selectedCropFinanceRows.filter(f => String(f.crop_id) === String(selectedCrop._id));
               const spent = cropExpenses.filter(f => f.type === 'expense').reduce((sum, f) => sum + f.amount, 0);
               const earned = cropExpenses.filter(f => f.type === 'income').reduce((sum, f) => sum + f.amount, 0);
               const net = earned - spent;
@@ -5540,7 +5632,7 @@ function App() {
             <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/20 space-y-2">
               <h4 className="muf-caption flex items-center gap-1">📜 Complete Ledger History</h4>
               <div className="space-y-2 max-h-[30vh] overflow-y-auto pr-1">
-                {finance.filter(f => f.crop_id === selectedCrop._id).map(f => (
+                {selectedCropFinanceRows.filter(f => String(f.crop_id) === String(selectedCrop._id)).map(f => (
                   <div key={f._id} className="flex justify-between items-center text-xs p-2.5 rounded-lg border border-slate-200/60 dark:border-slate-800 bg-white dark:bg-[#101625]/40 text-slate-800 dark:text-slate-100">
                     <div>
                       <p className="font-bold">{f.category}</p>
@@ -5551,7 +5643,7 @@ function App() {
                     </span>
                   </div>
                 ))}
-                {finance.filter(f => f.crop_id === selectedCrop._id).length === 0 && (
+                {selectedCropFinanceRows.filter(f => String(f.crop_id) === String(selectedCrop._id)).length === 0 && (
                   <p className="text-center text-xs text-slate-400 italic py-4">{L('No ledger transactions linked to this crop cycle.')}</p>
                 )}
               </div>
@@ -5560,8 +5652,8 @@ function App() {
 
             {/* Linked Care Tasks */}
             {(() => {
-              const linkedTasks = tasks.filter(t => {
-                if (t.crop_id) return t.crop_id === selectedCrop._id;
+              const linkedTasks = selectedCropTaskRows.filter(t => {
+                if (t.crop_id) return String(t.crop_id) === String(selectedCrop._id);
                 return cropNameInText(t.title, selectedCrop.name) || cropNameInText(t.notes, selectedCrop.name) || cropNameInText(t.title, selectedCrop.variety);
               });
               return (
