@@ -438,21 +438,26 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
       years: [...years].sort(),
       monthlyCycles: [...cropMonthCounts.entries()].sort(([a], [b]) => a.localeCompare(b))
         .map(([month, count]) => ({ month, count })),
-      // No image_base64 is selected or returned. These are compact selector rows.
-      options: cropRows.map((crop) => ({
-        _id: crop._id,
-        name: crop.name,
-        variety: crop.variety,
-        status: crop.status,
-        area_kanal: crop.area_kanal,
-        plant_date: crop.plant_date,
-        harvest_date: crop.harvest_date,
-        field: crop.field,
-        season: crop.season,
-        crop_year: crop.crop_year,
-        yield_kg: crop.yield_kg,
-        yield_unit: crop.yield_unit,
-      })),
+      // No image_base64 is selected or returned. Keep the same worker
+      // redaction as GET /crops: production yield is owner/manager data.
+      options: cropRows.map((crop) => {
+        const option = {
+          _id: crop._id,
+          name: crop.name,
+          variety: crop.variety,
+          status: crop.status,
+          area_kanal: crop.area_kanal,
+          plant_date: crop.plant_date,
+          harvest_date: crop.harvest_date,
+          field: crop.field,
+          season: crop.season,
+          crop_year: crop.crop_year,
+          yield_kg: crop.yield_kg,
+          yield_unit: crop.yield_unit,
+        };
+        if (!fullRole) delete option.yield_kg;
+        return option;
+      }),
     },
     taskSummary,
     financeSummary,
