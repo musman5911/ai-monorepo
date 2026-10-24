@@ -144,6 +144,20 @@ const CowSchema = new mongoose.Schema({
   }],
 }, { timestamps: true });
 
+const BreedingEventSchema = new mongoose.Schema({
+  _id: String,
+  cowId: { type: String, required: true, index: true },
+  type: { type: String, enum: ['heat', 'service', 'pregnancy_check', 'calving'], required: true },
+  date: { type: String, required: true },
+  sireSource: { type: String, enum: ['farm_bull', 'outside_bull', 'outside_straw'], default: '' },
+  bullId: { type: String, default: '' },
+  bullName: { type: String, default: '' },
+  semenCode: { type: String, default: '' },
+  technician: { type: String, default: '' },
+  result: { type: String, default: '' },
+  notes: { type: String, default: '' },
+}, { timestamps: true });
+
 const MilkSchema = new mongoose.Schema({
   _id: String,
   cowId: { type: String, required: true },
@@ -373,7 +387,7 @@ const FarmSchema = new mongoose.Schema({
 // Every record below belongs to exactly one farm. User, PasswordReset, Meta and
 // Farm stay global. The server adds the farmId; clients can never set it.
 const FARM_SCOPED = {
-  Cow: CowSchema, Milk: MilkSchema, Expense: ExpenseSchema, Laborer: LaborerSchema,
+  Cow: CowSchema, BreedingEvent: BreedingEventSchema, Milk: MilkSchema, Expense: ExpenseSchema, Laborer: LaborerSchema,
   LaborAttendance: LaborAttendanceSchema, LaborAdvance: LaborAdvanceSchema, Rate: RateSchema,
   Health: HealthSchema, Buyer: BuyerSchema, BuyerPayment: BuyerPaymentSchema,
   Supplier: SupplierSchema, SupplierPayment: SupplierPaymentSchema, RateHistory: RateHistorySchema,
@@ -385,11 +399,12 @@ for (const schema of Object.values(FARM_SCOPED)) {
 }
 
 // ─── Models ──────────────────────────────────────────────────────────────────
-let Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, Meta, Farm;
+let Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, Meta, Farm;
 
 if (USE_MEMORY) {
   const models = createStore({
     Cow: CowSchema,
+    BreedingEvent: BreedingEventSchema,
     Milk: MilkSchema,
     Expense: ExpenseSchema,
     Laborer: LaborerSchema,
@@ -410,6 +425,7 @@ if (USE_MEMORY) {
     Farm: FarmSchema,
   });
   Cow = models.Cow;
+  BreedingEvent = models.BreedingEvent;
   Milk = models.Milk;
   Expense = models.Expense;
   Laborer = models.Laborer;
@@ -430,6 +446,7 @@ if (USE_MEMORY) {
   Farm = models.Farm;
 } else {
   Cow = mongoose.model('Cow', CowSchema);
+  BreedingEvent = mongoose.model('BreedingEvent', BreedingEventSchema);
   Milk = mongoose.model('Milk', MilkSchema);
   Expense = mongoose.model('Expense', ExpenseSchema);
   Laborer = mongoose.model('Laborer', LaborerSchema);
@@ -451,7 +468,7 @@ if (USE_MEMORY) {
 }
 
 // Server-side farm scoping for every farm-owned model (works for MongoDB and memory mode).
-const MUF_FARM_MODELS = { Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, RateHistory, DailyLog, Sale };
+const MUF_FARM_MODELS = { Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, RateHistory, DailyLog, Sale };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
 
-export { MUF_FARM_MODELS, Farm, connectDB, Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, Meta };
+export { MUF_FARM_MODELS, Farm, connectDB, Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, Meta };
