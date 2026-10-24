@@ -144,11 +144,7 @@ router.put('/events/:id', protect, async (req, res) => {
     if (!(await validateReferences(payload, res))) return;
     const updated = await BreedingEvent.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
     await syncCowDate(existing.cowId, existing.type);
-    if (next.cowId !== existing.cowId || next.type !== existing.type) {
-      await syncCowDate(next.cowId, next.type);
-    } else {
-      await syncCowDate(next.cowId, next.type);
-    }
+    await syncCowDate(next.cowId, next.type);
     res.json(updated);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -158,7 +154,7 @@ router.delete('/events/:id', protect, adminOnly, async (req, res) => {
     const event = await BreedingEvent.findById(req.params.id).lean();
     if (!event) return res.status(404).json({ error: 'Breeding event not found' });
     await BreedingEvent.findByIdAndDelete(req.params.id);
-    await syncCowDate(event.cowId, event.type, event.date);
+    await syncCowDate(event.cowId, event.type);
     res.json({ deleted: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
