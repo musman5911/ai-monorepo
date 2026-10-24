@@ -16,7 +16,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 |---|---|---|---|
 | 0 | Done and verified | Done | [phase-00-done-and-verified.md](phases/phase-00-done-and-verified.md) |
 | 1 | Super Admin: owner only, per-farm summaries | Done | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
-| 2 | Dairy breeding events: server | Not started | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
+| 2 | Dairy breeding events: server | In progress | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Not started | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
 | 4 | Dairy calves and lineage | Not started | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
 | 5 | Agri fields and crop cycles: server | Not started | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
@@ -39,7 +39,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 
 ## Current checkpoint
 
-Phase 1 is **Done**. The owner reported passing local Windows CMD results for the 13-test Phase 1 regression test, three-app runtime authorization check, full Vitest suite (24 files, 232 tests), shared sync/UI/workbench/farm/docs checks, and all three production builds. Phase 2 is now the next phase: Dairy breeding events on the server. GitHub Actions are not required for this local verification.
+Phase 1 is **Done**. The owner reported passing local Windows CMD results for the 13-test Phase 1 regression test, three-app runtime authorization check, full Vitest suite (24 files, 232 tests), shared sync/UI/workbench/farm/docs checks, and all three production builds. Phase 2 is now in progress: Dairy breeding events on the server. Its schema and API contract are documented before coding. GitHub Actions are not required for local verification.
 
 ## Why this order
 
