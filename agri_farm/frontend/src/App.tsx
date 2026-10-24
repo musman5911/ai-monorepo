@@ -1257,31 +1257,76 @@ function App() {
         savedCrop = res.data;
         showAlert(isOfflineSave(res) ? "Saved on this device. It will sync when you reconnect." : "Crop developments updated successfully!");
         
-        // Update auto-logged seed cost under the existing Seed category boxes
+        // The dashboard now keeps only recent ledger rows in memory. Query the
+        // full crop-linked ledger before deciding whether an auto-seed expense
+        // already exists, otherwise editing an older crop could create a duplicate.
         const totalSeedCost = payload.seed_quantity * payload.seed_cost_per_unit;
-        const existingSeedFin = finance.find(f => f.crop_id === editingCrop._id && isAutoSeedFinance(f));
-        
-        if (existingSeedFin) {
+        let existingSeedFin = null;
+        let seedLedgerLoaded = false;
+        try {
+          const firstPage = await api.getFinance(0, 500, { crop_id: String(editingCrop._id) });
+          if (!Array.isArray(firstPage.data)) throw new Error('Crop seed-ledger query returned a non-array payload.');
+          const seedRows = [...firstPage.data];
+          const rawTotal = firstPage.headers?.['x-total-count'] ?? firstPage.headers?.['X-Total-Count'];
+          const total = Number(rawTotal);
+
+          if (Number.isSafeInteger(total) && total >= 0) {
+            const seen = new Set(seedRows.filter((row) => row?._id != null).map((row) => String(row._id)));
+            for (let skip = 500; skip < total; skip += 500) {
+              const page = await api.getFinance(skip, 500, { crop_id: String(editingCrop._id) });
+              if (!Array.isArray(page.data)) throw new Error('Crop seed-ledger query returned a non-array payload.');
+              const pageTotal = Number(page.headers?.['x-total-count'] ?? page.headers?.['X-Total-Count']);
+              if (Number.isSafeInteger(pageTotal) && pageTotal !== total) {
+                throw new Error('Crop seed ledger changed while loading; refusing to risk creating a duplicate seed expense.');
+              }
+              for (const row of page.data) {
+                if (row?._id == null || !seen.has(String(row._id))) {
+                  seedRows.push(row);
+                  if (row?._id != null) seen.add(String(row._id));
+                }
+              }
+            }
+            if (seedRows.length < total) throw new Error('Crop seed ledger was incomplete; refusing to risk creating a duplicate seed expense.');
+            seedLedgerLoaded = true;
+          } else {
+            // Compatibility fallback for older API servers without total headers.
+            let skip = seedRows.length;
+            let previousCount = seedRows.length;
+            while (previousCount === 500) {
+              const page = await api.getFinance(skip, 500, { crop_id: String(editingCrop._id) });
+              if (!Array.isArray(page.data)) throw new Error('Crop seed-ledger query returned a non-array payload.');
+              seedRows.push(...page.data);
+              previousCount = page.data.length;
+              skip += page.data.length;
+            }
+            seedLedgerLoaded = true;
+          }
+          existingSeedFin = seedRows.find((row) => isAutoSeedFinance(row)) || null;
+        } catch (finErr) {
+          console.warn('Could not verify the existing crop seed ledger; leaving its automatic expense unchanged:', finErr);
+          showAlert('Crop updated, but the seed ledger could not be checked. No automatic seed expense was created or changed; retry while online.', true);
+        }
+
+        // Never create a replacement unless the complete crop-linked ledger was read.
+        if (seedLedgerLoaded && existingSeedFin) {
           if (totalSeedCost > 0) {
             try {
               await api.updateFinance(existingSeedFin._id, buildAutoSeedFinance(payload, editingCrop._id, existingSeedFin));
             } catch (finErr) {
-              console.warn("Failed to update auto-logged seed expense:", finErr);
+              console.warn('Failed to update auto-logged seed expense:', finErr);
             }
           } else {
-            // Sowing seed cost is now 0, delete the transaction
             try {
               await api.deleteFinance(existingSeedFin._id);
             } catch (finErr) {
-              console.warn("Failed to delete auto-logged seed expense:", finErr);
+              console.warn('Failed to delete auto-logged seed expense:', finErr);
             }
           }
-        } else if (totalSeedCost > 0 && savedCrop && savedCrop._id) {
-          // It didn't exist before, but now totalSeedCost > 0, so create it!
+        } else if (seedLedgerLoaded && totalSeedCost > 0 && savedCrop && savedCrop._id) {
           try {
             await api.addFinance(buildAutoSeedFinance(payload, savedCrop._id));
           } catch (finErr) {
-            console.warn("Failed to auto-log seed expense on edit:", finErr);
+            console.warn('Failed to auto-log seed expense on edit:', finErr);
           }
         }
       } else {
