@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import mongoose from 'mongoose';
-import { Cow, Milk, Expense, Rate, Health, Buyer, BuyerPayment, RateHistory, DailyLog, Sale, Meta, Laborer, LaborAttendance, LaborAdvance, Supplier, SupplierPayment, User, Farm, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
+import { Cow, Milk, Expense, Rate, Health, Buyer, BuyerPayment, RateHistory, DailyLog, Sale, Meta, Laborer, LaborAttendance, LaborAdvance, Supplier, SupplierPayment, BreedingEvent, User, Farm, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
 import { protectUnscoped, ownerOnly } from '../middleware/auth.js';
 import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
 
@@ -27,7 +27,7 @@ import { MUF_ENV } from '../muf-env.mjs';
 // GET /api/backup — download full database as JSON
 router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
   try {
-    const [cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments] = await Promise.all([
+    const [cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents] = await Promise.all([
       Cow.find().lean(),
       Milk.find().lean(),
       Expense.find().lean(),
@@ -40,7 +40,7 @@ router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
       Sale.find().lean(),
       Laborer.find().lean(),
       LaborAttendance.find().lean(),
-      LaborAdvance.find().lean(), Supplier.find().lean(), SupplierPayment.find().lean(),
+      LaborAdvance.find().lean(), Supplier.find().lean(), SupplierPayment.find().lean(), BreedingEvent.find().lean(),
     ]);
     const farms = await Farm.find().lean();
     const backup = {
@@ -48,7 +48,7 @@ router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
       farmName: 'Usman Dairy Farm',
       version: 3,
       farms,
-      cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments
+      cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents
     };
     res.setHeader('Content-Disposition', `attachment; filename=usman-dairy-backup-${new Date().toISOString().slice(0,10)}.json`);
     res.setHeader('Content-Type', 'application/json');
@@ -72,6 +72,7 @@ const COLLECTIONS = {
   laborAdvances: LaborAdvance,
   suppliers: Supplier,
   supplierPayments: SupplierPayment,
+  breedingEvents: BreedingEvent,
 };
 
 async function restoreCollections(payload, session) {
@@ -175,10 +176,10 @@ router.post('/restore', protectUnscoped, ...adminOnly, async (req, res) => {
 const MONTHLY_AUTO_BACKUP_KEY = 'monthly_auto_backup';
 
 async function collectBackupPayload() {
-  const [cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments] = await Promise.all([
+  const [cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents] = await Promise.all([
     Cow.find().lean(), Milk.find().lean(), Expense.find().lean(), Rate.find().lean(),
     Health.find().lean(), Buyer.find().lean(), BuyerPayment.find().lean(), RateHistory.find().lean(), DailyLog.find().lean(), Sale.find().lean(),
-    Laborer.find().lean(), LaborAttendance.find().lean(), LaborAdvance.find().lean(), Supplier.find().lean(), SupplierPayment.find().lean(),
+    Laborer.find().lean(), LaborAttendance.find().lean(), LaborAdvance.find().lean(), Supplier.find().lean(), SupplierPayment.find().lean(), BreedingEvent.find().lean(),
   ]);
   const farms = await Farm.find().lean();
   return {
@@ -186,7 +187,7 @@ async function collectBackupPayload() {
     exportDate: new Date().toISOString(),
     farmName: 'Usman Dairy Farm',
     version: 2,
-    cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments,
+    cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents,
   };
 }
 
