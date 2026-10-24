@@ -67,6 +67,7 @@ npm run check-sync
 npm run check-ui
 npm run check-workbench
 npm run check-farms
+npm run check-breeding-events
 npm run check-docs
 tools\build-all.bat
 ```
