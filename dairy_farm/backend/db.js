@@ -49,6 +49,8 @@ async function ensureIndexes() {
       Milk.collection.createIndex({ cowId: 1, date: 1 }, { unique: true, name: 'milk_cow_date_unique' }),
       Milk.collection.createIndex({ date: -1 }, { name: 'milk_date' }),
       Milk.collection.createIndex({ farmId: 1, date: -1 }, { name: 'milk_farm_date' }),
+      BreedingEvent.collection.createIndex({ farmId: 1, cowId: 1, date: -1 }, { name: 'breeding_event_farm_cow_date' }),
+      BreedingEvent.collection.createIndex({ farmId: 1, type: 1, date: -1 }, { name: 'breeding_event_farm_type_date' }),
       Expense.collection.createIndex({ farmId: 1, date: -1 }, { name: 'expense_farm_date' }),
       Expense.collection.createIndex({ date: -1 }, { name: 'expense_date' }),
       Expense.collection.createIndex({ cowId: 1, date: -1 }, { name: 'expense_cow_date' }),
