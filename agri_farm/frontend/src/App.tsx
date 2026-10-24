@@ -807,13 +807,16 @@ function App() {
     return tips.slice(0, 2).join(' ');
   };
 
+  const needsFullDetails = activeTab === 'labor' ||
+    (activeTab === 'finance' && agriFinanceSubTab !== 'ledger');
+
   useEffect(() => {
     if (!token) return;
     setLoading(true);
-    refreshData(['finance', 'labor', 'summary'].includes(activeTab)).finally(() => setLoading(false));
-  }, [token, activeTab]);
+    refreshData(needsFullDetails).finally(() => setLoading(false));
+  }, [token, activeTab, agriFinanceSubTab]);
 
-  const refreshData = async (includeFullDetails = ['finance', 'labor', 'summary'].includes(activeTab)) => {
+  const refreshData = async (includeFullDetails = needsFullDetails) => {
     // Summary-first startup avoids downloading every ledger row just to paint
     // dashboard KPIs. Lists still use their independent server-paged endpoints.
     // Full details are fetched only for workspaces that open cross-record
