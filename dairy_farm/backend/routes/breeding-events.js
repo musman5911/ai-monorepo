@@ -76,8 +76,8 @@ async function syncCowDate(cowId, type, oldDate = '') {
   const cow = await Cow.findById(cowId).lean();
   if (!cow) return;
   const patch = {};
+  // Preserve a legacy date when no event remains; deleting new event history must not erase older cow data.
   if (latest) patch[field] = latest.date;
-  else if (oldDate && cow[field] === oldDate) patch[field] = '';
   if (Object.keys(patch).length) await Cow.findByIdAndUpdate(cowId, { $set: patch });
 }
 
