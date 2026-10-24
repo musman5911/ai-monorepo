@@ -205,6 +205,7 @@ function App() {
   const confirm = useConfirm();
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [userRole, setUserRole] = useState(localStorage.getItem('role') || 'worker');
+  const [farmRole, setFarmRole] = useState(localStorage.getItem('farmRole') || 'worker');
   const [username, setUsername] = useState(localStorage.getItem('username') || 'Worker');
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const [currentUserAvatar, setCurrentUserAvatar] = useState(localStorage.getItem('avatar_base64') || '');
@@ -1162,6 +1163,7 @@ function App() {
     // Preserve theme preference and the offline request queue on sign-out
     localStorage.removeItem('token');
     localStorage.removeItem('role');
+    localStorage.removeItem('farmRole');
     localStorage.removeItem('username');
     localStorage.removeItem('avatar_base64');
     api.logout().catch(() => {});
@@ -1213,12 +1215,14 @@ function App() {
         const res = await api.login(authForm.username, authForm.password);
         localStorage.setItem('token', res.data.access_token);
         localStorage.setItem('role', res.data.role);
+        localStorage.setItem('farmRole', res.data.farmRole || (res.data.role === 'admin' ? 'owner' : 'worker'));
         
         const cleanName = res.data.username || authForm.username.split('@')[0];
         localStorage.setItem('username', cleanName);
 
         setToken(res.data.access_token);
         setUserRole(res.data.role);
+        setFarmRole(res.data.farmRole || (res.data.role === 'admin' ? 'owner' : 'worker'));
         setUsername(cleanName);
         showAlert("Welcome back to Usman Agri Farm!");
       }
@@ -2927,7 +2931,7 @@ function App() {
                 ...(userRole === 'admin'
                   ? [{ key: 'summary', tab: 'summary', label: L('Summary'), Icon: BarChart2 }]
                   : []),
-                ...(userRole === 'admin'
+                ...(farmRole === 'owner'
                   ? [{ key: 'super_admin', tab: 'super_admin', label: 'Super Admin', Icon: ShieldCheck }]
                   : []),
               ].map(({ key, tab, label, Icon }) => (
@@ -4626,7 +4630,7 @@ function App() {
             </div>
           )}
 
-          {activeTab === 'super_admin' && userRole === 'admin' && <SuperAdminTab />}
+          {activeTab === 'super_admin' && farmRole === 'owner' && <SuperAdminTab />}
         </div>
       </main>
 
