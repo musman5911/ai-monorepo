@@ -238,6 +238,9 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(app).toContain("const needsFullDetails = activeTab === 'labor'");
     expect(app).toContain("activeTab === 'finance' && agriFinanceSubTab !== 'ledger'");
     expect(app).toContain('refreshData(needsFullDetails)');
+    expect(app).toContain('setSelectedCropFinanceRows(financeRows)');
+    expect(app).toContain('setSelectedCropTaskRows(taskRows)');
+    expect(app).toContain('Loading complete crop history');
     expect(app).toContain('serverFinanceSummary?.monthlyIncomeSeries');
   });
 
