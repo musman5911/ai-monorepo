@@ -158,7 +158,10 @@ export async function parseXlsxRows(buffer: ArrayBuffer): Promise<string[][]> {
     for (const row of result.slice(1)) {
       const serial = Number(row[dateIndex]);
       if (row[dateIndex] && Number.isFinite(serial) && serial >= 1 && serial <= 2958465) {
-        const date = new Date(Date.UTC(1899, 11, 30) + Math.floor(serial) * 86400000);
+        // Excel treats serial 1 as 1900-01-01; correct its pre-March
+        // dates while retaining the conventional 1899-12-30 epoch afterward.
+        const effectiveSerial = serial < 60 ? serial + 1 : serial;
+        const date = new Date(Date.UTC(1899, 11, 30) + Math.floor(effectiveSerial) * 86400000);
         row[dateIndex] = date.toISOString().slice(0, 10);
       }
     }
