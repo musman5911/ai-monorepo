@@ -66,11 +66,11 @@ The wrapper works on real MongoDB models and on the memory-mode demo models, so 
 - **Migration:** `flock_farm/backend/scripts/migrate-farms.js`; `npm run migrate:farms:dry` reports untagged records and legacy roles without applying the farm migration, while `npm run migrate:farms` applies it. Real data is never migrated at startup. Memory/demo data is disposable and migrates automatically.
 - Phase 2 will later move the large legacy bucket lists into proper collections; that restructure is not part of 1B-2.
 
-**Still pending:** run the Flock HTTP scope checks, automated tests/builds, and migration against a backup copy. Review backup/restore, image access, and manager assignment behavior before declaring the phase done.
+**Local checks still required where not yet reported:** keep Flock HTTP scope/security tests and automated builds passing. Browser review, migration against a database copy and backup/restore validation are postponed to the final project-wide verification pass after all planned phases have implementation complete.
 
 ## What is checked
 
 - `tests/muf-farms.test.ts`: roles, access rules, filter building, the model wrapper (also against real MongoDB query objects), and the migration, including running it twice.
 - `tools/check-farm-scope.js` (`npm run check-farms`): starts the Dairy backend in memory mode and proves over real HTTP that owners, managers and workers see and change only what they should (42 checks).
 
-Not checked yet: the migration against a real MongoDB copy, and the screens (step 1C).
+Postponed to final project-wide verification: migration against a disposable MongoDB copy and browser/screen review (step 1C), after all planned phases have implementation complete.

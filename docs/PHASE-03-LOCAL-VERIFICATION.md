@@ -1,3 +1,13 @@
+## Verification timing policy (owner decision)
+
+Browser/live UI and role walkthroughs plus all real-MongoDB/database-copy checks for Phase 03 are **POSTPONED until the single final project-wide pass after all planned phases have implementation complete**. Do not run or require them to sign off Phase 03 separately. Local root tests, memory-mode runtime HTTP integration tests, farm-scope/source checks, shared-file parity and all three frontend production builds remain required now. Never use production data.
+
+## Current implementation follow-up (2026-10-24)
+
+Agri now has an authenticated, farm-scoped \`/analytics/summary\` endpoint that returns crop/task totals, monthly finance rows, monthly income trends, expense/income breakdowns, profitability and bounded recent task/ledger rows without photo blobs. The initial dashboard/report load uses the summary endpoint. Full detail arrays are fetched only for the finance workspace outside the paged Ledger subtab and for Labor. Regression coverage checks per-farm summary arithmetic, worker finance redaction, farm isolation and no-partial-write validation for task/finance bulk requests that include a crop from another farm.
+
+The follow-up is committed to \`muf-monorepo\` but **local tests/builds have not yet been run for this follow-up**. Do not mark Phase 03 verified until the owner runs the local commands and reviews failures.
+
 # Phase 03 Agri runtime and release verification
 
 This checklist complements the automated source tests. It deliberately separates automated API coverage from browser checks that need a real browser session and representative farm data.
@@ -46,8 +56,7 @@ The Agri crop and task screens now fetch a filtered first page when their view o
 
 The existing refresh still retrieves complete crop/task/finance arrays for current dashboard/report calculations. Thus the list UI is network-paged, but aggregate startup transfer remains a known scalability item until farm-scoped summary endpoints replace the arrays without changing totals. Tests/builds have not been rerun for this batch.
 
-Keep Phase 03 open until automated tests and all three frontend builds are rerun, filters/Load More and aggregate totals are checked locally, and the final browser-role and disposable real-database checks are recorded. Browser/live UI and real-database checks remain deliberately postponed until the planned phases are implemented. Never treat environment-dependent skips as passes.
-
+Keep Phase 03 open until root tests/checks and all three frontend builds pass locally and the summary, filters, Load More, farm-scoped totals and bulk-import regressions pass. Browser/live UI and real-MongoDB/database-copy checks are deliberately postponed to the final project-wide pass after all planned phases are implemented. Never treat environment-dependent skips as passes.
 
 ## Owner-reported local checkpoint (2026-10-23, commit 757e11e)
 
@@ -67,7 +76,6 @@ Not yet verified in this checkpoint:
 Root `npm ci` reported five dependency vulnerabilities (1 moderate, 2 high, 2 critical). Do not apply a blanket `npm audit fix --force`; investigate the dependency tree and handle upgrades separately.
 
 The first root test run exposed an over-escaped regex in the adjacent-page metadata test. Commit `757e11e` fixes it; the focused integration suite and complete root suite passed after pulling that commit.
-
 
 ## Farm, sync, UI and workbench follow-up (2026-10-23)
 
@@ -90,7 +98,6 @@ Owner-reported Windows checks after commit `93d38fa`:
 - Dairy client build is still pending; the confirmed path is `dairy_farm/client`.
 
 These checks do not close the Phase 3 acceptance gates for Agri on-demand network paging, large-dataset runtime coverage, cross-farm aggregate runtime fixtures, or the final browser/isolated-database pass.
-
 
 ## Runtime smoke test runner update (2026-10-23)
 

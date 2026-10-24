@@ -1,12 +1,17 @@
 # Roadmap
-Last reviewed: 2026-10-23. Current follow-up strengthens farm deletion and Flock inventory allocation, and implements server-filtered Agri list paging with regression coverage. Tests/builds have not been rerun for these edits; CI is manual-only, so prior results do not verify this batch. Browser role review, real-MongoDB lock contention and disposable-copy migration/backup-restore checks remain deferred to the consolidated final pass. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; what is planned now is the scale-up of the three apps.
+Last reviewed: 2026-10-24. Agri now has a farm-scoped analytics summary endpoint and summary-first frontend refresh, with full details retained for workspaces that require them. The new code and regression coverage still need the owner's local test/build run. GitHub Actions remains manual-only; do not start a run on every commit. This roadmap replaces the old UI-modernization roadmap. The design-system work (MUF phases 6 to 12) is finished and lives on `main`; the roadmap below covers scale-up work for the three apps.
+
+## Verification timing policy (owner decision)
+
+For **every planned phase (0 through 7)**, browser/live UI testing (including all role walkthroughs) and every real-MongoDB or database-copy test are **POSTPONED until one consolidated project-wide verification pass after all planned phases have implementation complete**. This includes multi-process MongoDB concurrency, index/migration validation, disposable-copy backup/restore and final browser role checks. These checks do not block individual phase implementation, and must not be run independently for a phase. Never run verification against production data.
+
+Per-phase work must still use local automated tests, memory-mode HTTP integration fixtures, source/safety checks, shared-file parity checks and frontend production builds. Those checks are not postponed. At the final checkpoint, run the combined browser/role matrix and isolated real-database/disposable-copy suite, record exact results, and only then close the related verification gates. This decision supersedes older historical notes below that describe browser or real-MongoDB checks as immediate per-phase blockers.
 
 ### Phase 3 step: Agri task and finance bulk imports
 
 Added admin-only bulk endpoints and preview-first CSV/XLSX import UI for task and finance records. The endpoints reject malformed rows before writing, enforce a 200-record request cap, and restrict finance imports to an explicit field allowlist and validate crop/inventory references against the selected farm. The frontend accepts up to 1,000 rows per file and submits sequential chunks of at most 200, reporting failed chunks without automatically retrying them. The XLSX parser now resolves the actual first worksheet through workbook relationships and bounds archive/file sizes. Source-contract tests and the memory-mode HTTP farm-scope checker cover validation and cross-farm visibility, but local tests, production build and browser review remain pending.
 
-The Agri crop/task/ledger list views now use user-triggered server paging and server-side filters while the current full datasets remain in place for dashboard/report totals. The remaining Phase 3 blockers are verification, cross-farm bulk/aggregate fixtures, and the separate optimization of aggregate-array transfer through summary endpoints. The prior owner-reported root test suite passed 186/186 tests across 21 files, the Agri runtime HTTP integration suite passed 6/6, and Agri/Flock builds passed; those historical results do not verify the current commit. Owner subsequently passed `check-farms`, `check-sync`, `check-ui`, and all 23 `check-workbench` source checks. Dairy client build remains pending. `check-workbench-runtime` was attempted but failed because the Dairy Vite dev server was not running at `127.0.0.1:5000`. Keep Phase 3 open until current tests/builds, large-dataset and cross-farm bulk fixtures, and the consolidated verification checkpoint are complete.
-
+The Agri crop/task/ledger lists use server-side paging and filters. The new authenticated `/analytics/summary` route returns farm-scoped crop/task/finance aggregates, monthly trends, profitability and bounded recent rows without returning photo blobs. The frontend uses these summaries for dashboard/report totals and loads full detail arrays only in the non-ledger finance and Labor workspaces. Runtime tests now cover summary accuracy, selected-farm isolation, worker finance redaction and cross-farm bulk task/finance rejection. This code has not yet been verified by the owner's local test/build run. Keep Phase 3 open until local automated gates, paging/import/summary regression fixtures and all three frontend builds pass. Browser and real-MongoDB/database-copy checks are postponed to the final project-wide pass.
 
 The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md). Status is in [PROGRESS.md](PROGRESS.md).
 
@@ -25,9 +30,9 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 | Phase | What | Projects | Risk |
 |---|---|---|---|
 | 0 | Docs reset and repository cleanup | Repository | Low (done, see PROGRESS) |
-| 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Implementation done; copy-migration checks and final integrated browser pass pending |
-| 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | Implementation checkpoint delivered: batch-first panels, source-batch egg allocation validation, batch-linked labor, cross-process inventory locking, and complete batch backup fields. Local tests/builds and disposable-copy backup/restore verification are pending before phase sign-off |
-| 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | In progress, not signed off. Dairy cow/milk paging and CSV imports, Flock batch paging and bulk CSV workflows, and Agri bounded crop/task/finance APIs are implemented. Agri has preview-first crop/task/finance CSV/XLSX workflows with bounded row/chunk sizes and row validation. Runtime HTTP tests now cover adjacent-page metadata/ID uniqueness and invalid/unauthorized task bulk writes. Remaining: wire Agri lists to genuine on-demand network paging without losing full dashboard/report totals; verify cross-farm isolation for bulk writes and aggregates with dedicated runtime fixtures; confirm Flock bulk-entry acceptance scope (CSV workflows are implemented; XLSX support needs an explicit requirement); run Dairy client build; rerun the updated workbench runtime smoke test (it now starts/stops the local Vite server itself); then complete browser role review and real-MongoDB/disposable-copy validation in the consolidated final pass. Browser role checks and real-MongoDB validation remain in the consolidated final pass. |
+| 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Implementation substantially delivered; local scope/security/build gates continue. Migration/backup on database copies and the final browser-role pass are postponed until every phase is implemented |
+| 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | Batch-first panels, allocation guards, batch-linked labor, inventory locking and backup fields are implemented. Local tests/builds remain phase gates; real-MongoDB concurrency and database-copy backup/restore are postponed to final project-wide verification |
+| 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | In progress, not signed off. Dairy cow/milk paging and CSV imports, Flock batch paging/bulk CSV workflows and Agri bounded crop/task/finance APIs/imports are implemented. Agri now has summary-first dashboard/report totals and server-paged detail lists; regression coverage adds farm-scoped aggregate and cross-farm bulk fixtures. Remaining: run local tests/checks and all three builds; resolve whether Flock needs XLSX beyond current CSV support. Browser/live UI and real-MongoDB/database-copy checks are postponed until final project-wide verification |
 | 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | In progress: optional cow lineage fields and ear-tag index added; workflows and disposable-MongoDB index verification remain |
 | 5 | Photo storage adapter and Cloudinary | All three | Medium |
 | 6 | Super Admin upgrade (Owner-only, per-farm summaries) | All three | Low to medium |
@@ -53,7 +58,7 @@ Built in four steps so each zip can be checked on its own. The design record is 
 - Migration script: "Farm 1", tag all records, convert admin to owner, assign workers. Re-runnable, tested on a copy, backup first.
 - Shared files per `FARMS_AND_ROLES.md` section 6; extend `check-muf-sync.js`; new tests for scope and roles.
 - The plan must list every collection and decide farm-owned versus global.
-- Done when: migration passes on a copy of each project's data, a worker cannot reach another farm through the API, the three builds pass, and the owner confirms in the browser.
+- Local implementation gate: automated farm-scope/role tests and the three builds pass. Migration on disposable copies, backup/restore validation and browser/role confirmation are postponed to the final project-wide pass.
 
 ### Phase 2: Flock restructure
 
@@ -65,7 +70,7 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 - **Implemented in source:** new per-batch egg and vaccination log models, authenticated API routes, frontend entry forms and history tables. Batch summary includes egg totals, egg income and vaccination costs, with egg income included in revenue/profit. Batch detail, export/import, deletion and wipe paths include the new collections.
 - **CI passed:** GitHub Actions run [39906778407](https://github.com/musman5911/ai-monorepo/actions/runs/39906778407) completed successfully on commit `d63d719`; root tests, farm scope, MUF parity, UI safety, workbench checks/runtime, design audit and all three app builds passed. `tests/flock-batch-math.test.ts` was included in the passing root test run. Still required: inspect backup/restore compatibility and fix any failures. No migration has been run; new collections are additive, but copy-based backup/restore validation is still required.
 - Browser and end-to-end role verification are deferred to the final pass after all phases, per owner direction.
-- Done when: Batches is the clear primary workflow, Home Birds exposes only the approved features, relevant automated checks pass, and any required copy-based migration/backup checks pass.
+- Local implementation gate: Batches is the primary workflow, Home Birds exposes only the approved features, and relevant automated checks/builds pass. Real-MongoDB concurrency and disposable-copy backup/restore are postponed to the final project-wide pass.
 
 ### Latest verification checkpoint (2026-10-23)
 
@@ -142,43 +147,35 @@ These are still open. Each needs the owner's approval before it starts.
 
 Not planned until the scale-up phases are done: lazy-loading PDF and charts (C1), right-to-left logical properties (C2), accessibility pass (C3), service-worker update prompt (C4), shared form, table and icon components, a component gallery in the workbench, splitting the large components (Agri `App.tsx`, Flock `App.tsx`), one real shared MUF package instead of three copies, and clearing Agri's type errors so `tsc` can join its build.
 
-
 ### Phase 1C implementation status (2026-10-23)
 
 The first frontend integration adds a shared farm switcher to all three app headers and attaches the selected farm ID to API requests. The owner panel uses existing APIs for farm maintenance and role/farm assignment. Permanent deletion and “All farms” mode are intentionally not exposed.
 
 Owner-reported local results before the latest Dashboard change: all three frontend builds, farm-scope, MUF-sync, UI-safety, 89 unit tests and 8 workbench runtime checks passed. The latest Dashboard change is not yet verified. Build warnings remain for large chunks and a mixed static/dynamic import; they did not fail the builds. Review actual endpoint compatibility and role-based access, then test migration dry-runs on database copies. Never run migrations against live data. Browser testing remains deferred until final review.
 
-
 ### Phase 2 implementation update (2026-10-23): server-enforced incubation allocation
 
 Incubation records linked to a batch now pass server validation against egg supply in the selected farm. Availability is calculated from batch egg logs after sold, home-use and waste counts; all linked incubation records are summed before accepting a write. Unknown batches and over-allocation are rejected. Legacy unlinked records remain valid. The validator has six unit cases added, but no tests/build/workflow have been run for this update yet. Egg-log edits can still reduce supply below existing allocations, so stock reconciliation is not complete. Next: prevent that case, then implement real batch-linked labor assignments. GitHub Actions stays manual-only and should be triggered at the Phase 2 testing checkpoint, not on each commit.
-
 
 ### Phase 2 implementation update (2026-10-23): batch-linked labor and egg-history protection
 
 Daily labor attendance can now be assigned to a batch, displays that assignment in history, and summarizes assigned workers by active batch for the selected month. Server validation rejects attendance writes linked to batches outside the active farm. Batch deletion is blocked while incubation or labor history references it; deleting an egg log is blocked if it would make current incubation allocations exceed remaining supply. Added validator unit tests for labor assignment and incubation allocation, but they have not yet been executed. The UI still needs a clear per-batch available-egg figure, and Dashboard/Health/Summary need a final review for batch-first workflows. The workflow remains manual-only; run it at the Phase 2 checkpoint, not per commit.
 
-
 ### Phase 2 implementation update (2026-10-23): available egg supply in incubation
 
 Batch summary now includes net eggs after sales, home use and waste. Incubation shows net supply, linked allocations and estimated unallocated eggs by batch, including the current record's allocation when editing. Validator tests and a batch-math assertion were added, but tests/builds remain unrun. Remaining stock-integrity work includes preventing races between an incubation save and egg-log deletion with transaction or serialization support, plus integration coverage. This environment has no GitHub Actions workflow-dispatch action, so CI cannot be started directly here; keep the workflow manual-only and run it at the deliberate Phase 2 checkpoint.
-
 
 ### Phase 2 implementation update (2026-10-23): destructive batch replacement guards
 
 Batch import-all and wipe-all now return HTTP 409 if incubation or labor attendance records reference a batch, preventing those bulk operations from silently orphaning history. A new batch-math test covers net egg availability after sales, home use and waste. These tests and builds remain unrun; the GitHub Actions connector cannot dispatch the manual workflow. Still open: race protection between allocation writes and egg-log deletion, concurrency/integration coverage, and coordinated full backup restore when linked history exists.
 
-
 ### Phase 2 implementation update (2026-10-23): linked-history guard tests
 
 The import/wipe guard is now a pure tested helper with coverage for empty, incubation-linked and labor-linked history. The route uses the helper. Tests/builds remain unrun; manual workflow dispatch is unavailable through this connector. Allocation-vs-egg-log deletion race protection and integration coverage remain unresolved before Phase 2 can be considered fully verified.
 
-
 ### Phase 2 implementation update (2026-10-23): allocation math consistency
 
 Incubation validation now clamps each egg-log's net supply at zero, matching the batch summary calculation and preventing negative-net legacy records from reducing valid supply on other dates. Added a regression unit test, not yet executed. Cross-request allocation/deletion concurrency and integration coverage remain open. The connected GitHub tools do not expose workflow dispatch, so the manual-only Actions checkpoint has not run; Phase 2 remains in progress until those risks and verification are addressed.
-
 
 ### Phase 2 verification checkpoint (2026-10-23): atomicity and current-test evidence
 
@@ -199,7 +196,6 @@ The Home Birds navigation is secondary and scoped to Bird List, Eggs, Monthly Re
 - Batch Health displays the 20 most recent batch vaccination/mortality events and computes headline totals from the full loaded history, with a visible warning when any batch detail could not be loaded.
 - The Home Birds Monthly Report is now bird-focused again; batch financials live in the dedicated top-level Summary. No legacy bird report data was deleted.
 
-
 ## Verification checkpoint update (2026-10-23)
 
 The owner's latest local run found one failing root test and a Flock farm-scope failure. The incubation test expectation was inconsistent with the implemented rule: 100 net eggs are available, so allocation 110 must be rejected. The test now checks that exactly 100 is accepted and that a malformed negative-net legacy log cannot make 101 available. The farm-scope harness now reports login/farm setup HTTP responses and exits that project check cleanly when setup fails; this improves diagnostics but does **not** mean the underlying Flock role/migration failure is fixed.
@@ -215,7 +211,6 @@ The owner's latest local run found one failing root test and a Flock farm-scope 
 
 For every following implementation step, update both this roadmap and `PROGRESS.md`, add/extend automated regression tests, and record reproducible Windows CMD commands. Phase 3 should include automated tests for bulk request validation, farm isolation in bulk reads/writes, pagination/filter correctness, server-side totals, and a 1,000-row save/performance fixture before its UI is considered done.
 
-
 ## Latest local verification update (2026-10-23)
 
 The owner reports root unit tests passing (**115/115**), MUF sync/UI/workbench checks passing, and the Flock client production build passing. The farm-scope script passed Agri and Dairy but received Flock's intentional startup 503 at login: its HTTP health route can respond before asynchronous database initialization and farm migration finish.
@@ -223,7 +218,6 @@ The owner reports root unit tests passing (**115/115**), MUF sync/UI/workbench c
 The harness has been updated to retry only that exact startup response for up to 30 seconds; role checks remain strict and other failures remain visible. Commit: `9a3eeb5`. This change is awaiting the owner's local rerun.
 
 **Phase 2 is still open.** After the farm-scope check passes, remaining sign-off gates are real-MongoDB inventory-lock concurrency and repeatable backup/restore compatibility tests on disposable data. The Vite chunk-size warning is a performance follow-up, not the cause of the farm-scope failure.
-
 
 ### Latest verification update (2026-10-23): Flock backup path
 
@@ -233,13 +227,11 @@ The cause identified is a missing `findOneAndDelete` operation in Flock's in-mem
 
 Next: pull and rerun `npm run check-farms`; if it passes, rerun the root checks and builds at the checkpoint. Real-MongoDB cross-process inventory concurrency and disposable-copy backup/restore compatibility remain mandatory before Phase 2 sign-off. Phase 3 stays blocked until all Phase 2 gates pass.
 
-
 ### Phase 3 implementation update (2026-10-23): Agri workbook imports and regression coverage
 - Added browser-native XLSX ZIP/XML parsing for the first worksheet, including shared strings, inline strings, sparse columns, basic booleans, and Excel serial date normalization for plant/harvest dates. CSV and XLSX share the same preview, required-column checks, row-width validation, 1,000-row cap, 5 MB file cap, and explicit confirmation.
 - Crop import converts an `area_acres` value to kanal before saving, rather than silently sending an unsupported field while applying the default area.
 - Added parser regressions for CSV round-tripping, row limits, malformed workbook signatures, malformed row widths, and farm-scope helper behavior. Existing `tools/check-farm-scope.js` already exercises Agri record isolation over HTTP in memory mode.
 - Not signed off: Agri still loads all crop/task/finance pages during refresh because dashboards and reports currently consume the full arrays. Changing those arrays to one page would silently break totals and report history. True list-on-demand loading needs a separate list state plus server-backed aggregate/report data or carefully deferred report fetches; this remains open rather than being mislabeled complete.
 - Verification status: no tests or builds were executed by the GitHub file-editing session. Run the Windows checkpoint commands listed in `PROGRESS.md` before treating these changes as working.
-
 
 Phase 3 implementation follow-up: commit `7245abb` adds a 1,001-row Agri task pagination integration test that creates data through the bulk API, validates page metadata and exact unique fixture coverage across real HTTP pages, and cleans up its fixture. Commit `3e50f9d` updates the workbench runtime smoke script to manage its local Vite server. Both changes are pending local execution. They strengthen verification but do not resolve the core Agri on-demand UI paging blocker.

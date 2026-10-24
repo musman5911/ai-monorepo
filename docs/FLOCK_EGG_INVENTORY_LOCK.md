@@ -1,6 +1,6 @@
 ## Additional edge-case safety (2026-10-23)
 
-Incubation allocation now counts egg-log rows as usable supply only when collected, sold, home-use and waste quantities are absent or valid non-negative safe integers. A malformed field makes that row contribute zero supply, preventing NaN from bypassing the allocation comparison. Tests cover malformed numeric strings, negative/unsafe counts, independent per-farm locks and retry after a storage acquisition error. Tests have not been run for this batch. Real MongoDB multi-process contention and backup/restore must still be verified on a disposable copy, never production.
+Incubation allocation now counts egg-log rows as usable supply only when collected, sold, home-use and waste quantities are absent or valid non-negative safe integers. A malformed field makes that row contribute zero supply, preventing NaN from bypassing the allocation comparison. Tests cover malformed numeric strings, negative/unsafe counts, independent per-farm locks and retry after a storage acquisition error. Tests have not been run for this batch. Real-MongoDB multi-process contention and backup/restore are postponed to the final project-wide verification pass, using a disposable copy and never production.
 
 ---
 
