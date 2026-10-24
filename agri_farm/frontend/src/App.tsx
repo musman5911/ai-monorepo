@@ -2406,6 +2406,13 @@ function App() {
   const dashPendingCount = dashboardCropFilter === 'all'
     ? Number(analyticsSummary?.taskSummary?.byStatus?.Pending ?? dashPendingTaskRows.length)
     : Number(selectedDashboardTaskSummary?.pending ?? dashPendingTaskRows.length);
+  const currentAssigneeSummary = analyticsSummary?.taskSummary?.byAssignee?.find(
+    (item) => String(item.assignee || '').toLowerCase() === String(username || '').toLowerCase()
+  );
+  const myPendingTaskCount = Number(currentAssigneeSummary?.active ??
+    tasks.filter((task) => String(task.assigned_to || '').toLowerCase() === String(username || '').toLowerCase() && task.status !== 'Completed').length);
+  const myCompletedTaskCount = Number(currentAssigneeSummary?.completed ??
+    tasks.filter((task) => String(task.assigned_to || '').toLowerCase() === String(username || '').toLowerCase() && task.status === 'Completed').length);
   const pendingDutyRows = Array.isArray(analyticsSummary?.taskSummary?.recentPending)
     ? analyticsSummary.taskSummary.recentPending
     : tasks.filter((task) => task.status === 'Pending');
