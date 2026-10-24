@@ -745,7 +745,7 @@ function App() {
     const cropHint = activeNames.length ? ` for your ${activeNames.join(', ')}` : '';
 
     // Pending irrigation/watering tasks on the roster.
-    const pendingIrrigation = tasks.filter(t => t.status === 'Pending' && isIrrigationRelated(t.title, t.notes)).length;
+    const pendingIrrigation = Number(analyticsSummary?.taskSummary?.pendingIrrigation ?? tasks.filter(t => t.status === 'Pending' && isIrrigationRelated(t.title, t.notes)).length);
 
     const tips = [];
 
@@ -2138,14 +2138,6 @@ function App() {
     return result;
   }, [crops, filteredFinance, financeCropFilter, financeFilter, serverFinanceSummary]);
 
-  const filteredTasks = tasks.filter(t => {
-    if (taskFilter !== 'all') {
-      if (taskFilter === 'Pending' && t.status !== 'Pending') return false;
-      if (taskFilter === 'Completed' && t.status !== 'Completed') return false;
-    }
-    if (taskCropFilter !== 'all' && !taskMatchesCrop(t, taskCropFilter)) return false;
-    return true;
-  });
   const cropListFilters = { status: cropFilter, season: cropSeasonFilter, crop_year: cropYearFilter, field: cropFieldFilter, crop_id: cropIdFilter, search: cropSearch };
   const selectedTaskCrop = taskCropFilter === 'all' ? null : crops.find((crop) => crop._id === taskCropFilter);
   const taskListFilters = { status: taskFilter, crop_id: taskCropFilter === 'all' ? '' : taskCropFilter, crop_search: selectedTaskCrop ? [selectedTaskCrop.name, selectedTaskCrop.variety].filter(Boolean).join('|') : '' };
@@ -3938,7 +3930,7 @@ function App() {
                 const todayStr = mufToday();
                 const todaysRows = todayAttendance.filter(a => a.date === todayStr);
                 const presentIds = new Set(todaysRows.map(a => a.laborer_id));
-                const pendingTasksWithCrew = tasks.filter(t => t.status === 'Pending' && (t.laborer_ids || []).length > 0);
+                const pendingTasksWithCrew = analyticsSummary?.taskSummary?.recentPendingWithCrew || tasks.filter(t => t.status === 'Pending' && (t.laborer_ids || []).length > 0);
                 const deploymentOf = (lid) => {
                   const t = pendingTasksWithCrew.find(x => (x.laborer_ids || []).includes(lid));
                   if (!t) return null;
@@ -4025,13 +4017,13 @@ function App() {
                 {taskPageError && <div role="alert" className="my-3 flex items-center justify-between gap-3 rounded-xl border border-red-300/60 p-3 text-xs text-red-700"><span>{taskPageError}</span><button type="button" onClick={() => fetchTaskPage(taskPageNextSkip, taskListFilters, taskPageNextSkip === 0)} className="font-bold underline">Retry</button></div>}
                 {taskPageLoading && taskPageRows.length === 0 && <p role="status" className="py-5 text-center text-xs text-slate-500">Loading task records…</p>}
                 <div className="muf-crop-grid">
-                  {tasks.length === 0 ? (
+                  {!taskPageLoading && taskPageTotal === 0 && Number(analyticsSummary?.taskSummary?.total ?? tasks.length) === 0 ? (
                     <div className="muf-empty-crops">
                       <div><HeartPulse size={36}/></div>
                       <h4>{L('Duty care roster is clean')}</h4>
                       <p>{L('No active care schedules or tasks registered in the database.')}</p>
                     </div>
-                  ) : filteredTasks.length === 0 ? (
+                  ) : !taskPageLoading && taskPageTotal === 0 ? (
                     <div className="muf-empty-crops">
                       <div><HeartPulse size={36}/></div>
                       <h4>{L('No duties match filter')}</h4>
