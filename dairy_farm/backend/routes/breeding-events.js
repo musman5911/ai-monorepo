@@ -136,10 +136,12 @@ router.put('/events/:id', protect, async (req, res) => {
   try {
     const existing = await BreedingEvent.findById(req.params.id).lean();
     if (!existing) return res.status(404).json({ error: 'Breeding event not found' });
-    const { payload, errors } = eventPayload(req.body || {}, { partial: true });
+    const { payload: changes, errors: changeErrors } = eventPayload(req.body || {}, { partial: true });
+    if (changeErrors.length) return sendValidationError(res, changeErrors);
+    const next = { ...existing, ...changes };
+    const { payload, errors } = eventPayload(next);
     if (errors.length) return sendValidationError(res, errors);
     if (!(await validateReferences(payload, res))) return;
-    const next = { ...existing, ...payload };
     const updated = await BreedingEvent.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
     await syncCowDate(existing.cowId, existing.type, existing.date);
     if (next.cowId !== existing.cowId || next.type !== existing.type) {
