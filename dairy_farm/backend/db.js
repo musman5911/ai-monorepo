@@ -151,7 +151,7 @@ const BreedingEventSchema = new mongoose.Schema({
   cowId: { type: String, required: true, index: true },
   type: { type: String, enum: ['heat', 'service', 'pregnancy_check', 'calving'], required: true },
   date: { type: String, required: true },
-  sireSource: { type: String, enum: ['farm_bull', 'outside_bull', 'outside_straw'], default: '' },
+  sireSource: { type: String, enum: ['', 'farm_bull', 'outside_bull', 'outside_straw'], default: '' },
   bullId: { type: String, default: '' },
   bullName: { type: String, default: '' },
   semenCode: { type: String, default: '' },
@@ -395,7 +395,7 @@ const FARM_SCOPED = {
   Supplier: SupplierSchema, SupplierPayment: SupplierPaymentSchema, RateHistory: RateHistorySchema,
   DailyLog: DailyLogSchema, Sale: SaleSchema,
 };
-export const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
+const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
 for (const schema of Object.values(FARM_SCOPED)) {
   schema.add({ farmId: { type: String, index: true } });
 }
