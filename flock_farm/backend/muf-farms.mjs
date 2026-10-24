@@ -282,6 +282,99 @@ export async function mufCountFarmRecords(models, names, farmId) {
   });
 }
 
+function mufFarmValueIdentity(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  for (const key of ['_id', 'id', 'key']) {
+    if (value[key] !== undefined && value[key] !== null && String(value[key]) !== '') {
+      return `${key}:${String(value[key])}`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Merge the flexible value payloads used by Flock's DataStore buckets.
+ * Arrays are unioned by stable row identity when available; object fields are
+ * retained from both sides, with source values winning for conflicting scalars.
+ */
+function mufMergeFarmDataValue(destinationValue, sourceValue) {
+  if (Array.isArray(destinationValue) && Array.isArray(sourceValue)) {
+    const merged = [...destinationValue];
+    for (const incoming of sourceValue) {
+      const identity = mufFarmValueIdentity(incoming);
+      let index = -1;
+      if (identity) {
+        index = merged.findIndex((existing) => mufFarmValueIdentity(existing) === identity);
+      } else {
+        const serialized = JSON.stringify(incoming);
+        index = merged.findIndex((existing) => JSON.stringify(existing) === serialized);
+      }
+      if (index < 0) merged.push(incoming);
+      else if (identity) merged[index] = mufMergeFarmDataValue(merged[index], incoming);
+    }
+    return merged;
+  }
+  const isPlainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
+  if (isPlainObject(destinationValue) && isPlainObject(sourceValue)) {
+    const merged = { ...destinationValue };
+    for (const [key, incoming] of Object.entries(sourceValue)) {
+      merged[key] = Object.prototype.hasOwnProperty.call(merged, key)
+        ? mufMergeFarmDataValue(merged[key], incoming)
+        : incoming;
+    }
+    return merged;
+  }
+  if (sourceValue === undefined) return destinationValue;
+  return sourceValue;
+}
+
+/** Move Flock DataStore buckets without violating the unique (farmId, key) index. */
+async function mufMoveDataStoreBuckets(DataStore, sourceFarmId, destinationFarmId) {
+  const sourceId = sid(sourceFarmId);
+  const destinationId = sid(destinationFarmId);
+  const sourceBuckets = await DataStore.find({ farmId: sourceId }).lean();
+
+  async function mergeAndRemoveSource(source, destination) {
+    const value = mufMergeFarmDataValue(destination.value, source.value);
+    const version = Math.max(Number(destination.version) || 0, Number(source.version) || 0) + 1;
+    const saved = await DataStore.findOneAndUpdate(
+      { _id: destination._id, farmId: destinationId, key: source.key },
+      { $set: { value, version } },
+      { new: true },
+    );
+    if (!saved) {
+      throw new Error(`DataStore bucket "${source.key}" changed during farm move; source data was retained.`);
+    }
+    const removed = await DataStore.findOneAndDelete({ _id: source._id, farmId: sourceId });
+    if (!removed) {
+      throw new Error(`Source DataStore bucket "${source.key}" could not be removed after merge.`);
+    }
+  }
+
+  for (const source of sourceBuckets) {
+    let destination = await DataStore.findOne({ farmId: destinationId, key: source.key }).lean();
+    if (destination) {
+      await mergeAndRemoveSource(source, destination);
+      continue;
+    }
+    try {
+      const moved = await DataStore.findOneAndUpdate(
+        { _id: source._id, farmId: sourceId },
+        { $set: { farmId: destinationId } },
+        { new: true },
+      );
+      if (moved) continue;
+    } catch (error) {
+      if (error?.code !== 11000 && error?.codeName !== 'DuplicateKey') throw error;
+    }
+    destination = await DataStore.findOne({ farmId: destinationId, key: source.key }).lean();
+    if (!destination) {
+      throw new Error(`DataStore bucket "${source.key}" could not be moved; source data was retained.`);
+    }
+    await mergeAndRemoveSource(source, destination);
+  }
+}
+
 /**
  * Router for /api/farms. Pass the express module so this file needs no express import.
  *   list:    owner sees every farm, others only assigned, active ones
@@ -382,7 +475,13 @@ export function mufCreateFarmsRouter({ express, Farm, User, models, names, prote
             return res.status(400).json({ error: 'Choose a different active farm to move the records to', code: 'INVALID_MOVE_TARGET' });
           }
           await mufRunUnscoped(async () => {
-            for (const n of names) await models[n].updateMany({ farmId: sid(farm._id) }, { $set: { farmId: moveTo } });
+            for (const n of names) {
+              if (n === 'DataStore' && models[n]) {
+                await mufMoveDataStoreBuckets(models[n], farm._id, moveTo);
+              } else {
+                await models[n].updateMany({ farmId: sid(farm._id) }, { $set: { farmId: moveTo } });
+              }
+            }
           });
         } else if (req.body?.deleteData === true) {
           await mufRunUnscoped(async () => {

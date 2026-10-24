@@ -37,10 +37,10 @@ export function restoreBackupImages(rows) {
     if (source.farmId === undefined || source.farmId === null || !String(source.farmId).trim()) {
       throw new TypeError(`Image backup row ${index + 1} is missing its farm ID.`);
     }
-    if (typeof source.dataBase64 !== 'string' ||
-        !/^(?:[A-Za-z0-9+/]{4})*(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$/.test(source.dataBase64)) {
+    if (typeof source.dataBase64 !== 'string') {
       throw new TypeError(`Image backup row ${index + 1} has invalid base64 data.`);
     }
+    // Decode/round-trip validation handles huge valid strings without a regex stack overflow.
     const data = Buffer.from(source.dataBase64, 'base64');
     if (data.toString('base64') !== source.dataBase64) {
       throw new TypeError(`Image backup row ${index + 1} has invalid base64 data.`);

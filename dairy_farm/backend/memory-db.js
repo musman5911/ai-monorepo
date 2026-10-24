@@ -182,6 +182,14 @@ function createModel(name, schema) {
       return d;
     },
 
+    async findOneAndDelete(filter) {
+      const idx = store.findIndex((d) => matches(d, filter || {}));
+      if (idx === -1) return null;
+      const d = store[idx];
+      store.splice(idx, 1);
+      return d;
+    },
+
     async deleteMany(filter) {
       const before = store.length;
       const keep = [];

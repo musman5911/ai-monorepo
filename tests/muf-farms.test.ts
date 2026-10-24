@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 // @ts-expect-error plain ESM twin without type declarations
 import * as farms from '../dairy_farm/backend/muf-farms.mjs';
 // @ts-expect-error plain ESM without type declarations
@@ -63,6 +65,67 @@ describe('farm deletion safety', () => {
     expect(res.statusCode).toBe(400);
     expect(res.body.code).toBe('CONFIRM_NAME');
     expect(await store.Crop.findById('crop-1')).toMatchObject({ farmId: 'source-farm' });
+  });
+});
+
+describe('farm deletion data safety', () => {
+  it('merges colliding DataStore buckets and moves non-colliding buckets before deleting a farm', async () => {
+    const store = createStore({
+      Farm: { paths: {}, options: { timestamps: true } },
+      User: { paths: {} },
+      DataStore: { paths: {}, options: { timestamps: true } },
+    });
+    await store.Farm.create({ _id: 'source-farm', name: 'Source farm', archived: false });
+    await store.Farm.create({ _id: 'destination-farm', name: 'Destination farm', archived: false });
+    await store.DataStore.create({
+      _id: 'destination-birds', farmId: 'destination-farm', key: 'birds', version: 3,
+      value: [{ id: 'bird-existing', name: 'destination' }, { id: 'shared-bird', note: 'destination' }],
+    });
+    await store.DataStore.create({
+      _id: 'source-birds', farmId: 'source-farm', key: 'birds', version: 5,
+      value: [{ id: 'bird-moving', name: 'source' }, { id: 'shared-bird', extra: 'preserved' }],
+    });
+    await store.DataStore.create({
+      _id: 'source-eggs', farmId: 'source-farm', key: 'eggs', version: 1,
+      value: [{ id: 'egg-moving', count: 12 }],
+    });
+
+    const response = mockResponse();
+    await createFarmDeleteHandler(store, ['DataStore'])({
+      params: { id: 'source-farm' },
+      body: { confirmName: 'Source farm', moveToFarmId: 'destination-farm' },
+    }, response);
+
+    expect(response.statusCode).toBe(200);
+    const birds = await store.DataStore.findOne({ farmId: 'destination-farm', key: 'birds' }).lean();
+    expect(birds.value.map((item) => item.id)).toEqual(['bird-existing', 'shared-bird', 'bird-moving']);
+    expect(birds.value[1]).toMatchObject({ note: 'destination', extra: 'preserved' });
+    expect(birds.version).toBe(6);
+    const eggs = await store.DataStore.findOne({ farmId: 'destination-farm', key: 'eggs' }).lean();
+    expect(eggs.value).toEqual([{ id: 'egg-moving', count: 12 }]);
+    expect(await store.DataStore.findOne({ farmId: 'source-farm' })).toBeNull();
+    expect(await store.Farm.findById('source-farm')).toBeNull();
+  });
+});
+
+describe('memory adapter compatibility', () => {
+  it('supports atomic findOneAndDelete used by farm-scoped by-id deletes', async () => {
+    const store = createStore({ Cow: { paths: {}, options: { timestamps: true } } });
+    await store.Cow.create({ _id: 'cow-a', farmId: 'farm-a' });
+    await store.Cow.create({ _id: 'cow-b', farmId: 'farm-b' });
+    mufScopeModel(store.Cow, 'Cow');
+    const context = { mode: 'single', farmId: 'farm-a', farmIds: ['farm-a'] };
+
+    const deleted = await mufRunWithFarmContext(context, () => store.Cow.findByIdAndDelete('cow-a'));
+    expect(deleted).toMatchObject({ _id: 'cow-a' });
+    const refused = await mufRunWithFarmContext(context, () => store.Cow.findByIdAndDelete('cow-b'));
+    expect(refused).toBeNull();
+    expect(await store.Cow.findById('cow-b')).toMatchObject({ _id: 'cow-b', farmId: 'farm-b' });
+  });
+
+  it('loads dotenv before the Flock farm migration checks its environment', () => {
+    const script = readFileSync(resolve(process.cwd(), 'flock_farm/backend/scripts/migrate-farms.js'), 'utf8');
+    expect(script.startsWith("import 'dotenv/config';")).toBe(true);
   });
 });
 

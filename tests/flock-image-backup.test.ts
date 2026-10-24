@@ -48,6 +48,17 @@ describe('Flock image backup binary preservation', () => {
     expect(() => restoreBackupImages([{ farmId: 'farm-a', dataBase64: '' }])).toThrow(/missing its ID/i);
   });
 
+  it('restores multi-megabyte Base64 images without stack overflow', () => {
+    // 4 MiB becomes >5.5 million Base64 characters, above the prior RegExp.test crash threshold.
+    const bytes = Buffer.alloc(4 * 1024 * 1024, 0xab);
+    const dataBase64 = bytes.toString('base64');
+    expect(dataBase64.length).toBeGreaterThan(5_000_000);
+    const [restored] = restoreBackupImages([{
+      _id: 'large-image', farmId: 'farm-large', contentType: 'image/jpeg', dataBase64,
+    }]);
+    expect(restored.data.equals(bytes)).toBe(true);
+  });
+
   it('routes manual and monthly backup/restore through the binary-safe image helpers', () => {
     const route = readFileSync(resolve(process.cwd(), 'flock_farm/backend/routes/backup.js'), 'utf8');
     expect(route).toContain('serializeBackupImages');

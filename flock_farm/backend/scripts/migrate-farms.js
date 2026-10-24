@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import mongoose from 'mongoose';
 import { connectDB, Farm, User, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
 import { mufMigrateFarms, mufRunUnscoped } from '../muf-farms.mjs';
