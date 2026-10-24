@@ -12,7 +12,8 @@ import rateLimit from 'express-rate-limit';
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
-import { connectDB, Crop, Finance } from './db.js';
+import { connectDB, Crop, Finance, Farm } from './db.js';
+import { protect, ownerOnly } from './middleware/auth.js';
 import authRoutes from './routes/auth.js';
 import { automationsRouter, startScheduler } from './routes/automations.js';
 import cropsRoutes from './routes/crops.js';
@@ -155,11 +156,32 @@ async function farmSummaryHandler(req, res) {
     if (String(req.query.key || '') !== expected) return res.status(401).json({ error: 'Bad key' });
     const now = new Date();
     const month = now.toISOString().slice(0, 7);
-    const crops = await Crop.find({}).limit(1000);
-    const finance = await Finance.find({}).limit(10000);
+    const [crops, finance, activeFarms] = await Promise.all([
+      Crop.find({}).limit(1000),
+      Finance.find({}).limit(10000),
+      Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean(),
+    ]);
     const monthRows = finance.filter((f) => String(f.date || '').slice(0, 7) === month);
     const income = monthRows.filter((f) => f.type === 'income').reduce((a, f) => a + (Number(f.amount) || 0), 0);
     const expense = monthRows.filter((f) => f.type === 'expense').reduce((a, f) => a + (Number(f.amount) || 0), 0);
+    const perFarm = await Promise.all(activeFarms.map(async (farm) => {
+      const farmId = String(farm._id);
+      const [farmCrops, farmFinance] = await Promise.all([
+        Crop.find({ farmId }).limit(1000),
+        Finance.find({ farmId }).limit(10000),
+      ]);
+      const farmMonth = farmFinance.filter((f) => String(f.date || '').slice(0, 7) === month);
+      return {
+        farmId,
+        farmName: farm.name,
+        stats: [
+          { label: 'Crops planted', value: farmCrops.length },
+          { label: 'Growing now', value: farmCrops.filter((c) => c.status === 'Growing').length },
+          { label: 'Income this month', value: `Rs ${Math.trunc(farmMonth.filter((f) => f.type === 'income').reduce((a, f) => a + (Number(f.amount) || 0), 0)).toLocaleString()}` },
+          { label: 'Expenses this month', value: `Rs ${Math.trunc(farmMonth.filter((f) => f.type === 'expense').reduce((a, f) => a + (Number(f.amount) || 0), 0)).toLocaleString()}` },
+        ],
+      };
+    }));
     return res.json({
       farm: 'agri',
       label: 'Usman Agri Farm',
@@ -169,6 +191,7 @@ async function farmSummaryHandler(req, res) {
         { label: 'Income this month', value: `Rs ${Math.trunc(income).toLocaleString()}` },
         { label: 'Expenses this month', value: `Rs ${Math.trunc(expense).toLocaleString()}` },
       ],
+      farms: perFarm,
     });
   } catch (e) {
     return res.status(500).json({ error: e.message });
@@ -176,6 +199,8 @@ async function farmSummaryHandler(req, res) {
 }
 app.get('/farm-summary', farmSummaryHandler);
 app.get('/api/farm-summary', farmSummaryHandler);
+// The same read-only summary is owner-only when requested through the Super Admin API.
+app.get('/api/super-admin/farm-summary', protect, ownerOnly, farmSummaryHandler);
 
 // Unknown API paths must return JSON 404 — never fall through to the SPA
 // HTML (a 200 HTML response masks bugs as JSON-parse errors in the client).
