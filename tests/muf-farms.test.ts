@@ -151,6 +151,15 @@ describe('model wrapper', () => {
     expect((calls[1][1] as unknown[])[0]).toEqual({ _id: 'x', farmId: 'a' });
     expect((calls[2][1] as unknown[])[0]).toEqual({ farmId: 'a' });
   });
+  it('uses one atomic farm-scoped delete operation for by-id deletes', () => {
+    const { model, calls } = fakeModel();
+    mufScopeModel(model, 'Thing');
+    mufRunWithFarmContext(single, () => (model.findByIdAndDelete as Function)('record-1'));
+    expect(calls).toHaveLength(1);
+    expect(calls[0][0]).toBe('findOneAndDelete');
+    expect((calls[0][1] as unknown[])[0]).toEqual({ _id: 'record-1', farmId: 'a' });
+  });
+
   it('stamps creates with the selected farm and ignores a client farmId', () => {
     const { model, calls } = fakeModel();
     mufScopeModel(model, 'Thing');

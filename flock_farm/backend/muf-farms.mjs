@@ -187,11 +187,11 @@ export function mufScopeModel(model, name = 'model') {
     };
   }
   if (orig.findByIdAndDelete) {
-    model.findByIdAndDelete = async function scopedFindByIdAndDelete(id, ...rest) {
+    model.findByIdAndDelete = function scopedFindByIdAndDelete(id, ...rest) {
       if (!mufGetFarmContext()) return orig.findByIdAndDelete.call(model, id, ...rest);
-      const hit = await model.findOne({ _id: id });
-      if (!hit) return null;
-      return orig.findByIdAndDelete.call(model, id, ...rest);
+      // Keep the farm predicate and deletion in one atomic operation. A
+      // separate scoped read followed by an unscoped delete has a move race.
+      return model.findOneAndDelete({ _id: id }, ...rest);
     };
   }
   if (orig.create) {
