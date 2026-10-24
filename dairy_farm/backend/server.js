@@ -137,9 +137,11 @@ app.use('/api/farms',    farmsRoutes);
 async function dairyFarmSummaryHandler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    const key = MUF_ENV.crossFarmKey;
-    if (!key) return res.status(404).json({ error: 'Not enabled' });
-    if (String(req.query.key || '') !== key) return res.status(401).json({ error: 'Bad key' });
+    if (req.path !== '/api/super-admin/farm-summary') {
+      const key = MUF_ENV.crossFarmKey;
+      if (!key) return res.status(404).json({ error: 'Not enabled' });
+      if (String(req.query.key || '') !== key) return res.status(401).json({ error: 'Bad key' });
+    }
     const today = new Date().toISOString().slice(0, 10);
     const month = today.slice(0, 7);
     const [cows, milkAll, expAll, activeFarms] = await Promise.all([
