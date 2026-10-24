@@ -85,4 +85,4 @@ Whoever works on a phase updates it in the same change: set the phase status her
 
 ## Phase 2 kickoff
 
-Phase 2 (Dairy breeding events: server) is in progress on `muf-monorepo`. The schema and API contract are documented in `docs/phases/phase-02-dairy-breeding-events-server.md` before implementation. No Phase 2 tests or builds have been run yet; record results only after local CMD execution.
+Phase 2 (Dairy breeding events: server) is in progress on `muf-monorepo`. The farm-scoped model, event API, legacy date synchronization, backup/restore integration, demo events and local test commands have been added. The schema and API contract are documented in `docs/phases/phase-02-dairy-breeding-events-server.md`. No Phase 2 tests or builds have been run yet; record results only after local CMD execution.
