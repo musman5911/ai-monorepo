@@ -292,6 +292,22 @@ describe.sequential('Agri runtime API integration', () => {
     const farms = await request('/farms', { token: ownerToken });
     expect(farms.response.status).toBe(200);
     const farmA = String(farms.data.activeFarmId || farms.data.farms[0]._id);
+    const privateYieldCrop = await request('/crops', {
+      method: 'POST',
+      token: ownerToken,
+      farmId: farmA,
+      body: {
+        name: suffix + ' private-yield-crop',
+        status: 'Growing',
+        yield_kg: 777,
+        seed_quantity: 12,
+        seed_cost_per_unit: 50,
+        notes: 'owner-only crop notes',
+      },
+    });
+    expect(privateYieldCrop.response.status).toBe(201);
+    created.crops.push(String(privateYieldCrop.data._id));
+
     const beforeA = await request('/analytics/summary', { token: ownerToken, farmId: farmA });
     expect(beforeA.response.status).toBe(200);
     expect(beforeA.data.financeSummary.recent.length).toBeLessThanOrEqual(50);
@@ -299,6 +315,12 @@ describe.sequential('Agri runtime API integration', () => {
     const workerSummary = await request('/analytics/summary', { token: workerToken, farmId: farmA });
     expect(workerSummary.response.status).toBe(200);
     expect(workerSummary.data.financeSummary).toBeNull();
+    const workerCropOption = workerSummary.data.cropSummary.options.find((row) => String(row._id) === String(privateYieldCrop.data._id));
+    expect(workerCropOption).toBeDefined();
+    expect(workerCropOption.yield_kg).toBeUndefined();
+    expect(workerCropOption.seed_quantity).toBeUndefined();
+    expect(workerCropOption.seed_cost_per_unit).toBeUndefined();
+    expect(workerCropOption.notes).toBeUndefined();
 
     const createFarm = await request('/farms', {
       method: 'POST',
