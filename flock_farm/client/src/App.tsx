@@ -245,7 +245,7 @@ export default function App() {
   // able to mutate local state and then watch the server reject the save.
   // The farm switcher reloads the page after selection, so this is stable
   // for the lifetime of this app instance.
-  const isReadOnlyAll = role === 'admin' && (() => {
+  const isReadOnlyAll = (() => {
     try { return localStorage.getItem('muf_active_farm_flock') === 'all'; }
     catch { return false; }
   })();

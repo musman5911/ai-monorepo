@@ -36,7 +36,17 @@ function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return d
 function rnd(min, max) { return Math.round((min + Math.random() * (max - min)) * 10) / 10; }
 
 async function seedDemoData(db) {
-  const { Cow, Milk, Expense, Rate, RateHistory, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, DailyLog, Sale, Laborer, LaborAttendance, Meta } = db;
+  const { Cow, Milk, Expense, Rate, RateHistory, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, DailyLog, Sale, Laborer, LaborAttendance, Meta, Farm } = db;
+
+
+  const farm1 = await Farm.create({
+    name: 'Farm 1', location: 'Local demo farm', archived: false,
+    createdAt: new Date('2020-01-01T00:00:00.000Z'), updatedAt: new Date('2020-01-01T00:00:00.000Z'),
+  });
+  const farm2 = await Farm.create({
+    name: 'Farm 2 - Access Test', location: 'Isolated role-testing farm', archived: false,
+    createdAt: new Date('2020-01-02T00:00:00.000Z'), updatedAt: new Date('2020-01-02T00:00:00.000Z'),
+  });
 
   // ────────────────────────────────────────── USERS
   await User.create({
@@ -46,6 +56,14 @@ async function seedDemoData(db) {
   await User.create({
     username: 'worker', password: await bcrypt.hash('worker123', 10),
     role: 'worker', displayName: 'Farm Worker', email: '', active: true, avatarBase64: WORKER_AVATAR,
+  });
+  await User.create({
+    username: 'manager', password: await bcrypt.hash('manager123', 10), role: 'manager',
+    farmIds: [String(farm2._id)], displayName: 'Farm 2 Manager', email: 'manager@dairyfarm.test', active: true, avatarBase64: WORKER_AVATAR,
+  });
+  await User.create({
+    username: 'worker2', password: await bcrypt.hash('worker2123', 10), role: 'worker',
+    farmIds: [String(farm2._id)], displayName: 'Farm 2 Worker', email: 'worker2@dairyfarm.test', active: true, avatarBase64: WORKER_AVATAR,
   });
 
   // ────────────────────────────────────────── COWS (herd with bulls + calves + sold)

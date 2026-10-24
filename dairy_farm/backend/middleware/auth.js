@@ -19,7 +19,7 @@ if (MUF_ENV.nodeEnv === 'production' && (SECRET === 'GENERATE-A-LONG-RANDOM-STRI
   process.exit(1);
 }
 
-const protect = async (req, res, next) => {
+const authenticate = async (req, res, next, applyFarmScope = true) => {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     if (MUF_ENV.logRequests) console.log(`[AUTH] ${req.method} ${req.originalUrl} -> 401 (no token)`);
@@ -57,7 +57,7 @@ const protect = async (req, res, next) => {
     };
     // Resolve the selected farm (X-Farm-Id header) and run the rest of the
     // request inside that farm's scope. Every farm-owned query is filtered by it.
-    return mufApplyFarmContext(req, res, next, { Farm });
+    return applyFarmScope ? mufApplyFarmContext(req, res, next, { Farm }) : next();
   } catch (err) {
     console.error('Auth user lookup failed:', err);
     return res.status(500).json({ error: 'Authentication check failed' });
@@ -82,4 +82,7 @@ const workerOrAdmin = (req, res, next) => {
   next();
 };
 
-export { protect, adminOnly, ownerOnly, workerOrAdmin };
+const protect = (req, res, next) => authenticate(req, res, next, true);
+const protectUnscoped = (req, res, next) => authenticate(req, res, next, false);
+
+export { protect, protectUnscoped, adminOnly, ownerOnly, workerOrAdmin };

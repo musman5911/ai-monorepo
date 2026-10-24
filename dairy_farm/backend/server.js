@@ -55,7 +55,24 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Cron-Secret', 'X-Farm-Id'],
 }));
-app.use(express.json({ limit: '10mb' }));
+
+const standardJsonParser = express.json({ limit: '10mb' });
+const backupRestoreJsonParser = express.json({ limit: '100mb' });
+const backupRestorePaths = new Set(["/backup/restore","/api/backup/restore"]);
+app.use((req, res, next) => {
+  const isBackupRestore = req.method === 'POST' && backupRestorePaths.has(req.path);
+  const parser = isBackupRestore ? backupRestoreJsonParser : standardJsonParser;
+  parser(req, res, (err) => {
+    if (!err) return next();
+    if (err.type === 'entity.too.large') {
+      return res.status(413).json({
+        error: isBackupRestore ? 'Backup file is too large. The restore limit is 100mb.' : 'Request body is too large.',
+      });
+    }
+    if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Request body contains invalid JSON.' });
+    return next(err);
+  });
+});
 app.use(cookieParser());
 app.use(mongoSanitize());
 

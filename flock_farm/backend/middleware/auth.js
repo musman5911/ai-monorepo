@@ -28,7 +28,7 @@ export function signToken(user) {
  * header (or the `token` cookie). On success, attaches `req.user` (a
  * sanitized plain object) and `req.token`.
  */
-export async function authRequired(req, res, next) {
+async function authenticate(req, res, next, applyFarmScope = true) {
   try {
     let token = null;
 
@@ -77,11 +77,20 @@ export async function authRequired(req, res, next) {
       farmIds: (user.farmIds || []).map(String),
     };
     req.token = token;
-    return mufApplyFarmContext(req, res, next, { Farm });
+    return applyFarmScope ? mufApplyFarmContext(req, res, next, { Farm }) : next();
   } catch (err) {
     console.error('auth middleware error:', err);
     return res.status(500).json({ error: 'Authentication failure' });
   }
+}
+
+export function authRequired(req, res, next) {
+  return authenticate(req, res, next, true);
+}
+
+/** Authenticate a protected global route without selecting a farm. */
+export function authRequiredUnscoped(req, res, next) {
+  return authenticate(req, res, next, false);
 }
 
 /**

@@ -1,7 +1,7 @@
 // ─── Backup & restore (admin only) + monthly auto-backup ────────────────────
 import express from 'express';
 import { Setting, User, Farm, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer, Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia } from '../db.js';
-import { protect, ownerOnly } from '../middleware/auth.js';
+import { protectUnscoped, ownerOnly } from '../middleware/auth.js';
 import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
 import { HttpError, badRequest, notFound, asyncHandler } from '../utils/helpers.js';
 import { sendEmail, mufEmail, mailConfigured } from '../utils/mailer.js';
@@ -181,11 +181,11 @@ function validateBackupPayload(payload) {
 }
 
 // ─── Routes ──────────────────────────────────────────────────────────────────
-router.get('/backup', protect, ...requireAdmin, asyncHandler(async (_req, res) => {
+router.get('/backup', protectUnscoped, ...requireAdmin, asyncHandler(async (_req, res) => {
   return res.json(await collectBackupPayload());
 }));
 
-router.post('/restore', protect, ...requireAdmin, asyncHandler(async (req, res) => {
+router.post('/restore', protectUnscoped, ...requireAdmin, asyncHandler(async (req, res) => {
   const payload = req.body || {};
   validateBackupPayload(payload);
   // Safety net: snapshot current data into the auto-backup slot before the
@@ -201,7 +201,7 @@ router.post('/restore', protect, ...requireAdmin, asyncHandler(async (req, res) 
   return res.json({ status: 'ok' });
 }));
 
-router.get('/backup/auto', protect, ...requireAdmin, asyncHandler(async (_req, res) => {
+router.get('/backup/auto', protectUnscoped, ...requireAdmin, asyncHandler(async (_req, res) => {
   const existing = await Setting.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
   const value = (existing && existing.value) || {};
   if (!value.name) {
@@ -216,7 +216,7 @@ router.get('/backup/auto', protect, ...requireAdmin, asyncHandler(async (_req, r
   });
 }));
 
-router.post('/restore/auto', protect, ...requireAdmin, asyncHandler(async (req, res) => {
+router.post('/restore/auto', protectUnscoped, ...requireAdmin, asyncHandler(async (req, res) => {
   const existing = await Setting.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
   const value = (existing && existing.value) || {};
   const payload = value.payload;

@@ -5,7 +5,7 @@
 // exists, nothing happens. Admins can download it, force-refresh it, or
 // restore the entire database from it.
 import express from 'express';
-import { authRequired } from '../middleware/auth.js';
+import { authRequiredUnscoped } from '../middleware/auth.js';
 import { mailConfigured, sendBackupEmail } from '../mailer.js';
 import User from '../models/User.js';
 import DataStore from '../models/DataStore.js';
@@ -250,7 +250,7 @@ export async function maybeRunMonthlyAutoBackup(force = false) {
 }
 
 // GET /api/backup — download a full snapshot right now (admin only)
-router.get('/backup', authRequired, ownerUnscoped, async (_req, res) => {
+router.get('/backup', authRequiredUnscoped, ownerUnscoped, async (_req, res) => {
   try {
     const payload = await collectBackupPayload();
     res.setHeader('Content-Disposition', `attachment; filename=flock-farm-backup-${new Date().toISOString().slice(0, 10)}.json`);
@@ -262,7 +262,7 @@ router.get('/backup', authRequired, ownerUnscoped, async (_req, res) => {
 });
 
 // POST /api/backup/restore — restore a downloaded full snapshot (owner only)
-router.post('/backup/restore', authRequired, ownerUnscoped, async (req, res) => {
+router.post('/backup/restore', authRequiredUnscoped, ownerUnscoped, async (req, res) => {
   let releaseLocks;
   try {
     const payload = req.body;
@@ -281,7 +281,7 @@ router.post('/backup/restore', authRequired, ownerUnscoped, async (req, res) => 
 });
 
 // GET /api/backup/auto — info + payload of the stored monthly auto-backup
-router.get('/backup/auto', authRequired, ownerUnscoped, async (_req, res) => {
+router.get('/backup/auto', authRequiredUnscoped, ownerUnscoped, async (_req, res) => {
   try {
     const existing = await DataStore.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
@@ -294,7 +294,7 @@ router.get('/backup/auto', authRequired, ownerUnscoped, async (_req, res) => {
 });
 
 // POST /api/backup/auto/run — force-refresh this month's snapshot now
-router.post('/backup/auto/run', authRequired, ownerUnscoped, async (_req, res) => {
+router.post('/backup/auto/run', authRequiredUnscoped, ownerUnscoped, async (_req, res) => {
   try {
     const stored = await maybeRunMonthlyAutoBackup(true);
     res.json({ ok: true, name: stored.name, createdAt: stored.createdAt });
@@ -305,7 +305,7 @@ router.post('/backup/auto/run', authRequired, ownerUnscoped, async (_req, res) =
 });
 
 // POST /api/backup/restore-auto — restore the whole DB from the auto-backup
-router.post('/backup/restore-auto', authRequired, ownerUnscoped, async (_req, res) => {
+router.post('/backup/restore-auto', authRequiredUnscoped, ownerUnscoped, async (_req, res) => {
   let releaseLocks;
   try {
     const existing = await DataStore.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });

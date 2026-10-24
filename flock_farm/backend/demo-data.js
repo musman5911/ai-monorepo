@@ -42,6 +42,19 @@ export async function seedDemoData() {
   const { default: BatchMortalityLog } = await import('./models/BatchMortalityLog.js');
   const { default: BatchExpenseLog } = await import('./models/BatchExpenseLog.js');
   const { default: BatchSaleLog } = await import('./models/BatchSaleLog.js');
+  const { default: Farm } = await import('./models/Farm.js');
+
+
+  const farm1 = await Farm.create({
+    name: 'Farm 1', location: 'Local demo farm', archived: false,
+    createdAt: new Date('2020-01-01T00:00:00.000Z'), updatedAt: new Date('2020-01-01T00:00:00.000Z'),
+  });
+  const farm2 = await Farm.create({
+    name: 'Farm 2 - Access Test', location: 'Isolated role-testing farm', archived: false,
+    createdAt: new Date('2020-01-02T00:00:00.000Z'), updatedAt: new Date('2020-01-02T00:00:00.000Z'),
+  });
+
+
 
   // ------------------------------------------------------------------ USERS
   await User.create({
@@ -59,6 +72,16 @@ export async function seedDemoData() {
     displayName: 'Farm Worker',
     active: true,
     avatarBase64: WORKER_AVATAR,
+  });
+  await User.create({
+    username: 'manager', email: 'manager@flockfarm.test',
+    passwordHash: await User.hashPassword('manager123'), role: 'manager',
+    farmIds: [String(farm2._id)], displayName: 'Farm 2 Manager', active: true, avatarBase64: WORKER_AVATAR,
+  });
+  await User.create({
+    username: 'worker2', email: 'worker2@flockfarm.test',
+    passwordHash: await User.hashPassword('worker2123'), role: 'worker',
+    farmIds: [String(farm2._id)], displayName: 'Farm 2 Worker', active: true, avatarBase64: WORKER_AVATAR,
   });
 
   // --------------------------------------------------------------- SETTINGS

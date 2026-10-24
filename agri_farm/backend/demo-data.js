@@ -33,11 +33,21 @@ const ADMIN_AVATAR = U('photo-1673538064388-21d1aaaf6594'); // farmer in a field
 const WORKER_AVATAR = U('photo-1696371268939-5c5710319bde'); // farm worker with a bucket
 
 async function seedDemoData({
-  User, Crop, Finance, Task, Inventory, Liability, Irrigation,
+  Farm, User, Crop, Finance, Task, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance,
   Supplier, SupplierPayment,
 }) {
   console.log('🌱 [Demo] Seeding in-memory database with realistic demo farm data...');
+
+
+  const farm1 = await Farm.create({
+    name: 'Farm 1', location: 'Local demo farm', archived: false,
+    createdAt: new Date('2020-01-01T00:00:00.000Z'), updatedAt: new Date('2020-01-01T00:00:00.000Z'),
+  });
+  const farm2 = await Farm.create({
+    name: 'Farm 2 - Access Test', location: 'Isolated role-testing farm', archived: false,
+    createdAt: new Date('2020-01-02T00:00:00.000Z'), updatedAt: new Date('2020-01-02T00:00:00.000Z'),
+  });
 
   // ---------------------------------------------------------------- USERS
   await User.insertMany([
@@ -54,6 +64,14 @@ async function seedDemoData({
       role: 'worker',
       password: bcrypt.hashSync('worker123', 12),
       avatar_base64: WORKER_AVATAR,
+    },
+    {
+      username: 'manager', email: 'manager@agrifarm.test', role: 'manager',
+      farmIds: [String(farm2._id)], password: bcrypt.hashSync('manager123', 12), avatar_base64: WORKER_AVATAR,
+    },
+    {
+      username: 'worker2', email: 'worker2@agrifarm.test', role: 'worker',
+      farmIds: [String(farm2._id)], password: bcrypt.hashSync('worker2123', 12), avatar_base64: WORKER_AVATAR,
     },
   ]);
 

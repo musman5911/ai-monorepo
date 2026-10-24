@@ -108,6 +108,19 @@ export async function protect(req, res, next) {
 // Same lookup but never rejects — used by /signup where an optional admin
 // token decides whether registration is allowed. No farm scope here: signup
 // only touches the global User collection.
+/**
+ * Authenticate an owner-only database-wide operation without selecting a farm.
+ */
+export async function protectUnscoped(req, res, next) {
+  const user = await resolveUser(req);
+  if (!user) {
+    res.setHeader('WWW-Authenticate', 'Bearer');
+    return sendHttpError(res, 401, 'Invalid or expired authentication credentials');
+  }
+  req.user = toRequestUser(user);
+  return next();
+}
+
 export async function protectOptional(req, res, next) {
   const user = await resolveUser(req);
   if (user) req.user = toRequestUser(user);

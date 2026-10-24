@@ -2,7 +2,7 @@ import express from 'express';
 const router = express.Router();
 import mongoose from 'mongoose';
 import { Cow, Milk, Expense, Rate, Health, Buyer, BuyerPayment, RateHistory, DailyLog, Sale, Meta, Laborer, LaborAttendance, LaborAdvance, Supplier, SupplierPayment, User, Farm, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
-import { protect, ownerOnly } from '../middleware/auth.js';
+import { protectUnscoped, ownerOnly } from '../middleware/auth.js';
 import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
 
 // A backup covers every farm of this project, so only owners may take or restore
@@ -25,7 +25,7 @@ import { sendMail, mailConfigured, mufEmail } from '../utils/mailer.js';
 import { MUF_ENV } from '../muf-env.mjs';
 
 // GET /api/backup — download full database as JSON
-router.get('/', protect, ...adminOnly, async (req, res) => {
+router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
   try {
     const [cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments] = await Promise.all([
       Cow.find().lean(),
@@ -96,7 +96,7 @@ async function restoreCollections(payload, session) {
 // POST /api/backup/restore — restore from JSON backup
 // Uses a transaction when the deployment supports it (replica set / Atlas).
 // Falls back to sequential restore on standalone MongoDB.
-router.post('/restore', protect, ...adminOnly, async (req, res) => {
+router.post('/restore', protectUnscoped, ...adminOnly, async (req, res) => {
   const payload = req.body;
   if (!payload || typeof payload !== 'object') {
     return res.status(400).json({ error: 'Invalid backup payload' });
@@ -247,7 +247,7 @@ async function maybeRunMonthlyAutoBackup(force = false) {
 }
 
 // GET /api/backup/auto — info + payload of the stored monthly auto-backup
-router.get('/auto', protect, ...adminOnly, async (_req, res) => {
+router.get('/auto', protectUnscoped, ...adminOnly, async (_req, res) => {
   try {
     const existing = await Meta.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
@@ -257,7 +257,7 @@ router.get('/auto', protect, ...adminOnly, async (_req, res) => {
 });
 
 // POST /api/backup/auto/run — force-refresh this month's snapshot now
-router.post('/auto/run', protect, ...adminOnly, async (_req, res) => {
+router.post('/auto/run', protectUnscoped, ...adminOnly, async (_req, res) => {
   try {
     const stored = await maybeRunMonthlyAutoBackup(true);
     res.json({ ok: true, name: stored.name, createdAt: stored.createdAt });
@@ -265,7 +265,7 @@ router.post('/auto/run', protect, ...adminOnly, async (_req, res) => {
 });
 
 // POST /api/backup/restore-auto — restore the DB from the monthly auto-backup
-router.post('/restore-auto', protect, ...adminOnly, async (_req, res) => {
+router.post('/restore-auto', protectUnscoped, ...adminOnly, async (_req, res) => {
   try {
     const existing = await Meta.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;

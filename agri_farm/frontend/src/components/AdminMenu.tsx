@@ -620,7 +620,11 @@ export default function AdminMenu({
         showAlert("Database restored successfully!");
         refreshData();
       } catch (err) {
-        showAlert("Database restore failed. Ensure valid JSON structure.", true);
+        const detail = err?.response?.data?.error
+          || err?.response?.data?.detail
+          || err?.response?.data?.message
+          || err?.message;
+        showAlert(detail ? `Database restore failed: ${detail}` : "Database restore failed. Ensure valid JSON structure.", true);
       }
     };
     reader.readAsText(file);

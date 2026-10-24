@@ -161,7 +161,7 @@ const connectDB = async () => {
     const userCount = await User.countDocuments({});
     if (userCount === 0) {
       await seedDemoData({
-        User, Crop, Finance, Task, Inventory, Liability, Irrigation,
+        Farm, User, Crop, Finance, Task, Inventory, Liability, Irrigation,
         CropPhoto, Spray, Laborer, Attendance, LaborAdvance,
         Supplier, SupplierPayment,
       });

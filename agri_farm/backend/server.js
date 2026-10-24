@@ -59,7 +59,24 @@ app.use(cors({
 // 10mb JSON limit — unified across all 3 farm backends (dairy, flock, agri).
 // Photos/avatars are stored base64-in-DB; 10mb comfortably covers a single
 // high-res photo after muf-image compression, and matches dairy/flock.
-app.use(express.json({ limit: '10mb' }));
+
+const standardJsonParser = express.json({ limit: '10mb' });
+const backupRestoreJsonParser = express.json({ limit: '100mb' });
+const backupRestorePaths = new Set(["/restore","/api/restore"]);
+app.use((req, res, next) => {
+  const isBackupRestore = req.method === 'POST' && backupRestorePaths.has(req.path);
+  const parser = isBackupRestore ? backupRestoreJsonParser : standardJsonParser;
+  parser(req, res, (err) => {
+    if (!err) return next();
+    if (err.type === 'entity.too.large') {
+      return res.status(413).json({
+        error: isBackupRestore ? 'Backup file is too large. The restore limit is 100mb.' : 'Request body is too large.',
+      });
+    }
+    if (err.type === 'entity.parse.failed') return res.status(400).json({ error: 'Request body contains invalid JSON.' });
+    return next(err);
+  });
+});
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 app.use(mongoSanitize());

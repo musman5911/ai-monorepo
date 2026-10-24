@@ -17,7 +17,7 @@ const connectDB = async () => {
     // farm data so every screen is populated out of the box.
     await seedDemoData({
       connectDB, Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance,
-      Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User,
+      Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, Farm,
       PasswordReset, RateHistory, DailyLog, Sale, Meta,
     });
     // Demo data is disposable, so the farms migration runs automatically here.
