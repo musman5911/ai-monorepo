@@ -16,7 +16,7 @@ const connectDB = async () => {
     // Seed demo accounts (admin + worker) and a full year of realistic
     // farm data so every screen is populated out of the box.
     await seedDemoData({
-      connectDB, Cow, Milk, Expense, Laborer, LaborAttendance, LaborAdvance,
+      connectDB, Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance,
       Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, Farm,
       PasswordReset, RateHistory, DailyLog, Sale, Meta,
     });
