@@ -15,7 +15,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | Phase | What | Status | File |
 |---|---|---|---|
 | 0 | Done and verified | Done | [phase-00-done-and-verified.md](phases/phase-00-done-and-verified.md) |
-| 1 | Super Admin: owner only, per-farm summaries | Not started | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
+| 1 | Super Admin: owner only, per-farm summaries | In progress | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
 | 2 | Dairy breeding events: server | Not started | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Not started | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
 | 4 | Dairy calves and lineage | Not started | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
