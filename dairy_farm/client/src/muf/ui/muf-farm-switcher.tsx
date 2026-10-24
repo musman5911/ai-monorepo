@@ -81,7 +81,7 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
       const nextFarms: Farm[] = Array.isArray(result.farms) ? result.farms : [];
       setFarms(nextFarms);
       const saved = (() => { try { return localStorage.getItem(config.selectedKey) || ''; } catch { return ''; } })();
-      const validSaved = nextFarms.some((farm) => farm._id === saved && !farm.archived) ? saved : '';
+      const validSaved = normalizedRole === 'owner' && saved === 'all' ? 'all' : nextFarms.some((farm) => farm._id === saved && !farm.archived) ? saved : '';
       const nextId = validSaved || result.activeFarmId || nextFarms.find((farm) => !farm.archived)?._id || nextFarms[0]?._id || '';
       setActiveFarmId(nextId);
       if (nextId) { try { localStorage.setItem(config.selectedKey, nextId); } catch { /* storage may be unavailable */ } }
@@ -96,7 +96,7 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
   useEffect(() => { void load(); }, [load]);
 
   const activeFarm = useMemo(() => farms.find((farm) => farm._id === activeFarmId), [farms, activeFarmId]);
-  const isReadOnlyAll = false;
+  const isReadOnlyAll = farmRole === 'owner' && activeFarmId === 'all';
 
   const selectFarm = (id: string) => {
     if (!id || id === activeFarmId) { setOpen(false); return; }
@@ -201,11 +201,12 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
           <ChevronDown size={14} />
         </button>
         {open && <div className="absolute right-0 top-full mt-2 z-[1700] w-64 max-w-[calc(100vw-24px)] rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-2 shadow-xl">
-          {farms.filter((farm) => !farm.archived).map((farm) => <button key={farm._id} type="button" onClick={() => selectFarm(farm._id)} className={`w-full rounded-lg px-3 py-2 text-left text-sm ${farm._id === activeFarmId ? 'bg-emerald-50 dark:bg-emerald-900/30 font-semibold' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}>{farm.name}</button>)}
+          {farmRole === 'owner' && <button type="button" onClick={() => selectFarm('all')} className={`w-full rounded-lg px-3 py-2 text-left text-sm ${isReadOnlyAll ? 'bg-amber-50 dark:bg-amber-900/30 font-semibold' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}>{L('All farms · read only')}</button>}{farms.filter((farm) => !farm.archived).map((farm) => <button key={farm._id} type="button" onClick={() => selectFarm(farm._id)} className={`w-full rounded-lg px-3 py-2 text-left text-sm ${farm._id === activeFarmId ? 'bg-emerald-50 dark:bg-emerald-900/30 font-semibold' : 'hover:bg-slate-100 dark:hover:bg-slate-800'}`}>{farm.name}</button>)}
           {farmRole === 'owner' && <button type="button" onClick={() => { setOpen(false); void openManage(); }} className="mt-2 w-full border-t border-slate-200 dark:border-slate-700 px-3 py-2 text-left text-sm font-semibold text-emerald-700 dark:text-emerald-400 flex items-center gap-2"><Settings size={15} />{L('Manage farms & access')}</button>}
         </div>}
       </div>
 
+      {isReadOnlyAll && <span role="status" className="sr-only">{L('All farms is read-only. Select one farm to make changes.')}</span>}
       {manageOpen && farmRole === 'owner' && <div className="fixed inset-0 z-[1800] flex items-start justify-center overflow-y-auto bg-black/40 p-3 sm:p-6" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setManageOpen(false); }}>
         <section role="dialog" aria-modal="true" aria-labelledby="muf-farm-manager-title" className="mt-8 w-full max-w-2xl rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 p-4 sm:p-6 shadow-2xl">
           <div className="mb-4 flex items-center justify-between gap-3">
