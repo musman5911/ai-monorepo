@@ -472,6 +472,9 @@ function App() {
   const [popupStack, setPopupStack] = useState([]);
   const [selectedMonthRow, setSelectedMonthRow] = useState(null);
   const [selectedExpenseCategory, setSelectedExpenseCategory] = useState(null);
+  const [expenseCategoryRows, setExpenseCategoryRows] = useState([]);
+  const [expenseCategoryLoading, setExpenseCategoryLoading] = useState(false);
+  const [expenseCategoryError, setExpenseCategoryError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [financeFilter, setFinanceFilter] = useState('all');
@@ -1016,6 +1019,76 @@ function App() {
     }
     setListRefreshKey((value) => value + 1);
   };
+
+  useEffect(() => {
+    const category = String(selectedExpenseCategory?.category || '');
+    if (!token || !category) {
+      setExpenseCategoryRows([]);
+      setExpenseCategoryLoading(false);
+      setExpenseCategoryError('');
+      return undefined;
+    }
+    let cancelled = false;
+    setExpenseCategoryRows([]);
+    setExpenseCategoryLoading(true);
+    setExpenseCategoryError('');
+
+    const loadAllMatchingRows = async () => {
+      const pageSize = 500;
+      const filters = { type: 'expense', search: category };
+      if (reportsCropFilter !== 'all') filters.crop_id = String(reportsCropFilter);
+      const first = await api.getFinance(0, pageSize, filters);
+      if (!Array.isArray(first.data)) throw new Error('Expense detail API returned a non-array payload.');
+      const rows = [...first.data];
+      const rawTotal = first.headers?.['x-total-count'] ?? first.headers?.['X-Total-Count'];
+      const total = Number(rawTotal);
+      if (Number.isSafeInteger(total) && total >= 0) {
+        const seen = new Set(rows.filter((row) => row?._id != null).map((row) => String(row._id)));
+        for (let skip = pageSize; skip < total; skip += pageSize) {
+          const page = await api.getFinance(skip, pageSize, filters);
+          if (!Array.isArray(page.data)) throw new Error('Expense detail API returned a non-array payload.');
+          const pageTotal = Number(page.headers?.['x-total-count'] ?? page.headers?.['X-Total-Count']);
+          if (Number.isSafeInteger(pageTotal) && pageTotal !== total) {
+            throw new Error('Ledger changed while loading this category. Reopen it to retry.');
+          }
+          for (const row of page.data) {
+            if (row?._id == null || !seen.has(String(row._id))) {
+              rows.push(row);
+              if (row?._id != null) seen.add(String(row._id));
+            }
+          }
+        }
+        if (rows.length < total) throw new Error('Not all category transactions were returned. Reopen this category to retry.');
+        return rows.filter((row) => row.type === 'expense' &&
+          String(row.category || '') === category &&
+          (reportsCropFilter === 'all' || String(row.crop_id || '') === String(reportsCropFilter)));
+      }
+
+      let skip = rows.length;
+      let previousCount = rows.length;
+      while (previousCount === pageSize) {
+        const page = await api.getFinance(skip, pageSize, filters);
+        if (!Array.isArray(page.data)) throw new Error('Expense detail API returned a non-array payload.');
+        rows.push(...page.data);
+        previousCount = page.data.length;
+        skip += page.data.length;
+      }
+      return rows.filter((row) => row.type === 'expense' &&
+        String(row.category || '') === category &&
+        (reportsCropFilter === 'all' || String(row.crop_id || '') === String(reportsCropFilter)));
+    };
+
+    void loadAllMatchingRows().then((rows) => {
+      if (!cancelled) setExpenseCategoryRows(rows);
+    }).catch((error) => {
+      if (!cancelled) setExpenseCategoryError(
+        error?.response?.data?.error || error?.message || 'Could not load all category transactions.'
+      );
+    }).finally(() => {
+      if (!cancelled) setExpenseCategoryLoading(false);
+    });
+    return () => { cancelled = true; };
+  }, [token, selectedExpenseCategory?.category, reportsCropFilter, listRefreshKey]);
 
   const fetchCropPage = async (skip, filters, reset = false) => {
     const id = ++cropPageRequestRef.current;
@@ -5385,8 +5458,10 @@ function App() {
         {selectedExpenseCategory && (
           <div className="space-y-4 text-slate-800 dark:text-slate-100">
             <p className="muf-pc-muted">All direct outlays and ledger transactions matching this expenditure category{reportsCropFilter !== 'all' ? ` (filtered by crop)` : ''}:</p>
+            {expenseCategoryLoading && <p role="status" className="text-xs text-slate-500 py-3">Loading all matching ledger entries…</p>}
+            {expenseCategoryError && <p role="alert" className="text-xs text-red-600 py-3">{expenseCategoryError}</p>}
             <div className="max-h-[300px] overflow-y-auto space-y-2.5 pr-1 text-xs">
-              {filteredPeriodFinance.filter(f => f.type === 'expense' && f.category === selectedExpenseCategory.category).map(f => (
+              {expenseCategoryRows.map(f => (
                 <button
                   type="button"
                   key={f._id}
@@ -5405,7 +5480,7 @@ function App() {
                   <p className="muf-pc-micro">Crop sector: {crops.find(c => c._id === f.crop_id)?.name || 'Farm-wide'}</p>
                 </button>
               ))}
-              {filteredPeriodFinance.filter(f => f.type === 'expense' && f.category === selectedExpenseCategory.category).length === 0 && (
+              {!expenseCategoryLoading && !expenseCategoryError && expenseCategoryRows.length === 0 && (
                 <p className="text-center text-xs text-slate-500 italic py-4">No expense logs in this category for the selected crop filter.</p>
               )}
             </div>
