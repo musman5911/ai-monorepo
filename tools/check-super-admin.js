@@ -82,17 +82,28 @@ async function checkProject(project, port) {
       return;
     }
 
+    const url = '/api/super-admin/farm-summary';
+    const ownerSummary = await call('GET', url, { token: owner });
+    ok(ownerSummary.status === 200, 'owner can read the Super Admin farm summary');
+    ok(Array.isArray(ownerSummary.json?.farms) && ownerSummary.json.farms.length > 0, 'owner receives a separate entry for each active farm');
+    ok(ownerSummary.json?.farms?.every((farm) => farm.farmId && farm.farmName && Array.isArray(farm.stats)), 'each farm entry contains its own identity and metrics');
+    const farmIds = (ownerSummary.json?.farms || []).map((farm) => farm.farmId).filter(Boolean);
+    if (!farmIds.length) {
+      console.log('  Cannot create scoped test users because no active farm id was returned.');
+      return;
+    }
+
     const suffix = project.name.toLowerCase();
     const managerCreate = await call('POST', project.createUser, {
       token: owner,
-      body: { username: `phase1-manager-${suffix}`, password: 'phase1-manager-pass', email: `phase1-manager-${suffix}@example.com`, role: 'manager' },
+      body: { username: `phase1-manager-${suffix}`, password: 'phase1-manager-pass', email: `phase1-manager-${suffix}@example.com`, role: 'manager', farmIds: [farmIds[0]] },
     });
-    ok([200, 201].includes(managerCreate.status), 'owner can create a manager for the authorization check');
+    ok([200, 201].includes(managerCreate.status), 'owner can create a manager assigned to a farm');
     const workerCreate = await call('POST', project.createUser, {
       token: owner,
-      body: { username: `phase1-worker-${suffix}`, password: 'phase1-worker-pass', role: 'worker' },
+      body: { username: `phase1-worker-${suffix}`, password: 'phase1-worker-pass', email: `phase1-worker-${suffix}@example.com`, role: 'worker', farmIds: [farmIds[0]] },
     });
-    ok([200, 201].includes(workerCreate.status), 'owner can create a worker for the authorization check');
+    ok([200, 201].includes(workerCreate.status), 'owner can create a worker assigned to a farm');
 
     const managerLogin = await call('POST', project.login, { body: { username: `phase1-manager-${suffix}`, password: 'phase1-manager-pass' } });
     const workerLogin = await call('POST', project.login, { body: { username: `phase1-worker-${suffix}`, password: 'phase1-worker-pass' } });
@@ -100,12 +111,6 @@ async function checkProject(project, port) {
     const worker = project.token(workerLogin.json || {});
     ok(managerLogin.status === 200 && manager, 'manager can log in');
     ok(workerLogin.status === 200 && worker, 'worker can log in');
-
-    const url = '/api/super-admin/farm-summary';
-    const ownerSummary = await call('GET', url, { token: owner });
-    ok(ownerSummary.status === 200, 'owner can read the Super Admin farm summary');
-    ok(Array.isArray(ownerSummary.json?.farms) && ownerSummary.json.farms.length > 0, 'owner receives a separate entry for each active farm');
-    ok(ownerSummary.json?.farms?.every((farm) => farm.farmId && farm.farmName && Array.isArray(farm.stats)), 'each farm entry contains its own identity and metrics');
     if (manager) ok((await call('GET', url, { token: manager })).status === 403, 'manager receives HTTP 403 on owner-only summary data');
     if (worker) ok((await call('GET', url, { token: worker })).status === 403, 'worker receives HTTP 403 on owner-only summary data');
   } finally {
