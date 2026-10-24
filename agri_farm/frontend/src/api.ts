@@ -99,6 +99,7 @@ export const resetPassword = (email, code, newPassword) => {
 };
 
 // --- CROPS ROUTES ---
+export const getAnalyticsSummary = () => api.get('/analytics/summary');
 export const getCrops = (skip = 0, limit = 100, filters = {}) => api.get(`/crops?${buildAgriPageQuery(skip, limit, filters)}`);
 export const addCrop = (crop) => api.post('/crops', crop);
 export const updateCrop = (id, crop) => api.put(`/crops/${id}`, crop);
