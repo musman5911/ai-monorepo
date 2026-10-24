@@ -2085,54 +2085,58 @@ function App() {
     };
   });
 
-  const ledgerScopedFinance = finance.filter(f => financeCropFilter === 'all' || f.crop_id === financeCropFilter);
-  const filteredFinance = ledgerScopedFinance.filter(f => financeFilter === 'all' ? true : f.type === financeFilter);
+  const ledgerScopedFinance = finance.filter((row) => financeCropFilter === 'all' || String(row.crop_id) === String(financeCropFilter));
+  const filteredFinance = ledgerScopedFinance.filter((row) => financeFilter === 'all' ? true : row.type === financeFilter);
+  const selectedFinanceCropSummary = financeCropFilter === 'all'
+    ? null
+    : serverFinanceSummary?.byCrop?.find((item) => String(item.crop_id) === String(financeCropFilter));
+  const selectedFinanceGroupSummary = financeCropFilter === 'all'
+    ? null
+    : serverFinanceSummary?.groups?.find((item) => String(item.id) === String(financeCropFilter));
   const groupedFinances = React.useMemo(() => {
+    const summaries = serverFinanceSummary?.groups;
+    if (Array.isArray(summaries)) {
+      return summaries
+        .filter((group) => financeCropFilter === 'all' || String(group.id) === String(financeCropFilter))
+        .map((group) => {
+          const entryCount = financeFilter === 'income'
+            ? Number(group.incomeCount || 0)
+            : financeFilter === 'expense'
+              ? Number(group.expenseCount || 0)
+              : Number(group.entryCount || 0);
+          const income = financeFilter === 'expense' ? 0 : Number(group.income || 0);
+          const expense = financeFilter === 'income' ? 0 : Number(group.expense || 0);
+          return { ...group, entryCount, income, expense, net: income - expense };
+        })
+        .filter((group) => (group.id === 'farm-wide' && financeCropFilter === 'all') || group.entryCount > 0);
+    }
+
     const groupsMap = {};
-
-    // Initialize the farm-wide group
     groupsMap['farm-wide'] = {
-      id: 'farm-wide',
-      name: 'General / Farm-Wide Operational',
-      plot: 'General',
-      transactions: [],
-      net: 0
+      id: 'farm-wide', name: 'General / Farm-Wide Operational',
+      plot: 'General', transactions: [], net: 0,
     };
-
-    // Initialize groups for each crop
-    crops.forEach(c => {
-      groupsMap[c._id] = {
-        id: c._id,
-        name: `Crop: ${c.name} (${c.variety || 'Standard'})`,
-        plot: c.field || 'Farm-wide',
-        transactions: [],
-        net: 0
+    crops.forEach((crop) => {
+      groupsMap[crop._id] = {
+        id: crop._id, name: \`Crop: \${crop.name} (\${crop.variety || 'Standard'})\`,
+        plot: crop.field || 'Farm-wide', transactions: [], net: 0,
       };
     });
-
-    // Populate transactions into their respective groups
-    filteredFinance.forEach(f => {
-      const cropId = f.crop_id || 'farm-wide';
-      if (!groupsMap[cropId]) {
-        groupsMap['farm-wide'].transactions.push(f);
-      } else {
-        groupsMap[cropId].transactions.push(f);
-      }
+    filteredFinance.forEach((row) => {
+      const cropId = row.crop_id || 'farm-wide';
+      if (!groupsMap[cropId]) groupsMap['farm-wide'].transactions.push(row);
+      else groupsMap[cropId].transactions.push(row);
     });
-
     const result = [];
-    Object.values(groupsMap).forEach(g => {
-      const inc = g.transactions.filter(f => f.type === 'income').reduce((sum, f) => sum + f.amount, 0);
-      const exp = g.transactions.filter(f => f.type === 'expense').reduce((sum, f) => sum + f.amount, 0);
-      g.net = inc - exp;
-
-      if ((g.id === 'farm-wide' && financeCropFilter === 'all') || g.transactions.length > 0) {
-        result.push(g);
-      }
+    Object.values(groupsMap).forEach((group) => {
+      const inc = group.transactions.filter((row) => row.type === 'income').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+      const exp = group.transactions.filter((row) => row.type === 'expense').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+      group.net = inc - exp;
+      group.entryCount = group.transactions.length;
+      if ((group.id === 'farm-wide' && financeCropFilter === 'all') || group.transactions.length > 0) result.push(group);
     });
-
     return result;
-  }, [crops, filteredFinance, financeCropFilter]);
+  }, [crops, filteredFinance, financeCropFilter, financeFilter, serverFinanceSummary]);
 
   const filteredTasks = tasks.filter(t => {
     if (taskFilter !== 'all') {
@@ -2157,64 +2161,70 @@ function App() {
   }, [token, activeTab, taskFilter, taskCropFilter, selectedTaskCrop?.name, selectedTaskCrop?.variety, listRefreshKey]);
 
   const openLedgerProfitModal = (source, cardType = 'profit') => {
-    if (userRole !== 'admin') return; // money popups are admin-only
-    let income = 0;
-    let expense = 0;
+    if (userRole !== 'admin') return;
     let transactions = [];
-    let title = "Operational Ledger Flow";
+    let aggregateSummary = serverFinanceSummary;
+    let title = 'Operational Ledger Flow';
 
     if (source === 'dashboard') {
-      transactions = finance.filter(f => dashboardCropFilter === 'all' ? true : f.crop_id === dashboardCropFilter);
-      income = transactions.filter(f => f.type === 'income').reduce((sum, item) => sum + item.amount, 0);
-      expense = transactions.filter(f => f.type === 'expense').reduce((sum, item) => sum + item.amount, 0);
-      const cropName = dashboardCropFilter === 'all' ? L('All Crops') : (crops.find(c => c._id === dashboardCropFilter)?.name || L('Crop'));
-      title = `${L('Dashboard Ledger Flow')}: ${cropName}`;
+      transactions = finance.filter((row) => dashboardCropFilter === 'all' || String(row.crop_id) === String(dashboardCropFilter));
+      aggregateSummary = dashboardCropFilter === 'all' ? serverFinanceSummary : selectedDashboardCropSummary;
+      const cropName = dashboardCropFilter === 'all' ? L('All Crops') : (crops.find((crop) => crop._id === dashboardCropFilter)?.name || L('Crop'));
+      title = \`\${L('Dashboard Ledger Flow')}: \${cropName}\`;
     } else if (source === 'reports') {
       transactions = filteredPeriodFinance;
-      income = periodIncome;
-      expense = periodExpense;
-      const cropName = reportsCropFilter === 'all' ? L('All Crops') : (crops.find(c => c._id === reportsCropFilter)?.name || L('Crop'));
-      title = `${L('Reports Ledger Flow')}: ${cropName}`;
+      aggregateSummary = reportsCropFilter === 'all' ? serverFinanceSummary : selectedReportCropSummary;
+      const cropName = reportsCropFilter === 'all' ? L('All Crops') : (crops.find((crop) => crop._id === reportsCropFilter)?.name || L('Crop'));
+      title = \`\${L('Reports Ledger Flow')}: \${cropName}\`;
     } else {
       transactions = ledgerScopedFinance;
-      income = pageIncome;
-      expense = pageExpense;
-      const cropName = financeCropFilter === 'all' ? L('All Crops') : (crops.find(c => c._id === financeCropFilter)?.name || L('Crop'));
-      title = `${L('Financial Ledger Flow')}: ${cropName}`;
+      aggregateSummary = financeCropFilter === 'all' ? serverFinanceSummary : selectedFinanceGroupSummary;
+      const cropName = financeCropFilter === 'all' ? L('All Crops') : (crops.find((crop) => crop._id === financeCropFilter)?.name || L('Crop'));
+      title = \`\${L('Financial Ledger Flow')}: \${cropName}\`;
     }
 
-    // Process breakdowns based on cardType
+    const aggregateMoney = aggregateSummary?.totals || aggregateSummary;
+    const localIncome = transactions.filter((row) => row.type === 'income').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+    const localExpense = transactions.filter((row) => row.type === 'expense').reduce((sum, row) => sum + (Number(row.amount) || 0), 0);
+    const income = Number(aggregateMoney?.income ?? localIncome);
+    const expense = Number(aggregateMoney?.expense ?? localExpense);
+
     let breakdowns = [];
     let listTransactions = [...transactions];
-
     if (cardType === 'income') {
-      title += ` (${L('Income Source')})`;
-      listTransactions = transactions.filter(f => f.type === 'income');
-      const group = {};
-      listTransactions.forEach(f => {
-        const buyer = f.buyer_name ? f.buyer_name.trim() : f.category;
-        const key = buyer || 'General / Spot Sale';
-        group[key] = (group[key] || 0) + f.amount;
-      });
-      breakdowns = Object.entries(group)
-        .map(([name, amount]) => ({ name, amount }))
-        .sort((a, b) => b.amount - a.amount);
+      title += \` (\${L('Income Source')})\`;
+      listTransactions = transactions.filter((row) => row.type === 'income');
+      const sourceBreakdown = aggregateSummary?.incomeBreakdown;
+      if (Array.isArray(sourceBreakdown)) {
+        breakdowns = sourceBreakdown.map((row) => ({ name: row.name || row.category || 'Other', amount: Number(row.amount) || 0 }));
+      } else {
+        const group = {};
+        listTransactions.forEach((row) => {
+          const buyer = row.buyer_name ? row.buyer_name.trim() : row.category;
+          const key = buyer || 'General / Spot Sale';
+          group[key] = (group[key] || 0) + (Number(row.amount) || 0);
+        });
+        breakdowns = Object.entries(group).map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount);
+      }
     } else if (cardType === 'expense') {
-      title += ` (${L('Expense Breakdown')})`;
-      listTransactions = transactions.filter(f => f.type === 'expense');
-      const group = {};
-      listTransactions.forEach(f => {
-        const key = f.category || 'General Expense';
-        group[key] = (group[key] || 0) + f.amount;
-      });
-      breakdowns = Object.entries(group)
-        .map(([name, amount]) => ({ name, amount }))
-        .sort((a, b) => b.amount - a.amount);
+      title += \` (\${L('Expense Breakdown')})\`;
+      listTransactions = transactions.filter((row) => row.type === 'expense');
+      const sourceBreakdown = aggregateSummary?.expenseBreakdown;
+      if (Array.isArray(sourceBreakdown)) {
+        breakdowns = sourceBreakdown.map((row) => ({ name: row.name || row.category || 'Other', amount: Number(row.amount) || 0 }));
+      } else {
+        const group = {};
+        listTransactions.forEach((row) => {
+          const key = row.category || 'General Expense';
+          group[key] = (group[key] || 0) + (Number(row.amount) || 0);
+        });
+        breakdowns = Object.entries(group).map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount);
+      }
     } else if (cardType === 'profit') {
-      title += ` (${L('Profit Formula')})`;
+      title += \` (\${L('Profit Formula')})\`;
       listTransactions = [];
     } else if (cardType === 'margin') {
-      title += ` (${L('Margin Formula')})`;
+      title += \` (\${L('Margin Formula')})\`;
       listTransactions = [];
     }
 
@@ -2226,7 +2236,7 @@ function App() {
       title,
       cardType,
       source,
-      breakdowns
+      breakdowns,
     });
     setModal('ledger_profit');
   };
@@ -2303,8 +2313,12 @@ function App() {
     ...dashTasks.map(t => ({ id: `task-${t._id}`, label: t.title, date: t.due_date || '', kind: 'Task', status: t.status || 'Pending' })),
     ...dashFinance.map(f => ({ id: `finance-${f._id}`, label: `${f.type === 'income' ? 'Income' : 'Expense'}: ${f.description || f.category || 'Finance entry'}`, date: f.date || '', kind: 'Finance', status: '' })),
   ].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 6);
-  const pageIncome = ledgerScopedFinance.filter(f => f.type === 'income').reduce((sum, item) => sum + item.amount, 0);
-  const pageExpense = ledgerScopedFinance.filter(f => f.type === 'expense').reduce((sum, item) => sum + item.amount, 0);
+  const pageIncome = Number((financeCropFilter === 'all'
+    ? serverFinanceSummary?.totals?.income
+    : selectedFinanceCropSummary?.income) ?? ledgerScopedFinance.filter((row) => row.type === 'income').reduce((sum, row) => sum + (Number(row.amount) || 0), 0));
+  const pageExpense = Number((financeCropFilter === 'all'
+    ? serverFinanceSummary?.totals?.expense
+    : selectedFinanceCropSummary?.expense) ?? ledgerScopedFinance.filter((row) => row.type === 'expense').reduce((sum, row) => sum + (Number(row.amount) || 0), 0));
   const pageProfit = pageIncome - pageExpense;
 
   // --- RENDER AUTHENTICATION & LOGIN ---
@@ -3511,7 +3525,7 @@ function App() {
                           </div>
                           <div>
                             <h3 className="text-sm font-black">{group.name}</h3>
-                            <p className="text-[10px] text-slate-500">Plot: {group.plot} • {group.transactions.length} entries</p>
+                            <p className="text-[10px] text-slate-500">Plot: {group.plot} • {(group.entryCount ?? group.transactions.length)} entries</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-4 text-right">
