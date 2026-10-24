@@ -1,8 +1,8 @@
 ## Owner decision: final verification timing (2026-10-24)
 
-For every planned phase (0–7), browser/live UI testing (including the role matrix) and all real-MongoDB/database-copy validation are **POSTPONED until one consolidated project-wide pass after all phases have implementation complete**. This includes multi-process concurrency, index/migration tests, backup/restore on disposable copies and final browser walkthroughs. They are not per-phase blockers and must not be run as part of individual phase sign-off. Never use production data.
+Browser/live UI testing and role walkthroughs, plus all real-MongoDB/database-copy validation for **every phase (0–7)**, are **POSTPONED until one consolidated project-wide pass after all phases have implementation complete**. This includes multi-process concurrency, index/migration tests, backup/restore on disposable copies and the final browser matrix. They are not per-phase blockers. Never use production data.
 
-Local unit/source tests, memory-mode HTTP integration tests, MUF parity and scope/security checks, and frontend builds continue at each implementation checkpoint. This rule supersedes older historical progress notes below that call browser or real-MongoDB work an immediate blocker.
+Local unit/source tests, memory-mode HTTP integration tests, MUF parity and scope/security checks, and frontend builds continue at each implementation checkpoint. This rule supersedes older historical progress notes that describe browser or real-MongoDB work as an immediate blocker.
 
 ## Consolidated phase follow-up (2026-10-23)
 

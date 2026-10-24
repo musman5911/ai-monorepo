@@ -1,3 +1,7 @@
+## Verification timing policy (owner decision)
+
+Real-MongoDB multi-process concurrency and disposable-copy backup/restore validation for Phase 2 are **POSTPONED until the consolidated final project-wide pass after all planned phases have implementation complete**. They are not Phase 2 implementation blockers. Continue unit and memory-mode regression coverage now. Never use production data for verification.
+
 ## Additional edge-case safety (2026-10-23)
 
 Incubation allocation now counts egg-log rows as usable supply only when collected, sold, home-use and waste quantities are absent or valid non-negative safe integers. A malformed field makes that row contribute zero supply, preventing NaN from bypassing the allocation comparison. Tests cover malformed numeric strings, negative/unsafe counts, independent per-farm locks and retry after a storage acquisition error. Tests have not been run for this batch. Real-MongoDB multi-process contention and backup/restore are postponed to the final project-wide verification pass, using a disposable copy and never production.

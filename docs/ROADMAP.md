@@ -21,7 +21,7 @@ The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md).
 2. Continue through the approved roadmap without asking for repeated approval. Inspect existing schemas, APIs and data flows before changing them; preserve historical data unless a safe replacement is explicit.
 3. Update both `PROGRESS.md` and `ROADMAP.md` after each work step, and state clearly what is implemented versus verified.
 4. GitHub Actions is manual-only (`workflow_dispatch`). Do not run a workflow for every commit. Trigger it deliberately at a useful testing checkpoint, and report only checks that actually ran.
-5. For data/migration changes, use disposable database copies and backups before considering any live application. Never run migrations against live data. Browser and end-to-end role testing are deferred to one consolidated final pass after all planned phases.
+5. For data/migration changes, use disposable database copies and backups at the final verification checkpoint only. Never run migrations against live data. All browser/live UI and real-MongoDB/database-copy checks across every phase are postponed to one consolidated project-wide pass after all planned phases have implementation complete.
 
 Rules for every phase come from `RULES.md`: back up before migrations, ask before removing anything, keep the three projects separate, keep shared MUF files identical.
 
@@ -33,7 +33,7 @@ Rules for every phase come from `RULES.md`: back up before migrations, ask befor
 | 1 | Farms and roles in the MUF layer (1A Dairy backend, 1B-1 Agri backend, 1B-2 Flock backend, 1C screens, 1D migration/CI wrap-up) | Agri, Dairy, Flock | Implementation substantially delivered; local scope/security/build gates continue. Migration/backup on database copies and the final browser-role pass are postponed until every phase is implemented |
 | 2 | Flock restructure: Batches become the main project, Home Birds becomes a small tab | Flock | Batch-first panels, allocation guards, batch-linked labor, inventory locking and backup fields are implemented. Local tests/builds remain phase gates; real-MongoDB concurrency and database-copy backup/restore are postponed to final project-wide verification |
 | 3 | Bulk entry, scroll loading, server-side totals | Dairy, Flock, then Agri | In progress, not signed off. Dairy cow/milk paging and CSV imports, Flock batch paging/bulk CSV workflows and Agri bounded crop/task/finance APIs/imports are implemented. Agri now has summary-first dashboard/report totals and server-paged detail lists; regression coverage adds farm-scoped aggregate and cross-farm bulk fixtures. Remaining: run local tests/checks and all three builds; resolve whether Flock needs XLSX beyond current CSV support. Browser/live UI and real-MongoDB/database-copy checks are postponed until final project-wide verification |
-| 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | In progress: optional cow lineage fields and ear-tag index added; workflows and disposable-MongoDB index verification remain |
+| 4 | Dairy breeding and father records; Agri fields and seasons | Dairy, Agri | In progress: optional cow lineage fields and ear-tag index added; workflows remain. Real-MongoDB index verification is postponed to the final project-wide pass |
 | 5 | Photo storage adapter and Cloudinary | All three | Medium |
 | 6 | Super Admin upgrade (Owner-only, per-farm summaries) | All three | Low to medium |
 | 7 | MU Farms shop | Parent | Medium |
@@ -77,7 +77,7 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 - The owner pulled through `d7321fb` and reported 151 passing tests in the latest console output. Because command output is interleaved, capture a clean standalone root `npm test` summary at the next checkpoint.
 - `npm run check-farms`, `npm run check-sync`, `npm run check-ui`, and `npm run check-workbench` passed locally.
 - Dairy, Flock and Agri production builds succeeded. Dairy's mixed static/dynamic import warning, Flock/Agri large-chunk warnings, and Agri's deprecated `advancedChunks` warning are advisory, not build failures.
-- Do not run a production migration or index build to verify Phase 4. Use a disposable database copy and first check for duplicate non-empty ear tags within each farm.
+- Phase 4 database/index validation is postponed to final project-wide verification. At that checkpoint, use a disposable database copy and first check for duplicate non-empty ear tags within each farm. Do not run production migrations or index builds.
 
 ### Phase 3: Bulk entry, scroll loading, server totals
 
@@ -90,7 +90,7 @@ Owner-approved retained Home Birds scope: home-animal list/details, eggs, monthl
 - Flock batch listing now supports 20-row pages and Load More; batch egg logs have a lock-coordinated bulk endpoint and preview-first CSV import. Agri crop, finance and task APIs validate skip/limit, apply supported server-side filters before counting, and expose stable page metadata. Crop/task screens request a filtered first page when their view/filters change and later pages only on Load More. Ledger details page transactions by crop/farm-wide group and finance type. Full arrays remain loaded for current dashboard/report calculations. Dairy Health also has preview-first CSV import backed by the bulk health endpoint.
 - Contract tests were added for page metadata, filtered cow paging, bulk bounds, partial-write reporting, and Flock memory-query pagination. The owner's first Phase 3 run exposed a missing Dairy milk CSV preview modal, unused Dairy rate state, a stale Flock pagination setter, and missing skip/limit behavior in the Flock memory query adapter. Fixes have been pushed; rerun the suite and builds before proceeding.
 - The Flock API and UI now support preview-first CSV bulk entry for egg, feed, weight, vaccination and expense logs. Bulk writes are bounded to 200 entries per request and CSV previews are capped at 1,000 rows / 2 MB. Mortality and sales remain single-row only because each write depends on the live-bird count.
-- Agri crop/task cards now use 40-row server pages and Load More requests; ledger folder details page transaction rows by crop/farm-wide group and finance type. Complete arrays remain the source for dashboard/report calculations, so replacing those full transfers with summary endpoints remains a separate scale optimization. Remaining: rerun tests and all three builds; finish cross-farm bulk/aggregate fixtures; and confirm the existing preview-first CSV/Excel imports and 1,000-row API fixtures at the deliberate verification checkpoint. Phase 3 remains in progress until automated and deferred verification gates are closed.
+- Agri crop/task cards use 40-row server pages and Load More; ledger detail pages by crop/farm-wide group and finance type. The new `/analytics/summary` endpoint supplies farm-scoped dashboard/report totals, monthly trends, income/expense breakdowns and crop profitability. Full detail data is fetched only by workspaces that need it. Memory-mode runtime tests cover aggregate accuracy, farm isolation, worker finance redaction and cross-farm task/finance bulk rejection. Remaining local gates: run root tests/checks and all three frontend builds, then resolve whether Flock needs XLSX beyond its current CSV workflows. Browser and real-MongoDB/database-copy verification remains postponed to the final project-wide pass.
 
 **Status: implementation in progress (2026-10-23).** Per owner direction, Phase 2's real-MongoDB concurrency and disposable-copy backup/restore checks are deferred to the final verification pass after all phases. Continue Phase 3 implementation without accessing production data; Phase 2 is not being marked complete early.
 
@@ -109,6 +109,8 @@ Implementation order:
 
 ### Phase 4: Dairy breeding and Agri structure
 
+Browser/live UI and all real-MongoDB/database-copy checks for Phase 4 are postponed to the final project-wide verification pass; they are not per-phase blockers.
+
 **First implementation slice (2026-10-23, local verification pending):** Dairy cow records now have additive `earTag`, `fatherId`, `fatherType` (`farm` or `outside`) and `fatherName` fields, with a partial unique index scoped by farm for non-empty ear tags. This preserves existing records that have no tag. Added source-contract tests in `tests/phase4-breeding-lineage.test.ts`. Before rollout, verify index creation against a disposable MongoDB copy and detect any existing duplicate tags within a farm.
 
 Remaining work:
@@ -117,15 +119,21 @@ Remaining work:
 
 ### Phase 5: Photo storage
 
+Browser/live UI and all real-MongoDB/database-copy checks for Phase 5 are postponed to the final project-wide verification pass; they are not per-phase blockers.
+
 - Add `muf-storage.mjs`: compression and size limits, delete photos with their record, clean up orphaned photos.
 - Connect Cloudinary (Free plan; the owner created the account on 2026-10-22, not yet connected). Credentials go only in environment secrets.
 - Done when: new photos go through the adapter in all three apps and old photos still display.
 
 ### Phase 6: Super Admin upgrade
 
+Browser/live UI and all real-MongoDB/database-copy checks for Phase 6 are postponed to the final project-wide verification pass; they are not per-phase blockers.
+
 - Make the existing tab Owner-only and show each project's farms separately from the existing `/api/farm-summary` endpoints.
 
 ### Phase 7: MU Farms shop
+
+Browser/live UI and all real-MongoDB/database-copy checks for Phase 7 are postponed to the final project-wide verification pass; they are not per-phase blockers.
 
 - One shop with Crops, Dairy and Poultry sections, and a "Publish to MU Farms" switch per product. Decide where it lives (a separate public section inside one app, or a free-subdomain site) before building.
 - Dairy: a "List on MU Farms" option for milk or animals with no buyer.

@@ -1,3 +1,7 @@
+## Verification timing policy (owner decision)
+
+Phase 1 browser/role review and all real-MongoDB/database-copy migration, index and backup/restore checks are **POSTPONED until the consolidated final project-wide pass after all planned phases have implementation complete**. They are not Phase 1 implementation blockers. Continue local farm-scope/security tests, shared-file checks and frontend builds now. Never use production data for verification.
+
 ## Farm deletion safety follow-up (2026-10-23)
 
 The shared farm delete route refuses to delete an active farm if it is the last active farm, even when archived farms remain. It also verifies that a move destination exists and is active before moving populated records. Route-handler regressions cover the last-active-farm guard, archived destination and typed-name confirmation. Tests have not yet been run for this batch. Migration/backup-restore on a disposable copy and the all-role browser pass remain deferred; never use production data for those checks.

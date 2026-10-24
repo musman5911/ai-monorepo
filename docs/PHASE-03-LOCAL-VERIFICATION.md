@@ -4,9 +4,9 @@ Browser/live UI and role walkthroughs plus all real-MongoDB/database-copy checks
 
 ## Current implementation follow-up (2026-10-24)
 
-Agri now has an authenticated, farm-scoped \`/analytics/summary\` endpoint that returns crop/task totals, monthly finance rows, monthly income trends, expense/income breakdowns, profitability and bounded recent task/ledger rows without photo blobs. The initial dashboard/report load uses the summary endpoint. Full detail arrays are fetched only for the finance workspace outside the paged Ledger subtab and for Labor. Regression coverage checks per-farm summary arithmetic, worker finance redaction, farm isolation and no-partial-write validation for task/finance bulk requests that include a crop from another farm.
+Agri now has an authenticated, farm-scoped `/analytics/summary` endpoint that returns crop/task totals, monthly finance rows, monthly income trends, expense/income breakdowns, profitability and bounded recent task/ledger rows without photo blobs. The initial dashboard/report load uses the summary endpoint. Full detail arrays are fetched only for the finance workspace outside the paged Ledger subtab and for Labor. Regression coverage checks per-farm summary arithmetic, worker finance redaction, farm isolation and no-partial-write validation for task/finance bulk requests that include a crop from another farm.
 
-The follow-up is committed to \`muf-monorepo\` but **local tests/builds have not yet been run for this follow-up**. Do not mark Phase 03 verified until the owner runs the local commands and reviews failures.
+The follow-up is committed to `muf-monorepo` but **local tests/builds have not yet been run for this follow-up**. Do not mark Phase 03 verified until the owner runs the local commands and reviews failures.
 
 # Phase 03 Agri runtime and release verification
 
@@ -35,9 +35,9 @@ cd ../../agri_farm/frontend && npm ci && npm run build
 
 The `tests/agri-runtime-api.integration.test.ts` test starts an isolated Agri backend in memory mode and exercises live HTTP requests for authentication, Owner/Manager/Worker authorization, farm reads, pagination headers and limits, invalid query handling, worker crop visibility, and all-or-nothing validation of finance bulk imports. It also checks that crop/task/finance page metadata stays consistent across adjacent requests, IDs do not duplicate across page boundaries, and unauthorized or invalid task bulk imports do not create partial records. These are runtime HTTP tests against the in-memory adapter, not production-MongoDB verification.
 
-## Browser review matrix
+## Browser review matrix (POSTPONED until the final project-wide pass)
 
-Use a disposable test farm and do not use production records for bulk-import tests.
+This matrix is a checklist only for now. Do not perform the browser/live UI pass until every planned phase has implementation complete. At that final checkpoint, use a disposable test farm and do not use production records for bulk-import tests.
 
 | Role | Verify |
 | --- | --- |
@@ -52,9 +52,7 @@ For crops, tasks and finance, use enough disposable records to exceed one server
 
 ## Release gate
 
-The Agri crop and task screens now fetch a filtered first page when their view or filters change and fetch later pages only on Load More. Ledger-folder details page transactions by crop or farm-wide grouping and finance type. Server filters are applied before row selection and total-count calculation.
-
-The existing refresh still retrieves complete crop/task/finance arrays for current dashboard/report calculations. Thus the list UI is network-paged, but aggregate startup transfer remains a known scalability item until farm-scoped summary endpoints replace the arrays without changing totals. Tests/builds have not been rerun for this batch.
+The Agri crop and task screens fetch filtered pages on demand, and ledger-folder details page transactions by crop/farm-wide grouping and finance type. The authenticated `/analytics/summary` endpoint supplies farm-scoped totals, monthly trends, income/expense breakdowns and crop profitability; normal dashboard/report loading no longer pulls the full finance or task ledgers. Full detail data is fetched for workspaces that require it. Cross-farm task/finance bulk and aggregate accuracy regression tests have been added. Local tests and builds remain unverified for this follow-up.
 
 Keep Phase 03 open until root tests/checks and all three frontend builds pass locally and the summary, filters, Load More, farm-scoped totals and bulk-import regressions pass. Browser/live UI and real-MongoDB/database-copy checks are deliberately postponed to the final project-wide pass after all planned phases are implemented. Never treat environment-dependent skips as passes.
 
