@@ -647,7 +647,7 @@ export default function App() {
     ...(isAdmin ? [{ id: 'labor', label: 'Labor', icon: HardHat }] : []),
     { id: 'incubation', label: 'Incubation', icon: Egg },
     { id: 'summary', label: 'Summary', icon: BarChart2 }, 
-    ...(isAdmin ? [{ id: 'super_admin', label: 'Super Admin', icon: Shield }] : []),
+    ...(currentUser && typeof currentUser === 'object' && currentUser.farmRole === 'owner' ? [{ id: 'super_admin', label: 'Super Admin', icon: Shield }] : []),
   ];
 
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
@@ -1060,7 +1060,7 @@ export default function App() {
                 />
               )}
 
-              {activeTab === 'super_admin' && isAdmin && <SuperAdminTab />}
+              {activeTab === 'super_admin' && currentUser && typeof currentUser === 'object' && currentUser.farmRole === 'owner' && <SuperAdminTab />}
 
             </div>
           )}
