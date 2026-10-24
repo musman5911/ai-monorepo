@@ -111,7 +111,7 @@ Implementation order:
 
 Browser/live UI and all real-MongoDB/database-copy checks for Phase 4 are postponed to the final project-wide verification pass; they are not per-phase blockers.
 
-**First implementation slice (2026-10-23, local verification pending):** Dairy cow records now have additive `earTag`, `fatherId`, `fatherType` (`farm` or `outside`) and `fatherName` fields, with a partial unique index scoped by farm for non-empty ear tags. This preserves existing records that have no tag. Added source-contract tests in `tests/phase4-breeding-lineage.test.ts`. Before rollout, verify index creation against a disposable MongoDB copy and detect any existing duplicate tags within a farm.
+**First implementation slice (2026-10-23, local verification pending):** Dairy cow records now have additive `earTag`, `fatherId`, `fatherType` (`farm` or `outside`) and `fatherName` fields, with a partial unique index scoped by farm for non-empty ear tags. This preserves existing records that have no tag. Added source-contract tests in `tests/phase4-breeding-lineage.test.ts`. Index creation and duplicate-tag detection are postponed to final project-wide verification against a disposable MongoDB copy.
 
 Remaining work:
 - Dairy: sire selection and validation in the UI/API, breeding-event history, automatic calf creation with gender and mother/father links (farm bull or outside straw), tests for lineage and per-farm tag uniqueness.
@@ -175,19 +175,19 @@ Batch summary now includes net eggs after sales, home use and waste. Incubation 
 
 ### Phase 2 implementation update (2026-10-23): destructive batch replacement guards
 
-Batch import-all and wipe-all now return HTTP 409 if incubation or labor attendance records reference a batch, preventing those bulk operations from silently orphaning history. A new batch-math test covers net egg availability after sales, home use and waste. These tests and builds remain unrun; the GitHub Actions connector cannot dispatch the manual workflow. Still open: race protection between allocation writes and egg-log deletion, concurrency/integration coverage, and coordinated full backup restore when linked history exists.
+Historical Phase 2 checkpoint (2026-10-23): import-all and wipe-all guards were added at this stage; the shared inventory lock and further regression tests were committed later. Current local tests/builds remain implementation gates. Real-MongoDB concurrency and coordinated backup/restore checks are postponed to the final project-wide pass.
 
 ### Phase 2 implementation update (2026-10-23): linked-history guard tests
 
-The import/wipe guard is now a pure tested helper with coverage for empty, incubation-linked and labor-linked history. The route uses the helper. Tests/builds remain unrun; manual workflow dispatch is unavailable through this connector. Allocation-vs-egg-log deletion race protection and integration coverage remain unresolved before Phase 2 can be considered fully verified.
+Historical Phase 2 checkpoint (2026-10-23): pure linked-history guard tests were added here; later commits add shared inventory locking and route-level memory-mode regressions. Real-MongoDB concurrency and disposable-copy backup/restore are postponed to the final project-wide pass.
 
 ### Phase 2 implementation update (2026-10-23): allocation math consistency
 
-Incubation validation now clamps each egg-log's net supply at zero, matching the batch summary calculation and preventing negative-net legacy records from reducing valid supply on other dates. Added a regression unit test, not yet executed. Cross-request allocation/deletion concurrency and integration coverage remain open. The connected GitHub tools do not expose workflow dispatch, so the manual-only Actions checkpoint has not run; Phase 2 remains in progress until those risks and verification are addressed.
+Historical Phase 2 checkpoint (2026-10-23): that update added net-supply validation but still listed allocation/deletion race protection as open. Later commits implement the shared inventory lock and memory-mode route regressions. Real-MongoDB race/concurrency checks and disposable-copy backup/restore are postponed to final project-wide verification after every phase has implementation complete.
 
 ### Phase 2 verification checkpoint (2026-10-23): atomicity and current-test evidence
 
-The Home Birds navigation is secondary and scoped to Bird List, Eggs, Monthly Report and Vaccination; bird details are reached from Bird List. Batch panels are present across the requested screens, but some legacy health/summary calculations still depend on individual-bird ledgers, so batch-first review is not complete. Allocation validation and egg-log deletion still need shared database atomic coordination and route-level integration tests. No simplistic in-process lock was added because it would not safely cover multiple server processes. The latest visible Actions success (`39909652206`, commit `6c7b3e95d5264f09e347ea66eb3d30e1ce77048c`) predates current changes and is not current verification. Workflow dispatch is unavailable through the connected GitHub tool. Phase 2 remains in progress until atomicity, integration tests, current Actions verification, and disposable-copy backup/restore validation are complete.
+Historical Phase 2 checkpoint (2026-10-23): later commits implemented shared farm-scoped inventory locking and memory-mode route coverage. Current local unit/source/build checks continue per phase. Real-MongoDB concurrency, final browser role review and disposable-copy backup/restore are postponed to the final project-wide pass; this older checkpoint is not the current status.
 
 ### Phase 2 implementation checkpoint (2026-10-23): inventory coordination and backup completeness
 
