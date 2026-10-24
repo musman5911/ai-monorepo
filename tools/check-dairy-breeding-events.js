@@ -79,6 +79,19 @@ async function main() {
     ok(eventResponse.status === 201 && eventId, 'owner can create a valid breeding event');
     if (!eventId) throw new Error(`Event create failed: ${JSON.stringify(eventResponse.json)}`);
 
+    const cowAfterCreate = await call('GET', '/api/cows/cow8', { token: owner, farm: String(farmA._id) });
+    ok(cowAfterCreate.status === 200 && cowAfterCreate.json?.cow?.heatDate === today, 'creating a heat event synchronizes the legacy cow heatDate');
+
+    const tomorrowDate = new Date();
+    tomorrowDate.setUTCDate(tomorrowDate.getUTCDate() + 1);
+    const tomorrow = tomorrowDate.toISOString().slice(0, 10);
+    const update = await call('PUT', `/api/breeding/events/${eventId}`, {
+      token: owner, farm: String(farmA._id), body: { date: tomorrow, result: 'Updated by checker' },
+    });
+    ok(update.status === 200 && update.json?.date === tomorrow, 'owner can edit an existing breeding event');
+    const cowAfterUpdate = await call('GET', '/api/cows/cow8', { token: owner, farm: String(farmA._id) });
+    ok(cowAfterUpdate.json?.cow?.heatDate === tomorrow, 'editing an event resynchronizes the legacy cow date');
+
     const listA = await call('GET', '/api/breeding/events?page=1&limit=20&cowId=cow8', { token: owner, farm: String(farmA._id) });
     ok(listA.status === 200 && listA.json?.events?.some((event) => event._id === eventId), 'event appears in paginated list for its farm and cow');
     ok(listA.json?.total >= 1 && listA.json?.page === 1, 'list response includes pagination metadata');
@@ -96,6 +109,11 @@ async function main() {
     const worker = workerLogin.json?.token;
     ok(workerLogin.status === 200 && worker, 'seeded worker can log in');
     if (worker) {
+      const workerCreate = await call('POST', '/api/breeding/events', {
+        token: worker, farm: String(farmA._id),
+        body: { cowId: 'cow8', type: 'pregnancy_check', date: today, result: 'Negative', technician: 'Worker check' },
+      });
+      ok(workerCreate.status === 201 && workerCreate.json?._id, 'worker can create a breeding event');
       const workerDelete = await call('DELETE', `/api/breeding/events/${eventId}`, { token: worker, farm: String(farmA._id) });
       ok(workerDelete.status === 403, 'worker cannot delete a breeding event');
     }
