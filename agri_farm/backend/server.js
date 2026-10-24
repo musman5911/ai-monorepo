@@ -18,6 +18,7 @@ import { automationsRouter, startScheduler } from './routes/automations.js';
 import cropsRoutes from './routes/crops.js';
 import financeRoutes from './routes/finance.js';
 import tasksRoutes from './routes/tasks.js';
+import analyticsRoutes from './routes/analytics.js';
 import inventoryRoutes from './routes/inventory.js';
 import liabilitiesRoutes from './routes/liabilities.js';
 import suppliersRoutes from './routes/suppliers.js';
@@ -104,6 +105,7 @@ const apiRouters = [
   cropsRoutes,
   financeRoutes,
   tasksRoutes,
+  analyticsRoutes,
   inventoryRoutes,
   liabilitiesRoutes,
   suppliersRoutes,
