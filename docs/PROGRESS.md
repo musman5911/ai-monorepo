@@ -1,3 +1,13 @@
+## Phase 01 active follow-up (2026-10-24)
+
+Owner has changed the verification policy: Phase 01 browser and role walkthroughs are now required before calling Phase 01 complete. Run them only against isolated local memory-mode instances. Real MongoDB migration/index creation and backup/restore validation on a disposable database copy remain in the consolidated final project-wide verification pass; never use production data.
+
+Changes pushed after the owner-reported 205/205 test and three-build checkpoint:
+- Commit `7c6c9d8`: replaced the shared farm-scoped `findByIdAndDelete` lookup-then-unscoped-delete sequence with one farm-scoped delete query in all three identical helpers, and added a regression test.
+- Commit `ff24217`: added Agri DiaryMedia to the shared backup/restore collection registry.
+
+These follow-up commits have **not yet been locally tested or built**. Remaining Phase 01 implementation work still includes Dairy Supplier/SupplierPayment backup symmetry, Flock Image backup/restore with IDs and binary data preserved, owner-facing All farms and backup-first deletion UI, farm-first index review, and a repeatable browser role matrix. Do not mark Phase 01 complete until implementation, local gates, and the browser checklist pass.
+
 ## Latest owner-run checkpoint (2026-10-24; source through dbc41f4)
 
 - After pulling dbc41f4, the supplied Windows run reported 204/205 tests passing. The one failure was a stale Flock source-contract expectation: the import validator says 'Duplicate date in import file', not 'Duplicate date in CSV'. The assertion is corrected in this commit.
