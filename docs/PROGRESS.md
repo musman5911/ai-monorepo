@@ -82,7 +82,7 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 | Phase | State |
 |---|---|
 | 0. Docs reset and repository cleanup | Done. Applied by the owner, pushed to the `muf-monorepo` branch, owner's checks and builds all passed |
-| 1. Farms and roles (MUF) | Implementation substantially delivered; local farm-scope, shared-MUF and UI checks pass. Disposable database-copy migration/backup checks remain open; final browser/role review is deferred until all phases finish |
+| 1. Farms and roles (MUF) | Implementation substantially delivered; local farm-scope, shared-MUF and UI checks pass. Disposable database-copy migration/backup and browser/role review are postponed to the final project-wide verification pass after all phases have implementation complete |
 | 2. Flock restructure and Home Birds | Partial. Batches default and batch egg/vaccination logs plus calculations are implemented and automated checks pass. Dashboard, Health, Labors, Incubation and Summary are not yet all batch-driven; backup/restore copy validation remains open |
 | 3. Bulk entry, scroll loading, server totals | In progress: opt-in Dairy cows/milk API pagination and query validation are implemented; UI incremental loading and bulk entry remain |
 | 4. Dairy breeding; Agri fields and seasons | In progress: optional Dairy lineage fields and farm-scoped ear-tag unique index are implemented; sire workflow, lineage automation, Agri fields/seasons and MongoDB index verification remain |
@@ -110,7 +110,7 @@ The system is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md); the phases 
 - The owner synced local `muf-monorepo` to `2d4d788` and reported a clean working tree. `npm test` passed 89 tests across 9 files; `npm run check-farms`, `npm run check-ui`, `npm run check-sync`, and `npm run check-workbench` passed; the Flock client `npm run build` passed; and `npm run check-workbench-runtime` passed all 8 checks after starting the Dairy Vite server on port 5000. These are local results supplied by the owner, not a claim that every workflow was browser-tested.
 - Phase 2 implementation step: Dashboard now loads its operational KPIs and recent-batch list from the authenticated batch API, with an explicit loading-failure message and a shortcut to Batches. Commits `d2939da` and `1df705b` on `muf-monorepo`; the active-batch KPI uses the actual `Active` enum value. Health now also shows recent batch vaccination history by batch, with record counts, bird counts, dates, doses and costs (`d3be222`, hook import fix `9815fc2` and JSX wrapper fix `4259907`). Source-level work only; automated verification is pending.
 - Continue Phase 2: make Labors, Incubation and Summary derive their primary information from batches, and finish shifting Health's primary workflow to batch health while retaining Home Birds vaccination as its limited legacy view; keep Home Birds secondary with Bird List, Bird Details, Eggs, Monthly Report and Vaccination only. Inspect batch backup/restore compatibility and validate on a disposable copy.
-- Phase 1 still needs disposable database-copy migration tests and backup/restore review. Per owner direction, defer all browser/end-to-end role testing to one final pass after every planned phase. Never run migrations against live data without explicit approval.
+- Phase 1's disposable database-copy migration/backup checks and browser/end-to-end role review are postponed to one final project-wide pass after every planned phase has implementation complete. Never run migrations against live data.
 - Dependency audit warnings were reported by `npm ci`: root 5 vulnerabilities (1 moderate, 2 high, 2 critical), Flock backend 6 (4 moderate, 2 high), Flock client 3 (2 high, 1 critical). Investigate with targeted updates in the planned security work; do not use blanket `npm audit fix --force`.
 
 ## Phase 1 step 1B-2: Flock backend (in progress, 2026-10-23)
@@ -427,8 +427,8 @@ The owner pulled commit `e49317e` and ran the local checks. These are owner-repo
 
 1. Pull the latest `muf-monorepo` branch and rerun the root test and farm-scope check. Capture the new Flock login/farms diagnostic if it still fails.
 2. Fix the actual Flock startup/login/farm migration defect exposed by that diagnostic; do not weaken role or isolation assertions to make the check green.
-3. Run inventory-lock concurrency tests against a disposable real MongoDB database, including concurrent incubation saves, an incubation save racing an egg-log deletion, lock cleanup on success/failure, and two backend processes. Memory mode alone is not evidence of cross-process lock correctness.
-4. Test backup/restore on a disposable database copy, including legacy backup payloads, all Phase 2 collections, IDs/relationships, and failure behavior. Never test destructive restore against production data.
+3. **Final pass only, not now:** run inventory-lock concurrency tests against a disposable real MongoDB database, including concurrent incubation saves, an incubation save racing an egg-log deletion, lock cleanup on success/failure, and two backend processes. Memory mode alone is not evidence of cross-process lock correctness.
+4. **Final pass only, not now:** test backup/restore on a disposable database copy, including legacy backup payloads, all Phase 2 collections, IDs/relationships, and failure behavior. Never test destructive restore against production data.
 5. Re-run all automated checks and builds, then manually trigger CI at the verification checkpoint. Record only checks that actually ran.
 6. Only after those gates pass, mark Phase 2 verified and start Phase 3.
 
@@ -495,7 +495,7 @@ Implemented the first bounded-pagination contract and wired it into Dairy cow an
 - New `parsePagePagination` helper uses 1-based pages, a default page size of 50, a maximum page size of 200, and rejects invalid/unsafe page or limit values.
 - `GET /api/cows?page=N` and `GET /api/milk?page=N` now use stable sort keys, run a matching `countDocuments` query, and expose `X-Total-Count`, `X-Page`, `X-Page-Size`, and `X-Total-Pages` response headers.
 - The farm-scoped model wrapper applies the request's farm filter to both list and count operations. Browser clients are explicitly allowed to read the pagination headers.
-- Legacy requests without `page` keep the existing array response and skip/limit behavior. No frontend has been switched to paging yet, so this is additive.
+- Legacy requests without `page` keep the existing array response and skip/limit behavior. At this early checkpoint, no frontend had yet been switched to paging; later Phase 3 work added paged list flows across the three apps.
 
 Added `tests/phase3-pagination.test.ts` with cases for legacy compatibility, 1-based offsets, default and capped limits, invalid values, overflow protection, and source contracts for the two routes.
 
