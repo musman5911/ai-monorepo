@@ -76,6 +76,7 @@ const offlinePendingCount = () => {
 export default function App() {
   const [token, setToken] = useState<string | null>(getToken);
   const [role, setRole] = useState<string | null>(getRole);
+  const [farmRole, setFarmRole] = useState<string | null>(() => { try { return localStorage.getItem('dm_farm_role'); } catch { return null; } });
   const [username, setUsername] = useState<string | null>(getUsername);
   const [dark, setDark] = useState(
     () => localStorage.getItem("dm_dark") === "true",
@@ -306,6 +307,8 @@ export default function App() {
       clearAuth();
       setToken(null);
       setRole(null);
+      setFarmRole(null);
+      try { localStorage.removeItem('dm_farm_role'); } catch { /* storage unavailable */ }
       setUsername(null);
       setShowAdmin(false);
       setSessionNotice("Your session expired. Please sign in again.");
@@ -314,9 +317,11 @@ export default function App() {
     return () => window.removeEventListener("dm:unauthorized", onUnauthorized);
   }, []);
 
-  function handleLogin(t: string, r: string, u: string) {
+  function handleLogin(t: string, r: string, u: string, actualFarmRole: string) {
     setToken(t);
     setRole(r);
+    setFarmRole(actualFarmRole);
+    try { localStorage.setItem('dm_farm_role', actualFarmRole); } catch { /* storage unavailable */ }
     setUsername(u);
     setSessionNotice(null);
   }
@@ -347,7 +352,8 @@ export default function App() {
   // Workers can use day-to-day tabs; financial Reports stay admin-only
   const NAV = getNav(); // re-evaluated every render so labels follow the language
   void lang; // language state drives re-render
-  const visibleNav = isAdmin ? NAV : NAV.filter((n) => n.id !== "reports" && n.id !== "labor" && n.id !== "super_admin");
+  const visibleNav = (isAdmin ? NAV : NAV.filter((n) => n.id !== "reports" && n.id !== "labor"))
+    .filter((n) => n.id !== "super_admin" || farmRole === "owner");
 
   return (
     <div
@@ -560,7 +566,7 @@ export default function App() {
                 {L('Reports are available to admin accounts only.')}
               </div>
             ))}
-            {tab === "super_admin" && isAdmin && <SuperAdminTab />}
+            {tab === "super_admin" && farmRole === "owner" && <SuperAdminTab />}
           </motion.main>
         </AnimatePresence>
       </div>
