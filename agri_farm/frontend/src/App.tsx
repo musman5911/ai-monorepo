@@ -825,6 +825,8 @@ function App() {
     }
 
     let cancelled = false;
+    setSelectedCropFinanceRows([]);
+    setSelectedCropTaskRows([]);
     setSelectedCropDetailLoading(true);
     setSelectedCropDetailError('');
 
@@ -2385,16 +2387,20 @@ function App() {
     (dashboardCropFilter === 'all' || c._id === dashboardCropFilter) &&
     (userRole === 'admin' || c.status !== 'Completed')
   );
-  const dashTaskRows = Array.isArray(analyticsSummary?.taskSummary?.recentPending)
-    ? analyticsSummary.taskSummary.recentPending
+  const dashTaskRows = Array.isArray(analyticsSummary?.taskSummary?.recent)
+    ? analyticsSummary.taskSummary.recent
     : tasks;
   const dashTasks = dashTaskRows.filter((task) =>
     taskMatchesCrop(task, dashboardCropFilter) &&
     (userRole === 'admin' || task.status !== 'Completed')
   );
+  const dashPendingTaskRows = (Array.isArray(analyticsSummary?.taskSummary?.recentPending)
+    ? analyticsSummary.taskSummary.recentPending
+    : tasks.filter((task) => task.status === 'Pending'))
+    .filter((task) => taskMatchesCrop(task, dashboardCropFilter));
   const dashPendingCount = dashboardCropFilter === 'all'
-    ? Number(analyticsSummary?.taskSummary?.byStatus?.Pending ?? dashTasks.filter((task) => task.status === 'Pending').length)
-    : Number(selectedDashboardTaskSummary?.pending ?? dashTasks.filter((task) => task.status === 'Pending').length);
+    ? Number(analyticsSummary?.taskSummary?.byStatus?.Pending ?? dashPendingTaskRows.length)
+    : Number(selectedDashboardTaskSummary?.pending ?? dashPendingTaskRows.length);
   const pendingDutyRows = Array.isArray(analyticsSummary?.taskSummary?.recentPending)
     ? analyticsSummary.taskSummary.recentPending
     : tasks.filter((task) => task.status === 'Pending');
@@ -3014,7 +3020,7 @@ function App() {
                     <ArrowUpRight size={17} className="text-slate-400"/>
                   </div>
                   <div className="px-4 pb-4 pt-1 space-y-2">
-                    {dashPendingCount === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">{L('No pending care tasks.')}</p> : dashTasks.filter(t => t.status !== 'Completed').slice(0, 3).map(t => <div key={t._id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{t.title}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{t.priority || t.status || 'Pending'}</span></div>)}
+                    {dashPendingCount === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">{L('No pending care tasks.')}</p> : dashPendingTaskRows.slice(0, 3).map(t => <div key={t._id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{t.title}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{t.priority || t.status || 'Pending'}</span></div>)}
                     <div className="flex items-center justify-between pt-1"><span className="text-[10px] text-slate-500">{dashPendingCount} pending tasks</span><span className="text-[10px] font-bold text-farm-600 dark:text-farm-400 uppercase tracking-wider">{L('Open Board')} →</span></div>
                   </div>
                 </button>
@@ -3148,7 +3154,7 @@ function App() {
                 <div className="space-y-3">
                   {dashPendingCount === 0 ? (
                     <p className="text-slate-500 text-xs text-center py-8">{L('Care roster is clean.')}</p>
-                  ) : dashTasks.filter(t => t.status !== 'Completed').map(t => (
+                  ) : dashPendingTaskRows.map(t => (
                     <button
                       type="button"
                       key={t._id}
