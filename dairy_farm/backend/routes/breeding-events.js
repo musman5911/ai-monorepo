@@ -1,0 +1,164 @@
+import express from 'express';
+import { randomUUID } from 'node:crypto';
+import { protect, adminOnly } from '../middleware/auth.js';
+import { Cow, BreedingEvent } from '../db.js';
+import { readString, readDate, readEnum, sendValidationError } from './input.js';
+
+const router = express.Router();
+const TYPES = ['heat', 'service', 'pregnancy_check', 'calving'];
+const SIRE_SOURCES = ['farm_bull', 'outside_bull', 'outside_straw'];
+const TEXT_LIMITS = { technician: 120, result: 500, notes: 2000, bullName: 160, semenCode: 100 };
+
+function eventPayload(body, { partial = false } = {}) {
+  const errors = [];
+  const payload = {};
+  const required = !partial;
+  const cowId = readString(body, 'cowId', errors, { required, allowEmpty: false });
+  if (cowId !== undefined) payload.cowId = cowId;
+  const type = readEnum(body, 'type', TYPES, errors, { required });
+  if (type !== undefined) payload.type = type;
+  const date = readDate(body, 'date', errors, { required });
+  if (date !== undefined) payload.date = date;
+
+  const sireSource = readEnum(body, 'sireSource', SIRE_SOURCES, errors);
+  if (sireSource !== undefined) payload.sireSource = sireSource;
+  for (const field of Object.keys(TEXT_LIMITS)) {
+    const value = readString(body, field, errors);
+    if (value !== undefined) {
+      if (value.length > TEXT_LIMITS[field]) errors.push(`${field} must be at most ${TEXT_LIMITS[field]} characters`);
+      else payload[field] = value;
+    }
+  }
+  const bullId = readString(body, 'bullId', errors);
+  if (bullId !== undefined) payload.bullId = bullId;
+  if (payload.sireSource === 'farm_bull' && !payload.bullId && required) errors.push('bullId is required for an in-farm bull');
+  if (payload.sireSource === 'outside_bull' && !payload.bullName && required) errors.push('bullName is required for an outside bull');
+  if (payload.sireSource === 'outside_straw') {
+    if (!payload.bullName && required) errors.push('bullName is required for outside straw');
+    if (!payload.semenCode && required) errors.push('semenCode is required for outside straw');
+  }
+  return { payload, errors };
+}
+
+async function validateReferences(payload, res) {
+  if (payload.cowId !== undefined) {
+    const cow = await Cow.findById(payload.cowId).lean();
+    if (!cow) { res.status(400).json({ error: 'Cow not found in the selected farm' }); return false; }
+    if (cow.gender === 'male' || cow.status === 'sold' || cow.status === 'calf' || cow.isCalf) {
+      res.status(400).json({ error: 'Breeding events require an active female animal, not a bull, sold animal or calf' });
+      return false;
+    }
+  }
+  if (payload.sireSource === 'farm_bull' && payload.bullId !== undefined) {
+    const bull = await Cow.findById(payload.bullId).lean();
+    if (!bull || bull.gender !== 'male') {
+      res.status(400).json({ error: 'In-farm sire must be a male animal in the selected farm' });
+      return false;
+    }
+  }
+  if (payload.sireSource && payload.sireSource !== 'farm_bull') delete payload.bullId;
+  if (payload.sireSource === 'farm_bull') {
+    delete payload.bullName;
+    delete payload.semenCode;
+  }
+  if (payload.sireSource === 'outside_bull') delete payload.semenCode;
+  return true;
+}
+
+function legacyField(type) {
+  return ({ heat: 'heatDate', service: 'pregnancyDate', calving: 'calvingDate' })[type] || null;
+}
+
+async function syncCowDate(cowId, type, oldDate = '') {
+  const field = legacyField(type);
+  if (!field || !cowId) return;
+  const latest = await BreedingEvent.findOne({ cowId, type }).sort({ date: -1, createdAt: -1 }).lean();
+  const cow = await Cow.findById(cowId).lean();
+  if (!cow) return;
+  const patch = {};
+  if (latest) patch[field] = latest.date;
+  else if (oldDate && cow[field] === oldDate) patch[field] = '';
+  if (Object.keys(patch).length) await Cow.findByIdAndUpdate(cowId, { $set: patch });
+}
+
+function pagination(query) {
+  const rawPage = query.page === undefined ? '1' : String(query.page);
+  const rawLimit = query.limit === undefined ? '50' : String(query.limit);
+  if (!/^\d+$/.test(rawPage) || Number(rawPage) < 1 || !Number.isSafeInteger(Number(rawPage))) return { error: 'page must be a positive integer' };
+  if (!/^\d+$/.test(rawLimit) || Number(rawLimit) < 1) return { error: 'limit must be a positive integer' };
+  const page = Number(rawPage);
+  const limit = Math.min(Number(rawLimit), 200);
+  return { page, limit, skip: (page - 1) * limit };
+}
+
+// Preserve GET /api/breeding: existing calendar and reminder contract.
+router.get('/events', protect, async (req, res) => {
+  try {
+    const pg = pagination(req.query);
+    if (pg.error) return res.status(400).json({ error: pg.error });
+    const filter = {};
+    if (req.query.cowId !== undefined) filter.cowId = String(req.query.cowId);
+    if (req.query.type !== undefined) {
+      if (!TYPES.includes(String(req.query.type))) return res.status(400).json({ error: 'Invalid event type' });
+      filter.type = String(req.query.type);
+    }
+    for (const key of ['from', 'to']) {
+      if (req.query[key] !== undefined) {
+        const probe = readDate({ date: String(req.query[key]) }, 'date', []);
+        if (probe === undefined) return res.status(400).json({ error: `${key} must be a valid YYYY-MM-DD date` });
+      }
+    }
+    if (req.query.from || req.query.to) {
+      filter.date = {};
+      if (req.query.from) filter.date.$gte = String(req.query.from);
+      if (req.query.to) filter.date.$lte = String(req.query.to);
+    }
+    const [events, total] = await Promise.all([
+      BreedingEvent.find(filter).sort({ date: -1, _id: -1 }).skip(pg.skip).limit(pg.limit).lean(),
+      BreedingEvent.countDocuments(filter),
+    ]);
+    res.json({ events, total, page: pg.page, limit: pg.limit, pages: Math.ceil(total / pg.limit) });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.post('/events', protect, async (req, res) => {
+  try {
+    const { payload, errors } = eventPayload(req.body || {});
+    if (errors.length) return sendValidationError(res, errors);
+    if (!(await validateReferences(payload, res))) return;
+    const event = await BreedingEvent.create({ ...payload, _id: randomUUID() });
+    await syncCowDate(event.cowId, event.type);
+    res.status(201).json(event);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.put('/events/:id', protect, async (req, res) => {
+  try {
+    const existing = await BreedingEvent.findById(req.params.id).lean();
+    if (!existing) return res.status(404).json({ error: 'Breeding event not found' });
+    const { payload, errors } = eventPayload(req.body || {}, { partial: true });
+    if (errors.length) return sendValidationError(res, errors);
+    if (!(await validateReferences(payload, res))) return;
+    const next = { ...existing, ...payload };
+    const updated = await BreedingEvent.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
+    await syncCowDate(existing.cowId, existing.type, existing.date);
+    if (next.cowId !== existing.cowId || next.type !== existing.type) {
+      await syncCowDate(next.cowId, next.type);
+    } else {
+      await syncCowDate(next.cowId, next.type, existing.date);
+    }
+    res.json(updated);
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+router.delete('/events/:id', protect, adminOnly, async (req, res) => {
+  try {
+    const event = await BreedingEvent.findById(req.params.id).lean();
+    if (!event) return res.status(404).json({ error: 'Breeding event not found' });
+    await BreedingEvent.findByIdAndDelete(req.params.id);
+    await syncCowDate(event.cowId, event.type, event.date);
+    res.json({ deleted: true });
+  } catch (e) { res.status(500).json({ error: e.message }); }
+});
+
+export default router;
