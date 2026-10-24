@@ -24,15 +24,15 @@ Local unit/source tests, memory-mode HTTP integration tests, MUF parity and scop
 # Progress
 
 What is done, what remains and what is next for the scale-up project. Keep this file up to date after every change.
-Last updated: 2026-10-23 (Phase 03 runtime regression coverage and documentation reconciled; on-demand Agri UI paging and consolidated verification remain open.)
+Last updated: 2026-10-24 (Agri summary-first loading, complete crop history on demand, cross-farm regression fixtures, Flock XLSX previews and final-pass deferral policy added; local verification pending.)
 ## Phase 3 follow-up: runtime pagination and task-bulk regression coverage (2026-10-23)
 
 - Added runtime HTTP integration coverage that requests adjacent one-record pages from Agri crops, tasks and finance, checks stable total/page metadata across requests, and rejects duplicate IDs across the page boundary.
 - Added a task bulk-import regression test proving Worker writes are forbidden and a malformed mixed batch is rejected without inserting its otherwise-valid row.
-- Updated the Phase 03 local verification checklist and roadmap to distinguish API pagination support from genuine on-demand UI pagination. The Agri list views now request filtered pages on demand; the full refresh still walks every server page for dashboard/report arrays, so aggregate transfer remains a separate scale optimization.
+- Updated the Phase 03 local verification checklist and roadmap to distinguish paged list views from summary-first refresh. Agri now uses a farm-scoped analytics summary for dashboard/report totals; full finance/task arrays load only in workspaces that need them, and the crop profile loads complete linked finance/task history on demand.
 - Commits: `56fa5df` (runtime tests), `41a6e84` (verification checklist), `dbca9e8` (roadmap).
 - Verification status: tests and production builds were not run during this remote-editing step. These commits are implementation changes, not a passing release checkpoint.
-- Still open: rerun tests/builds for the implemented Agri list paging; add dedicated cross-farm fixtures for task/finance/crop bulk imports and aggregate totals; review remaining Flock bulk-entry/Excel acceptance scope; run the root test/check suite and all three frontend production builds. Browser review and real-MongoDB/copy-based checks remain deferred to the consolidated final pass.
+- The implementation scope now covers Agri farm-scoped summary totals, paged crop/task/ledger lists, on-demand crop history and cross-farm bulk regression fixtures, plus Flock preview-first CSV/XLSX batch-log imports. Remaining Phase 03 work is local verification: root tests/checks and all three frontend production builds, followed by fixes for any failures. Browser review and real-MongoDB/database-copy checks remain deferred to the final project-wide pass.
 
 ## Phase 3 implementation update: Agri task and finance bulk imports
 
@@ -532,22 +532,22 @@ Added `tests/phase4-breeding-lineage.test.ts` to guard the additive sire/ear-tag
 
 ### Phase 3 Flock CSV workflow follow-up (2026-10-23)
 
-- Added preview-first CSV import controls in the Flock batch detail UI for feed, weight, vaccination and expense logs, wired to the bounded bulk API. The parser caps files at 2 MB and 1,000 data rows, checks required columns, validates each row, and blocks submission while any preview row is invalid. Writes are sent in chunks of at most 200.
+- Added preview-first CSV import controls in the Flock batch detail UI for feed, weight, vaccination and expense logs, wired to the bounded bulk API. This follow-up adds XLSX support through a bounded browser-native first-worksheet parser. CSV files are capped at 2 MB, XLSX at 5 MB, and each import at 1,000 data rows; valid rows are submitted in chunks of at most 200.
 - Added source-contract coverage for the additional import controls. These changes have not yet been built or tested in a local checkout; the owner should pull the branch and run the full checks before treating them as verified.
 - New commits: `7a7175c` (UI import), `b27a78e` (test).
-- Remaining Phase 3 work still includes Agri incremental UI and bulk/import workflows, Excel workbook import, stronger real route/API scale and farm-isolation tests, and a full verification pass. Mortality and sale CSV bulk import is intentionally not exposed because these records depend on sequential live-bird validation.
+- This historical checkpoint was superseded by Agri summary-first loading, cross-farm aggregate/bulk regression fixtures, and Flock CSV/XLSX support. The current Phase 03 gate is the owner's local root test/check run and all three frontend builds. Browser/live UI and real-MongoDB/database-copy validation remain postponed to the final project-wide pass. Mortality and sale bulk imports remain intentionally unavailable because these records depend on sequential live-bird validation.
 
 ### Phase 3 Agri list rendering and scale fixtures (2026-10-23)
 
-- Agri crop and task cards now render in chunks of 40 with Load More controls. The underlying complete arrays remain intact for dashboard calculations, crop selectors and report totals; this is incremental rendering, not yet network-level lazy loading.
+- This historical checkpoint described incremental rendering before network paging was completed. Agri now uses server-paged crop/task/ledger lists and farm-scoped analytics summaries so dashboard/report totals do not require a complete finance/task download.
 - Added regression/source-contract checks for Agri list pagination headers, worker crop visibility, finance admin-only access, preserved aggregate inputs, and stable paging of a 1,250-row fixture.
 - Commits: `20a94e7` (Agri incremental card rendering), `fd45009` (tests).
 - Verification has not been run against this commit batch. The source-contract and synthetic fixture tests do not replace live route integration tests.
-- Phase 3 is still open: Agri needs network-level Load More with correct full-dataset summary totals, preview-first CSV bulk import workflows, and Excel workbook parsing/import. Stronger farm-isolation and real route/API scale fixtures also remain. No production database was accessed.
+- That implementation gap was subsequently addressed by the summary-first Agri refresh and on-demand paged detail views. Current local verification remains pending; browser/live UI and real-MongoDB/database-copy checks remain postponed to final project-wide verification.
 
 ## Phase 3 work checkpoint (2026-10-23)
 
-- **Agri pagination improvement committed:** frontend list fetches now request bounded pages of 500, use the server's `X-Total-Count` metadata when available, validate that the expected number of rows was received, and no longer silently stop at 10,000 records. A compatibility fallback remains for servers without count headers. This preserves full-data consumers used by dashboard/report aggregates, but it is not yet true list-on-demand loading: the current app still fetches all pages for those consumers.
+- **Historical pagination checkpoint:** Agri's complete-array helper used bounded pages of 500 before summary-first dashboard refresh was implemented. It remains useful for detail workspaces that require full records, while the default dashboard/report refresh now uses farm-scoped summary results.
 - **Agri crop CSV import committed:** admin crop workflow now offers a preview-first CSV importer, limits files to 1,000 data rows, validates headers and row widths, checks crop name/date/area, displays a preview and row errors, and requires explicit confirmation before writes. Partial write failures are reported rather than hidden. This currently covers crop CSV only; XLSX, task/finance imports, and broader Flock bulk workflows remain outstanding.
 - **Regression coverage added:** parser tests cover quoted commas, escaped quotes, embedded newlines, BOMs, duplicate/missing headers, row limits, malformed row widths, and crop validation. Pagination contract test asserts server totals are used and the hard 10,000-row cap is absent.
 - **Verification status:** changes have been committed to `muf-monorepo`. Automated tests and production builds have not yet been run in this environment; do not treat these changes as verified until the root suite, farm/sync/UI/workbench checks, and all three builds pass. Browser and real database checks remain deferred per project rules.
@@ -557,7 +557,7 @@ Added `tests/phase4-breeding-lineage.test.ts` to guard the additive sire/ear-tag
 - Added native browser XLSX import for the first worksheet, with shared CSV preview/validation, 1,000-row and 5 MB caps, and Excel serial date normalization for plant/harvest dates. Import stays preview-first and only writes after explicit confirmation.
 - Agri crop imports now convert acres to kanal where needed and report saved/failed row counts.
 - Added Agri import parser tests and farm-scope regression contracts. Existing memory-mode HTTP farm isolation check remains the integration-level test for create/read/update/delete.
-- Important open item: Agri startup still downloads all crop, task, and finance pages because existing dashboard and report logic uses full arrays. Genuine on-demand list loading cannot safely replace these arrays until global totals/report data are moved to server summaries or report fetches are deferred. This is deliberately still open to avoid corrupting totals/history.
+- This was an open item at the dated checkpoint. It has since been addressed by the authenticated farm-scoped analytics summary and summary-first refresh; crop profile views fetch full linked history on demand. The new source/runtime regression tests are committed, and the owner must run the current root tests/checks and all three builds.
 - Execution: tests/builds have NOT been run in this editing session. After pulling, run from Windows CMD at `F:\\PROJECTS\\dairy\\muf-monorepo`:
   1. `npm ci`
   2. `npm test`
@@ -605,10 +605,10 @@ Additional Windows Command Prompt results reported by the owner after pulling co
 - `npm run check-workbench-runtime`: **not passed** because `http://127.0.0.1:5000/__muf-workbench` was unreachable. The script explicitly requires the Dairy Vite development server to be started first. This is pending runtime verification, not a source-check failure.
 - Dairy client directory is confirmed as `dairy_farm/client`; it contains `package.json` and `package-lock.json`, so the production build can be run there.
 
-Phase 3 remains open. The core unresolved implementation is genuine Agri on-demand network paging that preserves complete dashboard/report aggregates. Also pending: realistic large-dataset runtime paging, dedicated cross-farm aggregate runtime fixtures beyond existing memory-mode farm checks, Dairy build, workbench runtime smoke test, and the consolidated browser/isolated-database final pass.
+Phase 3 implementation scope is now in place: Agri has farm-scoped analytics summaries and summary-first refresh, crop profiles fetch complete linked histories on demand, and cross-farm aggregate/bulk fixtures have been added. Flock batch-log imports now support preview-first CSV and XLSX. Phase 03 remains open for the owner’s local root tests/checks and all three production frontend builds, followed by fixes for any failures. Browser/live UI and all real-MongoDB/database-copy checks stay postponed until the final project-wide pass.
 
 ## Phase 3 implementation follow-up (2026-10-23)
 
 - Commit `3e50f9d` makes the workbench runtime smoke test start/stop its own local Dairy Vite server when the default port is unavailable, avoiding the previously reported false-negative caused by a server that had not been started.
 - Commit `7245abb` adds a real-HTTP Agri integration test that bulk-creates 1,001 tasks in bounded chunks, walks all API pages using server metadata, asserts exact fixture coverage and unique IDs, then removes the synthetic fixture.
-- These two changes are committed but have **not yet been run locally**. The full Phase 3 implementation remains incomplete until true Agri on-demand list fetching is implemented without breaking full dashboard/report totals. Dairy build, workbench runtime rerun, new large-fixture integration test, and final browser/isolated-database validation remain pending.
+- These changes were committed but had not been run locally at that checkpoint. Since then, Agri summary-first loading, complete crop history on demand, cross-farm summary/bulk fixtures and Flock XLSX preview support have been added. Current local gates are the root test/check suite and all three frontend builds. Browser/role and real-MongoDB/disposable-copy verification are postponed to the single final pass after all phases have implementation complete.
