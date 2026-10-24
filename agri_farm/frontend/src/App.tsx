@@ -4082,7 +4082,9 @@ function App() {
                 const todayStr = mufToday();
                 const todaysRows = todayAttendance.filter(a => a.date === todayStr);
                 const presentIds = new Set(todaysRows.map(a => a.laborer_id));
-                const pendingTasksWithCrew = analyticsSummary?.taskSummary?.recentPendingWithCrew || tasks.filter(t => t.status === 'Pending' && (t.laborer_ids || []).length > 0);
+                const pendingTasksWithCrew = activeTab === 'labor'
+                  ? tasks.filter(t => t.status === 'Pending' && (t.laborer_ids || []).length > 0)
+                  : (analyticsSummary?.taskSummary?.recentPendingWithCrew || tasks.filter(t => t.status === 'Pending' && (t.laborer_ids || []).length > 0));
                 const deploymentOf = (lid) => {
                   const t = pendingTasksWithCrew.find(x => (x.laborer_ids || []).includes(lid));
                   if (!t) return null;
