@@ -67,11 +67,18 @@ async function checkProject(project, port) {
   const { child, base } = await start(project, port);
   const call = client(base);
   try {
-    const ownerLogin = await call('POST', project.login, { body: { username: 'admin', password: 'admin123' } });
-    const owner = project.token(ownerLogin.json || {});
-    ok(ownerLogin.status === 200 && owner, 'seeded owner can log in');
+    let ownerLogin = null;
+    for (let attempt = 0; attempt < 30; attempt += 1) {
+      try {
+        ownerLogin = await call('POST', project.login, { body: { username: 'admin', password: 'admin123' } });
+        if (ownerLogin.status !== 503) break;
+      } catch { /* wait for backend startup */ }
+      await wait(500);
+    }
+    const owner = project.token(ownerLogin?.json || {});
+    ok(ownerLogin?.status === 200 && owner, 'seeded owner can log in');
     if (!owner) {
-      console.log(`  Login response: ${JSON.stringify(ownerLogin.json)}`);
+      console.log(`  Login response: ${JSON.stringify(ownerLogin?.json ?? null)}`);
       return;
     }
 
