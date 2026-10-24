@@ -129,7 +129,7 @@ describe('model wrapper', () => {
     const calls: Array<[string, unknown[]]> = [];
     const rec = (name: string) => (...args: unknown[]) => { calls.push([name, args]); return name; };
     const model: Record<string, unknown> = {};
-    for (const n of ['find', 'findOne', 'findOneAndUpdate', 'updateMany', 'deleteMany', 'countDocuments', 'findById', 'findByIdAndUpdate', 'findByIdAndDelete', 'create', 'insertMany', 'aggregate']) {
+    for (const n of ['find', 'findOne', 'findOneAndUpdate', 'findOneAndDelete', 'updateMany', 'deleteMany', 'countDocuments', 'findById', 'findByIdAndUpdate', 'findByIdAndDelete', 'create', 'insertMany', 'aggregate']) {
       model[n] = rec(n);
     }
     model.findOne = (...args: unknown[]) => { calls.push(['findOne', args]); return { _id: 'x' }; };
@@ -151,6 +151,13 @@ describe('model wrapper', () => {
     expect((calls[1][1] as unknown[])[0]).toEqual({ _id: 'x', farmId: 'a' });
     expect((calls[2][1] as unknown[])[0]).toEqual({ farmId: 'a' });
   });
+  it('deletes by id through one farm-scoped delete query', () => {
+    const { model, calls } = fakeModel();
+    mufScopeModel(model, 'Thing');
+    mufRunWithFarmContext(single, () => (model.findByIdAndDelete as Function)('x'));
+    expect(calls).toEqual([['findOneAndDelete', [{ _id: 'x', farmId: 'a' }, undefined]]]);
+  });
+
   it('stamps creates with the selected farm and ignores a client farmId', () => {
     const { model, calls } = fakeModel();
     mufScopeModel(model, 'Thing');

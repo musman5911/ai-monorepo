@@ -187,11 +187,11 @@ export function mufScopeModel(model, name = 'model') {
     };
   }
   if (orig.findByIdAndDelete) {
-    model.findByIdAndDelete = async function scopedFindByIdAndDelete(id, ...rest) {
+    model.findByIdAndDelete = function scopedFindByIdAndDelete(id, ...rest) {
       if (!mufGetFarmContext()) return orig.findByIdAndDelete.call(model, id, ...rest);
-      const hit = await model.findOne({ _id: id });
-      if (!hit) return null;
-      return orig.findByIdAndDelete.call(model, id, ...rest);
+      // One scoped delete query is essential: a lookup followed by the original
+      // unscoped delete can remove a record after it has moved to another farm.
+      return model.findOneAndDelete({ _id: id }, ...rest);
     };
   }
   if (orig.create) {
