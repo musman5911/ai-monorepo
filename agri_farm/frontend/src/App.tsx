@@ -2292,22 +2292,33 @@ function App() {
     showAlert(`Monthly summary PDF downloaded (Crop Filter: ${reportsCropName}).`);
   };
 
-  const cropCareDutiesCount = tasks.filter(t => t.status === 'Pending' && (
-    filteredCrops.length === crops.length || filteredCrops.some(c => taskMatchesCrop(t, c._id))
-  )).length;
-  const cropLedgerEntriesCount = finance.filter(f => (
-    filteredCrops.length === crops.length || (f.crop_id && filteredCrops.some(c => c._id === f.crop_id))
-  )).length;
+  const cropCareDutiesCount = filteredCrops.length === crops.length
+    ? Number(analyticsSummary?.taskSummary?.byStatus?.Pending ?? tasks.filter((task) => task.status === 'Pending').length)
+    : filteredCrops.reduce((sum, crop) => sum + Number(analyticsSummary?.taskSummary?.byCrop?.find((item) => String(item.crop_id) === String(crop._id))?.pending ?? 0), 0);
+  const cropLedgerEntriesCount = filteredCrops.length === crops.length
+    ? Number(serverFinanceSummary?.totals?.entries ?? finance.length)
+    : filteredCrops.reduce((sum, crop) => sum + Number(serverFinanceSummary?.byCrop?.find((item) => String(item.crop_id) === String(crop._id))?.entryCount ?? finance.filter((row) => String(row.crop_id) === String(crop._id)).length), 0);
   // Workers only see CURRENT work: completed crop cycles and finished duties
   // are history that belongs to the admin (backend also filters crops).
   const dashCrops = crops.filter(c =>
     (dashboardCropFilter === 'all' || c._id === dashboardCropFilter) &&
     (userRole === 'admin' || c.status !== 'Completed')
   );
-  const dashTasks = tasks.filter(t =>
-    taskMatchesCrop(t, dashboardCropFilter) &&
-    (userRole === 'admin' || t.status !== 'Completed')
+  const dashTaskRows = Array.isArray(analyticsSummary?.taskSummary?.recentPending)
+    ? analyticsSummary.taskSummary.recentPending
+    : tasks;
+  const dashTasks = dashTaskRows.filter((task) =>
+    taskMatchesCrop(task, dashboardCropFilter) &&
+    (userRole === 'admin' || task.status !== 'Completed')
   );
+  const dashPendingCount = dashboardCropFilter === 'all'
+    ? Number(analyticsSummary?.taskSummary?.byStatus?.Pending ?? dashTasks.filter((task) => task.status === 'Pending').length)
+    : Number(selectedDashboardTaskSummary?.pending ?? dashTasks.filter((task) => task.status === 'Pending').length);
+  const pendingDutyRows = Array.isArray(analyticsSummary?.taskSummary?.recentPending)
+    ? analyticsSummary.taskSummary.recentPending
+    : tasks.filter((task) => task.status === 'Pending');
+  const pendingDutyCount = Number(analyticsSummary?.taskSummary?.byStatus?.Pending ??
+    tasks.filter((task) => task.status === 'Pending').length);
   const dashFinance = finance.filter(f => dashboardCropFilter === 'all' || f.crop_id === dashboardCropFilter);
   const dashRecentActivities = [
     ...dashTasks.map(t => ({ id: `task-${t._id}`, label: t.title, date: t.due_date || '', kind: 'Task', status: t.status || 'Pending' })),
@@ -2834,8 +2845,8 @@ function App() {
                     <span className="muf-kpi-icon green"><HeartPulse size={22}/></span>
                     <div>
                       <small>{L('My Assigned Duties')}</small>
-                      <strong>{tasks.filter(t => (t.assigned_to || '').toLowerCase() === (username || '').toLowerCase() && t.status !== 'Completed').length}</strong>
-                      <p>{tasks.filter(t => (t.assigned_to || '').toLowerCase() === (username || '').toLowerCase() && t.status === 'Completed').length} of my duties completed</p>
+                      <strong>{myPendingTaskCount}</strong>
+                      <p>{myCompletedTaskCount} of my duties completed</p>
                     </div>
                   </div>
                 )}
@@ -2922,8 +2933,8 @@ function App() {
                     <ArrowUpRight size={17} className="text-slate-400"/>
                   </div>
                   <div className="px-4 pb-4 pt-1 space-y-2">
-                    {dashTasks.filter(t => t.status !== 'Completed').length === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">{L('No pending care tasks.')}</p> : dashTasks.filter(t => t.status !== 'Completed').slice(0, 3).map(t => <div key={t._id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{t.title}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{t.priority || t.status || 'Pending'}</span></div>)}
-                    <div className="flex items-center justify-between pt-1"><span className="text-[10px] text-slate-500">{dashTasks.filter(t => t.status !== 'Completed').length} pending tasks</span><span className="text-[10px] font-bold text-farm-600 dark:text-farm-400 uppercase tracking-wider">{L('Open Board')} →</span></div>
+                    {dashPendingCount === 0 ? <p className="text-xs text-slate-500 dark:text-slate-400 py-2">{L('No pending care tasks.')}</p> : dashTasks.filter(t => t.status !== 'Completed').slice(0, 3).map(t => <div key={t._id} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 dark:bg-slate-800/60 px-3 py-2"><span className="text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">{t.title}</span><span className="text-[10px] text-slate-500 dark:text-slate-400 shrink-0">{t.priority || t.status || 'Pending'}</span></div>)}
+                    <div className="flex items-center justify-between pt-1"><span className="text-[10px] text-slate-500">{dashPendingCount} pending tasks</span><span className="text-[10px] font-bold text-farm-600 dark:text-farm-400 uppercase tracking-wider">{L('Open Board')} →</span></div>
                   </div>
                 </button>
               </div>
@@ -3048,13 +3059,13 @@ function App() {
                 open={showCareRosterModal}
                 onClose={() => setShowCareRosterModal(false)}
                 title={L('Care & Operations Roster')}
-                subtitle={L('{count} pending tasks', { count: dashTasks.filter(t => t.status !== 'Completed').length })}
+                subtitle={L('{count} pending tasks', { count: dashPendingCount })}
                 icon={<HeartPulse size={20} />}
                 iconBg="bg-amber-100 text-amber-600 dark:bg-amber-900/30 dark:text-amber-400"
                 size="small"
               >
                 <div className="space-y-3">
-                  {dashTasks.filter(t => t.status !== 'Completed').length === 0 ? (
+                  {dashPendingCount === 0 ? (
                     <p className="text-slate-500 text-xs text-center py-8">{L('Care roster is clean.')}</p>
                   ) : dashTasks.filter(t => t.status !== 'Completed').map(t => (
                     <button
@@ -5896,13 +5907,13 @@ function App() {
         open={modal === 'pending_duties'}
         onClose={closePopup}
         title={L('Active Care & Duties')}
-        subtitle={`${tasks.filter(t => t.status === 'Pending').length} Pending Tasks`}
+        subtitle={`${pendingDutyCount} Pending Tasks`}
         icon={<CheckSquare size={16} />}
        size="small">
         <div className="space-y-4">
           <p className="text-xs text-slate-500 dark:text-slate-400 font-semibold">{L('Active tasks assigned to your team:')}</p>
           <div className="space-y-3 max-h-[50vh] overflow-y-auto pr-1">
-            {tasks.filter(t => t.status === 'Pending').map(t => (
+            {pendingDutyRows.filter(t => t.status === 'Pending').map(t => (
               <button
                 type="button"
                 key={t._id}
@@ -5921,7 +5932,7 @@ function App() {
                 </div>
               </button>
             ))}
-            {tasks.filter(t => t.status === 'Pending').length === 0 && (
+            {pendingDutyCount === 0 && (
               <p className="text-center text-xs text-slate-500 py-6">All tasks completed! Duty roster is clean.</p>
             )}
           </div>
