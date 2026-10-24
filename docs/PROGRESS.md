@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-24 (documentation restructure; no application code changed).
+Last updated: 2026-10-24 (Phase 1 implementation started).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -11,7 +11,7 @@ Last updated: 2026-10-24 (documentation restructure; no application code changed
 | Phase | What | Status | File |
 |---|---|---|---|
 | 0 | Done and verified | Done | [phase-00-done-and-verified.md](phases/phase-00-done-and-verified.md) |
-| 1 | Super Admin: owner only, per-farm summaries | Not started | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
+| 1 | Super Admin: owner only, per-farm summaries | In progress | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
 | 2 | Dairy breeding events: server | Not started | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Not started | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
 | 4 | Dairy calves and lineage | Not started | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
