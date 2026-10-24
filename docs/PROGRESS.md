@@ -1,13 +1,13 @@
-## Latest owner-run verification and repair (2026-10-24; source through 0a3add1)
+## Latest owner-run checkpoint (2026-10-24; source through dbc41f4)
 
-- The supplied Windows command log was captured after git pull advanced the checkout to 0a3add1. The log has now been reviewed, and result-cmd.txt is removed in this corrective commit.
-- Before these corrections, npm test reported 202 passed and 3 failed out of 205. The failures were: (1) the cross-farm fixture reused the same search suffix for Farm A's own test crop and Farm B's test crop, making the expected Farm A zero invalid; the fixture now uses a distinct Farm B tag. (2) the Agri source-contract test expected an obsolete crew-list expression; it now checks the summary-first fallback and full-detail Labor behavior. (3) the Flock source-contract test expected the old egg import label; it now matches the current CSV/Excel label.
-- In the captured run, npm run check-farms, npm run check-sync, npm run check-ui, npm run check-workbench, and npm run check-workbench-runtime all passed.
-- The log contains no Dairy, Flock, or Agri production build command. Rerun the root test suite and all three builds after this patch. This commit records fixes; it does not claim the corrected tests have already passed.
-- npm ci reported unresolved audit findings: root 5 (1 moderate, 2 high, 2 critical); Dairy backend 6 (3 moderate, 3 high), Dairy client 4 (1 moderate, 2 high, 1 critical); Flock backend 6 (3 moderate, 3 high), Flock client 3 (2 high, 1 critical); Agri backend 5 (3 moderate, 2 high), Agri frontend 6 (5 high, 1 critical). No blanket or forced audit fix was run.
-- Browser/live role checks and real-MongoDB/database-copy migration, backup/restore, index, and multi-process concurrency checks remain postponed to the single final project-wide pass. They are not listed as unfinished phase implementation work.
+- After pulling dbc41f4, the supplied Windows run reported 204/205 tests passing. The one failure was a stale Flock source-contract expectation: the import validator says 'Duplicate date in import file', not 'Duplicate date in CSV'. The assertion is corrected in this commit.
+- The same run passed check-farms, check-sync, check-ui, check-workbench, and check-workbench-runtime.
+- Dairy and Flock production builds succeeded. Dairy reports a non-fatal mixed static/dynamic import warning; Flock reports a non-fatal large-chunk warning.
+- Agri production build failed because agri_farm/frontend/src/App.tsx had escaped template-literal delimiters and interpolation markers (for example `\`Crop: \${crop.name}\``), which Vite rejects as an invalid Unicode escape. All 8 affected template literal expressions have been restored to normal TypeScript template syntax in this commit.
+- These source/test repairs have not yet been rerun by the owner. After pulling, run npm test and all three frontend builds. This note is not a claim that the repaired tests/builds already pass.
+- Postponed browser/live role checks and real-MongoDB/database-copy migration, backup/restore, index, and multi-process concurrency checks remain reserved for the single final project-wide pass. They are not current implementation blockers for Phases 1-3.
 
----
+------
 ## Owner decision: final verification timing (2026-10-24)
 
 Browser/live UI testing and role walkthroughs, plus all real-MongoDB/database-copy validation for **every phase (0–7)**, are **POSTPONED until one consolidated project-wide pass after all phases have implementation complete**. This includes multi-process concurrency, index/migration tests, backup/restore on disposable copies and the final browser matrix. They are not per-phase blockers. Never use production data.

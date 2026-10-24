@@ -2332,7 +2332,7 @@ function App() {
     };
     crops.forEach((crop) => {
       groupsMap[crop._id] = {
-        id: crop._id, name: \`Crop: \${crop.name} (\${crop.variety || 'Standard'})\`,
+        id: crop._id, name: `Crop: ${crop.name} (${crop.variety || 'Standard'})`,
         plot: crop.field || 'Farm-wide', transactions: [], net: 0,
       };
     });
@@ -2376,17 +2376,17 @@ function App() {
       transactions = finance.filter((row) => dashboardCropFilter === 'all' || String(row.crop_id) === String(dashboardCropFilter));
       aggregateSummary = dashboardCropFilter === 'all' ? serverFinanceSummary : selectedDashboardCropSummary;
       const cropName = dashboardCropFilter === 'all' ? L('All Crops') : (crops.find((crop) => crop._id === dashboardCropFilter)?.name || L('Crop'));
-      title = \`\${L('Dashboard Ledger Flow')}: \${cropName}\`;
+      title = `${L('Dashboard Ledger Flow')}: ${cropName}`;
     } else if (source === 'reports') {
       transactions = filteredPeriodFinance;
       aggregateSummary = reportsCropFilter === 'all' ? serverFinanceSummary : selectedReportCropSummary;
       const cropName = reportsCropFilter === 'all' ? L('All Crops') : (crops.find((crop) => crop._id === reportsCropFilter)?.name || L('Crop'));
-      title = \`\${L('Reports Ledger Flow')}: \${cropName}\`;
+      title = `${L('Reports Ledger Flow')}: ${cropName}`;
     } else {
       transactions = ledgerScopedFinance;
       aggregateSummary = financeCropFilter === 'all' ? serverFinanceSummary : selectedFinanceGroupSummary;
       const cropName = financeCropFilter === 'all' ? L('All Crops') : (crops.find((crop) => crop._id === financeCropFilter)?.name || L('Crop'));
-      title = \`\${L('Financial Ledger Flow')}: \${cropName}\`;
+      title = `${L('Financial Ledger Flow')}: ${cropName}`;
     }
 
     const aggregateMoney = aggregateSummary?.totals || aggregateSummary;
@@ -2398,7 +2398,7 @@ function App() {
     let breakdowns = [];
     let listTransactions = [...transactions];
     if (cardType === 'income') {
-      title += \` (\${L('Income Source')})\`;
+      title += ` (${L('Income Source')})`;
       listTransactions = transactions.filter((row) => row.type === 'income');
       const sourceBreakdown = aggregateSummary?.incomeBreakdown;
       if (Array.isArray(sourceBreakdown)) {
@@ -2413,7 +2413,7 @@ function App() {
         breakdowns = Object.entries(group).map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount);
       }
     } else if (cardType === 'expense') {
-      title += \` (\${L('Expense Breakdown')})\`;
+      title += ` (${L('Expense Breakdown')})`;
       listTransactions = transactions.filter((row) => row.type === 'expense');
       const sourceBreakdown = aggregateSummary?.expenseBreakdown;
       if (Array.isArray(sourceBreakdown)) {
@@ -2427,10 +2427,10 @@ function App() {
         breakdowns = Object.entries(group).map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount);
       }
     } else if (cardType === 'profit') {
-      title += \` (\${L('Profit Formula')})\`;
+      title += ` (${L('Profit Formula')})`;
       listTransactions = [];
     } else if (cardType === 'margin') {
-      title += \` (\${L('Margin Formula')})\`;
+      title += ` (${L('Margin Formula')})`;
       listTransactions = [];
     }
 

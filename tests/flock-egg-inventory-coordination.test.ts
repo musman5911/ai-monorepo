@@ -100,7 +100,7 @@ describe('Phase 3 Flock bounded per-batch egg bulk entry', () => {
     const source = readFileSync(path.join(repoRoot, 'flock_farm/client/src/components/BatchesTab.tsx'), 'utf8');
     expect(source).toContain('Preview Batch Egg CSV');
     expect(source).toContain('Import egg log CSV / Excel (preview first)');
-    expect(source).toContain('Duplicate date in CSV');
+    expect(source).toContain('Duplicate date in import file');
     expect(source).toContain('lines.length > 1001');
   });
 

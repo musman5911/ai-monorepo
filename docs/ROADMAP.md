@@ -9,9 +9,10 @@ Per-phase work must still use local automated tests, memory-mode HTTP integratio
 
 ## Latest local checkpoint (2026-10-24)
 
-- The supplied run used source through 0a3add1: root tests reported 202 passed and 3 failed. The cross-farm fixture and two stale source-contract assertions are corrected in the follow-up commit but have not been rerun yet.
-- In that run, check-farms, check-sync, check-ui, check-workbench and check-workbench-runtime passed. No production build command appears in the log, so all three app builds remain unverified.
-- The deferred browser/real-database checks are deliberately excluded from active remaining work; see PROGRESS.md for the complete audit-count summary and test-failure diagnosis.
+- The owner's latest run after pulling dbc41f4 reported 204/205 tests passing. The one remaining failure was a stale Flock duplicate-date label assertion; it has been corrected to the current generic CSV/XLSX import wording.
+- check-farms, check-sync, check-ui, check-workbench and check-workbench-runtime passed in that run.
+- Dairy and Flock builds passed with non-fatal chunk/import warnings. Agri failed at App.tsx template literals where escaped backticks and interpolation markers caused a Vite invalid-Unicode-escape parse error. Those source expressions are corrected in the new commit but the build has not been rerun yet.
+- Pull the repair and rerun the root suite and all three app builds. Browser/live UI and real-MongoDB/database-copy checks remain postponed to the consolidated final pass and are not counted as unfinished phase implementation.
 
 ### Phase 3 step: Agri task and finance bulk imports
 
