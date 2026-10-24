@@ -13,6 +13,7 @@ interface FarmSummary {
   farm: string;
   label: string;
   stats: { label: string; value: string | number }[];
+  farms?: { farmId: string; farmName: string; stats: { label: string; value: string | number }[] }[];
   alerts?: { count: number; items: string[] };
 }
 interface PeerState { url: string; loading: boolean; error?: string; data?: FarmSummary }
@@ -183,6 +184,24 @@ export default function MyFarmsPanel() {
                     </div>
                   ))}
                 </div>
+                {p.data.farms && p.data.farms.length > 0 && (
+                  <div className="space-y-2 pt-2">
+                    <h5 className="text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">Farm-by-farm breakdown</h5>
+                    {p.data.farms.map((farm) => (
+                      <section key={farm.farmId} className="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+                        <h6 className="text-xs font-bold text-slate-800 dark:text-slate-100 mb-2">{farm.farmName}</h6>
+                        <div className="grid grid-cols-2 gap-2">
+                          {farm.stats.map((st) => (
+                            <div key={st.label} className="rounded-lg bg-slate-50 dark:bg-slate-800/60 p-2">
+                              <p className="text-[9px] font-bold uppercase tracking-wider text-slate-400">{st.label}</p>
+                              <p className="text-xs font-black text-farm-700 dark:text-farm-300">{st.value}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </section>
+                    ))}
+                  </div>
+                )}
               </>
             ) : null}
           </div>
