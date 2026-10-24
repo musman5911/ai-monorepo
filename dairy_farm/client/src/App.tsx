@@ -337,6 +337,8 @@ export default function App() {
     clearAuth();
     setToken(null);
     setRole(null);
+    setFarmRole(null);
+    try { localStorage.removeItem('dm_farm_role'); } catch { /* storage unavailable */ }
     setUsername(null);
     setShowAdmin(false);
   }
