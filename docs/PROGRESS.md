@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-24 (Phase 1 local tests updated).
+Last updated: 2026-10-24 (Phase 1 complete after local Windows checks).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -11,7 +11,7 @@ Last updated: 2026-10-24 (Phase 1 local tests updated).
 | Phase | What | Status | File |
 |---|---|---|---|
 | 0 | Done and verified | Done | [phase-00-done-and-verified.md](phases/phase-00-done-and-verified.md) |
-| 1 | Super Admin: owner only, per-farm summaries | In progress | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
+| 1 | Super Admin: owner only, per-farm summaries | Done | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
 | 2 | Dairy breeding events: server | Not started | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Not started | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
 | 4 | Dairy calves and lineage | Not started | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
@@ -48,17 +48,23 @@ Last updated: 2026-10-24 (Phase 1 local tests updated).
 
 Not run: anything needing a real MongoDB, a browser, a phone or a live website (Phases 19 to 21).
 
-Phase 1 implementation is in progress on `muf-monorepo`. The owner reported the following local Windows CMD results after pulling commit `561f571a37b7d5d0056bc8400fd98976b9df927a`. These are user-provided results, not commands run in this editing session. The new runtime checker passed against all three in-memory backends; backend dependencies were evidently available for that run.
+Phase 1 implementation and local command-line verification are complete on `muf-monorepo`. The results below were supplied by the owner from Windows CMD and are recorded as owner-reported results, not commands run in this editing session.
 
-## Phase 1 local verification (2026-10-24, Windows CMD; output supplied by owner)
+## Phase 1 final local verification (2026-10-24, Windows CMD; output supplied by owner)
 
 | Command | Result |
 |---|---|
 | `npm test -- tests/phase-1-super-admin.test.ts` | Passed: 1 file, 13 tests |
 | `npm run check-super-admin` | Passed: all three apps; owners read per-farm summaries, managers and workers receive HTTP 403 |
 | `npm test` | Passed: 24 files, 232 tests |
+| `npm run check-sync` | Passed: all MUF shared copies and three-app invariants in sync |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source safety checks |
+| `npm run check-farms` | Passed: Agri, Dairy and Flock farm-scope checks |
+| `npm run check-docs` | Passed: all 22 phase files, statuses, links and required sections consistent at time of run |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds succeeded |
 
-Still required before Phase 1 can be marked Done: `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs`, and `tools\\build-all.bat`. Record their actual results here after running them. Real MongoDB, browser, phone and live-site checks remain in Phases 19 to 21.
+`npm ci` was not run; the existing local dependencies supported all checks and builds. The optional `npm run check-workbench-runtime` was not run. Phase 1 is marked Done based on the listed checks. Real MongoDB, browser, phone and live-site checks remain in Phases 19 to 21.
 
 ## Decisions (owner)
 
