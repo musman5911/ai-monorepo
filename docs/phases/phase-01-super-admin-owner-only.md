@@ -4,7 +4,7 @@
 
 ## Goal
 
-Only owners see the Super Admin tab, and it shows each project's farms separately (milk, eggs, crops, revenue, expenses).
+Only owners see the Super Admin tab, and its owner-only summary endpoint returns each project's active farms separately with project-specific metrics.
 
 ## Already in place (from Phase 0)
 
@@ -13,8 +13,8 @@ Only owners see the Super Admin tab, and it shows each project's farms separatel
 
 ## Scope
 
-- The tab and its menu entry are shown to owners only in all three apps. Today it is gated by `isAdmin`, which includes managers.
-- `/api/farm-summary` also returns a per-farm breakdown (one entry per active farm) next to the project totals.
+- The tab and its menu entry are gated by the normalized `farmRole === 'owner'` in all three apps.
+- `/api/super-admin/farm-summary` is protected by server-side owner authorization and returns a per-farm breakdown (one entry per active farm) next to project totals. The legacy `/api/farm-summary` cross-app endpoint keeps its existing shared-key behavior.
 - The panel lists farms separately and never adds Agri, Dairy and Flock into one total.
 - Server side: any owner-only route must answer 403 to a manager or worker.
 
@@ -27,9 +27,9 @@ Only owners see the Super Admin tab, and it shows each project's farms separatel
 
 1. Read how each app computes the project totals today (`server.js` farm-summary handler).
 2. Add the per-farm breakdown to the handler, scoped by `farmId`.
-3. Switch the tab gating from `isAdmin` to the owner role in the three `App.tsx` files.
+3. Gate the tab and menu entry on the owner role in the three `App.tsx` files.
 4. Update the panel to show farms separately.
-5. Add the check below and run everything.
+5. Add the regression test and runtime authorization check below; run the full standard verification list.
 
 ## New command-line check
 
@@ -52,11 +52,11 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] The tab and its menu entry are shown to owners only in all three apps. Today it is gated by `isAdmin`, which includes managers.
-- [ ] `/api/farm-summary` also returns a per-farm breakdown (one entry per active farm) next to the project totals.
+- [x] The tab and its menu entry are gated by the owner role in all three apps.
+- [x] `/api/super-admin/farm-summary` is owner-protected and returns a per-farm breakdown next to project totals.
 - [ ] The panel lists farms separately and never adds Agri, Dairy and Flock into one total.
 - [ ] Server side: any owner-only route must answer 403 to a manager or worker.
-- [ ] The new command-line check above exists and passes.
+- [ ] The `npm run check-super-admin` runtime check exists and passes locally; the source-contract regression test is `tests/phase-1-super-admin.test.ts`.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
