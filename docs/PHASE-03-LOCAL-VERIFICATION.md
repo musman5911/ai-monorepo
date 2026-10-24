@@ -4,9 +4,9 @@ Browser/live UI and role walkthroughs plus all real-MongoDB/database-copy checks
 
 ## Current implementation follow-up (2026-10-24)
 
-Agri now has an authenticated, farm-scoped `/analytics/summary` endpoint that returns crop/task totals, monthly finance rows, monthly income trends, expense/income breakdowns, profitability and bounded recent task/ledger rows without photo blobs. The initial dashboard/report load uses the summary endpoint. Full detail arrays are fetched only for the finance workspace outside the paged Ledger subtab and for Labor. Regression coverage checks per-farm summary arithmetic, worker finance redaction, farm isolation and no-partial-write validation for task/finance bulk requests that include a crop from another farm.
+Agri has an authenticated, farm-scoped `/analytics/summary` endpoint for crop/task totals, monthly finance trends, breakdowns and profitability without photo blobs. Dashboard/report views use summary aggregates rather than complete finance/task ledgers; full detail arrays load only for detail workspaces, and crop profiles fetch complete linked finance/task history on demand. Regression coverage includes summary arithmetic, worker finance redaction, selected-farm isolation, cross-farm task/finance bulk rejection without partial writes, and protection against creating duplicate seed expenses when older ledger rows are outside the dashboard's recent-row window. Flock batch egg/feed/weight/vaccination/expense previews now accept bounded CSV/XLSX files (CSV up to 2 MB, XLSX up to 5 MB, 1,000 data rows/file and 200 writes/request).
 
-The follow-up is committed to `muf-monorepo` but **local tests/builds have not yet been run for this follow-up**. Do not mark Phase 03 verified until the owner runs the local commands and reviews failures.
+The follow-up is committed to `muf-monorepo` but **local tests/builds have not yet been run for this follow-up**. Run the commands below from Windows CMD after pulling the branch, and fix any failures before treating Phase 03 as locally verified.
 
 # Phase 03 Agri runtime and release verification
 
@@ -33,7 +33,7 @@ cd ../../flock_farm/client && npm ci && npm run build
 cd ../../agri_farm/frontend && npm ci && npm run build
 ```
 
-The `tests/agri-runtime-api.integration.test.ts` test starts an isolated Agri backend in memory mode and exercises live HTTP requests for authentication, Owner/Manager/Worker authorization, farm reads, pagination headers and limits, invalid query handling, worker crop visibility, and all-or-nothing validation of finance bulk imports. It also checks that crop/task/finance page metadata stays consistent across adjacent requests, IDs do not duplicate across page boundaries, and unauthorized or invalid task bulk imports do not create partial records. These are runtime HTTP tests against the in-memory adapter, not production-MongoDB verification.
+The `tests/agri-runtime-api.integration.test.ts` test starts an isolated Agri backend in memory mode and exercises HTTP authentication/role boundaries, paging metadata, query filters, 1,001-row task pagination, farm-scoped summary totals, worker finance redaction, no-leak cross-farm list visibility and all-or-nothing task/finance bulk validation for cross-farm crop references. These are runtime HTTP tests against the in-memory adapter, not production-MongoDB verification. `tests/phase3-pagination.test.ts` also covers the Agri summary-first/lazy-detail contract, complete crop-linked seed-ledger lookup and Flock's bounded preview-first XLSX parsing/CSV quoting.
 
 ## Browser review matrix (POSTPONED until the final project-wide pass)
 
