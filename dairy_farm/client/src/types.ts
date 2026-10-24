@@ -165,6 +165,7 @@ export interface Sale {
 export type UserRole = 'admin' | 'worker';
 
 export interface AuthUser {
+  farmRole?: 'owner' | 'manager' | 'worker';
   _id: string;
   username: string;
   role: UserRole;
