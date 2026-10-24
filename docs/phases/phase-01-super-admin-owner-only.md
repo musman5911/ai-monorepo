@@ -1,6 +1,6 @@
 # Phase 1: Super Admin: owner only, per-farm summaries
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
