@@ -97,6 +97,7 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
 
   const taskStatuses = { Pending: 0, Completed: 0, Other: 0 };
   const taskByCrop = new Map();
+  const taskByAssignee = new Map();
   let dueToday = 0;
   let completedToday = 0;
   let taskActivityToday = false;
@@ -111,6 +112,18 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
     const taskText = String(task.title || '') + ' ' + String(task.notes || '');
     if (task.status === 'Pending' && ['irrigation', 'irrigate', 'tubewell', 'tube-well', 'sprinkler', 'watering']
       .some((term) => taskText.toLowerCase().includes(term))) pendingIrrigation += 1;
+
+    const assignee = String(task.assigned_to || '').trim();
+    if (assignee) {
+      const assigneeKey = assignee.toLowerCase();
+      const assigned = taskByAssignee.get(assigneeKey) || {
+        assignee, pending: 0, completed: 0, total: 0,
+      };
+      assigned.total += 1;
+      if (task.status === 'Pending') assigned.pending += 1;
+      if (task.status === 'Completed') assigned.completed += 1;
+      taskByAssignee.set(assigneeKey, assigned);
+    }
 
     const linkedCropIds = new Set();
     const explicitId = String(task.crop_id || '');
@@ -129,15 +142,16 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
       taskByCrop.set(cropId, summary);
     }
   }
-  const recentTasks = [...tasks]
-    .sort((a, b) => String(b.due_date || b.completed_at || b.date || b.createdAt || '')
-      .localeCompare(String(a.due_date || a.completed_at || a.date || a.createdAt || '')))
-    .slice(0, 40)
-    .map(asId);
+  const taskSort = (a, b) => String(b.due_date || b.completed_at || b.date || b.createdAt || '')
+    .localeCompare(String(a.due_date || a.completed_at || a.date || a.createdAt || ''));
+  const recentTasks = [...tasks].sort(taskSort).slice(0, 40).map(asId);
+  const recentPendingTasks = tasks.filter((task) => task.status === 'Pending').sort(taskSort).slice(0, 40).map(asId);
   const taskSummary = {
     total: tasks.length,
     byStatus: taskStatuses,
     byCrop: [...taskByCrop.values()],
+    byAssignee: [...taskByAssignee.values()],
+    recentPending: recentPendingTasks,
     dueToday,
     completedToday,
     pendingIrrigation,
