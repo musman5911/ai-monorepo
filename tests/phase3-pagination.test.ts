@@ -107,8 +107,8 @@ describe('Phase 3 bounded Dairy milk bulk-entry contract', () => {
   it('exposes stable paginated totals for Agri crop, finance, and task lists', () => {
     for (const [file, model] of [
       ['agri_farm/backend/routes/crops.js', 'Crop.countDocuments(query)'],
-      ['agri_farm/backend/routes/finance.js', 'Finance.countDocuments({})'],
-      ['agri_farm/backend/routes/tasks.js', 'Task.countDocuments({})'],
+      ['agri_farm/backend/routes/finance.js', 'Finance.countDocuments(query)'],
+      ['agri_farm/backend/routes/tasks.js', 'Task.countDocuments(query)'],
     ]) {
       const source = readFileSync(path.join(repoRoot, file), 'utf8');
       expect(source).toContain(model);
@@ -214,7 +214,8 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
       expect(source).toContain('X-Total-Pages');
       expect(source).toContain('sort({');
     }
-    expect(crops).toContain("const query = isAdmin ? {} : { status: { $ne: 'Completed' } }");
+    expect(crops).toContain("if (!isAdmin) clauses.push({ status: { $ne: 'Completed' } });");
+    expect(crops).toContain("const query = clauses.length === 0 ? {} : clauses.length === 1 ? clauses[0] : { $and: clauses };");
     expect(finance).toContain('protect, requireAdmin');
   });
 
