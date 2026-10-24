@@ -16,4 +16,6 @@ const imageSchema = new mongoose.Schema(
   { timestamps: true, collection: 'images' }
 );
 
+imageSchema.index({ farmId: 1, kind: 1, createdAt: -1 }, { name: 'image_farm_kind_created' });
+
 export default mongoose.model('Image', imageSchema);

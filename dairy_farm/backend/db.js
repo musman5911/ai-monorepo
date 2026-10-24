@@ -67,6 +67,14 @@ async function ensureIndexes() {
       Cow.collection.createIndex({ batch: 1 }, { name: 'cow_batch' }),
       User.collection.createIndex({ email: 1 }, { name: 'user_email', sparse: true }),
       RateHistory.collection.createIndex({ date: -1 }, { name: 'rate_history_date' }),
+      Health.collection.createIndex({ farmId: 1, cowId: 1, date: -1 }, { name: 'health_farm_cow_date' }),
+      Sale.collection.createIndex({ farmId: 1, date: -1 }, { name: 'sale_farm_date' }),
+      Cow.collection.createIndex({ farmId: 1, status: 1, createdAt: -1 }, { name: 'cow_farm_status_created' }),
+      LaborAttendance.collection.createIndex({ farmId: 1, date: -1 }, { name: 'labor_attendance_farm_date' }),
+      LaborAdvance.collection.createIndex({ farmId: 1, date: -1 }, { name: 'labor_advance_farm_date' }),
+      Supplier.collection.createIndex({ farmId: 1, name: 1 }, { name: 'supplier_farm_name' }),
+      SupplierPayment.collection.createIndex({ farmId: 1, supplierId: 1, date: -1 }, { name: 'supplier_payment_farm_supplier_date' }),
+      RateHistory.collection.createIndex({ farmId: 1, date: -1 }, { name: 'rate_history_farm_date' }),
     ]);
   } catch (err) {
     // Duplicate key on existing bad data shouldn't crash boot — log and continue.

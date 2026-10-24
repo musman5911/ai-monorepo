@@ -19,4 +19,6 @@ const batchSchema = new mongoose.Schema(
   { timestamps: true, collection: 'batches' }
 );
 
+batchSchema.index({ farmId: 1, status: 1, start_date: -1 }, { name: 'batch_farm_status_start' });
+
 export default mongoose.model('Batch', batchSchema);

@@ -32,6 +32,10 @@ The system being built is described in [FARMS_AND_ROLES.md](FARMS_AND_ROLES.md).
 
 Rules for every phase come from `RULES.md`: back up before migrations, ask before removing anything, keep the three projects separate, keep shared MUF files identical.
 
+## Phase 01 implementation follow-up (2026-10-24)
+
+Current follow-up status: Agri DiaryMedia and Dairy supplier/payment backup registries have been added; owner All farms read-only selector is now present in all three clients; farm-first compound index definitions have been added. Remaining implementation blockers are Flock image binary backup/restore and the backup-first permanent deletion UI. Root tests and all three frontend builds must be rerun after these edits. Real MongoDB index/restore checks and browser role walkthroughs remain postponed until the consolidated final pass.
+
 ## Phases
 
 | Phase | What | Projects | Risk |

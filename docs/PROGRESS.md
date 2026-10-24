@@ -1,3 +1,13 @@
+## Phase 01 implementation update (2026-10-24)
+
+- Fixed the fake model fixture for atomic farm-scoped deletion regression coverage.
+- Added Agri DiaryMedia to the shared manual/monthly backup and restore registry.
+- Added Dairy Supplier and SupplierPayment to export, monthly snapshot and restore registry.
+- Added owner-only All farms selector in all three shared farm-switcher UIs. The backend already enforces read-only behavior for All farms.
+- Added farm-first compound index definitions for Agri/Dairy query patterns and Flock batch/image access. Actual MongoDB index creation and query-plan validation remain for the consolidated final pass.
+- Still open: Flock image binary/ID backup and restore; safe permanent deletion UI requiring a fresh backup, typed-name confirmation and explicit move/delete choice; complete Phase 01 regression suite/build verification. Do not sign off until these are implemented and verified.
+- Verification: these GitHub edits have not been executed locally in this editing session. Prior owner-run results do not prove these new edits pass. Browser role walkthrough and disposable-database restore/index validation remain deferred to the consolidated final project-wide pass.
+
 ## Phase 01 active follow-up (2026-10-24)
 
 Owner has changed the verification policy: Phase 01 browser and role walkthroughs are now required before calling Phase 01 complete. Run them only against isolated local memory-mode instances. Real MongoDB migration/index creation and backup/restore validation on a disposable database copy remain in the consolidated final project-wide verification pass; never use production data.

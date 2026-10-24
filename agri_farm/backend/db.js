@@ -74,8 +74,22 @@ const FARM_SCOPED = {
   SupplierPayment: SupplierPaymentSchema, DiaryMedia: DiaryMediaSchema,
 };
 const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
+const FARM_QUERY_INDEXES = new Map([
+  [CropSchema, [{ farmId: 1, status: 1, date: -1 }]],
+  [FinanceSchema, [{ farmId: 1, date: -1 }]],
+  [TaskSchema, [{ farmId: 1, status: 1, date: -1 }]],
+  [SpraySchema, [{ farmId: 1, date: -1 }]],
+  [AttendanceSchema, [{ farmId: 1, date: -1 }]],
+  [LaborAdvanceSchema, [{ farmId: 1, date: -1 }]],
+  [SupplierSchema, [{ farmId: 1, name: 1 }]],
+  [SupplierPaymentSchema, [{ farmId: 1, supplierId: 1, date: -1 }]],
+  [DiaryMediaSchema, [{ farmId: 1, date: -1 }]],
+]);
 for (const schema of Object.values(FARM_SCOPED)) {
-  schema.add({ farmId: { type: String, index: true } });
+  schema.add({ farmId: { type: String } });
+  const indexes = FARM_QUERY_INDEXES.get(schema);
+  if (indexes) for (const keys of indexes) schema.index(keys);
+  else schema.index({ farmId: 1 });
 }
 
 // ─── Models ─────────────────────────────────────────────────────────────────
