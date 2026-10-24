@@ -110,7 +110,7 @@ Phases 1, 2 and 4 change data. Follow these steps for each project separately, a
 4. **Publish** following the checklist above, then test: login as an owner, a manager and a worker; confirm a worker sees only assigned farms; add, rename and archive a farm; make one safe record save in each farm.
 5. **Rollback** means restoring the backup and republishing the previous commit. Keep the backup until the owner has used the new version for a while.
 
-Phase 1 migration commands, run inside each project's backend folder with that project's MongoDB URI set (Dairy, Agri and Flock now have the script):
+Farm migration commands, run inside each project's backend folder with that project's MongoDB URI set (Dairy, Agri and Flock now have the script):
 
 ```
 npm run migrate:farms:dry     shows what would change and changes nothing
@@ -123,13 +123,13 @@ Never run a migration against live data from a developer machine without the own
 
 ## Free-tier limits to watch
 
-- The free MongoDB tier has a small storage cap (usually 512 MB; check the cluster's dashboard). Photos stored in the database count against it. This is why photos are size-limited and why Phase 5 moves them to an external store.
+- The free MongoDB tier has a small storage cap (usually 512 MB; check the cluster's dashboard). Photos stored in the database count against it. This is why photos are size-limited and why Phases 8 and 9 move them to an external store.
 - Replit's local disk is not permanent on autoscale deployments, so nothing important may be stored as a local file.
 - Re-check current free-tier limits on the providers' own pages before relying on them.
 
 ## Planned variables (not read by the code yet)
 
-Phase 5 is expected to add names for the photo store, for example `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET`. They are not used by any app today. When they are added, save them only in Replit Secrets and the published deployment secrets, never in Git, chat or logs.
+Phases 8 and 9 are expected to add names for the photo store, for example `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET`. They are not used by any app today. When they are added, save them only in Replit Secrets and the published deployment secrets, never in Git, chat or logs.
 
 ## Secret handling
 

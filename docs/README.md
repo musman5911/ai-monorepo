@@ -12,7 +12,7 @@ The source of truth for three independent farm-management web apps: Agri Farm, D
 
 The URLs above are the local URLs printed by tools\start-all.bat. The command starts services; it does not rebuild the frontends.
 
-Project status is tracked in `docs/PROGRESS.md`; the plan for what comes next is `docs/ROADMAP.md`.
+Project status is tracked in `docs/PROGRESS.md`; the plan for what comes next is `docs/ROADMAP.md`, with one file per phase in `docs/phases/`.
 
 ## First commands on Windows
 
@@ -45,8 +45,8 @@ Run `node tools/check-muf-workbench.js` from the monorepo root to run the workbe
 - `docs/MUF_OVERVIEW.md`: MUF architecture, folder layout and approved design decisions.
 - `docs/muf-rules.md`: detailed rules for shared components, tokens, popups and editor safety.
 - `docs/WORKBENCH.md`: the development-only visual workbench, how to open it and what it can and cannot do.
-- `docs/ROADMAP.md`: the scale-up phases (0 to 7) and carried-over items, each with scope, risk and an approval gate.
-- `docs/PROGRESS.md`: what is done, what remains, what is next, decisions made and the latest validation results. Keep it updated after every change.
+- `docs/ROADMAP.md`: the ordered plan and principles; `docs/phases/`: one file per phase (scope, steps, command-line checks, done checklist). Phase 0 holds everything already done and verified.
+- `docs/PROGRESS.md`: the status of every phase, the latest verification results and the owner's decisions. Update it with every change. The old dated log is in `docs/archive/`.
 - `docs/FARMS_AND_ROLES.md`: the rulebook for the new system: farms, the three roles, data scope, migration, shared MUF file locations, Flock/Dairy/Agri structure.
 - `docs/DEPLOYMENT.md`: Replit build/run configuration, canonical environment names, migration steps and the production smoke-test checklist.
 - `agri_farm/README.md`, `dairy_farm/README.md`, `flock_farm/README.md`: app-specific orientation.

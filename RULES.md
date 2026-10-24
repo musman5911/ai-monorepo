@@ -8,7 +8,7 @@ The old "frontend only, no backend change" workstream is finished. The current p
 
 - **Backend and database changes are allowed, but only phase by phase.** Describe a phase's plan, wait for the owner's "yes", deliver it, and let the owner test before the next phase starts.
 - **Back up before every migration.** Migrations must be re-runnable (safe to run twice), must be tried on a copy of the data first, and must never be run on live data without the owner's approval. Rollback means restoring the backup.
-- **Farm scoping is enforced on the server**, not only in the screens. After Phase 1 every farm-owned record carries a `farmId`, and a request can never read or write a farm the user is not assigned to.
+- **Farm scoping is enforced on the server**, not only in the screens. Every farm-owned record carries a `farmId`, and a request can never read or write a farm the user is not assigned to.
 - **Exactly three roles:** `owner`, `manager`, `worker` (see `docs/FARMS_AND_ROLES.md`). Do not add other roles.
 - **The three projects stay separate.** Agri, Dairy and Flock each have their own farms, users, database and deployment. Farms of one project never mix with another project's farms.
 - **Ask before removing anything.** No screen, control, field, export or workflow is removed without the owner's explicit OK. The one standing exception: Flock's old per-bird system is being cut down to a small "Home Birds" tab, and the extras there may be removed without asking each time (the removed items are listed in `docs/PROGRESS.md`).
@@ -121,11 +121,12 @@ Browser review must cover Agri, Dairy and Flock on phone, tablet and desktop; sh
 - Do not change existing data semantics or configured farm URLs except as a roadmap phase requires, with the owner's approval.
 - Keep `docs/PROGRESS.md` updated as each phase changes state: record what changed, the validation results and anything still unverified. Keep `docs/ROADMAP.md` current with planned work.
 
-## 10. Testing checkpoints and final live verification (owner direction, 2026-10-23)
+## 10. Phase workflow and testing (owner direction, 2026-10-24; replaces the 2026-10-23 text)
 
-- **After every phase, run automated checks by explicit commands only.** Record the exact commands and actual outcomes in `docs/PROGRESS.md`. Do not report a command as passed unless it was actually run and its result was observed.
-- **Do not perform real-time database testing or browser/live-site testing between phases.** Defer all live MongoDB concurrency checks, disposable-copy backup/restore verification that requires the final integrated system, live website checks, and browser/end-to-end role testing to one consolidated verification pass after every planned phase is implemented.
-- Until that final pass, use code review, unit tests, contract tests, deterministic fixtures, and local build/check commands. Do not connect to or query production databases, mutate live data, run live migrations, or use production credentials as a test target.
-- The final verification pass must use a clearly identified disposable database for database tests and the approved live/browser checklist for live-site checks. Never point destructive or concurrency tests at a production database. If a safe disposable target cannot be confirmed, stop that database test and report it as pending.
-- Keep implementation status separate from verification status. Passing command-line tests does not prove browser behavior or real MongoDB concurrency; deferred live checks remain pending until the final pass.
-
+- **The plan is `docs/phases/`**: one file per phase, indexed in `docs/phases/README.md`, with status in `docs/PROGRESS.md` and the overview in `docs/ROADMAP.md`. Work one phase at a time, in order.
+- **Whoever works on a phase must update the docs in the same change**: the phase file's status and checklist, `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md`. Run `npm run check-docs`.
+- **Every phase must add at least one new command-line check** (a test file, a script under `tools/`, or a new case in an existing check) and name it in the phase file. A phase is not done without it.
+- **Phases 1 to 18 are tested by explicit commands only.** Record the exact commands and what they actually printed in `docs/PROGRESS.md`. Never report a command as passed unless it was run and its result was seen.
+- **Real MongoDB, browser, phone and live-site testing happens only in Phases 19 to 21,** after all building is finished. Nothing is postponed or dropped: if a phase finds something that can only be tested live, add it to the matching list in Phase 19, 20 or 21.
+- **Use disposable data in the final phases:** a throwaway database, a staging copy, test accounts. Never run destructive or concurrency tests, migrations or restores against production, and never use production credentials as a test target. If a safe target cannot be confirmed, stop and report that test as pending.
+- Keep implementation status separate from verification status. Passing command-line tests does not prove browser behavior or real-MongoDB behavior.

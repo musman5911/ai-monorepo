@@ -6,7 +6,7 @@ The rulebook for the scale-up project. It records the decisions the owner approv
 
 ```
                   MU FARMS (parent, later)
-        Super Admin tab (private)  +  public shop (Phase 7)
+        Super Admin tab (private)  +  public shop (Phase 16)
               |                |                |
             AGRI             DAIRY            FLOCK
          own farms         own farms        own farms
@@ -37,7 +37,7 @@ Exactly three roles. Do not add others.
 - A worker only enters data (milk, eggs, feed, expenses and similar) in assigned farms.
 - Every user has a list of assigned farms. Owners implicitly have all farms.
 - Today's apps have only `admin` and `worker`. In the Phase 1 migration every existing `admin` becomes `owner`, and existing workers are assigned to "Farm 1".
-- Until the screens are updated (step 1C), the API also returns the old `role` value (`admin` for owners and managers) next to the real `farmRole`.
+- The API also returns the old `role` value (`admin` for owners and managers) next to the real `farmRole`. Phase 14 reviews every remaining use of the old value.
 
 ## 3. Farm rules
 
@@ -51,14 +51,14 @@ Exactly three roles. Do not add others.
 
 ## 4. Data scope
 
-- After Phase 1 every farm-owned record has a `farmId`. Users, password-reset codes and app-level settings stay global. The exact per-collection list is fixed in the Phase 1 plan before any code is written.
+- Every farm-owned record has a `farmId` (done, see Phase 0). Users, password-reset codes and app-level settings stay global. The exact per-collection list is recorded in `PHASE1_PLAN.md`.
 - The server enforces scope. A request is checked against the user's assigned farms; the farm picked in the screen is only a filter inside what the user may see.
 - Indexes change to lead with `farmId` (for example `farmId` + `date`).
-- Migration (Phase 1), per project: create "Farm 1" (rename later), tag all existing records with it, convert roles, assign workers. It must be safe to run twice, tried on a copy first, and preceded by a backup. Rollback means restoring the backup.
+- Migration, per project: create "Farm 1" (rename later), tag all existing records with it, convert roles, assign workers. It must be safe to run twice, tried on a copy first, and preceded by a backup. Rollback means restoring the backup.
 
 ## 5. Server-side totals
 
-Today the browser downloads records and adds them up. That is slow with thousands of records. After Phase 3 the browser asks the server a question ("profit for Farm 2 this month") and receives only the small answer.
+Today the browser downloads records and adds them up. That is slow with thousands of records. With the paging and summary work (Phase 0) the browser asks the server a question ("profit for Farm 2 this month") and receives only the small answer.
 
 - With one farm selected, only that farm's records are counted.
 - With "All farms", the same calculation runs without the farm filter, or grouped by farm.
@@ -70,7 +70,7 @@ Shared code is identical in all three apps and guarded by `tools/check-muf-sync.
 
 | Kind | Planned location |
 |---|---|
-| Backend: farm rules, scope filter, roles, farms API, migration | `backend/muf-farms.mjs` (built, step 1A) |
+| Backend: farm rules, scope filter, roles, farms API, migration | `backend/muf-farms.mjs` (built, Phase 0) |
 | Backend: save many rows at once | `backend/muf-bulk.mjs` |
 | Backend: scroll loading and filters | `backend/muf-paging.mjs` |
 | Backend: photo storage adapter | `backend/muf-storage.mjs` |
@@ -84,13 +84,13 @@ Project-only features stay in their own project: Flock batches, Dairy breeding, 
 
 - It is an Owner-only tab, not a new site or domain.
 - It already exists in all three apps (`SuperAdminTab`, `SuperAdminView`, `MyFarmsPanel`) and reads each project's key-protected `/api/farm-summary`, using `CROSS_FARM_KEY`.
-- Phase 6 makes it Owner-only and shows each project's farms separately: milk, eggs, crops, revenue and expenses. Projects are never mixed into one total.
+- Phase 1 makes it Owner-only and shows each project's farms separately: milk, eggs, crops, revenue and expenses. Projects are never mixed into one total.
 
 ## 8. Photos
 
 - Photos are compressed and size-limited, stored behind one adapter (`muf-storage.mjs`), and deleted with their record.
 - The default store is the project's own MongoDB (Flock already has an `images` collection). The adapter lets us switch store by changing one file.
-- Cloudinary's Free plan is the chosen first external store. The owner created the account on 2026-10-22; it is not connected to any app yet. Credentials go only in environment secrets, never in Git. Phase 5 connects it.
+- Cloudinary's Free plan is the chosen first external store. The owner created the account on 2026-10-22; it is not connected to any app yet. Credentials go only in environment secrets, never in Git. Phases 8 and 9 build the adapter and connect it.
 
 ## 9. Flock structure
 
@@ -121,4 +121,4 @@ Batches become the main project; the old per-bird system becomes a small **Home 
 
 ## 12. MU Farms (later)
 
-One shop with three sections (Crops, Dairy, Poultry). Each project gets a "Publish to MU Farms" switch on a product, so products are managed inside the three apps. There is no budget for a new domain, so the options are a clearly separated public section inside one of the apps or a separate free-subdomain site. Decide in Phase 7.
+One shop with three sections (Crops, Dairy, Poultry). Each project gets a "Publish to MU Farms" switch on a product, so products are managed inside the three apps. There is no budget for a new domain, so the options are a clearly separated public section inside one of the apps or a separate free-subdomain site. Decide in Phase 16.

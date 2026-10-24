@@ -1,3 +1,5 @@
+> **Historical design record.** The phase numbers, "postponed" wording and step names (1A, 1B, 1C) in this file belong to the old plan. The current plan is `docs/ROADMAP.md` and `docs/phases/`; what was built is summarised in `docs/phases/phase-00-done-and-verified.md`. The design rules below (how farm scoping works and why) are still correct.
+
 ## Phase 01 status after local verification (2026-10-24)
 
 Owner-run local checkpoint on commit 26f6731:
