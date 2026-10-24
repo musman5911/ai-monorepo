@@ -46,7 +46,7 @@ router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
     const backup = {
       exportDate: new Date().toISOString(),
       farmName: 'Usman Dairy Farm',
-      version: 3,
+      version: 4,
       farms,
       cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents
     };
@@ -186,7 +186,7 @@ async function collectBackupPayload() {
     farms,
     exportDate: new Date().toISOString(),
     farmName: 'Usman Dairy Farm',
-    version: 2,
+    version: 3,
     cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents,
   };
 }
