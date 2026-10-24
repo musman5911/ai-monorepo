@@ -287,6 +287,141 @@ describe.sequential('Agri runtime API integration', () => {
     for (const row of financeRows.data || []) created.finance.push(String(row._id));
   });
 
+  it('serves exact farm-scoped dashboard aggregates without leaking another farm', async () => {
+    const suffix = 'runtime-summary-' + process.pid + '-' + Date.now();
+    const farms = await request('/farms', { token: ownerToken });
+    expect(farms.response.status).toBe(200);
+    const farmA = String(farms.data.activeFarmId || farms.data.farms[0]._id);
+    const beforeA = await request('/analytics/summary', { token: ownerToken, farmId: farmA });
+    expect(beforeA.response.status).toBe(200);
+    expect(beforeA.data.financeSummary.recent.length).toBeLessThanOrEqual(50);
+
+    const workerSummary = await request('/analytics/summary', { token: workerToken, farmId: farmA });
+    expect(workerSummary.response.status).toBe(200);
+    expect(workerSummary.data.financeSummary).toBeNull();
+
+    const createFarm = await request('/farms', {
+      method: 'POST',
+      token: ownerToken,
+      body: { name: suffix },
+    });
+    expect(createFarm.response.status).toBe(201);
+    const farmB = String(createFarm.data._id);
+    const emptyB = await request('/analytics/summary', { token: ownerToken, farmId: farmB });
+    expect(emptyB.response.status).toBe(200);
+    expect(emptyB.data.cropSummary.total).toBe(0);
+    expect(emptyB.data.taskSummary.total).toBe(0);
+    expect(emptyB.data.financeSummary.totals.entries).toBe(0);
+
+    const monthKey = emptyB.data.monthKey;
+    const date = monthKey + '-12';
+    const crop = await request('/crops', {
+      method: 'POST',
+      token: ownerToken,
+      farmId: farmB,
+      body: {
+        name: suffix + ' wheat',
+        variety: 'Local',
+        status: 'Growing',
+        season: 'Rabi',
+        crop_year: monthKey.slice(0, 4),
+        plant_date: monthKey + '-10',
+        field: 'Summary Plot',
+        area_kanal: 4,
+      },
+    });
+    expect(crop.response.status).toBe(201);
+    const cropId = String(crop.data._id);
+
+    const task = await request('/tasks', {
+      method: 'POST',
+      token: ownerToken,
+      farmId: farmB,
+      body: {
+        title: suffix + ' irrigation',
+        crop_id: cropId,
+        status: 'Pending',
+        priority: 'Medium',
+        due_date: date,
+      },
+    });
+    expect(task.response.status).toBe(201);
+
+    const income = await request('/finance', {
+      method: 'POST',
+      token: ownerToken,
+      farmId: farmB,
+      body: { category: suffix + ' income', type: 'income', amount: 320, date, crop_id: cropId, notes: suffix },
+    });
+    const expense = await request('/finance', {
+      method: 'POST',
+      token: ownerToken,
+      farmId: farmB,
+      body: { category: suffix + ' expense', type: 'expense', amount: 120, date, crop_id: cropId, notes: suffix },
+    });
+    expect(income.response.status).toBe(201);
+    expect(expense.response.status).toBe(201);
+
+    const afterB = await request('/analytics/summary', { token: ownerToken, farmId: farmB });
+    expect(afterB.response.status).toBe(200);
+    expect(afterB.data.cropSummary.total).toBe(1);
+    expect(afterB.data.cropSummary.statusCounts.Growing).toBe(1);
+    expect(afterB.data.cropSummary.areaKanal).toBe(4);
+    expect(afterB.data.cropSummary.options).toHaveLength(1);
+    expect(afterB.data.cropSummary.options[0].image_base64).toBeUndefined();
+    expect(afterB.data.taskSummary.total).toBe(1);
+    expect(afterB.data.taskSummary.byStatus.Pending).toBe(1);
+    expect(afterB.data.taskSummary.byCrop).toContainEqual({
+      crop_id: cropId, pending: 1, completed: 0, total: 1,
+    });
+    expect(afterB.data.financeSummary.totals).toMatchObject({
+      entries: 2, income: 320, expense: 120, net: 200,
+    });
+    expect(afterB.data.financeSummary.byCrop).toContainEqual(expect.objectContaining({
+      crop_id: cropId, income: 320, expense: 120, net: 200, entryCount: 2,
+    }));
+    const monthly = afterB.data.financeSummary.monthlyRows.find(([key]) => key === monthKey);
+    expect(monthly).toBeDefined();
+    expect(monthly[1]).toMatchObject({ income: 320, expense: 120, cropsCount: 1 });
+
+    const [farmBPage, farmAPage] = await Promise.all([
+      request('/crops?skip=0&limit=10&search=' + encodeURIComponent(suffix), { token: ownerToken, farmId: farmB }),
+      request('/crops?skip=0&limit=10&search=' + encodeURIComponent(suffix), { token: ownerToken, farmId: farmA }),
+    ]);
+    expect(farmBPage.response.headers.get('x-total-count')).toBe('1');
+    expect(farmAPage.response.headers.get('x-total-count')).toBe('0');
+    const farmBTasks = await request('/tasks?skip=0&limit=10&crop_search=' + encodeURIComponent(suffix), {
+      token: ownerToken, farmId: farmB,
+    });
+    const farmATasks = await request('/tasks?skip=0&limit=10&crop_search=' + encodeURIComponent(suffix), {
+      token: ownerToken, farmId: farmA,
+    });
+    expect(farmBTasks.response.headers.get('x-total-count')).toBe('1');
+    expect(farmATasks.response.headers.get('x-total-count')).toBe('0');
+    const farmBLedger = await request('/finance?skip=0&limit=10&search=' + encodeURIComponent(suffix), {
+      token: ownerToken, farmId: farmB,
+    });
+    const farmALedger = await request('/finance?skip=0&limit=10&search=' + encodeURIComponent(suffix), {
+      token: ownerToken, farmId: farmA,
+    });
+    expect(farmBLedger.response.headers.get('x-total-count')).toBe('2');
+    expect(farmALedger.response.headers.get('x-total-count')).toBe('0');
+
+    const forbiddenManagerSummary = await request('/analytics/summary', { token: managerToken, farmId: farmB });
+    expect(forbiddenManagerSummary.response.status).toBe(403);
+
+    const afterA = await request('/analytics/summary', { token: ownerToken, farmId: farmA });
+    expect(afterA.response.status).toBe(200);
+    expect(afterA.data.cropSummary.total).toBe(beforeA.data.cropSummary.total);
+    expect(afterA.data.taskSummary.total).toBe(beforeA.data.taskSummary.total);
+    expect(afterA.data.financeSummary.totals).toMatchObject({
+      entries: beforeA.data.financeSummary.totals.entries,
+      income: beforeA.data.financeSummary.totals.income,
+      expense: beforeA.data.financeSummary.totals.expense,
+      net: beforeA.data.financeSummary.totals.net,
+    });
+  });
+
   it('pages a 1,001-row task fixture over real HTTP without missing or duplicating records', async () => {
     const suffix = `runtime-large-page-${process.pid}-${Date.now()}`;
     const fixtureRows = Array.from({ length: 1001 }, (_, index) => ({
