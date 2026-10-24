@@ -51,7 +51,7 @@ async function validateReferences(payload, res) {
   }
   if (payload.sireSource === 'farm_bull' && payload.bullId !== undefined) {
     const bull = await Cow.findById(payload.bullId).lean();
-    if (!bull || bull.gender !== 'male') {
+    if (!bull || bull.gender !== 'male' || bull.status === 'sold' || bull.status === 'calf' || bull.isCalf) {
       res.status(400).json({ error: 'In-farm sire must be a male animal in the selected farm' });
       return false;
     }
