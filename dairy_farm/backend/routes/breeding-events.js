@@ -69,7 +69,7 @@ function legacyField(type) {
   return ({ heat: 'heatDate', service: 'pregnancyDate', calving: 'calvingDate' })[type] || null;
 }
 
-async function syncCowDate(cowId, type, oldDate = '') {
+async function syncCowDate(cowId, type) {
   const field = legacyField(type);
   if (!field || !cowId) return;
   const latest = await BreedingEvent.findOne({ cowId, type }).sort({ date: -1, createdAt: -1 }).lean();
@@ -143,11 +143,11 @@ router.put('/events/:id', protect, async (req, res) => {
     if (errors.length) return sendValidationError(res, errors);
     if (!(await validateReferences(payload, res))) return;
     const updated = await BreedingEvent.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
-    await syncCowDate(existing.cowId, existing.type, existing.date);
+    await syncCowDate(existing.cowId, existing.type);
     if (next.cowId !== existing.cowId || next.type !== existing.type) {
       await syncCowDate(next.cowId, next.type);
     } else {
-      await syncCowDate(next.cowId, next.type, existing.date);
+      await syncCowDate(next.cowId, next.type);
     }
     res.json(updated);
   } catch (e) { res.status(500).json({ error: e.message }); }
