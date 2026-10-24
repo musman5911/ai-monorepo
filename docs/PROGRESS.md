@@ -48,6 +48,8 @@ Last updated: 2026-10-24 (Phase 1 implementation started).
 
 Not run: anything needing a real MongoDB, a browser, a phone or a live website (Phases 19 to 21).
 
+Phase 1 implementation is in progress on `muf-monorepo`: the owner-only summary routes, per-farm summary payloads, owner-only navigation gates, farm-by-farm panel rendering, and `npm run check-super-admin` have been added. These new changes have **not yet been run through the checker or builds in the Windows working tree**; the verification table above is the earlier baseline, not proof of the new Phase 1 changes. The new checker requires dependencies installed in each app's backend folder.
+
 ## Decisions (owner)
 
 - **Roles:** exactly three: Owner (all farms, manages farms and users, sees the Super Admin tab), Manager (full control inside assigned farms; not an admin; no Super Admin), Worker (data entry in assigned farms).
