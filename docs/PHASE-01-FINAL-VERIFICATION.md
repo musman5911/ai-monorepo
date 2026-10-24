@@ -1,70 +1,63 @@
 # Phase 01 final verification checklist
 
-Status: active, as of 2026-10-24. The owner has requested that formerly postponed Phase 01 checks be completed now. Never use production data.
+Status: OPEN. Updated 2026-10-24. Owner has now run memory-mode farm-deletion, backup/restore, and single-process concurrency checks. Those tests found three functional bugs and one minor migration setup issue. Source fixes and regression tests were committed as `b09f9d3`; the new tests/checks/builds still need to be run locally. Real-MongoDB checks remain POSTPONED until the consolidated project-wide verification pass. Never use production data.
 
-## Verified on commit 26f6731 (owner-provided CMD log)
+## Owner-reported results before the fix commit
 
-- [x] Root tests: 22 files, 210/210 tests passed.
-- [x] `npm run check-farms`.
-- [x] `npm run check-sync`.
-- [x] `npm run check-ui`.
-- [x] `npm run check-workbench`.
-- [x] `npm run check-workbench-runtime`.
-- [x] Dairy frontend production build.
-- [x] Flock frontend production build.
-- [x] Agri frontend production build.
+### 1. Farm deletion safety (all three apps)
 
-These results are specific to commit 26f6731. Any source fix after it must be retested.
+- **82/84 checks passed** before the fixes; two real bugs were identified.
+- Passed: missing confirmation name returns 400 `CONFIRM_NAME`; wrong name returns 400; confirmation without a data action returns 400 `CHOOSE_DATA_ACTION`; source-equals-destination and archived destination are rejected; manager/worker DELETE returns 403; fresh backup JSON contains the test record; move and delete-data flows produced the expected record/farm results; Farm 1 and Farm 2 stayed untouched.
+- Disposable temporary instances on ports 5820-5822 were discarded after testing. `LAST_FARM` and `LAST_ACTIVE_FARM` guards passed 12/12 across all three apps.
+- **Bug A, Dairy memory mode:** cow DELETE returned 500 because `dairy_farm/backend/memory-db.js` lacked `findOneAndDelete`. Fixed; regression coverage now exercises the scoped by-ID delete path.
+- **Bug B, Flock farm move:** DataStore buckets with the same key were simply re-stamped with the destination `farmId`. This made moved values unreachable; on real MongoDB the unique `(farmId, key)` index would raise E11000 partway through the move. Fixed in all three byte-identical MUF farm helpers: merge colliding DataStore buckets, union array entries by stable row identity, retain object fields, increment the destination version, and only remove the source bucket after the destination write succeeds. Non-colliding buckets are moved separately.
+- Regression coverage was added for merging a colliding `birds` bucket and moving a non-colliding `eggs` bucket. **The original 82/84 run predates the fix; rerun is required.**
 
-## Known source fix before large-image backup/restore tests
+## 2. Backup and restore validation (memory mode)
 
-- [ ] Fix Flock manual restore body handling. `flock_farm/backend/server.js` currently parses all JSON requests with a global 10 MB limit before the backup route. Since the restore handler expects `req.body`, a large image backup is rejected by the global parser before handler validation. Exclude only the manual restore route from the global parser, then apply an explicit bounded larger JSON parser (for example 100 MB) before authentication/handler execution on that route. Keep reasonable request limits and ensure malformed/oversized requests fail before data changes.
-- [ ] Add/extend regression coverage so a restore body above 10 MB reaches the route and valid Base64 image data can be restored; ensure over-limit input fails without mutating collections.
+- **Agri: 13/13 passed.** DiaryMedia, photos, linked-entity associations, record `_id` values and `farmId` values survived backup/restore in All-Farms mode; farm isolation remained intact.
+- **Dairy: 11/11 passed.** Supplier and SupplierPayment records preserved `_id`, `supplierId` relationships and farm scope.
+- **Flock: 10/10 passed after a clean restart** for the cases exercised: a 1 MB image round trip, manual restore in All-Farms mode, a JSON payload above 10 MB, explicit 413 for payloads above the 100 MB limit without mutation, legacy backups lacking image fields not wiping images, malformed image rows rejected before mutation, and a monthly image snapshot assembled byte-for-byte from two chunks.
+- **Bug C, critical Flock image restore:** `restoreBackupImages` used a large Base64 regex that overflowed the V8 call stack at about 4.92 million characters, approximately 3.3-3.6 MB of source image bytes. This can make otherwise valid larger photo backups unrestorable. Removed the regex validation; canonical Base64 decode-and-round-trip validation remains. Added a 4 MiB byte-for-byte regression test. **The new test has not yet been run locally.**
+- The user-reported corruption tests refused restore before existing image data changed. Mongo-backed missing/corrupt monthly-chunk simulation remains postponed.
 
-## Browser and role matrix (all 3 apps: Agri, Dairy, Flock)
+## 3. Concurrency results (memory mode)
 
-- [ ] Owner signs in; creates, renames, archives and restores a disposable test farm.
-- [ ] Owner selects All farms, sees active farms' records, and verifies write actions are refused by the server without changes.
-- [ ] Manager sees only assigned farms, cannot select an unassigned farm, cannot open owner management or download/restore backups.
-- [ ] Worker sees only assigned farms, cannot select an unassigned farm, and cannot perform owner-only farm management or backup actions.
-- [ ] Direct API calls are checked as well as UI visibility; role restrictions must be enforced server-side.
+- 12 parallel writes across two farms per app produced no cross-farm leakage.
+- Cross-farm DELETE requests returned 404 and their target records survived.
+- Flock stale-`baseVersion` race produced exactly one 200 and one 409.
+- Parallel writes to different farms both succeeded.
+- **POSTPONED:** shared-Mongo, two-backend-process Flock egg-inventory lock test.
+- **POSTPONED:** Mongo-backed missing/corrupt monthly image-chunk simulation.
 
-## Permanent deletion safety (disposable data only)
+## 4. Flock migration environment setup
 
-- [ ] Farm with records: delete is blocked until a fresh full backup download starts; manually verify the JSON file is present and opens.
-- [ ] Wrong typed name is refused; exact typed name is accepted.
-- [ ] Move mode requires another active farm; records are assigned to destination and no longer attached to source.
-- [ ] Delete-data mode deletes source-farm records and farm only after fresh backup and typed name.
-- [ ] Invalid destination, destination equal to source, archived destination, last farm and last active farm are rejected.
-- [ ] Manager and worker direct DELETE requests are refused.
+- **Bug D, minor:** `flock_farm/backend/scripts/migrate-farms.js` lacked `import 'dotenv/config'`. The script could throw a raw missing-`MONGODB_URI` error before reaching its friendly guard. Added the dotenv side-effect import as the first line and a regression assertion.
+- The migration guard remains fail-closed: reported migration dry-run attempts in memory mode exited nonzero in Agri, Dairy and Flock and made no migration changes.
 
-## Disposable MongoDB-copy migration and index checks
+## Code-level index review versus persistent-database verification
 
-- [ ] Create fresh disposable copies/backups for Agri, Dairy and Flock; record baseline farm counts, users/roles and record counts per collection.
-- [ ] On each copy, run the matching `node scripts/migrate-farms.js --dry-run` from that app's `backend` directory; verify it makes no changes.
-- [ ] Apply each migration only to its disposable copy, then rerun it and confirm idempotency/no unintended count or ownership changes.
-- [ ] For Flock, verify legacy DataStore key index removal and the unique `(farmId, key)` index, plus expected farm-first batch/image indexes.
-- [ ] For all three copies, inspect actual index listings; confirm the leading `farmId` field is appropriate for farm-owned queries and check representative query plans for key filter/sort combinations.
-- [ ] Compare farm ownership and collection counts before/after; investigate every unexpected difference.
+- Static source review confirmed Flock's unique `(farmId, key)` index `datastore_farm_key_unique`; the migration drops legacy `key_1` and creates the compound index. Farm-first index declarations were found for Flock batch/image access, Dairy milk/expense access and Agri farm query patterns.
+- Static definitions do not prove index creation or query plans in a real database.
 
-## Backup and restore validation on disposable copies
+## Required local rerun after pulling commit `b09f9d3`
 
-- [ ] Agri: manual backup and monthly backup include DiaryMedia; restore retains media records, farm IDs and valid media associations.
-- [ ] Dairy: export, monthly snapshot and restore preserve Supplier and SupplierPayment records/relationships.
-- [ ] Flock manual JSON: preserve image `_id`, farmId, kind, contentType, size, uploadedBy, timestamps and byte-for-byte data.
-- [ ] Flock monthly auto-backup: exercise chunk creation, stored chunk count, retrieval/assembly, and restore; verify a missing/corrupt chunk aborts before images are deleted.
-- [ ] Test legacy backups without image fields/chunk metadata and confirm they do not unexpectedly wipe images.
-- [ ] Validate an image backup whose JSON payload exceeds 10 MB after the body-limit fix.
-- [ ] Restore a full backup and compare representative records across multiple farms; ensure one farm's records are never moved/deleted by another farm's context.
+- [ ] `npm test`, including DataStore collision merge, Dairy scoped delete, Flock dotenv order, and 4 MiB Base64 regression tests.
+- [ ] `npm run check-farms`, including farm-move cases in all three apps.
+- [ ] `npm run check-sync` and `npm run check-ui`.
+- [ ] `npm run check-workbench` and `npm run check-workbench-runtime`.
+- [ ] Production builds for `agri_farm/frontend`, `dairy_farm/client`, and `flock_farm/client`.
+- [ ] Rerun the deletion and Flock large-image cases against a clean memory-mode restart, including byte/metadata preservation and no mutation for malformed/over-limit requests.
+- [ ] Record actual result counts, exact commit SHA, command output summaries and warnings in `docs/PROGRESS.md`.
 
-## Concurrency and final rerun
+## POSTPONED until the consolidated project-wide verification pass
 
-- [ ] Against disposable MongoDB only, send concurrent scoped reads/writes/deletes for two farms and verify no cross-farm mutation or visibility.
-- [ ] Verify the atomic by-id deletion regression with concurrent farm ownership changes/requests where the test setup permits it.
-- [ ] After code changes: rerun `npm test`, `npm run check-farms`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-workbench-runtime`, and production builds in `dairy_farm/client`, `flock_farm/client`, and `agri_farm/frontend`.
-- [ ] Record exact commit SHA, command exit results, browser results, disposable DB names/copy identifiers (no credentials), index output, backup/restore counts, and any warnings in `PROGRESS.md`.
+These tasks have **not** been completed and must not be reported as passing:
 
-## Do not do
+- [ ] Real disposable-MongoDB migration dry-run, apply, and idempotency checks for Agri, Dairy and Flock; compare baseline/after record counts and ownership.
+- [ ] Actual MongoDB index listings and representative query plans, including Flock's unique `(farmId, key)` index.
+- [ ] Persistent backup/restore on disposable copies: Agri DiaryMedia; Dairy Supplier/SupplierPayment; Flock exact image bytes/metadata, monthly chunks, legacy backups, and Mongo-backed missing/corrupt-chunk handling.
+- [ ] Shared-Mongo, two-backend-process Flock egg-inventory lock/concurrency validation.
+- [ ] Physical browser walkthroughs for owner/manager/worker flows in all three apps.
 
-- Never run farm migration, restore or deletion tests against production databases.
-- Do not mark Phase 01 complete merely because source tests/builds pass; close it only when the browser matrix, disposable-copy migration/index/backup checks, and concurrency checks above are complete.
+Never run migrations, destructive restores or farm-deletion tests against production databases. Phase 01 remains OPEN until the post-fix local rerun passes and all postponed checks are completed in the consolidated pass.
