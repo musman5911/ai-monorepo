@@ -219,6 +219,26 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(finance).toContain('protect, requireAdmin');
   });
 
+  it('provides farm-scoped Agri analytics summaries and lazy full-detail loading', () => {
+    const route = readFileSync(path.join(repoRoot, 'agri_farm/backend/routes/analytics.js'), 'utf8');
+    const server = readFileSync(path.join(repoRoot, 'agri_farm/backend/server.js'), 'utf8');
+    const client = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/api.ts'), 'utf8');
+    const app = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/App.tsx'), 'utf8');
+
+    expect(route).toContain("router.get('/analytics/summary', protect");
+    expect(route).toContain("Crop.find(fullRole ? {} : { status: { $ne: 'Completed' } })");
+    expect(route).toContain("Finance.find({}).select('_id type amount date crop_id category notes buyer_name description').lean()");
+    expect(route).toContain("slice(0, 50)");
+    expect(route).toContain('financeSummary');
+    expect(server).toContain("import analyticsRoutes from './routes/analytics.js';");
+    expect(server).toContain('  analyticsRoutes,');
+    expect(client).toContain("api.get('/analytics/summary')");
+    expect(app).toContain('api.getAnalyticsSummary()');
+    expect(app).toContain('setAnalyticsSummary(summary)');
+    expect(app).toContain("['finance', 'labor', 'summary'].includes(activeTab)");
+    expect(app).toContain('serverFinanceSummary?.monthlyIncomeSeries');
+  });
+
   it('renders Agri crop and task cards in incremental chunks without truncating aggregate source arrays', () => {
     const app = readFileSync(path.join(repoRoot, 'agri_farm/frontend/src/App.tsx'), 'utf8');
     expect(app).toContain('const visibleFilteredCrops = cropPageRows');
