@@ -129,7 +129,7 @@ describe('model wrapper', () => {
     const calls: Array<[string, unknown[]]> = [];
     const rec = (name: string) => (...args: unknown[]) => { calls.push([name, args]); return name; };
     const model: Record<string, unknown> = {};
-    for (const n of ['find', 'findOne', 'findOneAndUpdate', 'updateMany', 'deleteMany', 'countDocuments', 'findById', 'findByIdAndUpdate', 'findByIdAndDelete', 'create', 'insertMany', 'aggregate']) {
+    for (const n of ['find', 'findOne', 'findOneAndUpdate', 'findOneAndDelete', 'updateMany', 'deleteMany', 'countDocuments', 'findById', 'findByIdAndUpdate', 'findByIdAndDelete', 'create', 'insertMany', 'aggregate']) {
       model[n] = rec(n);
     }
     model.findOne = (...args: unknown[]) => { calls.push(['findOne', args]); return { _id: 'x' }; };
