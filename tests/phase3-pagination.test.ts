@@ -235,7 +235,9 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(client).toContain("api.get('/analytics/summary')");
     expect(app).toContain('api.getAnalyticsSummary()');
     expect(app).toContain('setAnalyticsSummary(summary)');
-    expect(app).toContain("['finance', 'labor', 'summary'].includes(activeTab)");
+    expect(app).toContain("const needsFullDetails = activeTab === 'labor'");
+    expect(app).toContain("activeTab === 'finance' && agriFinanceSubTab !== 'ledger'");
+    expect(app).toContain('refreshData(needsFullDetails)');
     expect(app).toContain('serverFinanceSummary?.monthlyIncomeSeries');
   });
 
