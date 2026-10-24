@@ -11,7 +11,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 
 import { mufToday } from './muf-date.mjs';
-import { connectDB } from './db.js';
+import { connectDB, Farm } from './db.js';
 import authRoutes from './routes/auth.js';
 import cronRoutes from './routes/cron.js';
 import batchRoutes from './routes/batches.js';
@@ -22,6 +22,7 @@ import telegramRoutes, { initTelegram } from './routes/telegram.js';
 import cardsRoutes from './routes/cards.js';
 import settingsRoutes from './routes/settings.js';
 import farmsRoutes from './routes/farms.js';
+import { authRequiredUnscoped, requireRole } from './middleware/auth.js';
 import { MUF_ENV } from './muf-env.mjs';
 
 dotenv.config();
@@ -150,35 +151,51 @@ app.use('/api/', apiLimiter);
 app.post('/api/auth/login', loginLimiter);
 // Cross-farm summary — tiny read-only aggregates for the "My Farms" tab in
 // the sibling apps. Protected by the shared CROSS_FARM_KEY; CORS-open.
-app.get('/api/farm-summary', async (req, res) => {
+async function flockFarmSummaryHandler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*');
     const key = MUF_ENV.crossFarmKey;
     if (!key) return res.status(404).json({ error: 'Not enabled' });
     if (String(req.query.key || '') !== key) return res.status(401).json({ error: 'Bad key' });
     const DataStore = (await import('./models/DataStore.js')).default;
-    const bucket = async (k) => {
-      const docs = await DataStore.find({ key: k });
+    const activeFarms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+    const bucket = async (k, farmId) => {
+      const query = { key: k };
+      if (farmId !== undefined) query.farmId = String(farmId);
+      const docs = await DataStore.find(query).lean();
       return docs.flatMap((doc) => Array.isArray(doc?.value) ? doc.value : []);
     };
     const [birds, eggs, expenses] = await Promise.all([bucket('birds'), bucket('eggs'), bucket('expenses')]);
     const today = mufToday();
     const month = today.slice(0, 7);
-    const eggsToday = eggs.filter(e => e.date === today).reduce((a, e) => a + (e.totalEggsCollected || 0), 0);
-    const eggsMonth = eggs.filter(e => String(e.date || '').startsWith(month)).reduce((a, e) => a + (e.totalEggsCollected || 0), 0);
-    const expMonth = expenses.filter(e => String(e.date || '').startsWith(month)).reduce((a, e) => a + (e.amount || 0), 0);
-    res.json({
-      farm: 'flock',
-      label: 'Usman Flock Farm',
-      stats: [
-        { label: 'Active birds', value: birds.filter(b => b.status === 'Active' || b.status === 'Sick').length },
+    const buildStats = (farmBirds, farmEggs, farmExpenses) => {
+      const eggsToday = farmEggs.filter(e => e.date === today).reduce((a, e) => a + (Number(e.totalEggsCollected) || 0), 0);
+      const eggsMonth = farmEggs.filter(e => String(e.date || '').startsWith(month)).reduce((a, e) => a + (Number(e.totalEggsCollected) || 0), 0);
+      const expMonth = farmExpenses.filter(e => String(e.date || '').startsWith(month)).reduce((a, e) => a + (Number(e.amount) || 0), 0);
+      return [
+        { label: 'Active birds', value: farmBirds.filter(b => b.status === 'Active' || b.status === 'Sick').length },
         { label: 'Eggs today', value: eggsToday },
         { label: 'Eggs this month', value: eggsMonth },
         { label: 'Expenses this month', value: `Rs ${Math.round(expMonth).toLocaleString()}` },
-      ],
+      ];
+    };
+    const perFarm = await Promise.all(activeFarms.map(async (farm) => {
+      const farmId = String(farm._id);
+      const [farmBirds, farmEggs, farmExpenses] = await Promise.all([
+        bucket('birds', farmId), bucket('eggs', farmId), bucket('expenses', farmId),
+      ]);
+      return { farmId, farmName: farm.name, stats: buildStats(farmBirds, farmEggs, farmExpenses) };
+    }));
+    return res.json({
+      farm: 'flock',
+      label: 'Usman Flock Farm',
+      stats: buildStats(birds, eggs, expenses),
+      farms: perFarm,
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
-});
+}
+app.get('/api/farm-summary', flockFarmSummaryHandler);
+app.get('/api/super-admin/farm-summary', authRequiredUnscoped, requireRole('owner'), flockFarmSummaryHandler);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/farms', farmsRoutes);
