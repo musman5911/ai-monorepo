@@ -19,6 +19,8 @@ import BatchEggLog from '../models/BatchEggLog.js';
 import BatchVaccinationLog from '../models/BatchVaccinationLog.js';
 import { acquireEggInventoryLocks } from '../egg-inventory-lock.mjs';
 import Farm from '../models/Farm.js';
+import Image from '../models/Image.js';
+import { serializeBackupImages, restoreBackupImages, splitBase64Image, assembleBase64ImageParts } from '../muf-backup-images.mjs';
 import { mufGetDefaultFarmId, mufIsOwner, mufRunUnscoped } from '../muf-farms.mjs';
 
 const router = express.Router();
@@ -29,6 +31,8 @@ const ownerUnscoped = (req, res, next) => {
 };
 
 const MONTHLY_AUTO_BACKUP_KEY = 'monthly_auto_backup';
+const MONTHLY_IMAGE_CHUNK_PREFIX = 'monthly_auto_backup_image_chunk_';
+const MONTHLY_IMAGE_CHUNK_CHARS = 4 * 1024 * 1024;
 const BUCKET_KEYS = [
   'birds', 'expenses', 'feed', 'eggs', 'settings',
   'vaccinations', 'customers', 'customerSales',
@@ -58,6 +62,7 @@ async function collectBackupPayload() {
     farms: [],
     buckets: {},
     farmBuckets: {},
+    images: serializeBackupImages(await Image.find({}).lean()),
   };
   payload.farms = (await Farm.find({}).lean()).map((farm) => {
     const out = { ...farm };
@@ -83,6 +88,9 @@ async function collectBackupPayload() {
 }
 
 async function restoreBackupPayload(payload) {
+  // Validate the complete image section before any restore mutation. Older backups
+  // without an images key remain compatible and leave current images untouched.
+  const restoredImages = Array.isArray(payload.images) ? restoreBackupImages(payload.images) : null;
   // Buckets: overwrite each present bucket, bumping the version so any
   // logged-in clients get a clean 409 + reload instead of silent overwrite.
   if (Array.isArray(payload.farms)) {
@@ -123,6 +131,70 @@ async function restoreBackupPayload(payload) {
       await Model.insertMany(payload[name]);
     }
   }
+  if (restoredImages) {
+    await Image.deleteMany({});
+    if (restoredImages.length) await Image.insertMany(restoredImages);
+  }
+}
+
+
+async function saveMonthlyImageChunks(snapshotId, images) {
+  const chunks = [];
+  for (let imageIndex = 0; imageIndex < images.length; imageIndex += 1) {
+    chunks.push(...splitBase64Image(images[imageIndex], imageIndex, MONTHLY_IMAGE_CHUNK_CHARS));
+  }
+  const groups = [];
+  let current = [];
+  let currentBytes = 0;
+  for (const part of chunks) {
+    const size = Buffer.byteLength(JSON.stringify(part), 'utf8');
+    if (current.length && currentBytes + size > 6 * 1024 * 1024) {
+      groups.push(current);
+      current = [];
+      currentBytes = 0;
+    }
+    current.push(part);
+    currentBytes += size;
+  }
+  if (current.length) groups.push(current);
+  const farmId = mufGetDefaultFarmId();
+  if (!farmId) throw new Error('Cannot store monthly image backup without a default farm.');
+  for (let i = 0; i < groups.length; i += 1) {
+    await DataStore.create({
+      key: MONTHLY_IMAGE_CHUNK_PREFIX + snapshotId + '_' + String(i).padStart(5, '0'),
+      farmId,
+      value: { snapshotId, chunkIndex: i, parts: groups[i] },
+      version: 1,
+    });
+  }
+  return groups.length;
+}
+
+async function expandMonthlyImagePayload(stored) {
+  const payload = { ...(stored?.payload || {}) };
+  if (!stored?.imageSnapshotId) return payload;
+  const docs = await DataStore.find({}).lean();
+  const rows = docs.filter((doc) => String(doc.key || '').startsWith(MONTHLY_IMAGE_CHUNK_PREFIX) && doc.value?.snapshotId === stored.imageSnapshotId);
+  if (rows.length !== stored.imageChunkCount) throw new Error('Monthly backup image chunks are missing; restore was not started.');
+  const parts = rows.flatMap((doc) => Array.isArray(doc.value?.parts) ? doc.value.parts : []);
+  const imageIndexes = [...new Set(parts.map((part) => part.imageIndex))].sort((a, b) => a - b);
+  const images = [];
+  for (let index = 0; index < imageIndexes.length; index += 1) {
+    if (imageIndexes[index] !== index) throw new Error('Monthly backup image list is incomplete; restore was not started.');
+    const imageParts = parts.filter((part) => part.imageIndex === index);
+    images.push(assembleBase64ImageParts(imageParts, index));
+  }
+  payload.images = images;
+  return payload;
+}
+
+async function cleanOldMonthlyImageChunks(keepSnapshotId) {
+  const docs = await DataStore.find({}).lean();
+  for (const doc of docs) {
+    if (String(doc.key || '').startsWith(MONTHLY_IMAGE_CHUNK_PREFIX) && doc.value?.snapshotId !== keepSnapshotId) {
+      await DataStore.deleteMany({ _id: doc._id });
+    }
+  }
 }
 
 function currentAutoBackupName(now = new Date()) {
@@ -133,11 +205,16 @@ export async function maybeRunMonthlyAutoBackup(force = false) {
   const name = currentAutoBackupName();
   const existing = await DataStore.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
   const value = (existing && existing.value) || {};
-  if (!force && value.name === name && value.payload) return value;
+  if (!force && value.name === name && value.payload && value.imageSnapshotId) return value;
+  const fullPayload = await collectBackupPayload();
+  const imageSnapshotId = new Date().toISOString().replace(/[^0-9A-Za-z]/g, '') + '_' + Math.random().toString(36).slice(2, 10);
+  const imageChunkCount = await saveMonthlyImageChunks(imageSnapshotId, fullPayload.images || []);
   const stored = {
     name,
     createdAt: new Date().toISOString(),
-    payload: await collectBackupPayload(),
+    imageSnapshotId,
+    imageChunkCount,
+    payload: { ...fullPayload, images: [] },
   };
   if (existing) {
     await DataStore.findOneAndUpdate(
@@ -147,6 +224,7 @@ export async function maybeRunMonthlyAutoBackup(force = false) {
   } else {
     await DataStore.create({ key: MONTHLY_AUTO_BACKUP_KEY, value: stored, version: 1 });
   }
+  await cleanOldMonthlyImageChunks(imageSnapshotId);
   console.log(`💾 [Auto Backup] Saved ${name}`);
 
   // Silently email the snapshot to the admin so a copy lives OUTSIDE the
@@ -155,7 +233,7 @@ export async function maybeRunMonthlyAutoBackup(force = false) {
     if (mailConfigured()) {
       const admin = await User.findOne({ role: { $in: ['owner', 'admin'] }, email: { $nin: [null, ''] } });
       if (admin && admin.email) {
-        await sendBackupEmail({ to: admin.email, name, json: JSON.stringify(stored.payload, null, 2) });
+        await sendBackupEmail({ to: admin.email, name, json: JSON.stringify(await expandMonthlyImagePayload(stored), null, 2) });
         stored.emailedTo = admin.email;
         stored.emailedAt = new Date().toISOString();
         await DataStore.findOneAndUpdate(
@@ -183,13 +261,32 @@ router.get('/backup', authRequired, ownerUnscoped, async (_req, res) => {
   }
 });
 
+// POST /api/backup/restore — restore a downloaded full snapshot (owner only)
+router.post('/backup/restore', authRequired, ownerUnscoped, async (req, res) => {
+  let releaseLocks;
+  try {
+    const payload = req.body;
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return res.status(400).json({ error: 'Backup payload must be an object.' });
+    if (Array.isArray(payload.images)) restoreBackupImages(payload.images);
+    const farmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
+    releaseLocks = await acquireEggInventoryLocks(DataStore, farmIds);
+    await restoreBackupPayload(payload);
+    res.json({ ok: true, message: 'Backup restored.' });
+  } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
+    res.status(400).json({ error: `Restore failed: ${err.message}` });
+  } finally {
+    if (releaseLocks) { try { await releaseLocks(); } catch (e) { console.error('Failed to release restore locks:', e); } }
+  }
+});
+
 // GET /api/backup/auto — info + payload of the stored monthly auto-backup
 router.get('/backup/auto', authRequired, ownerUnscoped, async (_req, res) => {
   try {
     const existing = await DataStore.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
     if (!value || !value.payload) return res.json({ available: false });
-    res.json({ available: true, name: value.name, createdAt: value.createdAt, emailedTo: value.emailedTo || null, emailedAt: value.emailedAt || null, payload: value.payload });
+    res.json({ available: true, name: value.name, createdAt: value.createdAt, emailedTo: value.emailedTo || null, emailedAt: value.emailedAt || null, payload: await expandMonthlyImagePayload(value) });
   } catch (err) {
     console.error('GET /api/backup/auto error:', err);
     res.status(500).json({ error: 'Failed to load auto-backup' });
@@ -214,7 +311,7 @@ router.post('/backup/restore-auto', authRequired, ownerUnscoped, async (_req, re
     const existing = await DataStore.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
     if (!value || !value.payload) return res.status(404).json({ error: 'No auto-backup available yet' });
-    const payload = value.payload;
+    const payload = await expandMonthlyImagePayload(value);
     const existingFarmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
     const backupFarmIds = [
       ...(Array.isArray(payload.farms) ? payload.farms.map((farm) => farm.id || farm._id) : []),
