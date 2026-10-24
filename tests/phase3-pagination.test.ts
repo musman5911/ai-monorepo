@@ -231,6 +231,7 @@ describe('Phase 3 Agri scale and incremental-rendering contracts', () => {
     expect(route).toContain("Finance.find({}).select('_id type amount date crop_id category notes buyer_name description').lean()");
     expect(route).toContain("slice(0, 50)");
     expect(route).toContain('financeSummary');
+    expect(route).toContain('if (!fullRole) delete option.yield_kg;');
     expect(server).toContain("import analyticsRoutes from './routes/analytics.js';");
     expect(server).toContain('  analyticsRoutes,');
     expect(client).toContain("api.get('/analytics/summary')");
