@@ -1,6 +1,6 @@
 # Phase 5: Agri fields and crop cycles: server
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -35,7 +35,7 @@ Initial server implementation is committed on `muf-monorepo`:
 - Fields are included in backup/restore, farm-scoped model migration/deletion, and memory-mode demo data. Demo crop cycles are linked to seeded fields where their legacy field name matches.
 - Added `tests/agri-fields-cycles.test.ts`, expanded the Agri HTTP integration tests, and added cross-farm field/link assertions to `npm run check-farms`.
 
-**Verification status:** these changes have not yet been run locally in this editing session. Phase 5 remains **In progress** until the owner pulls the branch and the Phase 5 command-line checks pass. Do not claim runtime tests or builds passed based only on source review.
+**Verification status (2026-10-25): Done for the command-line scope.** The owner supplied Windows CMD output confirming the required checks passed on branch `muf-monorepo`. Results are recorded in `docs/PROGRESS.md`. These are owner-reported results, not commands independently run in this editing session. No real-MongoDB, browser/phone, or live-site verification is claimed; those remain in Phases 19 to 21.
 
 ## Steps
 
@@ -65,14 +65,14 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] A farm-scoped `Field` collection: name, acres, notes.
-- [ ] A crop can link to a field and a season (`fieldId`, `season`); old crops without a link keep working.
-- [ ] Finance entries can optionally link to a field and a crop cycle.
-- [ ] Server filters and the existing `/analytics/summary` can group by field and by season.
-- [ ] Included in backup/restore, demo data and farm deletion.
-- [ ] The new command-line check above exists and passes.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] A farm-scoped `Field` collection: name, acres, notes.
+- [x] A crop can link to a field and a season (`fieldId`, `season`); old crops without a link keep working.
+- [x] Finance entries can optionally link to a field and a crop cycle.
+- [x] Server filters and the existing `/analytics/summary` can group by field and by season.
+- [x] Included in backup/restore, demo data and farm deletion.
+- [x] The new command-line check above exists and passes.
+- [x] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Rules for whoever works on this phase
 
