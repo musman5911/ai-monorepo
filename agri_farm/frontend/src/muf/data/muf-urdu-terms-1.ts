@@ -324,4 +324,5 @@ export const MUF_URDU_PART_1: Record<string, string> = {
   "Delete this breeding event?": "کیا آپ افزائش کا یہ ریکارڈ حذف کرنا چاہتے ہیں؟",
   "Edit event": "ریکارڈ میں ترمیم کریں",
   "Event type": "ریکارڈ کی قسم",
+  "Cow": "گائے",
 };
