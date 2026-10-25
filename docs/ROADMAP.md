@@ -18,7 +18,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 1 | Super Admin: owner only, per-farm summaries | Done | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
 | 2 | Dairy breeding events: server | Done | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Done | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
-| 4 | Dairy calves and lineage | Not started | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
+| 4 | Dairy calves and lineage | In progress | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
 | 5 | Agri fields and crop cycles: server | Not started | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Not started | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Not started | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
@@ -41,7 +41,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 
 Phases 1 to 3 are **Done** for the command-line scope. For Phase 3, the owner reported 7/7 focused screen tests, 249/249 full-suite tests, passing MUF sync, UI safety, 23 workbench source checks, farm-scope plus 19 breeding runtime checks, and all three production builds. On 2026-10-25, the owner supplied a passing `npm run check-docs` output after the Phase 3 headings were restored. These are owner-reported Windows CMD results; they were not independently executed in this editing session. Real MongoDB, browser/phone and live-site verification remains in Phases 19 to 21.
 
-**Phase 4 is now In progress:** Dairy calves and lineage. First inspect the existing Cow schema, breeding-event create/edit/delete lifecycle, farm-scoping guarantees, and cow detail popup. Then implement server-side calf creation with rollback-safe persistence, farm-scoped ear-tag uniqueness, lineage display, and a new memory-mode CLI regression check. No Phase 4 implementation tests or builds are claimed yet.
+**Phase 4 is In progress:** Dairy calves and lineage. Initial implementation is committed and pulled by the owner. Owner-reported Windows CMD verification on 2026-10-25: focused Phase 4 tests passed (5/5), full suite passed (254/254 across 27 files), MUF sync passed, workbench source checks passed (23/23), and all three production builds passed. However, `npm run check-ui` failed one Dairy popup class check, and `npm run check-farms` failed three Dairy breeding runtime checks (event edit, legacy date resynchronization, and same ear tag allowed across different farms). `npm run check-docs` also detected a Phase 4 status mismatch; this documentation update aligns the index and roadmap with the phase file. Phase 4 is not Done until failures are fixed and checks rerun.
 
 
 ## Why this order
