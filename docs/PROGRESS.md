@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-25 (Phase 3 UI and documentation recheck).
+Last updated: 2026-10-25 (Phase 3 closed; Phase 4 started).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -13,7 +13,7 @@ Last updated: 2026-10-25 (Phase 3 UI and documentation recheck).
 | 0 | Done and verified | Done | [phase-00-done-and-verified.md](phases/phase-00-done-and-verified.md) |
 | 1 | Super Admin: owner only, per-farm summaries | Done | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
 | 2 | Dairy breeding events: server | Done | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
-| 3 | Dairy breeding events: screens | In progress | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
+| 3 | Dairy breeding events: screens | Done | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
 | 4 | Dairy calves and lineage | Not started | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
 | 5 | Agri fields and crop cycles: server | Not started | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Not started | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
@@ -32,6 +32,27 @@ Last updated: 2026-10-25 (Phase 3 UI and documentation recheck).
 | 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phases/phase-21-final-testing-live-and-signoff.md) |
+
+## Phase 3 final local verification (2026-10-25, Windows CMD; output supplied by owner)
+
+Phase 3 is marked Done after the owner supplied a passing `npm run check-docs` output. The implementation and remaining Phase 3 checks below are owner-reported results, not commands run in this editing session.
+
+| Command/check | Result |
+|---|---|
+| `npm test -- tests/dairy-breeding-screens.test.ts` | Owner-reported passed: 7/7 focused tests |
+| `npm test` | Owner-reported passed: 26 files, 249 tests |
+| `npm run check-sync` | Owner-reported passed |
+| `npm run check-ui` | Owner-reported passed after replacing the legacy grid class with the shared form-grid primitive |
+| `npm run check-workbench` | Owner-reported passed: 23 source checks |
+| `npm run check-farms` | Owner-reported passed, including farm-scope and 19 breeding-event runtime checks |
+| `tools\build-all.bat` | Owner-reported passed: Dairy, Flock and Agri production builds |
+| `npm run check-docs` | Passed: owner supplied the complete Windows CMD output on 2026-10-25; all phase docs checks passed |
+
+`npm ci` and the optional `npm run check-workbench-runtime` were not reported as run for this checkpoint. No browser/mobile review or real-MongoDB verification is claimed. Phase 3 is complete for the command-line scope; real-world verification remains in Phases 19 to 21.
+
+## Phase 4 start (2026-10-25)
+
+Phase 4, Dairy calves and lineage, is now **In progress**. Work starts with a repository audit of the existing breeding-event API, Cow schema, farm-scoping model, event edit/delete behavior, and cow detail popup before implementing automatic calf creation. No Phase 4 implementation tests or builds have been run yet in this editing session.
 
 ## Earlier baseline verification (2026-10-24, Linux sandbox, uploaded `muf-monorepo` snapshot)
 
