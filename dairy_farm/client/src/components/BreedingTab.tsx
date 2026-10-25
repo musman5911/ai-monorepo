@@ -13,6 +13,7 @@ import DetailModal from '../muf/core/muf-modal';
 import CowDetailPopup from './CowDetailPopup';
 import type { RateHistory } from '../types';
 import { todayStr } from '../utils/date';
+import BreedingEventsPanel from './BreedingEventsPanel';
 
 interface BreedingInfo {
   cowId: string;
@@ -335,6 +336,8 @@ export default function BreedingTab({ isAdmin }: { isAdmin: boolean }) {
       {selectedCowId && (
         <CowDetailPopup cowId={selectedCowId} rate={rate} rateHistory={rateHistory} rateDate={rateDate} isAdmin={isAdmin} onClose={() => setSelectedCowId(null)} />
       )}
+
+      <BreedingEventsPanel isAdmin={isAdmin} />
 
       <p className="text-[10px] text-slate-400">
         {L('Evening Telegram summary includes these reminders automatically. Tap any animal to open its full profile.')}
