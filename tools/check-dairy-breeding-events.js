@@ -102,11 +102,34 @@ async function main() {
 
     const calving = await call('POST', '/api/breeding/events', {
       token: owner, farm: String(farmA._id),
-      body: { cowId: 'cow1', type: 'calving', date: today, result: 'Normal calving' },
+      body: {
+        cowId: 'cow1', type: 'calving', date: today, result: 'Twins and stillbirth',
+        sireSource: 'farm_bull', bullId: 'cow15',
+        calves: [
+          { gender: 'female', earTag: 'phase4-twin-a', outcome: 'live' },
+          { gender: 'male', earTag: 'phase4-twin-b', outcome: 'live' },
+          { gender: 'female', earTag: '', outcome: 'stillbirth' },
+        ],
+      },
     });
-    ok(calving.status === 201, 'calving event can be recorded without automatically creating a calf');
+    ok(calving.status === 201 && calving.json?.generatedCalfIds?.length === 2, 'calving creates one live calf record per twin and excludes stillbirth from live calf records');
     const cowAfterCalving = await call('GET', '/api/cows/cow1', { token: owner, farm: String(farmA._id) });
     ok(cowAfterCalving.json?.calvingDate === today, 'calving event synchronizes the legacy cow calving date');
+    const calvesA = await call('GET', '/api/cows?motherId=cow1', { token: owner, farm: String(farmA._id) });
+    const phase4CalvesA = (Array.isArray(calvesA.json) ? calvesA.json : calvesA.json?.cows || []).filter((calf) => calf.calvingEventId === calving.json?._id);
+    ok(phase4CalvesA.length === 2 && phase4CalvesA.every((calf) => calf.isCalf && calf.status === 'calf' && calf.birthDate === today && calf.fatherId === 'cow15'), 'generated calves carry gender, date, mother, farm bull and calf status');
+    const duplicateTag = await call('POST', '/api/breeding/events', {
+      token: owner, farm: String(farmA._id),
+      body: { cowId: 'cow1', type: 'calving', date: today, calves: [{ gender: 'female', earTag: 'PHASE4-TWIN-A', outcome: 'live' }] },
+    });
+    ok(duplicateTag.status === 409, 'duplicate ear tag is refused within the same farm, ignoring case');
+    const sameTagOtherFarm = await call('POST', '/api/breeding/events', {
+      token: owner, farm: String(farmB._id),
+      body: { cowId: 'cow1', type: 'calving', date: today, calves: [{ gender: 'female', earTag: 'phase4-twin-a', outcome: 'live' }] },
+    });
+    ok(sameTagOtherFarm.status === 201, 'the same ear tag is allowed in a different farm');
+    const protectedDelete = await call('DELETE', `/api/breeding/events/${calving.json?._id}`, { token: owner, farm: String(farmA._id) });
+    ok(protectedDelete.status === 409, 'a calving event with linked calves cannot be deleted and orphan them');
 
     const listA = await call('GET', '/api/breeding/events?page=1&limit=20&cowId=cow8', { token: owner, farm: String(farmA._id) });
     ok(listA.status === 200 && listA.json?.events?.some((event) => event._id === eventId), 'event appears in paginated list for its farm and cow');
