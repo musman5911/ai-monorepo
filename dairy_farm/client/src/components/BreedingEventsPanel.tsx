@@ -3,7 +3,7 @@ import { CalendarHeart, Plus, Pencil, Trash2, History, RefreshCw } from 'lucide-
 import { api } from '../api';
 import { L } from '../i18n';
 import { Cow } from '../types';
-import { notify, confirmAction } from '../muf/core/muf-confirm';
+import { notify, useConfirm } from '../muf/core/muf-confirm';
 import DetailModal from '../muf/core/muf-modal';
 import { todayStr } from '../utils/date';
 
@@ -27,6 +27,7 @@ const TYPE_LABEL: Record<EventType, string> = {
 };
 
 export default function BreedingEventsPanel({ isAdmin }: { isAdmin: boolean }) {
+  const confirm = useConfirm();
   const [cows, setCows] = useState<Cow[]>([]);
   const [events, setEvents] = useState<BreedingEvent[]>([]);
   const [filterCow, setFilterCow] = useState('');
@@ -102,7 +103,7 @@ export default function BreedingEventsPanel({ isAdmin }: { isAdmin: boolean }) {
   };
 
   const remove = async (event: BreedingEvent) => {
-    const accepted = await confirmAction(L('Delete this breeding event?'), { title: L('Delete event'), confirmLabel: L('Delete'), danger: true });
+    const accepted = await confirm({ title: L('Delete event'), message: L('Delete this breeding event?'), confirmLabel: L('Delete'), tone: 'danger' });
     if (!accepted) return;
     try {
       await api.deleteBreedingEvent(event._id);
