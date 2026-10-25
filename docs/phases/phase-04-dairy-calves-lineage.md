@@ -1,10 +1,20 @@
 # Phase 4: Dairy calves and lineage
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
 A calving event creates the calf with gender, mother and father, so lineage is never typed twice.
+
+## Calving-to-calf rules
+
+- A successful calving event is the source record. Calf records are created only by the server after the event is validated and saved; the client cannot submit a trusted `farmId` or bypass farm scope.
+- Each live calf entry creates exactly one Cow record in the same farm as the mother and calving event, with `isCalf: true`, `status: calf`, the event birth date, gender, mother link, and available father/sire details. The parent must belong to that farm; a farm-bull sire must resolve to a valid male animal in that farm. Outside bull/straw details are copied from the validated event.
+- A calving payload must describe its calf entries explicitly. Twins are two separate calf entries and therefore two separate calf records. Stillbirth entries are retained as calving outcomes but do not create a live calf record or inflate live-calf counts. If the existing event contract cannot express entries or stillbirths, extend it compatibly rather than silently guessing.
+- Ear-tag uniqueness is case-insensitive after trimming and is enforced by the server within a farm. The same tag may exist in a different farm. A missing optional tag is allowed unless the existing Cow contract says otherwise.
+- Event and generated calf changes must behave atomically from the caller's perspective. Use the repository's supported transaction mechanism if available; otherwise use a documented compensating rollback and test failures at each write boundary. Never leave an apparently successful calving event without its expected calf records.
+- Editing a calving event must reconcile generated calves without duplicating them. Deleting an event must not silently orphan or erase calves that have subsequently been edited or referenced; reject the delete with a clear error unless a safe, explicit lifecycle is supported by the existing data model. Preserve existing non-calving event behavior.
+- Lineage reads are farm-scoped. Unknown parent information is displayed as unavailable rather than causing the cow detail popup to fail.
 
 ## Already in place (from Phase 0)
 
