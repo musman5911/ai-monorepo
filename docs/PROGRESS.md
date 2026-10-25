@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-25 (Phase 3 verification checkpoint).
+Last updated: 2026-10-25 (Phase 3 UI and documentation recheck).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -101,9 +101,9 @@ These are owner-reported results from the pasted CMD output, not commands run in
 | `npm test -- tests/dairy-breeding-screens.test.ts` | Passed: 1 file, 7 tests |
 | `npm test` | Passed: 26 files, 249 tests |
 | `npm run check-sync` | Passed: all shared MUF twins and three-app invariants |
-| `npm run check-ui` | **One failure:** Dairy had one popup grid still using a legacy Tailwind pattern; Flock and Agri passed |
+| `npm run check-ui` | Passed on rerun: all MUF UI safety checks passed after replacing the Dairy breeding popup grid with `muf-pc-form-grid` |
 | `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope tests plus all 19 Dairy breeding runtime checks |
-| `npm run check-docs` | Passed: phase docs and indexes consistent at time of run |
+| `npm run check-docs` | **Failed on rerun:** Phase 3 file was missing required `Steps`, `Command-line checks at the end of this phase`, and `Rules for whoever works on this phase` sections; documentation corrected on GitHub, rerun pending |
 | `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
 
-The UI-safety failure was traced to the new breeding form's `grid grid-cols-1 sm:grid-cols-2 gap-3` class inside the shared popup. It has been changed to the existing `muf-pc-form-grid` primitive on `muf-monorepo`. The UI safety check, full test suite, docs check and all three builds must be rerun after this last code change before Phase 3 can be marked Done. These are owner-reported command results, not commands executed in this editing session.
+The owner then reran `npm run check-ui`, which passed. `npm test` passed again with 26 files / 249 tests; `check-sync`, `check-workbench` (23 checks), `check-farms`, and all three production builds passed. The `check-docs` rerun exposed missing required headings in the Phase 3 document. Those sections have now been restored on `muf-monorepo`; `npm run check-docs` must be rerun locally before Phase 3 can be marked Done. All results above are owner-reported Windows CMD output, not commands executed in this editing session.
