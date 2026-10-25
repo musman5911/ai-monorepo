@@ -38,6 +38,7 @@ function looseSchema(collection) {
 
 const UserSchema = looseSchema('users');
 const CropSchema = looseSchema('crops');
+const FieldSchema = looseSchema('fields');
 const FinanceSchema = looseSchema('finance');
 const TaskSchema = looseSchema('tasks');
 const ResetSchema = looseSchema('resets');
@@ -67,7 +68,7 @@ const FarmSchema = new mongoose.Schema({
 // Every record below belongs to exactly one farm. User, Reset, TelegramMeta,
 // Setting and Farm stay global. The server adds the farmId; clients can never set it.
 const FARM_SCOPED = {
-  Crop: CropSchema, Finance: FinanceSchema, Task: TaskSchema, Inventory: InventorySchema,
+  Field: FieldSchema, Crop: CropSchema, Finance: FinanceSchema, Task: TaskSchema, Inventory: InventorySchema,
   Liability: LiabilitySchema, Irrigation: IrrigationSchema, CropPhoto: CropPhotoSchema,
   Spray: SpraySchema, Laborer: LaborerSchema, Attendance: AttendanceSchema,
   LaborAdvance: LaborAdvanceSchema, Supplier: SupplierSchema,
@@ -75,6 +76,7 @@ const FARM_SCOPED = {
 };
 const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
 const FARM_QUERY_INDEXES = new Map([
+  [FieldSchema, [{ farmId: 1, name: 1 }]],
   [CropSchema, [{ farmId: 1, status: 1, date: -1 }]],
   [FinanceSchema, [{ farmId: 1, date: -1 }]],
   [TaskSchema, [{ farmId: 1, status: 1, date: -1 }]],
@@ -93,13 +95,14 @@ for (const schema of Object.values(FARM_SCOPED)) {
 }
 
 // ─── Models ─────────────────────────────────────────────────────────────────
-let User, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
+let User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
   Supplier, SupplierPayment, Setting, DiaryMedia, Farm;
 
 if (useMock) {
   const models = createStore({
     User: UserSchema,
+    Field: FieldSchema,
     Crop: CropSchema,
     Finance: FinanceSchema,
     Task: TaskSchema,
@@ -119,11 +122,12 @@ if (useMock) {
     DiaryMedia: DiaryMediaSchema,
     Farm: FarmSchema,
   });
-  ({ User, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
+  ({ User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
     CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
     Supplier, SupplierPayment, Setting, DiaryMedia, Farm } = models);
 } else {
   User = mongoose.model('User', UserSchema);
+  Field = mongoose.model('Field', FieldSchema);
   Crop = mongoose.model('Crop', CropSchema);
   Finance = mongoose.model('Finance', FinanceSchema);
   Task = mongoose.model('Task', TaskSchema);
@@ -147,7 +151,7 @@ if (useMock) {
 // Server-side farm scoping: inside a request every query of these models is limited
 // to the selected farm(s) and every create is stamped with it (see muf-farms.mjs).
 const MUF_FARM_MODELS = {
-  Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer,
+  Field, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer,
   Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia,
 };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
@@ -212,7 +216,7 @@ const connectDB = async () => {
 
 export {
   connectDB, useMock,
-  User, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
+  User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
   Supplier, SupplierPayment, Setting, DiaryMedia, Farm,
   MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES,
