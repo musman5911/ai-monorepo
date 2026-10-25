@@ -2,7 +2,7 @@
 // Lists and editor forms continue using their paged endpoints. This route sends
 // aggregates plus bounded recent rows, and deliberately excludes photo blobs.
 import express from 'express';
-import { Crop, Finance, Task } from '../db.js';
+import { Crop, Finance, Task, Field } from '../db.js';
 import { protect } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/helpers.js';
 import { mufIsFullRole } from '../muf-farms.mjs';
@@ -52,7 +52,7 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
   // Use find/select/lean rather than raw aggregation: the shared MUF wrapper
   // applies the active farm scope to these reads. Never query the base
   // collections directly or mix records from the owner's other farms.
-  const [crops, tasks, finance] = await Promise.all([
+  const [crops, tasks, finance, fieldDocs] = await Promise.all([
     Crop.find(fullRole ? {} : { status: { $ne: 'Completed' } })
       .select('_id name variety status area_kanal plant_date harvest_date field season crop_year yield_kg yield_unit createdAt')
       .lean(),
@@ -60,8 +60,9 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
       .select('_id title status due_date completed_at date crop_id assigned_to priority notes laborer_ids laborer_names createdAt')
       .lean(),
     fullRole
-      ? Finance.find({}).select('_id type amount date crop_id category notes buyer_name description').lean()
+      ? Finance.find({}).select('_id type amount date crop_id fieldId cropCycleId category notes buyer_name description').lean()
       : Promise.resolve(null),
+    Field.find({}).select('_id name acres notes').lean(),
   ]);
 
   const cropRows = crops.map(asId).map((crop) => ({
@@ -72,11 +73,14 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
     plant_date: crop.plant_date || '',
     harvest_date: crop.harvest_date || '',
     field: crop.field || '',
+    fieldId: crop.fieldId ? String(crop.fieldId) : '',
     season: crop.season || '',
     crop_year: crop.crop_year == null ? '' : String(crop.crop_year),
     yield_unit: crop.yield_unit || 'kg',
   }));
   const cropById = new Map(cropRows.map((crop) => [crop._id, crop]));
+  const fieldRows = fieldDocs.map((field) => ({ ...field, _id: String(field._id), name: String(field.name || '') }));
+  const fieldById = new Map(fieldRows.map((field) => [field._id, field]));
   const cropMonthCounts = new Map();
   const cropStatuses = { Growing: 0, Planted: 0, Harvesting: 0, Completed: 0, Other: 0 };
   const fields = new Set();
@@ -171,6 +175,8 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
     const totals = emptyMoney();
     const monthTotals = new Map();
     const byCropTotals = new Map();
+    const byFieldTotals = new Map();
+    const bySeasonTotals = new Map();
     const byCropMonths = new Map();
     const byCropCategories = new Map();
     const byCropIncomeCategories = new Map();
@@ -210,7 +216,25 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
         incomeCategories.set(buyer, (incomeCategories.get(buyer) || 0) + amount);
       }
 
-      const cropId = String(row.crop_id || '');
+      const cropId = String(row.cropCycleId || row.crop_id || '');
+      const linkedCrop = cropById.get(cropId);
+      const fieldId = String(row.fieldId || linkedCrop?.fieldId || '');
+      const fieldLabel = (fieldById.get(fieldId)?.name || linkedCrop?.field || '').trim();
+      const seasonLabel = String(linkedCrop?.season || '').trim();
+      if (fieldLabel) {
+        const fieldTotals = byFieldTotals.get(fieldLabel) || { fieldId: fieldId || null, field: fieldLabel, income: 0, expense: 0, entryCount: 0 };
+        fieldTotals.entryCount += 1;
+        if (isIncome) fieldTotals.income += amount;
+        if (isExpense) fieldTotals.expense += amount;
+        byFieldTotals.set(fieldLabel, fieldTotals);
+      }
+      if (seasonLabel) {
+        const seasonTotals = bySeasonTotals.get(seasonLabel) || { season: seasonLabel, income: 0, expense: 0, entryCount: 0 };
+        seasonTotals.entryCount += 1;
+        if (isIncome) seasonTotals.income += amount;
+        if (isExpense) seasonTotals.expense += amount;
+        bySeasonTotals.set(seasonLabel, seasonTotals);
+      }
       if (!cropId || !cropById.has(cropId)) {
         farmWideEntryCount += 1;
         if (isIncome) {
@@ -421,6 +445,10 @@ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
       byCrop,
       profitability,
       groups: groups.filter((group) => group.id === 'farm-wide' || group.entryCount > 0),
+      byField: [...byFieldTotals.values()].map((row) => ({ ...row, net: row.income - row.expense }))
+        .sort((a, b) => a.field.localeCompare(b.field)),
+      bySeason: [...bySeasonTotals.values()].map((row) => ({ ...row, net: row.income - row.expense }))
+        .sort((a, b) => a.season.localeCompare(b.season)),
       recent,
     };
   }
