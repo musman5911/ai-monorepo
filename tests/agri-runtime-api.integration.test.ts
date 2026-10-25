@@ -151,6 +151,11 @@ describe.sequential('Agri runtime API integration', () => {
   });
 
   it('keeps fields farm-scoped and groups linked finance by field and season', async () => {
+    const analyticsBefore = await request('/analytics/summary', { token: ownerToken });
+    expect(analyticsBefore.response.status).toBe(200);
+    const baselineSeason = analyticsBefore.data.financeSummary.bySeason.find((row) => row.season === 'Kharif') || {
+      income: 0, expense: 0, net: 0,
+    };
     const suffix = `field-cycle-${process.pid}-${Date.now()}`;
     const fieldResult = await request('/fields', {
       method: 'POST',
@@ -204,7 +209,11 @@ describe.sequential('Agri runtime API integration', () => {
     const fieldSummary = analytics.data.financeSummary.byField.find((row) => row.field === suffix);
     expect(fieldSummary).toMatchObject({ income: 0, expense: 23, net: -23 });
     const seasonSummary = analytics.data.financeSummary.bySeason.find((row) => row.season === 'Kharif');
-    expect(seasonSummary).toMatchObject({ income: 0, expense: 23, net: -23 });
+    expect(seasonSummary).toMatchObject({
+      income: baselineSeason.income,
+      expense: baselineSeason.expense + 23,
+      net: baselineSeason.net - 23,
+    });
 
     const fields = await request('/fields', { token: ownerToken });
     expect(fields.response.status).toBe(200);
@@ -212,6 +221,7 @@ describe.sequential('Agri runtime API integration', () => {
 
     const deletedWhileLinked = await request(`/fields/${fieldResult.data._id}`, { method: 'DELETE', token: ownerToken });
     expect(deletedWhileLinked.response.status).toBe(409);
+    expect(deletedWhileLinked.data.error).toContain('This field is linked to existing crop cycles or finance entries');
   });
 
   it('serves bounded, ordered crop/task/finance pages with real response metadata', async () => {
