@@ -281,6 +281,30 @@ async function checkProject(name, project, port) {
       const financeB = (await call('GET', '/api/finance', { token: owner, farm: farmB })).json;
       ok(Array.isArray(financeA) && !financeA.some((row) => row.category === 'Scope Check Bulk Entry'), 'Agri bulk finance row is hidden from farm A');
       ok(Array.isArray(financeB) && financeB.some((row) => row.category === 'Scope Check Bulk Entry'), 'Agri bulk finance row belongs to farm B');
+
+      const field = await call('POST', '/api/fields', {
+        token: owner, farm: farmB,
+        body: { name: 'Scope Check Field B', acres: 2, notes: 'farm isolation test' },
+      });
+      ok(field.status === 201 && field.json.farmId === farmB, 'Agri field is created in the selected farm');
+      const fieldsA = await call('GET', '/api/fields', { token: owner, farm: farmA });
+      const fieldsB = await call('GET', '/api/fields', { token: owner, farm: farmB });
+      ok(Array.isArray(fieldsA.json) && !fieldsA.json.some((row) => row._id === field.json._id), 'farm A cannot see farm B fields');
+      ok(Array.isArray(fieldsB.json) && fieldsB.json.some((row) => row._id === field.json._id), 'farm B can see its own field');
+      const fieldCrop = await call('POST', '/api/crops', {
+        token: owner, farm: farmB,
+        body: { name: 'Scope Check Field Crop', status: 'Growing', fieldId: field.json._id, season: 'Kharif', crop_year: '2099' },
+      });
+      ok(fieldCrop.status === 201 && fieldCrop.json.fieldId === field.json._id, 'crop cycle can link to a field in the same farm');
+      const crossFieldCrop = await call('POST', '/api/crops', {
+        token: owner, farm: farmA,
+        body: { name: 'Invalid Cross-Farm Field Crop', status: 'Growing', fieldId: field.json._id },
+      });
+      ok(crossFieldCrop.status === 400, 'crop cycle cannot link to a field in another farm');
+      const invalidField = await call('POST', '/api/fields', {
+        token: owner, farm: farmB, body: { name: 'Invalid Area Field', acres: -1 },
+      });
+      ok(invalidField.status === 400, 'field acreage must be non-negative');
     }
 
     // Cross-farm access by id.
