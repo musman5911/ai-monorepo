@@ -37,10 +37,12 @@ export default function BreedingEventsPanel({ isAdmin }: { isAdmin: boolean }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [draft, setDraft] = useState<EventDraft>(emptyDraft());
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [bullSearch, setBullSearch] = useState('');
 
   const females = useMemo(() => cows.filter(c => c.gender !== 'male' && c.status !== 'sold' && c.status !== 'inactive' && c.status !== 'calf' && !c.isCalf), [cows]);
   const bulls = useMemo(() => cows.filter(c => c.gender === 'male' && c.status !== 'sold' && c.status !== 'calf' && !c.isCalf), [cows]);
   const cowNames = useMemo(() => Object.fromEntries(cows.map(c => [c._id, c.name])), [cows]);
+  const filteredBulls = useMemo(() => bulls.filter(b => `${b.name} ${b.breed}`.toLowerCase().includes(bullSearch.trim().toLowerCase())), [bulls, bullSearch]);
 
   const load = async () => {
     setLoading(true);
@@ -59,11 +61,13 @@ export default function BreedingEventsPanel({ isAdmin }: { isAdmin: boolean }) {
 
   const openNew = () => {
     setEditingId(null);
+    setBullSearch('');
     setDraft({ ...emptyDraft(), cowId: filterCow || females[0]?._id || '' });
     setModalOpen(true);
   };
   const openEdit = (event: BreedingEvent) => {
     setEditingId(event._id);
+    setBullSearch('');
     setDraft({
       cowId: event.cowId, type: event.type, date: event.date, sireSource: event.sireSource || '',
       bullId: event.bullId || '', bullName: event.bullName || '', semenCode: event.semenCode || '',
@@ -172,8 +176,8 @@ export default function BreedingEventsPanel({ isAdmin }: { isAdmin: boolean }) {
             <div><label className={label}>{L('Date')} *</label><input required type="date" className={field} value={draft.date} onChange={e => change('date', e.target.value)} /></div>
           </div>
           {(draft.type === 'service' || draft.type === 'pregnancy_check') && <>
-            <div><label className={label}>{L('Father source')}</label><select className={field} value={draft.sireSource} onChange={e => { const source = e.target.value as SireSource; setDraft(current => ({ ...current, sireSource: source, bullId: '', bullName: '', semenCode: '' })); }}><option value="">{L('Not recorded')}</option><option value="farm_bull">{L('Bull on this farm')}</option><option value="outside_bull">{L('Outside bull')}</option><option value="outside_straw">{L('Outside semen straw')}</option></select></div>
-            {draft.sireSource === 'farm_bull' && <div><label className={label}>{L('Choose a farm bull')} *</label><select required className={field} value={draft.bullId} onChange={e => change('bullId', e.target.value)}><option value="">{L('Choose a bull')}</option>{bulls.map(b => <option key={b._id} value={b._id}>{b.name} · {b.breed}</option>)}</select>{bulls.length === 0 && <p className="mt-1 text-amber-600">{L('No eligible farm bulls found.')}</p>}</div>}
+            <div><label className={label}>{L('Father source')}</label><select className={field} value={draft.sireSource} onChange={e => { const source = e.target.value as SireSource; setDraft(current => ({ ...current, sireSource: source, bullId: '', bullName: '', semenCode: '' })); setBullSearch(''); }}><option value="">{L('Not recorded')}</option><option value="farm_bull">{L('Bull on this farm')}</option><option value="outside_bull">{L('Outside bull')}</option><option value="outside_straw">{L('Outside semen straw')}</option></select></div>
+            {draft.sireSource === 'farm_bull' && <div><label className={label}>{L('Choose a farm bull')} *</label><input type="search" className={field} value={bullSearch} onChange={e => setBullSearch(e.target.value)} placeholder={L('Search farm bulls')} aria-label={L('Search farm bulls')} /><select required className={field + ' mt-2'} value={draft.bullId} onChange={e => change('bullId', e.target.value)}><option value="">{L('Choose a bull')}</option>{filteredBulls.map(b => <option key={b._id} value={b._id}>{b.name} · {b.breed}</option>)}</select>{bulls.length === 0 && <p className="mt-1 text-amber-600">{L('No eligible farm bulls found.')}</p>}{bulls.length > 0 && filteredBulls.length === 0 && <p className="mt-1 text-slate-500">{L('No matching bulls.')}</p>}</div>}
             {(draft.sireSource === 'outside_bull' || draft.sireSource === 'outside_straw') && <div><label className={label}>{L('Outside bull name')} *</label><input required maxLength={160} className={field} value={draft.bullName} onChange={e => change('bullName', e.target.value)} /></div>}
             {draft.sireSource === 'outside_straw' && <div><label className={label}>{L('Semen code')} *</label><input required maxLength={100} className={field} value={draft.semenCode} onChange={e => change('semenCode', e.target.value)} /></div>}
           </>}
