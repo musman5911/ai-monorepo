@@ -5,6 +5,10 @@ export interface Cow {
   name: string;
   breed: string;
   gender?: 'female' | 'male';
+  earTag?: string;
+  fatherId?: string;
+  fatherType?: 'farm' | 'outside';
+  fatherName?: string;
   birthDate?: string;
   ageYears?: number;
   weight?: number;
