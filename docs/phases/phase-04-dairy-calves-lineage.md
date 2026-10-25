@@ -31,6 +31,18 @@ A calving event creates the calf with gender, mother and father, so lineage is n
 
 - No change to milk or expense calculations.
 
+## Implementation checkpoint (2026-10-25)
+
+Initial implementation is on `muf-monorepo`:
+
+- Calving events accept calf entries with gender, optional ear tag and outcome (`live` or `stillbirth`).
+- The server creates one farm-scoped Cow record for each live entry, links the mother and available sire, records the source event, normalizes ear tags, checks duplicates within the selected farm, and rolls back created calves/event if creation fails.
+- Events with generated calves reject unsafe changes to calf identity/date/sire and reject deletion to avoid orphaning calf records; ordinary notes/result edits remain allowed.
+- The cow detail summary now returns the registered farm bull, and the lineage section displays mother, father (registered or outside sire) and offspring.
+- The calving form supports multiple calf entries, gender, ear tags and stillbirth outcomes.
+- Added `tests/dairy-calving-creates-calf.test.ts` and expanded the existing HTTP memory-mode breeding checker. `npm run check-farms` already invokes that runtime checker, so the new Phase 4 checks run as part of it.
+- **Not yet verified:** no tests, checker, docs check or builds have been run after these code changes in this editing session. Do not mark this phase Done until the owner runs the end-of-phase commands locally and records the actual output in `docs/PROGRESS.md`.
+
 ## Steps
 
 1. Write the calving-to-calf rules in this file.
