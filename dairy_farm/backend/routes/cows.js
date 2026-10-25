@@ -302,6 +302,7 @@ router.get('/:id/summary', protect, async (req, res) => {
     });
 
     const mother = cow.motherId ? await Cow.findById(cow.motherId) : null;
+    const father = cow.fatherId && cow.fatherType === 'farm' ? await Cow.findById(cow.fatherId) : null;
 
     // Lifetime: saleable liters only. totalDirectExpenses excludes purchasing.
     // Medicine auto-created from health is already inside expenses — do NOT also add health.cost into profit.
