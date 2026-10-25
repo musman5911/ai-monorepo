@@ -34,7 +34,7 @@ describe('Phase 4 Dairy calving creates calves and preserves lineage', () => {
 
   it('enforces farm-scoped ear-tag uniqueness and records stillbirth without creating a live calf', () => {
     expect(routes).toContain('const taggedCows = await Cow.find({ farmId, earTag: { $ne: \'\' } }).lean()');
-    expect(routes).toContain('toLocaleLowerCase() === earTag.toLocaleLowerCase()');
+    expect(routes).toContain('String(cow.earTag || \'\').trim().toLocaleLowerCase() === normalizedTag');
     expect(routes).toContain("if (entry.outcome === 'stillbirth') continue");
     expect(checker).toContain('duplicate ear tag is refused within the same farm');
     expect(checker).toContain('same ear tag is allowed in a different farm');
