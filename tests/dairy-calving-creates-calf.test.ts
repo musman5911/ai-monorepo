@@ -38,7 +38,7 @@ describe('Phase 4 Dairy calving creates calves and preserves lineage', () => {
     expect(routes).toContain("if (entry.outcome === 'stillbirth') continue");
     expect(checker).toContain('duplicate ear tag is refused within the same farm');
     expect(checker).toContain('same ear tag is allowed in a different farm');
-    expect(checker).toContain('twins and excludes stillbirth');
+    expect(checker).toContain('calving creates one live calf record per twin and excludes stillbirth');
   });
 
   it('returns and displays mother, father and offspring in the cow lineage section', () => {
