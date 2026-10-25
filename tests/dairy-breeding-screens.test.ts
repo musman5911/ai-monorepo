@@ -57,6 +57,7 @@ describe('Phase 3 Dairy breeding event screens', () => {
     expect(panel).toContain('size="big"');
     expect(panel).toContain("'muf-field'");
     expect(panel).toContain("'muf-label block mb-1'");
+    expect(panel).toContain('muf-pc-form-grid');
     expect(panel).toContain('useConfirm');
   });
 
