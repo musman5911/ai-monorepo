@@ -19,6 +19,7 @@ export function getEmptyCropForm() {
     plant_date: '',
     harvest_date: '',
     field: '',
+    fieldId: '',
     yield_kg: '',
     yield_unit: 'kg',
     area_kanal: '1.0',
