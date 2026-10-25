@@ -11,7 +11,7 @@ let baseUrl = '';
 let ownerToken = '';
 let workerToken = '';
 let managerToken = '';
-const created = { crops: [], tasks: [], finance: [] };
+const created = { crops: [], tasks: [], finance: [], fields: [] };
 
 async function reservePort() {
   const server = createServer();
@@ -119,6 +119,7 @@ describe.sequential('Agri runtime API integration', () => {
       for (const id of created.finance) await request(`/finance/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.tasks) await request(`/tasks/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.crops) await request(`/crops/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
+      for (const id of created.fields) await request(`/fields/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
     }
     if (serverProcess && serverProcess.exitCode === null) {
       serverProcess.kill('SIGTERM');
@@ -147,6 +148,70 @@ describe.sequential('Agri runtime API integration', () => {
 
     const workerFinance = await request('/finance?skip=0&limit=1', { token: workerToken });
     expect(workerFinance.response.status).toBe(403);
+  });
+
+  it('keeps fields farm-scoped and groups linked finance by field and season', async () => {
+    const suffix = `field-cycle-${process.pid}-${Date.now()}`;
+    const fieldResult = await request('/fields', {
+      method: 'POST',
+      token: ownerToken,
+      body: { name: suffix, acres: 2.5, notes: 'Phase 5 integration fixture' },
+    });
+    expect(fieldResult.response.status).toBe(201);
+    expect(fieldResult.data.name).toBe(suffix);
+    expect(fieldResult.data.acres).toBe(2.5);
+    created.fields.push(String(fieldResult.data._id));
+
+    const duplicate = await request('/fields', {
+      method: 'POST',
+      token: ownerToken,
+      body: { name: suffix, acres: 1 },
+    });
+    expect(duplicate.response.status).toBe(409);
+
+    const invalid = await request('/fields', {
+      method: 'POST',
+      token: ownerToken,
+      body: { name: `${suffix}-invalid`, acres: -1 },
+    });
+    expect(invalid.response.status).toBe(400);
+
+    const cropResult = await request('/crops', {
+      method: 'POST',
+      token: ownerToken,
+      body: { name: `${suffix}-crop`, status: 'Growing', fieldId: String(fieldResult.data._id), season: 'Kharif', crop_year: '2026' },
+    });
+    expect(cropResult.response.status).toBe(201);
+    created.crops.push(String(cropResult.data._id));
+
+    const financeResult = await request('/finance', {
+      method: 'POST',
+      token: ownerToken,
+      body: { category: 'Phase 5 field expense', type: 'expense', amount: 23, date: '2026-10-25', fieldId: String(fieldResult.data._id), cropCycleId: String(cropResult.data._id) },
+    });
+    expect(financeResult.response.status).toBe(201);
+    const financeRows = await request('/finance?limit=500', { token: ownerToken });
+    const financeRow = financeRows.data.find((row) => row.category === 'Phase 5 field expense');
+    expect(financeRow).toBeTruthy();
+    created.finance.push(String(financeRow._id));
+
+    const cropPage = await request(`/crops?fieldId=${fieldResult.data._id}`, { token: ownerToken });
+    expect(cropPage.response.status).toBe(200);
+    expect(cropPage.data.some((row) => String(row._id) === String(cropResult.data._id))).toBe(true);
+
+    const analytics = await request('/analytics/summary', { token: ownerToken });
+    expect(analytics.response.status).toBe(200);
+    const fieldSummary = analytics.data.financeSummary.byField.find((row) => row.field === suffix);
+    expect(fieldSummary).toMatchObject({ income: 0, expense: 23, net: -23 });
+    const seasonSummary = analytics.data.financeSummary.bySeason.find((row) => row.season === 'Kharif');
+    expect(seasonSummary).toMatchObject({ income: 0, expense: 23, net: -23 });
+
+    const fields = await request('/fields', { token: ownerToken });
+    expect(fields.response.status).toBe(200);
+    expect(fields.data.some((row) => String(row._id) === String(fieldResult.data._id))).toBe(true);
+
+    const deletedWhileLinked = await request(`/fields/${fieldResult.data._id}`, { method: 'DELETE', token: ownerToken });
+    expect(deletedWhileLinked.response.status).toBe(409);
   });
 
   it('serves bounded, ordered crop/task/finance pages with real response metadata', async () => {
