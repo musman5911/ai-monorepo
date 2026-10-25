@@ -339,6 +339,7 @@ router.get('/:id/summary', protect, async (req, res) => {
       health,
       offspring,
       mother,
+      father,
       sale,
       lifetime: {
         purchasePrice,
