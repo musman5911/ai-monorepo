@@ -27,12 +27,17 @@ router.get('/crops', protect, asyncHandler(async (req, res) => {
   const season = readFilter(req.query.season);
   const cropYear = readFilter(req.query.crop_year);
   const field = readFilter(req.query.field);
+  const fieldId = readFilter(req.query.fieldId);
   const cropId = readFilter(req.query.crop_id);
   const search = readFilter(req.query.search).slice(0, 100);
   if (status && status !== 'all') clauses.push({ status });
   if (season && season !== 'all') clauses.push({ season });
   if (cropYear && cropYear !== 'all') clauses.push({ crop_year: cropYear });
   if (field && field !== 'all') clauses.push({ field });
+  if (fieldId && fieldId !== 'all') {
+    if (!/^[0-9a-fA-F]{24}$/.test(fieldId)) return res.status(400).json({ error: 'fieldId must be a valid field ID' });
+    clauses.push({ fieldId });
+  }
   if (cropId && cropId !== 'all') {
     if (!/^[0-9a-fA-F]{24}$/.test(cropId)) return res.status(400).json({ error: 'crop_id must be a valid crop ID' });
     clauses.push({ _id: cropId });
