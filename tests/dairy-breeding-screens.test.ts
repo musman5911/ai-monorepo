@@ -34,7 +34,9 @@ describe('Phase 3 Dairy breeding event screens', () => {
     expect(panel).toContain("value=\"farm_bull\"");
     expect(panel).toContain("value=\"outside_bull\"");
     expect(panel).toContain("value=\"outside_straw\"");
-    expect(panel).toContain('bulls.map');
+    expect(panel).toContain('filteredBulls.map');
+    expect(panel).toContain('type="search"');
+    expect(panel).toContain("L('Search farm bulls')");
     expect(panel).toContain("L('Outside bull name')");
     expect(panel).toContain("L('Semen code')");
     expect(panel).toContain('api.getCows()');
