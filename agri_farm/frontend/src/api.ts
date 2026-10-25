@@ -100,6 +100,10 @@ export const resetPassword = (email, code, newPassword) => {
 
 // --- CROPS ROUTES ---
 export const getAnalyticsSummary = () => api.get('/analytics/summary');
+export const getFields = () => api.get('/fields');
+export const addField = (field) => api.post('/fields', field);
+export const updateField = (id, field) => api.put(`/fields/${id}`, field);
+export const deleteField = (id) => api.delete(`/fields/${id}`);
 export const getCrops = (skip = 0, limit = 100, filters = {}) => api.get(`/crops?${buildAgriPageQuery(skip, limit, filters)}`);
 export const addCrop = (crop) => api.post('/crops', crop);
 export const updateCrop = (id, crop) => api.put(`/crops/${id}`, crop);
