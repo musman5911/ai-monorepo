@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-25 (Phase 3 closed; Phase 4 started).
+Last updated: 2026-10-25 (Phase 4 implementation checks recorded; failures remain).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -14,7 +14,7 @@ Last updated: 2026-10-25 (Phase 3 closed; Phase 4 started).
 | 1 | Super Admin: owner only, per-farm summaries | Done | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
 | 2 | Dairy breeding events: server | Done | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Done | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
-| 4 | Dairy calves and lineage | Not started | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
+| 4 | Dairy calves and lineage | In progress | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
 | 5 | Agri fields and crop cycles: server | Not started | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Not started | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Not started | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
@@ -134,3 +134,19 @@ These are owner-reported results from the pasted CMD output, not commands run in
 | `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
 
 The owner then reran `npm run check-ui`, which passed. `npm test` passed again with 26 files / 249 tests; `check-sync`, `check-workbench` (23 checks), `check-farms`, and all three production builds passed. The `check-docs` rerun exposed missing required headings in the Phase 3 document. Those sections have now been restored on `muf-monorepo`; `npm run check-docs` must be rerun locally before Phase 3 can be marked Done. All results above are owner-reported Windows CMD output, not commands executed in this editing session.
+
+## Phase 4 local verification checkpoint (2026-10-25, Windows CMD; output supplied by owner)
+
+| Command | Result |
+|---|---|
+| `git pull origin muf-monorepo` | Passed: fast-forward from `ba24110` to `9aba98d`; 13 files updated |
+| `npm test -- tests/dairy-calving-creates-calf.test.ts` | Passed: 1 file, 5 tests |
+| `npm test` | Passed: 27 files, 254 tests |
+| `npm run check-sync` | Passed: all shared MUF twins and three-app invariants |
+| `npm run check-ui` | **Failed:** one Dairy popup element still uses a Tailwind pattern that should use a `muf-pc-*` class; Flock and Agri checks passed |
+| `npm run check-workbench` | Passed: all 23 workbench source checks |
+| `npm run check-farms` | **Failed in Dairy breeding runtime checks:** event edit, legacy cow date resynchronization after edit, and allowing the same ear tag in a different farm. Farm-scope checks passed; other listed breeding checks passed |
+| `npm run check-docs` | **Failed:** Phase 4 status in the phase file was In progress, but the phase index still said Not started. Index and roadmap status are being corrected in this documentation update |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+
+These results are from the owner's pasted Windows CMD output. The focused and full test suites pass, but Phase 4 remains **In progress** because UI safety and three runtime checks fail. Fix those failures, rerun the affected checks, then rerun `npm run check-docs` and the full end-of-phase suite before considering completion.
