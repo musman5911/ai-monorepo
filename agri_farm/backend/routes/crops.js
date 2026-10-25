@@ -1,6 +1,6 @@
 // ─── Crop routes (mirrors the previous FastAPI backend) ─────────────────────
 import express from 'express';
-import { Crop, CropPhoto, Spray } from '../db.js';
+import { Crop, CropPhoto, Spray, Field } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { mufIsFullRole } from '../muf-farms.mjs';
@@ -70,14 +70,33 @@ router.get('/crops', protect, asyncHandler(async (req, res) => {
   return res.json(out);
 }));
 
+async function validateFieldLink(body) {
+  const fieldId = String(body?.fieldId || '').trim();
+  if (!fieldId) return { ok: true, fieldId: '' };
+  if (!/^[0-9a-fA-F]{24}$/.test(fieldId)) return { ok: false, message: 'fieldId must be a valid field ID' };
+  const field = await Field.findOne({ _id: fieldId });
+  if (!field) return { ok: false, message: 'Field must exist in the selected farm' };
+  return { ok: true, fieldId };
+}
+
 router.post('/crops', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const doc = (await Crop.insertMany([req.body || {}]))[0];
+  const link = await validateFieldLink(req.body || {});
+  if (!link.ok) return badRequest(res, link.message);
+  const payload = { ...(req.body || {}) };
+  if (link.fieldId) payload.fieldId = link.fieldId;
+  else delete payload.fieldId;
+  const doc = (await Crop.insertMany([payload]))[0];
   return res.status(201).json({ ...doc, _id: String(doc._id) });
 }));
 
 router.put('/crops/:cropId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.cropId, 'crop ID');
-  const result = await replaceFarmRecord(Crop, oid, req.body || {});
+  const link = await validateFieldLink(req.body || {});
+  if (!link.ok) return badRequest(res, link.message);
+  const payload = { ...(req.body || {}) };
+  if (link.fieldId) payload.fieldId = link.fieldId;
+  else delete payload.fieldId;
+  const result = await replaceFarmRecord(Crop, oid, payload);
   if (!result.matchedCount) return notFound(res, 'Crop not found');
   return res.json({ ...(req.body || {}), _id: oid });
 }));
