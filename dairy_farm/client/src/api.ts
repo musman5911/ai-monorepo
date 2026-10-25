@@ -270,6 +270,11 @@ export const api = {
   telegramSaveSettings: (data: { dailySummary?: boolean; dropPct?: number }) => req('/telegram/settings', { method: 'PUT', body: JSON.stringify(data) }),
   telegramSendSummary: () => req('/telegram/send-summary', { method: 'POST' }),
   getBreeding: () => req('/breeding'),
+  getBreedingEvents: (p?: { cowId?: string; type?: string; page?: number; limit?: string; from?: string; to?: string }) =>
+    req('/breeding/events' + qs({ ...p, page: p?.page == null ? undefined : String(p.page) })),
+  addBreedingEvent: (data: object) => req('/breeding/events', { method: 'POST', body: JSON.stringify(data) }),
+  updateBreedingEvent: (id: string, data: object) => req(`/breeding/events/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
+  deleteBreedingEvent: (id: string) => req(`/breeding/events/${id}`, { method: 'DELETE' }),
   // Supplier khata (money going out)
   getSuppliers: () => req('/suppliers'),
   addSupplier: (data: object) => req('/suppliers', { method: 'POST', body: JSON.stringify(data) }),
