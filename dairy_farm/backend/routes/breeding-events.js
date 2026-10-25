@@ -53,7 +53,7 @@ function eventPayload(body, { partial = false } = {}) {
       if (new Set(tags).size !== tags.length) errors.push('Calf ear tags must be unique within this calving event');
     }
   }
-  if (payload.calves !== undefined && payload.type !== undefined && payload.type !== 'calving') {
+  if (payload.calves !== undefined && payload.calves.length > 0 && payload.type !== undefined && payload.type !== 'calving') {
     errors.push('Calf entries are only allowed on a calving event');
   }
   return { payload, errors };
