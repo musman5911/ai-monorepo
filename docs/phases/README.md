@@ -8,8 +8,8 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 1 | Super Admin: owner only, per-farm summaries | Done | [phase-01-super-admin-owner-only.md](phase-01-super-admin-owner-only.md) |
 | 2 | Dairy breeding events: server | Done | [phase-02-dairy-breeding-events-server.md](phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Done | [phase-03-dairy-breeding-screens.md](phase-03-dairy-breeding-screens.md) |
-| 4 | Dairy calves and lineage | In progress | [phase-04-dairy-calves-lineage.md](phase-04-dairy-calves-lineage.md) |
-| 5 | Agri fields and crop cycles: server | Not started | [phase-05-agri-fields-cycles-server.md](phase-05-agri-fields-cycles-server.md) |
+| 4 | Dairy calves and lineage | Done | [phase-04-dairy-calves-lineage.md](phase-04-dairy-calves-lineage.md) |
+| 5 | Agri fields and crop cycles: server | In progress | [phase-05-agri-fields-cycles-server.md](phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Not started | [phase-06-agri-fields-cycles-screens.md](phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Not started | [phase-07-telegram-daily-summary-per-farm.md](phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Not started | [phase-08-photo-storage-adapter.md](phase-08-photo-storage-adapter.md) |
