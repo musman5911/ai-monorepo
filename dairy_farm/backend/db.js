@@ -113,6 +113,8 @@ const CowSchema = new mongoose.Schema({
   batch: { type: String, default: '' },
   motherId: { type: String, default: '' },
   isCalf: { type: Boolean, default: false },
+  // Source calving event prevents duplicate calf creation and protects lineage lifecycle.
+  calvingEventId: { type: String, default: '' },
   // Marketplace: asking price when the animal is up for sale, plus notes
   // about interested buyers and their offers.
   expectedPrice: { type: Number, default: 0 },
@@ -158,6 +160,9 @@ const BreedingEventSchema = new mongoose.Schema({
   technician: { type: String, default: '' },
   result: { type: String, default: '' },
   notes: { type: String, default: '' },
+  // Each calving entry is either a live calf or a stillbirth outcome.
+  calves: { type: [{ gender: { type: String, enum: ['female', 'male'], default: 'female' }, earTag: { type: String, default: '' }, outcome: { type: String, enum: ['live', 'stillbirth'], default: 'live' } }], default: [] },
+  generatedCalfIds: { type: [String], default: [] },
 }, { timestamps: true });
 
 const MilkSchema = new mongoose.Schema({
