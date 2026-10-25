@@ -1,6 +1,6 @@
 // ─── Finance ledger routes — money-sensitive, admin-only ────────────────────
 import express from 'express';
-import { Finance, Crop } from '../db.js';
+import { Finance, Crop, Field } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
@@ -76,6 +76,8 @@ router.post('/finance/bulk', protect, requireAdmin, asyncHandler(async (req, res
     return {
       category, type, amount, date,
       crop_id: String(row.crop_id || '').trim() || null,
+      fieldId: String(row.fieldId || '').trim() || null,
+      cropCycleId: String(row.cropCycleId || '').trim() || null,
       notes: String(row.notes || '').trim(),
     };
   });
@@ -84,14 +86,34 @@ router.post('/finance/bulk', protect, requireAdmin, asyncHandler(async (req, res
     if (row.crop_id && (!/^[0-9a-fA-F]{24}$/.test(row.crop_id) || !(await Crop.findOne({ _id: row.crop_id })))) {
       errors.push({ row: index + 2, message: 'Crop must exist in the selected farm.' });
     }
+    if (row.fieldId && (!/^[0-9a-fA-F]{24}$/.test(row.fieldId) || !(await Field.findOne({ _id: row.fieldId })))) {
+      errors.push({ row: index + 2, message: 'Field must exist in the selected farm.' });
+    }
+    if (row.cropCycleId && (!/^[0-9a-fA-F]{24}$/.test(row.cropCycleId) || !(await Crop.findOne({ _id: row.cropCycleId })))) {
+      errors.push({ row: index + 2, message: 'Crop cycle must exist in the selected farm.' });
+    }
   }
   if (errors.length) return res.status(400).json({ error: 'Bulk finance validation failed', details: errors });
   const inserted = await Finance.insertMany(prepared);
   return res.status(201).json({ status: 'ok', inserted: inserted.length });
 }));
 
+async function validateFinanceLinks(entry) {
+  const fieldId = String(entry.fieldId || '').trim();
+  const cropCycleId = String(entry.cropCycleId || '').trim();
+  if (fieldId && (!/^[0-9a-fA-F]{24}$/.test(fieldId) || !(await Field.findOne({ _id: fieldId })))) {
+    return 'Field must exist in the selected farm.';
+  }
+  if (cropCycleId && (!/^[0-9a-fA-F]{24}$/.test(cropCycleId) || !(await Crop.findOne({ _id: cropCycleId })))) {
+    return 'Crop cycle must exist in the selected farm.';
+  }
+  return '';
+}
+
 router.post('/finance', protect, requireAdmin, asyncHandler(async (req, res) => {
   const entry = { ...(req.body || {}) };
+  const linkError = await validateFinanceLinks(entry);
+  if (linkError) return res.status(400).json({ error: linkError });
   if (!entry.date) entry.date = todayStr();
   await Finance.insertMany([entry]);
   return res.status(201).json({ status: 'ok' });
@@ -100,6 +122,8 @@ router.post('/finance', protect, requireAdmin, asyncHandler(async (req, res) => 
 router.put('/finance/:financeId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.financeId, 'finance ID');
   const entry = { ...(req.body || {}) };
+  const linkError = await validateFinanceLinks(entry);
+  if (linkError) return res.status(400).json({ error: linkError });
   if (!entry.date) entry.date = todayStr();
   const result = await replaceFarmRecord(Finance, oid, entry);
   if (!result.matchedCount) return notFound(res, 'Finance entry not found');
