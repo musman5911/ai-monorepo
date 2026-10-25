@@ -33,7 +33,7 @@ const ADMIN_AVATAR = U('photo-1673538064388-21d1aaaf6594'); // farmer in a field
 const WORKER_AVATAR = U('photo-1696371268939-5c5710319bde'); // farm worker with a bucket
 
 async function seedDemoData({
-  Farm, User, Crop, Finance, Task, Inventory, Liability, Irrigation,
+  Farm, User, Field, Crop, Finance, Task, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance,
   Supplier, SupplierPayment,
 }) {
@@ -74,6 +74,15 @@ async function seedDemoData({
       farmIds: [String(farm2._id)], password: bcrypt.hashSync('worker2123', 12), avatar_base64: WORKER_AVATAR,
     },
   ]);
+
+  // ---------------------------------------------------------------- FIELDS
+  const fieldSeeds = [
+    { name: 'Sector 1A', acres: 1.5, notes: 'North boundary plots' },
+    { name: 'Sector 2B', acres: 2.0, notes: 'Rice and water-intensive crops' },
+    { name: 'Sector 3C', acres: 1.0, notes: 'Corn rotation plots' },
+  ];
+  const seededFields = await Field.insertMany(fieldSeeds.map((field) => ({ ...field, farmId: String(farm1._id) })));
+  const fieldIdByName = new Map(seededFields.map((field) => [field.name, String(field._id)]));
 
   // ---------------------------------------------------------------- CROPS
   // Dates are anchored to "today" ~ Aug 2026 so date-driven progress bars
@@ -131,7 +140,10 @@ async function seedDemoData({
   // Demo photos: a real picture per crop (same image for both corn cycles).
   const cropPhoto = ['corn', 'wheat', 'rice', 'corn', 'bajra', 'mattar'];
   crops.forEach((c, i) => { c.image_base64 = CROP_IMG[cropPhoto[i]] || ''; });
-  const cropDocs = await Crop.insertMany(crops);
+  const cropDocs = await Crop.insertMany(crops.map((crop) => ({
+    ...crop,
+    fieldId: fieldIdByName.get(String(crop.field || '')) || undefined,
+  })));
   const [corn25Id, wheatId, riceId, cornId, bajraId, mattarId] = cropDocs.map((d) => String(d._id));
 
   // ------------------------------------------------------------- FINANCE
