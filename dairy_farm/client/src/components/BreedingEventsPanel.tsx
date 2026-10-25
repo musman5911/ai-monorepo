@@ -171,7 +171,7 @@ export default function BreedingEventsPanel({ isAdmin }: { isAdmin: boolean }) {
       <DetailModal open={modalOpen} onClose={() => setModalOpen(false)} title={L(editingId ? 'Edit breeding event' : 'Add breeding event')} subtitle={L('Breeding records stay attached to the selected farm.')} icon={<CalendarHeart className="w-5 h-5" />} iconBg="bg-pink-100 text-pink-700" size="big">
         <form onSubmit={save} className="space-y-3 text-xs">
           <div><label className={label}>{L('Cow')} *</label><select required className={field} value={draft.cowId} onChange={e => change('cowId', e.target.value)}><option value="">{L('Choose a cow')}</option>{females.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}</select></div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="muf-pc-form-grid">
             <div><label className={label}>{L('Event type')} *</label><select required className={field} value={draft.type} onChange={e => change('type', e.target.value as EventType)}>{(Object.keys(TYPE_LABEL) as EventType[]).map(type => <option key={type} value={type}>{L(TYPE_LABEL[type])}</option>)}</select></div>
             <div><label className={label}>{L('Date')} *</label><input required type="date" className={field} value={draft.date} onChange={e => change('date', e.target.value)} /></div>
           </div>
