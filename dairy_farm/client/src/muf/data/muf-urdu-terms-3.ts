@@ -311,4 +311,6 @@ export const MUF_URDU_PART_3: Record<string, string> = {
   "All event types": "تمام اقسام",
   "Bull on this farm": "اس فارم کا بیل",
   "Outside bull name": "باہر کے بیل کا نام",
+  "Search farm bulls": "فارم کے بیل تلاش کریں",
+  "No matching bulls.": "کوئی مماثل بیل نہیں ملا۔",
 };
