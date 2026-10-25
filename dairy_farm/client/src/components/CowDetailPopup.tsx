@@ -21,6 +21,7 @@ interface CowSummary {
   health: HealthRecord[];
   offspring: Cow[];
   mother: Cow | null;
+  father: Cow | null;
   sale: { salePrice: number; date?: string } | null;
   lifetime: CowLifetime;
 }
@@ -98,7 +99,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
 
   if (!data) return null;
 
-  const { cow, milk, expenses, health, offspring, mother } = data;
+  const { cow, milk, expenses, health, offspring, mother, father } = data;
   const milkRev30 = calcRevenueWithHistory(milk.records30, rateHistory, rate, rateDate);
 
   return (
@@ -166,12 +167,13 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
           </div>
 
           {/* ── Mother / Offspring ────────────────── */}
-          {(mother || offspring.length > 0) && (
+          {(mother || father || cow.fatherName || offspring.length > 0) && (
             <div className="bg-pink-50 dark:bg-pink-900/10 border border-pink-200 dark:border-pink-800 rounded-lg p-4">
               <h4 className="text-xs font-semibold text-pink-700 dark:text-pink-400 uppercase tracking-wider mb-2 flex items-center gap-1">
                 <Baby className="w-3.5 h-3.5" /> Lineage
               </h4>
               {mother && <p className="text-sm text-slate-700 dark:text-slate-300">{L('Mother:')} <span className="font-medium">{mother.name}</span> ({mother.breed})</p>}
+              {(father || cow.fatherName) && <p className="text-sm text-slate-700 dark:text-slate-300">{L('Father:')} <span className="font-medium">{father?.name || cow.fatherName}</span>{father?.breed ? ` (${father.breed})` : cow.fatherType === 'outside' ? ` (${L('Outside bull/straw')})` : ''}</p>}
               {cow.nursingUntil && (
                 <p className="text-sm text-slate-700 dark:text-slate-300">{L('Nursing until:')} <span className="font-medium">{cow.nursingUntil}</span></p>
               )}
