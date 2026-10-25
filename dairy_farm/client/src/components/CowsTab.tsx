@@ -388,7 +388,7 @@ export default function CowsTab({ isAdmin }: CowsTabProps) {
               </div>
             } />
             <div className="md:col-span-3"><Field label={L('Notes')} children={<textarea rows={2} className="muf-field" value={formData.notes} onChange={e => setFormData({ ...formData, notes: e.target.value })} />} /></div>
-            <div className="md:col-span-3 flex justify-end gap-3 pt-2">
+            <div className="md:col-span-3 muf-pc-actions">
               <button type="button" onClick={() => { setShowForm(false); resetForm(); }} className="px-4 py-2 text-sm text-slate-600 hover:text-slate-800">{L('Cancel')}</button>
               <button type="submit" className="bg-farm-600 hover:bg-farm-700 text-white rounded-lg px-6 py-2 text-sm font-medium flex items-center gap-2"><Save className="h-4 w-4" /> {editingCow ? L('Update') : L('Save')}</button>
             </div>
