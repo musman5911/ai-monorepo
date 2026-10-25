@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-25 (Phase 4 command-line checks passed; Phase 5 started).
+Last updated: 2026-10-25 (Phase 4 command-line scope complete; Phase 5 implementation started, verification pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -169,3 +169,16 @@ Phase 4, Dairy calves and lineage, is **Done for the command-line scope**. The l
 The latest full-suite run also confirms the stale source-string assertion in `tests/dairy-calving-creates-calf.test.ts` has been corrected. Results above are owner-reported from the pasted Windows CMD output, not independently executed in this editing session. `npm ci` and the optional `npm run check-workbench-runtime` were not reported as run for this checkpoint. No real-MongoDB, browser/mobile or live-site verification is claimed; those remain in Phases 19 to 21.
 
 Phase 5, **Agri fields and crop cycles: server**, is now **In progress**. Work is limited to the server/data layer: farm-scoped fields, optional crop field/season links, field/season financial summaries, and backup/restore/demo/farm-deletion integration. UI work remains in Phase 6.
+
+
+## Phase 5 implementation checkpoint (2026-10-25; verification pending)
+
+Phase 5, **Agri fields and crop cycles: server**, is **In progress**. Initial implementation has been committed to `muf-monorepo`:
+
+- Added a farm-scoped `Field` model and CRUD API for field name, acres and notes.
+- Added optional `fieldId` links on crop cycles and finance entries, and `cropCycleId` on finance entries, with same-farm link validation.
+- Added field/season finance breakdowns to `/analytics/summary`, including a farm-wide/unassigned group for unlinked ledger entries.
+- Included fields in backup/restore, shared farm migration/deletion model lists and memory-mode demo data.
+- Added a Phase 5 contract test, extended Agri HTTP integration coverage, and added field farm-isolation checks to `tools/check-farm-scope.js` (executed by `npm run check-farms`).
+
+**No Phase 5 commands have been executed after these changes in this editing session.** The owner must pull the latest branch and run the Phase 5 command list before this phase can be marked Done. In particular, the full test suite, farm/UI/sync/workbench/docs checks and all three builds are still unverified against this implementation.
