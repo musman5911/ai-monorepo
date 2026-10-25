@@ -100,7 +100,11 @@ router.put('/crops/:cropId', protect, requireAdmin, asyncHandler(async (req, res
   if (!link.ok) return badRequest(res, link.message);
   const payload = { ...(req.body || {}) };
   if (link.fieldId) payload.fieldId = link.fieldId;
-  else delete payload.fieldId;
+  else if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'fieldId')) {
+    const existing = await Crop.findOne({ _id: oid });
+    if (existing?.fieldId) payload.fieldId = String(existing.fieldId);
+    else delete payload.fieldId;
+  } else delete payload.fieldId;
   const result = await replaceFarmRecord(Crop, oid, payload);
   if (!result.matchedCount) return notFound(res, 'Crop not found');
   return res.json({ ...(req.body || {}), _id: oid });
