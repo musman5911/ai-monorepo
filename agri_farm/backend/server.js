@@ -17,6 +17,7 @@ import { protectUnscoped, ownerOnly } from './middleware/auth.js';
 import authRoutes from './routes/auth.js';
 import { automationsRouter, startScheduler } from './routes/automations.js';
 import cropsRoutes from './routes/crops.js';
+import fieldsRoutes from './routes/fields.js';
 import financeRoutes from './routes/finance.js';
 import tasksRoutes from './routes/tasks.js';
 import analyticsRoutes from './routes/analytics.js';
@@ -121,6 +122,7 @@ const apiRouters = [
   authRoutes,
   automationsRouter,
   cropsRoutes,
+  fieldsRoutes,
   financeRoutes,
   tasksRoutes,
   analyticsRoutes,
