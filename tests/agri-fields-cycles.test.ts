@@ -36,7 +36,7 @@ describe('Agri fields and crop-cycle server contracts', () => {
   it('links finance to optional fields and crop cycles and groups analytics', () => {
     const finance = read('agri_farm/backend/routes/finance.js');
     const analytics = read('agri_farm/backend/routes/analytics.js');
-    expect(finance).toContain('fieldId: String(row.fieldId ||').toBeTruthy;
+    expect(finance).toContain("fieldId: String(row.fieldId || '').trim() || null");
     expect(finance).toContain('async function validateFinanceLinks');
     expect(finance).toContain('Crop cycle must exist in the selected farm.');
     expect(analytics).toContain('byField: [...byFieldTotals.values()]');
