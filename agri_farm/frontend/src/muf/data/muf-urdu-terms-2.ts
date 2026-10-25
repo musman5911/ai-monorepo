@@ -319,4 +319,7 @@ export const MUF_URDU_PART_2: Record<string, string> = {
   "Pregnancy check": "حمل کی جانچ",
   "Record heat, service, pregnancy checks and calving for each cow.": "ہر گائے کی ہیٹ، ملاپ، حمل کی جانچ اور بچہ دینے کا ریکارڈ درج کریں۔",
   "Result": "نتیجہ",
+  "Enter the outside bull name": "باہر کے بیل کا نام درج کریں",
+  "Enter the semen code": "سیمن کوڈ درج کریں",
+  "Refresh": "تازہ کریں",
 };
