@@ -54,6 +54,12 @@ Phase 3 is marked Done after the owner supplied a passing `npm run check-docs` o
 
 Phase 4, Dairy calves and lineage, is now **In progress**. Work starts with a repository audit of the existing breeding-event API, Cow schema, farm-scoping model, event edit/delete behavior, and cow detail popup before implementing automatic calf creation. No Phase 4 implementation tests or builds have been run yet in this editing session.
 
+## Phase 4 implementation checkpoint (2026-10-25)
+
+Phase 4 is **In progress**. Initial implementation is committed on `muf-monorepo`: server-side live-calf creation from calving entries, stillbirth exclusion from live-calf records, farm-scoped normalized ear-tag checks, rollback on calf/event creation failure, safe restrictions for edits/deletes of events with generated calves, and father display in the cow lineage popup. The calving form now supports multiple calf entries and outcomes. Added `tests/dairy-calving-creates-calf.test.ts` and extended the memory-mode HTTP checker that is invoked by `npm run check-farms`.
+
+**Verification status:** no Phase 4 test, runtime checker, `npm run check-docs`, or production build has been run after these changes in this editing session. The code is not yet verified and Phase 4 must not be marked Done until the owner runs the standard commands locally and records the actual output. Potentially important edge cases to inspect during that run include memory-mode behavior, farm-B fixture data, and the UI build/type check.
+
 ## Earlier baseline verification (2026-10-24, Linux sandbox, uploaded `muf-monorepo` snapshot)
 
 | Command | Result |
