@@ -3625,6 +3625,32 @@ function App() {
               </section>
 
               <div className="mb-3 flex justify-end"><button type="button" onClick={() => setShowFieldsPanel(true)} className="rounded-xl border border-farm-300 px-3 py-2 text-xs font-bold text-farm-700 hover:bg-farm-50 dark:border-farm-800 dark:text-farm-300 dark:hover:bg-farm-950/30">{L('Manage Fields')}</button></div>
+              <section className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2" aria-label={L('Field and season profitability')}>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+                  <h3 className="mb-3 text-sm font-black">{L('Profit by field')}</h3>
+                  <div className="space-y-2">
+                    {(analyticsSummary?.financeSummary?.byField || []).map(row => (
+                      <div key={row.field} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 p-3 text-xs dark:bg-slate-800/60">
+                        <span className="min-w-0 break-words font-semibold">{row.field}</span>
+                        <span className={row.income - row.expense >= 0 ? 'shrink-0 font-bold text-emerald-700 dark:text-emerald-400' : 'shrink-0 font-bold text-red-600'}>Rs. {formatCurrency(row.income - row.expense)}</span>
+                      </div>
+                    ))}
+                    {!(analyticsSummary?.financeSummary?.byField || []).length && <p className="text-xs text-slate-500">{L('No field-linked finance data yet.')}</p>}
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
+                  <h3 className="mb-3 text-sm font-black">{L('Profit by season')}</h3>
+                  <div className="space-y-2">
+                    {(analyticsSummary?.financeSummary?.bySeason || []).map(row => (
+                      <div key={row.season} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 p-3 text-xs dark:bg-slate-800/60">
+                        <span className="min-w-0 break-words font-semibold">{row.season}</span>
+                        <span className={row.income - row.expense >= 0 ? 'shrink-0 font-bold text-emerald-700 dark:text-emerald-400' : 'shrink-0 font-bold text-red-600'}>Rs. {formatCurrency(row.income - row.expense)}</span>
+                      </div>
+                    ))}
+                    {!(analyticsSummary?.financeSummary?.bySeason || []).length && <p className="text-xs text-slate-500">{L('No season-linked finance data yet.')}</p>}
+                  </div>
+                </div>
+              </section>
 
               {/* FAB — Add New Crop */}
               {userRole === 'admin' && (
