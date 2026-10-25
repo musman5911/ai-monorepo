@@ -39,7 +39,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 
 ## Current checkpoint
 
-Phases 1 and 2 are **Done**. The owner reported Phase 2 Windows CMD verification: `npm run check-breeding-events` passed 19 runtime checks, `npm test` passed 25 files / 242 tests, and `npm run check-farms` passed the three app farm-scope checks plus breeding-event runtime checks. Phase 3 is now in progress: add Dairy breeding event forms and per-cow history to the existing Breeding tab. UI/build checks remain pending local execution. GitHub Actions are not required for local verification.
+Phases 1 and 2 are **Done**. The owner reported Phase 2 Windows CMD verification: `npm run check-breeding-events` passed 19 runtime checks, `npm test` passed 25 files / 242 tests, and `npm run check-farms` passed the three app farm-scope checks plus breeding-event runtime checks. Phase 3 is in progress: the owner reports 7/7 focused screen tests, 249/249 full-suite tests, MUF sync checks, UI safety checks, 23 workbench source checks, farm-scope plus 19 breeding runtime checks, and all three production builds passed. The latest `npm run check-docs` run exposed missing required headings in the Phase 3 document; those headings have been restored on `muf-monorepo`, and the docs check must be rerun locally before Phase 3 can be marked Done. These are owner-reported Windows CMD results. GitHub Actions are not required for local verification.
 
 ## Why this order
 
