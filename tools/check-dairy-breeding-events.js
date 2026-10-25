@@ -123,8 +123,14 @@ async function main() {
       body: { cowId: 'cow1', type: 'calving', date: today, calves: [{ gender: 'female', earTag: 'PHASE4-TWIN-A', outcome: 'live' }] },
     });
     ok(duplicateTag.status === 409, 'duplicate ear tag is refused within the same farm, ignoring case');
-    const cowsB = await call('GET', '/api/cows?gender=female', { token: owner, farm: String(farmB._id) });
-    const farmBMother = (Array.isArray(cowsB.json) ? cowsB.json : cowsB.json?.cows || []).find((cow) => cow.gender !== 'male' && cow.status !== 'calf' && !cow.isCalf);
+    // Farm B's access-test fixture may have no cows. Create a mother there so
+    // this assertion actually reaches calf ear-tag validation instead of
+    // failing because the test has no eligible animal to calve.
+    const farmBMotherResponse = await call('POST', '/api/cows', {
+      token: owner, farm: String(farmB._id),
+      body: { name: 'Phase 4 Farm B Mother', breed: 'Test breed', gender: 'female', status: 'active' },
+    });
+    const farmBMother = farmBMotherResponse.status === 201 ? farmBMotherResponse.json : null;
     const sameTagOtherFarm = farmBMother ? await call('POST', '/api/breeding/events', {
       token: owner, farm: String(farmB._id),
       body: { cowId: farmBMother._id, type: 'calving', date: today, calves: [{ gender: 'female', earTag: 'phase4-twin-a', outcome: 'live' }] },
