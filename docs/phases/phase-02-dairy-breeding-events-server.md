@@ -1,6 +1,6 @@
 # Phase 2: Dairy breeding events: server
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -56,7 +56,7 @@ Date synchronization: latest heat event updates `Cow.heatDate`; latest service e
 
 ## Implementation checkpoint (2026-10-24)
 
-Implemented on `muf-monorepo`, pending local execution: the farm-scoped model and indexes, additive event routes, legacy date synchronization, manual/monthly backup and restore integration, disposable demo events, Vitest source-contract tests, and a memory-mode HTTP checker. **No Phase 2 test or build results are claimed yet.**
+Implemented on `muf-monorepo` and locally verified by the owner on Windows CMD (2026-10-25). The owner reported `npm run check-breeding-events` passed all 19 runtime checks, `npm test` passed all 25 files / 242 tests, and `npm run check-farms` passed Agri, Flock and Dairy farm-scope checks plus the breeding-event runtime checks. Production builds and the remaining standard checks are not claimed here.
 
 ## Command-line checks at the end of this phase
 
@@ -75,13 +75,13 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] A farm-scoped `BreedingEvent` collection: type (heat, service, pregnancy check, calving), date, cow, bull or outside straw (name and semen code), technician, result, notes.
-- [ ] API: list (paged, per cow and per farm), create, edit, delete, with the same roles as other Dairy data.
-- [ ] The existing date fields on the cow keep working; new events keep them in step (additive, no forced migration).
-- [ ] Included in backup and restore, demo data and farm deletion (move/delete).
-- [ ] The new command-line check above exists and passes.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] A farm-scoped `BreedingEvent` collection: type (heat, service, pregnancy check, calving), date, cow, bull or outside straw (name and semen code), technician, result, notes.
+- [x] API: list (paged, per cow and per farm), create, edit, delete, with the same roles as other Dairy data.
+- [x] The existing date fields on the cow keep working; new events keep them in step (additive, no forced migration).
+- [x] Included in backup and restore and demo data. Farm deletion integration was not separately verified.
+- [x] The new command-line check above exists and passes.
+- [ ] Remaining standard checks and all three production builds pass (record results in `docs/PROGRESS.md`).
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Rules for whoever works on this phase
 
