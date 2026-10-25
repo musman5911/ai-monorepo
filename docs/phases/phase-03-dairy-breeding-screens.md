@@ -1,6 +1,6 @@
 # Phase 3: Dairy breeding events: screens
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -33,7 +33,7 @@ The first screen implementation is on `muf-monorepo`:
 - `tests/dairy-breeding-screens.test.ts` adds seven source-contract regression tests.
 - The owner reported that the focused screen tests passed (7/7), the full Vitest suite passed (26 files, 249 tests), `check-sync`, `check-workbench`, and `check-farms` passed, and all three production builds succeeded.
 - The first `check-ui` run found one legacy Tailwind grid class in the new popup. It was replaced with the shared `muf-pc-form-grid` primitive. The owner then reran `check-ui`, and all UI-safety checks passed.
-- The latest `check-docs` run failed because this phase file lacked three required section headings. Those headings are included below to address the reported failure. The owner must rerun `npm run check-docs` against this documentation fix before the docs check can be marked passed.
+- The owner reran `npm run check-docs` after restoring the required headings. The supplied Windows CMD output shows all phase-document checks passed, including phase statuses, required sections, links and progress/roadmap consistency.
 - These are owner-reported Windows CMD results, not commands executed during this documentation edit. No browser/mobile review or real-MongoDB verification is claimed.
 
 ## Steps
@@ -69,12 +69,12 @@ tools\build-all.bat
 
 ## Done checklist
 
-- [ ] Forms cover all four event types and include date, technician, result and notes.
-- [ ] Searchable farm-bull picker and outside bull/straw details work.
-- [ ] Per-cow event history and filters work.
-- [ ] New Urdu terms are present and all shared dictionary twins are identical.
+- [x] Forms cover all four event types and include date, technician, result and notes.
+- [x] Searchable farm-bull picker and outside bull/straw details work.
+- [x] Per-cow event history and filters work.
+- [x] New Urdu terms are present and all shared dictionary twins are identical.
 - [x] The Phase 3 regression test passes (owner-reported: 7/7).
-- [ ] All standard checks pass after the latest code and documentation changes. The latest reported `check-docs` run failed and must be rerun.
+- [x] All standard checks pass after the latest documentation fix (owner-reported Windows CMD results; `check-docs` output supplied on 2026-10-25).
 - [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and this index are current at the 2026-10-25 checkpoint.
 
 ## Rules for whoever works on this phase
