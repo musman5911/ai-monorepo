@@ -44,7 +44,7 @@ describe('global backup restore and local role-test setup', () => {
       expect(s).toContain("username: 'worker2'");
       expect(s).toContain('farmIds: [String(farm2._id)]');
     }
-    expect(read('agri_farm/backend/db.js')).toContain('Farm, User, Crop');
+    expect(read('agri_farm/backend/db.js')).toContain('Farm, User, Field, Crop');
     expect(read('dairy_farm/backend/db.js')).toContain('User, Farm');
   });
   it('shows Agri restore server errors', () => {
