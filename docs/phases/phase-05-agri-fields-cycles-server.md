@@ -24,6 +24,19 @@ Land is organised as Farm, Field (with acres), Crop cycle (season) so profit can
 - No screens (Phase 6).
 - No forced change of old crop records.
 
+## Implementation checkpoint (2026-10-25)
+
+Initial server implementation is committed on `muf-monorepo`:
+
+- Added the farm-scoped `Field` model and authenticated CRUD routes for field name, acreage and notes. Duplicate names are rejected within the selected farm; invalid/negative acreage is rejected; deleting a field is blocked while crop cycles or finance entries reference it.
+- Crops can optionally reference `fieldId`, with server validation that the field exists in the selected farm. Legacy crops using the existing text `field` value remain supported.
+- Finance entries support optional `fieldId` and `cropCycleId`; the server validates those links for normal and bulk create paths.
+- `/analytics/summary` now returns finance totals grouped by field and season, including an explicit unassigned/farm-wide bucket so grouped values remain reconcilable to the ledger total.
+- Fields are included in backup/restore, farm-scoped model migration/deletion, and memory-mode demo data. Demo crop cycles are linked to seeded fields where their legacy field name matches.
+- Added `tests/agri-fields-cycles.test.ts`, expanded the Agri HTTP integration tests, and added cross-farm field/link assertions to `npm run check-farms`.
+
+**Verification status:** these changes have not yet been run locally in this editing session. Phase 5 remains **In progress** until the owner pulls the branch and the Phase 5 command-line checks pass. Do not claim runtime tests or builds passed based only on source review.
+
 ## Steps
 
 1. Write the field and cycle schema in this file.
