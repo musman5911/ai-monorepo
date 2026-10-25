@@ -218,10 +218,17 @@ router.put('/events/:id', protect, async (req, res) => {
     if (errors.length) return sendValidationError(res, errors);
     if (!(await validateReferences(payload, res))) return;
     if (existing.type === 'calving' && (existing.generatedCalfIds || []).length) {
-      const protectedFields = ['cowId', 'date', 'sireSource', 'bullId', 'bullName', 'semenCode', 'calves'];
-      const changedGeneratedData = protectedFields.some((field) =>
-        JSON.stringify(payload[field] ?? existing[field] ?? null) !== JSON.stringify(existing[field] ?? null)
+      const protectedFields = ['cowId', 'date', 'sireSource', 'bullId', 'bullName', 'semenCode'];
+      const changedCoreData = protectedFields.some((field) =>
+        String(payload[field] ?? existing[field] ?? '') !== String(existing[field] ?? '')
       );
+      const normalizeCalves = (entries) => (entries || []).map((entry) => ({
+        gender: entry.gender,
+        earTag: String(entry.earTag || '').trim(),
+        outcome: entry.outcome || 'live',
+      }));
+      const changedCalfEntries = JSON.stringify(normalizeCalves(payload.calves ?? existing.calves)) !== JSON.stringify(normalizeCalves(existing.calves));
+      const changedGeneratedData = changedCoreData || changedCalfEntries;
       if (changedGeneratedData) {
         return res.status(409).json({ error: 'This calving already has generated calves. Calf identity, date and sire cannot be changed; create a correction workflow instead.' });
       }
