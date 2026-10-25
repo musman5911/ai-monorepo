@@ -123,10 +123,12 @@ async function main() {
       body: { cowId: 'cow1', type: 'calving', date: today, calves: [{ gender: 'female', earTag: 'PHASE4-TWIN-A', outcome: 'live' }] },
     });
     ok(duplicateTag.status === 409, 'duplicate ear tag is refused within the same farm, ignoring case');
-    const sameTagOtherFarm = await call('POST', '/api/breeding/events', {
+    const cowsB = await call('GET', '/api/cows?gender=female', { token: owner, farm: String(farmB._id) });
+    const farmBMother = (Array.isArray(cowsB.json) ? cowsB.json : cowsB.json?.cows || []).find((cow) => cow.gender !== 'male' && cow.status !== 'calf' && !cow.isCalf);
+    const sameTagOtherFarm = farmBMother ? await call('POST', '/api/breeding/events', {
       token: owner, farm: String(farmB._id),
-      body: { cowId: 'cow1', type: 'calving', date: today, calves: [{ gender: 'female', earTag: 'phase4-twin-a', outcome: 'live' }] },
-    });
+      body: { cowId: farmBMother._id, type: 'calving', date: today, calves: [{ gender: 'female', earTag: 'phase4-twin-a', outcome: 'live' }] },
+    }) : { status: 0, json: null };
     ok(sameTagOtherFarm.status === 201, 'the same ear tag is allowed in a different farm');
     const protectedDelete = await call('DELETE', `/api/breeding/events/${calving.json?._id}`, { token: owner, farm: String(farmA._id) });
     ok(protectedDelete.status === 409, 'a calving event with linked calves cannot be deleted and orphan them');
