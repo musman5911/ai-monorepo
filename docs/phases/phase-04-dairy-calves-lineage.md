@@ -1,6 +1,6 @@
 # Phase 4: Dairy calves and lineage
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -42,8 +42,8 @@ Initial implementation is on `muf-monorepo`:
 - The calving form supports multiple calf entries, gender, ear tags and stillbirth outcomes.
 - Added `tests/dairy-calving-creates-calf.test.ts` and expanded the existing HTTP memory-mode breeding checker. `npm run check-farms` already invokes that runtime checker, so the new Phase 4 checks run as part of it.
 - **Owner-reported local verification (2026-10-25, Windows CMD):** focused Phase 4 test passed (1 file, 5 tests); full test suite passed (27 files, 254 tests); `npm run check-sync` passed; `npm run check-workbench` passed (23 checks); and `tools\\build-all.bat` built all three apps successfully.
-- **Failures still open (latest owner-reported Windows CMD run, 2026-10-25):** `npm run check-ui` reports one Dairy popup element still using a Tailwind pattern where a `muf-pc-*` class is required. `npm run check-farms` now reports only one Dairy breeding runtime failure: the same ear tag is still refused in a different farm. Editing an existing breeding event, synchronizing the legacy cow date after edit, and `npm run check-docs` pass in the latest supplied output. Follow-up fixes have since been committed on `muf-monorepo`: the backend explicitly scopes ear-tag candidates to the selected farm; the runtime test creates a valid Farm B mother so the cross-farm assertion reliably reaches the duplicate-tag logic; and the remaining Dairy breeding-event popup alignment pattern uses `muf-pc-between`. Owner must rerun the failing checks locally to verify these commits.
-- Phase 4 remains **In progress**. Fix the failing UI/runtime checks, rerun them, then rerun `npm run check-docs` and the full standard command list. Do not mark Done until the checks pass and actual results are recorded in `docs/PROGRESS.md`.
+- **Final owner-reported local verification (2026-10-25, Windows CMD):** after the follow-up commits were pulled, `npm test` passed (27 files, 254 tests); `npm run check-farms` passed, including same-farm case-insensitive ear-tag rejection and cross-farm tag reuse; `npm run check-ui` passed all MUF UI safety checks; `npm run check-docs` passed all phase documentation checks; and `npm run check-sync` passed all MUF synchronization checks. Earlier Phase 4 verification also reported `npm run check-workbench` passing (23 checks) and `tools\\build-all.bat` building Dairy, Flock and Agri successfully. These are owner-reported outputs supplied in chat, not commands run independently in this editing session.
+- Phase 4 is **Done for the command-line scope** based on the supplied passing results. Real MongoDB, browser/phone and live-site verification remains scheduled for Phases 19 to 21.
 
 ## Steps
 
