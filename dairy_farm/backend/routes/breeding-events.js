@@ -37,6 +37,25 @@ function eventPayload(body, { partial = false } = {}) {
     if (!payload.bullName && required) errors.push('bullName is required for outside straw');
     if (!payload.semenCode && required) errors.push('semenCode is required for outside straw');
   }
+  if (body.calves !== undefined) {
+    if (!Array.isArray(body.calves) || body.calves.length > 4) {
+      errors.push('calves must be a list with no more than four entries');
+    } else {
+      payload.calves = body.calves.map((entry, index) => {
+        const gender = entry?.gender === 'male' ? 'male' : entry?.gender === 'female' ? 'female' : '';
+        const outcome = entry?.outcome === 'stillbirth' ? 'stillbirth' : entry?.outcome === 'live' || entry?.outcome === undefined ? 'live' : '';
+        const earTag = typeof entry?.earTag === 'string' ? entry.earTag.trim().slice(0, 80) : '';
+        if (!gender) errors.push(`calves[${index}].gender must be female or male`);
+        if (!outcome) errors.push(`calves[${index}].outcome must be live or stillbirth`);
+        return { gender: gender || 'female', outcome: outcome || 'live', earTag };
+      });
+      const tags = payload.calves.map((entry) => entry.earTag.toLocaleLowerCase()).filter(Boolean);
+      if (new Set(tags).size !== tags.length) errors.push('Calf ear tags must be unique within this calving event');
+    }
+  }
+  if (payload.calves !== undefined && payload.type !== undefined && payload.type !== 'calving') {
+    errors.push('Calf entries are only allowed on a calving event');
+  }
   return { payload, errors };
 }
 
@@ -121,15 +140,73 @@ router.get('/events', protect, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
+async function createCalvingCalves(event, mother) {
+  const entries = Array.isArray(event.calves) ? event.calves : [];
+  const created = [];
+  try {
+    for (const entry of entries) {
+      if (entry.outcome === 'stillbirth') continue;
+      const earTag = String(entry.earTag || '').trim();
+      if (earTag) {
+        const duplicate = await Cow.findOne({ earTag }).lean();
+        if (duplicate) throw Object.assign(new Error(`Ear tag "${earTag}" is already used in this farm`), { status: 409 });
+      }
+      const id = randomUUID();
+      const name = earTag ? `Calf ${earTag}` : `${mother.name} calf ${event.date} ${created.length + 1}`;
+      const fatherType = event.sireSource === 'farm_bull' ? 'farm' : (event.sireSource ? 'outside' : '');
+      const calf = await Cow.create({
+        _id: id,
+        name,
+        breed: mother.breed || 'Unknown',
+        gender: entry.gender,
+        status: 'calf',
+        isCalf: true,
+        birthDate: event.date,
+        earTag,
+        motherId: mother._id,
+        fatherId: event.sireSource === 'farm_bull' ? event.bullId || '' : '',
+        fatherType: fatherType || 'farm',
+        fatherName: event.sireSource && event.sireSource !== 'farm_bull'
+          ? [event.bullName, event.semenCode].filter(Boolean).join(' / ')
+          : '',
+        calvingEventId: event._id,
+      });
+      created.push(calf);
+    }
+    return created;
+  } catch (error) {
+    await Promise.all(created.map((calf) => Cow.findByIdAndDelete(calf._id).catch(() => null)));
+    throw error;
+  }
+}
+
 router.post('/events', protect, async (req, res) => {
+  let event = null;
+  let createdCalves = [];
   try {
     const { payload, errors } = eventPayload(req.body || {});
     if (errors.length) return sendValidationError(res, errors);
     if (!(await validateReferences(payload, res))) return;
-    const event = await BreedingEvent.create({ ...payload, _id: randomUUID() });
+    const mother = await Cow.findById(payload.cowId).lean();
+    if (payload.type === 'calving' && !Array.isArray(payload.calves)) {
+      payload.calves = [];
+    }
+    event = await BreedingEvent.create({ ...payload, generatedCalfIds: [], _id: randomUUID() });
+    if (event.type === 'calving' && event.calves.length) {
+      createdCalves = await createCalvingCalves(event, mother);
+      const generatedCalfIds = createdCalves.map((calf) => calf._id);
+      event = await BreedingEvent.findByIdAndUpdate(event._id, { $set: { generatedCalfIds } }, { new: true });
+      await Cow.findByIdAndUpdate(mother._id, {
+        $push: { calvingHistory: { date: event.date, notes: event.notes || '' } },
+      });
+    }
     await syncCowDate(event.cowId, event.type);
     res.status(201).json(event);
-  } catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) {
+    await Promise.all(createdCalves.map((calf) => Cow.findByIdAndDelete(calf._id).catch(() => null)));
+    if (event?._id) await BreedingEvent.findByIdAndDelete(event._id).catch(() => null);
+    res.status(e.status || 500).json({ error: e.message });
+  }
 });
 
 router.put('/events/:id', protect, async (req, res) => {
@@ -142,6 +219,15 @@ router.put('/events/:id', protect, async (req, res) => {
     const { payload, errors } = eventPayload(next);
     if (errors.length) return sendValidationError(res, errors);
     if (!(await validateReferences(payload, res))) return;
+    if (existing.type === 'calving' && (existing.generatedCalfIds || []).length) {
+      const protectedFields = ['cowId', 'date', 'sireSource', 'bullId', 'bullName', 'semenCode', 'calves'];
+      const changedGeneratedData = protectedFields.some((field) =>
+        JSON.stringify(payload[field] ?? existing[field] ?? null) !== JSON.stringify(existing[field] ?? null)
+      );
+      if (changedGeneratedData) {
+        return res.status(409).json({ error: 'This calving already has generated calves. Calf identity, date and sire cannot be changed; create a correction workflow instead.' });
+      }
+    }
     const updated = await BreedingEvent.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
     await syncCowDate(existing.cowId, existing.type);
     await syncCowDate(next.cowId, next.type);
@@ -153,6 +239,9 @@ router.delete('/events/:id', protect, adminOnly, async (req, res) => {
   try {
     const event = await BreedingEvent.findById(req.params.id).lean();
     if (!event) return res.status(404).json({ error: 'Breeding event not found' });
+    if (event.type === 'calving' && (event.generatedCalfIds || []).length) {
+      return res.status(409).json({ error: 'This calving has linked calf records. Resolve the calf records before deleting the event.' });
+    }
     await BreedingEvent.findByIdAndDelete(req.params.id);
     await syncCowDate(event.cowId, event.type);
     res.json({ deleted: true });
