@@ -979,6 +979,7 @@ function App() {
       const summaryRes = await api.getAnalyticsSummary();
       const summary = summaryRes.data;
       setAnalyticsSummary(summary);
+      api.getFields().then(response => setFields(Array.isArray(response.data) ? response.data : [])).catch(() => setFields([]));
 
       if (includeFullDetails) {
         const [cropRows, taskRows] = await Promise.all([
