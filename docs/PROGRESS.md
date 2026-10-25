@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-25 (Phase 3 started).
+Last updated: 2026-10-25 (Phase 3 verification checkpoint).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -93,6 +93,17 @@ Whoever works on a phase updates it in the same change: set the phase status her
 
 These are owner-reported results from the pasted CMD output, not commands run in this editing session. Production builds and the remaining standard checks were not included in the reported Phase 2 verification.
 
-## Phase 3 kickoff
+## Phase 3 local verification checkpoint (2026-10-25, Windows CMD; output supplied by owner)
 
-Phase 3 (Dairy breeding event screens) is in progress on `muf-monorepo`. The new `BreedingEventsPanel` is mounted in the existing Dairy Breeding tab and provides create/edit forms, cow and event-type filters, sire source selection, farm-bull selection, outside bull/straw details and event history. Client API methods, shared Urdu dictionary entries and a dedicated source-contract test have been added. UI and build validation are pending local CMD execution.
+| Command | Result |
+|---|---|
+| `git pull origin muf-monorepo` | Already up to date |
+| `npm test -- tests/dairy-breeding-screens.test.ts` | Passed: 1 file, 7 tests |
+| `npm test` | Passed: 26 files, 249 tests |
+| `npm run check-sync` | Passed: all shared MUF twins and three-app invariants |
+| `npm run check-ui` | **One failure:** Dairy had one popup grid still using a legacy Tailwind pattern; Flock and Agri passed |
+| `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope tests plus all 19 Dairy breeding runtime checks |
+| `npm run check-docs` | Passed: phase docs and indexes consistent at time of run |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+
+The UI-safety failure was traced to the new breeding form's `grid grid-cols-1 sm:grid-cols-2 gap-3` class inside the shared popup. It has been changed to the existing `muf-pc-form-grid` primitive on `muf-monorepo`. The UI safety check, full test suite, docs check and all three builds must be rerun after this last code change before Phase 3 can be marked Done. These are owner-reported command results, not commands executed in this editing session.
