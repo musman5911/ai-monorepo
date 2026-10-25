@@ -1,0 +1,1371 @@
+Microsoft Windows [Version 10.0.19045.5965]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\M.Usman>
+C:\Users\M.Usman>cd /d F:\PROJECTS\dairy\muf-monorepo
+
+F:\PROJECTS\dairy\muf-monorepo>git pull origin muf-monorepo
+remote: Enumerating objects: 37, done.
+remote: Counting objects: 100% (37/37), done.
+remote: Compressing objects: 100% (24/24), done.
+remote: Total 24 (delta 19), reused 0 (delta 0), pack-reused 0 (from 0)
+Unpacking objects: 100% (24/24), 3.13 KiB | 3.00 KiB/s, done.
+From https://github.com/musman5911/ai-monorepo
+ * branch            muf-monorepo -> FETCH_HEAD
+   219f708..161fb7b  muf-monorepo -> origin/muf-monorepo
+Updating 219f708..161fb7b
+Fast-forward
+ dairy_farm/client/src/components/BreedingEventsPanel.tsx |  2 +-
+ docs/PROGRESS.md                                         |  2 +-
+ docs/ROADMAP.md                                          |  2 +-
+ docs/phases/phase-04-dairy-calves-lineage.md             |  2 +-
+ tools/check-dairy-breeding-events.js                     | 10 ++++++++--
+ 5 files changed, 12 insertions(+), 6 deletions(-)
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-farms
+
+> check-farms
+> node tools/check-farm-scope.js && node tools/check-dairy-breeding-events.js
+
+
+agri: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  ✓ existing records were tagged into the first farm
+  ✓ owner can add a farm
+  ✓ duplicate farm names are rejected
+  ✓ owner can rename a farm
+  ✓ a new farm starts empty
+  ✓ record can be created in farm B
+  ✓ record created in B (with a forged farmId) is not in farm A
+  ✓ record is visible in farm B
+  ✓ All farms shows both farms
+  ✓ writing in All farms is refused
+  ✓ Agri bulk task import rejects the entire payload before writing invalid rows
+  ✓ Agri bulk task import inserts a validated row
+  ✓ Agri bulk task row is hidden from farm A
+  ✓ Agri bulk task row belongs to farm B
+  ✓ Agri bulk finance import inserts a validated row
+  ✓ Agri bulk finance row is hidden from farm A
+  ✓ Agri bulk finance row belongs to farm B
+  ✓ updating a farm-B record while in farm A finds nothing
+  ✓ deleting a farm-B record while in farm A finds nothing
+  ✓ updating a record inside its own farm works
+  ✓ the updated record is still in farm B
+  ✓ and did not move to farm A
+  ✓ owner can create a worker assigned to farm B
+  ✓ owner can create a manager assigned to farm A
+  ✓ a worker created without farms gets the creator's selected farm
+  ✓ worker logs in as worker
+  ✓ worker defaults to farm B and sees only farm B
+  ✓ worker cannot select farm A
+  ✓ worker "All farms" is limited to assigned farms
+  ✓ worker cannot add farms
+  ✓ worker cannot download a backup
+  ✓ worker cannot list users
+  ✓ manager keeps full control but is not an owner
+  ✓ manager sees farm A only
+  ✓ manager cannot select farm B
+  ✓ manager cannot add farms
+  ✓ manager cannot download a backup
+  ✓ manager cannot create another manager
+  ✓ manager can create a worker, limited to the manager's own farm
+  ✓ manager does not see workers of other farms
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore the backup
+  ✓ all farms still exist after the restore
+  ✓ the farm-B record is still in farm B after the restore
+  ✓ farm A is unchanged after the restore
+  ✓ deleting a farm with data needs the farm name typed
+  ✓ and a choice: move or delete the records
+  ✓ owner can archive a farm
+  ✓ workers of an archived farm lose access
+  ✓ owner can restore it
+  ✓ owner can delete the farm after moving its records
+  ✓ the moved record now lives in farm A
+  ✓ the last farm cannot be deleted
+
+flock: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  Flock: legacy buckets and batches
+  ✓ legacy egg bucket keeps its established response shape
+  ✓ owner can create a second poultry farm
+  ✓ new farm has an isolated empty bucket
+  ✓ bucket write succeeds in selected farm
+  ✓ farm B bucket write does not change farm A
+  ✓ farm B reads only its own bucket
+  ✓ All farms mode rejects bucket writes
+  ✓ batch creation is stamped with selected farm
+  ✓ farm A cannot see farm B batches
+  ✓ farm B can see its own batch
+  ✓ batch feed logs are stamped with the selected farm
+  ✓ batch egg logs are stamped with the selected farm
+  ✓ batch vaccination logs are stamped with the selected farm
+  ✓ batch detail returns egg and vaccination history
+  ✓ batch summary includes egg income and vaccination costs
+  ✓ batch details and their logs are hidden from another farm
+  ✓ new worker is assigned to the selected farm
+  ✓ assigned worker can log in
+  ✓ worker cannot select another farm
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore a full Flock backup while All farms is selected
+  ✓ Flock restore preserves all farms
+  ✓ Flock restore preserves records in their original farm
+
+dairy: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  ✓ existing records were tagged into the first farm
+  ✓ owner can add a farm
+  ✓ duplicate farm names are rejected
+  ✓ owner can rename a farm
+  ✓ a new farm starts empty
+  ✓ record can be created in farm B
+  ✓ record created in B (with a forged farmId) is not in farm A
+  ✓ record is visible in farm B
+  ✓ All farms shows both farms
+  ✓ writing in All farms is refused
+  ✓ updating a farm-B record while in farm A finds nothing
+  ✓ deleting a farm-B record while in farm A finds nothing
+  ✓ updating a record inside its own farm works
+  ✓ the updated record is still in farm B
+  ✓ and did not move to farm A
+  ✓ owner can create a worker assigned to farm B
+  ✓ owner can create a manager assigned to farm A
+  ✓ a worker needs at least one farm
+  ✓ worker logs in as worker
+  ✓ worker defaults to farm B and sees only farm B
+  ✓ worker cannot select farm A
+  ✓ worker "All farms" is limited to assigned farms
+  ✓ worker cannot add farms
+  ✓ worker cannot download a backup
+  ✓ worker cannot list users
+  ✓ manager keeps full control but is not an owner
+  ✓ manager sees farm A only
+  ✓ manager cannot select farm B
+  ✓ manager cannot add farms
+  ✓ manager cannot download a backup
+  ✓ manager cannot create another manager
+  ✓ manager can create a worker, limited to the manager's own farm
+  ✓ manager does not see workers of other farms
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore the backup
+  ✓ all farms still exist after the restore
+  ✓ the farm-B record is still in farm B after the restore
+  ✓ farm A is unchanged after the restore
+  ✓ deleting a farm with data needs the farm name typed
+  ✓ and a choice: move or delete the records
+  ✓ owner can archive a farm
+  ✓ workers of an archived farm lose access
+  ✓ owner can restore it
+  ✓ owner can delete the farm after moving its records
+  ✓ the moved record now lives in farm A
+  ✓ the last farm cannot be deleted
+
+All farm scope checks passed.
+
+Phase 2: Dairy breeding event runtime checks
+  ✓ seeded owner can log in
+  ✓ demo data provides two farms for isolation testing
+  ✓ owner can create a valid breeding event
+  ✓ creating a heat event synchronizes the legacy cow heatDate
+  ✓ owner can edit an existing breeding event
+  ✓ editing an event resynchronizes the legacy cow date
+  ✓ service event accepts a valid in-farm bull
+  ✓ service event synchronizes the legacy breeding date
+  ✓ calving creates one live calf record per twin and excludes stillbirth from live calf records
+  ✓ calving event synchronizes the legacy cow calving date
+  ✓ generated calves carry gender, date, mother, farm bull and calf status
+  ✓ duplicate ear tag is refused within the same farm, ignoring case
+  ✓ the same ear tag is allowed in a different farm
+  ✓ a calving event with linked calves cannot be deleted and orphan them
+  ✓ event appears in paginated list for its farm and cow
+  ✓ list response includes pagination metadata
+  ✓ farm B cannot see an event created in farm A
+  ✓ invalid event dates are rejected
+  ✓ seeded worker can log in
+  ✓ worker can create a breeding event
+  ✓ worker cannot delete a breeding event
+  ✓ manual backup contains breeding events
+  ✓ backup restore succeeds with breeding events included
+  ✓ restored backup retains breeding events
+
+All Dairy breeding event checks passed.
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-ui
+
+> check-ui
+> node tools/check-ui-safety.js
+
+
+MUF UI safety checks
+  ✓ muf/core/muf-modal.tsx matches across all three apps
+  ✓ muf/core/muf-confirm.tsx matches across all three apps
+  ✓ muf-style.css matches across all three apps
+  ✓ muf/ui/muf-diary.tsx matches across all three apps
+  ✓ muf/ui/muf-login.tsx matches across all three apps
+  ✓ dairy: no native browser dialog calls in app source
+  ✓ dairy: popup has dialog semantics
+  ✓ dairy: active modal stack and Escape handling present
+  ✓ dairy: notifications queue without native alert fallback
+  ✓ dairy: QR receipt uses MUF notification
+  ✓ dairy: responsive and reduced-motion styles present
+  ✓ dairy: Finance dropdown uses an accessible body portal
+  ✓ dairy: MUF dropdown tokens and popup field safeguards present
+  ✓ dairy: MUF login shell and inset mobile dialog sizing present
+  ✓ dairy: auth UI uses shared MUF login components
+  ✓ dairy: header and primary navbar share a sticky MUF wrapper
+  ✓ dairy: app root clips horizontal overflow without disabling sticky chrome
+  ✓ flock: no native browser dialog calls in app source
+  ✓ flock: popup has dialog semantics
+  ✓ flock: active modal stack and Escape handling present
+  ✓ flock: notifications queue without native alert fallback
+  ✓ flock: QR receipt uses MUF notification
+  ✓ flock: responsive and reduced-motion styles present
+  ✓ flock: Home Birds navigation is scoped to the approved sections
+  ✓ flock: MUF dropdown tokens and popup field safeguards present
+  ✓ flock: MUF login shell and inset mobile dialog sizing present
+  ✓ flock: auth UI uses shared MUF login components
+  ✓ flock: header and primary navbar share a sticky MUF wrapper
+  ✓ agri: no native browser dialog calls in app source
+  ✓ agri: popup has dialog semantics
+  ✓ agri: active modal stack and Escape handling present
+  ✓ agri: notifications queue without native alert fallback
+  ✓ agri: QR receipt uses MUF notification
+  ✓ agri: responsive and reduced-motion styles present
+  ✓ agri: Finance dropdown uses an accessible body portal
+  ✓ agri: MUF dropdown tokens and popup field safeguards present
+  ✓ agri: MUF login shell and inset mobile dialog sizing present
+  ✓ agri: auth UI uses shared MUF login components
+  ✓ agri: header and primary navbar share a sticky MUF wrapper
+  ✓ dairy: popup content uses muf-pc-* classes for the shared patterns
+  ✓ flock: popup content uses muf-pc-* classes for the shared patterns
+  ✓ agri: popup content uses muf-pc-* classes for the shared patterns
+
+All MUF UI safety checks passed.
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-docs
+
+> check-docs
+> node tools/check-phase-docs.js
+
+
+Phase docs check
+  ✓ docs/phases/README.md exists
+  ✓ the index lists Phase 0 plus at least 12 later phases (found 22)
+  ✓ phase numbers run 0, 1, 2 ... without gaps
+  ✓ Phase 0 is Done
+  ✓ the last three phases are the final testing phases
+  ✓ no final-testing phase appears before the end
+  ✓ every phase file is listed and every row has a file (22 files, 22 rows)
+  ✓ Phase 0: title line starts with "# Phase 0:"
+  ✓ Phase 0: status matches the index (Done)
+  ✓ Phase 0: has all required sections
+  ✓ Phase 1: title line starts with "# Phase 1:"
+  ✓ Phase 1: status matches the index (Done)
+  ✓ Phase 1: has all required sections
+  ✓ Phase 1: names a new command-line check
+  ✓ Phase 2: title line starts with "# Phase 2:"
+  ✓ Phase 2: status matches the index (Done)
+  ✓ Phase 2: has all required sections
+  ✓ Phase 2: names a new command-line check
+  ✓ Phase 3: title line starts with "# Phase 3:"
+  ✓ Phase 3: status matches the index (Done)
+  ✓ Phase 3: has all required sections
+  ✓ Phase 3: names a new command-line check
+  ✓ Phase 4: title line starts with "# Phase 4:"
+  ✓ Phase 4: status matches the index (In progress)
+  ✓ Phase 4: has all required sections
+  ✓ Phase 4: names a new command-line check
+  ✓ Phase 5: title line starts with "# Phase 5:"
+  ✓ Phase 5: status matches the index (Not started)
+  ✓ Phase 5: has all required sections
+  ✓ Phase 5: names a new command-line check
+  ✓ Phase 6: title line starts with "# Phase 6:"
+  ✓ Phase 6: status matches the index (Not started)
+  ✓ Phase 6: has all required sections
+  ✓ Phase 6: names a new command-line check
+  ✓ Phase 7: title line starts with "# Phase 7:"
+  ✓ Phase 7: status matches the index (Not started)
+  ✓ Phase 7: has all required sections
+  ✓ Phase 7: names a new command-line check
+  ✓ Phase 8: title line starts with "# Phase 8:"
+  ✓ Phase 8: status matches the index (Not started)
+  ✓ Phase 8: has all required sections
+  ✓ Phase 8: names a new command-line check
+  ✓ Phase 9: title line starts with "# Phase 9:"
+  ✓ Phase 9: status matches the index (Not started)
+  ✓ Phase 9: has all required sections
+  ✓ Phase 9: names a new command-line check
+  ✓ Phase 10: title line starts with "# Phase 10:"
+  ✓ Phase 10: status matches the index (Not started)
+  ✓ Phase 10: has all required sections
+  ✓ Phase 10: names a new command-line check
+  ✓ Phase 11: title line starts with "# Phase 11:"
+  ✓ Phase 11: status matches the index (Not started)
+  ✓ Phase 11: has all required sections
+  ✓ Phase 11: names a new command-line check
+  ✓ Phase 12: title line starts with "# Phase 12:"
+  ✓ Phase 12: status matches the index (Not started)
+  ✓ Phase 12: has all required sections
+  ✓ Phase 12: names a new command-line check
+  ✓ Phase 13: title line starts with "# Phase 13:"
+  ✓ Phase 13: status matches the index (Not started)
+  ✓ Phase 13: has all required sections
+  ✓ Phase 13: names a new command-line check
+  ✓ Phase 14: title line starts with "# Phase 14:"
+  ✓ Phase 14: status matches the index (Not started)
+  ✓ Phase 14: has all required sections
+  ✓ Phase 14: names a new command-line check
+  ✓ Phase 15: title line starts with "# Phase 15:"
+  ✓ Phase 15: status matches the index (Not started)
+  ✓ Phase 15: has all required sections
+  ✓ Phase 15: names a new command-line check
+  ✓ Phase 16: title line starts with "# Phase 16:"
+  ✓ Phase 16: status matches the index (Not started)
+  ✓ Phase 16: has all required sections
+  ✓ Phase 16: names a new command-line check
+  ✓ Phase 17: title line starts with "# Phase 17:"
+  ✓ Phase 17: status matches the index (Not started)
+  ✓ Phase 17: has all required sections
+  ✓ Phase 17: names a new command-line check
+  ✓ Phase 18: title line starts with "# Phase 18:"
+  ✓ Phase 18: status matches the index (Not started)
+  ✓ Phase 18: has all required sections
+  ✓ Phase 18: names a new command-line check
+  ✓ Phase 19: title line starts with "# Phase 19:"
+  ✓ Phase 19: status matches the index (Not started)
+  ✓ Phase 19: has all required sections
+  ✓ Phase 19: names a new command-line check
+  ✓ Phase 20: title line starts with "# Phase 20:"
+  ✓ Phase 20: status matches the index (Not started)
+  ✓ Phase 20: has all required sections
+  ✓ Phase 20: names a new command-line check
+  ✓ Phase 21: title line starts with "# Phase 21:"
+  ✓ Phase 21: status matches the index (Not started)
+  ✓ Phase 21: has all required sections
+  ✓ Phase 21: names a new command-line check
+  ✓ docs/PROGRESS.md has a row for every phase
+  ✓ docs/PROGRESS.md shows the same status as the index
+  ✓ docs/ROADMAP.md has a row for every phase
+  ✓ docs/ROADMAP.md shows the same status as the index
+  ✓ relative links resolve
+  ✓ RULES.md points at docs/phases
+  ✓ RULES.md requires a new command-line check for every phase
+  ✓ RULES.md requires the docs to be updated by whoever works on a phase
+
+All phase docs checks passed.
+
+F:\PROJECTS\dairy\muf-monorepo>
+F:\PROJECTS\dairy\muf-monorepo>
+F:\PROJECTS\dairy\muf-monorepo>cd /d F:\PROJECTS\dairy\muf-monorepo
+
+F:\PROJECTS\dairy\muf-monorepo>git pull origin muf-monorepo
+From https://github.com/musman5911/ai-monorepo
+ * branch            muf-monorepo -> FETCH_HEAD
+Already up to date.
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-farms
+
+> check-farms
+> node tools/check-farm-scope.js && node tools/check-dairy-breeding-events.js
+
+
+agri: farm scope
+Terminate batch job (Y/N)?
+^C
+F:\PROJECTS\dairy\muf-monorepo>
+F:\PROJECTS\dairy\muf-monorepo>npm ci
+
+added 51 packages, and audited 52 packages in 8s
+
+15 packages are looking for funding
+  run `npm fund` for details
+
+5 vulnerabilities (1 moderate, 2 high, 2 critical)
+
+To address issues that do not require attention, run:
+  npm audit fix
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+npm warn allow-scripts 1 package has install scripts not yet covered by allowScripts:
+npm warn allow-scripts   esbuild@0.28.2 (postinstall: node install.js)
+npm warn allow-scripts
+npm warn allow-scripts Run `npm approve-scripts --allow-scripts-pending` to review, or `npm approve-scripts <pkg>` to allow.
+
+F:\PROJECTS\dairy\muf-monorepo>npm test
+
+> test
+> vitest run
+
+
+ RUN  v3.2.7 F:/PROJECTS/dairy/muf-monorepo
+
+ ✓ tests/smoke.test.ts (32 tests) 107ms
+ ✓ tests/phase3-pagination.test.ts (39 tests) 68ms
+ ✓ tests/flock-egg-inventory-coordination.test.ts (12 tests) 33ms
+ ✓ tests/muf-farms-agri.test.ts (10 tests) 35ms
+ ✓ tests/muf-farms.test.ts (20 tests) 729ms
+   ✓ real mongoose queries (skipped when the dairy backend packages are not installed) > builds scoped filters and strips farmId from updates  685ms
+ ✓ tests/flock-egg-inventory-lock.test.ts (7 tests) 18ms
+ ✓ tests/agri-bulk-import.test.ts (11 tests) 21ms
+ ✓ tests/dairy-breeding-events.test.ts (10 tests) 16ms
+ ✓ tests/dairy-breeding-screens.test.ts (7 tests) 22ms
+ ✓ tests/flock-data-route-allocation.test.ts (4 tests) 14ms
+ ✓ tests/flock-incubation-allocation.test.ts (12 tests) 11ms
+ ✓ tests/flock-image-backup.test.ts (5 tests) 32ms
+ ✓ tests/muf-urdu-fallback-coverage.test.ts (2 tests) 8ms
+ ❯ tests/dairy-calving-creates-calf.test.ts (5 tests | 1 failed) 58ms
+   ✓ Phase 4 Dairy calving creates calves and preserves lineage > stores calving entries and links generated calves back to their source event 3ms
+   ✓ Phase 4 Dairy calving creates calves and preserves lineage > rolls back failed calf creation and protects generated calf links from unsafe event edits/deletes 1ms
+   × Phase 4 Dairy calving creates calves and preserves lineage > enforces farm-scoped ear-tag uniqueness and records stillbirth without creating a live calf 51ms
+     → expected 'import express from \'express\';\r\ni…' to contain 'const taggedCows = await Cow.find({ e…'
+   ✓ Phase 4 Dairy calving creates calves and preserves lineage > returns and displays mother, father and offspring in the cow lineage section 1ms
+   ✓ Phase 4 Dairy calving creates calves and preserves lineage > lets the calving form enter multiple calf genders, tags and outcomes 1ms
+ ✓ tests/phase1-backup-farm-context.test.ts (5 tests) 13ms
+ ✓ tests/agri-bulk-api.test.ts (4 tests) 15ms
+ ✓ tests/phase-1-super-admin.test.ts (13 tests) 27ms
+ ✓ tests/phase3-farm-isolation.test.ts (4 tests) 33ms
+ ✓ tests/flock-batch-math.test.ts (6 tests) 9ms
+ ✓ tests/muf-compare.test.ts (12 tests) 11ms
+ ✓ tests/phase4-breeding-lineage.test.ts (3 tests) 10ms
+ ✓ tests/muf-charts.test.ts (9 tests) 9ms
+ ✓ tests/flock-batch-history-guards.test.ts (3 tests) 10ms
+ ✓ tests/flock-batch-labor.test.ts (3 tests) 14ms
+ ✓ tests/flock-dark-login-background.test.ts (1 test) 7ms
+ ✓ tests/muf-zakat.test.ts (5 tests) 10ms
+ ✓ tests/agri-runtime-api.integration.test.ts (10 tests) 10856ms
+   ✓ Agri runtime API integration > pages a 1,001-row task fixture over real HTTP without missing or duplicating records  2255ms
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/dairy-calving-creates-calf.test.ts > Phase 4 Dairy calving creates calves and preserves lineage > enforces farm-scoped ear-tag uniqueness and records stillbirth without creating a live calf
+AssertionError: expected 'import express from \'express\';\r\ni…' to contain 'const taggedCows = await Cow.find({ e…'
+
+- Expected
++ Received
+
+- const taggedCows = await Cow.find({ earTag: { $ne: '' } }).lean()
++ import express from 'express';
++ import { randomUUID } from 'node:crypto';
++ import { protect, adminOnly } from '../middleware/auth.js';
++ import { Cow, BreedingEvent } from '../db.js';
++ import { readString, readDate, readEnum, sendValidationError } from './input.js';
++
++ const router = express.Router();
++ const TYPES = ['heat', 'service', 'pregnancy_check', 'calving'];
++ const SIRE_SOURCES = ['farm_bull', 'outside_bull', 'outside_straw'];
++ const TEXT_LIMITS = { technician: 120, result: 500, notes: 2000, bullName: 160, semenCode: 100 };
++
++ function eventPayload(body, { partial = false } = {}) {
++   const errors = [];
++   const payload = {};
++   const required = !partial;
++   const cowId = readString(body, 'cowId', errors, { required, allowEmpty: false });
++   if (cowId !== undefined) payload.cowId = cowId;
++   const type = readEnum(body, 'type', TYPES, errors, { required });
++   if (type !== undefined) payload.type = type;
++   const date = readDate(body, 'date', errors, { required });
++   if (date !== undefined) payload.date = date;
++
++   const sireSource = readEnum(body, 'sireSource', SIRE_SOURCES, errors);
++   if (sireSource !== undefined) payload.sireSource = sireSource;
++   for (const field of Object.keys(TEXT_LIMITS)) {
++     const value = readString(body, field, errors);
++     if (value !== undefined) {
++       if (value.length > TEXT_LIMITS[field]) errors.push(`${field} must be at most ${TEXT_LIMITS[field]} characters`);
++       else payload[field] = value;
++     }
++   }
++   const bullId = readString(body, 'bullId', errors);
++   if (bullId !== undefined) payload.bullId = bullId;
++   if (payload.sireSource === 'farm_bull' && !payload.bullId && required) errors.push('bullId is required for an in-farm bull');
++   if (payload.sireSource === 'outside_bull' && !payload.bullName && required) errors.push('bullName is required for an outside bull');
++   if (payload.sireSource === 'outside_straw') {
++     if (!payload.bullName && required) errors.push('bullName is required for outside straw');
++     if (!payload.semenCode && required) errors.push('semenCode is required for outside straw');
++   }
++   if (body.calves !== undefined) {
++     if (!Array.isArray(body.calves) || body.calves.length > 4) {
++       errors.push('calves must be a list with no more than four entries');
++     } else {
++       payload.calves = body.calves.map((entry, index) => {
++         const gender = entry?.gender === 'male' ? 'male' : entry?.gender === 'female' ? 'female' : '';
++         const outcome = entry?.outcome === 'stillbirth' ? 'stillbirth' : entry?.outcome === 'live' || entry?.outcome === undefined ? 'live' : '';
++         const earTag = typeof entry?.earTag === 'string' ? entry.earTag.trim().slice(0, 80) : '';
++         if (!gender) errors.push(`calves[${index}].gender must be female or male`);
++         if (!outcome) errors.push(`calves[${index}].outcome must be live or stillbirth`);
++         return { gender: gender || 'female', outcome: outcome || 'live', earTag };
++       });
++       const tags = payload.calves.map((entry) => entry.earTag.toLocaleLowerCase()).filter(Boolean);
++       if (new Set(tags).size !== tags.length) errors.push('Calf ear tags must be unique within this calving event');
++     }
++   }
++   if (payload.calves !== undefined && payload.calves.length > 0 && payload.type !== undefined && payload.type !== 'calving') {
++     errors.push('Calf entries are only allowed on a calving event');
++   }
++   return { payload, errors };
++ }
++
++ async function validateReferences(payload, res) {
++   if (payload.cowId !== undefined) {
++     const cow = await Cow.findById(payload.cowId).lean();
++     if (!cow) { res.status(400).json({ error: 'Cow not found in the selected farm' }); return false; }
++     if (cow.gender === 'male' || cow.status === 'sold' || cow.status === 'inactive' || cow.status === 'calf' || cow.isCalf) {
++       res.status(400).json({ error: 'Breeding events require an active female animal, not a bull, sold animal or calf' });
++       return false;
++     }
++   }
++   if (payload.sireSource === 'farm_bull' && payload.bullId !== undefined) {
++     const bull = await Cow.findById(payload.bullId).lean();
++     if (!bull || bull.gender !== 'male' || bull.status === 'sold' || bull.status === 'calf' || bull.isCalf) {
++       res.status(400).json({ error: 'In-farm sire must be a male animal in the selected farm' });
++       return false;
++     }
++   }
++   if (payload.sireSource && payload.sireSource !== 'farm_bull') payload.bullId = '';
++   if (payload.sireSource === 'farm_bull') {
++     payload.bullName = '';
++     payload.semenCode = '';
++   }
++   if (payload.sireSource === 'outside_bull') payload.semenCode = '';
++   return true;
++ }
++
++ function legacyField(type) {
++   return ({ heat: 'heatDate', service: 'pregnancyDate', calving: 'calvingDate' })[type] || null;
++ }
++
++ async function syncCowDate(cowId, type) {
++   const field = legacyField(type);
++   if (!field || !cowId) return;
++   const latest = await BreedingEvent.findOne({ cowId, type }).sort({ date: -1, createdAt: -1 }).lean();
++   const cow = await Cow.findById(cowId).lean();
++   if (!cow) return;
++   const patch = {};
++   // Preserve a legacy date when no event remains; deleting new event history must not erase older cow data.
++   if (latest) patch[field] = latest.date;
++   if (Object.keys(patch).length) await Cow.findByIdAndUpdate(cowId, { $set: patch });
++ }
++
++ function pagination(query) {
++   const rawPage = query.page === undefined ? '1' : String(query.page);
++   const rawLimit = query.limit === undefined ? '50' : String(query.limit);
++   if (!/^\d+$/.test(rawPage) || Number(rawPage) < 1 || !Number.isSafeInteger(Number(rawPage))) return { error: 'page must be a positive integer' };
++   if (!/^\d+$/.test(rawLimit) || Number(rawLimit) < 1) return { error: 'limit must be a positive integer' };
++   const page = Number(rawPage);
++   const limit = Math.min(Number(rawLimit), 200);
++   return { page, limit, skip: (page - 1) * limit };
++ }
++
++ // Preserve GET /api/breeding: existing calendar and reminder contract.
++ router.get('/events', protect, async (req, res) => {
++   try {
++     const pg = pagination(req.query);
++     if (pg.error) return res.status(400).json({ error: pg.error });
++     const filter = {};
++     if (req.query.cowId !== undefined) filter.cowId = String(req.query.cowId);
++     if (req.query.type !== undefined) {
++       if (!TYPES.includes(String(req.query.type))) return res.status(400).json({ error: 'Invalid event type' });
++       filter.type = String(req.query.type);
++     }
++     for (const key of ['from', 'to']) {
++       if (req.query[key] !== undefined) {
++         const probe = readDate({ date: String(req.query[key]) }, 'date', []);
++         if (probe === undefined) return res.status(400).json({ error: `${key} must be a valid YYYY-MM-DD date` });
++       }
++     }
++     if (req.query.from || req.query.to) {
++       filter.date = {};
++       if (req.query.from) filter.date.$gte = String(req.query.from);
++       if (req.query.to) filter.date.$lte = String(req.query.to);
++     }
++     const [events, total] = await Promise.all([
++       BreedingEvent.find(filter).sort({ date: -1, _id: -1 }).skip(pg.skip).limit(pg.limit).lean(),
++       BreedingEvent.countDocuments(filter),
++     ]);
++     res.json({ events, total, page: pg.page, limit: pg.limit, pages: Math.ceil(total / pg.limit) });
++   } catch (e) { res.status(500).json({ error: e.message }); }
++ });
++
++ async function createCalvingCalves(event, mother, farmId) {
++   const entries = Array.isArray(event.calves) ? event.calves : [];
++   const created = [];
++   try {
++     for (const entry of entries) {
++       if (entry.outcome === 'stillbirth') continue;
++       const earTag = String(entry.earTag || '').trim().toLocaleUpperCase();
++       if (earTag) {
++         // Be explicit about the selected farm instead of relying only on the
++         // request-scoped model wrapper. This keeps the rule obvious and makes
++         // identical ear tags valid in separate farms in both Mongo and memory mode.
++         const taggedCows = await Cow.find({ farmId, earTag: { $ne: '' } }).lean();
++         const normalizedTag = earTag.toLocaleLowerCase();
++         const duplicate = taggedCows.some((cow) => String(cow.earTag || '').trim().toLocaleLowerCase() === normalizedTag);
++         if (duplicate) throw Object.assign(new Error(`Ear tag "${earTag}" is already used in this farm`), { status: 409 });
++       }
++       const id = randomUUID();
++       const name = earTag ? `Calf ${earTag}` : `${mother.name} calf ${event.date} ${created.length + 1}`;
++       const fatherType = event.sireSource === 'farm_bull' ? 'farm' : (event.sireSource ? 'outside' : '');
++       const calf = await Cow.create({
++         _id: id,
++         name,
++         breed: mother.breed || 'Unknown',
++         gender: entry.gender,
++         status: 'calf',
++         isCalf: true,
++         birthDate: event.date,
++         earTag,
++         motherId: mother._id,
++         fatherId: event.sireSource === 'farm_bull' ? event.bullId || '' : '',
++         fatherType: fatherType || 'farm',
++         fatherName: event.sireSource && event.sireSource !== 'farm_bull'
++           ? [event.bullName, event.semenCode].filter(Boolean).join(' / ')
++           : '',
++         calvingEventId: event._id,
++       });
++       created.push(calf);
++     }
++     return created;
++   } catch (error) {
++     await Promise.all(created.map((calf) => Cow.findByIdAndDelete(calf._id).catch(() => null)));
++     throw error;
++   }
++ }
++
++ router.post('/events', protect, async (req, res) => {
++   let event = null;
++   let createdCalves = [];
++   try {
++     const { payload, errors } = eventPayload(req.body || {});
++     if (errors.length) return sendValidationError(res, errors);
++     if (!(await validateReferences(payload, res))) return;
++     const mother = await Cow.findById(payload.cowId).lean();
++     if (payload.type === 'calving' && !Array.isArray(payload.calves)) {
++       payload.calves = [];
++     }
++     event = await BreedingEvent.create({ ...payload, generatedCalfIds: [], _id: randomUUID() });
++     if (event.type === 'calving' && event.calves.length) {
++       createdCalves = await createCalvingCalves(event, mother, req.farmContext?.farmId || event.farmId);
++       const generatedCalfIds = createdCalves.map((calf) => calf._id);
++       event = await BreedingEvent.findByIdAndUpdate(event._id, { $set: { generatedCalfIds } }, { new: true });
++     }
++     await syncCowDate(event.cowId, event.type);
++     res.status(201).json(event);
++   } catch (e) {
++     await Promise.all(createdCalves.map((calf) => Cow.findByIdAndDelete(calf._id).catch(() => null)));
++     if (event?._id) await BreedingEvent.findByIdAndDelete(event._id).catch(() => null);
++     res.status(e.status || (e.code === 11000 ? 409 : 500)).json({ error: e.code === 11000 ? 'That ear tag is already used in this farm' : e.message });
++   }
++ });
++
++ router.put('/events/:id', protect, async (req, res) => {
++   try {
++     const existing = await BreedingEvent.findById(req.params.id).lean();
++     if (!existing) return res.status(404).json({ error: 'Breeding event not found' });
++     const { payload: changes, errors: changeErrors } = eventPayload(req.body || {}, { partial: true });
++     if (changeErrors.length) return sendValidationError(res, changeErrors);
++     const next = { ...existing, ...changes };
++     const { payload, errors } = eventPayload(next);
++     if (errors.length) return sendValidationError(res, errors);
++     if (!(await validateReferences(payload, res))) return;
++     if (existing.type === 'calving' && (existing.generatedCalfIds || []).length) {
++       const protectedFields = ['cowId', 'date', 'sireSource', 'bullId', 'bullName', 'semenCode'];
++       const changedCoreData = protectedFields.some((field) =>
++         String(payload[field] ?? existing[field] ?? '') !== String(existing[field] ?? '')
++       );
++       const normalizeCalves = (entries) => (entries || []).map((entry) => ({
++         gender: entry.gender,
++         earTag: String(entry.earTag || '').trim(),
++         outcome: entry.outcome || 'live',
++       }));
++       const changedCalfEntries = JSON.stringify(normalizeCalves(payload.calves ?? existing.calves)) !== JSON.stringify(normalizeCalves(existing.calves));
++       const changedGeneratedData = changedCoreData || changedCalfEntries;
++       if (changedGeneratedData) {
++         return res.status(409).json({ error: 'This calving already has generated calves. Calf identity, date and sire cannot be changed; create a correction workflow instead.' });
++       }
++     }
++     const updated = await BreedingEvent.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
++     await syncCowDate(existing.cowId, existing.type);
++     await syncCowDate(next.cowId, next.type);
++     res.json(updated);
++   } catch (e) { res.status(500).json({ error: e.message }); }
++ });
++
++ router.delete('/events/:id', protect, adminOnly, async (req, res) => {
++   try {
++     const event = await BreedingEvent.findById(req.params.id).lean();
++     if (!event) return res.status(404).json({ error: 'Breeding event not found' });
++     if (event.type === 'calving' && (event.generatedCalfIds || []).length) {
++       return res.status(409).json({ error: 'This calving has linked calf records. Resolve the calf records before deleting the event.' });
++     }
++     await BreedingEvent.findByIdAndDelete(req.params.id);
++     await syncCowDate(event.cowId, event.type);
++     res.json({ deleted: true });
++   } catch (e) { res.status(500).json({ error: e.message }); }
++ });
++
++ export default router;
++
+
+ ❯ tests/dairy-calving-creates-calf.test.ts:36:20
+     34|
+     35|   it('enforces farm-scoped ear-tag uniqueness and records stillbirth without creating a live calf', () => {
+     36|     expect(routes).toContain('const taggedCows = await Cow.find({ earTag: { $ne: \'\' } }).lean()');
+       |                    ^
+     37|     expect(routes).toContain('toLocaleLowerCase() === earTag.toLocaleLowerCase()');
+     38|     expect(routes).toContain("if (entry.outcome === 'stillbirth') continue");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 26 passed (27)
+      Tests  1 failed | 253 passed (254)
+   Start at  21:51:54
+   Duration  11.79s (transform 1.71s, setup 0ms, collect 5.20s, tests 12.19s, environment 11ms, prepare 6.39s)
+
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-sync
+
+> check-sync
+> node tools/check-muf-sync.js
+
+
+━━ Twin files (dairy ↔ flock, must be identical after normalizing farm identity) ━━
+  ✅ muf-style.css (all 3)          identical
+  ✅ muf-login.tsx (all 3)          identical
+  ✅ components/MyFarmsPanel.tsx    identical
+  ✅ muf-print.ts                   identical
+  ✅ utils/share.ts                 identical
+  ✅ muf-labor.ts                   identical
+  ✅ muf-zakat.ts                   identical
+  ✅ muf-pdf.ts                     identical
+  ✅ muf-feedstock.ts               identical
+  ✅ muf-khata.ts                   identical
+  ✅ muf-farmbook.ts                identical
+  ✅ muf-image.ts                   identical
+  ✅ muf-voice.ts                   identical
+  ✅ muf-urdu.ts                    identical
+  ✅ muf-urdu-terms-1.ts            identical
+  ✅ muf-urdu-terms-2.ts            identical
+  ✅ muf-urdu-terms-3.ts            identical
+  ✅ muf-urdu-terms-4.ts            identical
+  ✅ muf-urdu-terms-5.ts            identical
+  ✅ muf-urdu-terms-6.ts            identical
+  ✅ muf-search.ts                  identical
+  ✅ muf-offline.ts                 identical
+  ✅ muf-charts.tsx                 identical
+  ✅ muf-profile.ts                 identical
+  ✅ muf-applike.tsx                identical
+  ✅ muf-date.ts                    identical
+  ✅ muf-story.ts                   identical
+  ✅ muf-telegram.mjs               identical
+  ✅ muf-supplier.ts                identical
+  ✅ muf-motion.ts                  identical
+  ✅ muf-modal.tsx                  identical
+  ✅ muf-confirm.tsx                identical
+  ✅ muf-portal.tsx                 identical
+  ✅ muf-offline-banner.tsx         identical
+  ✅ muf-avatar.tsx                 identical
+  ✅ muf-farm-profile.tsx           identical
+  ✅ muf-header-search.tsx          identical
+  ✅ muf-telegram-panel.tsx         identical
+  ✅ muf-form-overlay.tsx           identical
+  ✅ muf-scroll-lock.ts             identical
+  ✅ muf-card-qr.tsx                identical
+  ✅ muf-entity-grid.tsx            identical
+  ✅ muf-diary-media.tsx            identical
+  ✅ muf-login-lang.tsx             identical
+  ✅ muf-login.tsx                  identical
+  ✅ muf-a11y.ts                    identical
+  ✅ muf-worker-panel.tsx           identical
+
+━━ Shared farm switcher (all three apps, byte-identical) ━━
+  ✅ Shared farm switcher identical in all three apps
+
+━━ Backend muf twins (byte-identical in all 3 backends) ━━
+  ✅ muf-telegram.mjs     byte-identical
+  ✅ muf-email.mjs        byte-identical
+  ✅ muf-date.mjs         byte-identical
+  ✅ muf-query.mjs        byte-identical
+  ✅ muf-env.mjs          byte-identical
+  ✅ muf-card.mjs         byte-identical
+  ✅ muf-farms.mjs        byte-identical
+  ✅ backend: telegram parser helper    parseCommand
+  ✅ backend: email factory helper      createMufMailer
+  ✅ backend: farm-local today helper   mufToday
+  ✅ backend: query matcher helper      mufMatches
+  ✅ backend: env resolver (MUF_ENV)    MUF_ENV
+  ✅ backend: card page renderer        renderMufCard
+
+━━ Unified env system (same names in all 3 backends) ━━
+  ✅ env: MONGO_URI                     in all 3 .env.example
+  ✅ env: JWT_SECRET                    in all 3 .env.example
+  ✅ env: APP_URL                       in all 3 .env.example
+  ✅ env: FRONTEND_URL                  in all 3 .env.example
+  ✅ env: SMTP_HOST                     in all 3 .env.example
+  ✅ env: SMTP_PORT                     in all 3 .env.example
+  ✅ env: SMTP_SECURE                   in all 3 .env.example
+  ✅ env: SMTP_USER                     in all 3 .env.example
+  ✅ env: SMTP_PASS                     in all 3 .env.example
+  ✅ env: SMTP_FROM                     in all 3 .env.example
+  ✅ env: TELEGRAM_BOT_TOKEN            in all 3 .env.example
+  ✅ env: TELEGRAM_WEBHOOK_SECRET       in all 3 .env.example
+  ✅ env: CRON_SECRET                   in all 3 .env.example
+  ✅ env: MEMORY_MODE                   in all 3 .env.example
+  ✅ env: CROSS_FARM_KEY                in all 3 .env.example
+  ✅ env: TZ_OFFSET_HOURS               in all 3 .env.example
+  ✅ env: LOG_REQUESTS                  in all 3 .env.example
+  ✅ env: PORT                          in all 3 .env.example
+  ✅ env: dairy no legacy reads         all through muf-env
+  ✅ env: flock no legacy reads         all through muf-env
+  ✅ env: agri no legacy reads          all through muf-env
+
+━━ muf invariants (same value required in all three apps) ━━
+  ✅ popup width small (MUF token)  muf-pup-width-sm
+  ✅ popup width big (MUF token)    muf-pup-width-lg
+  ✅ popup max height (MUF card)    muf-pup-card
+  ✅ popup mobile height token      70dvh
+  ✅ form overlay mobile height cap max-height: var(--muf-popup-mobile-max-height) !important
+  ✅ primary action uses canonical  var(--muf-color-primary)
+  ✅ active navigation uses canonic var(--muf-color-primary-hover)
+  ✅ detail action uses canonical t var(--muf-color-primary)
+  ✅ focus ring uses semantic succe var(--muf-color-success)
+  ✅ popup focus outline uses share var(--muf-ui-focus)
+  ✅ mobile popup stage padding tok 10px
+  ✅ mobile popup typography scale  (matched)
+  ✅ mobile popup fields use shared (matched)
+  ✅ popup form gap uses shared tok 1rem
+  ✅ popup field height uses shared 38px
+  ✅ mobile popup field size uses s var(--muf-ui-popup-field-font-size-mobile)
+  ✅ primary action height token    47px
+  ✅ primary action consumes height var(--muf-core-action-primary-height,47px)
+  ✅ compact action consumes sizing var(--muf-core-action-compact-height,31px)
+  ✅ KPI spacing consumes token     var(--muf-core-kpi-gap,12px)
+  ✅ KPI padding consumes token     var(--muf-core-kpi-padding,17px 15px)
+  ✅ panel radius consumes token    var(--muf-core-panel-radius,20px)
+  ✅ entity card radius consumes to var(--muf-core-entity-radius,17px)
+  ✅ record action color consumes t var(--muf-core-action-record-bg,#f0f3f1)
+  ✅ popup content: label primitive font-weight: 600
+  ✅ popup content: muted text prim font-size: 0.75rem
+  ✅ popup content: form grid primi gap: 0.75rem
+  ✅ popup content: actions primiti justify-content: flex-end
+  ✅ popup content: mobile scale ho var(--muf-popup-mobile-text-xs, 10.5px)
+  ✅ popup content: dark popup hook #e5edf7
+  ✅ brand token: WhatsApp green    #25D366
+  ✅ brand token: WhatsApp hover    #1ebe5b
+  ✅ dark popups: white panels repa #172337
+  ✅ dark popups: dark slate text r #e5edf7
+  ✅ photo viewer z-index token     1450
+  ✅ Notes MUF root class           muf-notes
+  ✅ scale: shared popup title 0.87 0.875rem
+  ✅ popup body padding             --pup-body-pad
+  ✅ popup rounding                 rounded-2xl sm:rounded-3xl
+  ✅ popup backdrop                 bg-black/50
+  ✅ admin popup width (MUF token)  muf-admin-shell-card
+  ✅ admin popup height (MUF token) muf-admin-shell-card
+  ✅ admin popup rounding (MUF)     muf-admin-shell-card
+  ✅ admin stage spacing (MUF)      muf-popup-stage
+  ✅ toast z-index                  z-[var(--muf-z-toast)]
+  ✅ type scale: desktop zoom       0.8
+  ✅ print: brand title 26px        26px
+  ✅ print: green rule              #16a34a
+  ✅ print: logo size 56px          56px
+  ✅ print: dark green brand        #14532d
+  ✅ compare: pctChange helper      pctChange
+  ✅ compare: trendArrow helper     trendArrow
+  ✅ share: backup share helper     shareBackupFile
+  ✅ share: WhatsApp fallback URL   https://web.whatsapp.com
+  ✅ labor: half-day units 0.5      0.5
+  ✅ labor: wage sheet helper       buildWageSheet
+  ✅ labor: post date (28th)        -28
+  ✅ zakat: default 2.5%            2.5
+  ✅ zakat: ushr rates 10/5         10
+  ✅ zakat: statement helper        zakatStatementBody
+  ✅ zakat: download helper         downloadZakatPdf
+  ✅ pdf: header helper             mufPdfHeader
+  ✅ pdf: logo 17mm at 14,8         14, 8, 17, 17
+  ✅ pdf: dark green brand rgb      20, 83, 45
+  ✅ pdf: green rule rgb            22, 163, 74
+  ✅ labor: advance helper          payoutAfterAdvances
+  ✅ farmbook: download helper      downloadFarmBookPdf
+  ✅ urdu: dictionary helper        mufUr
+  ✅ urdu: Dashboard term           ڈیش بورڈ
+  ✅ search: ranking helper         mufSearch
+  ✅ offline: watch helper          watchOffline
+  ✅ charts: area chart component   MufAreaChart
+  ✅ dark: shared palette vars      --muf-dark-bg
+  ✅ profile: buyers pdf            downloadFarmProfilePdf
+  ✅ applike: pull to refresh       initMufPullToRefresh
+  ✅ applike: splash styles         #muf-splash
+  ✅ date: local today helper       mufToday
+  ✅ story: lifetime verdict        mufVerdictText
+  ✅ compare: same month last year  sameMonthLastYearKey
+  ✅ telegram: doodh keyword        doodh
+  ✅ telegram: urdu hazri keyword   حاضری
+  ✅ telegram: drop check           mufDropCheck
+  ✅ telegram: drop alert text      tgDropAlert
+  ✅ supplier: balance math         supplierBalances
+  ✅ supplier: urdu hisab text      کھاتے کی تفصیل
+  ✅ motion: single re-export       'motion/react'
+  ✅ motion: modal spring 480/30    480
+  ✅ motion: reduced-motion gate    prefersReducedMotion
+  ✅ modal: muf-overlay class       muf-overlay
+  ✅ modal: ESC top-most close      (matched)
+  ✅ modal: body scroll lock        (matched)
+  ✅ confirm: prompt support        usePromptInput
+  ✅ confirm: toast support         notify
+  ✅ portal: modal root id          (matched)
+  ✅ form overlay uses muf modal    ./muf-modal
+  ✅ scroll lock: stack counter     0
+
+━━ muf email shell (backend mailers) ━━
+  ✅ email: brand green header      #16a34a
+  ✅ email: farm name color         #14532d
+  ✅ email: code box bg             #f0fdf4
+  ✅ email: logo 56px               56
+
+━━ Scan rules (must stay clean in all three apps) ━━
+  ✅ motion imported only via muf-motion          clean in all 3 apps
+
+━━ muf-urdu shared helpers (all 3 apps) ━━
+  ✅ urdu: mufUr helper                  (all 3)
+  ✅ urdu: mufFill helper                (all 3)
+  ✅ urdu: mufL helper                   (all 3)
+  ✅ Urdu only in muf-urdu + message builders     clean in all 3 apps
+  ✅ toLocaleDateString only in muf-date (+ legac clean in all 3 apps
+  ✅ popup size only small|big                   clean in all 3 apps
+
+━━ backend invariants (mongoSanitize + JSON body limit, all 3 apps) ━━
+  ✅ mongoSanitize imported             (matched)
+  ✅ mongoSanitize mounted              (matched)
+  ✅ JSON body limit 10mb               10mb
+
+━━ muf-pdf: typed finalY helper present in all 3 apps ━━
+  ✅ mufLastAutoTableY exported         mufLastAutoTableY
+  ✅ mufPdfTable delegates to helper    mufLastAutoTableY
+  ✅ lastAutoTable only via mufLastAutoTableY hel clean in all 3 apps
+
+━━ muf-image twin present in all 3 apps ━━
+  ✅ muf-image: compressGalleryImage ex compressGalleryImage
+  ✅ muf-image: GALLERY_MAX_PHOTOS = 10 10
+
+━━ muf-voice twin present in all 3 apps ━━
+  ✅ muf-voice: isVoiceSupported export isVoiceSupported
+  ✅ muf-voice: startVoiceRecording exp startVoiceRecording
+  ✅ muf-voice: MAX_VOICE_SECONDS = 60  60
+
+🎉 All muf checks passed — the three apps are in sync.
+
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-ui
+
+> check-ui
+> node tools/check-ui-safety.js
+
+
+MUF UI safety checks
+  ✓ muf/core/muf-modal.tsx matches across all three apps
+  ✓ muf/core/muf-confirm.tsx matches across all three apps
+  ✓ muf-style.css matches across all three apps
+  ✓ muf/ui/muf-diary.tsx matches across all three apps
+  ✓ muf/ui/muf-login.tsx matches across all three apps
+  ✓ dairy: no native browser dialog calls in app source
+  ✓ dairy: popup has dialog semantics
+  ✓ dairy: active modal stack and Escape handling present
+  ✓ dairy: notifications queue without native alert fallback
+  ✓ dairy: QR receipt uses MUF notification
+  ✓ dairy: responsive and reduced-motion styles present
+  ✓ dairy: Finance dropdown uses an accessible body portal
+  ✓ dairy: MUF dropdown tokens and popup field safeguards present
+  ✓ dairy: MUF login shell and inset mobile dialog sizing present
+  ✓ dairy: auth UI uses shared MUF login components
+  ✓ dairy: header and primary navbar share a sticky MUF wrapper
+  ✓ dairy: app root clips horizontal overflow without disabling sticky chrome
+  ✓ flock: no native browser dialog calls in app source
+  ✓ flock: popup has dialog semantics
+  ✓ flock: active modal stack and Escape handling present
+  ✓ flock: notifications queue without native alert fallback
+  ✓ flock: QR receipt uses MUF notification
+  ✓ flock: responsive and reduced-motion styles present
+  ✓ flock: Home Birds navigation is scoped to the approved sections
+  ✓ flock: MUF dropdown tokens and popup field safeguards present
+  ✓ flock: MUF login shell and inset mobile dialog sizing present
+  ✓ flock: auth UI uses shared MUF login components
+  ✓ flock: header and primary navbar share a sticky MUF wrapper
+  ✓ agri: no native browser dialog calls in app source
+  ✓ agri: popup has dialog semantics
+  ✓ agri: active modal stack and Escape handling present
+  ✓ agri: notifications queue without native alert fallback
+  ✓ agri: QR receipt uses MUF notification
+  ✓ agri: responsive and reduced-motion styles present
+  ✓ agri: Finance dropdown uses an accessible body portal
+  ✓ agri: MUF dropdown tokens and popup field safeguards present
+  ✓ agri: MUF login shell and inset mobile dialog sizing present
+  ✓ agri: auth UI uses shared MUF login components
+  ✓ agri: header and primary navbar share a sticky MUF wrapper
+  ✓ dairy: popup content uses muf-pc-* classes for the shared patterns
+  ✓ flock: popup content uses muf-pc-* classes for the shared patterns
+  ✓ agri: popup content uses muf-pc-* classes for the shared patterns
+
+All MUF UI safety checks passed.
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-workbench
+
+> check-workbench
+> node tools/check-muf-workbench.js
+
+
+MUF workbench source safety check
+  ✓ workbench has a dedicated mount point
+  ✓ drafts use a namespaced browser-local key
+  ✓ undo/redo controls are present
+  ✓ CSS and JSON export controls are present
+  ✓ canvas ordering, duplication and deletion exist
+  ✓ responsive preview presets exist
+  ✓ the editor has no publish-to-production handler
+  ✓ editor contains no API client or network request
+  ✓ editor loads its isolated stylesheet
+  ✓ workbench stylesheet has tablet/mobile layout breakpoints
+  ✓ workbench respects reduced-motion preference
+  ✓ workbench route is registered through Vite development middleware
+  ✓ development route matches an explicit path only
+  ✓ development route serves the dedicated editor HTML
+  ✓ custom workbench HTML passes through Vite HTML transforms
+  ✓ workbench is not imported by the production app entry points
+  ✓ editor module and stylesheet are isolated from other app source files
+  ✓ normal production build script does not explicitly invoke the workbench
+  ✓ no new Puck dependency was added to the app manifest
+  ✓ runtime smoke test can target the development workbench URL
+  ✓ runtime smoke test checks the editor mount, module and stylesheet
+  ✓ runtime smoke test checks Vite and React refresh wiring
+  ✓ runtime smoke test has a network timeout and fails with a non-zero exit code
+
+All 23 workbench source checks passed. This does not replace a local TypeScript build or browser review.
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-farms
+
+> check-farms
+> node tools/check-farm-scope.js && node tools/check-dairy-breeding-events.js
+
+
+agri: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  ✓ existing records were tagged into the first farm
+  ✓ owner can add a farm
+  ✓ duplicate farm names are rejected
+  ✓ owner can rename a farm
+  ✓ a new farm starts empty
+  ✓ record can be created in farm B
+  ✓ record created in B (with a forged farmId) is not in farm A
+  ✓ record is visible in farm B
+  ✓ All farms shows both farms
+  ✓ writing in All farms is refused
+  ✓ Agri bulk task import rejects the entire payload before writing invalid rows
+  ✓ Agri bulk task import inserts a validated row
+  ✓ Agri bulk task row is hidden from farm A
+  ✓ Agri bulk task row belongs to farm B
+  ✓ Agri bulk finance import inserts a validated row
+  ✓ Agri bulk finance row is hidden from farm A
+  ✓ Agri bulk finance row belongs to farm B
+  ✓ updating a farm-B record while in farm A finds nothing
+  ✓ deleting a farm-B record while in farm A finds nothing
+  ✓ updating a record inside its own farm works
+  ✓ the updated record is still in farm B
+  ✓ and did not move to farm A
+  ✓ owner can create a worker assigned to farm B
+  ✓ owner can create a manager assigned to farm A
+  ✓ a worker created without farms gets the creator's selected farm
+  ✓ worker logs in as worker
+  ✓ worker defaults to farm B and sees only farm B
+  ✓ worker cannot select farm A
+  ✓ worker "All farms" is limited to assigned farms
+  ✓ worker cannot add farms
+  ✓ worker cannot download a backup
+  ✓ worker cannot list users
+  ✓ manager keeps full control but is not an owner
+  ✓ manager sees farm A only
+  ✓ manager cannot select farm B
+  ✓ manager cannot add farms
+  ✓ manager cannot download a backup
+  ✓ manager cannot create another manager
+  ✓ manager can create a worker, limited to the manager's own farm
+  ✓ manager does not see workers of other farms
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore the backup
+  ✓ all farms still exist after the restore
+  ✓ the farm-B record is still in farm B after the restore
+  ✓ farm A is unchanged after the restore
+  ✓ deleting a farm with data needs the farm name typed
+  ✓ and a choice: move or delete the records
+  ✓ owner can archive a farm
+  ✓ workers of an archived farm lose access
+  ✓ owner can restore it
+  ✓ owner can delete the farm after moving its records
+  ✓ the moved record now lives in farm A
+  ✓ the last farm cannot be deleted
+
+flock: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  Flock: legacy buckets and batches
+  ✓ legacy egg bucket keeps its established response shape
+  ✓ owner can create a second poultry farm
+  ✓ new farm has an isolated empty bucket
+  ✓ bucket write succeeds in selected farm
+  ✓ farm B bucket write does not change farm A
+  ✓ farm B reads only its own bucket
+  ✓ All farms mode rejects bucket writes
+  ✓ batch creation is stamped with selected farm
+  ✓ farm A cannot see farm B batches
+  ✓ farm B can see its own batch
+  ✓ batch feed logs are stamped with the selected farm
+  ✓ batch egg logs are stamped with the selected farm
+  ✓ batch vaccination logs are stamped with the selected farm
+  ✓ batch detail returns egg and vaccination history
+  ✓ batch summary includes egg income and vaccination costs
+  ✓ batch details and their logs are hidden from another farm
+  ✓ new worker is assigned to the selected farm
+  ✓ assigned worker can log in
+  ✓ worker cannot select another farm
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore a full Flock backup while All farms is selected
+  ✓ Flock restore preserves all farms
+  ✓ Flock restore preserves records in their original farm
+
+dairy: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  ✓ existing records were tagged into the first farm
+  ✓ owner can add a farm
+  ✓ duplicate farm names are rejected
+  ✓ owner can rename a farm
+  ✓ a new farm starts empty
+  ✓ record can be created in farm B
+  ✓ record created in B (with a forged farmId) is not in farm A
+  ✓ record is visible in farm B
+  ✓ All farms shows both farms
+  ✓ writing in All farms is refused
+  ✓ updating a farm-B record while in farm A finds nothing
+  ✓ deleting a farm-B record while in farm A finds nothing
+  ✓ updating a record inside its own farm works
+  ✓ the updated record is still in farm B
+  ✓ and did not move to farm A
+  ✓ owner can create a worker assigned to farm B
+  ✓ owner can create a manager assigned to farm A
+  ✓ a worker needs at least one farm
+  ✓ worker logs in as worker
+  ✓ worker defaults to farm B and sees only farm B
+  ✓ worker cannot select farm A
+  ✓ worker "All farms" is limited to assigned farms
+  ✓ worker cannot add farms
+  ✓ worker cannot download a backup
+  ✓ worker cannot list users
+  ✓ manager keeps full control but is not an owner
+  ✓ manager sees farm A only
+  ✓ manager cannot select farm B
+  ✓ manager cannot add farms
+  ✓ manager cannot download a backup
+  ✓ manager cannot create another manager
+  ✓ manager can create a worker, limited to the manager's own farm
+  ✓ manager does not see workers of other farms
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore the backup
+  ✓ all farms still exist after the restore
+  ✓ the farm-B record is still in farm B after the restore
+  ✓ farm A is unchanged after the restore
+  ✓ deleting a farm with data needs the farm name typed
+  ✓ and a choice: move or delete the records
+  ✓ owner can archive a farm
+  ✓ workers of an archived farm lose access
+  ✓ owner can restore it
+  ✓ owner can delete the farm after moving its records
+  ✓ the moved record now lives in farm A
+  ✓ the last farm cannot be deleted
+
+All farm scope checks passed.
+
+Phase 2: Dairy breeding event runtime checks
+  ✓ seeded owner can log in
+  ✓ demo data provides two farms for isolation testing
+  ✓ owner can create a valid breeding event
+  ✓ creating a heat event synchronizes the legacy cow heatDate
+  ✓ owner can edit an existing breeding event
+  ✓ editing an event resynchronizes the legacy cow date
+  ✓ service event accepts a valid in-farm bull
+  ✓ service event synchronizes the legacy breeding date
+  ✓ calving creates one live calf record per twin and excludes stillbirth from live calf records
+  ✓ calving event synchronizes the legacy cow calving date
+  ✓ generated calves carry gender, date, mother, farm bull and calf status
+  ✓ duplicate ear tag is refused within the same farm, ignoring case
+  ✓ the same ear tag is allowed in a different farm
+  ✓ a calving event with linked calves cannot be deleted and orphan them
+  ✓ event appears in paginated list for its farm and cow
+  ✓ list response includes pagination metadata
+  ✓ farm B cannot see an event created in farm A
+  ✓ invalid event dates are rejected
+  ✓ seeded worker can log in
+  ✓ worker can create a breeding event
+  ✓ worker cannot delete a breeding event
+  ✓ manual backup contains breeding events
+  ✓ backup restore succeeds with breeding events included
+  ✓ restored backup retains breeding events
+
+All Dairy breeding event checks passed.
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-docs
+
+> check-docs
+> node tools/check-phase-docs.js
+
+
+Phase docs check
+  ✓ docs/phases/README.md exists
+  ✓ the index lists Phase 0 plus at least 12 later phases (found 22)
+  ✓ phase numbers run 0, 1, 2 ... without gaps
+  ✓ Phase 0 is Done
+  ✓ the last three phases are the final testing phases
+  ✓ no final-testing phase appears before the end
+  ✓ every phase file is listed and every row has a file (22 files, 22 rows)
+  ✓ Phase 0: title line starts with "# Phase 0:"
+  ✓ Phase 0: status matches the index (Done)
+  ✓ Phase 0: has all required sections
+  ✓ Phase 1: title line starts with "# Phase 1:"
+  ✓ Phase 1: status matches the index (Done)
+  ✓ Phase 1: has all required sections
+  ✓ Phase 1: names a new command-line check
+  ✓ Phase 2: title line starts with "# Phase 2:"
+  ✓ Phase 2: status matches the index (Done)
+  ✓ Phase 2: has all required sections
+  ✓ Phase 2: names a new command-line check
+  ✓ Phase 3: title line starts with "# Phase 3:"
+  ✓ Phase 3: status matches the index (Done)
+  ✓ Phase 3: has all required sections
+  ✓ Phase 3: names a new command-line check
+  ✓ Phase 4: title line starts with "# Phase 4:"
+  ✓ Phase 4: status matches the index (In progress)
+  ✓ Phase 4: has all required sections
+  ✓ Phase 4: names a new command-line check
+  ✓ Phase 5: title line starts with "# Phase 5:"
+  ✓ Phase 5: status matches the index (Not started)
+  ✓ Phase 5: has all required sections
+  ✓ Phase 5: names a new command-line check
+  ✓ Phase 6: title line starts with "# Phase 6:"
+  ✓ Phase 6: status matches the index (Not started)
+  ✓ Phase 6: has all required sections
+  ✓ Phase 6: names a new command-line check
+  ✓ Phase 7: title line starts with "# Phase 7:"
+  ✓ Phase 7: status matches the index (Not started)
+  ✓ Phase 7: has all required sections
+  ✓ Phase 7: names a new command-line check
+  ✓ Phase 8: title line starts with "# Phase 8:"
+  ✓ Phase 8: status matches the index (Not started)
+  ✓ Phase 8: has all required sections
+  ✓ Phase 8: names a new command-line check
+  ✓ Phase 9: title line starts with "# Phase 9:"
+  ✓ Phase 9: status matches the index (Not started)
+  ✓ Phase 9: has all required sections
+  ✓ Phase 9: names a new command-line check
+  ✓ Phase 10: title line starts with "# Phase 10:"
+  ✓ Phase 10: status matches the index (Not started)
+  ✓ Phase 10: has all required sections
+  ✓ Phase 10: names a new command-line check
+  ✓ Phase 11: title line starts with "# Phase 11:"
+  ✓ Phase 11: status matches the index (Not started)
+  ✓ Phase 11: has all required sections
+  ✓ Phase 11: names a new command-line check
+  ✓ Phase 12: title line starts with "# Phase 12:"
+  ✓ Phase 12: status matches the index (Not started)
+  ✓ Phase 12: has all required sections
+  ✓ Phase 12: names a new command-line check
+  ✓ Phase 13: title line starts with "# Phase 13:"
+  ✓ Phase 13: status matches the index (Not started)
+  ✓ Phase 13: has all required sections
+  ✓ Phase 13: names a new command-line check
+  ✓ Phase 14: title line starts with "# Phase 14:"
+  ✓ Phase 14: status matches the index (Not started)
+  ✓ Phase 14: has all required sections
+  ✓ Phase 14: names a new command-line check
+  ✓ Phase 15: title line starts with "# Phase 15:"
+  ✓ Phase 15: status matches the index (Not started)
+  ✓ Phase 15: has all required sections
+  ✓ Phase 15: names a new command-line check
+  ✓ Phase 16: title line starts with "# Phase 16:"
+  ✓ Phase 16: status matches the index (Not started)
+  ✓ Phase 16: has all required sections
+  ✓ Phase 16: names a new command-line check
+  ✓ Phase 17: title line starts with "# Phase 17:"
+  ✓ Phase 17: status matches the index (Not started)
+  ✓ Phase 17: has all required sections
+  ✓ Phase 17: names a new command-line check
+  ✓ Phase 18: title line starts with "# Phase 18:"
+  ✓ Phase 18: status matches the index (Not started)
+  ✓ Phase 18: has all required sections
+  ✓ Phase 18: names a new command-line check
+  ✓ Phase 19: title line starts with "# Phase 19:"
+  ✓ Phase 19: status matches the index (Not started)
+  ✓ Phase 19: has all required sections
+  ✓ Phase 19: names a new command-line check
+  ✓ Phase 20: title line starts with "# Phase 20:"
+  ✓ Phase 20: status matches the index (Not started)
+  ✓ Phase 20: has all required sections
+  ✓ Phase 20: names a new command-line check
+  ✓ Phase 21: title line starts with "# Phase 21:"
+  ✓ Phase 21: status matches the index (Not started)
+  ✓ Phase 21: has all required sections
+  ✓ Phase 21: names a new command-line check
+  ✓ docs/PROGRESS.md has a row for every phase
+  ✓ docs/PROGRESS.md shows the same status as the index
+  ✓ docs/ROADMAP.md has a row for every phase
+  ✓ docs/ROADMAP.md shows the same status as the index
+  ✓ relative links resolve
+  ✓ RULES.md points at docs/phases
+  ✓ RULES.md requires a new command-line check for every phase
+  ✓ RULES.md requires the docs to be updated by whoever works on a phase
+
+All phase docs checks passed.
+
+F:\PROJECTS\dairy\muf-monorepo>tools\build-all.bat
+================ BUILD ALL ================
+Monorepo: F:\PROJECTS\dairy\muf-monorepo
+
+---- dairy_farm ----
+   [..] Building...
+   [..] build...
+   [OK] Build successful
+
+---- flock_farm ----
+   [..] Building...
+   [..] build...
+   [OK] Build successful
+
+---- agri_farm ----
+   [..] Building...
+   [..] build...
+   [OK] Build successful
+
+================ RESULTS ================
+  ✅ dairy_farm   : OK — built
+  ✅ flock_farm   : OK — built
+  ✅ agri_farm    : OK — built
+
+[OK] All projects built successfully!
+
+Press any key to continue...
+
+Press any key to continue . . .
+
+F:\PROJECTS\dairy\muf-monorepo>
+
+F:\PROJECTS\dairy\muf-monorepo>
