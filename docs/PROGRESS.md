@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-25 (Phase 4 command-line scope complete; Phase 5 implementation started, verification pending).
+Last updated: 2026-10-25 (Phase 5 command-line scope complete; Phase 6 screens work started).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -15,8 +15,8 @@ Last updated: 2026-10-25 (Phase 4 command-line scope complete; Phase 5 implement
 | 2 | Dairy breeding events: server | Done | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Done | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
 | 4 | Dairy calves and lineage | Done | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
-| 5 | Agri fields and crop cycles: server | In progress | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
-| 6 | Agri fields and crop cycles: screens | Not started | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
+| 5 | Agri fields and crop cycles: server | Done | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
+| 6 | Agri fields and crop cycles: screens | In progress | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Not started | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Not started | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Not started | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
@@ -182,3 +182,30 @@ Phase 5, **Agri fields and crop cycles: server**, is **In progress**. Initial im
 - Added a Phase 5 contract test, extended Agri HTTP integration coverage, and added field farm-isolation checks to `tools/check-farm-scope.js` (executed by `npm run check-farms`).
 
 **No Phase 5 commands have been executed after these changes in this editing session.** The owner must pull the latest branch and run the Phase 5 command list before this phase can be marked Done. In particular, the full test suite, farm/UI/sync/workbench/docs checks and all three builds are still unverified against this implementation.
+
+
+## Phase 5 final local verification (2026-10-25, Windows CMD; output supplied by owner)
+
+Phase 5, Agri fields and crop cycles server, is **Done for the command-line scope**. The owner supplied the following passing results from `F:\\PROJECTS\\dairy\\muf-monorepo` on branch `muf-monorepo`. These are owner-reported results, not commands independently executed in this editing session.
+
+| Command/check | Result |
+|---|---|
+| `git status` / `git branch --show-current` | Clean working tree; branch `muf-monorepo`; up to date with `origin/muf-monorepo` before documentation updates |
+| `npm ci` | Completed successfully; npm reported 5 audit vulnerabilities (1 moderate, 2 high, 2 critical) and an esbuild install-script approval warning |
+| `npm test` | Passed: 28 files, 260 tests |
+| `npm run check-sync` | Passed: all three apps in sync |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source checks |
+| `npm run check-farms` | Passed on the final complete run: Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks |
+| `npm run check-docs` | Passed: all phase docs, statuses, links and required sections consistent before the status update |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `npm test -- tests/agri-fields-cycles.test.ts` | Passed: 1 file, 5 tests |
+| `npm test -- tests/agri-runtime-api.integration.test.ts` | Passed: 1 file, 11 tests |
+
+The owner interrupted one earlier `npm run check-farms` run with Ctrl+C, then reran it to completion; only the completed run is counted as passing. The focused test runs and the complete farm check were shown in the supplied output. No real-MongoDB, browser/phone, or live-site verification is claimed; those remain in Phases 19 to 21.
+
+Security follow-up: `npm ci` reported 5 dependency audit findings. Do not use `npm audit fix --force` without reviewing the proposed breaking changes. The dedicated dependency-security phase remains Phase 13.
+
+## Phase 6 start (2026-10-25)
+
+Phase 6, Agri fields and crop cycles screens, is now **In progress**. The Phase 5 server foundation is verified for the command-line scope. Initial Phase 6 work begins with an audit of the Agri crop, finance, dashboard/report, shared popup/form, and Urdu-label patterns before wiring field and crop-cycle controls. No Phase 6 implementation tests or builds have been run yet at this checkpoint.
