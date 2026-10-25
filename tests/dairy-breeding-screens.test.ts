@@ -46,7 +46,8 @@ describe('Phase 3 Dairy breeding event screens', () => {
     expect(panel).toContain("L('Event type')");
     expect(panel).toContain('event.cowId');
     expect(panel).toContain('openEdit(event)');
-    expect(panel).toMatch(/isAdmin\s*&&\s*<button[^]*?api\.deleteBreedingEvent/);
+    expect(panel).toContain('{isAdmin && <button');
+    expect(panel).toContain('api.deleteBreedingEvent(event._id)');
   });
 
   it('uses the shared MUF popup and form field classes', () => {
