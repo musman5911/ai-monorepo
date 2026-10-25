@@ -31,14 +31,26 @@ The first screen implementation is on `muf-monorepo`:
 - Create/edit forms, cow/type filters, event history, searchable farm-bull selection, outside bull/straw details, and technician/result/notes fields are present.
 - Typed client API methods and shared Urdu dictionary entries were added.
 - `tests/dairy-breeding-screens.test.ts` adds seven source-contract regression tests.
-- The owner ran the focused screen test and full Vitest suite successfully. `check-sync`, `check-farms`, `check-docs`, and all three production builds also passed.
-- The first `check-ui` run found one legacy Tailwind grid class in the new popup. The class has now been replaced with the shared `muf-pc-form-grid` primitive. **The UI-safety rerun and post-fix builds are still pending.**
+- The owner reported that the focused screen tests passed (7/7), the full Vitest suite passed (26 files, 249 tests), `check-sync`, `check-workbench`, and `check-farms` passed, and all three production builds succeeded.
+- The first `check-ui` run found one legacy Tailwind grid class in the new popup. It was replaced with the shared `muf-pc-form-grid` primitive. The owner then reran `check-ui`, and all UI-safety checks passed.
+- The latest `check-docs` run failed because this phase file lacked three required section headings. Those headings are included below to address the reported failure. The owner must rerun `npm run check-docs` against this documentation fix before the docs check can be marked passed.
+- These are owner-reported Windows CMD results, not commands executed during this documentation edit. No browser/mobile review or real-MongoDB verification is claimed.
+
+## Steps
+
+1. Keep the existing Breeding tab and due-date calendar; add the event manager alongside them.
+2. Provide create/edit forms for heat, service/tikka, pregnancy checks and calving.
+3. Support farm bulls and outside bull/straw father details, with relevant identifiers.
+4. Show per-cow event history with cow and event-type filters.
+5. Add Urdu labels through the shared dictionary twins, keeping all three copies synchronized.
+6. Verify the new source-contract test, standard checks, and all three production builds.
+7. Record only observed command output in `docs/PROGRESS.md`, and keep all phase status indexes synchronized.
 
 ## New command-line check
 
 `npm test -- tests/dairy-breeding-screens.test.ts` runs the seven Phase 3 source-contract tests. The full suite also includes the existing Urdu fallback coverage test.
 
-## Standard checks
+## Command-line checks at the end of this phase
 
 Run these from the monorepo root in Windows CMD:
 
@@ -53,7 +65,7 @@ npm run check-docs
 tools\build-all.bat
 ```
 
-`npm run check-workbench-runtime` is optional and requires port 5000 to be free. Run all three builds even when only Dairy was changed.
+`npm run check-workbench-runtime` is optional and requires port 5000 to be free. Run all three builds even when only Dairy was changed. Do not mark the documentation check as passed until it has been rerun after the latest docs edits.
 
 ## Done checklist
 
@@ -61,11 +73,11 @@ tools\build-all.bat
 - [ ] Searchable farm-bull picker and outside bull/straw details work.
 - [ ] Per-cow event history and filters work.
 - [ ] New Urdu terms are present and all shared dictionary twins are identical.
-- [ ] The Phase 3 regression test passes.
-- [ ] All standard checks pass after the latest code change.
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and this index are current.
+- [x] The Phase 3 regression test passes (owner-reported: 7/7).
+- [ ] All standard checks pass after the latest code and documentation changes. The latest reported `check-docs` run failed and must be rerun.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and this index are current at the 2026-10-25 checkpoint.
 
-## Rules
+## Rules for whoever works on this phase
 
 1. Keep this file, `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` status values in sync.
 2. Record only command results actually observed; distinguish owner-reported output from commands run during editing.
