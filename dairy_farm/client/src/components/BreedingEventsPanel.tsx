@@ -13,14 +13,16 @@ interface BreedingEvent {
   _id: string; cowId: string; type: EventType; date: string;
   sireSource?: SireSource; bullId?: string; bullName?: string; semenCode?: string;
   technician?: string; result?: string; notes?: string;
+  calves?: { gender: 'female' | 'male'; earTag: string; outcome: 'live' | 'stillbirth' }[];
 }
 interface EventDraft {
   cowId: string; type: EventType; date: string; sireSource: SireSource;
   bullId: string; bullName: string; semenCode: string; technician: string; result: string; notes: string;
+  calves: { gender: 'female' | 'male'; earTag: string; outcome: 'live' | 'stillbirth' }[];
 }
 const emptyDraft = (): EventDraft => ({
   cowId: '', type: 'heat', date: todayStr(), sireSource: '', bullId: '', bullName: '',
-  semenCode: '', technician: '', result: '', notes: '',
+  semenCode: '', technician: '', result: '', notes: '', calves: [],
 });
 const TYPE_LABEL: Record<EventType, string> = {
   heat: 'Heat', service: 'Service / Tikka', pregnancy_check: 'Pregnancy check', calving: 'Calving',
@@ -72,6 +74,7 @@ export default function BreedingEventsPanel({ isAdmin }: { isAdmin: boolean }) {
       cowId: event.cowId, type: event.type, date: event.date, sireSource: event.sireSource || '',
       bullId: event.bullId || '', bullName: event.bullName || '', semenCode: event.semenCode || '',
       technician: event.technician || '', result: event.result || '', notes: event.notes || '',
+      calves: (event.calves || []).map(entry => ({ gender: entry.gender, earTag: entry.earTag || '', outcome: entry.outcome || 'live' })),
     });
     setModalOpen(true);
   };
@@ -93,6 +96,7 @@ export default function BreedingEventsPanel({ isAdmin }: { isAdmin: boolean }) {
       bullName: draft.sireSource === 'outside_bull' || draft.sireSource === 'outside_straw' ? draft.bullName.trim() : '',
       semenCode: draft.sireSource === 'outside_straw' ? draft.semenCode.trim() : '',
       technician: draft.technician.trim(), result: draft.result.trim(), notes: draft.notes.trim(),
+      calves: draft.type === 'calving' ? draft.calves : undefined,
     };
     setSaving(true);
     try {
@@ -172,15 +176,24 @@ export default function BreedingEventsPanel({ isAdmin }: { isAdmin: boolean }) {
         <form onSubmit={save} className="space-y-3 text-xs">
           <div><label className={label}>{L('Cow')} *</label><select required className={field} value={draft.cowId} onChange={e => change('cowId', e.target.value)}><option value="">{L('Choose a cow')}</option>{females.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}</select></div>
           <div className="muf-pc-form-grid">
-            <div><label className={label}>{L('Event type')} *</label><select required className={field} value={draft.type} onChange={e => change('type', e.target.value as EventType)}>{(Object.keys(TYPE_LABEL) as EventType[]).map(type => <option key={type} value={type}>{L(TYPE_LABEL[type])}</option>)}</select></div>
+            <div><label className={label}>{L('Event type')} *</label><select required className={field} value={draft.type} onChange={e => { const type = e.target.value as EventType; setDraft(current => ({ ...current, type, calves: type === 'calving' ? (current.calves.length ? current.calves : [{ gender: 'female', earTag: '', outcome: 'live' }]) : [] })); }}>{(Object.keys(TYPE_LABEL) as EventType[]).map(type => <option key={type} value={type}>{L(TYPE_LABEL[type])}</option>)}</select></div>
             <div><label className={label}>{L('Date')} *</label><input required type="date" className={field} value={draft.date} onChange={e => change('date', e.target.value)} /></div>
           </div>
-          {(draft.type === 'service' || draft.type === 'pregnancy_check') && <>
+          {(draft.type === 'service' || draft.type === 'pregnancy_check' || draft.type === 'calving') && <>
             <div><label className={label}>{L('Father source')}</label><select className={field} value={draft.sireSource} onChange={e => { const source = e.target.value as SireSource; setDraft(current => ({ ...current, sireSource: source, bullId: '', bullName: '', semenCode: '' })); setBullSearch(''); }}><option value="">{L('Not recorded')}</option><option value="farm_bull">{L('Bull on this farm')}</option><option value="outside_bull">{L('Outside bull')}</option><option value="outside_straw">{L('Outside semen straw')}</option></select></div>
             {draft.sireSource === 'farm_bull' && <div><label className={label}>{L('Choose a farm bull')} *</label><input type="search" className={field} value={bullSearch} onChange={e => setBullSearch(e.target.value)} placeholder={L('Search farm bulls')} aria-label={L('Search farm bulls')} /><select required className={field + ' mt-2'} value={draft.bullId} onChange={e => change('bullId', e.target.value)}><option value="">{L('Choose a bull')}</option>{filteredBulls.map(b => <option key={b._id} value={b._id}>{b.name} · {b.breed}</option>)}</select>{bulls.length === 0 && <p className="mt-1 text-amber-600">{L('No eligible farm bulls found.')}</p>}{bulls.length > 0 && filteredBulls.length === 0 && <p className="mt-1 text-slate-500">{L('No matching bulls.')}</p>}</div>}
             {(draft.sireSource === 'outside_bull' || draft.sireSource === 'outside_straw') && <div><label className={label}>{L('Outside bull name')} *</label><input required maxLength={160} className={field} value={draft.bullName} onChange={e => change('bullName', e.target.value)} /></div>}
             {draft.sireSource === 'outside_straw' && <div><label className={label}>{L('Semen code')} *</label><input required maxLength={100} className={field} value={draft.semenCode} onChange={e => change('semenCode', e.target.value)} /></div>}
           </>}
+          {draft.type === 'calving' && <div className="rounded-lg border border-pink-200 dark:border-pink-800 p-3 space-y-2">
+            <div className="flex items-center justify-between"><strong>{L('Calf entries')}</strong><button type="button" disabled={draft.calves.length >= 4} className="rounded border px-2 py-1 disabled:opacity-50" onClick={() => change('calves', [...draft.calves, { gender: 'female', earTag: '', outcome: 'live' }])}>{L('Add calf')}</button></div>
+            <p className="text-slate-500">{L('Each live calf is created automatically. Stillbirths are recorded but do not create live calf records.')}</p>
+            {draft.calves.map((entry, index) => <div key={index} className="grid grid-cols-1 sm:grid-cols-3 gap-2 border-t border-pink-100 dark:border-pink-900 pt-2">
+              <div><label className={label}>{L('Gender')}</label><select className={field} value={entry.gender} onChange={e => change('calves', draft.calves.map((item, i) => i === index ? { ...item, gender: e.target.value as 'female' | 'male' } : item))}><option value="female">{L('Female')}</option><option value="male">{L('Male')}</option></select></div>
+              <div><label className={label}>{L('Ear tag (optional)')}</label><input maxLength={80} className={field} value={entry.earTag} onChange={e => change('calves', draft.calves.map((item, i) => i === index ? { ...item, earTag: e.target.value } : item))} /></div>
+              <div><label className={label}>{L('Outcome')}</label><div className="flex gap-2"><select className={field} value={entry.outcome} onChange={e => change('calves', draft.calves.map((item, i) => i === index ? { ...item, outcome: e.target.value as 'live' | 'stillbirth' } : item))}><option value="live">{L('Live calf')}</option><option value="stillbirth">{L('Stillbirth')}</option></select>{draft.calves.length > 1 && <button type="button" className="rounded border px-2" aria-label={L('Remove calf')} onClick={() => change('calves', draft.calves.filter((_, i) => i !== index))}>×</button>}</div></div>
+            </div>)}
+          </div>}
           <div><label className={label}>{L('Technician')}</label><input maxLength={120} className={field} value={draft.technician} onChange={e => change('technician', e.target.value)} /></div>
           <div><label className={label}>{L('Result')}</label><input maxLength={500} className={field} value={draft.result} onChange={e => change('result', e.target.value)} placeholder={L(draft.type === 'pregnancy_check' ? 'e.g. Positive / Negative' : 'Optional result')} /></div>
           <div><label className={label}>{L('Notes')}</label><textarea rows={3} maxLength={2000} className={field} value={draft.notes} onChange={e => change('notes', e.target.value)} /></div>
