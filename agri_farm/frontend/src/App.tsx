@@ -31,6 +31,7 @@ import FormOverlay from './muf/core/muf-form-overlay';
 import CropOpsPanel from './components/CropOpsPanel';
 import LaborBoard from './components/LaborBoard';
 import LedgerBookForm from './components/LedgerBookForm';
+import AgriFieldsPanel from './components/AgriFieldsPanel';
 import SupplierKhata from './components/SupplierKhata';
 import { useConfirm } from './muf/core/muf-confirm';
 import MufEntityGrid from './muf/ui/muf-entity-grid';
@@ -280,6 +281,13 @@ function App() {
   const [isDark, setIsDark] = useState(() => localStorage.getItem('theme') === 'dark');
   const [lang, setLangState] = useState(getLang());
 
+  useEffect(() => {
+    if (!token) { setFields([]); return; }
+    let cancelled = false;
+    api.getFields().then(response => { if (!cancelled) setFields(Array.isArray(response.data) ? response.data : []); }).catch(() => { if (!cancelled) setFields([]); });
+    return () => { cancelled = true; };
+  }, [token]);
+
   // muf-applike: fade out the boot splash + enable pull-to-refresh on phones
   useEffect(() => {
     hideMufSplash();
@@ -420,6 +428,8 @@ function App() {
   
   // Modals
   const [showCropModal, setShowCropModal] = useState(false);
+  const [showFieldsPanel, setShowFieldsPanel] = useState(false);
+  const [fields, setFields] = useState([]);
   const [showCropImport, setShowCropImport] = useState(false);
   const [showTaskImport, setShowTaskImport] = useState(false);
   const [showFinanceImport, setShowFinanceImport] = useState(false);
@@ -1451,6 +1461,7 @@ function App() {
       plant_date: crop.plant_date || '',
       harvest_date: crop.harvest_date || '',
       field: crop.field || '',
+      fieldId: crop.fieldId || '',
       yield_kg: crop.yield_kg || '',
       yield_unit: crop.yield_unit || 'kg',
       area_kanal: crop.area_kanal ? crop.area_kanal.toString() : '1.0',
@@ -3612,6 +3623,8 @@ function App() {
                   {cropPageRows.length < cropPageTotal && <div className="flex justify-center py-4"><button type="button" disabled={cropPageLoading} onClick={() => fetchCropPage(cropPageNextSkip, cropListFilters, false)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold disabled:opacity-50">{cropPageLoading ? 'Loading crops…' : 'Load more crops (' + cropPageRows.length + ' of ' + cropPageTotal + ')'}</button></div>}
               </section>
 
+              <div className="mb-3 flex justify-end"><button type="button" onClick={() => setShowFieldsPanel(true)} className="rounded-xl border border-farm-300 px-3 py-2 text-xs font-bold text-farm-700 hover:bg-farm-50 dark:border-farm-800 dark:text-farm-300 dark:hover:bg-farm-950/30">{L('Manage Fields')}</button></div>
+
               {/* FAB — Add New Crop */}
               {userRole === 'admin' && (
                 <MufFab actions={[
@@ -4667,6 +4680,7 @@ function App() {
       </AnimatePresence>
 
       {/* ─── MODALS ─── */}
+      <AgriFieldsPanel open={showFieldsPanel} onClose={() => setShowFieldsPanel(false)} showAlert={showAlert} onFieldsChange={setFields} />
 
       {/* CROP FORM MODAL */}
       <FormOverlay
@@ -4692,6 +4706,7 @@ function App() {
                 <div>
                   <label className="muf-label">{L('Field / Plot Sector')}</label>
                   <input className="muf-field" value={cropForm.field} onChange={e => setCropForm({...cropForm, field: e.target.value})} placeholder={L('e.g. Sector 3A')} />
+                  <select className="muf-field mt-2" aria-label={L('Registered field')} value={cropForm.fieldId || ''} onChange={e => setCropForm({...cropForm, fieldId: e.target.value})}><option value="">{L('No registered field')}</option>{fields.map(field => <option key={field._id} value={field._id}>{field.name} ({Number(field.acres || 0).toLocaleString()} {L('acres')})</option>)}</select>
                 </div>
                 <div>
                   <label className="muf-label">Sizing Area (Kanal) *</label>
@@ -4849,6 +4864,7 @@ function App() {
           handleFinanceSubmit={handleFinanceSubmit}
           editingFinance={editingFinance}
           crops={crops}
+          fields={fields}
           inventory={inventory}
           suppliers={suppliers}
           onCancel={() => { setShowFinanceModal(false); setEditingFinance(null); setFinanceBookTab('ledger'); }}
