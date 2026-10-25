@@ -340,11 +340,14 @@ async function checkProject(name, project, port) {
     const worker = A.tokenOf(wLogin.json);
     ok(wLogin.json.role === 'worker' && wLogin.json.farmRole === 'worker', 'worker logs in as worker');
     const wRows = project.rows((await call('GET', project.list, { token: worker })).json);
-    ok(wRows.length === 1 && project.idOf(wRows[0]) === idB, 'worker defaults to farm B and sees only farm B');
+    const farmBRows = project.rows((await call('GET', project.list, { token: owner, farm: farmB })).json);
+    const farmBIds = new Set(farmBRows.map((row) => project.idOf(row)));
+    const workerIds = new Set(wRows.map((row) => project.idOf(row)));
+    ok(workerIds.has(idB) && [...workerIds].every((id) => farmBIds.has(id)), 'worker defaults to farm B and sees only farm B');
     const wForbidden = await call('GET', project.list, { token: worker, farm: farmA });
     ok(wForbidden.status === 403 && wForbidden.json.code === 'FARM_FORBIDDEN', 'worker cannot select farm A');
     const wAll = project.rows((await call('GET', project.list, { token: worker, farm: 'all' })).json);
-    ok(wAll.length === 1, 'worker "All farms" is limited to assigned farms');
+    ok(wAll.length === wRows.length && wAll.every((row) => workerIds.has(project.idOf(row))), 'worker "All farms" is limited to assigned farms');
     ok((await call('POST', '/api/farms', { token: worker, body: { name: 'Nope' } })).status === 403, 'worker cannot add farms');
     ok((await call('GET', '/api/backup', { token: worker })).status === 403, 'worker cannot download a backup');
     ok((await call('GET', A.users, { token: worker })).status === 403, 'worker cannot list users');
