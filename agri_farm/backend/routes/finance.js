@@ -122,6 +122,11 @@ router.post('/finance', protect, requireAdmin, asyncHandler(async (req, res) => 
 router.put('/finance/:financeId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.financeId, 'finance ID');
   const entry = { ...(req.body || {}) };
+  const existing = await Finance.findOne({ _id: oid });
+  if (existing) {
+    if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'fieldId') && existing.fieldId) entry.fieldId = String(existing.fieldId);
+    if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'cropCycleId') && existing.cropCycleId) entry.cropCycleId = String(existing.cropCycleId);
+  }
   const linkError = await validateFinanceLinks(entry);
   if (linkError) return res.status(400).json({ error: linkError });
   if (!entry.date) entry.date = todayStr();
