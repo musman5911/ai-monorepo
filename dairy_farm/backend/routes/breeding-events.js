@@ -140,7 +140,7 @@ router.get('/events', protect, async (req, res) => {
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
-async function createCalvingCalves(event, mother) {
+async function createCalvingCalves(event, mother, farmId) {
   const entries = Array.isArray(event.calves) ? event.calves : [];
   const created = [];
   try {
@@ -148,8 +148,12 @@ async function createCalvingCalves(event, mother) {
       if (entry.outcome === 'stillbirth') continue;
       const earTag = String(entry.earTag || '').trim().toLocaleUpperCase();
       if (earTag) {
-        const taggedCows = await Cow.find({ earTag: { $ne: '' } }).lean();
-        const duplicate = taggedCows.some((cow) => String(cow.earTag || '').trim().toLocaleLowerCase() === earTag.toLocaleLowerCase());
+        // Be explicit about the selected farm instead of relying only on the
+        // request-scoped model wrapper. This keeps the rule obvious and makes
+        // identical ear tags valid in separate farms in both Mongo and memory mode.
+        const taggedCows = await Cow.find({ farmId, earTag: { $ne: '' } }).lean();
+        const normalizedTag = earTag.toLocaleLowerCase();
+        const duplicate = taggedCows.some((cow) => String(cow.earTag || '').trim().toLocaleLowerCase() === normalizedTag);
         if (duplicate) throw Object.assign(new Error(`Ear tag "${earTag}" is already used in this farm`), { status: 409 });
       }
       const id = randomUUID();
@@ -194,7 +198,7 @@ router.post('/events', protect, async (req, res) => {
     }
     event = await BreedingEvent.create({ ...payload, generatedCalfIds: [], _id: randomUUID() });
     if (event.type === 'calving' && event.calves.length) {
-      createdCalves = await createCalvingCalves(event, mother);
+      createdCalves = await createCalvingCalves(event, mother, req.farmContext?.farmId || event.farmId);
       const generatedCalfIds = createdCalves.map((calf) => calf._id);
       event = await BreedingEvent.findByIdAndUpdate(event._id, { $set: { generatedCalfIds } }, { new: true });
     }
