@@ -1,0 +1,2371 @@
+Microsoft Windows [Version 10.0.19045.5965]
+(c) Microsoft Corporation. All rights reserved.
+
+C:\Users\M.Usman>cd /d F:\PROJECTS\dairy\muf-monorepo
+
+F:\PROJECTS\dairy\muf-monorepo>git pull origin muf-monorepo
+remote: Enumerating objects: 150, done.
+remote: Counting objects: 100% (150/150), done.
+remote: Compressing objects: 100% (128/128), done.
+remote: Total 128 (delta 102), reused 0 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (128/128), 18.86 KiB | 143.00 KiB/s, done.
+Resolving deltas: 100% (102/102), completed with 22 local objects.
+From https://github.com/musman5911/ai-monorepo
+ * branch            muf-monorepo -> FETCH_HEAD
+   dd63c36..763f6c0  muf-monorepo -> origin/muf-monorepo
+Updating dd63c36..763f6c0
+Fast-forward
+ agri_farm/backend/db.js                           | 16 ++++--
+ agri_farm/backend/demo-data.js                    | 16 +++++-
+ agri_farm/backend/routes/analytics.js             | 41 ++++++++++++--
+ agri_farm/backend/routes/backup.js                |  3 +-
+ agri_farm/backend/routes/crops.js                 | 34 +++++++++++-
+ agri_farm/backend/routes/fields.js                | 60 ++++++++++++++++++++
+ agri_farm/backend/routes/finance.js               | 31 ++++++++++-
+ agri_farm/backend/server.js                       |  2 +
+ docs/PROGRESS.md                                  | 38 ++++++++++++-
+ docs/ROADMAP.md                                   |  9 ++-
+ docs/phases/README.md                             |  4 +-
+ docs/phases/phase-04-dairy-calves-lineage.md      | 20 +++----
+ docs/phases/phase-05-agri-fields-cycles-server.md | 15 ++++-
+ tests/agri-fields-cycles.test.ts                  | 67 +++++++++++++++++++++++
+ tests/agri-runtime-api.integration.test.ts        | 67 ++++++++++++++++++++++-
+ tools/check-farm-scope.js                         | 24 ++++++++
+ 16 files changed, 407 insertions(+), 40 deletions(-)
+ create mode 100644 agri_farm/backend/routes/fields.js
+ create mode 100644 tests/agri-fields-cycles.test.ts
+
+F:\PROJECTS\dairy\muf-monorepo>npm test
+
+> test
+> vitest run
+
+
+ RUN  v3.2.7 F:/PROJECTS/dairy/muf-monorepo
+
+ ✓ tests/smoke.test.ts (32 tests) 108ms
+ ✓ tests/muf-farms.test.ts (20 tests) 733ms
+   ✓ real mongoose queries (skipped when the dairy backend packages are not installed) > builds scoped filters and strips farmId from updates  688ms
+ ❯ tests/phase3-pagination.test.ts (39 tests | 1 failed) 88ms
+   ✓ Agri list page helpers > encodes page filters and omits empty or all-valued selections 5ms
+   ✓ Agri list page helpers > merges pages by stable IDs without dropping ID-less legacy rows 2ms
+   ✓ Agri list page helpers > uses server count headers and falls back on malformed metadata 1ms
+   ✓ Phase 3 page-pagination contract > leaves legacy requests on the existing response path unless page is supplied 3ms
+   ✓ Phase 3 page-pagination contract > uses 1-based pages and a bounded default page size 2ms
+   ✓ Phase 3 page-pagination contract > caps requested page size to protect the backend from oversized requests 1ms
+   ✓ Phase 3 page-pagination contract > rejects invalid page value "0" 0ms
+   ✓ Phase 3 page-pagination contract > rejects invalid page value "-1" 0ms
+   ✓ Phase 3 page-pagination contract > rejects invalid page value "1.5" 0ms
+   ✓ Phase 3 page-pagination contract > rejects invalid page value "abc" 0ms
+   ✓ Phase 3 page-pagination contract > rejects invalid page value "" 0ms
+   ✓ Phase 3 page-pagination contract > rejects invalid limit value "0" 0ms
+   ✓ Phase 3 page-pagination contract > rejects invalid limit value "-5" 0ms
+   ✓ Phase 3 page-pagination contract > rejects invalid limit value "1.5" 0ms
+   ✓ Phase 3 page-pagination contract > rejects invalid limit value "abc" 0ms
+   ✓ Phase 3 page-pagination contract > rejects invalid limit value "" 0ms
+   ✓ Phase 3 page-pagination contract > rejects array-valued query parameters safely: {"page":["1","2"]} 0ms
+   ✓ Phase 3 page-pagination contract > rejects array-valued query parameters safely: {"page":"2","limit":["10","20"]} 0ms
+   ✓ Phase 3 page-pagination contract > rejects unsafe page offsets instead of overflowing arithmetic 0ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > validates the whole request before writes and caps payloads at 200 entries 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > returns explicit per-row outcomes for partial writes and retries 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > exposes stable paginated totals for Agri crop, finance, and task lists 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > provides server-side monthly milk summary totals for paged history 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > provides preview-first bulk health CSV import with bounded row count 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > provides preview-first Dairy milk CSV import with bounded row count 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > provides bounded bulk health writes through the client API 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > supports paged cow search, server totals, and eligible-mother lookup 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > bounds bulk health requests and validates rows before writes 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > supports reading paginated milk response metadata in the Dairy client API 1ms
+   ✓ Phase 3 bounded Dairy milk bulk-entry contract > exposes the bounded bulk endpoint in the Dairy client API 1ms
+   ✓ Phase 3 first list endpoint integration contract > Dairy cow and milk lists keep array payloads and expose page metadata headers 2ms
+   ✓ Phase 3 Agri scale and incremental-rendering contracts > keeps server-side Agri list pagination bounded with stable ordering and totals 2ms
+   × Phase 3 Agri scale and incremental-rendering contracts > provides farm-scoped Agri analytics summaries and lazy full-detail loading 30ms
+     → expected '// Compact, farm-scoped analytics for…' to contain 'Finance.find({}).select(\'_id type am…'
+   ✓ Phase 3 Agri scale and incremental-rendering contracts > supports bounded preview-first XLSX imports for Flock batch logs 2ms
+   ✓ Phase 3 Agri scale and incremental-rendering contracts > quotes XLSX cell values safely for legacy Flock row validators 1ms
+   ✓ Phase 3 Agri scale and incremental-rendering contracts > renders Agri crop and task cards in incremental chunks without truncating aggregate source arrays 4ms
+   ✓ Phase 3 Agri scale and incremental-rendering contracts > wires Agri crop CSV preview, bounded rows, validation, and explicit confirmation 4ms
+   ✓ Phase 3 Agri scale and incremental-rendering contracts > uses Agri server-reported totals and removes the hard 10,000-row stop 4ms
+   ✓ Phase 3 Agri scale and incremental-rendering contracts > pages a stable 1,250-row fixture without duplicates or missing rows 6ms
+ ✓ tests/phase3-farm-isolation.test.ts (4 tests) 42ms
+ ✓ tests/muf-farms-agri.test.ts (10 tests) 36ms
+ ✓ tests/flock-egg-inventory-coordination.test.ts (12 tests) 28ms
+ ✓ tests/agri-bulk-import.test.ts (11 tests) 24ms
+ ✓ tests/dairy-breeding-screens.test.ts (7 tests) 23ms
+ ✓ tests/flock-egg-inventory-lock.test.ts (7 tests) 15ms
+ ✓ tests/flock-incubation-allocation.test.ts (12 tests) 11ms
+ ✓ tests/dairy-breeding-events.test.ts (10 tests) 10ms
+ ✓ tests/flock-data-route-allocation.test.ts (4 tests) 10ms
+ ❯ tests/agri-fields-cycles.test.ts (5 tests | 1 failed) 35ms
+   ✓ Agri fields and crop-cycle server contracts > registers Field as a farm-scoped model and exposes the API 5ms
+   ✓ Agri fields and crop-cycle server contracts > validates field links in the selected farm and preserves legacy crops 1ms
+   ✓ Agri fields and crop-cycle server contracts > links finance to optional fields and crop cycles and groups analytics 1ms
+   ✓ Agri fields and crop-cycle server contracts > includes fields in backup/restore, demo data, and farm-scope runtime checks 2ms
+   × Agri fields and crop-cycle server contracts > exercises the field API and field/season summaries over HTTP 23ms
+     → expected 'import { afterAll, beforeAll, describ…' to contain 'This field is linked to existing crop…'
+ ✓ tests/flock-image-backup.test.ts (5 tests) 30ms
+ ✓ tests/phase-1-super-admin.test.ts (13 tests) 22ms
+ ❯ tests/phase1-backup-farm-context.test.ts (5 tests | 1 failed) 40ms
+   ✓ global backup restore and local role-test setup > uses authenticated unscoped owner middleware for full backup routers 5ms
+   ✓ global backup restore and local role-test setup > keeps the normal request limit and has explicit restore JSON limits/errors 2ms
+   ✓ global backup restore and local role-test setup > disables Flock writes locally in All farms mode 1ms
+   × global backup restore and local role-test setup > seeds Farm 1 and Farm 2 roles in each memory demo 29ms
+     → expected 'import mongoose from \'mongoose\';\r\…' to contain 'Farm, User, Crop'
+   ✓ global backup restore and local role-test setup > shows Agri restore server errors 1ms
+ ✓ tests/agri-bulk-api.test.ts (4 tests) 13ms
+ ✓ tests/dairy-calving-creates-calf.test.ts (5 tests) 7ms
+ ✓ tests/flock-batch-math.test.ts (6 tests) 9ms
+ ✓ tests/muf-compare.test.ts (12 tests) 12ms
+ ✓ tests/flock-batch-history-guards.test.ts (3 tests) 9ms
+ ✓ tests/muf-urdu-fallback-coverage.test.ts (2 tests) 9ms
+ ✓ tests/muf-charts.test.ts (9 tests) 10ms
+ ✓ tests/phase4-breeding-lineage.test.ts (3 tests) 10ms
+ ✓ tests/flock-batch-labor.test.ts (3 tests) 7ms
+ ✓ tests/flock-dark-login-background.test.ts (1 test) 7ms
+ ✓ tests/muf-zakat.test.ts (5 tests) 8ms
+ ❯ tests/agri-runtime-api.integration.test.ts (11 tests | 1 failed) 10865ms
+   ✓ Agri runtime API integration > enforces authentication and role boundaries against a live HTTP server 67ms
+   × Agri runtime API integration > keeps fields farm-scoped and groups linked finance by field and season 195ms
+     → expected { season: 'Kharif', …(4) } to match object { income: +0, expense: 23, net: -23 }
+(2 matching properties omitted from actual)
+   ✓ Agri runtime API integration > serves bounded, ordered crop/task/finance pages with real response metadata 150ms
+   ✓ Agri runtime API integration > keeps page metadata and row identities consistent across every Agri list endpoint 74ms
+   ✓ Agri runtime API integration > filters crop, task and ledger pages server-side while preserving worker visibility rules 214ms
+   ✓ Agri runtime API integration > serves exact farm-scoped dashboard aggregates without leaking another farm 185ms
+   ✓ Agri runtime API integration > rejects cross-farm crop references in bulk task/finance imports without partial writes 219ms
+   ✓ Agri runtime API integration > pages a 1,001-row task fixture over real HTTP without missing or duplicating records  2032ms
+   ✓ Agri runtime API integration > rejects unauthorized and invalid task bulk imports without creating partial records 46ms
+   ✓ Agri runtime API integration > rejects invalid pagination and validates bulk rows before writing any of them 234ms
+   ✓ Agri runtime API integration > filters completed crop history and enforces worker task-assignment authorization 102ms
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/agri-fields-cycles.test.ts > Agri fields and crop-cycle server contracts > exercises the field API and field/season summaries over HTTP
+AssertionError: expected 'import { afterAll, beforeAll, describ…' to contain 'This field is linked to existing crop…'
+
+- Expected
++ Received
+
+- This field is linked to existing crop cycles or finance entries
++ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
++ import { spawn } from 'node:child_process';
++ import { createServer } from 'node:net';
++ import path from 'node:path';
++ import { fileURLToPath } from 'node:url';
++
++ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
++ const backendRoot = path.join(repoRoot, 'agri_farm', 'backend');
++ let serverProcess;
++ let baseUrl = '';
++ let ownerToken = '';
++ let workerToken = '';
++ let managerToken = '';
++ const created = { crops: [], tasks: [], finance: [], fields: [] };
++
++ async function reservePort() {
++   const server = createServer();
++   await new Promise((resolve, reject) => {
++     server.once('error', reject);
++     server.listen(0, '127.0.0.1', resolve);
++   });
++   const address = server.address();
++   const port = address.port;
++   await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
++   return port;
++ }
++
++ async function request(route, { method = 'GET', token, body, farmId } = {}) {
++   const headers = {};
++   if (token) headers.Authorization = `Bearer ${token}`;
++   if (farmId) headers['X-Farm-Id'] = farmId;
++   if (body !== undefined) headers['Content-Type'] = 'application/json';
++   const response = await fetch(`${baseUrl}/api${route}`, {
++     method,
++     headers,
++     body: body === undefined ? undefined : JSON.stringify(body),
++   });
++   const raw = await response.text();
++   let data = null;
++   try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
++   return { response, data };
++ }
++
++ async function login(username, password) {
++   const response = await fetch(`${baseUrl}/api/login`, {
++     method: 'POST',
++     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
++     body: new URLSearchParams({ username, password }),
++   });
++   const data = await response.json();
++   if (!response.ok) throw new Error(`Login for ${username} failed: ${response.status} ${JSON.stringify(data)}`);
++   return data.access_token;
++ }
++
++ async function waitUntilReady() {
++   const deadline = Date.now() + 25_000;
++   let lastError = 'not started';
++   while (Date.now() < deadline) {
++     if (serverProcess?.exitCode !== null && serverProcess?.exitCode !== undefined) {
++       throw new Error(`Agri test server exited early with code ${serverProcess.exitCode}`);
++     }
++     try {
++       const response = await fetch(`${baseUrl}/api/crops?limit=1`);
++       if (response.status === 401) return;
++       lastError = `unexpected readiness status ${response.status}`;
++     } catch (error) {
++       lastError = String(error);
++     }
++     await new Promise((resolve) => setTimeout(resolve, 250));
++   }
++   throw new Error(`Agri test server did not become ready: ${lastError}`);
++ }
++
++ describe.sequential('Agri runtime API integration', () => {
++   beforeAll(async () => {
++     const port = await reservePort();
++     baseUrl = `http://127.0.0.1:${port}`;
++     serverProcess = spawn(process.execPath, ['server.js'], {
++       cwd: backendRoot,
++       env: {
++         ...process.env,
++         PORT: String(port),
++         NODE_ENV: 'test',
++         MEMORY_MODE: '1',
++         MONGO_URI: '',
++         JWT_SECRET: 'agri-runtime-integration-test-secret-not-for-production',
++         TELEGRAM_BOT_TOKEN: '',
++         LOG_REQUESTS: '0',
++       },
++       stdio: 'ignore',
++     });
++     await waitUntilReady();
++     ownerToken = await login('admin', 'admin123');
++     workerToken = await login('worker', 'worker123');
++
++     const farms = await request('/farms', { token: ownerToken });
++     expect(farms.response.status).toBe(200);
++     expect(Array.isArray(farms.data.farms)).toBe(true);
++     expect(farms.data.farms.length).toBeGreaterThan(0);
++     const farmIds = [String(farms.data.farms[0]._id)];
++
++     const managerSignup = await request('/signup', {
++       method: 'POST',
++       token: ownerToken,
++       body: {
++         username: `runtime-manager-${process.pid}`,
++         email: `runtime-manager-${process.pid}@example.test`,
++         password: 'Runtime-Test-Password-123!',
++         role: 'manager',
++         farmIds,
++       },
++     });
++     expect(managerSignup.response.status).toBe(201);
++     managerToken = await login(`runtime-manager-${process.pid}`, 'Runtime-Test-Password-123!');
++   }, 35_000);
++
++   afterAll(async () => {
++     if (baseUrl && ownerToken) {
++       for (const id of created.finance) await request(`/finance/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
++       for (const id of created.tasks) await request(`/tasks/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
++       for (const id of created.crops) await request(`/crops/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
++       for (const id of created.fields) await request(`/fields/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
++     }
++     if (serverProcess && serverProcess.exitCode === null) {
++       serverProcess.kill('SIGTERM');
++       await new Promise((resolve) => {
++         const timeout = setTimeout(() => {
++           serverProcess.kill('SIGKILL');
++           resolve();
++         }, 2_000);
++         serverProcess.once('exit', () => {
++           clearTimeout(timeout);
++           resolve();
++         });
++       });
++     }
++   }, 10_000);
++
++   it('enforces authentication and role boundaries against a live HTTP server', async () => {
++     const anonymous = await request('/crops?limit=1');
++     expect(anonymous.response.status).toBe(401);
++
++     const ownerFinance = await request('/finance?skip=0&limit=1', { token: ownerToken });
++     expect(ownerFinance.response.status).toBe(200);
++
++     const managerFinance = await request('/finance?skip=0&limit=1', { token: managerToken });
++     expect(managerFinance.response.status).toBe(200);
++
++     const workerFinance = await request('/finance?skip=0&limit=1', { token: workerToken });
++     expect(workerFinance.response.status).toBe(403);
++   });
++
++   it('keeps fields farm-scoped and groups linked finance by field and season', async () => {
++     const suffix = `field-cycle-${process.pid}-${Date.now()}`;
++     const fieldResult = await request('/fields', {
++       method: 'POST',
++       token: ownerToken,
++       body: { name: suffix, acres: 2.5, notes: 'Phase 5 integration fixture' },
++     });
++     expect(fieldResult.response.status).toBe(201);
++     expect(fieldResult.data.name).toBe(suffix);
++     expect(fieldResult.data.acres).toBe(2.5);
++     created.fields.push(String(fieldResult.data._id));
++
++     const duplicate = await request('/fields', {
++       method: 'POST',
++       token: ownerToken,
++       body: { name: suffix, acres: 1 },
++     });
++     expect(duplicate.response.status).toBe(409);
++
++     const invalid = await request('/fields', {
++       method: 'POST',
++       token: ownerToken,
++       body: { name: `${suffix}-invalid`, acres: -1 },
++     });
++     expect(invalid.response.status).toBe(400);
++
++     const cropResult = await request('/crops', {
++       method: 'POST',
++       token: ownerToken,
++       body: { name: `${suffix}-crop`, status: 'Growing', fieldId: String(fieldResult.data._id), season: 'Kharif', crop_year: '2026' },
++     });
++     expect(cropResult.response.status).toBe(201);
++     created.crops.push(String(cropResult.data._id));
++
++     const financeResult = await request('/finance', {
++       method: 'POST',
++       token: ownerToken,
++       body: { category: 'Phase 5 field expense', type: 'expense', amount: 23, date: '2026-10-25', fieldId: String(fieldResult.data._id), cropCycleId: String(cropResult.data._id) },
++     });
++     expect(financeResult.response.status).toBe(201);
++     const financeRows = await request('/finance?limit=500', { token: ownerToken });
++     const financeRow = financeRows.data.find((row) => row.category === 'Phase 5 field expense');
++     expect(financeRow).toBeTruthy();
++     created.finance.push(String(financeRow._id));
++
++     const cropPage = await request(`/crops?fieldId=${fieldResult.data._id}`, { token: ownerToken });
++     expect(cropPage.response.status).toBe(200);
++     expect(cropPage.data.some((row) => String(row._id) === String(cropResult.data._id))).toBe(true);
++
++     const analytics = await request('/analytics/summary', { token: ownerToken });
++     expect(analytics.response.status).toBe(200);
++     const fieldSummary = analytics.data.financeSummary.byField.find((row) => row.field === suffix);
++     expect(fieldSummary).toMatchObject({ income: 0, expense: 23, net: -23 });
++     const seasonSummary = analytics.data.financeSummary.bySeason.find((row) => row.season === 'Kharif');
++     expect(seasonSummary).toMatchObject({ income: 0, expense: 23, net: -23 });
++
++     const fields = await request('/fields', { token: ownerToken });
++     expect(fields.response.status).toBe(200);
++     expect(fields.data.some((row) => String(row._id) === String(fieldResult.data._id))).toBe(true);
++
++     const deletedWhileLinked = await request(`/fields/${fieldResult.data._id}`, { method: 'DELETE', token: ownerToken });
++     expect(deletedWhileLinked.response.status).toBe(409);
++   });
++
++   it('serves bounded, ordered crop/task/finance pages with real response metadata', async () => {
++     const suffix = `runtime-${process.pid}-${Date.now()}`;
++     for (const [index, status] of ['Growing', 'Completed', 'Growing'].entries()) {
++       const result = await request('/crops', {
++         method: 'POST',
++         token: ownerToken,
++         body: { name: `${suffix}-crop-${index}`, status, plant_date: '2026-10-01' },
++       });
++       expect(result.response.status).toBe(201);
++       created.crops.push(String(result.data._id));
++     }
++     const task = await request('/tasks', {
++       method: 'POST',
++       token: ownerToken,
++       body: { title: `${suffix}-task`, status: 'Pending', priority: 'Medium' },
++     });
++     expect(task.response.status).toBe(201);
++     if (task.data?._id) created.tasks.push(String(task.data._id));
++
++     const finance = await request('/finance', {
++       method: 'POST',
++       token: ownerToken,
++       body: { category: 'Runtime integration', type: 'expense', amount: 1, date: '2026-10-23', notes: suffix },
++     });
++     expect(finance.response.status).toBe(201);
++
++     const cropPage = await request('/crops?skip=0&limit=2', { token: ownerToken });
++     expect(cropPage.response.status).toBe(200);
++     expect(cropPage.response.headers.get('x-total-count')).toMatch(/^\d+$/);
++     expect(cropPage.response.headers.get('x-page')).toBe('1');
++     expect(cropPage.response.headers.get('x-page-size')).toBe('2');
++     expect(cropPage.response.headers.get('x-total-pages')).toMatch(/^\d+$/);
++     expect(cropPage.data).toHaveLength(2);
++
++     // Exercise a real second API page, not a sliced in-memory fixture.
++     const cropPageTwo = await request('/crops?skip=2&limit=2', { token: ownerToken });
++     expect(cropPageTwo.response.status).toBe(200);
++     expect(cropPageTwo.response.headers.get('x-page')).toBe('2');
++     expect(cropPageTwo.response.headers.get('x-page-size')).toBe('2');
++     expect(cropPageTwo.response.headers.get('x-total-count')).toBe(cropPage.response.headers.get('x-total-count'));
++     expect(cropPageTwo.data.length).toBeGreaterThan(0);
++     const cropIds = [...cropPage.data, ...cropPageTwo.data].map((row) => String(row._id));
++     expect(new Set(cropIds).size).toBe(cropIds.length);
++
++     const taskPage = await request('/tasks?skip=0&limit=1', { token: ownerToken });
++     expect(taskPage.response.status).toBe(200);
++     expect(taskPage.response.headers.get('x-total-count')).toMatch(/^\d+$/);
++     expect(taskPage.data).toHaveLength(1);
++
++     const financePage = await request('/finance?skip=0&limit=1', { token: ownerToken });
++     expect(financePage.response.status).toBe(200);
++     expect(financePage.response.headers.get('x-total-count')).toMatch(/^\d+$/);
++     expect(financePage.data).toHaveLength(1);
++     if (financePage.data.some((row) => row.notes === suffix)) {
++       created.finance.push(String(financePage.data.find((row) => row.notes === suffix)._id));
++     } else {
++       const all = await request('/finance?skip=0&limit=500', { token: ownerToken });
++       const inserted = all.data.find((row) => row.notes === suffix);
++       if (inserted) created.finance.push(String(inserted._id));
++     }
++   });
++
++   it('keeps page metadata and row identities consistent across every Agri list endpoint', async () => {
++     for (const route of ['/crops', '/tasks', '/finance']) {
++       const first = await request(`${route}?skip=0&limit=1`, { token: ownerToken });
++       const second = await request(`${route}?skip=1&limit=1`, { token: ownerToken });
++       expect(first.response.status, route).toBe(200);
++       expect(second.response.status, route).toBe(200);
++       expect(first.response.headers.get('x-total-count'), route).toMatch(/^\d+$/);
++       expect(second.response.headers.get('x-total-count'), route).toBe(first.response.headers.get('x-total-count'));
++       expect(first.response.headers.get('x-page'), route).toBe('1');
++       expect(second.response.headers.get('x-page'), route).toBe('2');
++       expect(first.response.headers.get('x-page-size'), route).toBe('1');
++       expect(second.response.headers.get('x-page-size'), route).toBe('1');
++       expect(first.response.headers.get('x-total-pages'), route).toBe(second.response.headers.get('x-total-pages'));
++       expect(Array.isArray(first.data), route).toBe(true);
++       expect(Array.isArray(second.data), route).toBe(true);
++       const ids = [...first.data, ...second.data].map((row) => String(row._id));
++       expect(new Set(ids).size, route).toBe(ids.length);
++     }
++   });
++
++   it('filters crop, task and ledger pages server-side while preserving worker visibility rules', async () => {
++     const suffix = `runtime-filter-${process.pid}-${Date.now()}-[literal]`;
++     const crop = await request('/crops', { method: 'POST', token: ownerToken, body: {
++       name: `${suffix}-wheat`, variety: 'Local wheat', status: 'Growing', season: 'Rabi', crop_year: '2026', field: 'North Plot',
++     } });
++     const completed = await request('/crops', { method: 'POST', token: ownerToken, body: {
++       name: `${suffix}-corn`, variety: 'Hybrid', status: 'Completed', season: 'Kharif', crop_year: '2025', field: 'South Plot',
++     } });
++     expect(crop.response.status).toBe(201);
++     expect(completed.response.status).toBe(201);
++     created.crops.push(String(crop.data._id), String(completed.data._id));
++     const cropPage = await request(`/crops?skip=0&limit=10&status=Growing&season=Rabi&crop_year=2026&field=North%20Plot&search=${encodeURIComponent(suffix)}`, { token: ownerToken });
++     expect(cropPage.response.status).toBe(200);
++     expect(cropPage.response.headers.get('x-total-count')).toBe('1');
++     expect(String(cropPage.data[0]._id)).toBe(String(crop.data._id));
++     const caseInsensitive = await request(`/crops?skip=0&limit=10&search=${encodeURIComponent(suffix.toUpperCase())}`, { token: ownerToken });
++     expect(caseInsensitive.response.status).toBe(200);
++     expect(caseInsensitive.response.headers.get('x-total-count')).toBe('2');
++     const workerHistory = await request(`/crops?skip=0&limit=10&status=Completed&search=${encodeURIComponent(suffix)}`, { token: workerToken });
++     expect(workerHistory.response.status).toBe(200);
++     expect(workerHistory.data).toEqual([]);
++
++     const task = await request('/tasks', { method: 'POST', token: ownerToken, body: {
++       title: `${suffix}-wheat scouting`, notes: 'North Plot', crop_id: String(crop.data._id), priority: 'Medium',
++     } });
++     expect(task.response.status).toBe(201);
++     created.tasks.push(String(task.data._id));
++     const taskPage = await request(`/tasks?skip=0&limit=10&status=Pending&crop_id=${crop.data._id}&crop_search=${encodeURIComponent('Local wheat')}`, { token: ownerToken });
++     expect(taskPage.response.status).toBe(200);
++     expect(taskPage.response.headers.get('x-total-count')).toBe('1');
++     expect(taskPage.data[0].title).toContain('wheat scouting');
++
++     const income = await request('/finance', { method: 'POST', token: ownerToken, body: {
++       category: `${suffix}-income`, type: 'income', amount: 100, date: '2026-10-23', crop_id: String(crop.data._id), notes: suffix,
++     } });
++     const farmWide = await request('/finance', { method: 'POST', token: ownerToken, body: {
++       category: `${suffix}-farm-wide`, type: 'expense', amount: 15, date: '2026-10-23', notes: suffix,
++     } });
++     const cropExpense = await request('/finance', { method: 'POST', token: ownerToken, body: {
++       category: `${suffix}-crop-expense`, type: 'expense', amount: 5, date: '2026-10-23', crop_id: String(crop.data._id), notes: suffix,
++     } });
++     expect(income.response.status).toBe(201);
++     expect(farmWide.response.status).toBe(201);
++     expect(cropExpense.response.status).toBe(201);
++     const incomePage = await request(`/finance?skip=0&limit=10&type=income&crop_id=${crop.data._id}&search=${encodeURIComponent(suffix)}`, { token: ownerToken });
++     expect(incomePage.response.status).toBe(200);
++     expect(incomePage.response.headers.get('x-total-count')).toBe('1');
++     expect(incomePage.data[0].category).toContain('-income');
++     const farmWidePage = await request(`/finance?skip=0&limit=10&farm_wide=true&type=expense&search=${encodeURIComponent(suffix)}`, { token: ownerToken });
++     expect(farmWidePage.response.status).toBe(200);
++     expect(farmWidePage.response.headers.get('x-total-count')).toBe('1');
++     expect(farmWidePage.data[0].category).toContain('-farm-wide');
++     const financeRows = await request(`/finance?skip=0&limit=500&search=${encodeURIComponent(suffix)}`, { token: ownerToken });
++     for (const row of financeRows.data || []) created.finance.push(String(row._id));
++   });
++
++   it('serves exact farm-scoped dashboard aggregates without leaking another farm', async () => {
++     const suffix = 'runtime-summary-' + process.pid + '-' + Date.now();
++     const farms = await request('/farms', { token: ownerToken });
++     expect(farms.response.status).toBe(200);
++     const farmA = String(farms.data.activeFarmId || farms.data.farms[0]._id);
++     const privateYieldCrop = await request('/crops', {
++       method: 'POST',
++       token: ownerToken,
++       farmId: farmA,
++       body: {
++         name: suffix + ' private-yield-crop',
++         status: 'Growing',
++         yield_kg: 777,
++         seed_quantity: 12,
++         seed_cost_per_unit: 50,
++         notes: 'owner-only crop notes',
++       },
++     });
++     expect(privateYieldCrop.response.status).toBe(201);
++     created.crops.push(String(privateYieldCrop.data._id));
++
++     const beforeA = await request('/analytics/summary', { token: ownerToken, farmId: farmA });
++     expect(beforeA.response.status).toBe(200);
++     expect(beforeA.data.financeSummary.recent.length).toBeLessThanOrEqual(50);
++
++     const workerSummary = await request('/analytics/summary', { token: workerToken, farmId: farmA });
++     expect(workerSummary.response.status).toBe(200);
++     expect(workerSummary.data.financeSummary).toBeNull();
++     const workerCropOption = workerSummary.data.cropSummary.options.find((row) => String(row._id) === String(privateYieldCrop.data._id));
++     expect(workerCropOption).toBeDefined();
++     expect(workerCropOption.yield_kg).toBeUndefined();
++     expect(workerCropOption.seed_quantity).toBeUndefined();
++     expect(workerCropOption.seed_cost_per_unit).toBeUndefined();
++     expect(workerCropOption.notes).toBeUndefined();
++
++     const createFarm = await request('/farms', {
++       method: 'POST',
++       token: ownerToken,
++       body: { name: suffix },
++     });
++     expect(createFarm.response.status).toBe(201);
++     const farmB = String(createFarm.data._id);
++     const farmBTag = suffix + '-farmB';
++     const emptyB = await request('/analytics/summary', { token: ownerToken, farmId: farmB });
++     expect(emptyB.response.status).toBe(200);
++     expect(emptyB.data.cropSummary.total).toBe(0);
++     expect(emptyB.data.taskSummary.total).toBe(0);
++     expect(emptyB.data.financeSummary.totals.entries).toBe(0);
++
++     const monthKey = emptyB.data.monthKey;
++     const date = monthKey + '-12';
++     const crop = await request('/crops', {
++       method: 'POST',
++       token: ownerToken,
++       farmId: farmB,
++       body: {
++         name: farmBTag + ' wheat',
++         variety: 'Local',
++         status: 'Growing',
++         season: 'Rabi',
++         crop_year: monthKey.slice(0, 4),
++         plant_date: monthKey + '-10',
++         field: 'Summary Plot',
++         area_kanal: 4,
++       },
++     });
++     expect(crop.response.status).toBe(201);
++     const cropId = String(crop.data._id);
++
++     const task = await request('/tasks', {
++       method: 'POST',
++       token: ownerToken,
++       farmId: farmB,
++       body: {
++         title: farmBTag + ' irrigation',
++         crop_id: cropId,
++         status: 'Pending',
++         priority: 'Medium',
++         due_date: date,
++       },
++     });
++     expect(task.response.status).toBe(201);
++
++     const income = await request('/finance', {
++       method: 'POST',
++       token: ownerToken,
++       farmId: farmB,
++       body: { category: farmBTag + ' income', type: 'income', amount: 320, date, crop_id: cropId, notes: farmBTag },
++     });
++     const expense = await request('/finance', {
++       method: 'POST',
++       token: ownerToken,
++       farmId: farmB,
++       body: { category: farmBTag + ' expense', type: 'expense', amount: 120, date, crop_id: cropId, notes: farmBTag },
++     });
++     expect(income.response.status).toBe(201);
++     expect(expense.response.status).toBe(201);
++
++     const afterB = await request('/analytics/summary', { token: ownerToken, farmId: farmB });
++     expect(afterB.response.status).toBe(200);
++     expect(afterB.data.cropSummary.total).toBe(1);
++     expect(afterB.data.cropSummary.statusCounts.Growing).toBe(1);
++     expect(afterB.data.cropSummary.areaKanal).toBe(4);
++     expect(afterB.data.cropSummary.options).toHaveLength(1);
++     expect(afterB.data.cropSummary.options[0].image_base64).toBeUndefined();
++     expect(afterB.data.taskSummary.total).toBe(1);
++     expect(afterB.data.taskSummary.byStatus.Pending).toBe(1);
++     expect(afterB.data.taskSummary.byCrop).toContainEqual({
++       crop_id: cropId, pending: 1, completed: 0, total: 1,
++     });
++     expect(afterB.data.financeSummary.totals).toMatchObject({
++       entries: 2, income: 320, expense: 120, net: 200,
++     });
++     expect(afterB.data.financeSummary.byCrop).toContainEqual(expect.objectContaining({
++       crop_id: cropId, income: 320, expense: 120, net: 200, entryCount: 2,
++     }));
++     const monthly = afterB.data.financeSummary.monthlyRows.find(([key]) => key === monthKey);
++     expect(monthly).toBeDefined();
++     expect(monthly[1]).toMatchObject({ income: 320, expense: 120, cropsCount: 1 });
++
++     const [farmBPage, farmAPage] = await Promise.all([
++       request('/crops?skip=0&limit=10&search=' + encodeURIComponent(farmBTag), { token: ownerToken, farmId: farmB }),
++       request('/crops?skip=0&limit=10&search=' + encodeURIComponent(farmBTag), { token: ownerToken, farmId: farmA }),
++     ]);
++     expect(farmBPage.response.headers.get('x-total-count')).toBe('1');
++     expect(farmAPage.response.headers.get('x-total-count')).toBe('0');
++     const farmBTasks = await request('/tasks?skip=0&limit=10&crop_search=' + encodeURIComponent(farmBTag), {
++       token: ownerToken, farmId: farmB,
++     });
++     const farmATasks = await request('/tasks?skip=0&limit=10&crop_search=' + encodeURIComponent(farmBTag), {
++       token: ownerToken, farmId: farmA,
++     });
++     expect(farmBTasks.response.headers.get('x-total-count')).toBe('1');
++     expect(farmATasks.response.headers.get('x-total-count')).toBe('0');
++     const farmBLedger = await request('/finance?skip=0&limit=10&search=' + encodeURIComponent(farmBTag), {
++       token: ownerToken, farmId: farmB,
++     });
++     const farmALedger = await request('/finance?skip=0&limit=10&search=' + encodeURIComponent(farmBTag), {
++       token: ownerToken, farmId: farmA,
++     });
++     expect(farmBLedger.response.headers.get('x-total-count')).toBe('2');
++     expect(farmALedger.response.headers.get('x-total-count')).toBe('0');
++
++     const forbiddenManagerSummary = await request('/analytics/summary', { token: managerToken, farmId: farmB });
++     expect(forbiddenManagerSummary.response.status).toBe(403);
++
++     const afterA = await request('/analytics/summary', { token: ownerToken, farmId: farmA });
++     expect(afterA.response.status).toBe(200);
++     expect(afterA.data.cropSummary.total).toBe(beforeA.data.cropSummary.total);
++     expect(afterA.data.taskSummary.total).toBe(beforeA.data.taskSummary.total);
++     expect(afterA.data.financeSummary.totals).toMatchObject({
++       entries: beforeA.data.financeSummary.totals.entries,
++       income: beforeA.data.financeSummary.totals.income,
++       expense: beforeA.data.financeSummary.totals.expense,
++       net: beforeA.data.financeSummary.totals.net,
++     });
++   });
++
++   it('rejects cross-farm crop references in bulk task/finance imports without partial writes', async () => {
++     const suffix = 'runtime-cross-farm-bulk-' + process.pid + '-' + Date.now();
++     const farms = await request('/farms', { token: ownerToken });
++     expect(farms.response.status).toBe(200);
++     const farmA = String(farms.data.activeFarmId || farms.data.farms[0]._id);
++     const createFarm = await request('/farms', {
++       method: 'POST', token: ownerToken, body: { name: suffix },
++     });
++     expect(createFarm.response.status).toBe(201);
++     const farmB = String(createFarm.data._id);
++
++     const cropA = await request('/crops', {
++       method: 'POST', token: ownerToken, farmId: farmA,
++       body: { name: suffix + ' farm-a crop', status: 'Growing' },
++     });
++     const cropB = await request('/crops', {
++       method: 'POST', token: ownerToken, farmId: farmB,
++       body: { name: suffix + ' farm-b crop', status: 'Growing' },
++     });
++     expect(cropA.response.status).toBe(201);
++     expect(cropB.response.status).toBe(201);
++     created.crops.push(String(cropA.data._id), String(cropB.data._id));
++
++     const beforeB = await request('/analytics/summary', { token: ownerToken, farmId: farmB });
++     expect(beforeB.response.status).toBe(200);
++
++     const invalidTasks = await request('/tasks/bulk', {
++       method: 'POST', token: ownerToken, farmId: farmB,
++       body: { rows: [
++         { title: suffix + ' valid task', priority: 'Low', crop_id: String(cropB.data._id) },
++         { title: suffix + ' invalid cross-farm task', priority: 'Low', crop_id: String(cropA.data._id) },
++       ] },
++     });
++     expect(invalidTasks.response.status).toBe(400);
++     expect(invalidTasks.data.details.some((item) => item.message.includes('selected farm'))).toBe(true);
++     const noTaskWrite = await request('/tasks?skip=0&limit=20&crop_search=' + encodeURIComponent(suffix), {
++       token: ownerToken, farmId: farmB,
++     });
++     expect(noTaskWrite.response.headers.get('x-total-count')).toBe('0');
++
++     const invalidFinance = await request('/finance/bulk', {
++       method: 'POST', token: ownerToken, farmId: farmB,
++       body: { rows: [
++         { category: suffix + ' valid ledger', type: 'income', amount: 50, crop_id: String(cropB.data._id) },
++         { category: suffix + ' invalid cross-farm ledger', type: 'expense', amount: 10, crop_id: String(cropA.data._id) },
++       ] },
++     });
++     expect(invalidFinance.response.status).toBe(400);
++     expect(invalidFinance.data.details.some((item) => item.message.includes('selected farm'))).toBe(true);
++     const noFinanceWrite = await request('/finance?skip=0&limit=20&search=' + encodeURIComponent(suffix), {
++       token: ownerToken, farmId: farmB,
++     });
++     expect(noFinanceWrite.response.headers.get('x-total-count')).toBe('0');
++
++     const validTask = await request('/tasks/bulk', {
++       method: 'POST', token: ownerToken, farmId: farmB,
++       body: { rows: [
++         { title: suffix + ' valid task', priority: 'Low', crop_id: String(cropB.data._id), assigned_to: 'Runtime Assignee' },
++       ] },
++     });
++     expect(validTask.response.status).toBe(201);
++     expect(validTask.data.inserted).toBe(1);
++     const validFinance = await request('/finance/bulk', {
++       method: 'POST', token: ownerToken, farmId: farmB,
++       body: { rows: [
++         { category: suffix + ' valid ledger', type: 'income', amount: 50, date: beforeB.data.monthKey + '-12', crop_id: String(cropB.data._id) },
++       ] },
++     });
++     expect(validFinance.response.status).toBe(201);
++     expect(validFinance.data.inserted).toBe(1);
++
++     const afterB = await request('/analytics/summary', { token: ownerToken, farmId: farmB });
++     expect(afterB.response.status).toBe(200);
++     expect(afterB.data.cropSummary.total).toBe(1);
++     expect(afterB.data.taskSummary.total).toBe(beforeB.data.taskSummary.total + 1);
++     expect(afterB.data.taskSummary.byAssignee).toContainEqual(expect.objectContaining({
++       assignee: 'Runtime Assignee', pending: 1, completed: 0, total: 1,
++     }));
++     expect(afterB.data.taskSummary.recentPending.some((row) => row.title === suffix + ' valid task')).toBe(true);
++     expect(afterB.data.taskSummary.pendingWithCrewCount).toBeGreaterThanOrEqual(0);
++     expect(afterB.data.financeSummary.totals.entries).toBe(beforeB.data.financeSummary.totals.entries + 1);
++     expect(afterB.data.financeSummary.totals.income).toBe(beforeB.data.financeSummary.totals.income + 50);
++     expect(afterB.data.financeSummary.byCrop).toContainEqual(expect.objectContaining({
++       crop_id: String(cropB.data._id),
++       income: 50,
++       entryCount: 1,
++       incomeCount: 1,
++       expenseCount: 0,
++       incomeBreakdown: expect.arrayContaining([expect.objectContaining({ name: suffix + ' valid ledger', amount: 50 })]),
++     }));
++     expect(afterB.data.financeSummary.groups).toContainEqual(expect.objectContaining({
++       id: String(cropB.data._id), entryCount: 1, incomeCount: 1, expenseCount: 0, income: 50,
++     }));
++
++     const farmAAfter = await request('/analytics/summary', { token: ownerToken, farmId: farmA });
++     expect(farmAAfter.response.status).toBe(200);
++     expect(farmAAfter.data.cropSummary.total).toBeGreaterThanOrEqual(1);
++     const farmAQuery = await request('/crops?skip=0&limit=10&search=' + encodeURIComponent(suffix + ' farm-b'), {
++       token: ownerToken, farmId: farmA,
++     });
++     expect(farmAQuery.response.headers.get('x-total-count')).toBe('0');
++
++     // Find created rows so the test's normal cleanup also works if this suite
++     // is later run against a persistent-but-disposable test fixture.
++     const taskRows = await request('/tasks?skip=0&limit=20&crop_search=' + encodeURIComponent(suffix), {
++       token: ownerToken, farmId: farmB,
++     });
++     for (const row of taskRows.data || []) if (String(row.title || '').startsWith(suffix)) created.tasks.push(String(row._id));
++     const financeRows = await request('/finance?skip=0&limit=20&search=' + encodeURIComponent(suffix), {
++       token: ownerToken, farmId: farmB,
++     });
++     for (const row of financeRows.data || []) created.finance.push(String(row._id));
++   });
++
++   it('pages a 1,001-row task fixture over real HTTP without missing or duplicating records', async () => {
++     const suffix = `runtime-large-page-${process.pid}-${Date.now()}`;
++     const fixtureRows = Array.from({ length: 1001 }, (_, index) => ({
++       title: `${suffix}-${String(index).padStart(4, '0')}`,
++       priority: 'Low',
++       status: 'Pending',
++     }));
++     const fixtureIds = new Set();
++
++     try {
++       for (let offset = 0; offset < fixtureRows.length; offset += 200) {
++         const batch = fixtureRows.slice(offset, offset + 200);
++         const inserted = await request('/tasks/bulk', {
++           method: 'POST',
++           token: ownerToken,
++           body: { rows: batch },
++         });
++         expect(inserted.response.status).toBe(201);
++         expect(inserted.data.inserted).toBe(batch.length);
++       }
++
++       const first = await request('/tasks?skip=0&limit=200', { token: ownerToken });
++       expect(first.response.status).toBe(200);
++       const reportedTotal = Number(first.response.headers.get('x-total-count'));
++       expect(Number.isInteger(reportedTotal)).toBe(true);
++       expect(reportedTotal).toBeGreaterThanOrEqual(1001);
++       expect(Number(first.response.headers.get('x-total-pages'))).toBe(Math.ceil(reportedTotal / 200));
++
++       const allRows = [...first.data];
++       for (let skip = 200; skip < reportedTotal; skip += 200) {
++         const page = await request(`/tasks?skip=${skip}&limit=200`, { token: ownerToken });
++         expect(page.response.status).toBe(200);
++         expect(Number(page.response.headers.get('x-total-count'))).toBe(reportedTotal);
++         expect(Number(page.response.headers.get('x-page'))).toBe(Math.floor(skip / 200) + 1);
++         expect(page.data.length).toBeLessThanOrEqual(200);
++         allRows.push(...page.data);
++       }
++
++       const fixture = allRows.filter((row) => String(row.title || '').startsWith(suffix));
++       for (const row of fixture) fixtureIds.add(String(row._id));
++       expect(fixture).toHaveLength(1001);
++       expect(fixtureIds.size).toBe(1001);
++       expect(fixture.map((row) => row.title).sort()).toEqual(fixtureRows.map((row) => row.title).sort());
++     } finally {
++       // Always clean the generated fixture, even when a pagination assertion fails.
++       // Discover by unique prefix so a failed insert assertion cannot leak rows.
++       const first = await request('/tasks?skip=0&limit=500', { token: ownerToken }).catch(() => null);
++       const reportedTotal = Number(first?.response.headers.get('x-total-count')) || 0;
++       const cleanupRows = [...(first?.data || [])];
++       for (let skip = 500; skip < reportedTotal; skip += 500) {
++         const page = await request(`/tasks?skip=${skip}&limit=500`, { token: ownerToken }).catch(() => null);
++         if (page?.response.ok && Array.isArray(page.data)) cleanupRows.push(...page.data);
++       }
++       for (const row of cleanupRows) {
++         if (String(row.title || '').startsWith(suffix) && row._id) fixtureIds.add(String(row._id));
++       }
++       for (let offset = 0; offset < fixtureIds.size; offset += 25) {
++         const batch = [...fixtureIds].slice(offset, offset + 25);
++         await Promise.all(batch.map((id) => request(`/tasks/${id}`, {
++           method: 'DELETE',
++           token: ownerToken,
++         }).catch(() => null)));
++       }
++     }
++   });
++
++   it('rejects unauthorized and invalid task bulk imports without creating partial records', async () => {
++     const suffix = `runtime-task-bulk-${process.pid}-${Date.now()}`;
++     const denied = await request('/tasks/bulk', {
++       method: 'POST',
++       token: workerToken,
++       body: { rows: [{ title: `${suffix}-worker`, priority: 'Low' }] },
++     });
++     expect(denied.response.status).toBe(403);
++
++     const before = await request('/tasks?skip=0&limit=500', { token: ownerToken });
++     const invalid = await request('/tasks/bulk', {
++       method: 'POST',
++       token: ownerToken,
++       body: { rows: [
++         { title: `${suffix}-valid`, priority: 'Low' },
++         { title: '', priority: 'Impossible', labor_cost: -1 },
++       ] },
++     });
++     expect(invalid.response.status).toBe(400);
++     expect(invalid.data.details.length).toBeGreaterThan(0);
++     const after = await request('/tasks?skip=0&limit=500', { token: ownerToken });
++     expect(after.response.status).toBe(200);
++     expect(Number(after.response.headers.get('x-total-count'))).toBe(Number(before.response.headers.get('x-total-count')));
++     expect(after.data.some((row) => String(row.title || '').startsWith(suffix))).toBe(false);
++   });
++
++   it('rejects invalid pagination and validates bulk rows before writing any of them', async () => {
++     for (const route of ['/crops', '/tasks', '/finance']) {
++       for (const query of ['skip=-1&limit=10', 'skip=0&limit=0', 'skip=1.5&limit=10', 'skip=0&limit=abc']) {
++         const result = await request(`${route}?${query}`, { token: ownerToken });
++         expect(result.response.status, `${route}? ${query}`).toBe(400);
++       }
++     }
++
++     const oversized = await request('/tasks?skip=0&limit=999999', { token: ownerToken });
++     expect(oversized.response.status).toBe(200);
++     expect(oversized.response.headers.get('x-page-size')).toBe('500');
++     expect(oversized.data.length).toBeLessThanOrEqual(500);
++
++     const workerCannotWriteFinance = await request('/finance', {
++       method: 'POST',
++       token: workerToken,
++       body: { category: 'forbidden write', type: 'expense', amount: 1, date: '2026-10-23' },
++     });
++     expect(workerCannotWriteFinance.response.status).toBe(403);
++
++     const before = await request('/finance?skip=0&limit=500', { token: ownerToken });
++     const invalid = await request('/finance/bulk', {
++       method: 'POST',
++       token: ownerToken,
++       body: { rows: [
++         { category: 'Valid row should not be committed', type: 'expense', amount: 5, date: '2026-10-23' },
++         { category: '', type: 'not-a-type', amount: -1, date: 'not-a-date' },
++       ] },
++     });
++     expect(invalid.response.status).toBe(400);
++     expect(invalid.data.details.length).toBeGreaterThan(0);
++     const after = await request('/finance?skip=0&limit=500', { token: ownerToken });
++     expect(Number(after.response.headers.get('x-total-count'))).toBe(Number(before.response.headers.get('x-total-count')));
++   });
++
++   it('filters completed crop history and enforces worker task-assignment authorization', async () => {
++     const workerCrops = await request('/crops?skip=0&limit=500', { token: workerToken });
++     expect(workerCrops.response.status).toBe(200);
++     expect(workerCrops.data.every((crop) => crop.status !== 'Completed')).toBe(true);
++
++     const suffix = `runtime-auth-${process.pid}-${Date.now()}`;
++     const unassignedTask = await request('/tasks', {
++       method: 'POST',
++       token: ownerToken,
++       body: { title: `${suffix}-unassigned`, assigned_to: 'someone-else', priority: 'Medium' },
++     });
++     expect(unassignedTask.response.status).toBe(201);
++
++     const taskRows = await request('/tasks?skip=0&limit=500', { token: ownerToken });
++     const unassigned = taskRows.data.find((row) => row.title === `${suffix}-unassigned`);
++     expect(unassigned).toBeTruthy();
++     if (unassigned) {
++       created.tasks.push(String(unassigned._id));
++       const forbiddenCompletion = await request(`/tasks/${unassigned._id}`, {
++         method: 'PATCH',
++         token: workerToken,
++       });
++       expect(forbiddenCompletion.response.status).toBe(403);
++     }
++
++     const assignedTask = await request('/tasks', {
++       method: 'POST',
++       token: ownerToken,
++       body: { title: `${suffix}-assigned`, assigned_to: 'worker', priority: 'Medium' },
++     });
++     expect(assignedTask.response.status).toBe(201);
++     const refreshedTasks = await request('/tasks?skip=0&limit=500', { token: ownerToken });
++     const assigned = refreshedTasks.data.find((row) => row.title === `${suffix}-assigned`);
++     expect(assigned).toBeTruthy();
++     if (assigned) {
++       created.tasks.push(String(assigned._id));
++       const allowedCompletion = await request(`/tasks/${assigned._id}`, {
++         method: 'PATCH',
++         token: workerToken,
++       });
++       expect(allowedCompletion.response.status).toBe(200);
++       expect(allowedCompletion.data.status).toBe('ok');
++       expect(allowedCompletion.data.already_completed).not.toBe(true);
++       const repeatedCompletion = await request(`/tasks/${assigned._id}`, {
++         method: 'PATCH',
++         token: workerToken,
++       });
++       expect(repeatedCompletion.response.status).toBe(200);
++       expect(repeatedCompletion.data.already_completed).toBe(true);
++     }
++   });
++ });
++
+
+ ❯ tests/agri-fields-cycles.test.ts:65:25
+     63|     expect(integration).toContain('financeSummary.byField');
+     64|     expect(integration).toContain('financeSummary.bySeason');
+     65|     expect(integration).toContain('This field is linked to existing crop cycles or finance entries');
+       |                         ^
+     66|   });
+     67| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  tests/agri-runtime-api.integration.test.ts > Agri runtime API integration > keeps fields farm-scoped and groups linked finance by field and season
+AssertionError: expected { season: 'Kharif', …(4) } to match object { income: +0, expense: 23, net: -23 }
+(2 matching properties omitted from actual)
+
+- Expected
++ Received
+
+  {
+-   "expense": 23,
+-   "income": 0,
+-   "net": -23,
++   "expense": 326623,
++   "income": 558000,
++   "net": 231377,
+  }
+
+ ❯ tests/agri-runtime-api.integration.test.ts:207:27
+    205|     expect(fieldSummary).toMatchObject({ income: 0, expense: 23, net: -23 });
+    206|     const seasonSummary = analytics.data.financeSummary.bySeason.find((row) => row.season === 'Kharif');
+    207|     expect(seasonSummary).toMatchObject({ income: 0, expense: 23, net: -23 });
+       |                           ^
+    208|
+    209|     const fields = await request('/fields', { token: ownerToken });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  tests/phase1-backup-farm-context.test.ts > global backup restore and local role-test setup > seeds Farm 1 and Farm 2 roles in each memory demo
+AssertionError: expected 'import mongoose from \'mongoose\';\r\…' to contain 'Farm, User, Crop'
+
+- Expected
++ Received
+
+- Farm, User, Crop
++ import mongoose from 'mongoose';
++ import { createStore } from './memory-db.js';
++ import { MUF_ENV, mufEnvHasMongo } from './muf-env.mjs';
++ import { mufScopeModels, mufMigrateFarms, mufLoadDefaultFarm } from './muf-farms.mjs';
++
++ // ---------------------------------------------------------------------------
++ // Database selection rule (same across all three farm apps):
++ //
++ //   1. If MONGO_URI is set           -> ALWAYS the real MongoDB. A leftover
++ //                                       MEMORY_MODE flag is ignored, so demo
++ //                                       mode can never hide your real data.
++ //                                       Connection failure = loud crash.
++ //   2. No MONGO_URI + MEMORY_MODE=1  -> in-memory demo database, auto-seeded
++ //                                       with a year of demo data. Data is
++ //                                       LOST on restart.
++ //   3. Neither                       -> try local MongoDB, fail loudly with a
++ //                                       helpful hint.
++ // ---------------------------------------------------------------------------
++ let envUri = MUF_ENV.mongoUri || '';
++
++ // Treat the template placeholder as "not configured"
++ if (!mufEnvHasMongo()) {
++   if (envUri) console.log('⚠️ [Database] MONGO_URI in .env is a template placeholder — ignoring it.');
++   envUri = '';
++ }
++
++ const memoryRequested = MUF_ENV.memoryMode;
++
++ const useMock = memoryRequested && !envUri;
++
++ // ─── Schemas (loose on purpose: the docs are plain field bags) ─────────────
++ // Collection names match the previous Python backend 1:1, so a real MongoDB
++ // with existing farm data keeps working with zero migration.
++ const baseOptions = { strict: false, versionKey: false, collection: undefined };
++ function looseSchema(collection) {
++   return new mongoose.Schema({}, { ...baseOptions, collection });
++ }
++
++ const UserSchema = looseSchema('users');
++ const CropSchema = looseSchema('crops');
++ const FieldSchema = looseSchema('fields');
++ const FinanceSchema = looseSchema('finance');
++ const TaskSchema = looseSchema('tasks');
++ const ResetSchema = looseSchema('resets');
++ const InventorySchema = looseSchema('inventory');
++ const LiabilitySchema = looseSchema('liabilities');
++ const IrrigationSchema = looseSchema('irrigation');
++ const CropPhotoSchema = looseSchema('crop_photos');
++ const SpraySchema = looseSchema('spray_logs');
++ const LaborerSchema = looseSchema('laborers');
++ const AttendanceSchema = looseSchema('attendance');
++ const LaborAdvanceSchema = looseSchema('labor_advances');
++ const TelegramMetaSchema = looseSchema('telegram_meta');
++ const SupplierSchema = looseSchema('suppliers');
++ const SupplierPaymentSchema = looseSchema('supplier_payments');
++ const SettingSchema = looseSchema('settings');
++ const DiaryMediaSchema = looseSchema('diary_media');
++
++ // Farms of this project (crop land only). See docs/FARMS_AND_ROLES.md.
++ // Timestamps matter here: the oldest farm is the default farm.
++ const FarmSchema = new mongoose.Schema({
++   name: { type: String, required: true, trim: true },
++   location: { type: String, default: '' },
++   archived: { type: Boolean, default: false },
++   createdBy: { type: String, default: '' },
++ }, { timestamps: true, versionKey: false, collection: 'farms' });
++
++ // Every record below belongs to exactly one farm. User, Reset, TelegramMeta,
++ // Setting and Farm stay global. The server adds the farmId; clients can never set it.
++ const FARM_SCOPED = {
++   Field: FieldSchema, Crop: CropSchema, Finance: FinanceSchema, Task: TaskSchema, Inventory: InventorySchema,
++   Liability: LiabilitySchema, Irrigation: IrrigationSchema, CropPhoto: CropPhotoSchema,
++   Spray: SpraySchema, Laborer: LaborerSchema, Attendance: AttendanceSchema,
++   LaborAdvance: LaborAdvanceSchema, Supplier: SupplierSchema,
++   SupplierPayment: SupplierPaymentSchema, DiaryMedia: DiaryMediaSchema,
++ };
++ const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
++ const FARM_QUERY_INDEXES = new Map([
++   [FieldSchema, [{ farmId: 1, name: 1 }]],
++   [CropSchema, [{ farmId: 1, status: 1, date: -1 }]],
++   [FinanceSchema, [{ farmId: 1, date: -1 }]],
++   [TaskSchema, [{ farmId: 1, status: 1, date: -1 }]],
++   [SpraySchema, [{ farmId: 1, date: -1 }]],
++   [AttendanceSchema, [{ farmId: 1, date: -1 }]],
++   [LaborAdvanceSchema, [{ farmId: 1, date: -1 }]],
++   [SupplierSchema, [{ farmId: 1, name: 1 }]],
++   [SupplierPaymentSchema, [{ farmId: 1, supplierId: 1, date: -1 }]],
++   [DiaryMediaSchema, [{ farmId: 1, date: -1 }]],
++ ]);
++ for (const schema of Object.values(FARM_SCOPED)) {
++   schema.add({ farmId: { type: String } });
++   const indexes = FARM_QUERY_INDEXES.get(schema);
++   if (indexes) for (const keys of indexes) schema.index(keys);
++   else schema.index({ farmId: 1 });
++ }
++
++ // ─── Models ─────────────────────────────────────────────────────────────────
++ let User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
++   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
++   Supplier, SupplierPayment, Setting, DiaryMedia, Farm;
++
++ if (useMock) {
++   const models = createStore({
++     User: UserSchema,
++     Field: FieldSchema,
++     Crop: CropSchema,
++     Finance: FinanceSchema,
++     Task: TaskSchema,
++     Reset: ResetSchema,
++     Inventory: InventorySchema,
++     Liability: LiabilitySchema,
++     Irrigation: IrrigationSchema,
++     CropPhoto: CropPhotoSchema,
++     Spray: SpraySchema,
++     Laborer: LaborerSchema,
++     Attendance: AttendanceSchema,
++     LaborAdvance: LaborAdvanceSchema,
++     TelegramMeta: TelegramMetaSchema,
++     Supplier: SupplierSchema,
++     SupplierPayment: SupplierPaymentSchema,
++     Setting: SettingSchema,
++     DiaryMedia: DiaryMediaSchema,
++     Farm: FarmSchema,
++   });
++   ({ User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
++     CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
++     Supplier, SupplierPayment, Setting, DiaryMedia, Farm } = models);
++ } else {
++   User = mongoose.model('User', UserSchema);
++   Field = mongoose.model('Field', FieldSchema);
++   Crop = mongoose.model('Crop', CropSchema);
++   Finance = mongoose.model('Finance', FinanceSchema);
++   Task = mongoose.model('Task', TaskSchema);
++   Reset = mongoose.model('Reset', ResetSchema);
++   Inventory = mongoose.model('Inventory', InventorySchema);
++   Liability = mongoose.model('Liability', LiabilitySchema);
++   Irrigation = mongoose.model('Irrigation', IrrigationSchema);
++   CropPhoto = mongoose.model('CropPhoto', CropPhotoSchema);
++   Spray = mongoose.model('Spray', SpraySchema);
++   Laborer = mongoose.model('Laborer', LaborerSchema);
++   Attendance = mongoose.model('Attendance', AttendanceSchema);
++   LaborAdvance = mongoose.model('LaborAdvance', LaborAdvanceSchema);
++   TelegramMeta = mongoose.model('TelegramMeta', TelegramMetaSchema);
++   Supplier = mongoose.model('Supplier', SupplierSchema);
++   SupplierPayment = mongoose.model('SupplierPayment', SupplierPaymentSchema);
++   Setting = mongoose.model('Setting', SettingSchema);
++   DiaryMedia = mongoose.model('DiaryMedia', DiaryMediaSchema);
++   Farm = mongoose.model('Farm', FarmSchema);
++ }
++
++ // Server-side farm scoping: inside a request every query of these models is limited
++ // to the selected farm(s) and every create is stamped with it (see muf-farms.mjs).
++ const MUF_FARM_MODELS = {
++   Field, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer,
++   Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia,
++ };
++ mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
++
++ const connectDB = async () => {
++   if (useMock) {
++     console.log('🧠 [Database] MEMORY_MODE=1 — using in-memory demo database (data is lost on restart).');
++     // Seed demo accounts (admin + worker) and a full year of realistic farm
++     // data so every screen is populated out of the box.
++     const { seedDemoData } = await import('./demo-data.js');
++     const userCount = await User.countDocuments({});
++     if (userCount === 0) {
++       await seedDemoData({
++         Farm, User, Field, Crop, Finance, Task, Inventory, Liability, Irrigation,
++         CropPhoto, Spray, Laborer, Attendance, LaborAdvance,
++         Supplier, SupplierPayment,
++       });
++     }
++     // Demo data is disposable, so the farms migration runs automatically here.
++     await mufMigrateFarms({
++       Farm, User, models: MUF_FARM_MODELS, names: MUF_FARM_SCOPED_NAMES,
++       log: (m) => console.log(`[farms] ${m}`),
++     });
++     return;
++   }
++
++   const uri = envUri || 'mongodb://localhost:27017/farm_management';
++   let hostName = 'localhost';
++   let dbName = 'farm_management';
++   try {
++     const m = uri.match(/mongodb(\+srv)?:\/\/([^@/]*@)?([^/:]+)/);
++     if (m) hostName = m[3];
++     const dbm = uri.match(/\/([^/?]+)(\?.*)?$/);
++     if (dbm) dbName = decodeURIComponent(dbm[1]);
++   } catch { /* keep defaults */ }
++
++   if (memoryRequested && envUri) {
++     console.log('ℹ️ [Database] MEMORY_MODE is set but MONGO_URI is configured — the real MongoDB wins; memory mode ignored.');
++   }
++   console.log(`🔌 [Database] Connection target resolved: Host '${hostName}' | Database '${dbName}'`);
++
++   const timeoutMs = uri.startsWith('mongodb+srv://') ? 15000 : 5000;
++   try {
++     const conn = await mongoose.connect(uri, { serverSelectionTimeoutMS: timeoutMs });
++     console.log(`✅ [Database] Connected successfully to real MongoDB server. Database in use: '${conn.connection.name || dbName}'`);
++     // Real data is never migrated automatically. Run `npm run migrate:farms`
++     // (see docs/DEPLOYMENT.md) after taking a backup.
++     const defaultFarm = await mufLoadDefaultFarm(Farm);
++     if (!defaultFarm) {
++       console.warn('[farms] No farms exist yet. Take a backup, then run: npm run migrate:farms');
++     }
++   } catch (error) {
++     // Production must fail loudly so a typo'd MONGO_URI / Atlas allowlist
++     // problem is noticed immediately — never silently boot an empty
++     // throwaway database in place of the real one.
++     console.error(`❌ [Database] CRITICAL: Could not connect to MongoDB at '${hostName}' (${error.message}).`);
++     console.error('   Please verify the MONGO_URI secret (and MongoDB Atlas Network Access allowlist).');
++     console.error('   For a local demo without MongoDB, remove MONGO_URI and set MEMORY_MODE=1.');
++     process.exit(1);
++   }
++ };
++
++ export {
++   connectDB, useMock,
++   User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
++   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
++   Supplier, SupplierPayment, Setting, DiaryMedia, Farm,
++   MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES,
++ };
++
+
+ ❯ tests/phase1-backup-farm-context.test.ts:47:45
+     45|       expect(s).toContain('farmIds: [String(farm2._id)]');
+     46|     }
+     47|     expect(read('agri_farm/backend/db.js')).toContain('Farm, User, Crop');
+       |                                             ^
+     48|     expect(read('dairy_farm/backend/db.js')).toContain('User, Farm');
+     49|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  tests/phase3-pagination.test.ts > Phase 3 Agri scale and incremental-rendering contracts > provides farm-scoped Agri analytics summaries and lazy full-detail loading
+AssertionError: expected '// Compact, farm-scoped analytics for…' to contain 'Finance.find({}).select(\'_id type am…'
+
+- Expected
++ Received
+
+- Finance.find({}).select('_id type amount date crop_id category notes buyer_name description').lean()
++ // Compact, farm-scoped analytics for Agri dashboard/report views.
++ // Lists and editor forms continue using their paged endpoints. This route sends
++ // aggregates plus bounded recent rows, and deliberately excludes photo blobs.
++ import express from 'express';
++ import { Crop, Finance, Task, Field } from '../db.js';
++ import { protect } from '../middleware/auth.js';
++ import { asyncHandler } from '../utils/helpers.js';
++ import { mufIsFullRole } from '../muf-farms.mjs';
++ import { todayStr } from '../utils/date.js';
++
++ const router = express.Router();
++
++ const monthOf = (value) => (
++   typeof value === 'string' && /^\d{4}-\d{2}/.test(value) ? value.slice(0, 7) : ''
++ );
++ const amountOf = (row) => {
++   const value = Number(row?.amount);
++   return Number.isFinite(value) ? value : 0;
++ };
++ const shiftMonth = (key, amount) => {
++   const [year, month] = key.split('-').map(Number);
++   return new Date(Date.UTC(year, month - 1 + amount, 1)).toISOString().slice(0, 7);
++ };
++ const emptyMoney = () => ({ income: 0, expense: 0, net: 0 });
++ const percentChange = (current, previous) => (
++   previous ? Math.round(((current - previous) / Math.abs(previous)) * 100) : null
++ );
++ const containsName = (text, name) => {
++   const haystack = String(text || '').toLowerCase();
++   const needle = String(name || '').trim().toLowerCase();
++   if (needle.length < 2) return false;
++   let from = 0;
++   while (from <= haystack.length) {
++     const index = haystack.indexOf(needle, from);
++     if (index < 0) return false;
++     const before = index > 0 ? haystack[index - 1] : ' ';
++     const after = haystack[index + needle.length] || ' ';
++     if (/[^a-z0-9]/.test(before) && /[^a-z0-9]/.test(after)) return true;
++     from = index + 1;
++   }
++   return false;
++ };
++ const asId = (row) => ({ ...row, _id: String(row._id) });
++
++ router.get('/analytics/summary', protect, asyncHandler(async (req, res) => {
++   const fullRole = mufIsFullRole(req.user.role);
++   const today = todayStr();
++   const currentMonthKey = today.slice(0, 7);
++   const previousMonthKey = shiftMonth(currentMonthKey, -1);
++   const lastYearMonthKey = shiftMonth(currentMonthKey, -12);
++
++   // Use find/select/lean rather than raw aggregation: the shared MUF wrapper
++   // applies the active farm scope to these reads. Never query the base
++   // collections directly or mix records from the owner's other farms.
++   const [crops, tasks, finance, fieldDocs] = await Promise.all([
++     Crop.find(fullRole ? {} : { status: { $ne: 'Completed' } })
++       .select('_id name variety status area_kanal plant_date harvest_date field fieldId season crop_year yield_kg yield_unit createdAt')
++       .lean(),
++     Task.find({})
++       .select('_id title status due_date completed_at date crop_id assigned_to priority notes laborer_ids laborer_names createdAt')
++       .lean(),
++     fullRole
++       ? Finance.find({}).select('_id type amount date crop_id fieldId cropCycleId category notes buyer_name description').lean()
++       : Promise.resolve(null),
++     Field.find({}).select('_id name acres notes').lean(),
++   ]);
++
++   const cropRows = crops.map(asId).map((crop) => ({
++     ...crop,
++     name: crop.name || '',
++     variety: crop.variety || '',
++     status: crop.status || '',
++     plant_date: crop.plant_date || '',
++     harvest_date: crop.harvest_date || '',
++     field: crop.field || '',
++     fieldId: crop.fieldId ? String(crop.fieldId) : '',
++     season: crop.season || '',
++     crop_year: crop.crop_year == null ? '' : String(crop.crop_year),
++     yield_unit: crop.yield_unit || 'kg',
++   }));
++   const cropById = new Map(cropRows.map((crop) => [crop._id, crop]));
++   const fieldRows = fieldDocs.map((field) => ({ ...field, _id: String(field._id), name: String(field.name || '') }));
++   const fieldById = new Map(fieldRows.map((field) => [field._id, field]));
++   const cropMonthCounts = new Map();
++   const cropStatuses = { Growing: 0, Planted: 0, Harvesting: 0, Completed: 0, Other: 0 };
++   const fields = new Set();
++   const seasons = new Set();
++   const years = new Set();
++   let areaKanal = 0;
++   for (const crop of cropRows) {
++     if (Object.prototype.hasOwnProperty.call(cropStatuses, crop.status)) cropStatuses[crop.status] += 1;
++     else cropStatuses.Other += 1;
++     const area = Number(crop.area_kanal);
++     if (Number.isFinite(area)) areaKanal += area;
++     if (crop.field) fields.add(String(crop.field));
++     if (crop.season) seasons.add(String(crop.season));
++     if (crop.crop_year) years.add(String(crop.crop_year));
++     const month = monthOf(crop.plant_date);
++     if (month) cropMonthCounts.set(month, (cropMonthCounts.get(month) || 0) + 1);
++   }
++
++   const taskStatuses = { Pending: 0, Completed: 0, Other: 0 };
++   const taskByCrop = new Map();
++   const taskByAssignee = new Map();
++   let dueToday = 0;
++   let completedToday = 0;
++   let taskActivityToday = false;
++   let pendingIrrigation = 0;
++   for (const task of tasks) {
++     if (Object.prototype.hasOwnProperty.call(taskStatuses, task.status)) taskStatuses[task.status] += 1;
++     else taskStatuses.Other += 1;
++     const activityDate = String(task.completed_at || task.date || '').slice(0, 10);
++     if (activityDate === today) taskActivityToday = true;
++     if (activityDate === today && task.status === 'Completed') completedToday += 1;
++     if (task.status === 'Pending' && String(task.due_date || '').slice(0, 10) === today) dueToday += 1;
++     const taskText = String(task.title || '') + ' ' + String(task.notes || '');
++     if (task.status === 'Pending' && ['irrigation', 'irrigate', 'tubewell', 'tube-well', 'sprinkler', 'watering']
++       .some((term) => taskText.toLowerCase().includes(term))) pendingIrrigation += 1;
++
++     const assignee = String(task.assigned_to || '').trim();
++     if (assignee) {
++       const assigneeKey = assignee.toLowerCase();
++       const assigned = taskByAssignee.get(assigneeKey) || {
++         assignee, pending: 0, active: 0, completed: 0, total: 0,
++       };
++       assigned.total += 1;
++       if (task.status === 'Pending') assigned.pending += 1;
++       if (task.status !== 'Completed') assigned.active += 1;
++       if (task.status === 'Completed') assigned.completed += 1;
++       taskByAssignee.set(assigneeKey, assigned);
++     }
++
++     const linkedCropIds = new Set();
++     const explicitId = String(task.crop_id || '');
++     if (explicitId && cropById.has(explicitId)) linkedCropIds.add(explicitId);
++     else {
++       for (const crop of cropRows) {
++         if (containsName(task.title, crop.name) || containsName(task.notes, crop.name) ||
++             containsName(task.title, crop.variety)) linkedCropIds.add(crop._id);
++       }
++     }
++     for (const cropId of linkedCropIds) {
++       const summary = taskByCrop.get(cropId) || { crop_id: cropId, pending: 0, completed: 0, total: 0 };
++       summary.total += 1;
++       if (task.status === 'Pending') summary.pending += 1;
++       if (task.status === 'Completed') summary.completed += 1;
++       taskByCrop.set(cropId, summary);
++     }
++   }
++   const taskSort = (a, b) => String(b.due_date || b.completed_at || b.date || b.createdAt || '')
++     .localeCompare(String(a.due_date || a.completed_at || a.date || a.createdAt || ''));
++   const recentTasks = [...tasks].sort(taskSort).slice(0, 40).map(asId);
++   const pendingTasks = tasks.filter((task) => task.status === 'Pending').sort(taskSort);
++   const recentPendingTasks = pendingTasks.slice(0, 40).map(asId);
++   const pendingTasksWithCrew = pendingTasks.filter((task) => Array.isArray(task.laborer_ids) && task.laborer_ids.length > 0);
++   const taskSummary = {
++     total: tasks.length,
++     byStatus: taskStatuses,
++     byCrop: [...taskByCrop.values()],
++     byAssignee: [...taskByAssignee.values()],
++     recentPending: recentPendingTasks,
++     pendingWithCrewCount: pendingTasksWithCrew.length,
++     recentPendingWithCrew: pendingTasksWithCrew.slice(0, 40).map(asId),
++     dueToday,
++     completedToday,
++     pendingIrrigation,
++     activityToday: taskActivityToday,
++     recent: recentTasks,
++   };
++
++   let financeSummary = null;
++   let financeActivityToday = false;
++   if (fullRole) {
++     const ledger = finance || [];
++     const totals = emptyMoney();
++     const monthTotals = new Map();
++     const byCropTotals = new Map();
++     const byFieldTotals = new Map();
++     const bySeasonTotals = new Map();
++     const byCropMonths = new Map();
++     const byCropCategories = new Map();
++     const byCropIncomeCategories = new Map();
++     const expenseCategories = new Map();
++     const incomeCategories = new Map();
++     const farmWideExpenseCategories = new Map();
++     const farmWideIncomeCategories = new Map();
++     let farmWideIncome = 0;
++     let farmWideExpense = 0;
++     let farmWideIncomeCount = 0;
++     let farmWideExpenseCount = 0;
++     let farmWideEntryCount = 0;
++
++     for (const row of ledger) {
++       const amount = amountOf(row);
++       const isIncome = row.type === 'income';
++       const isExpense = row.type === 'expense';
++       if (isIncome) totals.income += amount;
++       if (isExpense) totals.expense += amount;
++       const date = String(row.date || '').slice(0, 10);
++       if (date === today) financeActivityToday = true;
++
++       const month = monthOf(row.date);
++       if (month) {
++         const monthly = monthTotals.get(month) || { income: 0, expense: 0, cropsCount: 0 };
++         if (isIncome) monthly.income += amount;
++         if (isExpense) monthly.expense += amount;
++         monthTotals.set(month, monthly);
++       }
++
++       if (isExpense) {
++         const category = String(row.category || 'Other');
++         expenseCategories.set(category, (expenseCategories.get(category) || 0) + amount);
++       }
++       if (isIncome) {
++         const buyer = String(row.buyer_name || '').trim() || String(row.category || 'General / Spot Sale');
++         incomeCategories.set(buyer, (incomeCategories.get(buyer) || 0) + amount);
++       }
++
++       const cropId = String(row.cropCycleId || row.crop_id || '');
++       const linkedCrop = cropById.get(cropId);
++       const fieldId = String(row.fieldId || linkedCrop?.fieldId || '');
++       const fieldLabel = (fieldById.get(fieldId)?.name || linkedCrop?.field || '').trim();
++       const seasonLabel = String(linkedCrop?.season || '').trim();
++       {
++         const groupingField = fieldLabel || 'Unassigned / farm-wide';
++         const fieldTotals = byFieldTotals.get(groupingField) || { fieldId: fieldId || null, field: groupingField, income: 0, expense: 0, entryCount: 0 };
++         fieldTotals.entryCount += 1;
++         if (isIncome) fieldTotals.income += amount;
++         if (isExpense) fieldTotals.expense += amount;
++         byFieldTotals.set(groupingField, fieldTotals);
++       }
++       {
++         const groupingSeason = seasonLabel || 'Unassigned / farm-wide';
++         const seasonTotals = bySeasonTotals.get(groupingSeason) || { season: groupingSeason, income: 0, expense: 0, entryCount: 0 };
++         seasonTotals.entryCount += 1;
++         if (isIncome) seasonTotals.income += amount;
++         if (isExpense) seasonTotals.expense += amount;
++         bySeasonTotals.set(groupingSeason, seasonTotals);
++       }
++       if (!cropId || !cropById.has(cropId)) {
++         farmWideEntryCount += 1;
++         if (isIncome) {
++           farmWideIncome += amount;
++           farmWideIncomeCount += 1;
++           const buyer = String(row.buyer_name || '').trim() || String(row.category || 'General / Spot Sale');
++           farmWideIncomeCategories.set(buyer, (farmWideIncomeCategories.get(buyer) || 0) + amount);
++         }
++         if (isExpense) {
++           farmWideExpense += amount;
++           farmWideExpenseCount += 1;
++           const category = String(row.category || 'Other');
++           farmWideExpenseCategories.set(category, (farmWideExpenseCategories.get(category) || 0) + amount);
++         }
++         continue;
++       }
++
++       const cropTotals = byCropTotals.get(cropId) || {
++         income: 0, expense: 0, entryCount: 0, incomeCount: 0, expenseCount: 0,
++       };
++       cropTotals.entryCount += 1;
++       if (isIncome) {
++         cropTotals.income += amount;
++         cropTotals.incomeCount += 1;
++       }
++       if (isExpense) {
++         cropTotals.expense += amount;
++         cropTotals.expenseCount += 1;
++       }
++       byCropTotals.set(cropId, cropTotals);
++
++       if (month) {
++         let cropMonths = byCropMonths.get(cropId);
++         if (!cropMonths) {
++           cropMonths = new Map();
++           byCropMonths.set(cropId, cropMonths);
++         }
++         const monthly = cropMonths.get(month) || { income: 0, expense: 0, cropsCount: 0 };
++         if (isIncome) monthly.income += amount;
++         if (isExpense) monthly.expense += amount;
++         cropMonths.set(month, monthly);
++       }
++       if (isIncome) {
++         let categories = byCropIncomeCategories.get(cropId);
++         if (!categories) {
++           categories = new Map();
++           byCropIncomeCategories.set(cropId, categories);
++         }
++         const buyer = String(row.buyer_name || '').trim() || String(row.category || 'General / Spot Sale');
++         categories.set(buyer, (categories.get(buyer) || 0) + amount);
++       }
++       if (isExpense) {
++         let categories = byCropCategories.get(cropId);
++         if (!categories) {
++           categories = new Map();
++           byCropCategories.set(cropId, categories);
++         }
++         const category = String(row.category || 'Other');
++         categories.set(category, (categories.get(category) || 0) + amount);
++       }
++     }
++
++     totals.net = totals.income - totals.expense;
++     const totalsForMonth = (key) => {
++       const entry = monthTotals.get(key) || { income: 0, expense: 0 };
++       return { key, income: entry.income, expense: entry.expense, net: entry.income - entry.expense };
++     };
++     const currentMonth = totalsForMonth(currentMonthKey);
++     const previousMonth = totalsForMonth(previousMonthKey);
++     const sameMonthLastYear = totalsForMonth(lastYearMonthKey);
++     sameMonthLastYear.hasData = ledger.some((row) => String(row.date || '').startsWith(lastYearMonthKey));
++
++     for (const [month, count] of cropMonthCounts) {
++       const monthly = monthTotals.get(month) || { income: 0, expense: 0, cropsCount: 0 };
++       monthly.cropsCount = count;
++       monthTotals.set(month, monthly);
++     }
++
++     const monthlyRows = [...monthTotals.entries()]
++       .sort(([a], [b]) => a.localeCompare(b))
++       .map(([month, value]) => [month, { income: value.income, expense: value.expense, cropsCount: value.cropsCount }]);
++
++     const monthlyIncomeSeries = [...monthTotals.entries()]
++       .filter(([, value]) => value.income !== 0)
++       .sort(([a], [b]) => a.localeCompare(b))
++       .slice(-12)
++       .map(([month, value]) => ({ label: month.slice(2), value: value.income }));
++
++     const byCrop = cropRows.map((crop) => {
++       const amounts = byCropTotals.get(crop._id) || {
++         income: 0, expense: 0, entryCount: 0, incomeCount: 0, expenseCount: 0,
++       };
++       const months = byCropMonths.get(crop._id) || new Map();
++       const plantMonth = monthOf(crop.plant_date);
++       if (plantMonth) {
++         const existing = months.get(plantMonth) || { income: 0, expense: 0, cropsCount: 0 };
++         existing.cropsCount = 1;
++         months.set(plantMonth, existing);
++       }
++       const monthlyRowsForCrop = [...months.entries()]
++         .sort(([a], [b]) => a.localeCompare(b))
++         .map(([month, value]) => [month, value]);
++       const categoryMap = byCropCategories.get(crop._id) || new Map();
++       const categoryTotal = [...categoryMap.values()].reduce((sum, value) => sum + value, 0);
++       const incomeMap = byCropIncomeCategories.get(crop._id) || new Map();
++       return {
++         crop_id: crop._id,
++         name: crop.name || 'Crop',
++         income: amounts.income,
++         expense: amounts.expense,
++         net: amounts.income - amounts.expense,
++         entryCount: amounts.entryCount,
++         incomeCount: amounts.incomeCount,
++         expenseCount: amounts.expenseCount,
++         monthlyRows: monthlyRowsForCrop,
++         incomeBreakdown: [...incomeMap.entries()]
++           .map(([name, amount]) => ({ name, amount }))
++           .sort((a, b) => b.amount - a.amount),
++         expenseBreakdown: [...categoryMap.entries()]
++           .map(([category, amount]) => ({
++             category, amount,
++             percentage: categoryTotal > 0 ? Math.round((amount / categoryTotal) * 100) : 0,
++           }))
++           .sort((a, b) => b.amount - a.amount),
++       };
++     });
++     const profitability = cropRows.map((crop) => {
++       const amounts = byCropTotals.get(crop._id) || { income: 0, expense: 0 };
++       const area = Number(crop.area_kanal) || 1;
++       const netProfit = amounts.income - amounts.expense;
++       return {
++         ...crop,
++         spent: amounts.expense,
++         earned: amounts.income,
++         netProfit,
++         profitPerKanal: netProfit / area,
++         area,
++       };
++     }).sort((a, b) => b.profitPerKanal - a.profitPerKanal);
++
++     const categoryTotal = [...expenseCategories.values()].reduce((sum, value) => sum + value, 0);
++     const expenseBreakdown = [...expenseCategories.entries()]
++       .map(([category, amount]) => ({
++         category, amount,
++         percentage: categoryTotal > 0 ? Math.round((amount / categoryTotal) * 100) : 0,
++       }))
++       .sort((a, b) => b.amount - a.amount);
++     const incomeBreakdown = [...incomeCategories.entries()]
++       .map(([name, amount]) => ({ name, amount }))
++       .sort((a, b) => b.amount - a.amount);
++
++     const groups = [{
++       id: 'farm-wide',
++       name: 'General / Farm-Wide Operational',
++       plot: 'General',
++       entryCount: farmWideEntryCount,
++       incomeCount: farmWideIncomeCount,
++       expenseCount: farmWideExpenseCount,
++       income: farmWideIncome,
++       expense: farmWideExpense,
++       net: farmWideIncome - farmWideExpense,
++       incomeBreakdown: [...farmWideIncomeCategories.entries()].map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount),
++       expenseBreakdown: [...farmWideExpenseCategories.entries()].map(([name, amount]) => ({ name, amount })).sort((a, b) => b.amount - a.amount),
++     }, ...byCrop.map((crop) => ({
++       id: crop.crop_id,
++       name: 'Crop: ' + crop.name,
++       plot: cropRows.find((item) => item._id === crop.crop_id)?.field || 'Farm-wide',
++       entryCount: crop.entryCount,
++       incomeCount: crop.incomeCount,
++       expenseCount: crop.expenseCount,
++       income: crop.income,
++       expense: crop.expense,
++       net: crop.net,
++       incomeBreakdown: crop.incomeBreakdown,
++       expenseBreakdown: crop.expenseBreakdown.map((row) => ({ name: row.category, amount: row.amount })),
++     }))];
++
++     const recent = [...ledger]
++       .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')) ||
++         String(b._id).localeCompare(String(a._id)))
++       .slice(0, 50)
++       .map(asId);
++
++     financeSummary = {
++       totals: { entries: ledger.length, income: totals.income, expense: totals.expense, net: totals.net, farmWideIncome, farmWideExpense },
++       currentMonth,
++       previousMonth,
++       sameMonthLastYear,
++       comparison: {
++         curInc: currentMonth.income,
++         prevInc: previousMonth.income,
++         curExp: currentMonth.expense,
++         prevExp: previousMonth.expense,
++         curNet: currentMonth.net,
++         prevNet: previousMonth.net,
++         netPct: percentChange(currentMonth.net, previousMonth.net),
++         incPct: percentChange(currentMonth.income, previousMonth.income),
++         lyInc: sameMonthLastYear.income,
++         lyNet: sameMonthLastYear.net,
++         hasLy: sameMonthLastYear.hasData,
++         lyIncPct: percentChange(currentMonth.income, sameMonthLastYear.income),
++         lyNetPct: percentChange(currentMonth.net, sameMonthLastYear.net),
++       },
++       monthlyIncomeSeries,
++       monthlyRows,
++       incomeBreakdown,
++       expenseBreakdown,
++       byCrop,
++       profitability,
++       groups: groups.filter((group) => group.id === 'farm-wide' || group.entryCount > 0),
++       byField: [...byFieldTotals.values()].map((row) => ({ ...row, net: row.income - row.expense }))
++         .sort((a, b) => a.field.localeCompare(b.field)),
++       bySeason: [...bySeasonTotals.values()].map((row) => ({ ...row, net: row.income - row.expense }))
++         .sort((a, b) => a.season.localeCompare(b.season)),
++       recent,
++     };
++   }
++
++   return res.json({
++     asOf: today,
++     monthKey: currentMonthKey,
++     activityToday: taskActivityToday || financeActivityToday,
++     cropSummary: {
++       total: cropRows.length,
++       statusCounts: cropStatuses,
++       areaKanal,
++       fields: [...fields].sort(),
++       seasons: [...seasons].sort(),
++       years: [...years].sort(),
++       monthlyCycles: [...cropMonthCounts.entries()].sort(([a], [b]) => a.localeCompare(b))
++         .map(([month, count]) => ({ month, count })),
++       // No image_base64 is selected or returned. Keep the same worker
++       // redaction as GET /crops: production yield is owner/manager data.
++       options: cropRows.map((crop) => {
++         const option = {
++           _id: crop._id,
++           name: crop.name,
++           variety: crop.variety,
++           status: crop.status,
++           area_kanal: crop.area_kanal,
++           plant_date: crop.plant_date,
++           harvest_date: crop.harvest_date,
++           field: crop.field,
++           fieldId: crop.fieldId,
++           season: crop.season,
++           crop_year: crop.crop_year,
++           yield_kg: crop.yield_kg,
++           yield_unit: crop.yield_unit,
++         };
++         if (!fullRole) delete option.yield_kg;
++         return option;
++       }),
++     },
++     taskSummary,
++     financeSummary,
++   });
++ }));
++
++ export default router;
++
+
+ ❯ tests/phase3-pagination.test.ts:231:19
+    229|     expect(route).toContain("router.get('/analytics/summary', protect");
+    230|     expect(route).toContain("Crop.find(fullRole ? {} : { status: { $ne: 'Completed' } })");
+    231|     expect(route).toContain("Finance.find({}).select('_id type amount date crop_id category notes buyer_name description').lea…
+       |                   ^
+    232|     expect(route).toContain("slice(0, 50)");
+    233|     expect(route).toContain('financeSummary');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  4 failed | 24 passed (28)
+      Tests  4 failed | 256 passed (260)
+   Start at  22:18:23
+   Duration  11.77s (transform 1.19s, setup 0ms, collect 4.72s, tests 12.22s, environment 10ms, prepare 6.16s)
+
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-sync
+
+> check-sync
+> node tools/check-muf-sync.js
+
+
+━━ Twin files (dairy ↔ flock, must be identical after normalizing farm identity) ━━
+  ✅ muf-style.css (all 3)          identical
+  ✅ muf-login.tsx (all 3)          identical
+  ✅ components/MyFarmsPanel.tsx    identical
+  ✅ muf-print.ts                   identical
+  ✅ utils/share.ts                 identical
+  ✅ muf-labor.ts                   identical
+  ✅ muf-zakat.ts                   identical
+  ✅ muf-pdf.ts                     identical
+  ✅ muf-feedstock.ts               identical
+  ✅ muf-khata.ts                   identical
+  ✅ muf-farmbook.ts                identical
+  ✅ muf-image.ts                   identical
+  ✅ muf-voice.ts                   identical
+  ✅ muf-urdu.ts                    identical
+  ✅ muf-urdu-terms-1.ts            identical
+  ✅ muf-urdu-terms-2.ts            identical
+  ✅ muf-urdu-terms-3.ts            identical
+  ✅ muf-urdu-terms-4.ts            identical
+  ✅ muf-urdu-terms-5.ts            identical
+  ✅ muf-urdu-terms-6.ts            identical
+  ✅ muf-search.ts                  identical
+  ✅ muf-offline.ts                 identical
+  ✅ muf-charts.tsx                 identical
+  ✅ muf-profile.ts                 identical
+  ✅ muf-applike.tsx                identical
+  ✅ muf-date.ts                    identical
+  ✅ muf-story.ts                   identical
+  ✅ muf-telegram.mjs               identical
+  ✅ muf-supplier.ts                identical
+  ✅ muf-motion.ts                  identical
+  ✅ muf-modal.tsx                  identical
+  ✅ muf-confirm.tsx                identical
+  ✅ muf-portal.tsx                 identical
+  ✅ muf-offline-banner.tsx         identical
+  ✅ muf-avatar.tsx                 identical
+  ✅ muf-farm-profile.tsx           identical
+  ✅ muf-header-search.tsx          identical
+  ✅ muf-telegram-panel.tsx         identical
+  ✅ muf-form-overlay.tsx           identical
+  ✅ muf-scroll-lock.ts             identical
+  ✅ muf-card-qr.tsx                identical
+  ✅ muf-entity-grid.tsx            identical
+  ✅ muf-diary-media.tsx            identical
+  ✅ muf-login-lang.tsx             identical
+  ✅ muf-login.tsx                  identical
+  ✅ muf-a11y.ts                    identical
+  ✅ muf-worker-panel.tsx           identical
+
+━━ Shared farm switcher (all three apps, byte-identical) ━━
+  ✅ Shared farm switcher identical in all three apps
+
+━━ Backend muf twins (byte-identical in all 3 backends) ━━
+  ✅ muf-telegram.mjs     byte-identical
+  ✅ muf-email.mjs        byte-identical
+  ✅ muf-date.mjs         byte-identical
+  ✅ muf-query.mjs        byte-identical
+  ✅ muf-env.mjs          byte-identical
+  ✅ muf-card.mjs         byte-identical
+  ✅ muf-farms.mjs        byte-identical
+  ✅ backend: telegram parser helper    parseCommand
+  ✅ backend: email factory helper      createMufMailer
+  ✅ backend: farm-local today helper   mufToday
+  ✅ backend: query matcher helper      mufMatches
+  ✅ backend: env resolver (MUF_ENV)    MUF_ENV
+  ✅ backend: card page renderer        renderMufCard
+
+━━ Unified env system (same names in all 3 backends) ━━
+  ✅ env: MONGO_URI                     in all 3 .env.example
+  ✅ env: JWT_SECRET                    in all 3 .env.example
+  ✅ env: APP_URL                       in all 3 .env.example
+  ✅ env: FRONTEND_URL                  in all 3 .env.example
+  ✅ env: SMTP_HOST                     in all 3 .env.example
+  ✅ env: SMTP_PORT                     in all 3 .env.example
+  ✅ env: SMTP_SECURE                   in all 3 .env.example
+  ✅ env: SMTP_USER                     in all 3 .env.example
+  ✅ env: SMTP_PASS                     in all 3 .env.example
+  ✅ env: SMTP_FROM                     in all 3 .env.example
+  ✅ env: TELEGRAM_BOT_TOKEN            in all 3 .env.example
+  ✅ env: TELEGRAM_WEBHOOK_SECRET       in all 3 .env.example
+  ✅ env: CRON_SECRET                   in all 3 .env.example
+  ✅ env: MEMORY_MODE                   in all 3 .env.example
+  ✅ env: CROSS_FARM_KEY                in all 3 .env.example
+  ✅ env: TZ_OFFSET_HOURS               in all 3 .env.example
+  ✅ env: LOG_REQUESTS                  in all 3 .env.example
+  ✅ env: PORT                          in all 3 .env.example
+  ✅ env: dairy no legacy reads         all through muf-env
+  ✅ env: flock no legacy reads         all through muf-env
+  ✅ env: agri no legacy reads          all through muf-env
+
+━━ muf invariants (same value required in all three apps) ━━
+  ✅ popup width small (MUF token)  muf-pup-width-sm
+  ✅ popup width big (MUF token)    muf-pup-width-lg
+  ✅ popup max height (MUF card)    muf-pup-card
+  ✅ popup mobile height token      70dvh
+  ✅ form overlay mobile height cap max-height: var(--muf-popup-mobile-max-height) !important
+  ✅ primary action uses canonical  var(--muf-color-primary)
+  ✅ active navigation uses canonic var(--muf-color-primary-hover)
+  ✅ detail action uses canonical t var(--muf-color-primary)
+  ✅ focus ring uses semantic succe var(--muf-color-success)
+  ✅ popup focus outline uses share var(--muf-ui-focus)
+  ✅ mobile popup stage padding tok 10px
+  ✅ mobile popup typography scale  (matched)
+  ✅ mobile popup fields use shared (matched)
+  ✅ popup form gap uses shared tok 1rem
+  ✅ popup field height uses shared 38px
+  ✅ mobile popup field size uses s var(--muf-ui-popup-field-font-size-mobile)
+  ✅ primary action height token    47px
+  ✅ primary action consumes height var(--muf-core-action-primary-height,47px)
+  ✅ compact action consumes sizing var(--muf-core-action-compact-height,31px)
+  ✅ KPI spacing consumes token     var(--muf-core-kpi-gap,12px)
+  ✅ KPI padding consumes token     var(--muf-core-kpi-padding,17px 15px)
+  ✅ panel radius consumes token    var(--muf-core-panel-radius,20px)
+  ✅ entity card radius consumes to var(--muf-core-entity-radius,17px)
+  ✅ record action color consumes t var(--muf-core-action-record-bg,#f0f3f1)
+  ✅ popup content: label primitive font-weight: 600
+  ✅ popup content: muted text prim font-size: 0.75rem
+  ✅ popup content: form grid primi gap: 0.75rem
+  ✅ popup content: actions primiti justify-content: flex-end
+  ✅ popup content: mobile scale ho var(--muf-popup-mobile-text-xs, 10.5px)
+  ✅ popup content: dark popup hook #e5edf7
+  ✅ brand token: WhatsApp green    #25D366
+  ✅ brand token: WhatsApp hover    #1ebe5b
+  ✅ dark popups: white panels repa #172337
+  ✅ dark popups: dark slate text r #e5edf7
+  ✅ photo viewer z-index token     1450
+  ✅ Notes MUF root class           muf-notes
+  ✅ scale: shared popup title 0.87 0.875rem
+  ✅ popup body padding             --pup-body-pad
+  ✅ popup rounding                 rounded-2xl sm:rounded-3xl
+  ✅ popup backdrop                 bg-black/50
+  ✅ admin popup width (MUF token)  muf-admin-shell-card
+  ✅ admin popup height (MUF token) muf-admin-shell-card
+  ✅ admin popup rounding (MUF)     muf-admin-shell-card
+  ✅ admin stage spacing (MUF)      muf-popup-stage
+  ✅ toast z-index                  z-[var(--muf-z-toast)]
+  ✅ type scale: desktop zoom       0.8
+  ✅ print: brand title 26px        26px
+  ✅ print: green rule              #16a34a
+  ✅ print: logo size 56px          56px
+  ✅ print: dark green brand        #14532d
+  ✅ compare: pctChange helper      pctChange
+  ✅ compare: trendArrow helper     trendArrow
+  ✅ share: backup share helper     shareBackupFile
+  ✅ share: WhatsApp fallback URL   https://web.whatsapp.com
+  ✅ labor: half-day units 0.5      0.5
+  ✅ labor: wage sheet helper       buildWageSheet
+  ✅ labor: post date (28th)        -28
+  ✅ zakat: default 2.5%            2.5
+  ✅ zakat: ushr rates 10/5         10
+  ✅ zakat: statement helper        zakatStatementBody
+  ✅ zakat: download helper         downloadZakatPdf
+  ✅ pdf: header helper             mufPdfHeader
+  ✅ pdf: logo 17mm at 14,8         14, 8, 17, 17
+  ✅ pdf: dark green brand rgb      20, 83, 45
+  ✅ pdf: green rule rgb            22, 163, 74
+  ✅ labor: advance helper          payoutAfterAdvances
+  ✅ farmbook: download helper      downloadFarmBookPdf
+  ✅ urdu: dictionary helper        mufUr
+  ✅ urdu: Dashboard term           ڈیش بورڈ
+  ✅ search: ranking helper         mufSearch
+  ✅ offline: watch helper          watchOffline
+  ✅ charts: area chart component   MufAreaChart
+  ✅ dark: shared palette vars      --muf-dark-bg
+  ✅ profile: buyers pdf            downloadFarmProfilePdf
+  ✅ applike: pull to refresh       initMufPullToRefresh
+  ✅ applike: splash styles         #muf-splash
+  ✅ date: local today helper       mufToday
+  ✅ story: lifetime verdict        mufVerdictText
+  ✅ compare: same month last year  sameMonthLastYearKey
+  ✅ telegram: doodh keyword        doodh
+  ✅ telegram: urdu hazri keyword   حاضری
+  ✅ telegram: drop check           mufDropCheck
+  ✅ telegram: drop alert text      tgDropAlert
+  ✅ supplier: balance math         supplierBalances
+  ✅ supplier: urdu hisab text      کھاتے کی تفصیل
+  ✅ motion: single re-export       'motion/react'
+  ✅ motion: modal spring 480/30    480
+  ✅ motion: reduced-motion gate    prefersReducedMotion
+  ✅ modal: muf-overlay class       muf-overlay
+  ✅ modal: ESC top-most close      (matched)
+  ✅ modal: body scroll lock        (matched)
+  ✅ confirm: prompt support        usePromptInput
+  ✅ confirm: toast support         notify
+  ✅ portal: modal root id          (matched)
+  ✅ form overlay uses muf modal    ./muf-modal
+  ✅ scroll lock: stack counter     0
+
+━━ muf email shell (backend mailers) ━━
+  ✅ email: brand green header      #16a34a
+  ✅ email: farm name color         #14532d
+  ✅ email: code box bg             #f0fdf4
+  ✅ email: logo 56px               56
+
+━━ Scan rules (must stay clean in all three apps) ━━
+  ✅ motion imported only via muf-motion          clean in all 3 apps
+
+━━ muf-urdu shared helpers (all 3 apps) ━━
+  ✅ urdu: mufUr helper                  (all 3)
+  ✅ urdu: mufFill helper                (all 3)
+  ✅ urdu: mufL helper                   (all 3)
+  ✅ Urdu only in muf-urdu + message builders     clean in all 3 apps
+  ✅ toLocaleDateString only in muf-date (+ legac clean in all 3 apps
+  ✅ popup size only small|big                   clean in all 3 apps
+
+━━ backend invariants (mongoSanitize + JSON body limit, all 3 apps) ━━
+  ✅ mongoSanitize imported             (matched)
+  ✅ mongoSanitize mounted              (matched)
+  ✅ JSON body limit 10mb               10mb
+
+━━ muf-pdf: typed finalY helper present in all 3 apps ━━
+  ✅ mufLastAutoTableY exported         mufLastAutoTableY
+  ✅ mufPdfTable delegates to helper    mufLastAutoTableY
+  ✅ lastAutoTable only via mufLastAutoTableY hel clean in all 3 apps
+
+━━ muf-image twin present in all 3 apps ━━
+  ✅ muf-image: compressGalleryImage ex compressGalleryImage
+  ✅ muf-image: GALLERY_MAX_PHOTOS = 10 10
+
+━━ muf-voice twin present in all 3 apps ━━
+  ✅ muf-voice: isVoiceSupported export isVoiceSupported
+  ✅ muf-voice: startVoiceRecording exp startVoiceRecording
+  ✅ muf-voice: MAX_VOICE_SECONDS = 60  60
+
+🎉 All muf checks passed — the three apps are in sync.
+
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-ui
+
+> check-ui
+> node tools/check-ui-safety.js
+
+
+MUF UI safety checks
+  ✓ muf/core/muf-modal.tsx matches across all three apps
+  ✓ muf/core/muf-confirm.tsx matches across all three apps
+  ✓ muf-style.css matches across all three apps
+  ✓ muf/ui/muf-diary.tsx matches across all three apps
+  ✓ muf/ui/muf-login.tsx matches across all three apps
+  ✓ dairy: no native browser dialog calls in app source
+  ✓ dairy: popup has dialog semantics
+  ✓ dairy: active modal stack and Escape handling present
+  ✓ dairy: notifications queue without native alert fallback
+  ✓ dairy: QR receipt uses MUF notification
+  ✓ dairy: responsive and reduced-motion styles present
+  ✓ dairy: Finance dropdown uses an accessible body portal
+  ✓ dairy: MUF dropdown tokens and popup field safeguards present
+  ✓ dairy: MUF login shell and inset mobile dialog sizing present
+  ✓ dairy: auth UI uses shared MUF login components
+  ✓ dairy: header and primary navbar share a sticky MUF wrapper
+  ✓ dairy: app root clips horizontal overflow without disabling sticky chrome
+  ✓ flock: no native browser dialog calls in app source
+  ✓ flock: popup has dialog semantics
+  ✓ flock: active modal stack and Escape handling present
+  ✓ flock: notifications queue without native alert fallback
+  ✓ flock: QR receipt uses MUF notification
+  ✓ flock: responsive and reduced-motion styles present
+  ✓ flock: Home Birds navigation is scoped to the approved sections
+  ✓ flock: MUF dropdown tokens and popup field safeguards present
+  ✓ flock: MUF login shell and inset mobile dialog sizing present
+  ✓ flock: auth UI uses shared MUF login components
+  ✓ flock: header and primary navbar share a sticky MUF wrapper
+  ✓ agri: no native browser dialog calls in app source
+  ✓ agri: popup has dialog semantics
+  ✓ agri: active modal stack and Escape handling present
+  ✓ agri: notifications queue without native alert fallback
+  ✓ agri: QR receipt uses MUF notification
+  ✓ agri: responsive and reduced-motion styles present
+  ✓ agri: Finance dropdown uses an accessible body portal
+  ✓ agri: MUF dropdown tokens and popup field safeguards present
+  ✓ agri: MUF login shell and inset mobile dialog sizing present
+  ✓ agri: auth UI uses shared MUF login components
+  ✓ agri: header and primary navbar share a sticky MUF wrapper
+  ✓ dairy: popup content uses muf-pc-* classes for the shared patterns
+  ✓ flock: popup content uses muf-pc-* classes for the shared patterns
+  ✓ agri: popup content uses muf-pc-* classes for the shared patterns
+
+All MUF UI safety checks passed.
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-workbench
+
+> check-workbench
+> node tools/check-muf-workbench.js
+
+
+MUF workbench source safety check
+  ✓ workbench has a dedicated mount point
+  ✓ drafts use a namespaced browser-local key
+  ✓ undo/redo controls are present
+  ✓ CSS and JSON export controls are present
+  ✓ canvas ordering, duplication and deletion exist
+  ✓ responsive preview presets exist
+  ✓ the editor has no publish-to-production handler
+  ✓ editor contains no API client or network request
+  ✓ editor loads its isolated stylesheet
+  ✓ workbench stylesheet has tablet/mobile layout breakpoints
+  ✓ workbench respects reduced-motion preference
+  ✓ workbench route is registered through Vite development middleware
+  ✓ development route matches an explicit path only
+  ✓ development route serves the dedicated editor HTML
+  ✓ custom workbench HTML passes through Vite HTML transforms
+  ✓ workbench is not imported by the production app entry points
+  ✓ editor module and stylesheet are isolated from other app source files
+  ✓ normal production build script does not explicitly invoke the workbench
+  ✓ no new Puck dependency was added to the app manifest
+  ✓ runtime smoke test can target the development workbench URL
+  ✓ runtime smoke test checks the editor mount, module and stylesheet
+  ✓ runtime smoke test checks Vite and React refresh wiring
+  ✓ runtime smoke test has a network timeout and fails with a non-zero exit code
+
+All 23 workbench source checks passed. This does not replace a local TypeScript build or browser review.
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-farms
+
+> check-farms
+> node tools/check-farm-scope.js && node tools/check-dairy-breeding-events.js
+
+
+agri: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  ✓ existing records were tagged into the first farm
+  ✓ owner can add a farm
+  ✓ duplicate farm names are rejected
+  ✓ owner can rename a farm
+  ✓ a new farm starts empty
+  ✓ record can be created in farm B
+  ✓ record created in B (with a forged farmId) is not in farm A
+  ✓ record is visible in farm B
+  ✓ All farms shows both farms
+  ✓ writing in All farms is refused
+  ✓ Agri bulk task import rejects the entire payload before writing invalid rows
+  ✓ Agri bulk task import inserts a validated row
+  ✓ Agri bulk task row is hidden from farm A
+  ✓ Agri bulk task row belongs to farm B
+  ✓ Agri bulk finance import inserts a validated row
+  ✓ Agri bulk finance row is hidden from farm A
+  ✓ Agri bulk finance row belongs to farm B
+  ✓ Agri field is created in the selected farm
+  ✓ farm A cannot see farm B fields
+  ✓ farm B can see its own field
+  ✓ crop cycle can link to a field in the same farm
+  ✓ crop cycle cannot link to a field in another farm
+  ✓ field acreage must be non-negative
+  ✓ updating a farm-B record while in farm A finds nothing
+  ✓ deleting a farm-B record while in farm A finds nothing
+  ✓ updating a record inside its own farm works
+  ✓ the updated record is still in farm B
+  ✓ and did not move to farm A
+  ✓ owner can create a worker assigned to farm B
+  ✓ owner can create a manager assigned to farm A
+  ✓ a worker created without farms gets the creator's selected farm
+  ✓ worker logs in as worker
+  ✗ worker defaults to farm B and sees only farm B
+  ✓ worker cannot select farm A
+  ✗ worker "All farms" is limited to assigned farms
+  ✓ worker cannot add farms
+  ✓ worker cannot download a backup
+  ✓ worker cannot list users
+  ✓ manager keeps full control but is not an owner
+  ✓ manager sees farm A only
+  ✓ manager cannot select farm B
+  ✓ manager cannot add farms
+  ✓ manager cannot download a backup
+  ✓ manager cannot create another manager
+  ✓ manager can create a worker, limited to the manager's own farm
+  ✓ manager does not see workers of other farms
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore the backup
+  ✓ all farms still exist after the restore
+  ✓ the farm-B record is still in farm B after the restore
+  ✓ farm A is unchanged after the restore
+  ✓ deleting a farm with data needs the farm name typed
+  ✓ and a choice: move or delete the records
+  ✓ owner can archive a farm
+  ✓ workers of an archived farm lose access
+  ✓ owner can restore it
+  ✓ owner can delete the farm after moving its records
+  ✓ the moved record now lives in farm A
+  ✓ the last farm cannot be deleted
+
+flock: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  Flock: legacy buckets and batches
+  ✓ legacy egg bucket keeps its established response shape
+  ✓ owner can create a second poultry farm
+  ✓ new farm has an isolated empty bucket
+  ✓ bucket write succeeds in selected farm
+  ✓ farm B bucket write does not change farm A
+  ✓ farm B reads only its own bucket
+  ✓ All farms mode rejects bucket writes
+  ✓ batch creation is stamped with selected farm
+  ✓ farm A cannot see farm B batches
+  ✓ farm B can see its own batch
+  ✓ batch feed logs are stamped with the selected farm
+  ✓ batch egg logs are stamped with the selected farm
+  ✓ batch vaccination logs are stamped with the selected farm
+  ✓ batch detail returns egg and vaccination history
+  ✓ batch summary includes egg income and vaccination costs
+  ✓ batch details and their logs are hidden from another farm
+  ✓ new worker is assigned to the selected farm
+  ✓ assigned worker can log in
+  ✓ worker cannot select another farm
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore a full Flock backup while All farms is selected
+  ✓ Flock restore preserves all farms
+  ✓ Flock restore preserves records in their original farm
+
+dairy: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  ✓ existing records were tagged into the first farm
+  ✓ owner can add a farm
+  ✓ duplicate farm names are rejected
+  ✓ owner can rename a farm
+  ✓ a new farm starts empty
+  ✓ record can be created in farm B
+  ✓ record created in B (with a forged farmId) is not in farm A
+  ✓ record is visible in farm B
+  ✓ All farms shows both farms
+  ✓ writing in All farms is refused
+  ✓ updating a farm-B record while in farm A finds nothing
+  ✓ deleting a farm-B record while in farm A finds nothing
+  ✓ updating a record inside its own farm works
+  ✓ the updated record is still in farm B
+  ✓ and did not move to farm A
+  ✓ owner can create a worker assigned to farm B
+  ✓ owner can create a manager assigned to farm A
+  ✓ a worker needs at least one farm
+  ✓ worker logs in as worker
+  ✓ worker defaults to farm B and sees only farm B
+  ✓ worker cannot select farm A
+  ✓ worker "All farms" is limited to assigned farms
+  ✓ worker cannot add farms
+  ✓ worker cannot download a backup
+  ✓ worker cannot list users
+  ✓ manager keeps full control but is not an owner
+  ✓ manager sees farm A only
+  ✓ manager cannot select farm B
+  ✓ manager cannot add farms
+  ✓ manager cannot download a backup
+  ✓ manager cannot create another manager
+  ✓ manager can create a worker, limited to the manager's own farm
+  ✓ manager does not see workers of other farms
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore the backup
+  ✓ all farms still exist after the restore
+  ✓ the farm-B record is still in farm B after the restore
+  ✓ farm A is unchanged after the restore
+  ✓ deleting a farm with data needs the farm name typed
+  ✓ and a choice: move or delete the records
+  ✓ owner can archive a farm
+  ✓ workers of an archived farm lose access
+  ✓ owner can restore it
+  ✓ owner can delete the farm after moving its records
+  ✓ the moved record now lives in farm A
+  ✓ the last farm cannot be deleted
+
+2 farm scope check(s) FAILED.
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-docs
+
+> check-docs
+> node tools/check-phase-docs.js
+
+
+Phase docs check
+  ✓ docs/phases/README.md exists
+  ✓ the index lists Phase 0 plus at least 12 later phases (found 22)
+  ✓ phase numbers run 0, 1, 2 ... without gaps
+  ✓ Phase 0 is Done
+  ✓ the last three phases are the final testing phases
+  ✓ no final-testing phase appears before the end
+  ✓ every phase file is listed and every row has a file (22 files, 22 rows)
+  ✓ Phase 0: title line starts with "# Phase 0:"
+  ✓ Phase 0: status matches the index (Done)
+  ✓ Phase 0: has all required sections
+  ✓ Phase 1: title line starts with "# Phase 1:"
+  ✓ Phase 1: status matches the index (Done)
+  ✓ Phase 1: has all required sections
+  ✓ Phase 1: names a new command-line check
+  ✓ Phase 2: title line starts with "# Phase 2:"
+  ✓ Phase 2: status matches the index (Done)
+  ✓ Phase 2: has all required sections
+  ✓ Phase 2: names a new command-line check
+  ✓ Phase 3: title line starts with "# Phase 3:"
+  ✓ Phase 3: status matches the index (Done)
+  ✓ Phase 3: has all required sections
+  ✓ Phase 3: names a new command-line check
+  ✓ Phase 4: title line starts with "# Phase 4:"
+  ✓ Phase 4: status matches the index (Done)
+  ✓ Phase 4: has all required sections
+  ✓ Phase 4: names a new command-line check
+  ✓ Phase 5: title line starts with "# Phase 5:"
+  ✓ Phase 5: status matches the index (In progress)
+  ✓ Phase 5: has all required sections
+  ✓ Phase 5: names a new command-line check
+  ✓ Phase 6: title line starts with "# Phase 6:"
+  ✓ Phase 6: status matches the index (Not started)
+  ✓ Phase 6: has all required sections
+  ✓ Phase 6: names a new command-line check
+  ✓ Phase 7: title line starts with "# Phase 7:"
+  ✓ Phase 7: status matches the index (Not started)
+  ✓ Phase 7: has all required sections
+  ✓ Phase 7: names a new command-line check
+  ✓ Phase 8: title line starts with "# Phase 8:"
+  ✓ Phase 8: status matches the index (Not started)
+  ✓ Phase 8: has all required sections
+  ✓ Phase 8: names a new command-line check
+  ✓ Phase 9: title line starts with "# Phase 9:"
+  ✓ Phase 9: status matches the index (Not started)
+  ✓ Phase 9: has all required sections
+  ✓ Phase 9: names a new command-line check
+  ✓ Phase 10: title line starts with "# Phase 10:"
+  ✓ Phase 10: status matches the index (Not started)
+  ✓ Phase 10: has all required sections
+  ✓ Phase 10: names a new command-line check
+  ✓ Phase 11: title line starts with "# Phase 11:"
+  ✓ Phase 11: status matches the index (Not started)
+  ✓ Phase 11: has all required sections
+  ✓ Phase 11: names a new command-line check
+  ✓ Phase 12: title line starts with "# Phase 12:"
+  ✓ Phase 12: status matches the index (Not started)
+  ✓ Phase 12: has all required sections
+  ✓ Phase 12: names a new command-line check
+  ✓ Phase 13: title line starts with "# Phase 13:"
+  ✓ Phase 13: status matches the index (Not started)
+  ✓ Phase 13: has all required sections
+  ✓ Phase 13: names a new command-line check
+  ✓ Phase 14: title line starts with "# Phase 14:"
+  ✓ Phase 14: status matches the index (Not started)
+  ✓ Phase 14: has all required sections
+  ✓ Phase 14: names a new command-line check
+  ✓ Phase 15: title line starts with "# Phase 15:"
+  ✓ Phase 15: status matches the index (Not started)
+  ✓ Phase 15: has all required sections
+  ✓ Phase 15: names a new command-line check
+  ✓ Phase 16: title line starts with "# Phase 16:"
+  ✓ Phase 16: status matches the index (Not started)
+  ✓ Phase 16: has all required sections
+  ✓ Phase 16: names a new command-line check
+  ✓ Phase 17: title line starts with "# Phase 17:"
+  ✓ Phase 17: status matches the index (Not started)
+  ✓ Phase 17: has all required sections
+  ✓ Phase 17: names a new command-line check
+  ✓ Phase 18: title line starts with "# Phase 18:"
+  ✓ Phase 18: status matches the index (Not started)
+  ✓ Phase 18: has all required sections
+  ✓ Phase 18: names a new command-line check
+  ✓ Phase 19: title line starts with "# Phase 19:"
+  ✓ Phase 19: status matches the index (Not started)
+  ✓ Phase 19: has all required sections
+  ✓ Phase 19: names a new command-line check
+  ✓ Phase 20: title line starts with "# Phase 20:"
+  ✓ Phase 20: status matches the index (Not started)
+  ✓ Phase 20: has all required sections
+  ✓ Phase 20: names a new command-line check
+  ✓ Phase 21: title line starts with "# Phase 21:"
+  ✓ Phase 21: status matches the index (Not started)
+  ✓ Phase 21: has all required sections
+  ✓ Phase 21: names a new command-line check
+  ✓ docs/PROGRESS.md has a row for every phase
+  ✓ docs/PROGRESS.md shows the same status as the index
+  ✓ docs/ROADMAP.md has a row for every phase
+  ✓ docs/ROADMAP.md shows the same status as the index
+  ✓ relative links resolve
+  ✓ RULES.md points at docs/phases
+  ✓ RULES.md requires a new command-line check for every phase
+  ✓ RULES.md requires the docs to be updated by whoever works on a phase
+
+All phase docs checks passed.
+
+F:\PROJECTS\dairy\muf-monorepo>tools\build-all.bat
+================ BUILD ALL ================
+Monorepo: F:\PROJECTS\dairy\muf-monorepo
+
+---- dairy_farm ----
+   [..] Building...
+   [..] build...
+   [OK] Build successful
+
+---- flock_farm ----
+   [..] Building...
+   [..] build...
+   [OK] Build successful
+
+---- agri_farm ----
+   [..] Building...
+   [..] build...
+   [OK] Build successful
+
+================ RESULTS ================
+  ✅ dairy_farm   : OK — built
+  ✅ flock_farm   : OK — built
+  ✅ agri_farm    : OK — built
+
+[OK] All projects built successfully!
+
+Press any key to continue...
+
+Press any key to continue . . .
+
+F:\PROJECTS\dairy\muf-monorepo>
