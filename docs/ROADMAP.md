@@ -18,8 +18,8 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 1 | Super Admin: owner only, per-farm summaries | Done | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
 | 2 | Dairy breeding events: server | Done | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Done | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
-| 4 | Dairy calves and lineage | In progress | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
-| 5 | Agri fields and crop cycles: server | Not started | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
+| 4 | Dairy calves and lineage | Done | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
+| 5 | Agri fields and crop cycles: server | In progress | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Not started | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Not started | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Not started | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
@@ -39,10 +39,9 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 
 ## Current checkpoint
 
-Phases 1 to 3 are **Done** for the command-line scope. For Phase 3, the owner reported 7/7 focused screen tests, 249/249 full-suite tests, passing MUF sync, UI safety, 23 workbench source checks, farm-scope plus 19 breeding runtime checks, and all three production builds. On 2026-10-25, the owner supplied a passing `npm run check-docs` output after the Phase 3 headings were restored. These are owner-reported Windows CMD results; they were not independently executed in this editing session. Real MongoDB, browser/phone and live-site verification remains in Phases 19 to 21.
+Phases 1 to 4 are **Done for the command-line scope**. On 2026-10-25, the owner supplied passing Windows CMD results for Phase 4: `npm test` (27 files, 254 tests), `npm run check-farms` (including Dairy breeding runtime checks), `npm run check-ui`, `npm run check-docs`, and `npm run check-sync`. Earlier Phase 4 outputs also reported `npm run check-workbench` (23 checks) and all three production builds passing. These are owner-reported results, not independently executed in this editing session. Real MongoDB, browser/phone and live-site verification remains in Phases 19 to 21.
 
-**Phase 4 is In progress:** Dairy calves and lineage. Initial implementation is committed and pulled by the owner. Owner-reported Windows CMD verification on 2026-10-25: focused Phase 4 tests passed (5/5), full suite passed (254/254 across 27 files), MUF sync passed, workbench source checks passed (23/23), and all three production builds passed. The latest owner-reported run shows `npm run check-ui` still fails one Dairy popup class check, and `npm run check-farms` now fails only the Dairy runtime check for allowing the same ear tag in a different farm; event editing and legacy cow-date resynchronization pass after the latest backend fix. `npm run check-docs` passes with Phase 4 consistently marked In progress. Follow-up fixes are committed: the cross-farm ear-tag runtime test now creates a valid Farm B mother before asserting the same tag can be reused there, the backend explicitly scopes duplicate-tag lookup to the selected farm, and the remaining Dairy breeding-event popup alignment pattern uses `muf-pc-between`. These changes still require local verification. Phase 4 remains In progress until `npm run check-farms` and `npm run check-ui` pass, followed by the full end-of-phase checks.
-
+**Phase 5 is In progress:** Agri fields and crop cycles: server. The next work is a farm-scoped Field model, optional field/crop-cycle links that preserve old records, field/season analytics, and backup/restore/demo-data/farm-deletion integration. Phase 6 owns the screens.
 
 ## Why this order
 
