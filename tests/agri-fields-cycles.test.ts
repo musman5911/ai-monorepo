@@ -62,6 +62,6 @@ describe('Agri fields and crop-cycle server contracts', () => {
     expect(integration).toContain("request('/analytics/summary'");
     expect(integration).toContain('financeSummary.byField');
     expect(integration).toContain('financeSummary.bySeason');
-    expect(integration).toContain("expect(deletedWhileLinked.data.error).toContain('This field is linked to existing crop cycles or finance entries');
+    expect(integration).toContain("expect(deletedWhileLinked.data.error).toContain('This field is linked to existing crop cycles or finance entries');");
   });
 });
