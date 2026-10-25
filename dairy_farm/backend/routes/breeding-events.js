@@ -146,7 +146,7 @@ async function createCalvingCalves(event, mother) {
   try {
     for (const entry of entries) {
       if (entry.outcome === 'stillbirth') continue;
-      const earTag = String(entry.earTag || '').trim();
+      const earTag = String(entry.earTag || '').trim().toLocaleUpperCase();
       if (earTag) {
         const taggedCows = await Cow.find({ earTag: { $ne: '' } }).lean();
         const duplicate = taggedCows.some((cow) => String(cow.earTag || '').trim().toLocaleLowerCase() === earTag.toLocaleLowerCase());
@@ -203,7 +203,7 @@ router.post('/events', protect, async (req, res) => {
   } catch (e) {
     await Promise.all(createdCalves.map((calf) => Cow.findByIdAndDelete(calf._id).catch(() => null)));
     if (event?._id) await BreedingEvent.findByIdAndDelete(event._id).catch(() => null);
-    res.status(e.status || 500).json({ error: e.message });
+    res.status(e.status || (e.code === 11000 ? 409 : 500)).json({ error: e.code === 11000 ? 'That ear tag is already used in this farm' : e.message });
   }
 });
 
