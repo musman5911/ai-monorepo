@@ -83,6 +83,16 @@ Phase 1 implementation and local command-line verification are complete on `muf-
 
 Whoever works on a phase updates it in the same change: set the phase status here and in the phase file and in `docs/phases/README.md` and `docs/ROADMAP.md`, and add the real command results to the table above. Then run `npm run check-docs`.
 
-## Phase 2 kickoff
+## Phase 2 final local verification (2026-10-25, Windows CMD; output supplied by owner)
 
-Phase 2 (Dairy breeding events: server) is in progress on `muf-monorepo`. The farm-scoped model, event API, legacy date synchronization, backup/restore integration, demo events and local test commands have been added. The schema and API contract are documented in `docs/phases/phase-02-dairy-breeding-events-server.md`. No Phase 2 tests or builds have been run yet; record results only after local CMD execution.
+| Command | Result |
+|---|---|
+| `npm run check-breeding-events` | Passed: all 19 breeding-event runtime checks, including event CRUD, farm isolation, validation, role restrictions, legacy date synchronization and backup/restore retention |
+| `npm test` | Passed: 25 test files, 242 tests |
+| `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope checks plus all breeding-event runtime checks |
+
+These are owner-reported results from the pasted CMD output, not commands run in this editing session. Production builds and the remaining standard checks were not included in the reported Phase 2 verification.
+
+## Phase 3 kickoff
+
+Phase 3 (Dairy breeding event screens) is in progress on `muf-monorepo`. The new `BreedingEventsPanel` is mounted in the existing Dairy Breeding tab and provides create/edit forms, cow and event-type filters, sire source selection, farm-bull selection, outside bull/straw details and event history. Client API methods, shared Urdu dictionary entries and a dedicated source-contract test have been added. UI and build validation are pending local CMD execution.
