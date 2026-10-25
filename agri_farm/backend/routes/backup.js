@@ -1,6 +1,6 @@
 // ─── Backup & restore (admin only) + monthly auto-backup ────────────────────
 import express from 'express';
-import { Setting, User, Farm, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer, Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia } from '../db.js';
+import { Setting, User, Farm, Field, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer, Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia } from '../db.js';
 import { protectUnscoped, ownerOnly } from '../middleware/auth.js';
 import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
 import { HttpError, badRequest, notFound, asyncHandler } from '../utils/helpers.js';
@@ -30,6 +30,7 @@ async function restoreMissingFarms(payload) {
 
 const MONTHLY_AUTO_BACKUP_KEY = 'monthly_auto_backup';
 const BACKUP_COLLECTIONS = [
+  ['fields', Field],
   ['crops', Crop],
   ['finance', Finance],
   ['tasks', Task],
