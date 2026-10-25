@@ -16,8 +16,8 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 |---|---|---|---|
 | 0 | Done and verified | Done | [phase-00-done-and-verified.md](phases/phase-00-done-and-verified.md) |
 | 1 | Super Admin: owner only, per-farm summaries | Done | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
-| 2 | Dairy breeding events: server | In progress | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
-| 3 | Dairy breeding events: screens | Not started | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
+| 2 | Dairy breeding events: server | Done | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
+| 3 | Dairy breeding events: screens | In progress | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
 | 4 | Dairy calves and lineage | Not started | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
 | 5 | Agri fields and crop cycles: server | Not started | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Not started | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
@@ -39,7 +39,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 
 ## Current checkpoint
 
-Phase 1 is **Done**. The owner reported passing local Windows CMD results for the 13-test Phase 1 regression test, three-app runtime authorization check, full Vitest suite (24 files, 232 tests), shared sync/UI/workbench/farm/docs checks, and all three production builds. Phase 2 is now in progress: Dairy breeding events on the server. The model, API, backup/restore integration and local checks have been added to the branch; local verification is still pending. GitHub Actions are not required for local verification.
+Phases 1 and 2 are **Done**. The owner reported Phase 2 Windows CMD verification: `npm run check-breeding-events` passed 19 runtime checks, `npm test` passed 25 files / 242 tests, and `npm run check-farms` passed the three app farm-scope checks plus breeding-event runtime checks. Phase 3 is now in progress: add Dairy breeding event forms and per-cow history to the existing Breeding tab. UI/build checks remain pending local execution. GitHub Actions are not required for local verification.
 
 ## Why this order
 
