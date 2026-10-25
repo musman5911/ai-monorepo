@@ -27,6 +27,7 @@ export default function LedgerBookForm({
   handleFinanceSubmit,
   editingFinance,
   crops = [],
+  fields: suppliedFields,
   inventory = [],
   suppliers = [],
   onCancel,
@@ -38,6 +39,12 @@ export default function LedgerBookForm({
   const confirm = useConfirm();
   const [irrigationRows, setIrrigationRows] = useState([]);
   const [sprayRows, setSprayRows] = useState([]);
+  const [loadedFields, setLoadedFields] = useState([]);
+  const fields = suppliedFields || loadedFields;
+  useEffect(() => {
+    if (!open) return;
+    api.getFields().then(response => setLoadedFields(Array.isArray(response.data) ? response.data : [])).catch(() => setLoadedFields([]));
+  }, [open]);
   const [opsBusy, setOpsBusy] = useState(false);
   const pesticides = inventory.filter(item => item.category === 'pesticide');
   const rentedTotal = (parseFloat(finForm.hours) || 0) * (parseFloat(finForm.hourly_rate) || 0);
@@ -126,6 +133,12 @@ export default function LedgerBookForm({
 
   return (
     <form onSubmit={handleFinanceSubmit} className="space-y-4">
+      {tab === 'ledger' && (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div><label className={labelClass}>{L('Field (optional)')}</label><select className={fieldClass} value={finForm.fieldId || ''} onChange={event => setFinForm(prev => ({ ...prev, fieldId: event.target.value }))}><option value="">{L('Unassigned / farm-wide')}</option>{fields.map(field => <option key={field._id} value={field._id}>{field.name}</option>)}</select></div>
+          <div><label className={labelClass}>{L('Crop cycle (optional)')}</label><select className={fieldClass} value={finForm.cropCycleId || ''} onChange={event => setFinForm(prev => ({ ...prev, cropCycleId: event.target.value }))}><option value="">{L('No crop cycle linked')}</option>{crops.map(crop => <option key={crop._id} value={crop._id}>{crop.name} · {crop.season || L('Season not set')} {crop.crop_year || ''}</option>)}</select></div>
+        </div>
+      )}
       <div className="flex flex-wrap gap-1.5">
         {BOOK_TABS.map(({ id, label, icon: Icon }) => {
           const locked = !!editingFinance && (id === 'irrigation' || id === 'spray');
