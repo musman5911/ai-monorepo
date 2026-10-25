@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-25 (Phase 4 implementation checks recorded; failures remain).
+Last updated: 2026-10-25 (Phase 4 command-line checks passed; Phase 5 started).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -14,8 +14,8 @@ Last updated: 2026-10-25 (Phase 4 implementation checks recorded; failures remai
 | 1 | Super Admin: owner only, per-farm summaries | Done | [phase-01-super-admin-owner-only.md](phases/phase-01-super-admin-owner-only.md) |
 | 2 | Dairy breeding events: server | Done | [phase-02-dairy-breeding-events-server.md](phases/phase-02-dairy-breeding-events-server.md) |
 | 3 | Dairy breeding events: screens | Done | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
-| 4 | Dairy calves and lineage | In progress | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
-| 5 | Agri fields and crop cycles: server | Not started | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
+| 4 | Dairy calves and lineage | Done | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
+| 5 | Agri fields and crop cycles: server | In progress | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Not started | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Not started | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Not started | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
@@ -150,3 +150,22 @@ The owner then reran `npm run check-ui`, which passed. `npm test` passed again w
 | `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
 
 These results are from the owner's pasted Windows CMD output. The focused and full test suites pass, but Phase 4 remains **In progress** because UI safety and three runtime checks fail. Fix those failures, rerun the affected checks, then rerun `npm run check-docs` and the full end-of-phase suite before considering completion.
+
+
+## Phase 4 final verification and Phase 5 start (2026-10-25; Windows CMD output supplied by owner)
+
+Phase 4, Dairy calves and lineage, is **Done for the command-line scope**. The latest owner-provided output confirms:
+
+| Command | Result |
+|---|---|
+| `npm test` | Passed: 27 files, 254 tests |
+| `npm run check-farms` | Passed: all farm-scope checks and Dairy breeding runtime checks, including same-farm duplicate-tag rejection and cross-farm tag reuse |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-docs` | Passed: all phase documentation checks |
+| `npm run check-sync` | Passed: all MUF shared-file and cross-app sync checks |
+| `npm run check-workbench` | Passed: 23 source checks in the earlier Phase 4 verification output |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds in the earlier Phase 4 verification output |
+
+The latest full-suite run also confirms the stale source-string assertion in `tests/dairy-calving-creates-calf.test.ts` has been corrected. Results above are owner-reported from the pasted Windows CMD output, not independently executed in this editing session. `npm ci` and the optional `npm run check-workbench-runtime` were not reported as run for this checkpoint. No real-MongoDB, browser/mobile or live-site verification is claimed; those remain in Phases 19 to 21.
+
+Phase 5, **Agri fields and crop cycles: server**, is now **In progress**. Work is limited to the server/data layer: farm-scoped fields, optional crop field/season links, field/season financial summaries, and backup/restore/demo/farm-deletion integration. UI work remains in Phase 6.
