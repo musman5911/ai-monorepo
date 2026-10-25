@@ -303,4 +303,12 @@ export const MUF_URDU_PART_3: Record<string, string> = {
   'Yield': 'پیداوار',
   'you': 'آپ',
   'You can\'t change your own role.': 'آپ اپنا رول خود تبدیل نہیں کر سکتے۔',
+  "Semen code": "سیمن کوڈ",
+  "Service / Tikka": "ملاپ / ٹیکہ",
+  "Showing up to 200 events. Use filters to narrow the history.": "زیادہ سے زیادہ 200 ریکارڈ دکھائے جا رہے ہیں۔ تاریخ محدود کرنے کے لیے فلٹر استعمال کریں۔",
+  "Technician": "ٹیکنیشن",
+  "Unknown cow": "نامعلوم گائے",
+  "All event types": "تمام اقسام",
+  "Bull on this farm": "اس فارم کا بیل",
+  "Outside bull name": "باہر کے بیل کا نام",
 };
