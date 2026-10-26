@@ -39,9 +39,10 @@ export default function CropOpsPanel({
     if (photos.length >= 3) return showAlert('This crop already has 3 diary photos.', true);
     setBusy(true);
     try {
+      const uploaded = await api.uploadPhoto(base64);
       await api.addCropPhoto({
         crop_id: crop._id,
-        image_base64: base64,
+        image_base64: uploaded.data.path,
         uploaded_at: todayIso(),
         label: photos.length === 0 ? 'Sowing' : photos.length === 1 ? 'Mid-season' : 'Harvest'
       });
