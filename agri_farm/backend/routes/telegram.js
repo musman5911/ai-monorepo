@@ -229,8 +229,8 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
 // number, so there is no drop alarm here — summary only.
 const TG_SETTINGS_DEFAULTS = { dailySummary: true };
 
-async function tgSettings() {
-  const v = await tgRead('settings');
+async function tgSettings(farmId = mufGetFarmContext()?.farmId) {
+  const v = await tgRead(farmId ? `settings:${farmId}` : 'settings');
   const out = { ...TG_SETTINGS_DEFAULTS };
   if (v && typeof v === 'object') Object.assign(out, v);
   return out;
@@ -292,7 +292,7 @@ router.put('/settings', protect, requireAdmin, asyncHandler(async (req, res) => 
   if (typeof (req.body || {}).dailySummary === 'boolean') {
     settings.dailySummary = req.body.dailySummary;
   }
-  await tgWrite('settings', settings);
+  await tgWrite(`settings:${mufGetFarmContext()?.farmId || 'unscoped'}`, settings);
   return res.json(settings);
 }));
 
