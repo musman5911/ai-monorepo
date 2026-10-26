@@ -28,6 +28,7 @@ import {mufToday} from '../muf/data/muf-date';
 
 interface Props {
   username: string | null;
+  isOwner: boolean;
   onClose: () => void;
 }
 
@@ -49,7 +50,7 @@ function parseCoordinates(input: string): { lat: number; lon: number } | null {
   return null;
 }
 
-export default function AdminPanel({ username, onClose }: Props) {
+export default function AdminPanel({ username, isOwner, onClose }: Props) {
   const confirmAction = useConfirm();
   const promptInput = usePromptInput();
   const [section, setSection] = useState<Section>('profile');
@@ -774,7 +775,7 @@ export default function AdminPanel({ username, onClose }: Props) {
                 <ExportCenter />
               </MufAdminReports>
               <YearlyArchivePanel
-                isOwner={(() => { try { return localStorage.getItem('dm_role') === 'admin'; } catch { return false; } })()}
+                isOwner={isOwner}
                 apiBase="/api"
                 collections={[{ value: 'milk', label: 'Milk records' }, { value: 'expenses', label: 'Expenses' }]}
                 getHeaders={() => {
