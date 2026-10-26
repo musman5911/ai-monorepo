@@ -293,6 +293,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                         try {
                           const base64 = await compressGalleryImage(file);
                           const uploaded = await api.uploadPhoto(base64);
+                          if (!uploaded.path) throw new Error('Photo upload failed. The gallery was not saved.');
                           const next: GalleryPhoto[] = [...(cow.gallery || []), { id: `g-${Date.now()}`, date: todayStr(), base64: uploaded.path, caption: '' }];
                           await saveMarket({ gallery: next } as any);
                           notify(L('Photo added'));
