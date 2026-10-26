@@ -38,7 +38,7 @@ Dairy and Agri provide admin-only `GET /api/photos/orphans` discovery and `POST 
 
 Regression coverage includes adapter validation, upload sequencing, authenticated retrieval, farm isolation, reference-safe deletion, orphan discovery/cleanup, grace-period retention, role restrictions, legacy compatibility and Flock reference discovery across data buckets. Runtime review also fixed an undefined-variable check in the Dairy daily-log GET handler, moved cleanup to the successful PUT path, and added model-level `deleteOne(filter)` support to Dairy and Flock memory adapters.
 
-## New command-line checks
+## New command-line check
 
 - `tests/muf-storage.test.ts`: save/read/delete, size/type/signature validation and orphan cleanup.
 - `tests/photo-client-migration.test.ts`: Dairy/Agri client migration contracts and shared diary component parity.
@@ -63,6 +63,24 @@ Regression coverage includes adapter validation, upload sequencing, authenticate
 | `npm ci` | Not run; existing local dependencies were used |
 
 These results were supplied by the owner and were not independently executed in this documentation-editing session. The initial focused run had one Dairy photo-delete failure (29/30). After adding `deleteOne(filter)` to the Dairy and Flock memory adapters, the focused suite passed 30/30 and the full suite passed 301/301.
+
+## Command-line checks at the end of this phase
+
+Run these from the repository root after pulling the latest branch:
+
+```bat
+npm test -- tests/muf-storage.test.ts tests/photo-client-migration.test.ts tests/photo-phase8-regression.test.ts tests/agri-runtime-api.integration.test.ts tests/dairy-photo-runtime.integration.test.ts
+npm test
+npm run check-sync
+npm run check-ui
+npm run check-workbench
+npm run check-farms
+npm run check-docs
+tools\\build-all.bat
+npm run check-workbench-runtime
+```
+
+The owner reported all of these checks passing on 2026-10-26, except `npm run check-docs` must be rerun after this documentation repair. The optional runtime check requires port 5000 to be available. `npm ci` was not run.
 
 ## Done checklist
 
