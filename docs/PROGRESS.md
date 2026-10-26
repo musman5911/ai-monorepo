@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 10 first build/test results recorded; bundle-size gate is failing and chunk splitting remains in progress).
+Last updated: 2026-10-26 (Phase 10 command-line scope completed; all three bundle budgets pass).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -47,21 +47,26 @@ Audit focus: preserve existing webhook secret validation and current bot command
 
 Phase 10 is In progress on `muf-monorepo`. Initial implementation dynamically imports the shared PDF shell from zakat/ushr/farm-book report actions, lazy-loads Agri's dashboard chart and Dairy's Reports screen, changes Agri Vite from deprecated `advancedChunks` to `rolldownOptions.output.codeSplitting`, and removes Dairy's mixed static/dynamic API import in `reportExport.ts`. Added `tools/check-bundle-size.js`, `npm run check-bundle-size`, and `tests/check-bundle-size.test.ts`. Per-file JavaScript budgets are Dairy 700 KiB, Agri 600 KiB, Flock 850 KiB.
 
-## Phase 10 verification results (owner-reported, 2026-10-26)
+## Phase 10 final verification results (owner-reported, 2026-10-26)
 
-- `npm test -- tests/check-bundle-size.test.ts`: passed, 1 file / 3 tests.
-- `npm run check-sync`: passed.
-- `npm run check-docs`: passed.
-- `tools\build-all.bat`: passed; Dairy, Flock and Agri built successfully.
-- `npm test`: passed, 38 files / 310 tests.
-- `npm run check-ui`: passed.
-- `npm run check-farms`: passed; farm-scope and Dairy breeding runtime checks completed successfully.
-- `npm run check-workbench` was run, but the supplied log excerpt does not show its final summary; rerun if a confirmed result is needed.
-- `npm run check-bundle-size`: failed. Largest JavaScript assets: Dairy 772.7 KiB against 700 KiB; Agri 659.8 KiB against 600 KiB; Flock 961.9 KiB against 850 KiB.
-- `npm ci` and `npm run check-workbench-runtime` were not shown as run.
+Phase 10, Smaller downloads and faster screens, is **Done for command-line scope**. Lazy loading was added for report/PDF code, Agri's dashboard chart, Dairy's Reports screen, major Dairy/Flock screens, and selected Agri admin/worker panels. Agri's deprecated Vite chunk setting was replaced, Dairy's mixed static/dynamic API import was removed, and the bundle-size checker and regression tests were added.
 
-Phase 10 remains **In progress**. All three builds and the full test suite pass, but the new size gate correctly rejects all three bundles. Next: inspect emitted chunk composition and configure effective splitting/deferred imports; do not loosen budgets merely to hide the failure.
+| Command/check | Result |
+|---|---|
+| `npm test -- tests/check-bundle-size.test.ts` | Passed: 1 file, 3 tests |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `npm run check-bundle-size` | Passed: Dairy 505.5/700 KiB, Agri 420.1/600 KiB, Flock 542.0/850 KiB |
+| `npm test` | Passed: 38 files, 310 tests |
+| `npm run check-ui` | Passed: all UI safety checks |
+| `npm run check-farms` | Passed: farm-scope and Dairy breeding-event runtime checks |
+| `npm run check-sync` | Passed: all three apps and shared MUF files in sync |
+| `npm run check-workbench` | Passed: all 23 workbench source safety checks |
+| `npm run check-docs` | Passed before this final documentation update; rerun after pulling |
+| `npm ci` / `npm run check-workbench-runtime` | Not reported as run for this checkpoint |
 
+Largest individual JavaScript asset changes from the initial measured build: Dairy 772.7 to 505.5 KiB (267.2 KiB smaller); Agri 659.8 to 420.1 KiB (239.7 KiB smaller); Flock 961.9 to 542.0 KiB (419.9 KiB smaller). All are within the existing per-file budgets. These are largest-file comparisons, not total-transfer measurements.
+
+The owner supplied the Windows CMD output; commands were not independently run in this documentation-editing session. Browser review, real-device performance, real MongoDB and live deployment verification are not claimed. Browser/phone and live checks remain in Phases 19–21 as appropriate.
 ## Phase 9 verification results (2026-10-26)
 
 After commit `3a2ff45` corrected the stale Phase 8 cleanup assertion, the owner reran the focused suite: **6 test files passed, 36 tests passed, 0 failed**. The full suite passed: **37 test files, 307 tests, 0 failed**. `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs`, `tools\\build-all.bat` (Dairy, Flock, Agri all successful), and `npm run check-workbench-runtime` (8 checks) all passed. `npm ci` was not run because dependencies were already installed. No live Cloudinary credentials or uploads were used. Phase 9 is Done for command-line scope; live-provider validation remains deferred to the final live-verification phase.
