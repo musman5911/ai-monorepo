@@ -33,7 +33,7 @@ Old years of records can be archived and exported so the live data stays small a
 
 ## New command-line check
 
-`tests/archive.test.ts` plus `tools/check-dairy-archive.js`, exposed as `npm run check-archive`: archiving farm B never touches farm A, an archive without a finished export refuses to delete, and restore brings records back unchanged. The focused runtime check passed in the prior local revision; rerun it after pulling the shared-service changes. The full cross-app contract tests and builds still need verification.
+`tests/archive.test.ts` plus `tools/check-dairy-archive.js`, `tools/check-flock-archive.js`, and `tools/check-agri-archive.js`, exposed together as `npm run check-archive`. The runtime checks cover Dairy milk and expenses, Flock batch-feed logs, and Agri finance. They verify export-before-delete, active-list exclusion, aggregate totals dropping and returning on restore, and farm isolation. These expanded checks have been added but have not yet been run in the owner's local checkout.
 
 Current implementation: the shared workflow in `shared/muf-yearly-archive.mjs` is wired to Dairy milk/expenses, all seven Flock batch-log collections, and Agri finance under `/api/archive`. Each app uses durable database snapshots and includes archive jobs/records in full and monthly backup payloads, with restore support. Snapshots are bounded to 5,000 records and 8 MiB per job; oversized jobs are rejected without removing active records. Runtime checks and all three builds still need to be run locally before this phase can be marked done.
 
@@ -53,14 +53,14 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [x] Dairy server slice: owner-only jobs for one explicit farm and collection, with a required positive retention period (milk and expenses only; Flock and Agri remain outstanding).
+- [x] Shared server slice: owner-only jobs for one explicit farm and collection, with a required positive retention period for Dairy, Flock, and Agri.
 - [x] Dairy server slice: durable database snapshot, downloadable JSON export, export-completion marker, and exact farm-name/job-ID confirmation before removal.
 - [x] Dairy server slice: snapshot completeness checks, stale-source preflight, archived-copy retention, idempotent archive retry, and conflict-aware restore.
 - [x] Dairy server slice requires a completed export and typed confirmation before source removal.
-- [ ] Archived records are excluded from normal lists and totals but can be read and restored.
+- [ ] Archived records are excluded from normal lists and totals but can be read and restored (expanded runtime assertions added; local run pending).
 - [x] Shared server workflow covers Dairy milk and expenses, all Flock batch-log collections, and Agri finance.
 - [x] Full and monthly backup payloads preserve archive jobs and snapshot records, with restore support in each app.
-- [ ] The new command-line check above exists and passes in the current checkout.
+- [ ] The expanded three-app command-line archive checks pass in the current checkout (scripts added; local run pending).
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated after local verification.
 
