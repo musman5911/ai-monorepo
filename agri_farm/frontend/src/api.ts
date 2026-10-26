@@ -194,10 +194,10 @@ async function fitPhotoDataUrl(data: string): Promise<string> {
   const encoded = data.slice(data.indexOf(',') + 1);
   if (Math.floor(encoded.length * 3 / 4) <= 90 * 1024) return data;
   const image = new Image();
-  image.src = data;
   await new Promise<void>((resolve, reject) => {
     image.onload = () => resolve();
     image.onerror = () => reject(new Error('Could not decode photo for storage'));
+    image.src = data;
   });
   const initialScale = Math.min(1, 1280 / Math.max(image.naturalWidth, image.naturalHeight));
   let width = Math.max(1, Math.round(image.naturalWidth * initialScale));
