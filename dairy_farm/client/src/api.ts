@@ -171,8 +171,39 @@ function qs(params?: Record<string, string | undefined>): string {
 }
 
 
+async function fitPhotoDataUrl(data: string): Promise<string> {
+  if (!/^data:image\/(?:jpeg|png|webp);base64,/.test(data)) throw new TypeError('Photo must be a JPEG, PNG or WebP data URL');
+  const encoded = data.slice(data.indexOf(',') + 1);
+  if (Math.floor(encoded.length * 3 / 4) <= 90 * 1024) return data;
+  const image = new Image();
+  image.src = data;
+  await new Promise<void>((resolve, reject) => {
+    image.onload = () => resolve();
+    image.onerror = () => reject(new Error('Could not decode photo for storage'));
+  });
+  let width = image.naturalWidth;
+  let height = image.naturalHeight;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const scale = Math.min(1, 1280 / Math.max(width, height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Photo compression is unavailable in this browser');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const quality = Math.max(0.35, 0.82 - attempt * 0.06);
+    const compressed = canvas.toDataURL('image/jpeg', quality);
+    const bytes = Math.floor((compressed.split(',')[1]?.length || 0) * 3 / 4);
+    if (bytes <= 90 * 1024) return compressed;
+    width = Math.max(1, Math.round(width * 0.82));
+    height = Math.max(1, Math.round(height * 0.82));
+  }
+  throw new RangeError('Photo could not be compressed below the 100 KiB storage limit');
+}
+
 export async function uploadPhoto(data: string): Promise<{ id: string; path: string }> {
-  return req('/photos', { method: 'POST', body: JSON.stringify({ data }) });
+  const safeData = await fitPhotoDataUrl(data);
+  return req('/photos', { method: 'POST', body: JSON.stringify({ data: safeData }) });
 }
 
 export async function getPhotoObjectUrl(path: string): Promise<string> {
