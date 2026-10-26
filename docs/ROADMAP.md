@@ -45,7 +45,7 @@ Phases 1 to 6 are **Done for the command-line scope**. On 2026-10-25, the owner 
 
 **Phase 6 is Done for the command-line scope:** Agri fields and crop cycles screens. Owner-supplied Windows CMD output on 2026-10-26 confirms the focused screen tests (4/4), full suite (29 files, 264 tests), documentation check and all three production builds passed. Sync, UI, workbench and farm checks were owner-reported passing before the final test-only assertion correction. Browser/phone, real-MongoDB and live-site verification remain in Phases 19 to 21.
 
-**Phase 7 is In progress:** Telegram bot and daily summary per farm. Initial audit found Telegram routes in all three apps and a shared admin panel. Current chat links identify a user/worker but do not yet assign a farm. Preserve webhook security and existing commands while adding farm-specific link and summary behavior. Acceptance check: a chat linked to farm B writes only to farm B, an unlinked chat creates nothing, and farm A's summary excludes farm B. See `docs/PROGRESS.md` for the audit checkpoint.
+**Phase 7 is In progress:** Telegram bot and daily summary per farm. New link codes and chat links now carry `farmId`; linked webhook work runs inside MUF single-farm context, and scheduled Telegram summaries/settings are handled per farm. A new MUF helper is parity-checked across all three backends. The regression test and full command-line validation still need to run. Acceptance: a chat linked to farm B writes only to farm B, an unlinked chat creates nothing, and farm A's summary excludes farm B. See `docs/PROGRESS.md`.
 
 ## Why this order
 
