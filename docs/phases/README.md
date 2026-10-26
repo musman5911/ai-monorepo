@@ -12,7 +12,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 5 | Agri fields and crop cycles: server | Done | [phase-05-agri-fields-cycles-server.md](phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Done | [phase-07-telegram-daily-summary-per-farm.md](phase-07-telegram-daily-summary-per-farm.md) |
-| 8 | Photo storage adapter | In progress | [phase-08-photo-storage-adapter.md](phase-08-photo-storage-adapter.md) |
+| 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Not started | [phase-09-cloudinary-store.md](phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Not started | [phase-11-yearly-archive-server.md](phase-11-yearly-archive-server.md) |
@@ -28,7 +28,9 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phase-21-final-testing-live-and-signoff.md) |
 
 
-Phase 8 remains **In progress** on `muf-monorepo`. Dairy cow gallery/receipts and Agri receipts/spray photos are migrated alongside the earlier diary/crop-photo flows. The owner reported passing validation before the latest runtime-test and daily-log fix commits. New Dairy HTTP integration coverage now exercises photo upload/read/delete, farm isolation, referenced-photo protection, orphan discovery, cleanup grace period, and admin role gates; Agri runtime coverage now also checks photo farm isolation. The owner’s first focused run reported 29/30 passing; the Dairy photo delete endpoint returned HTTP 500. Added model-level `deleteOne(filter)` support to Dairy and Flock memory adapters. This fix still needs a fresh local test/build run before Phase 8 can be marked Done. See [Phase 8 details](phase-08-photo-storage-adapter.md).
+Phase 8 is **Done for command-line scope**. Owner-supplied Windows CMD output on 2026-10-26 confirms the focused photo suite passed (30/30 tests), the full suite passed (36 files, 301 tests), sync/UI/workbench/farm/docs checks passed, all three production builds succeeded, and the optional workbench runtime smoke test passed (8/8). The final `check-docs` run preceded this documentation update, so run it again after pulling. `npm ci` was not run because existing dependencies were used. See [Phase 8 details](phase-08-photo-storage-adapter.md).
+
+**Next phase: Phase 9, Cloudinary photo store.** Use the existing adapter, implement signed Cloudinary requests with a mockable HTTP client, preserve reads for existing MongoDB photos, add consistent environment configuration and fallback behavior, and test signing/upload/delete/fallback/secret redaction without live uploads. No secrets belong in Git.
 
 ## How a phase runs
 
