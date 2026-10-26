@@ -1,6 +1,6 @@
 # Phase 6: Agri fields and crop cycles: screens
 
-**Status:** Done (command-line scope)
+**Status:** Done
 
 ## Goal
 
