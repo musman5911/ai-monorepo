@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { L } from '../i18n';
 import { api } from '../api';
+import PhotoImage from './PhotoImage';
 import { useConfirm, notify } from '../muf/core/muf-confirm';
 import type { Cow, Expense, ExpenseType, Supplier } from '../types';
 import SupplierKhata from './SupplierKhata';
@@ -104,6 +105,11 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
         note: formData.note || undefined,
         receiptBase64,
       };
+      if (typeof data.receiptBase64 === 'string' && data.receiptBase64.startsWith('data:image/')) {
+        const uploaded = await api.uploadPhoto(data.receiptBase64);
+        if (!uploaded.path || uploaded.offline) throw new Error('Receipt upload needs an active connection. The expense was not saved.');
+        data.receiptBase64 = uploaded.path;
+      }
 
       const wasEditing = !!editingId;
       if (editingId) {
@@ -337,7 +343,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                 <div className="flex items-center gap-3">
                   {receiptBase64 ? (
                     <>
-                      <img src={receiptBase64} alt="Receipt" className="w-14 h-14 rounded-lg object-cover border border-slate-200 dark:border-slate-700 cursor-pointer" onClick={() => setViewReceipt(receiptBase64)} />
+                      <button type="button" onClick={() => setViewReceipt(receiptBase64)}><PhotoImage src={receiptBase64} alt="Receipt" className="w-14 h-14 rounded-lg object-cover border border-slate-200 dark:border-slate-700 cursor-pointer" /></button>
                       <button type="button" onClick={() => setReceiptBase64('')} className="text-xs font-semibold text-red-400 hover:text-red-600 transition">{L('Remove photo')}</button>
                     </>
                   ) : (
@@ -545,8 +551,8 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
             const cow = expense.cowId ? cows.find(c => c._id === expense.cowId) : null;
             return (
               <article key={expense._id} className="muf-entity-card">
-                <div className={expense.receiptBase64 ? "muf-entity-photo" : "muf-entity-photo muf-entity-photo-noimg"} style={expense.receiptBase64 ? { backgroundImage: `url(${expense.receiptBase64})` } : undefined}>
-                  {expense.receiptBase64 ? <img src={expense.receiptBase64} alt="" /> : <span className="muf-entity-emoji">💸</span>}
+                <div className={expense.receiptBase64 ? "muf-entity-photo" : "muf-entity-photo muf-entity-photo-noimg"}>
+                  {expense.receiptBase64 ? <PhotoImage src={expense.receiptBase64} alt="" className="w-full h-full object-cover" /> : <span className="muf-entity-emoji">💸</span>}
                   <span className="muf-entity-status" data-tone={expense.type === 'feed' ? 'info' : expense.type === 'medicine' ? 'warn' : 'muted'}>{expense.type}</span>
                   <span className="muf-entity-round-icon">💸</span>
                 </div>
@@ -653,7 +659,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
       {canDelete && <SupplierKhata canDelete={canDelete} />}
 
       <DetailModal open={!!viewReceipt} onClose={() => setViewReceipt(null)} title={L('Receipt Photo')} size="big">
-        <img src={viewReceipt || ''} alt="Receipt" className="w-full max-h-[70vh] object-contain rounded-2xl bg-white" />
+        <PhotoImage src={viewReceipt || ''} alt="Receipt" className="w-full max-h-[70vh] object-contain rounded-2xl bg-white" />
       </DetailModal>
 
       {/* ── Zakat calculator (moved from Summary tab) ─────────── */}
