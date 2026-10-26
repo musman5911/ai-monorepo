@@ -81,7 +81,7 @@ router.put('/diary-media/:date', protect, asyncHandler(async (req, res) => {
   }
   await DiaryMedia.updateOne({ date }, { $set: update }, { upsert: true });
   const saved = await DiaryMedia.findOne({ date });
-  if (req.body?.photos !== undefined || req.body?.entries !== undefined) await cleanupOrphanPhotoAssets();
+  if (req.body?.photos !== undefined || req.body?.entries !== undefined) try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
   return res.json({ date, photos: Array.isArray(saved?.photos) ? saved.photos : [], entries: Array.isArray(saved?.entries) ? saved.entries : [] });
 }));
 export default router;
