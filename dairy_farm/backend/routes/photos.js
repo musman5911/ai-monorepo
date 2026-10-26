@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { PhotoAsset, Cow, Expense, DailyLog } from '../db.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { createMufStorage } from '../muf-storage.mjs';
-import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
+import { cleanupOrphanPhotoAssets, discoverOrphanPhotoAssets } from '../services/photo-assets.js';
 
 const router = express.Router();
 const TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
@@ -73,6 +73,13 @@ router.post('/photos', protect, async (req, res) => {
   } catch (err) {
     const status = err instanceof RangeError ? 413 : err instanceof TypeError ? 400 : 500;
     return res.status(status).json({ error: err.message || 'Photo upload failed' });
+  }
+});
+router.get('/photos/orphans', protect, adminOnly, async (req, res) => {
+  try {
+    return res.json(await discoverOrphanPhotoAssets());
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Photo orphan discovery failed' });
   }
 });
 router.post('/photos/cleanup-orphans', protect, adminOnly, async (req, res) => {
