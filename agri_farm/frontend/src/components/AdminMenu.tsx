@@ -35,6 +35,7 @@ export default function AdminMenu({
   open,
   onClose,
   userRole,
+  farmRole,
   username,
   currentUserEmail,
   onUpdateEmail,
@@ -1044,7 +1045,7 @@ export default function AdminMenu({
                     </div>
                     <ExportScopeWizard crops={crops} accent="yield" onExport={(scope) => handleExportPDF('yield', scope)} />
                     <YearlyArchivePanel
-                      isOwner={userRole === 'admin'}
+                      isOwner={farmRole === 'owner'}
                       apiBase="/api"
                       collections={[{ value: 'finance', label: 'Finance records' }]}
                       getHeaders={() => {
