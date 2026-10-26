@@ -13,7 +13,7 @@ import { protect, requireAdmin } from '../middleware/auth.js';
 import { parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
 import { MUF_ENV } from '../muf-env.mjs';
-import { mufGetFarmContext, mufRunWithFarmContext, mufIsFullRole } from '../muf-farms.mjs';
+import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext, mufIsFullRole } from '../muf-farms.mjs';
 import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
 
 let mufTelegram = null; // ESM twin, loaded once on first use
@@ -232,7 +232,8 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
 const TG_SETTINGS_DEFAULTS = { dailySummary: true };
 
 async function tgSettings(farmId = mufGetFarmContext()?.farmId) {
-  const v = await tgRead(farmId ? `settings:${farmId}` : 'settings');
+  let v = await tgRead(farmId ? `settings:${farmId}` : 'settings');
+  if (!Object.keys(v || {}).length && farmId && String(farmId) === String(mufGetDefaultFarmId() || '')) v = await tgRead('settings');
   const out = { ...TG_SETTINGS_DEFAULTS };
   if (v && typeof v === 'object') Object.assign(out, v);
   return out;
