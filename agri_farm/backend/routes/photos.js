@@ -1,6 +1,6 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { PhotoAsset, DiaryMedia, CropPhoto, Spray } from '../db.js';
+import { PhotoAsset, DiaryMedia, CropPhoto, Spray, Finance, Crop } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { createMufStorage } from '../muf-storage.mjs';
 
@@ -33,7 +33,7 @@ function referencesId(value, id, seen = new Set()) {
   return (Array.isArray(value) ? value : Object.values(value)).some((v) => referencesId(v, id, seen));
 }
 async function isReferenced(id) {
-  for (const Model of [DiaryMedia, CropPhoto, Spray]) {
+  for (const Model of [DiaryMedia, CropPhoto, Spray, Finance, Crop]) {
     const rows = await Model.find({}).lean();
     if (rows.some((row) => referencesId(row, id))) return true;
   }
