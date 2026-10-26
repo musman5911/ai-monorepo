@@ -790,6 +790,23 @@ describe.sequential('Agri runtime API integration', () => {
     const photoPath = uploaded.data.path as string;
     const photoId = photoPath.split('/').pop() as string;
 
+    const farmList = await request('/farms', { token: ownerToken });
+    expect(farmList.response.status).toBe(200);
+    const photoFarmA = String(farmList.data.activeFarmId || farmList.data.farms[0]._id);
+    const otherFarmResult = await request('/farms', {
+      method: 'POST', token: ownerToken,
+      body: { name: `Photo Isolation Farm ${process.pid}-${Date.now()}` },
+    });
+    expect(otherFarmResult.response.status).toBe(201);
+    const photoFarmB = String(otherFarmResult.data._id);
+
+    const crossFarmRead = await request(`/photos/${photoId}`, { token: ownerToken, farmId: photoFarmB });
+    expect(crossFarmRead.response.status).toBe(404);
+    const crossFarmDelete = await request(`/photos/${photoId}`, {
+      method: 'DELETE', token: ownerToken, farmId: photoFarmB,
+    });
+    expect(crossFarmDelete.response.status).toBe(404);
+
     let anonymousRead;
     try {
       anonymousRead = await fetch(`${baseUrl}${photoPath}`);
