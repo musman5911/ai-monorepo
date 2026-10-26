@@ -587,7 +587,7 @@ export default function App() {
       {/* Admin Panel Popup */}
       <AnimatePresence>
         {showAdmin && (
-          <AdminPanel username={username} onClose={() => setShowAdmin(false)} />
+          <AdminPanel username={username} isOwner={farmRole === 'owner'} onClose={() => setShowAdmin(false)} />
         )}
       </AnimatePresence>
 
