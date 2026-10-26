@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 // ─── Backup & restore (admin only) + monthly auto-backup ────────────────────
 import express from 'express';
 import { Setting, User, Farm, Field, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer, Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia } from '../db.js';
@@ -62,6 +63,8 @@ async function collectBackupPayload() {
     payload[key] = stringifyDocs(docs);
   }
   payload.farms = stringifyDocs(await Farm.find({}).limit(10000));
+  payload.archiveJobs = stringifyDocs(await (mongoose.models.MufArchiveJob?.find({}).limit(100000) || Promise.resolve([])));
+  payload.archiveRecords = stringifyDocs(await (mongoose.models.MufArchiveRecord?.find({}).limit(100000) || Promise.resolve([])));
   const usersList = await User.find({}).limit(100000);
   payload.users = usersList.map((u) => {
     const d = { ...u, _id: String(u._id) };
@@ -99,6 +102,10 @@ async function applyBackupPayload(payload) {
       await restoreCollection(Model, payload[key] || []);
       restoredAny = true;
     }
+  }
+  for (const [key, modelName] of [['archiveJobs','MufArchiveJob'],['archiveRecords','MufArchiveRecord']]) {
+    const Model = mongoose.models[modelName];
+    if (Model && Array.isArray(payload[key])) { await restoreCollection(Model, payload[key]); restoredAny = true; }
   }
   if (restoredAny) await tagAfterRestore();
   return restoredAny;
