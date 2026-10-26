@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 11 complete for command-line scope; owner-reported archive, regression, safety, documentation and build checks passed).
+Last updated: 2026-10-26 (Phase 12 archive screens started; Phase 11 complete for command-line scope).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -22,7 +22,7 @@ Last updated: 2026-10-26 (Phase 11 complete for command-line scope; owner-report
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
-| 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
+| 12 | Yearly archive: screens | In progress | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Not started | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
@@ -42,6 +42,10 @@ The owner approved Phase 7. Implemented farm-bound Telegram link codes and chat 
 Phase 7 is **Done for command-line scope**. These are results supplied by the owner, not commands independently executed in this editing session. `npm ci` and optional `npm run check-workbench-runtime` were not run. Real MongoDB, browser/phone, and live deployment verification remain in Phases 19–21.
 
 Audit focus: preserve existing webhook secret validation and current bot commands; trace each app's farm context and data stores before changing record writes, daily summary and monthly email flows. Required regression: farm B chat writes only to farm B, an unlinked chat creates nothing, and farm A summary excludes farm B data.
+
+## Phase 12 start (2026-10-26)
+
+Phase 12, Yearly archive: screens, is **In progress**. Initial audit confirms that all three apps mount the Phase 11 owner-only archive API and already have an Admin > Reports integration point plus a shared MUF reports component. The UI will be owner-only, require an explicit farm and retention period, preserve export-before-execute and exact typed confirmation, expose archive history/restore, and keep existing reports active-only unless archived years are explicitly selected. No Phase 12 implementation tests or builds have been run at this start checkpoint.
 
 ## Phase 11 final verification (owner-reported, 2026-10-26)
 
