@@ -52,7 +52,7 @@ router.get('/status', protect, adminOnly, async (_req, res) => {
     res.json({
       configured: !!(TOKEN() && WH_SECRET()),
       botUsername,
-      links: Object.entries(links).map(([chatId, v]) => ({ chatId, ...v })),
+      links: Object.entries(links).filter(([, v]) => mufTelegramFarmId(v) === String(mufGetFarmContext()?.farmId || '')).map(([chatId, v]) => ({ chatId, ...v })),
     });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -92,6 +92,8 @@ router.post('/link-code', protect, adminOnly, async (req, res) => {
 router.delete('/links/:chatId', protect, adminOnly, async (req, res) => {
   try {
     const links = await readMeta(LINKS_KEY);
+    const link = links[req.params.chatId];
+    if (!link || mufTelegramFarmId(link) !== String(mufGetFarmContext()?.farmId || '')) return res.status(404).json({ error: 'Telegram chat not found in selected farm' });
     delete links[req.params.chatId];
     await writeMeta(LINKS_KEY, links);
     res.json({ ok: true });
