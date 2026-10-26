@@ -289,11 +289,15 @@ async function buildDailyText() {
 // Send today's summary to every linked ADMIN chat. force=true is the
 // panel's "send now" button — it skips the once-per-day guard and does
 // NOT consume the evening auto-send.
-async function pushDailySummary(force = false) {
+async function pushDailySummary(force = false, allowedFarmIds = null) {
   if (!TOKEN()) return { sent: 0, reason: 'not configured' };
   const m = await muf();
   const links = await readMeta(LINKS_KEY);
-  const farms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+  let farms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+  if (Array.isArray(allowedFarmIds)) {
+    const allowed = new Set(allowedFarmIds.map(String));
+    farms = farms.filter((farm) => allowed.has(String(farm._id)));
+  }
   const results = [];
   for (const farm of farms) {
     const farmId = String(farm._id);
@@ -351,7 +355,11 @@ router.put('/settings', protect, adminOnly, async (req, res) => {
 
 // ── Admin: send today's summary right now (test / manual push) ──
 router.post('/send-summary', protect, adminOnly, async (_req, res) => {
-  try { res.json(await pushDailySummary(true)); }
+  try {
+    const context = mufGetFarmContext();
+    if (!context) return res.status(403).json({ error: 'Farm context is required' });
+    const allowed = context.mode === 'single' ? [context.farmId] : (context.farmIds || []);
+    res.json(await pushDailySummary(true, allowed));
   catch (e) { res.status(500).json({ error: e.message }); }
 });
 
