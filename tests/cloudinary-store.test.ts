@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { createCloudinaryClient, cloudinaryConfigured } from '../dairy_farm/backend/muf-cloudinary.mjs';
 
 function field(body, key) { return body.get(key); }
@@ -9,6 +10,19 @@ function expectedSignature(params, secret) {
 const jpeg = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]);
 
 describe('Cloudinary photo client', () => {
+  it('keeps the existing farm-scoped photo paths and MongoDB fallback in all three route modules', () => {
+    const routes = [
+      'dairy_farm/backend/routes/photos.js',
+      'agri_farm/backend/routes/photos.js',
+      'flock_farm/backend/routes/uploads.js',
+    ].map((path) => readFileSync(path, 'utf8'));
+    for (const source of routes) {
+      expect(source).toContain("provider: 'mongodb'");
+      expect(source).toContain('Cloudinary credentials are incomplete');
+      expect(source).toContain("remoteUrl.hostname !== 'res.cloudinary.com'");
+      expect(source).toContain("image.provider === 'cloudinary'");
+    }
+  });
   it('detects complete configuration without exposing credentials', () => {
     expect(cloudinaryConfigured({ cloudName: 'cloud', apiKey: 'key', apiSecret: 'secret' })).toBe(true);
     expect(cloudinaryConfigured({ cloudName: 'cloud', apiKey: 'key' })).toBe(false);
