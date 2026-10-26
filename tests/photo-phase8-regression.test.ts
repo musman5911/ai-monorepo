@@ -40,7 +40,8 @@ describe('Phase 8 photo storage regression coverage', () => {
       expect(routes).toContain("router.get('/photos/:id', protect");
       expect(routes).toContain("router.delete('/photos/:id', protect");
       expect(routes).toContain('if (await isReferenced(req.params.id))');
-      expect(routes).toContain("router.post('/photos/cleanup-orphans', protect, requireAdmin");
+      expect(routes).toContain("router.post('/photos/cleanup-orphans', protect,");
+      expect(routes).toContain(app === 'dairy_farm' ? 'adminOnly' : 'requireAdmin');
       expect(routes).toContain('cleanupOrphanPhotoAssets()');
     }
   });
