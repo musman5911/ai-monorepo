@@ -141,6 +141,9 @@ for (const r of apiRouters) {
   app.use('/', r);
   app.use('/api', r);
 }
+// Archive has a dedicated namespace so clients use /api/archive/jobs.
+app.use('/archive', archiveRoutes);
+app.use('/api/archive', archiveRoutes);
 // The telegram router's internal paths (/status, /webhook/:secret, /cron...)
 // live under /telegram — same URLs the previous backend served.
 app.use('/telegram', telegramRoutes);
