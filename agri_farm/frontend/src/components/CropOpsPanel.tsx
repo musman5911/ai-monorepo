@@ -18,7 +18,7 @@ export default function CropOpsPanel({
 }) {
   const isAdmin = userRole === 'admin';
   const [photos, setPhotos] = useState([]);
-  const [photoUrls, setPhotoUrls] = useState({});
+  const [photoUrls, setPhotoUrls] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
   const loadPhotos = async () => {
