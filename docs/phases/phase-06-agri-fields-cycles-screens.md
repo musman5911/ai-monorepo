@@ -22,6 +22,14 @@ Owners and managers create fields, assign crops to a field and season, and see p
 
 - No new data model (Phase 5).
 
+## Validation checkpoint (2026-10-26)
+
+The owner-provided Windows CMD output showed one failure in `tests/agri-fields-screens.test.ts`: the source-contract assertion expected the field update API call without its payload argument. The API helper correctly calls `api.put(`/fields/${id}`, field)`; the test expectation has been corrected accordingly.
+
+The initial focused test failed 1 of 4 checks, and the initial full suite failed 1 of 264 tests (263 passed), with this same assertion reported. The owner reported the sync, UI, workbench (23 checks), farm-scope/breeding runtime, docs and all-three-app build checks as passing. These checks were run before the assertion correction and have not been rerun after it.
+
+**Pending verification:** rerun `npm test -- tests/agri-fields-screens.test.ts` and `npm test` after pulling the fix. Urdu dictionary coverage and actual UI behavior still need verification. Phase 6 remains **In progress**.
+
 ## Steps
 
 1. Read the shared popup and form rules.
