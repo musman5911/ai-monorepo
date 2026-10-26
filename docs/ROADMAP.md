@@ -52,8 +52,7 @@ Phases 1 to 6 are **Done for the command-line scope**. On 2026-10-25, the owner 
 
 **Phase 9 is Done for command-line scope (2026-10-26):** the focused photo suite passed (6 files, 36 tests) and the full suite passed (37 files, 307 tests). Sync, UI, workbench, farm, docs, all three production builds, and the optional workbench runtime smoke test passed. The implementation provides a signed Cloudinary client, optional credentials across Dairy/Agri/Flock, MongoDB fallback, authenticated proxy reads, and remote deletion during supported cleanup. No live credentials or uploads were used. **Next: Phase 10, Smaller downloads and faster screens.**
 
-**Phase 10 status (2026-10-26): In progress.** Owner-reported checks: full test suite passed (38 files / 310 tests), all three production builds passed, and sync/UI/docs/farm checks passed. The new bundle-size check fails: Dairy 772.7 KiB / 700 KiB, Agri 659.8 KiB / 600 KiB, Flock 961.9 KiB / 850 KiB. Continue splitting large entry chunks; do not mark Phase 10 Done until the size gate and remaining checks pass.
-
+**Phase 10 is Done for command-line scope (2026-10-26).** Owner-reported results: all three production builds passed; the full suite passed (38 files / 310 tests); bundle-size, sync, UI, workbench (23 checks), farm-scope and documentation checks passed. Largest JavaScript assets are now Dairy 505.5/700 KiB, Agri 420.1/600 KiB, and Flock 542.0/850 KiB. Largest-file reductions from the initial measurements were 267.2 KiB, 239.7 KiB and 419.9 KiB respectively. These are per-file results, not total download measurements. Browser/device review and live verification remain for the final testing phases. See `docs/PROGRESS.md` and [Phase 10 details](phases/phase-10-bundle-size-performance.md).
 ## Why this order
 
 - Phases 1 to 7 finish the farm-level features that already have a server foundation: Super Admin, Dairy breeding and calves, Agri fields, and Telegram per farm.
