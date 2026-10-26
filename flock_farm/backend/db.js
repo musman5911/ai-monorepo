@@ -25,9 +25,23 @@ const BatchVaccinationLog = (await import('./models/BatchVaccinationLog.js')).de
 const Image = (await import('./models/Image.js')).default;
 const User = (await import('./models/User.js')).default;
 const Farm = (await import('./models/Farm.js')).default;
+const ArchiveJobSchema = new mongoose.Schema({
+  _id: { type: String }, farmId: { type: String, required: true, index: true }, collection: { type: String, required: true },
+  retentionYears: { type: Number, required: true, min: 1 }, cutoffDate: { type: String, required: true },
+  state: { type: String, default: 'preparing' }, sourceCount: { type: Number, required: true },
+  exportDownloaded: { type: Boolean, default: false }, createdBy: { type: String, default: '' },
+}, { timestamps: true, collection: 'muf_archive_jobs' });
+const ArchiveRecordSchema = new mongoose.Schema({
+  _id: { type: String }, farmId: { type: String, required: true, index: true }, jobId: { type: String, required: true, index: true },
+  sourceCollection: { type: String, required: true }, sourceId: { type: String, required: true },
+  originalRecord: { type: mongoose.Schema.Types.Mixed, required: true },
+}, { timestamps: true, collection: 'muf_archive_records' });
+ArchiveRecordSchema.index({ farmId: 1, jobId: 1, sourceCollection: 1, sourceId: 1 }, { unique: true });
+const ArchiveJob = mongoose.model('MufArchiveJob', ArchiveJobSchema);
+const ArchiveRecord = mongoose.model('MufArchiveRecord', ArchiveRecordSchema);
 
-const MUF_FARM_SCOPED_NAMES = ['DataStore', 'Batch', 'BatchFeedLog', 'BatchMortalityLog', 'BatchExpenseLog', 'BatchSaleLog', 'BatchWeightLog', 'BatchEggLog', 'BatchVaccinationLog', 'Image'];
-const MUF_FARM_MODELS = { DataStore, Batch, BatchFeedLog, BatchMortalityLog, BatchExpenseLog, BatchSaleLog, BatchWeightLog, BatchEggLog, BatchVaccinationLog, Image };
+const MUF_FARM_SCOPED_NAMES = ['MufArchiveJob', 'MufArchiveRecord', 'DataStore', 'Batch', 'BatchFeedLog', 'BatchMortalityLog', 'BatchExpenseLog', 'BatchSaleLog', 'BatchWeightLog', 'BatchEggLog', 'BatchVaccinationLog', 'Image'];
+const MUF_FARM_MODELS = { MufArchiveJob: ArchiveJob, MufArchiveRecord: ArchiveRecord, DataStore, Batch, BatchFeedLog, BatchMortalityLog, BatchExpenseLog, BatchSaleLog, BatchWeightLog, BatchEggLog, BatchVaccinationLog, Image };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
 
 let isConnected = false;
@@ -68,4 +82,4 @@ export async function connectDB() {
   if (!defaultFarmId) console.warn('[farms] No farms yet. Back up the database, then run npm run migrate:farms.');
 }
 
-export { Farm, User, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES };
+export { Farm, User, ArchiveJob, ArchiveRecord, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES };
