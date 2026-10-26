@@ -28,7 +28,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phase-21-final-testing-live-and-signoff.md) |
 
 
-Phase 8 remains **In progress** on `muf-monorepo`. Dairy cow gallery/receipts and Agri receipts/spray photos are now migrated alongside the earlier diary/crop-photo flows. Orphan discovery/cleanup hooks and a broader regression test have been added, but the latest test/build sequence still needs to run. See [Phase 8 details](phase-08-photo-storage-adapter.md).
+Phase 8 remains **In progress** on `muf-monorepo`. Dairy cow gallery/receipts and Agri receipts/spray photos are migrated alongside the earlier diary/crop-photo flows. The owner reported passing current validation on 2026-10-26: 35 test files / 299 tests, sync/UI/workbench/farm/docs checks, all three production builds, and the optional workbench runtime smoke test. Remaining Phase 8 work is stronger route-level runtime coverage for Dairy and photo farm-isolation/cleanup behavior before marking the phase Done. See [Phase 8 details](phase-08-photo-storage-adapter.md).
 
 ## How a phase runs
 
