@@ -40,30 +40,6 @@ async function isReferenced(id) {
   }
   return false;
 }
-function collectPhotoReferences(value, refs, seen = new Set()) {
-  if (typeof value === 'string') {
-    const pattern = /\/api\/photos\/([a-f0-9]{24})/ig;
-    for (const match of value.matchAll(pattern)) refs.add(match[1].toLowerCase());
-    return;
-  }
-  if (!value || typeof value !== 'object' || seen.has(value)) return;
-  seen.add(value);
-  for (const child of Array.isArray(value) ? value : Object.values(value)) {
-    collectPhotoReferences(child, refs, seen);
-  }
-}
-async function findOrphanPhotoAssets() {
-  const refs = new Set();
-  for (const Model of [DiaryMedia, CropPhoto, Spray]) {
-    const rows = await Model.find({}).lean();
-    for (const row of rows) collectPhotoReferences(row, refs);
-  }
-  const assets = await PhotoAsset.find({}).select('_id').lean();
-  return {
-    scanned: assets.length,
-    orphanIds: assets.filter((asset) => !refs.has(String(asset._id).toLowerCase())).map((asset) => asset._id),
-  };
-}
 router.post('/photos', protect, async (req, res) => {
   try {
     const parsed = parseDataUrl(req.body?.data);
