@@ -6,6 +6,7 @@
      SMTP_HOST  SMTP_PORT  SMTP_SECURE  SMTP_USER  SMTP_PASS  SMTP_FROM
      TELEGRAM_BOT_TOKEN  TELEGRAM_WEBHOOK_SECRET
      CRON_SECRET  MEMORY_MODE  CROSS_FARM_KEY  TZ_OFFSET_HOURS  LOG_REQUESTS
+     CLOUDINARY_CLOUD_NAME  CLOUDINARY_API_KEY  CLOUDINARY_API_SECRET
      PORT (per-app: 3000 / 3001 / 8000)
 
    Legacy aliases keep old .env files working (see pick() calls).
@@ -74,6 +75,11 @@ export const MUF_ENV = {
   // ── Cron + cross-farm ──
   cronSecret: pick('CRON_SECRET'),
   crossFarmKey: pick('CROSS_FARM_KEY'),
+
+  // ── Optional photo storage ──
+  cloudinaryCloudName: pick('CLOUDINARY_CLOUD_NAME'),
+  cloudinaryApiKey: pick('CLOUDINARY_API_KEY'),
+  cloudinaryApiSecret: pick('CLOUDINARY_API_SECRET'),
 
   // ── Diagnostics ──
   logRequests: pick('LOG_REQUESTS') === '1',
