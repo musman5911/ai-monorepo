@@ -45,7 +45,7 @@ describe('Phase 12 yearly archive screens', () => {
     expect(source).toContain('/restore');
     expect(source).toContain('Include archived records in this report');
     expect(source).toContain('Off by default. Existing active-data reports are not changed.');
-    expect(source).toContain('A separate archive report view');
+    expect(source).toContain('not merged into active totals');
   });
 
   it('offers only the source collections supported by each app route', () => {
