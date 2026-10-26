@@ -7,7 +7,7 @@ import { isVoiceSupported, startVoiceRecording, MAX_VOICE_SECONDS, type VoiceRec
 import type { ChecklistItem } from '../types';
 import { useDebouncedSave } from '../useDebouncedSave';
 import SaveIndicator from './SaveIndicator';
-import MufDiaryMedia, { type DiaryPhoto } from '../muf/ui/muf-diary-media';
+import MufDiaryMedia, { compressDiaryPhoto, type DiaryPhoto } from '../muf/ui/muf-diary-media';
 import { todayStr, shiftDate } from '../utils/date';
 
 const DEFAULT_CHECKLIST: Omit<ChecklistItem, 'done'>[] = [
@@ -217,7 +217,7 @@ export default function DiaryTab({ checklistOnly = false }: DiaryTabProps) {
               className="w-full border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 text-slate-800 dark:text-slate-100 resize-none"
             />
             <p className="text-[11px] text-slate-400 mt-2">{L('Saves automatically as you type.')}</p>
-            <MufDiaryMedia date={date} photos={photos} onChange={setPhotos} />
+            <MufDiaryMedia date={date} photos={photos} onChange={setPhotos} uploadPhoto={async (file) => { const compressed = await compressDiaryPhoto(file); const saved = await api.uploadPhoto(compressed.data); return saved.path; }} resolvePhotoUrl={api.getPhotoObjectUrl} />
 
             {/* ── Voice notes (Urdu-friendly) — record instead of typing ── */}
             <div className="mt-4 border-t border-slate-100 dark:border-slate-800 pt-3 space-y-2">
