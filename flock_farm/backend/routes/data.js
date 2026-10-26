@@ -19,6 +19,8 @@ import { validateIncubationAllocations } from '../incubation-allocation.mjs';
 import { validateLaborBatchAssignments } from '../batch-labor.mjs';
 import { acquireEggInventoryLock } from '../egg-inventory-lock.mjs';
 import { authRequired } from '../middleware/auth.js';
+import { MUF_ENV } from '../muf-env.mjs';
+import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.mjs';
 
 const router = express.Router();
 
@@ -118,14 +120,23 @@ async function cleanupOrphanedImages(candidateIds) {
     const buckets = await DataStore.find({}).select('value').lean();
     const unreferenced = findUnreferencedImageIds(candidateIds, buckets.map((bucket) => bucket.value));
     let deleted = 0;
+    let skippedCloudinary = 0;
+    const config = { cloudName: MUF_ENV.cloudinaryCloudName, apiKey: MUF_ENV.cloudinaryApiKey, apiSecret: MUF_ENV.cloudinaryApiSecret };
+    const cloudinary = cloudinaryConfigured(config) ? createCloudinaryClient(config) : null;
     for (const id of unreferenced) {
-      if (mongoose.isValidObjectId(id)) {
-        // Image queries inherit the active farm scope from auth middleware.
-        const result = await Image.deleteOne({ _id: id });
-        deleted += result.deletedCount || 0;
+      if (!mongoose.isValidObjectId(id)) continue;
+      // Image queries inherit the active farm scope from auth middleware.
+      const image = await Image.findById(id);
+      if (!image) continue;
+      if (image.provider === 'cloudinary' && image.cloudinaryPublicId) {
+        if (!cloudinary) { skippedCloudinary++; continue; }
+        await cloudinary.destroy(image.cloudinaryPublicId);
       }
+      const result = await Image.deleteOne({ _id: id });
+      deleted += result.deletedCount || 0;
     }
-    if (deleted > 0) console.log(`🗑️  Freed ${deleted} orphaned farm image(s) from the DB.`);
+    if (deleted > 0) console.log(`🗑️  Freed ${deleted} orphaned farm image(s) from storage.`);
+    if (skippedCloudinary > 0) console.warn(`[photo-storage] Kept ${skippedCloudinary} Cloudinary orphan record(s) because credentials are missing.`);
   } catch (err) {
     console.error('Image cleanup failed (non-fatal):', err.message);
   }
