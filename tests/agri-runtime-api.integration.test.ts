@@ -773,7 +773,7 @@ describe.sequential('Agri runtime API integration', () => {
     const photoPath = uploaded.data.path as string;
     const photoId = photoPath.split('/').pop() as string;
 
-    const anonymousRead = await fetch(`${baseUrl}/api${photoPath}`);
+    const anonymousRead = await fetch(`${baseUrl}${photoPath}`);
     expect(anonymousRead.status).toBe(401);
     const authenticatedRead = await fetch(`${baseUrl}/api${photoPath}`, {
       headers: { Authorization: `Bearer ${ownerToken}` },
