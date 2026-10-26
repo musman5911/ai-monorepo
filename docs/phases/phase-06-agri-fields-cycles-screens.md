@@ -28,7 +28,7 @@ The owner-provided Windows CMD output showed one failure in `tests/agri-fields-s
 
 The initial focused test failed 1 of 4 checks, and the initial full suite failed 1 of 264 tests (263 passed), with this same assertion reported. The owner reported the sync, UI, workbench (23 checks), farm-scope/breeding runtime, docs and all-three-app build checks as passing. These checks were run before the assertion correction and have not been rerun after it.
 
-**Pending verification:** rerun `npm test -- tests/agri-fields-screens.test.ts` and `npm test` after pulling the fix. Urdu dictionary coverage and actual UI behavior still need verification. Phase 6 remains **In progress**.
+**Verified after the fix (owner-supplied Windows CMD output, 2026-10-26):** `npm test -- tests/agri-fields-screens.test.ts` passed (4/4), and `npm test` passed (29 files, 264 tests, 0 failures). The remaining Phase 6 checks reported earlier passed before this assertion fix and have not been rerun afterward. Urdu coverage and actual UI behavior still need verification. Phase 6 remains **In progress**.
 
 ## Steps
 
