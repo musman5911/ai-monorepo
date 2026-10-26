@@ -58,7 +58,8 @@ router.post('/uploads/image', authRequired, requireRole('admin'), upload.single(
     res.status(201).json({ ok: true, path: `/api/images/${img._id}` });
   } catch (err) {
     console.error('POST /api/uploads/image error:', err);
-    res.status(500).json({ error: err.message || 'Failed to upload image' });
+    const status = err instanceof RangeError ? 413 : err instanceof TypeError ? 400 : 500;
+    res.status(status).json({ error: err.message || 'Failed to upload image' });
   }
 });
 
@@ -71,7 +72,8 @@ router.post('/uploads/diary-image', authRequired, upload.single('image'), async 
     return res.status(201).json({ ok: true, path: `/api/images/${img._id}` });
   } catch (err) {
     console.error('POST /api/uploads/diary-image error:', err);
-    return res.status(500).json({ error: err.message || 'Failed to upload diary image' });
+    const status = err instanceof RangeError ? 413 : err instanceof TypeError ? 400 : 500;
+    return res.status(status).json({ error: err.message || 'Failed to upload diary image' });
   }
 });
 
@@ -99,7 +101,7 @@ router.get('/images/:id', resolveImageFarm, authRequired, async (req, res) => {
 });
 
 // DELETE /api/images/:id — admin cleanup when replacing/removing a photo.
-router.delete('/images/:id', authRequired, requireRole('admin'), async (req, res) => {
+router.delete('/images/:id', resolveImageFarm, authRequired, requireRole('admin'), async (req, res) => {
   try {
     const { id } = req.params;
     if (!mongoose.isValidObjectId(id)) {
