@@ -131,6 +131,20 @@ const TWINS = [
   ['muf-a11y.ts',               'dairy_farm/client/src/muf/core/muf-a11y.ts',               'flock_farm/client/src/muf/core/muf-a11y.ts'],
   ['muf-worker-panel.tsx',      'dairy_farm/client/src/muf/ui/muf-worker-panel.tsx',      'flock_farm/client/src/muf/ui/muf-worker-panel.tsx'],
 ];
+// Shared Telegram farm-context helper must be byte-identical in all three backends.
+const TELEGRAM_FARM_HELPERS = [
+  'dairy_farm/backend/muf-telegram-farms.mjs',
+  'flock_farm/backend/muf-telegram-farms.mjs',
+  'agri_farm/backend/muf-telegram-farms.mjs',
+];
+const telegramFarmHelperSources = TELEGRAM_FARM_HELPERS.map(read);
+if (telegramFarmHelperSources.every((src) => src !== null && src === telegramFarmHelperSources[0])) {
+  console.log(`  ✅ ${pad('muf-telegram-farms.mjs (all 3)', 30)} identical`);
+} else {
+  console.log(`  ❌ ${pad('muf-telegram-farms.mjs (all 3)', 30)} copies differ or missing`);
+  failures++;
+}
+
 // muf-style.css must be byte-identical in ALL THREE apps (plain CSS, no TS/JS split)
 const cssA = read('dairy_farm/client/src/muf-style.css');
 const cssB = read('flock_farm/client/src/muf-style.css');
