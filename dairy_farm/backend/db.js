@@ -370,7 +370,10 @@ const DailyLogSchema = new mongoose.Schema({
 const PhotoAssetSchema = new mongoose.Schema({
   farmId: { type: String, index: true },
   contentType: { type: String, required: true },
-  data: { type: Buffer, required: true },
+  data: { type: Buffer, required: false },
+  provider: { type: String, enum: ['mongodb', 'cloudinary'], default: 'mongodb' },
+  cloudinaryPublicId: { type: String, default: '' },
+  secureUrl: { type: String, default: '' },
   size: { type: Number, required: true },
   createdBy: { type: String, default: '' },
 }, { timestamps: true, collection: 'photo_assets' });
