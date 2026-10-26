@@ -17,16 +17,23 @@ function timingSafeSecretEquals(provided, expected) {
   return crypto.timingSafeEqual(providedBuf, expectedBuf);
 }
 
-async function sendTodaysSummary(selectedFarmId = null) {
+async function sendTodaysSummary({ selectedFarmId = null, allowedFarmIds = null } = {}) {
   const { EMAIL_TO } = process.env;
   if (!EMAIL_TO) throw new Error('EMAIL_TO is not set — add the recipient address(es) in your environment/Secrets.');
 
   const recipients = EMAIL_TO.split(',').map((s) => s.trim()).filter(Boolean);
   if (recipients.length === 0) throw new Error('EMAIL_TO is empty — add at least one recipient address.');
 
-  const farms = selectedFarmId
-    ? [await Farm.findById(String(selectedFarmId)).lean()].filter(Boolean)
-    : await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+  let farms;
+  if (selectedFarmId) {
+    farms = [await Farm.findById(String(selectedFarmId)).lean()].filter((farm) => farm && !farm.archived);
+  } else {
+    farms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+    if (Array.isArray(allowedFarmIds)) {
+      const allowed = new Set(allowedFarmIds.map(String));
+      farms = farms.filter((farm) => allowed.has(String(farm._id)));
+    }
+  }
   if (!farms.length) throw new Error('No active farm is available for the daily summary.');
 
   const date = todayStr();
@@ -74,8 +81,12 @@ router.get('/status', protect, async (req, res) => {
 // POST /api/email/send-now — admin-triggered manual send, for testing
 router.post('/send-now', protect, adminOnly, async (req, res) => {
   try {
-    const farmId = mufGetFarmContext()?.farmId || null;
-    const result = await sendTodaysSummary(farmId);
+    const context = mufGetFarmContext();
+    if (!context) return res.status(403).json({ error: 'Farm context is required' });
+    const scope = context.mode === 'single'
+      ? { selectedFarmId: context.farmId }
+      : context.role === 'owner' ? {} : { allowedFarmIds: context.farmIds || [] };
+    const result = await sendTodaysSummary(scope);
     res.json({ sent: true, ...result });
   } catch (e) {
     res.status(500).json({ error: e.message });
