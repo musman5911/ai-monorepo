@@ -378,4 +378,11 @@ export const MUF_URDU_PART_6: Record<string, string> = {
   "Enable archived records and select an archive job first.": "پہلے آرکائیو ریکارڈ فعال کریں اور آرکائیو کا کام منتخب کریں۔",
   "Could not read archive records": "آرکائیو ریکارڈ نہیں پڑھے جا سکے",
   "No archived records loaded for this report yet.": "اس رپورٹ کے لیے ابھی آرکائیو ریکارڈ لوڈ نہیں ہوئے۔",
+  "Archiving removes records from active lists only after a complete snapshot has been exported and the exact farm name and job ID are confirmed. Preparing a snapshot does not delete active records.": "آرکائیو کرنے سے ریکارڈ صرف مکمل محفوظ کاپی برآمد ہونے اور فارم کا درست نام اور جاب آئی ڈی درج کرنے کے بعد فعال فہرستوں سے ہٹتے ہیں۔ کاپی تیار کرنے سے فعال ریکارڈ حذف نہیں ہوتے۔",
+  "Showing": "دکھائے جا رہے ہیں",
+  "archived records from job": "آرکائیو جاب کے ریکارڈ",
+  "This is a separate archive report view, not merged into active totals.": "یہ آرکائیو کی الگ رپورٹ ہے، اسے فعال مجموعوں میں شامل نہیں کیا گیا۔",
+  "records": "ریکارڈ",
+  "cutoff": "آخری حد",
+  "year(s)": "سال",
 };
