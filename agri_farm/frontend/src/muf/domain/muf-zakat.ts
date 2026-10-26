@@ -81,7 +81,6 @@ export function ushrStatementBody(opts: {
 }
 
 /* ── One-tap PDF downloads (muf-pdf shell) ─────────────────────── */
-import { mufPdfStart, mufPdfTable, mufPdfSummary, mufPdfFooter, mufPdfSave } from '../data/muf-pdf';
 import { mufEsc } from '../data/muf-print';
 import {mufToday} from '../data/muf-date';
 
@@ -97,6 +96,7 @@ function pdfDisclaimer(doc: any, y: number) {
 
 /** Downloads the yearly zakat statement as a PDF file (no print window). */
 export async function downloadZakatPdf(opts: { periodLabel: string; income: number; expenses: number; pct: number }): Promise<void> {
+  const { mufPdfStart, mufPdfTable, mufPdfSummary, mufPdfFooter, mufPdfSave } = await import('../data/muf-pdf');
   const { periodLabel, income, expenses, pct } = opts;
   const profit = (Number(income) || 0) - (Number(expenses) || 0);
   const amount = pctAmount(profit, pct);
@@ -116,6 +116,7 @@ export async function downloadZakatPdf(opts: { periodLabel: string; income: numb
 
 /** Downloads a per-crop ushr statement as a PDF file (no print window). */
 export async function downloadUshrPdf(opts: { cropLabel: string; base: number; pct: number }): Promise<void> {
+  const { mufPdfStart, mufPdfTable, mufPdfSummary, mufPdfFooter, mufPdfSave } = await import('../data/muf-pdf');
   const { cropLabel, base, pct } = opts;
   const amount = pctAmount(base, pct);
   const { doc, y } = await mufPdfStart(`Ushr Statement — ${mufEsc(cropLabel)}`, `Generated: ${mufToday()}`);
