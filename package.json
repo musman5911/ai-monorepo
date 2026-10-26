@@ -11,7 +11,8 @@
     "check-farms": "node tools/check-farm-scope.js && node tools/check-dairy-breeding-events.js",
     "check-breeding-events": "node tools/check-dairy-breeding-events.js",
     "check-super-admin": "node tools/check-super-admin.js",
-    "check-docs": "node tools/check-phase-docs.js"
+    "check-docs": "node tools/check-phase-docs.js",
+    "check-bundle-size": "node tools/check-bundle-size.js"
   },
   "devDependencies": {
     "vitest": "^3.0.0"
