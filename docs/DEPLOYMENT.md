@@ -1,6 +1,6 @@
 # Replit deployment and environment guide
 
-Last reviewed: 2026-10-22. This guide documents repository configuration and the steps for rolling out the scale-up phases. It does not prove that a published Replit deployment is currently running; only the live checks below do.
+Last reviewed: 2026-10-26. This guide documents repository configuration and the steps for rolling out the scale-up phases. It does not prove that a published Replit deployment is currently running; only the live checks below do.
 
 ## Project and port map
 
@@ -39,6 +39,9 @@ The three backends share `muf-env.mjs`; use the same variable names where the fe
 | `JWT_EXPIRES_IN` | Lifetime of newly issued JWT tokens | Optional; examples: `1440m` or `7d`. All three backends normalize a bare integer as minutes |
 | `TZ_OFFSET_HOURS` | Farm local-time offset from UTC | Use `5` for Pakistan Standard Time |
 | `LOG_REQUESTS` | Extra request/auth diagnostic logging | Leave unset unless temporarily debugging |
+| `CLOUDINARY_CLOUD_NAME` | Optional Cloudinary cloud name for photo uploads | Set in the deployment secret manager; never commit a real value |
+| `CLOUDINARY_API_KEY` | Optional Cloudinary API key | Set in the deployment secret manager; never commit a real value |
+| `CLOUDINARY_API_SECRET` | Signs Cloudinary server-side photo requests | Set in the deployment secret manager; never commit a real value |
 
 `NODE_ENV=production` is set by each published deployment run command, so it does not need to be added as a secret. Do not set `PORT=80`: the backend must listen on its configured local port (8000/3000/3001). Normally the existing code default is sufficient.
 
@@ -121,15 +124,21 @@ The migration is safe to run twice. The server does not run it for you: until it
 
 Never run a migration against live data from a developer machine without the owner's go-ahead.
 
+## Cloudinary photo storage
+
+Phase 9 adds optional Cloudinary storage for new photos. Configure all three `CLOUDINARY_*` values in each app's workspace Secrets and published deployment secrets to enable it. If any value is missing, uploads continue using the MongoDB store and the backend logs one fallback message. Do not put real credentials in `.env`, `.env.example`, GitHub, chat, or logs. Existing MongoDB photo records remain readable; no automatic bulk migration occurs. Cloudinary-backed records retain a farm-scoped local API path, and the authenticated backend redirects photo reads to the Cloudinary HTTPS URL. If credentials are removed later, existing Cloudinary records can still be read but cannot be deleted from Cloudinary until credentials are restored.
+
+Cloudinary's official documentation currently lists the Free Image & Video API plan at 25 credits. One credit equals 1,000 transformations OR 1 GB of managed storage OR 1 GB of image bandwidth, consumed in combination; transformations and bandwidth use a rolling 30-day window, while storage is a current total. The Free plan maximum image upload size is 10 MB. The app's own 100 KiB photo storage validation remains the stricter limit for current farm uploads. Verify current usage in Cloudinary Console > Settings > Billing. Sources: [Cloudinary billing and plans](https://cloudinary.com/documentation/billing_and_plans), [Cloudinary plan comparison](https://cloudinary.com/pricing/compare-plans).
+
 ## Free-tier limits to watch
 
 - The free MongoDB tier has a small storage cap (usually 512 MB; check the cluster's dashboard). Photos stored in the database count against it. This is why photos are size-limited and why Phases 8 and 9 move them to an external store.
 - Replit's local disk is not permanent on autoscale deployments, so nothing important may be stored as a local file.
 - Re-check current free-tier limits on the providers' own pages before relying on them.
 
-## Planned variables (not read by the code yet)
+## Photo-storage configuration
 
-Phases 8 and 9 are expected to add names for the photo store, for example `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY` and `CLOUDINARY_API_SECRET`. They are not used by any app today. When they are added, save them only in Replit Secrets and the published deployment secrets, never in Git, chat or logs.
+The Cloudinary environment names are now read by all three backends. They are optional; the default MongoDB store remains active when any credential is absent. Use only placeholder values in the tracked `.env.example` files.
 
 ## Secret handling
 
