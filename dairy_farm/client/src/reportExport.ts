@@ -6,6 +6,7 @@ import { fmt, fmtPKR, fmtL, monthLabel } from './utils/format';
 import { calcRevenueWithHistory } from './utils/rates';
 import { todayStr, shiftDate } from './utils/date';
 import { mufFmt } from './muf/data/muf-date';
+import { api } from './api';
 
 type Color = [number, number, number];
 const TEAL: Color = [27, 133, 74]; // farm green (brand)
@@ -376,9 +377,8 @@ export async function generateSummaryReport(data: ReportCtx & {
 // 4. SINGLE COW REPORT
 // ═══════════════════════════════════════════════════════════════
 export async function generateCowReport(cowId: string, _rate: number, _rateHistory: RateHistory[], _rateDate: string, days = 30) {
-  import('./api').then(({ api }) => {
   // Request detail window matching the selected export range (up to 365 days)
-  api.getCowSummary(cowId, { days }).then(async (data: any) => {
+  const data: any = await api.getCowSummary(cowId, { days });
     const doc = new jsPDF();
     const { cow, milk, expenses, health, offspring, mother } = data;
     const rLabel = rangeLabel(days);
@@ -545,8 +545,6 @@ export async function generateCowReport(cowId: string, _rate: number, _rateHisto
 
     footer(doc, `Cow Report — ${cow.name}`);
     doc.save(`cow-report-${cow.name.toLowerCase().replace(/\s+/g, '-')}.pdf`);
-  });
-  }); // end import
 }
 
 // ═══════════════════════════════════════════════════════════════
