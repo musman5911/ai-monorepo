@@ -158,6 +158,18 @@ describe.sequential('Dairy photo runtime API integration', () => {
       body: { data: 'data:image/gif;base64,R0lGODlh' },
     });
     expect(invalid.response.status).toBe(400);
+    const signatureMismatch = await request('/photos', {
+      method: 'POST', token: ownerToken, farmId: farmA,
+      body: { data: 'data:image/jpeg;base64,iVBORw0KGgo=' },
+    });
+    expect(signatureMismatch.response.status).toBe(400);
+    const oversizedBytes = Buffer.alloc(100 * 1024 + 1, 0x01);
+    oversizedBytes[0] = 0xff; oversizedBytes[1] = 0xd8; oversizedBytes[2] = 0xff;
+    const oversized = await request('/photos', {
+      method: 'POST', token: ownerToken, farmId: farmA,
+      body: { data: `data:image/jpeg;base64,${oversizedBytes.toString('base64')}` },
+    });
+    expect(oversized.response.status).toBe(413);
 
     const uploaded = await request('/photos', {
       method: 'POST', token: ownerToken, farmId: farmA, body: { data },
@@ -167,6 +179,8 @@ describe.sequential('Dairy photo runtime API integration', () => {
     const photoPath = uploaded.data.path as string;
     const photoId = photoPath.split('/').pop() as string;
 
+    const anonymousRead = await fetch(`${baseUrl}${photoPath}`, { headers: { 'X-Farm-Id': farmA } });
+    expect(anonymousRead.status).toBe(401);
     const authenticated = await fetch(`${baseUrl}${photoPath}`, {
       headers: { Authorization: `Bearer ${ownerToken}`, 'X-Farm-Id': farmA },
     });
