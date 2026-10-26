@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 8 runtime coverage extended; owner local verification of the latest commits is pending).
+Last updated: 2026-10-26 (Phase 8 command-line verification passed; final documentation check should be rerun after pulling this update).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -18,7 +18,7 @@ Last updated: 2026-10-26 (Phase 8 runtime coverage extended; owner local verific
 | 5 | Agri fields and crop cycles: server | Done | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Done | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
-| 8 | Photo storage adapter | In progress | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
+| 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Not started | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Not started | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
@@ -43,28 +43,28 @@ Phase 7 is **Done for command-line scope**. These are results supplied by the ow
 
 Audit focus: preserve existing webhook secret validation and current bot commands; trace each app's farm context and data stores before changing record writes, daily summary and monthly email flows. Required regression: farm B chat writes only to farm B, an unlinked chat creates nothing, and farm A summary excludes farm B data.
 
-## Phase 8 start (2026-10-26)
+## Phase 8 final verification (2026-10-26)
 
-Phase 8 is **In progress**. Audited the current photo paths: Flock stores uploaded images in the farm-scoped MongoDB `Image` model and serves `/api/images/:id`; Agri has inline DiaryMedia photos plus separate CropPhoto/Spray photo data; Dairy stores photos in farm-scoped DailyLog/cow-gallery data. These stores and URL/data shapes must remain compatible during migration.
+Phase 8, Photo storage adapter, is **Done for command-line scope**. Dairy, Flock and Agri use the shared MongoDB-first storage contract for the identified photo flows, with validation, authenticated access, farm isolation and safe orphan cleanup.
 
-**Initial implementation checkpoint (committed on `muf-monorepo`):**
-- Added byte-identical `backend/muf-storage.mjs` contract modules in Dairy, Flock and Agri. The contract validates non-empty image bytes, enforces a default 100 KiB cap, allows JPEG/PNG/WebP only, checks file signatures against declared MIME types, and exposes save/read-link/delete/orphan-cleanup methods around an injected persistence adapter.
-- Added `tests/muf-storage.test.ts` covering save/read/delete, size and type rejection, signature mismatch, and orphan cleanup.
-- Extended `tools/check-muf-sync.js` to verify all three backend copies are byte-identical and expose the expected API.
+**Owner-reported Windows CMD results from `F:\\PROJECTS\\dairy\\muf-monorepo` (2026-10-26):**
 
-**Owner-reported Phase 8 verification update (Windows CMD, 2026-10-26):** after pulling commit `f45be76`, the owner ran `npm test -- tests/muf-storage.test.ts` (8/8 passed), `npm run check-sync` (passed, including the three storage twins), `npm run check-docs` (passed), `npm test` (31 files, 284 tests passed), `npm run check-ui` (passed), `npm run check-workbench` (23 checks passed), `npm run check-farms` (passed), and `tools\\build-all.bat` (Dairy, Flock and Agri builds succeeded). These are owner-supplied results, not independently executed in this editing session.
+| Command/check | Result |
+|---|---|
+| Focused photo suite: `npm test -- tests/muf-storage.test.ts tests/photo-client-migration.test.ts tests/photo-phase8-regression.test.ts tests/agri-runtime-api.integration.test.ts tests/dairy-photo-runtime.integration.test.ts` | Passed: 5 files, 30 tests |
+| `npm test` | Passed: 36 files, 301 tests |
+| `npm run check-sync` | Passed: three-backend storage twins, shared MUF files, env names and invariants |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source safety checks |
+| `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope checks and Dairy breeding-event runtime checks |
+| `npm run check-docs` | Passed on the pre-final docs snapshot; rerun after pulling this documentation update |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `npm run check-workbench-runtime` | Passed: 8 runtime smoke checks |
+| `npm ci` | Not run; existing dependencies were used |
 
-**At the initial server checkpoint:** Dairy/Agri photo endpoints existed, but client migration and automatic cleanup had not yet been completed. The later implementation and current verification status are recorded in the client migration and deletion-cleanup checkpoint below. The earlier passing tests/builds predate the latest commits and must be rerun.
+The first focused run was 29/30 because Dairy photo deletion returned HTTP 500. The missing model-level `deleteOne(filter)` method was added to the Dairy and Flock in-memory model adapters. The subsequent focused run passed 30/30, and the full suite passed 301/301. These are results supplied by the owner, not commands independently run in this documentation-editing session.
 
-**Client migration checkpoint (2026-10-26; changes committed directly to `muf-monorepo`):** Dairy DailyLog/diary photos, cow-gallery photos and expense receipts, plus Agri diary/crop photos, spray images and finance receipts now upload through `POST /api/photos` before saving the returned path. Upload helpers compress large images to fit the 100 KiB storage contract. Protected paths render through authenticated blob requests; existing record field names and legacy inline data URLs remain supported.
-
-**Deletion and orphan cleanup checkpoint:** Dairy and Agri now expose admin-only `GET /api/photos/orphans` discovery and `POST /api/photos/cleanup-orphans` cleanup. Reference discovery scans farm-scoped photo-bearing parent records. Cleanup ignores assets created within the last hour to avoid deleting a fresh upload before its parent record is saved. Cleanup hooks run after relevant Dairy cow/expense/daily-log and Agri crop/crop-photo/spray/finance/diary updates or deletions.
-
-Added `tests/photo-client-migration.test.ts` and `tests/photo-phase8-regression.test.ts`; extended `tests/agri-runtime-api.integration.test.ts` with live HTTP upload, authenticated binary read, invalid-upload, referenced-delete and successful-delete cases. **Follow-up from owner test run (2026-10-26):** the first focused run after pulling reported 29/30 tests passing; the sole failure was the Dairy photo delete endpoint returning HTTP 500. Root cause: Dairy's memory model adapter lacked the model-level `deleteOne(filter)` method already present in Agri. Added that API to Dairy and Flock memory adapters (Flock had the same gap), preserving `{ deletedCount }` semantics. Re-run of the focused suite and full verification is pending; Phase 8 remains In progress until the owner confirms.
-
-**Owner-reported verification before the latest runtime-test/fix commits (Windows CMD, 2026-10-26):** `npm test` passed (35 files, 299 tests); `npm run check-sync`, `npm run check-ui`, `npm run check-workbench` (23 checks), `npm run check-farms`, and `npm run check-docs` passed; `tools\\build-all.bat` built Dairy, Flock and Agri successfully; optional `npm run check-workbench-runtime` passed (8/8). The earlier focused photo migration, Phase 8 regression, and Agri runtime integration tests passed (20/20). These results are owner-reported, not independently executed in this editing session and predate the latest commits. Added `tests/dairy-photo-runtime.integration.test.ts` for Dairy upload/read/delete, cross-farm denial, reference protection, orphan discovery, one-hour grace behavior, and admin-only operations; extended Agri runtime photo coverage with cross-farm read/delete denial. Also fixed a Dairy daily-log GET handler that referenced undefined variables and moved orphan cleanup to the successful PUT path. **The owner must now run the focused tests and full standard check/build sequence against these latest commits.** Phase 8 remains In progress until those results pass.
-
-MUF modules reused/created: existing client compression helpers; backend `muf-storage.mjs` twins; new per-app `services/photo-assets.js` cleanup services. Preserve farm scoping, existing data shapes, and byte-identical shared MUF files.
+Phase 8 is **Done for command-line scope**. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21. Phase 9 is next: implement the Cloudinary store behind the existing adapter, preserve legacy photo reads, and use mocked HTTP tests. Do not enable live uploads or commit secrets in Phase 9.
 
 ## Phase 3 final local verification (2026-10-25, Windows CMD; output supplied by owner)
 
