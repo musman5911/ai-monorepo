@@ -826,7 +826,7 @@ describe.sequential('Agri runtime API integration', () => {
     });
     expect(unlinked.response.status).toBe(200);
     const deleted = await request(`/photos/${photoId}`, { method: 'DELETE', token: ownerToken });
-    expect(deleted.response.status).toBe(200);
+    expect(deleted.response.status, `Photo deletion failed: ${JSON.stringify(deleted.data)}`).toBe(200);
     const missing = await request(`/photos/${photoId}`, { method: 'DELETE', token: ownerToken });
     expect(missing.response.status).toBe(404);
   });
