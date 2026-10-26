@@ -13,7 +13,8 @@
     "check-super-admin": "node tools/check-super-admin.js",
     "check-docs": "node tools/check-phase-docs.js",
     "check-bundle-size": "node tools/check-bundle-size.js",
-    "check-archive": "node tools/check-dairy-archive.js && node tools/check-flock-archive.js && node tools/check-agri-archive.js"
+    "check-archive": "node tools/check-dairy-archive.js && node tools/check-flock-archive.js && node tools/check-agri-archive.js",
+    "check-audit": "node tools/check-audit.js"
   },
   "devDependencies": {
     "vitest": "^3.0.0"
