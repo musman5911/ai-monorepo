@@ -1,6 +1,6 @@
 # Phase 10: Smaller downloads and faster screens
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -8,7 +8,8 @@ The three apps load faster on phones with slow connections.
 
 ## Already in place (from Phase 0)
 
-- All three production builds pass, with warnings: Flock about 977 kB, Dairy about 760 kB, Agri about 659 kB for the largest file; Agri reports a deprecated `advancedChunks` setting; Dairy imports `api.ts` both statically and dynamically.
+- Previously recorded build output (Phase 0; must be refreshed at the start of this phase): Flock about 977 kB, Dairy about 760 kB, Agri about 659 kB for the largest file. Agri uses the deprecated `advancedChunks` setting; Dairy imports `api.ts` both statically and dynamically.
+- Initial repository inspection confirms PDF utilities are imported by main app modules and charts are imported eagerly in Agri. Fresh baseline sizes have not yet been measured in this session.
 
 ## Scope
 
@@ -23,10 +24,10 @@ The three apps load faster on phones with slow connections.
 
 ## Steps
 
-1. Record the current sizes from a fresh build in this file.
-2. Split the biggest chunks first, one app at a time.
-3. Rebuild and compare after each change.
-4. Add the size check.
+1. Run `tools\\build-all.bat`, capture the exact largest emitted JS chunks and warnings for each app, and record them here.
+2. Lazy-load PDF utilities, charts and the workbench entry points only at their use points; split the biggest chunks one app at a time.
+3. Rebuild and compare after each change; keep the app's current screens and behavior unchanged.
+4. Add `tools/check-bundle-size.js`, configure an explicit per-app budget based on the measured baseline and achievable reductions, and expose `npm run check-bundle-size`.
 
 ## New command-line check
 
