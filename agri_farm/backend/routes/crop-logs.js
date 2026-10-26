@@ -167,6 +167,7 @@ router.delete('/spray/:logId', protect, requireAdmin, asyncHandler(async (req, r
     }
   }
   await Spray.deleteOne({ _id: oid });
+  await cleanupOrphanPhotoAssets();
   return res.json({ status: 'ok' });
 }));
 
