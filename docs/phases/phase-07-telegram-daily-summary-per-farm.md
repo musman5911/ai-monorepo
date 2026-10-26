@@ -29,6 +29,7 @@ Each Telegram chat is linked to one farm, bot entries land in that farm, and dai
 - Before implementation, link records stored user/worker identity without a farm assignment. Phase 7 now adds `farmId` to new link codes and linked-chat records; legacy links without a farm fail closed and require relinking.
 - Flock's Telegram data-store helpers fall back to the default farm when no farm context is active. New webhook handling resolves the linked farm and runs commands in MUF's single-farm context; scheduled summaries now iterate farms independently in all three backends.
 - Existing webhook secret checks, command parsing, worker attendance, production-drop alerts and summary controls must remain intact. No new bot commands are in scope.
+- Validation run on 2026-10-26 passed the focused Phase 7 tests (12/12), full test suite (276/276), UI/workbench/docs checks and all three builds. It also exposed a syntax error in the Dairy/Flock manual-summary handlers and MUF dictionary drift from inline Agri Urdu labels. Both are fixed in follow-up commits; rerun `check-sync` and `check-farms` before closure.
 - Implementation and acceptance tests are not complete yet. Do not mark this phase Done until the farm-B / unlinked-chat / farm-A-summary regression passes.
 
 ## Implementation checkpoint (2026-10-26)
