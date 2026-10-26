@@ -30,9 +30,17 @@ One shared place decides where photos are stored and how big they may be, so the
 3. Add per-app MongoDB store bindings and migrate existing upload/read/delete flows without changing stored data or URLs. (Flock routes integrated; farm-scoped orphan-reference discovery added for Flock; Dairy DailyLog, cow gallery/receipt payloads and Agri DiaryMedia/CropPhoto/Spray payloads accept the new photo-path format; legacy data URLs remain accepted. Client-side upload migration and automatic parent-record cleanup remain pending.)
 4. Add safe orphan cleanup, tests, and the shared-file parity check. (Flock production reference discovery and regression tests are now added; Dairy/Agri production reference discovery and record-deletion wiring remain pending.)
 
+## Client migration checkpoint (2026-10-26)
+
+A separate implementation branch now uploads Dairy DailyLog diary photos, Dairy/Agri diary-note photos, and Agri crop diary photos through `POST /api/photos` before saving the returned photo path. Existing record field names are preserved. Shared diary components now load protected photo paths through authenticated blob requests, and the shared component copies remain byte-identical.
+
+`tests/photo-client-migration.test.ts` was added to cover shared component parity and the migrated client contracts. It has **not yet been run**. No command-line checks or builds have been executed against this checkpoint in the current editing session.
+
+Still pending: Agri receipts and remaining spray/crop image fields, Dairy cow-gallery photo migration, complete parent-record deletion cleanup, production orphan-reference discovery, broader app-level regression coverage, and the full required command sequence.
+
 ## New command-line check
 
-`tests/muf-storage.test.ts`: a fake store proves save, read, delete, size-limit refusal, wrong-type refusal and orphan cleanup, and `check-sync` proves the three copies are identical.
+`tests/muf-storage.test.ts` proves save, read, delete, size-limit refusal, wrong-type refusal and orphan cleanup with a fake store. `tests/photo-client-migration.test.ts` covers the Dairy/Agri photo-client migration contracts and byte-identical shared diary components. `check-sync` also proves the backend storage twins are identical.
 
 ## Command-line checks at the end of this phase
 

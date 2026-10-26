@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 8: Flock farm-safe cleanup and Dairy/Agri farm-scoped photo endpoints committed; client upload migration, regression tests and local verification pending).
+Last updated: 2026-10-26 (Phase 8 client migration underway on `phase-8-photo-client-migration`; focused regression test added, command-line verification pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -55,6 +55,10 @@ Phase 8 is **In progress**. Audited the current photo paths: Flock stores upload
 **Owner-reported Phase 8 verification update (Windows CMD, 2026-10-26):** after pulling commit `f45be76`, the owner ran `npm test -- tests/muf-storage.test.ts` (8/8 passed), `npm run check-sync` (passed, including the three storage twins), `npm run check-docs` (passed), `npm test` (31 files, 284 tests passed), `npm run check-ui` (passed), `npm run check-workbench` (23 checks passed), `npm run check-farms` (passed), and `tools\\build-all.bat` (Dairy, Flock and Agri builds succeeded). These are owner-supplied results, not independently executed in this editing session.
 
 **Still incomplete despite those passing checks:** the submitted commit integrates the adapter into Flock routes, but Dairy and Agri now expose farm-scoped photo asset endpoints and accept `/api/photos/:id` references alongside legacy inline data URLs, but existing clients have not yet been switched to upload through the adapter. Parent-record deletion cleanup remains incomplete; explicit asset deletion checks references in the active farm. Passing contract tests and builds do not prove those integrations exist. Phase 8 must remain **In progress** until those gaps are implemented, covered by regression tests, and the full check list is rerun.
+
+**Client migration checkpoint (2026-10-26; branch `phase-8-photo-client-migration`):** Dairy DailyLog diary photos and the Dairy/Agri independent diary-note photo flows now upload compressed image data through `POST /api/photos` before saving the returned path. Agri crop diary photos now use the same adapter and keep the existing `image_base64` API field name, whose value may now be a photo path. Shared diary components resolve authenticated `/api/photos/:id` paths through authenticated blob requests instead of exposing tokens in image URLs. The three copies of both shared diary components were updated identically. Added `tests/photo-client-migration.test.ts` for shared-file parity and the migrated client contracts.
+
+**Not yet verified:** no tests, sync checks, docs checks or builds have been executed against this branch in this editing session. The new test is committed but not run. Receipts, Dairy cow-gallery photos, Agri spray/crop-image paths outside the crop diary, parent-record deletion cleanup, and production orphan-reference discovery still need implementation. This is a partial client migration, not phase completion.
 
 MUF modules reused/created: existing client `muf-image.ts` compression helper was reviewed; created backend `muf-storage.mjs` twins. Keep the adapter focused and preserve each app's farm scoping, existing data format and image URL contract.
 

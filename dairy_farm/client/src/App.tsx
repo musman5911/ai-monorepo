@@ -38,6 +38,7 @@ import HealthTab from "./components/HealthTab";
 import ReportsTab from "./components/ReportsTab";
 import DiaryTab from "./components/DiaryTab";
 import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from "./muf/ui/muf-diary";
+import { compressDiaryPhoto } from "./muf/ui/muf-diary-media";
 import LaborTab from "./components/LaborTab";
 import HeaderSearch from "./muf/ui/muf-header-search";
 import OfflineBanner from "./muf/core/muf-offline-banner";
@@ -611,7 +612,8 @@ export default function App() {
       >
         <div className="space-y-5">
           <MufDiary entries={diaryEntries} onSave={saveDiaryEntry} onDelete={deleteDiaryEntry}
-            entityOptions={diaryEntityOptions} shareTargets={diaryShareTargets} />
+            uploadPhoto={async (file) => { const compressed = await compressDiaryPhoto(file); const uploaded = await api.uploadPhoto(compressed.data); return uploaded.path; }}
+            resolvePhotoUrl={api.getPhotoObjectUrl} entityOptions={diaryEntityOptions} shareTargets={diaryShareTargets} />
           <details className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
             <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist')}</summary>
             <div className="mt-4"><DiaryTab checklistOnly /></div>

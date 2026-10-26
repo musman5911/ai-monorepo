@@ -9,6 +9,7 @@ import * as api from './api';
 import { AGRI_LIST_PAGE_SIZE, mergeAgriPageRows, getAgriPageTotal } from './components/app/agri-list-paging';
 import DetailModal from './muf/core/muf-modal';
 import MufDiary, { type MufDiaryEntry } from './muf/ui/muf-diary';
+import { compressDiaryPhoto } from './muf/ui/muf-diary-media';
 import AdminMenu from './components/AdminMenu';
 import MufFab from './muf/core/muf-fab';
 import MufWorkerPanel from './muf/ui/muf-worker-panel';
@@ -6255,6 +6256,8 @@ function App() {
           entries={diaryEntries}
           onSave={saveDiaryEntry}
           onDelete={deleteDiaryEntry}
+          uploadPhoto={async (file) => { const compressed = await compressDiaryPhoto(file); const uploaded = await api.uploadPhoto(compressed.data); return uploaded.data.path; }}
+          resolvePhotoUrl={api.getPhotoObjectUrl}
           entityOptions={[
             ...crops.map((item) => ({ id: String(item._id || item.id), type: 'crop', label: item.name || L('Crop') })),
             ...laborers.map((item) => ({ id: String(item._id || item.id), type: 'labor', label: item.name || L('Laborer') })),

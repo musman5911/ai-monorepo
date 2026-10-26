@@ -131,15 +131,18 @@ interface Props {
   onChange: (next: DiaryPhoto[]) => void | Promise<void>;
   /** false = view only. */
   canEdit?: boolean;
-  /** Optional: upload the file yourself and return its URL (flock). Otherwise the photo is shrunk and embedded. */
+  /** Optional: upload the file yourself and return its stored path. */
   uploadPhoto?: (file: File) => Promise<string>;
+  /** Resolve authenticated photo paths to temporary browser object URLs. */
+  resolvePhotoUrl?: (path: string) => Promise<string>;
   /** Also show device-only voice notes (apps without server voice notes pass true). */
   allowVoice?: boolean;
 }
 
-export default function MufDiaryMedia({ date, photos, onChange, canEdit = true, uploadPhoto, allowVoice = false }: Props) {
+export default function MufDiaryMedia({ date, photos, onChange, canEdit = true, uploadPhoto, resolvePhotoUrl, allowVoice = false }: Props) {
   const confirm = useConfirm();
   const [current, setCurrent] = useState<DiaryPhoto[]>(photos);
+  const [photoUrls, setPhotoUrls] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
   const [viewing, setViewing] = useState<DiaryPhoto | null>(null);
   const [voices, setVoices] = useState<VoiceItem[]>([]);
@@ -149,6 +152,37 @@ export default function MufDiaryMedia({ date, photos, onChange, canEdit = true, 
   const camRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => setCurrent(photos), [photos]);
+  useEffect(() => {
+    if (!resolvePhotoUrl) return;
+    let cancelled = false;
+    const created: string[] = [];
+    const load = async () => {
+      const pairs = await Promise.all(current
+        .filter((photo) => photo.data.startsWith('/api/photos/'))
+        .map(async (photo) => {
+          try {
+            const url = await resolvePhotoUrl(photo.data);
+            created.push(url);
+            return [photo.id, url] as const;
+          } catch {
+            return [photo.id, ''] as const;
+          }
+        }));
+      if (cancelled) {
+        created.forEach((url) => URL.revokeObjectURL(url));
+        return;
+      }
+      setPhotoUrls((previous) => {
+        Object.values(previous).forEach((url) => URL.revokeObjectURL(url));
+        return Object.fromEntries(pairs.filter(([, url]) => Boolean(url)));
+      });
+    };
+    void load();
+    return () => {
+      cancelled = true;
+      created.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [current, resolvePhotoUrl]);
 
   const refreshVoice = useCallback(async () => {
     if (!allowVoice) return;
@@ -252,7 +286,7 @@ export default function MufDiaryMedia({ date, photos, onChange, canEdit = true, 
         <div className="muf-diary-grid">
           {current.map((p) => (
             <button key={p.id} type="button" className="muf-diary-thumb" onClick={() => setViewing(p)} aria-label={L('Open photo')}>
-              <img src={p.data} alt="" loading="lazy" />
+              <img src={photoUrls[p.id] || p.data} alt="" loading="lazy" />
             </button>
           ))}
         </div>
@@ -294,7 +328,7 @@ export default function MufDiaryMedia({ date, photos, onChange, canEdit = true, 
       <DetailModal open={!!viewing} onClose={() => setViewing(null)} title={L('Photo')} subtitle={date} size="small">
         {viewing && (
           <div className="muf-diary-viewer">
-            <img src={viewing.data} alt={L('Diary photo')} />
+            <img src={photoUrls[viewing.id] || viewing.data} alt={L('Diary photo')} />
             <p className="muf-diary-hint">{fmtBytes(viewing.bytes)}</p>
             {canEdit && (
               <button type="button" className="muf-btn muf-btn-danger" onClick={() => void removePhoto(viewing)}>

@@ -27,6 +27,9 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phase-21-final-testing-live-and-signoff.md) |
 
+
+Phase 8 remains **In progress**. The active `phase-8-photo-client-migration` branch now migrates Dairy/Agri diary and Agri crop-diary photo uploads to the adapter; its new regression test and required checks have not yet been run. See [Phase 8 details](phase-08-photo-storage-adapter.md).
+
 ## How a phase runs
 
 1. Open the phase file, set the status to `In progress`, and update `docs/PROGRESS.md`.

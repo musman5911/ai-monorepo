@@ -37,17 +37,49 @@ interface Props {
   entityOptions?: MufDiaryChoice[];
   shareTargets?: MufDiaryChoice[];
   uploadPhoto?: (file: File) => Promise<string>;
+  resolvePhotoUrl?: (path: string) => Promise<string>;
   readOnly?: boolean;
 }
 
 const makeId = (prefix: string) => prefix + '-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
 const linkKey = (link?: MufDiaryLink | null) => link ? link.type + ':' + link.id : '';
 
-export default function MufDiary({ entries, onSave, onDelete, entityOptions = [], shareTargets = [], uploadPhoto, readOnly = false }: Props) {
+export default function MufDiary({ entries, onSave, onDelete, entityOptions = [], shareTargets = [], uploadPhoto, resolvePhotoUrl, readOnly = false }: Props) {
   const confirm = useConfirm();
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingExisting, setEditingExisting] = useState(false);
   const [draft, setDraft] = useState<MufDiaryEntry>(() => ({ id: '', date: mufToday(), note: '', photos: [] }));
+  const [photoUrls, setPhotoUrls] = useState<Record<string, string>>({});
+  useEffect(() => {
+    if (!resolvePhotoUrl) return;
+    let cancelled = false;
+    const created: string[] = [];
+    const paths = [...entries.flatMap((entry) => entry.photos || []), ...(draft.photos || [])]
+      .map((photo) => photo.data)
+      .filter((path, index, all) => path.startsWith('/api/photos/') && all.indexOf(path) === index);
+    void Promise.all(paths.map(async (path) => {
+      try {
+        const url = await resolvePhotoUrl(path);
+        created.push(url);
+        return [path, url] as const;
+      } catch {
+        return [path, ''] as const;
+      }
+    })).then((pairs) => {
+      if (cancelled) {
+        created.forEach((url) => URL.revokeObjectURL(url));
+        return;
+      }
+      setPhotoUrls((previous) => {
+        Object.values(previous).forEach((url) => URL.revokeObjectURL(url));
+        return Object.fromEntries(pairs.filter(([, url]) => Boolean(url)));
+      });
+    });
+    return () => {
+      cancelled = true;
+      created.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [entries, draft.photos, resolvePhotoUrl]);
   const [selectedLink, setSelectedLink] = useState('');
   const [busy, setBusy] = useState(false);
   const [recording, setRecording] = useState(false);
@@ -331,7 +363,7 @@ export default function MufDiary({ entries, onSave, onDelete, entityOptions = []
               <div className="muf-note-photo-grid">
                 {draft.photos.map((photo) => (
                   <div key={photo.id} className="relative">
-                    <button type="button" onClick={() => openFullPhoto(photo)} className="muf-note-photo"><img src={photo.data} alt="" className="h-full w-full object-cover" /></button>
+                    <button type="button" onClick={() => openFullPhoto(photo)} className="muf-note-photo"><img src={photoUrls[photo.data] || photo.data} alt="" className="h-full w-full object-cover" /></button>
                     {!readOnly && <button type="button" onClick={() => removeDraftPhoto(photo.id)} className="muf-btn-icon absolute right-1 top-1" aria-label={L('Remove photo')}><X className="h-3 w-3" /></button>}
                   </div>
                 ))}
@@ -369,7 +401,7 @@ export default function MufDiary({ entries, onSave, onDelete, entityOptions = []
           <p className="muf-note-viewer-text">{viewing.note || L('No written note.')}</p>
           {viewing.linkedEntity && <p className="inline-flex items-center gap-1 rounded-full bg-green-50 px-3 py-1.5 text-xs font-semibold text-green-800 dark:bg-green-950/40 dark:text-green-300"><Link2 className="h-3.5 w-3.5" /> {L('Linked to')}: {viewing.linkedEntity.label}</p>}
           {viewing.voiceBase64 && <div className="rounded-xl bg-slate-50 p-3 dark:bg-slate-900"><p className="mb-2 text-xs font-semibold"><Volume2 className="mr-1 inline h-4 w-4" />{L('Voice note')}</p><audio controls src={viewing.voiceBase64} className="w-full" /></div>}
-          {viewing.photos?.length > 0 && <div className="muf-note-photo-grid">{viewing.photos.map((photo) => <button key={photo.id} type="button" onClick={() => { openFullPhoto(photo); setShareTarget(''); }} className="muf-note-viewer-photo"><img src={photo.data} alt={L('Note photo')} className="h-full w-full object-cover" /></button>)}</div>}
+          {viewing.photos?.length > 0 && <div className="muf-note-photo-grid">{viewing.photos.map((photo) => <button key={photo.id} type="button" onClick={() => { openFullPhoto(photo); setShareTarget(''); }} className="muf-note-viewer-photo"><img src={photoUrls[photo.data] || photo.data} alt={L('Note photo')} className="h-full w-full object-cover" /></button>)}</div>}
           <div className="muf-note-actions">
             {!readOnly && <button type="button" onClick={() => editEntry(viewing)} className="muf-btn muf-btn-primary"><Pencil className="h-4 w-4" /> {L('Edit note')}</button>}
             {!readOnly && <button type="button" onClick={() => void deleteEntry(viewing)} className="muf-btn muf-btn-danger"><Trash2 className="h-4 w-4" /> {L('Delete note')}</button>}
@@ -393,7 +425,7 @@ export default function MufDiary({ entries, onSave, onDelete, entityOptions = []
             <button ref={photoCloseRef} type="button" onClick={() => setFullPhoto(null)} className="rounded-full bg-white/15 p-2.5 hover:bg-white/25" aria-label={L('Close photo')}><X className="h-5 w-5" /></button>
           </div>
           <div className="muf-photo-viewer-image" onClick={(e) => e.stopPropagation()}>
-            <img src={fullPhoto.data} alt={L('Note photo')} />
+            <img src={photoUrls[fullPhoto.data] || fullPhoto.data} alt={L('Note photo')} />
           </div>
           <div className="muf-photo-viewer-toolbar">
             {shareTargets.length > 0 && <select value={shareTarget} onChange={(e) => setShareTarget(e.target.value)} className="muf-field max-w-full">
@@ -401,7 +433,7 @@ export default function MufDiary({ entries, onSave, onDelete, entityOptions = []
               {shareTargets.map((target) => <option key={target.type + ':' + target.id} value={target.type + ':' + target.id}>{target.label} · {L(target.type)}</option>)}
             </select>}
             <button type="button" onClick={() => void sharePhoto(fullPhoto)} className="muf-btn muf-btn-primary"><Share2 className="h-4 w-4" /> {L('Share')}</button>
-            <a href={fullPhoto.data} download={'note-photo-' + fullPhoto.date + '.jpg'} onClick={(e) => e.stopPropagation()} className="muf-btn muf-btn-soft"><Download className="h-4 w-4" /> {L('Download')}</a>
+            <a href={photoUrls[fullPhoto.data] || fullPhoto.data} download={'note-photo-' + fullPhoto.date + '.jpg'} onClick={(e) => e.stopPropagation()} className="muf-btn muf-btn-soft"><Download className="h-4 w-4" /> {L('Download')}</a>
           </div>
           <p className="pt-2 text-center text-[10px] text-white/60">{L('For local photos, Share opens your device sharing options when supported. WhatsApp sharing uses the selected contact and note text.')}</p>
         </div>

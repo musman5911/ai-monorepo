@@ -170,7 +170,26 @@ function qs(params?: Record<string, string | undefined>): string {
   return s ? '?' + s : '';
 }
 
+
+export async function uploadPhoto(data: string): Promise<{ id: string; path: string }> {
+  return req('/photos', { method: 'POST', body: JSON.stringify({ data }) });
+}
+
+export async function getPhotoObjectUrl(path: string): Promise<string> {
+  const token = getToken();
+  const response = await fetch(BASE + path.replace(/^\/api/, ''), {
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(safeGet('muf_active_farm_dairy') ? { 'X-Farm-Id': safeGet('muf_active_farm_dairy')! } : {}),
+    },
+  });
+  if (!response.ok) throw new Error('Could not load photo');
+  return URL.createObjectURL(await response.blob());
+}
+
 export const api = {
+  uploadPhoto,
+  getPhotoObjectUrl,
   // Auth
   checkSetup: () => req('/auth/check'),
   setup: (username: string, password: string, email?: string) =>
