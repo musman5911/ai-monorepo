@@ -20,7 +20,8 @@ describe('Cloudinary photo client', () => {
       expect(source).toContain("provider: 'mongodb'");
       expect(source).toContain('Cloudinary credentials are incomplete');
       expect(source).toContain("remoteUrl.hostname !== 'res.cloudinary.com'");
-      expect(source).toContain("image.provider === 'cloudinary'");
+      expect(source).toContain("provider === 'cloudinary'");
+      expect(source).toContain('storage().delete(req.params.id)');
     }
   });
   it('detects complete configuration without exposing credentials', () => {
