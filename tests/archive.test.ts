@@ -8,6 +8,8 @@ const read = (file: string) => readFileSync(path.join(root, file), 'utf8');
 describe('Phase 11 shared archive server contracts', () => {
   const shared = read('shared/muf-yearly-archive.mjs');
   const dairyDb = read('dairy_farm/backend/db.js');
+  const flockDb = read('flock_farm/backend/db.js');
+  const agriDb = read('agri_farm/backend/db.js');
   const dairyRoute = read('dairy_farm/backend/routes/archive.js');
   const flockRoute = read('flock_farm/backend/routes/archive.js');
   const agriRoute = read('agri_farm/backend/routes/archive.js');
@@ -21,6 +23,10 @@ describe('Phase 11 shared archive server contracts', () => {
   });
   it('registers Dairy archive job and snapshot models as farm-scoped in both DB modes', () => {
     for (const s of ['const ArchiveJobSchema = new mongoose.Schema','const ArchiveRecordSchema = new mongoose.Schema','ArchiveJob: ArchiveJobSchema','ArchiveRecord: ArchiveRecordSchema',"ArchiveJob = mongoose.model('ArchiveJob', ArchiveJobSchema)","ArchiveRecord = mongoose.model('ArchiveRecord', ArchiveRecordSchema)",'ArchiveJob, ArchiveRecord']) expect(dairyDb).toContain(s);
+  });
+  it('registers Flock and Agri archive models in memory and real database modes', () => {
+    for (const s of ["const ArchiveJob = mongoose.model('MufArchiveJob', ArchiveJobSchema)", "const ArchiveRecord = mongoose.model('MufArchiveRecord', ArchiveRecordSchema)", 'MufArchiveJob: ArchiveJob', 'MufArchiveRecord: ArchiveRecord', 'export { Farm, User, ArchiveJob, ArchiveRecord']) expect(flockDb).toContain(s);
+    for (const s of ['ArchiveJob: ArchiveJobSchema', 'ArchiveRecord: ArchiveRecordSchema', 'ArchiveJob, ArchiveRecord', 'MUF_FARM_MODELS = {\n  ArchiveJob, ArchiveRecord']) expect(agriDb).toContain(s);
   });
   it('mounts archive routes in each app', () => {
     expect(dairyRoute).toContain('ArchiveJob');
@@ -54,8 +60,10 @@ describe('Phase 11 shared archive server contracts', () => {
     expect(shared).toContain("router.post('/jobs/:jobId/restore'");
     expect(shared).toContain('A conflicting active record exists');
   });
-  it('keeps the disposable Dairy runtime check in standard farm checks', () => {
-    expect(pkg.scripts?.['check-archive']).toBe('node tools/check-dairy-archive.js');
-    expect(read('tools/check-dairy-archive.js')).toContain('Archive farm A does not remove farm B records');
+  it('runs disposable archive runtime checks for all three apps', () => {
+    expect(pkg.scripts?.['check-archive']).toBe('node tools/check-dairy-archive.js && node tools/check-flock-archive.js && node tools/check-agri-archive.js');
+    expect(read('tools/check-dairy-archive.js')).toContain('archived expense leaves active list');
+    expect(read('tools/check-flock-archive.js')).toContain('Flock batch feed-cost total excludes archived log');
+    expect(read('tools/check-agri-archive.js')).toContain('Agri analytics totals exclude archived finance');
   });
 });
