@@ -57,6 +57,39 @@ describe('Phase 12 yearly archive screens', () => {
     expect(agri).toContain("value: 'finance'");
   });
 
+  it('waits for the server export marker before enabling execution and clears stale confirmations', () => {
+    const source = read(panels[0]);
+    expect(source).toContain('refreshedJob?.exportDownloaded');
+    expect(source).toContain('window.setTimeout(resolve, 250)');
+    expect(source).toContain("{prepared.collection}");
+    expect(read('shared/muf-yearly-archive.mjs')).toContain("res.once('finish'");
+  });
+
+  it('provides Urdu dictionary entries for the archive workflow labels', () => {
+    const source = read(panels[0]);
+    const dictionaryFiles = [
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-1.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-2.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-3.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-4.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-5.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-6.ts',
+    ].map(read).join('\\n');
+    for (const label of [
+      'Yearly Archive', 'Prepare archive snapshot', 'Preview eligible records',
+      'Download archive export', 'Archive history', 'Confirm archive',
+      'Confirm restore', 'Include archived records in this report',
+      'Off by default. Existing active-data reports are not changed.',
+    ]) {
+      expect(source).toContain("L('" + label + "')");
+      expect(dictionaryFiles).toContain(JSON.stringify(label) + ':');
+    }
+    for (const file of [
+      'flock_farm/client/src/muf/data/muf-urdu-terms-6.ts',
+      'agri_farm/frontend/src/muf/data/muf-urdu-terms-6.ts',
+    ]) expect(read(file)).toBe(read('dairy_farm/client/src/muf/data/muf-urdu-terms-6.ts'));
+  });
+
   it('keeps the three archive panels byte-identical', () => {
     expect(read(panels[1])).toBe(read(panels[0]));
     expect(read(panels[2])).toBe(read(panels[0]));
