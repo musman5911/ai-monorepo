@@ -1,6 +1,6 @@
 # Phase 10: Smaller downloads and faster screens
 
-**Status:** Done for command-line scope
+**Status:** Done
 
 ## Goal
 
