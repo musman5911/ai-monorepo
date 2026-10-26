@@ -23,7 +23,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Done | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
-| 9 | Cloudinary photo store | In progress | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
+| 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Not started | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
@@ -50,7 +50,7 @@ Phases 1 to 6 are **Done for the command-line scope**. On 2026-10-25, the owner 
 
 **Phase 8 is Done for command-line scope (2026-10-26):** owner-supplied Windows CMD output confirms the focused photo suite passed (5 files, 30 tests), the full suite passed (36 files, 301 tests), sync/UI/workbench (23 checks)/farm/docs checks passed, all three production builds succeeded, and the optional workbench runtime smoke test passed (8/8). The final `check-docs` result was against the documentation snapshot before this update, so rerun it after pulling. `npm ci` was not run; existing dependencies were used. The initial Dairy photo-delete failure was fixed by adding model-level `deleteOne(filter)` support to Dairy and Flock memory adapters. These are owner-reported results, not independently executed here. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21.
 
-**Phase 9 is In progress (2026-10-26):** added a signed Cloudinary client, optional Cloudinary environment settings in all three backends and `.env.example` files, route integration for Dairy/Agri/Flock, MongoDB fallback when credentials are incomplete, local metadata IDs to preserve existing API paths, authenticated proxy reads for Cloudinary-backed photos, and remote deletion during supported orphan cleanup. Cloudinary Free plan limits were checked against official docs. The new mocked client test has not been run yet, and route-level fallback tests plus all standard checks/builds remain pending. No live uploads or secrets in Git.
+**Phase 9 is Done for command-line scope (2026-10-26):** the focused photo suite passed (6 files, 36 tests) and the full suite passed (37 files, 307 tests). Sync, UI, workbench, farm, docs, all three production builds, and the optional workbench runtime smoke test passed. The implementation provides a signed Cloudinary client, optional credentials across Dairy/Agri/Flock, MongoDB fallback, authenticated proxy reads, and remote deletion during supported cleanup. No live credentials or uploads were used. **Next: Phase 10, Smaller downloads and faster screens.**
 
 ## Why this order
 
