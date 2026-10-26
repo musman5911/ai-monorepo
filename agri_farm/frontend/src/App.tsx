@@ -10,10 +10,10 @@ import { AGRI_LIST_PAGE_SIZE, mergeAgriPageRows, getAgriPageTotal } from './comp
 import DetailModal from './muf/core/muf-modal';
 import MufDiary, { type MufDiaryEntry } from './muf/ui/muf-diary';
 import { compressDiaryPhoto } from './muf/ui/muf-diary-media';
-import AdminMenu from './components/AdminMenu';
+const AdminMenu = React.lazy(() => import('./components/AdminMenu'));
 import MufFab from './muf/core/muf-fab';
-import MufWorkerPanel from './muf/ui/muf-worker-panel';
-import ImageUploader from './components/ImageUploader';
+const MufWorkerPanel = React.lazy(() => import('./muf/ui/muf-worker-panel'));
+const ImageUploader = React.lazy(() => import('./components/ImageUploader'));
 import { L, getLang, setCurrentLang } from './i18n';
 import { openMufPrint, mufEsc } from './muf/data/muf-print';
 
@@ -21,7 +21,7 @@ import { zakatStatementBody, ushrStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, US
 import { downloadFarmBookPdf } from './muf/domain/muf-farmbook';
 import HeaderSearch from './muf/ui/muf-header-search';
 import OfflineBanner from './muf/core/muf-offline-banner';
-import FarmProfileCard from './muf/ui/muf-farm-profile';
+const FarmProfileCard = React.lazy(() => import('./muf/ui/muf-farm-profile'));
 import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf/core/muf-applike';
 const MufAreaChart = React.lazy(() => import('./muf/ui/muf-charts').then((module) => ({ default: module.MufAreaChart })));
 import { MufCountUpText } from './muf/core/muf-applike';
@@ -29,16 +29,16 @@ import { mufToday, mufMonth } from './muf/data/muf-date';
 import { mufStoryNet, mufVerdictText, mufDaysBetween } from './muf/data/muf-story';
 import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from './muf/data/muf-compare';
 import FormOverlay from './muf/core/muf-form-overlay';
-import CropOpsPanel from './components/CropOpsPanel';
-import PhotoImage from './components/PhotoImage';
-import LaborBoard from './components/LaborBoard';
-import LedgerBookForm from './components/LedgerBookForm';
-import AgriFieldsPanel from './components/AgriFieldsPanel';
-import SupplierKhata from './components/SupplierKhata';
+const CropOpsPanel = React.lazy(() => import('./components/CropOpsPanel'));
+const PhotoImage = React.lazy(() => import('./components/PhotoImage'));
+const LaborBoard = React.lazy(() => import('./components/LaborBoard'));
+const LedgerBookForm = React.lazy(() => import('./components/LedgerBookForm'));
+const AgriFieldsPanel = React.lazy(() => import('./components/AgriFieldsPanel'));
+const SupplierKhata = React.lazy(() => import('./components/SupplierKhata'));
 import { useConfirm } from './muf/core/muf-confirm';
-import MufEntityGrid from './muf/ui/muf-entity-grid';
-import AgriCropCsvImport from './components/AgriCropCsvImport';
-import AgriBulkCsvImport from './components/AgriBulkCsvImport';
+const MufEntityGrid = React.lazy(() => import('./muf/ui/muf-entity-grid'));
+const AgriCropCsvImport = React.lazy(() => import('./components/AgriCropCsvImport'));
+const AgriBulkCsvImport = React.lazy(() => import('./components/AgriBulkCsvImport'));
 import {
   getEmptyCropForm, getEmptyFinForm, getEmptyTaskForm,
   formatCurrency, cropImageMap, getCropImage, getCropProgress,
@@ -2843,6 +2843,7 @@ function App() {
 
   // --- RENDER MAIN INTERFACE ---
   return (
+    <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center text-sm text-slate-500">{L('Loading section…')}</div>}>
     <div className={`muf-app min-h-screen flex flex-col transition-colors duration-300 text-xs sm:text-sm md:text-base ${
       isDark ? 'bg-[#070b13] text-slate-100' : 'bg-[#fcfaf2] text-[#1c1917]'
     }`}>
@@ -6282,6 +6283,7 @@ function App() {
       </DetailModal>
 
     </div>
+    </React.Suspense>
   );
 }
 
