@@ -2,6 +2,7 @@ import { randomUUID } from 'crypto';
 import express from 'express';
 const router = express.Router();
 import { Expense, Health, Cow } from '../db.js';
+import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 import { protect, adminOnly, workerOrAdmin } from '../middleware/auth.js';
 import {
   readString,
@@ -101,6 +102,7 @@ router.delete('/:id', protect, adminOnly, async (req, res) => {
     }
 
     await exp.deleteOne();
+    await cleanupOrphanPhotoAssets();
     res.json({ deleted: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
