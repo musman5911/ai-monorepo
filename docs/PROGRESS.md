@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 11 three-app archive runtime checks passed; standard checks and builds pending).
+Last updated: 2026-10-26 (Phase 11 complete for command-line scope; owner-reported archive, regression, safety, documentation and build checks passed).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -21,7 +21,7 @@ Last updated: 2026-10-26 (Phase 11 three-app archive runtime checks passed; stan
 | 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
-| 11 | Yearly archive for old records: server | In progress | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
+| 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
@@ -43,18 +43,25 @@ Phase 7 is **Done for command-line scope**. These are results supplied by the ow
 
 Audit focus: preserve existing webhook secret validation and current bot commands; trace each app's farm context and data stores before changing record writes, daily summary and monthly email flows. Required regression: farm B chat writes only to farm B, an unlinked chat creates nothing, and farm A summary excludes farm B data.
 
-## Phase 11 runtime verification checkpoint (owner-reported, 2026-10-26)
+## Phase 11 final verification (owner-reported, 2026-10-26)
 
-The owner ran `npm run check-archive` in Windows CMD after commits through `a68ac60`. Dairy milk and expenses, Flock batch-feed logs, and Agri finance archive runtime checks all passed. The checks verified export-before-delete, active-list and totals exclusion after archiving, farm isolation, and restoration of records and totals. Node emitted non-blocking `MODULE_TYPELESS_PACKAGE_JSON` warnings for the three checker `.js` files, which use ES module syntax.
+Phase 11, Yearly archive for old records: server, is **Done for command-line scope**. The owner supplied Windows CMD output from `F:\\PROJECTS\\dairy\\muf-monorepo` on branch `muf-monorepo`. These results were run by the owner and were not independently executed in this documentation-editing session.
 
 | Command/check | Result |
 |---|---|
-| `npm run check-archive` | Passed: Dairy milk/expenses, Flock batch-feed logs, Agri finance; active lists, totals, farm isolation, export, and restore assertions all passed |
-| `npm test` | Passed: 39 files, 320 tests (owner-reported 2026-10-26) |
-| `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs` | Pending for this Phase 11 checkpoint |
-| `tools\\build-all.bat` | Pending: Dairy, Flock and Agri production builds |
+| `npm run check-archive` | Passed: Dairy milk and expenses, Flock batch-feed logs, and Agri finance; export-before-delete, active-list exclusion, totals exclusion and restoration, and farm isolation verified |
+| `npm test` | Passed: 39 files, 320 tests, 0 failures |
+| `npm run check-sync` | Passed: shared MUF files and three-backend invariants |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: all 23 workbench source checks |
+| `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks |
+| `npm run check-docs` | Passed: phase files, status indexes, links and required sections consistent before this final documentation update |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `npm ci` | Not run; existing dependencies were used |
 
-Phase 11 remains **In progress** until the standard checks and three builds pass and their results are recorded. These are results supplied by the owner, not commands independently executed in this editing session.
+The archive runtime checks cover Dairy milk/expenses, Flock batch-feed logs, and Agri finance. They verify that archived records leave active lists and totals, other farms remain unchanged, and restore returns the original records and totals. The archive checkers emit non-blocking Node `MODULE_TYPELESS_PACKAGE_JSON` warnings because the `.js` files contain ES module syntax.
+
+This completes Phase 11 for its planned command-line scope. It does **not** claim real-MongoDB, browser/phone, or live-deployment validation; those remain explicitly assigned to Phases 19–21. Rerun `npm run check-docs` after pulling this documentation update.
 
 ## Phase 10 start (2026-10-26)
 
