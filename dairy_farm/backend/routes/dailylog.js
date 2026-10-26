@@ -36,7 +36,6 @@ router.get('/:date', protect, async (req, res) => {
     if (!log) {
       return res.json({ _id: req.params.date, date: req.params.date, checklist: [], notes: '', voiceNotes: [], photos: [], diaryEntries: [] });
     }
-    if (photos !== undefined || diaryEntries !== undefined) try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
     res.json(log);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -106,6 +105,10 @@ router.put('/:date', protect, async (req, res) => {
     const log = existing
       ? await DailyLog.findByIdAndUpdate(existing._id, { $set: update }, { new: true })
       : await DailyLog.create({ _id: `${req.farmContext.farmId}:${req.params.date}`, ...update });
+    if (photos !== undefined || diaryEntries !== undefined) {
+      try { await cleanupOrphanPhotoAssets(); }
+      catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
+    }
     res.json(log);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
