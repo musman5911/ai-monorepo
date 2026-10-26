@@ -45,7 +45,7 @@ Audit focus: preserve existing webhook secret validation and current bot command
 
 ## Phase 9 start (2026-10-26)
 
-Phase 9, Cloudinary photo store, is **In progress**. Initial implementation has been committed directly to `muf-monorepo`: signed Cloudinary REST client with injectable `fetch`, optional Cloudinary env configuration across Dairy/Flock/Agri, route integration using MongoDB metadata records to preserve existing local API paths, MongoDB fallback when credentials are incomplete, authenticated redirects for Cloudinary-backed reads, and Cloudinary-aware photo orphan/batch cleanup. Official Free plan limits are recorded in the Phase 9 document and deployment guide.
+Phase 9, Cloudinary photo store, is **In progress**. Initial implementation has been committed directly to `muf-monorepo`: signed Cloudinary REST client with injectable `fetch`, optional Cloudinary env configuration across Dairy/Flock/Agri, route integration using MongoDB metadata records to preserve existing local API paths, MongoDB fallback when credentials are incomplete, authenticated proxy reads for Cloudinary-backed photos, and Cloudinary-aware photo orphan/batch cleanup. Official Free plan limits are recorded in the Phase 9 document and deployment guide.
 
 **Not yet verified:** `tests/cloudinary-store.test.ts` has been added but not run; route-level fallback and old-photo compatibility coverage should be strengthened; `npm test`, `npm run check-sync`, UI/workbench/farm/docs checks, and all three production builds have not been run against this change. Phase 9 remains In progress until the owner runs the command sequence and any failures are fixed. No live Cloudinary credentials or uploads are part of this phase.
 
