@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 7 complete for command-line scope; real-world verification remains in Phases 19–21).
+Last updated: 2026-10-26 (Phase 8 started; shared photo-storage contract and tests/checks added, app integration pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -18,7 +18,7 @@ Last updated: 2026-10-26 (Phase 7 complete for command-line scope; real-world ve
 | 5 | Agri fields and crop cycles: server | Done | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Done | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
-| 8 | Photo storage adapter | Not started | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
+| 8 | Photo storage adapter | In progress | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Not started | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Not started | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
@@ -42,6 +42,19 @@ The owner approved Phase 7. Implemented farm-bound Telegram link codes and chat 
 Phase 7 is **Done for command-line scope**. These are results supplied by the owner, not commands independently executed in this editing session. `npm ci` and optional `npm run check-workbench-runtime` were not run. Real MongoDB, browser/phone, and live deployment verification remain in Phases 19–21.
 
 Audit focus: preserve existing webhook secret validation and current bot commands; trace each app's farm context and data stores before changing record writes, daily summary and monthly email flows. Required regression: farm B chat writes only to farm B, an unlinked chat creates nothing, and farm A summary excludes farm B data.
+
+## Phase 8 start (2026-10-26)
+
+Phase 8 is **In progress**. Audited the current photo paths: Flock stores uploaded images in the farm-scoped MongoDB `Image` model and serves `/api/images/:id`; Agri has inline DiaryMedia photos plus separate CropPhoto/Spray photo data; Dairy stores photos in farm-scoped DailyLog/cow-gallery data. These stores and URL/data shapes must remain compatible during migration.
+
+**Initial implementation checkpoint (committed on `muf-monorepo`):**
+- Added byte-identical `backend/muf-storage.mjs` contract modules in Dairy, Flock and Agri. The contract validates non-empty image bytes, enforces a default 100 KiB cap, allows JPEG/PNG/WebP only, checks file signatures against declared MIME types, and exposes save/read-link/delete/orphan-cleanup methods around an injected persistence adapter.
+- Added `tests/muf-storage.test.ts` covering save/read/delete, size and type rejection, signature mismatch, and orphan cleanup.
+- Extended `tools/check-muf-sync.js` to verify all three backend copies are byte-identical and expose the expected API.
+
+**Not yet complete:** per-app MongoDB persistence bindings and route migration; automatic cleanup integration with record deletion; execution of the new test and parity check; full command-line checks and all three builds. No tests or builds have been run in this editing session. The new shared contract is not yet wired into production upload/read/delete routes, so current application behavior is unchanged at this checkpoint.
+
+MUF modules reused/created: existing client `muf-image.ts` compression helper was reviewed; created backend `muf-storage.mjs` twins. Keep the adapter focused and preserve each app's farm scoping, existing data format and image URL contract.
 
 ## Phase 3 final local verification (2026-10-25, Windows CMD; output supplied by owner)
 
