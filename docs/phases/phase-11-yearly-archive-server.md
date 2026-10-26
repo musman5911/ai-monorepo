@@ -1,6 +1,6 @@
 # Phase 11: Yearly archive for old records: server
 
-**Status:** In progress
+**Status:** Done for command-line scope
 
 ## Goal
 
@@ -35,7 +35,11 @@ Old years of records can be archived and exported so the live data stays small a
 
 `tests/archive.test.ts` plus `tools/check-dairy-archive.js`, `tools/check-flock-archive.js`, and `tools/check-agri-archive.js`, exposed together as `npm run check-archive`. The runtime checks cover Dairy milk and expenses, Flock batch-feed logs, and Agri finance. They verify export-before-delete, active-list exclusion, aggregate totals dropping and returning on restore, and farm isolation. Owner-reported Windows CMD result (2026-10-26): `npm run check-archive` passed all three runtime checks, covering Dairy milk/expenses, Flock batch-feed logs, and Agri finance, including export-before-delete, active-list and totals exclusion, farm isolation, and restoration.
 
-Current implementation: the shared workflow in `shared/muf-yearly-archive.mjs` is wired to Dairy milk/expenses, all seven Flock batch-log collections, and Agri finance under `/api/archive`. Each app uses durable database snapshots and includes archive jobs/records in full and monthly backup payloads, with restore support. Snapshots are bounded to 5,000 records and 8 MiB per job; oversized jobs are rejected without removing active records. The expanded runtime checks have passed locally. The standard checks, documentation validation, and all three builds still need to be run locally before this phase can be marked done.
+Current implementation: the shared workflow in `shared/muf-yearly-archive.mjs` is wired to Dairy milk/expenses, all seven Flock batch-log collections, and Agri finance under `/api/archive`. Each app uses durable database snapshots and includes archive jobs/records in full and monthly backup payloads, with restore support. Snapshots are bounded to 5,000 records and 8 MiB per job; oversized jobs are rejected without removing active records.
+
+**Final command-line verification (owner-reported, 2026-10-26):** `npm run check-archive` passed all three app runtime checkers; `npm test` passed 39 files / 320 tests; `npm run check-sync`, `npm run check-ui`, `npm run check-workbench` (23 checks), `npm run check-farms`, `npm run check-docs`, and `tools\\build-all.bat` all passed. The three builds succeeded. These results were supplied by the owner and were not independently run in this editing session. `npm ci` was not run because dependencies were already installed. Node emitted non-blocking `MODULE_TYPELESS_PACKAGE_JSON` warnings for the archive checker scripts.
+
+Phase 11 is complete for command-line scope. Real MongoDB, browser/phone, and live-deployment validation are not claimed and remain in Phases 19–21.
 
 ## Command-line checks at the end of this phase
 
@@ -61,8 +65,9 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] Shared server workflow covers Dairy milk and expenses, all Flock batch-log collections, and Agri finance.
 - [x] Full and monthly backup payloads preserve archive jobs and snapshot records, with restore support in each app.
 - [x] The expanded three-app command-line archive checks pass in the current checkout (owner-reported `npm run check-archive` passed 2026-10-26).
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated after local verification.
+- [x] The standard checks above pass: `npm test`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs`, and `tools\\build-all.bat` (owner-reported 2026-10-26).
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md`, and `docs/phases/README.md` updated to record the final command-line results.
+- [x] Real-MongoDB, browser/phone, and live-deployment verification explicitly remain in Phases 19–21; no such verification is claimed for Phase 11.
 
 ## Rules for whoever works on this phase
 
