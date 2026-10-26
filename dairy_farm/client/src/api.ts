@@ -188,6 +188,8 @@ export async function getPhotoObjectUrl(path: string): Promise<string> {
 }
 
 export const api = {
+  uploadPhoto,
+  getPhotoObjectUrl,
   // Auth
   checkSetup: () => req('/auth/check'),
   setup: (username: string, password: string, email?: string) =>
