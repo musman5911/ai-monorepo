@@ -19,7 +19,7 @@ Last updated: 2026-10-26 (Phase 8 command-line verification passed; final docume
 | 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Done | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
-| 9 | Cloudinary photo store | Not started | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
+| 9 | Cloudinary photo store | In progress | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Not started | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
@@ -42,6 +42,12 @@ The owner approved Phase 7. Implemented farm-bound Telegram link codes and chat 
 Phase 7 is **Done for command-line scope**. These are results supplied by the owner, not commands independently executed in this editing session. `npm ci` and optional `npm run check-workbench-runtime` were not run. Real MongoDB, browser/phone, and live deployment verification remain in Phases 19–21.
 
 Audit focus: preserve existing webhook secret validation and current bot commands; trace each app's farm context and data stores before changing record writes, daily summary and monthly email flows. Required regression: farm B chat writes only to farm B, an unlinked chat creates nothing, and farm A summary excludes farm B data.
+
+## Phase 9 start (2026-10-26)
+
+Phase 9, Cloudinary photo store, is **In progress**. Initial implementation has been committed directly to `muf-monorepo`: signed Cloudinary REST client with injectable `fetch`, optional Cloudinary env configuration across Dairy/Flock/Agri, route integration using MongoDB metadata records to preserve existing local API paths, MongoDB fallback when credentials are incomplete, authenticated redirects for Cloudinary-backed reads, and Cloudinary-aware photo orphan/batch cleanup. Official Free plan limits are recorded in the Phase 9 document and deployment guide.
+
+**Not yet verified:** `tests/cloudinary-store.test.ts` has been added but not run; route-level fallback and old-photo compatibility coverage should be strengthened; `npm test`, `npm run check-sync`, UI/workbench/farm/docs checks, and all three production builds have not been run against this change. Phase 9 remains In progress until the owner runs the command sequence and any failures are fixed. No live Cloudinary credentials or uploads are part of this phase.
 
 ## Phase 8 final verification (2026-10-26)
 
