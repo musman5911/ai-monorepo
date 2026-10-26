@@ -11,7 +11,7 @@ function photoBytes(value) {
   if (Buffer.isBuffer(value)) return value;
   if (value instanceof Uint8Array || Array.isArray(value)) return Buffer.from(value);
   if (value && typeof value === 'object') {
-    const indexes = Object.keys(value).filter((key) => /^\\d+$/.test(key)).sort((a, b) => Number(a) - Number(b));
+    const indexes = Object.keys(value).filter((key) => /^\d+$/.test(key)).sort((a, b) => Number(a) - Number(b));
     if (indexes.length) return Buffer.from(indexes.map((key) => Number(value[key])));
     if (value.type === 'Buffer' && Array.isArray(value.data)) return Buffer.from(value.data);
   }
