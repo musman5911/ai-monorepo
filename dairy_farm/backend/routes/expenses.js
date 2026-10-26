@@ -85,6 +85,7 @@ router.put('/:id', protect, workerOrAdmin, async (req, res) => {
       await Cow.findByIdAndUpdate(exp._purchaseCowId, { $set: { purchasePrice: payload.amount } });
     }
 
+    await cleanupOrphanPhotoAssets();
     res.json(exp);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
