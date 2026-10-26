@@ -11,6 +11,7 @@ let baseUrl = '';
 let ownerToken = '';
 let workerToken = '';
 let managerToken = '';
+let serverOutput = '';
 const created = { crops: [], tasks: [], finance: [], fields: [] };
 
 async function reservePort() {
@@ -87,8 +88,14 @@ describe.sequential('Agri runtime API integration', () => {
         TELEGRAM_BOT_TOKEN: '',
         LOG_REQUESTS: '0',
       },
-      stdio: 'ignore',
+      stdio: ['ignore', 'pipe', 'pipe'],
     });
+    serverOutput = '';
+    const captureServerOutput = (chunk) => {
+      serverOutput = (serverOutput + chunk.toString()).slice(-12000);
+    };
+    serverProcess.stdout.on('data', captureServerOutput);
+    serverProcess.stderr.on('data', captureServerOutput);
     await waitUntilReady();
     ownerToken = await login('admin', 'admin123');
     workerToken = await login('worker', 'worker123');
@@ -773,11 +780,21 @@ describe.sequential('Agri runtime API integration', () => {
     const photoPath = uploaded.data.path as string;
     const photoId = photoPath.split('/').pop() as string;
 
-    const anonymousRead = await fetch(`${baseUrl}${photoPath}`);
+    let anonymousRead;
+    try {
+      anonymousRead = await fetch(`${baseUrl}${photoPath}`);
+    } catch (error) {
+      throw new Error(`Anonymous photo read failed; server exit=${serverProcess?.exitCode}; server output:\n${serverOutput}\nOriginal error: ${String(error)}`);
+    }
     expect(anonymousRead.status).toBe(401);
-    const authenticatedRead = await fetch(`${baseUrl}${photoPath}`, {
-      headers: { Authorization: `Bearer ${ownerToken}` },
-    });
+    let authenticatedRead;
+    try {
+      authenticatedRead = await fetch(`${baseUrl}${photoPath}`, {
+        headers: { Authorization: `Bearer ${ownerToken}` },
+      });
+    } catch (error) {
+      throw new Error(`Authenticated photo read failed; server exit=${serverProcess?.exitCode}; server output:\n${serverOutput}\nOriginal error: ${String(error)}`);
+    }
     expect(authenticatedRead.status).toBe(200);
     expect(authenticatedRead.headers.get('content-type')).toContain('image/jpeg');
     expect(Buffer.from(await authenticatedRead.arrayBuffer()).equals(bytes)).toBe(true);
