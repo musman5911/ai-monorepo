@@ -52,6 +52,8 @@ describe('Phase 8 photo storage regression coverage', () => {
       expect(service).toContain('PhotoAsset.find({})');
       expect(service).toContain('/api\\/photos\\/');
       expect(service).toContain('PhotoAsset.deleteMany');
+      expect(service).toContain('60 * 60 * 1000');
+      expect(service).toContain('asset.createdAt');
     }
     expect(dairyService).toContain('Cow, Expense, DailyLog');
     expect(agriService).toContain('DiaryMedia, CropPhoto, Spray, Finance, Crop');
