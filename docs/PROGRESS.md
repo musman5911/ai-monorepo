@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 6 screen tests passing; Urdu label coverage remains).
+Last updated: 2026-10-26 (Phase 6 complete for command-line scope).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -16,7 +16,7 @@ Last updated: 2026-10-26 (Phase 6 screen tests passing; Urdu label coverage rema
 | 3 | Dairy breeding events: screens | Done | [phase-03-dairy-breeding-screens.md](phases/phase-03-dairy-breeding-screens.md) |
 | 4 | Dairy calves and lineage | Done | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
 | 5 | Agri fields and crop cycles: server | Done | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
-| 6 | Agri fields and crop cycles: screens | In progress | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
+| 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Not started | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Not started | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Not started | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
@@ -229,13 +229,21 @@ The owner supplied the output saved in `result.tx` from the latest Phase 6 scree
 **Pending:** rerun `npm test -- tests/agri-fields-screens.test.ts` and the full `npm test` after the assertion fix. Phase 6 remains **In progress** until those results are supplied and Urdu label coverage is checked. The pasted command-output file `result.tx` has been removed from the branch after review.
 
 
-## Phase 6 test-fix verification (2026-10-26; Windows CMD output supplied by owner)
+## Phase 6 final verification (2026-10-26; Windows CMD output supplied by owner)
 
-The owner pulled commit `2c55d81` and reran the focused test and full suite after the source-contract assertion was corrected.
+Phase 6, Agri fields and crop cycles screens, is **Done for the planned command-line scope**. The owner supplied these results from `F:\\PROJECTS\\dairy\\muf-monorepo` after pulling the test assertion fix:
 
 | Command/check | Result |
 |---|---|
 | `npm test -- tests/agri-fields-screens.test.ts` | Passed: 1 file, 4 tests |
 | `npm test` | Passed: 29 files, 264 tests, 0 failures |
+| `npm run check-docs` | Passed: all phase docs checks, links and status indexes |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `npm run check-sync` | Owner-reported passed before the final test-only assertion correction |
+| `npm run check-ui` | Owner-reported passed before the final test-only assertion correction |
+| `npm run check-workbench` | Owner-reported passed: 23 source checks, before the final test-only assertion correction |
+| `npm run check-farms` | Owner-reported passed: farm-scope and Dairy breeding-event runtime checks, before the final test-only assertion correction |
 
-These are owner-supplied local results. The other Phase 6 standard checks passed before the test assertion fix, as recorded above; they have not been rerun after this fix. Urdu coverage and browser behavior are not yet verified. Phase 6 remains **In progress**.
+The initial failure was a stale source-contract expectation; the API implementation correctly included its payload argument. The test assertion was corrected, and the owner supplied passing focused and full-suite results afterward. The final correction changed only the test expectation. Results are owner-reported, not commands independently run in this editing session.
+
+The Phase 6 checklist is complete for command-line scope. No browser/phone, real-MongoDB, or live-site verification is claimed; those remain in Phases 19 to 21. Phase 7, Telegram bot and daily summary per farm, is next.
