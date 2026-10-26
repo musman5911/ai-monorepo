@@ -360,7 +360,7 @@ router.post('/send-summary', authRequired, requireRole('admin'), async (_req, re
     if (!context) return res.status(403).json({ error: 'Farm context is required' });
     const allowed = context.mode === 'single' ? [context.farmId] : (context.farmIds || []);
     res.json(await pushDailySummary(true, allowed));
-  catch (e) { res.status(500).json({ error: e.message }); }
+  } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
 // ── cron-job.org: GET /api/telegram/cron?key=CRON_SECRET (evening ping) ──
