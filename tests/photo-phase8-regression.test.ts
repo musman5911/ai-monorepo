@@ -55,7 +55,11 @@ describe('Phase 8 photo storage regression coverage', () => {
       expect(service).toContain('PhotoAsset.find({})');
       expect(service).toContain('/api\\/photos\\/');
       expect(service).toContain('export async function discoverOrphanPhotoAssets()');
-      expect(service).toContain('PhotoAsset.deleteMany');
+      // Cloudinary-aware cleanup deletes each remote asset first, then removes
+      // its metadata record individually; deleteMany would bypass remote cleanup.
+      expect(service).toContain("PhotoAsset.deleteOne({ _id: id })");
+      expect(service).toContain("asset.provider === 'cloudinary'");
+      expect(service).toContain("cloudinary.destroy(asset.cloudinaryPublicId)");
       expect(service).toContain('60 * 60 * 1000');
       expect(service).toContain('asset.createdAt');
     }
