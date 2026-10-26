@@ -538,7 +538,7 @@ export default function AdminMenu(props: AdminMenuProps) {
                   settings={settings}
                 />
                 <YearlyArchivePanel
-                  isOwner={currentUser?.farmRole === 'owner' || currentUser?.role === 'admin'}
+                  isOwner={currentUser?.farmRole === 'owner'}
                   apiBase="/api"
                   collections={[
                     { value: 'batchFeedLogs', label: 'Batch feed logs' },
