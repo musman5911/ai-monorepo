@@ -18,6 +18,7 @@ export default function CropOpsPanel({
 }) {
   const isAdmin = userRole === 'admin';
   const [photos, setPhotos] = useState([]);
+  const [photoUrls, setPhotoUrls] = useState({});
   const [busy, setBusy] = useState(false);
 
   const loadPhotos = async () => {
@@ -33,6 +34,31 @@ export default function CropOpsPanel({
   useEffect(() => {
     loadPhotos();
   }, [crop?._id]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const created = [];
+    void Promise.all((photos || []).filter((photo) => typeof photo.image_base64 === 'string' && photo.image_base64.startsWith('/api/photos/'))
+      .map(async (photo) => {
+        try {
+          const url = await api.getPhotoObjectUrl(photo.image_base64);
+          created.push(url);
+          return [photo._id, url];
+        } catch {
+          return [photo._id, ''];
+        }
+      })).then((pairs) => {
+        if (cancelled) {
+          created.forEach((url) => URL.revokeObjectURL(url));
+          return;
+        }
+        setPhotoUrls(Object.fromEntries(pairs.filter(([, url]) => Boolean(url))));
+      });
+    return () => {
+      cancelled = true;
+      created.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [photos]);
 
   const handleAddPhoto = async (base64) => {
     if (!base64 || !isAdmin) return;
@@ -78,7 +104,7 @@ export default function CropOpsPanel({
         <div className="grid grid-cols-3 gap-2">
           {photos.map(photo => (
             <div key={photo._id} className="relative rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 bg-white">
-              <img src={photo.image_base64} alt={photo.label || 'Crop diary'} className="w-full h-24 object-cover" />
+              <img src={photoUrls[photo._id] || photo.image_base64} alt={photo.label || 'Crop diary'} className="w-full h-24 object-cover" />
               <div className="px-1.5 py-1 text-[9px] font-bold text-slate-600 dark:text-slate-300 bg-white/90 dark:bg-slate-900/80">
                 {photo.uploaded_at || '—'}{photo.label ? ` · ${photo.label}` : ''}
               </div>
