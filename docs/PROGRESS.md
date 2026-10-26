@@ -35,7 +35,7 @@ Last updated: 2026-10-26 (Phase 6 complete for command-line scope; docs check re
 
 ## Phase 7 start (2026-10-26)
 
-The owner approved starting Phase 7. Initial repository audit found Telegram routes and a shared admin panel in all three backends/frontends. Existing chat links are stored in app metadata/data storage, but the current link contract is chat-to-user/worker and does not include a farm assignment. Implementation is in progress; no Phase 7 acceptance check has passed yet.
+The owner approved Phase 7. Implemented farm-bound Telegram link codes and chat links, fail-closed handling for legacy links without `farmId`, MUF single-farm execution for linked webhooks, and per-farm scheduled summaries/settings in all three backends. Added identical `backend/muf-telegram-farms.mjs` twins, registered them in `tools/check-muf-sync.js`, and added `tests/telegram-farm-scope.test.ts`. These changes are committed, but local test/check/build results have not yet been supplied; Phase 7 remains In progress until validation passes. Monthly email behavior still needs a final scope audit before phase closure.
 
 Audit focus: preserve existing webhook secret validation and current bot commands; trace each app's farm context and data stores before changing record writes, daily summary and monthly email flows. Required regression: farm B chat writes only to farm B, an unlinked chat creates nothing, and farm A summary excludes farm B data.
 
