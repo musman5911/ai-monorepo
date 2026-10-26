@@ -137,7 +137,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
       document.body.appendChild(link);
       link.click();
       link.remove();
-      URL.revokeObjectURL(url);
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       setNotice(L('Export download started. Wait for the download to finish before executing the archive.'));
       let refreshedJob: ArchiveJob | undefined;
       for (let attempt = 0; attempt < 5; attempt += 1) {
@@ -230,16 +230,16 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
         <section className="space-y-3">
           <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{L('Prepare archive snapshot')}</h4>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Farm')}<select className={fieldClass} value={farmId} onChange={(e) => { setFarmId(e.target.value); setPrepared(null); setReportRecords([]); }} disabled={busy !== '' || farms.length === 0}>
+            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Farm')}<select className={fieldClass} value={farmId} onChange={(e) => { setFarmId(e.target.value); setPrepared(null); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); setReportJobId(''); setReportRecords([]); }} disabled={busy !== '' || farms.length === 0}>
                 <option value="">{L('Select farm')}</option>
                 {farms.map((farm) => <option key={farm._id || farm.id} value={farm._id || farm.id}>{farm.name}</option>)}
               </select>
             </label>
-            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Collection')}<select className={fieldClass} value={collection} onChange={(e) => setCollection(e.target.value)} disabled={busy !== ''}>
+            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Collection')}<select className={fieldClass} value={collection} onChange={(e) => { setCollection(e.target.value); setPrepared(null); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }} disabled={busy !== ''}>
                 {collections.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
               </select>
             </label>
-            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Retention period (years)')}<input className={fieldClass} type="number" min="1" max="100" step="1" value={retentionYears} onChange={(e) => setRetentionYears(e.target.value)} disabled={busy !== ''} />
+            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Retention period (years)')}<input className={fieldClass} type="number" min="1" max="100" step="1" value={retentionYears} onChange={(e) => { setRetentionYears(e.target.value); setPrepared(null); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }} disabled={busy !== ''} />
             </label>
           </div>
           <button type="button" className={`${buttonClass} bg-farm-600 text-white hover:bg-farm-700`} onClick={prepareArchive} disabled={busy !== '' || !farmId || collections.length === 0}>
@@ -252,6 +252,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{L('Snapshot preview')}</h4>
             <dl className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
               <div><dt className="text-slate-500">{L('Farm')}</dt><dd className="mt-1 font-semibold">{farmName}</dd></div>
+              <div><dt className="text-slate-500">{L('Collection')}</dt><dd className="mt-1 font-semibold">{prepared.collection}</dd></div>
               <div><dt className="text-slate-500">{L('Eligible records')}</dt><dd className="mt-1 font-semibold">{prepared.sourceCount}</dd></div>
               <div><dt className="text-slate-500">{L('Cutoff date')}</dt><dd className="mt-1 font-semibold">{prepared.cutoffDate}</dd></div>
               <div><dt className="text-slate-500">{L('Status')}</dt><dd className="mt-1 font-semibold">{prepared.state}</dd></div>
