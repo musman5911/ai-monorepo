@@ -10,7 +10,9 @@ import express from 'express';
 import { timingSafeEqual } from 'crypto';
 import { authRequired, requireRole } from '../middleware/auth.js';
 import DataStore from '../models/DataStore.js';
-import { mufGetDefaultFarmId, mufGetFarmContext } from '../muf-farms.mjs';
+import Farm from '../models/Farm.js';
+import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext } from '../muf-farms.mjs';
+import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
 import User from '../models/User.js';
 import { buildDailySummary } from '../utils/summary.js';
 import {
@@ -82,11 +84,13 @@ router.post('/link-code', authRequired, requireRole('admin'), async (req, res) =
       laborerName = lw.name;
     }
     if (!userId && !laborerId) return res.status(400).json({ error: 'Pick an app user or a wage worker to link' });
+    const farmId = mufGetFarmContext()?.farmId;
+    if (!farmId) return res.status(400).json({ error: 'Select one farm before creating a Telegram link code' });
     const codes = await readStore(CODES_KEY, {});
     const now = Date.now();
     for (const [c, v] of Object.entries(codes)) if ((v.expires || 0) < now) delete codes[c];
     const code = tgNewLinkCode();
-    codes[code] = { userId: userId || '', username, laborerId: laborerId || '', laborerName, expires: now + 15 * 60 * 1000 };
+    codes[code] = { userId: userId || '', username, laborerId: laborerId || '', laborerName, farmId: String(farmId), expires: now + 15 * 60 * 1000 };
     await writeStore(CODES_KEY, codes);
     res.json({ code, expiresInMinutes: 15 });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -112,26 +116,46 @@ router.post('/webhook/:secret', async (req, res) => {
     const chatId = String(msg.chat.id);
     const send = (text) => tgSendMessage(TOKEN(), chatId, text);
     const cmd = parseCommand(msg.text);
-    const links = await readStore(LINKS_KEY, {});
-    const link = links[chatId];
+    const farms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+    let links = {};
+    let link = null;
+    let codes = {};
+    let codeEntry = null;
+    let targetFarmId = '';
+    for (const farm of farms) {
+      const farmId = String(farm._id);
+      const state = await mufRunTelegramFarm(farmId, mufRunWithFarmContext, async () => ({
+        links: await readStore(LINKS_KEY, {}),
+        codes: cmd.kind === 'link' ? await readStore(CODES_KEY, {}) : {},
+      }));
+      if (state?.links?.[chatId]) {
+        targetFarmId = farmId; links = state.links; link = links[chatId]; break;
+      }
+      if (cmd.kind === 'link' && state?.codes?.[cmd.code]) {
+        targetFarmId = farmId; codes = state.codes; codeEntry = codes[cmd.code]; break;
+      }
+    }
 
     if (cmd.kind === 'link') {
-      const codes = await readStore(CODES_KEY, {});
-      const entry = codes[cmd.code];
-      if (!entry || (entry.expires || 0) < Date.now()) return send(TG.linkBad);
+      if (!codeEntry || (codeEntry.expires || 0) < Date.now() || !mufTelegramFarmId(codeEntry) || mufTelegramFarmId(codeEntry) !== targetFarmId) return send(TG.linkBad);
       delete codes[cmd.code];
       links[chatId] = {
-        userId: entry.userId, username: entry.username,
-        laborerId: entry.laborerId, laborerName: entry.laborerName,
+        userId: codeEntry.userId, username: codeEntry.username,
+        laborerId: codeEntry.laborerId, laborerName: codeEntry.laborerName,
+        farmId: targetFarmId,
         linkedAt: new Date().toISOString(),
         tgName: [msg.from?.first_name, msg.from?.last_name].filter(Boolean).join(' '),
       };
-      await writeStore(CODES_KEY, codes);
-      await writeStore(LINKS_KEY, links);
-      return send(TG.linkOk(entry.laborerName || entry.username || 'worker'));
+      await mufRunTelegramFarm(targetFarmId, mufRunWithFarmContext, async () => {
+        await writeStore(CODES_KEY, codes);
+        await writeStore(LINKS_KEY, links);
+      });
+      return send(TG.linkOk(codeEntry.laborerName || codeEntry.username || 'worker'));
     }
 
     if (!link) return send(TG.notLinked);
+    if (!mufTelegramFarmId(link) || mufTelegramFarmId(link) !== targetFarmId) return send(TG.notLinked);
+    return await mufRunTelegramFarm(targetFarmId, mufRunWithFarmContext, async () => {
 
     const date = todayLocal();
     if (cmd.kind === 'help' || cmd.kind === 'unknown') {
@@ -187,6 +211,7 @@ router.post('/webhook/:secret', async (req, res) => {
       const summary = buildDailySummary({ birds, expenses, feed, eggs, vaccinations, customerSales, settings });
       return send(summary.text);
     }
+    });
   } catch (err) {
     console.error('Telegram webhook error:', err.message);
   }
