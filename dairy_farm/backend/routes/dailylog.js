@@ -2,6 +2,7 @@ import express from 'express';
 const router = express.Router();
 import { DailyLog } from '../db.js';
 import { protect } from '../middleware/auth.js';
+import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 
 // Load all independent diary notes across dates. Older daily-log text/photos are
 // exposed as a legacy entry until the user edits/saves them into diaryEntries.
@@ -35,6 +36,7 @@ router.get('/:date', protect, async (req, res) => {
     if (!log) {
       return res.json({ _id: req.params.date, date: req.params.date, checklist: [], notes: '', voiceNotes: [], photos: [], diaryEntries: [] });
     }
+    if (photos !== undefined || diaryEntries !== undefined) await cleanupOrphanPhotoAssets();
     res.json(log);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
