@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 10 command-line scope completed; Phase 11 server archive work started).
+Last updated: 2026-10-26 (Phase 11 shared archive implementation added; local verification pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -558,7 +558,7 @@ The Phase 6 checklist is complete for command-line scope. No browser/phone, real
 
 ## Phase 11 start (2026-10-26)
 
-Phase 11 is **In progress** on `muf-monorepo`. The first implementation slice will be Dairy milk, followed by Dairy expenses, Flock batch logs, and Agri finance. Archive requests must name one farm and a positive retention period explicitly; no retention default is assumed. The design requires a durable export snapshot and downloadable export before removal, typed confirmation bound to the farm/job, full-record preservation, farm isolation, and retry-safe behavior. No archive endpoint or destructive operation is considered complete until its tests and the standard command-line checks pass.
+Phase 11 is **In progress** on `muf-monorepo`. A shared archive workflow now serves Dairy milk/expenses, all seven Flock batch-log collections, and Agri finance. Archive requests name one farm and a positive retention period explicitly; no retention default is assumed. The workflow uses durable database snapshots, downloadable export before removal, typed confirmation bound to farm/job, full-record preservation, farm isolation, retry-safe archive/restore, and conflict detection. Full and monthly backup payloads now include archive jobs and snapshot records. Implementation has been pushed, but local runtime checks, all three production builds, and standard repository checks have not yet been run against this revision; do not treat Phase 11 as complete until those real results are recorded.
 
 
 ## Phase 11 implementation checkpoint (2026-10-26)
