@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Archive, Download, Eye, RefreshCw, RotateCcw, ShieldCheck } from 'lucide-react';
 import MufAdminCard from '../muf/admin/muf-admin-card';
 
@@ -38,6 +38,8 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
   const [notice, setNotice] = useState('');
 
   const base = apiBase.replace(/\/+$/, '');
+  const getHeadersRef = useRef(getHeaders);
+  useEffect(() => { getHeadersRef.current = getHeaders; }, [getHeaders]);
   const activeFarm = farms.find((farm) => (farm._id || farm.id) === farmId);
   const farmName = activeFarm?.name || '';
   const targetJob = restoreTarget || prepared;
@@ -47,7 +49,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
     const response = await fetch(`${base}${path}`, {
       ...init,
       headers: {
-        ...getHeaders(),
+        ...getHeadersRef.current(),
         ...(init.body ? { 'Content-Type': 'application/json' } : {}),
         ...(init.headers || {}),
       },
@@ -55,7 +57,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
     const data = await response.json().catch(() => ({}));
     if (!response.ok) throw new Error(data.error || data.message || `Request failed (${response.status})`);
     return { response, data };
-  }, [base, getHeaders]);
+  }, [base]);
 
   const refreshJobs = useCallback(async (selectedFarmId = farmId) => {
     if (!selectedFarmId) { setJobs([]); return []; }
@@ -121,7 +123,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
     setBusy(`export:${job._id || job.id}`);
     try {
       const id = String(job._id || job.id);
-      const response = await fetch(`${base}/archive/jobs/${encodeURIComponent(id)}/export?farmId=${encodeURIComponent(farmId)}`, { headers: getHeaders() });
+      const response = await fetch(`${base}/archive/jobs/${encodeURIComponent(id)}/export?farmId=${encodeURIComponent(farmId)}`, { headers: getHeadersRef.current() });
       if (!response.ok) {
         const data = await response.json().catch(() => ({}));
         throw new Error(data.error || data.message || `Export failed (${response.status})`);
