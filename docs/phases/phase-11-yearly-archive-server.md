@@ -33,7 +33,7 @@ Old years of records can be archived and exported so the live data stays small a
 
 ## New command-line check
 
-`tests/archive.test.ts` plus `tools/check-dairy-archive.js` wired into `npm run check-farms`: archiving farm B never touches farm A, an archive without a finished export refuses to delete, and restore brings records back unchanged.
+`tests/archive.test.ts` plus `tools/check-dairy-archive.js` wired into `npm run check-farms`: archiving farm B never touches farm A, an archive without a finished export refuses to delete, and restore brings records back unchanged. These checks have been added but have not yet been run in the local project.
 
 Current implementation slice: Dairy milk and expenses only, exposed through `/api/archive`. Flock batch logs and Agri finance are not yet implemented. The export snapshot is bounded to 5,000 records and 8 MiB per job; oversized jobs are rejected without removing active records.
 
