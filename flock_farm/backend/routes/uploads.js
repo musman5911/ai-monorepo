@@ -101,7 +101,7 @@ router.post('/uploads/image', authRequired, requireRole('admin'), upload.single(
 router.post('/uploads/diary-image', authRequired, upload.single('image'), async (req, res) => {
   try {
     if (!req.file?.buffer?.length) return res.status(400).json({ error: 'No image file uploaded' });
-    const storage = storageForCurrentFarm();
+    const storage = storageForCurrentFarm(req);
     const saved = await storage.save({
       bytes: req.file.buffer,
       contentType: req.file.mimetype || 'image/jpeg',
@@ -125,7 +125,7 @@ router.get('/images/:id', resolveImageFarm, authRequired, async (req, res) => {
     if (!mongoose.isValidObjectId(id)) {
       return res.status(404).json({ error: 'Image not found' });
     }
-    const storage = storageForCurrentFarm();
+    const storage = storageForCurrentFarm(req);
     const link = await storage.readLink(id);
     if (!link) return res.status(404).json({ error: 'Image not found' });
     const img = await Image.findOne({ _id: id, farmId: String(req.farmContext?.farmId || '') });
@@ -148,7 +148,7 @@ router.delete('/images/:id', resolveImageFarm, authRequired, requireRole('admin'
     if (!mongoose.isValidObjectId(id)) {
       return res.status(404).json({ error: 'Image not found' });
     }
-    const storage = storageForCurrentFarm();
+    const storage = storageForCurrentFarm(req);
     const deleted = await storage.delete(id);
     if (!deleted) return res.status(404).json({ error: 'Image not found' });
     res.json({ ok: true });
