@@ -5195,6 +5195,7 @@ function App() {
         open={adminMenuOpen}
         onClose={() => setAdminMenuOpen(false)}
         userRole={userRole}
+        farmRole={farmRole}
         username={username}
         currentUserEmail={currentUserEmail}
         onUpdateEmail={setCurrentUserEmail}
