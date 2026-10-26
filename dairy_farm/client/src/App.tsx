@@ -38,6 +38,7 @@ import HealthTab from "./components/HealthTab";
 import ReportsTab from "./components/ReportsTab";
 import DiaryTab from "./components/DiaryTab";
 import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from "./muf/ui/muf-diary";
+import { compressDiaryPhoto } from "./muf/ui/muf-diary-media";
 import LaborTab from "./components/LaborTab";
 import HeaderSearch from "./muf/ui/muf-header-search";
 import OfflineBanner from "./muf/core/muf-offline-banner";
