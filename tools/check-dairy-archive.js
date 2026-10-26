@@ -30,6 +30,12 @@ async function main(){
   const ma=await milk(a.id,'A'), mb=await milk(b.id,'B');
   const made=await call('POST','/api/archive/jobs',{token,body:{farmId:a.id,collection:'milk',retentionYears:1}}), job=made.json?.job;
   check(made.status===201 && job?.state==='snapshot_ready','old milk snapshot created for selected farm'); if(!job?.id)throw Error('archive create failed '+JSON.stringify(made.json));
+  const archiveRows=await call('GET',`/api/archive/jobs/${job.id}/records?farmId=${encodeURIComponent(a.id)}`,{token});
+  check(archiveRows.status===200&&archiveRows.json?.records?.length===1&&archiveRows.json.records[0]._id===ma._id,'snapshot records can be read before removal');
+  const foreignRead=await call('GET',`/api/archive/jobs/${job.id}/records?farmId=${encodeURIComponent(b.id)}`,{token});
+  check(foreignRead.status===404,'another farm cannot read this archive job');
+  const invalidRetention=await call('POST','/api/archive/jobs',{token,body:{farmId:a.id,collection:'milk',retentionYears:0}});
+  check(invalidRetention.status===400,'rejects missing/invalid retention period');
   const early=await call('POST',`/api/archive/jobs/${job.id}/execute`,{token,body:{farmId:a.id,confirmFarmName:a.name,confirmJobId:job.id}});
   check(early.status===409,'refuses delete before export');
   const exp=await call('GET',`/api/archive/jobs/${job.id}/export?farmId=${encodeURIComponent(a.id)}`,{token});
