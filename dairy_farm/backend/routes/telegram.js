@@ -211,8 +211,9 @@ const HELP_TEXT = [
 const SETTINGS_KEY = 'telegram_settings';
 const SETTINGS_DEFAULTS = { dailySummary: true, dropPct: 20 };
 
-async function readSettings() {
-  const v = await readMeta(SETTINGS_KEY);
+async function readSettings(farmId = mufGetFarmContext()?.farmId) {
+  const key = farmId ? `${SETTINGS_KEY}:${farmId}` : SETTINGS_KEY;
+  const v = await readMeta(key);
   return { ...SETTINGS_DEFAULTS, ...v };
 }
 
@@ -340,7 +341,7 @@ router.put('/settings', protect, adminOnly, async (req, res) => {
     if (typeof (req.body || {}).dailySummary === 'boolean') next.dailySummary = req.body.dailySummary;
     const pct = Number((req.body || {}).dropPct);
     if (Number.isFinite(pct) && pct >= 5 && pct <= 90) next.dropPct = Math.round(pct);
-    await writeMeta(SETTINGS_KEY, next);
+    await writeMeta(`${SETTINGS_KEY}:${mufGetFarmContext()?.farmId || 'unscoped'}`, next);
     res.json(next);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
