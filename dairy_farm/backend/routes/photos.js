@@ -33,7 +33,7 @@ function storage() {
       const doc = await PhotoAsset.findById(id).select('_id').lean();
       return doc ? `/api/photos/${doc._id}` : null;
     },
-    async delete(id) { return Boolean(await PhotoAsset.findByIdAndDelete(id)); },
+    async delete(id) { return (await PhotoAsset.deleteOne({ _id: id })).deletedCount > 0; },
     async list() { return (await PhotoAsset.find({}).select('_id').lean()).map((d) => ({ id: String(d._id) })); },
   }});
 }
@@ -92,9 +92,12 @@ router.delete('/photos/:id', protect, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
     if (await isReferenced(req.params.id)) return res.status(409).json({ error: 'Photo is still referenced by a farm record' });
-    // findByIdAndDelete is supported by both Mongoose and the in-memory test adapter.
-    const removed = await PhotoAsset.findByIdAndDelete(req.params.id);
-    if (!removed) return res.status(404).json({ error: 'Photo not found' });
+    // Use deleteOne rather than findByIdAndDelete: Mongoose implements the latter
+    // through findOneAndDelete, which the lightweight memory adapter does not expose.
+    const existing = await PhotoAsset.findById(req.params.id).select('_id').lean();
+    if (!existing) return res.status(404).json({ error: 'Photo not found' });
+    const removed = await PhotoAsset.deleteOne({ _id: req.params.id });
+    if (!removed.deletedCount) return res.status(404).json({ error: 'Photo not found' });
     return res.json({ ok: true });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Photo deletion failed' });
