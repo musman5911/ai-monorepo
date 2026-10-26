@@ -1,6 +1,6 @@
 # Phase 11: Yearly archive for old records: server
 
-**Status:** Done for command-line scope
+**Status:** Done
 
 ## Goal
 
