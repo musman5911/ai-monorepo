@@ -12,6 +12,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import DataStore from '../models/DataStore.js';
 import Image from '../models/Image.js';
+import { extractImageIds, findUnreferencedImageIds } from '../image-references.mjs';
 import Batch from '../models/Batch.js';
 import BatchEggLog from '../models/BatchEggLog.js';
 import { validateIncubationAllocations } from '../incubation-allocation.mjs';
@@ -109,31 +110,22 @@ function validateWorkerBirdWrite(existingBirds, incomingBirds) {
 }
 
 // ─── Image space GC ─────────────────────────────────────────────────────────
-// Bird and diary photos are stored as Image documents in MongoDB and referenced
-// by '/api/images/<id>' paths. When either bucket is saved, unreferenced images
-// are deleted so replaced/removed photos do not accumulate forever.
-function extractImageIds(value) {
-  const ids = new Set();
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      const candidates = [item && typeof item.image === 'string' ? item.image : '', ...(Array.isArray(item?.photos) ? item.photos.map((photo) => typeof photo?.data === 'string' ? photo.data : '') : [])];
-      for (const p of candidates) { const m = p.match(/^\/api\/images\/([a-f0-9]{24})$/i); if (m) ids.add(m[1]); }
-    }
-  }
-  return ids;
-}
-
-async function cleanupOrphanedImages(oldIds, newIds) {
+// Photos may be shared by a bird and a diary entry. Before deleting a candidate,
+// inspect every current bucket in the active farm, not only the bucket just saved.
+async function cleanupOrphanedImages(candidateIds) {
   try {
-    const orphaned = [...oldIds].filter((id) => !newIds.has(id));
-    for (const id of orphaned) {
+    if (!candidateIds?.size) return;
+    const buckets = await DataStore.find({}).select('value').lean();
+    const unreferenced = findUnreferencedImageIds(candidateIds, buckets.map((bucket) => bucket.value));
+    let deleted = 0;
+    for (const id of unreferenced) {
       if (mongoose.isValidObjectId(id)) {
-        await Image.findByIdAndDelete(id);
+        // Image queries inherit the active farm scope from auth middleware.
+        const result = await Image.deleteOne({ _id: id });
+        deleted += result.deletedCount || 0;
       }
     }
-    if (orphaned.length > 0) {
-      console.log(`🗑️  Freed ${orphaned.length} orphaned farm image(s) from the DB.`);
-    }
+    if (deleted > 0) console.log(`🗑️  Freed ${deleted} orphaned farm image(s) from the DB.`);
   } catch (err) {
     console.error('Image cleanup failed (non-fatal):', err.message);
   }
@@ -296,7 +288,9 @@ router.put('/data/:key', authRequired, async (req, res) => {
 
     // Free storage: delete Image docs no longer referenced by any bird
     if ((key === 'birds' || key === 'diary') && oldImageIds) {
-      await cleanupOrphanedImages(oldImageIds, extractImageIds(doc.value));
+      const newImageIds = extractImageIds(doc.value);
+      const candidates = new Set([...oldImageIds].filter((id) => !newImageIds.has(id)));
+      await cleanupOrphanedImages(candidates);
     }
 
     res.json({ key, exists: true, value: doc.value, version: doc.version || 0 });

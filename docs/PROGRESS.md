@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 8: shared storage contract and farm-isolation tests added; Flock route integration started; Dairy/Agri integration and local verification pending).
+Last updated: 2026-10-26 (Phase 8: shared storage contract and farm-isolation tests exist; Flock cross-bucket orphan-reference discovery and regression tests added; Dairy/Agri integrations and local verification pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
