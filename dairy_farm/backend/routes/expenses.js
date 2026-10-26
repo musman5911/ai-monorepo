@@ -85,7 +85,7 @@ router.put('/:id', protect, workerOrAdmin, async (req, res) => {
       await Cow.findByIdAndUpdate(exp._purchaseCowId, { $set: { purchasePrice: payload.amount } });
     }
 
-    await cleanupOrphanPhotoAssets();
+    try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
     res.json(exp);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -103,7 +103,7 @@ router.delete('/:id', protect, adminOnly, async (req, res) => {
     }
 
     await exp.deleteOne();
-    await cleanupOrphanPhotoAssets();
+    try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
     res.json({ deleted: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
