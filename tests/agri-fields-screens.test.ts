@@ -14,8 +14,8 @@ describe('Agri fields and crop-cycle screen contracts', () => {
     expect(panel).toContain('api.addField(payload)');
     expect(panel).toContain('api.updateField(editingId, payload)');
     expect(panel).toContain('api.deleteField(field._id)');
-    expect(panel).toContain("L('Field name')");
-    expect(panel).toContain("L('Acres')");
+    expect(panel).toContain("L('Field name', 'کھیت کا نام')");
+    expect(panel).toContain("L('Acres', 'ایکڑ')");
     expect(api).toContain("api.get('/fields')");
     expect(api).toContain("api.post('/fields'");
     expect(api).toContain("api.put(`/fields/${id}`, field)");
@@ -35,8 +35,8 @@ describe('Agri fields and crop-cycle screen contracts', () => {
   it('offers optional field and crop-cycle selectors on ledger entries', () => {
     const ledger = read('agri_farm/frontend/src/components/LedgerBookForm.tsx');
     const app = read('agri_farm/frontend/src/App.tsx');
-    expect(ledger).toContain("L('Field (optional)')");
-    expect(ledger).toContain("L('Crop cycle (optional)')");
+    expect(ledger).toContain("L('Field (optional)', 'کھیت (اختیاری)')");
+    expect(ledger).toContain("L('Crop cycle (optional)', 'فصل کا دورانیہ (اختیاری)')");
     expect(ledger).toContain('finForm.fieldId');
     expect(ledger).toContain('finForm.cropCycleId');
     expect(app).toContain('fields={fields}');
@@ -44,11 +44,11 @@ describe('Agri fields and crop-cycle screen contracts', () => {
 
   it('renders field and season profit from the server summary and localizes new labels through L()', () => {
     const app = read('agri_farm/frontend/src/App.tsx');
-    expect(app).toContain("L('Profit by field')");
-    expect(app).toContain("L('Profit by season')");
+    expect(app).toContain("L('Profit by field', 'کھیت کے حساب سے منافع')");
+    expect(app).toContain("L('Profit by season', 'موسم کے حساب سے منافع')");
     expect(app).toContain('analyticsSummary?.financeSummary?.byField');
     expect(app).toContain('analyticsSummary?.financeSummary?.bySeason');
-    expect(app).toContain("L('No field-linked finance data yet.')");
-    expect(app).toContain("L('No season-linked finance data yet.')");
+    expect(app).toContain("L('No field-linked finance data yet.', 'ابھی کھیت سے منسلک مالی معلومات موجود نہیں۔')");
+    expect(app).toContain("L('No season-linked finance data yet.', 'ابھی موسم سے منسلک مالی معلومات موجود نہیں۔')");
   });
 });
