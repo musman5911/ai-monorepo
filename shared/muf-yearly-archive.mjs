@@ -13,6 +13,7 @@ export function createYearlyArchiveRouter({
 }) {
   const router = express.Router();
   const jobSchema = new mongoose.Schema({
+    _id: { type: String },
     farmId: { type: String, required: true, index: true },
     collection: { type: String, required: true },
     retentionYears: { type: Number, required: true, min: 1 },
@@ -23,6 +24,7 @@ export function createYearlyArchiveRouter({
     createdBy: { type: String, default: '' },
   }, { timestamps: true, collection: 'muf_archive_jobs' });
   const recordSchema = new mongoose.Schema({
+    _id: { type: String },
     farmId: { type: String, required: true, index: true },
     jobId: { type: String, required: true, index: true },
     sourceCollection: { type: String, required: true },
