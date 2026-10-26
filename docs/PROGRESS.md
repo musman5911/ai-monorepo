@@ -209,3 +209,21 @@ Security follow-up: `npm ci` reported 5 dependency audit findings. Do not use `n
 ## Phase 6 start (2026-10-25)
 
 Phase 6, Agri fields and crop cycles screens, is now **In progress**. The Phase 5 server foundation is verified for the command-line scope. Initial Phase 6 work begins with an audit of the Agri crop, finance, dashboard/report, shared popup/form, and Urdu-label patterns before wiring field and crop-cycle controls. No Phase 6 implementation tests or builds have been run yet at this checkpoint.
+
+
+## Phase 6 validation checkpoint (2026-10-26; Windows CMD output supplied by owner)
+
+The owner supplied the output saved in `result.tx` from the latest Phase 6 screen implementation. The focused test exposed one failing source-contract assertion: it expected `api.put(`/fields/${id}`)` but the actual helper correctly supplies the update payload as the second argument. Corrected the assertion in `tests/agri-fields-screens.test.ts` to expect `api.put(`/fields/${id}`, field)`.
+
+| Command/check | Result |
+|---|---|
+| Initial `npm test -- tests/agri-fields-screens.test.ts` | Failed: 1 of 4 tests, due to the incorrect update-helper string expectation; the other 3 tests passed |
+| Initial `npm test` | Failed: 1 of 264 tests; 263 passed. The same assertion was the reported failure |
+| `npm run check-sync` | Owner-reported passed |
+| `npm run check-ui` | Owner-reported passed |
+| `npm run check-workbench` | Owner-reported passed: 23 source checks |
+| `npm run check-farms` | Owner-reported passed: all farm-scope and Dairy breeding-event runtime checks |
+| `npm run check-docs` | Owner-reported passed |
+| `tools\\build-all.bat` | Owner-reported passed: Dairy, Flock and Agri builds |
+
+**Pending:** rerun `npm test -- tests/agri-fields-screens.test.ts` and the full `npm test` after the assertion fix. Phase 6 remains **In progress** until those results are supplied and Urdu label coverage is checked. The pasted command-output file `result.tx` has been removed from the branch after review.
