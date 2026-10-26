@@ -15,7 +15,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phase-10-bundle-size-performance.md) |
-| 11 | Yearly archive for old records: server | In progress | [phase-11-yearly-archive-server.md](phase-11-yearly-archive-server.md) |
+| 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phase-14-authorization-and-secrets-review.md) |
@@ -33,6 +33,9 @@ Phase 8 is **Done for command-line scope**. Owner-supplied Windows CMD output on
 **Phase 9 is Done for command-line scope:** the signed Cloudinary client, optional environment configuration, MongoDB fallback, local metadata records, authenticated proxy reads, and Cloudinary-aware cleanup are implemented. The focused photo suite (36 tests), full suite (307 tests), all sync/UI/workbench/farm/docs checks, all three production builds, and the optional workbench runtime smoke test passed. No live credentials or uploads were used. Next: Phase 10, Smaller downloads and faster screens.
 
 **Phase 10 is Done for command-line scope (2026-10-26).** Owner-reported checks confirm all three production builds passed, the full suite passed (38 files / 310 tests), and bundle-size, sync, UI, workbench (23 checks), farm-scope and documentation checks passed. Largest JavaScript assets: Dairy 505.5/700 KiB, Agri 420.1/600 KiB, Flock 542.0/850 KiB. Browser/device behavior and live performance are not claimed; see [Phase 10 details](phase-10-bundle-size-performance.md).
+
+**Phase 11 is Done for command-line scope (2026-10-26).** Owner-supplied Windows CMD results confirm the three-app archive runtime checks, full suite (39 files / 320 tests), sync/UI/workbench (23 checks)/farm/docs checks, and all three production builds passed. Archive checks cover Dairy milk/expenses, Flock batch-feed logs, and Agri finance, including export-before-delete, active-list and totals exclusion, farm isolation, and restore. Real MongoDB, browser/phone and live deployment are not claimed; those remain in Phases 19–21. See [Phase 11 details](phase-11-yearly-archive-server.md).
+
 ## How a phase runs
 
 1. Open the phase file, set the status to `In progress`, and update `docs/PROGRESS.md`.
