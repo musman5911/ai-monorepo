@@ -243,7 +243,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
             </label>
           </div>
           <button type="button" className={`${buttonClass} bg-farm-600 text-white hover:bg-farm-700`} onClick={prepareArchive} disabled={busy !== '' || !farmId || collections.length === 0}>
-            <Archive className="h-4 w-4" /> {busy === 'prepare' ? 'Preparing snapshot…' : 'Preview eligible records'}
+            <Archive className="h-4 w-4" /> {busy === 'prepare' ? L('Preparing snapshot…') : L('Preview eligible records')}
           </button>
         </section>
 
@@ -259,7 +259,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
             </dl>
             <p className="text-xs text-slate-500">{L('The server has saved a snapshot of the exact eligible records. Download the export before continuing.')}</p>
             <button type="button" className={`${buttonClass} bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-200 dark:text-slate-900`} onClick={() => downloadExport(prepared)} disabled={busy !== ''}>
-              <Download className="h-4 w-4" /> {busy.startsWith('export:') ? 'Preparing download…' : 'Download archive export'}
+              <Download className="h-4 w-4" /> {busy.startsWith('export:') ? L('Preparing download…') : L('Download archive export')}
             </button>
           </section>
         )}
@@ -296,7 +296,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
 
         {((prepared && ['snapshot_ready', 'archive_partial'].includes(prepared.state)) || restoreTarget) && (
           <section className="space-y-3 rounded-xl border border-amber-200 p-4 dark:border-amber-900">
-            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{restoreTarget ? 'Confirm archive restoration' : 'Confirm archive execution'}</h4>
+            <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{restoreTarget ? L('Confirm archive restoration') : L('Confirm archive execution')}</h4>
             {!restoreTarget && !prepared?.exportDownloaded && <p className="text-xs text-amber-800 dark:text-amber-200">{L('Download the export first. The server enforces this requirement.')}</p>}
             <p className="text-xs text-slate-500">{L('Type the exact farm name and job ID. This is deliberately tedious because deleting records should not be a one-click hobby.')}</p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -308,11 +308,11 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
             <div className="flex flex-wrap gap-2">
               {restoreTarget ? (
                 <button type="button" className={`${buttonClass} bg-amber-600 text-white hover:bg-amber-700`} onClick={restoreArchive} disabled={busy !== '' || !canConfirm}>
-                  <RotateCcw className="h-4 w-4" /> {busy === 'restore' ? 'Restoring…' : 'Confirm restore'}
+                  <RotateCcw className="h-4 w-4" /> {busy === 'restore' ? L('Restoring…') : L('Confirm restore')}
                 </button>
               ) : (
                 <button type="button" className={`${buttonClass} bg-red-600 text-white hover:bg-red-700`} onClick={executeArchive} disabled={busy !== '' || !canConfirm || !prepared?.exportDownloaded}>
-                  <Archive className="h-4 w-4" /> {busy === 'execute' ? 'Archiving…' : 'Confirm archive'}
+                  <Archive className="h-4 w-4" /> {busy === 'execute' ? L('Archiving…') : L('Confirm archive')}
                 </button>
               )}
               <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setPrepared(null); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }}>{L('Cancel')}</button>
@@ -334,7 +334,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
                 </select>
               </label>
               <button type="button" className={`${buttonClass} bg-farm-600 text-white hover:bg-farm-700`} onClick={loadReportRecords} disabled={busy !== '' || !reportJobId}>
-                <Eye className="h-4 w-4" /> {busy === 'records' ? 'Loading…' : 'Load archived report'}
+                <Eye className="h-4 w-4" /> {busy === 'records' ? L('Loading…') : L('Load archived report')}
               </button>
             </div>
           )}
