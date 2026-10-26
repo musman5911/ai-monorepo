@@ -611,7 +611,8 @@ export default function App() {
       >
         <div className="space-y-5">
           <MufDiary entries={diaryEntries} onSave={saveDiaryEntry} onDelete={deleteDiaryEntry}
-            entityOptions={diaryEntityOptions} shareTargets={diaryShareTargets} />
+            uploadPhoto={async (file) => { const compressed = await compressDiaryPhoto(file); const uploaded = await api.uploadPhoto(compressed.data); return uploaded.path; }}
+            resolvePhotoUrl={api.getPhotoObjectUrl} entityOptions={diaryEntityOptions} shareTargets={diaryShareTargets} />
           <details className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
             <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist')}</summary>
             <div className="mt-4"><DiaryTab checklistOnly /></div>
