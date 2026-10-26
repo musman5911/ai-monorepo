@@ -29,7 +29,7 @@ describe('Agri fields and crop-cycle screen contracts', () => {
     expect(app).toContain("L('Registered field', 'رجسٹر شدہ کھیت')");
     expect(app).toContain('value={cropForm.fieldId || \'\'}');
     expect(app).toContain('fieldId: crop.fieldId || \'\'');
-    expect(app).toContain('L(\'Manage Fields\')');
+    expect(app).toContain("L('Manage Fields', 'کھیتوں کا انتظام')");
   });
 
   it('offers optional field and crop-cycle selectors on ledger entries', () => {
