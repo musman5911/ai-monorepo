@@ -26,17 +26,25 @@ Each Telegram chat is linked to one farm, bot entries land in that farm, and dai
 
 - All three backends already have Telegram webhook routes, link-code flows, settings, manual send-summary endpoints and cron-driven summary pushes.
 - All three frontends use the shared MUF Telegram panel twin, which currently exposes user/worker linking and summary settings.
-- Current link records store user/worker identity and Telegram chat metadata, but no explicit `farmId` in the link payload.
-- Flock's Telegram data-store helpers fall back to the default farm when no farm context is active. The webhook currently runs without a selected chat farm, so default-farm fallback is a key isolation risk. Dairy and Agri have different data models and must be audited independently rather than assuming the same fix applies.
+- Before implementation, link records stored user/worker identity without a farm assignment. Phase 7 now adds `farmId` to new link codes and linked-chat records; legacy links without a farm fail closed and require relinking.
+- Flock's Telegram data-store helpers fall back to the default farm when no farm context is active. New webhook handling resolves the linked farm and runs commands in MUF's single-farm context; scheduled summaries now iterate farms independently in all three backends.
 - Existing webhook secret checks, command parsing, worker attendance, production-drop alerts and summary controls must remain intact. No new bot commands are in scope.
 - Implementation and acceptance tests are not complete yet. Do not mark this phase Done until the farm-B / unlinked-chat / farm-A-summary regression passes.
 
+## Implementation checkpoint (2026-10-26)
+
+- Added byte-identical `backend/muf-telegram-farms.mjs` twins to all three apps for farm-id validation and single-farm context execution.
+- Updated `tools/check-muf-sync.js` to enforce parity for the new MUF helper.
+- New link codes record the selected farm; legacy links without `farmId` fail closed. Telegram writes, reads and on-demand summaries run inside the linked farm context.
+- Scheduled daily summaries iterate active farms, filter recipients by each link's `farmId`, and use per-farm settings / once-per-day guards.
+- Added `tests/telegram-farm-scope.test.ts`. The source is committed but has not yet been run locally; phase acceptance is pending command-line validation and any fixes it reveals.
+
 ## Steps
 
-1. Read the Telegram routes and summary services in the three backends.
-2. Add the farm link in settings.
-3. Run bot and summary code inside the farm context.
-4. Add the check below.
+1. Audit existing Telegram routes, MUF farm scoping and summary services in all three backends. (Done)
+2. Add farm identity to link codes and chat links; reject legacy unscoped links. (Implemented; validate)
+3. Run webhook commands and summaries in the linked farm context. (Implemented; validate)
+4. Add and run the check below, then fix any failures. (Pending)
 
 ## New command-line check
 
