@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Loader, X, UploadCloud, ImagePlus, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react';
 import { compressImage, formatBytes } from '../imageUtils';
 import { L } from '../i18n';
+import PhotoImage from './PhotoImage';
 
 /**
  * Reusable image upload control with:
@@ -165,7 +166,7 @@ export default function ImageUploader({
       {value && !busy ? (
         /* Preview card with overlay actions */
         <div className="relative inline-flex group rounded-xl overflow-hidden border-2 border-farm-500/50 dark:border-farm-600/50 shadow-sm">
-          <img src={value} className="h-24 w-36 object-cover" alt="Uploaded preview" />
+          <PhotoImage src={value} className="h-24 w-36 object-cover" alt="Uploaded preview" />
           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/45 transition-colors flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
             <button
               type="button"
