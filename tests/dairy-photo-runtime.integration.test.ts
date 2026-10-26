@@ -187,6 +187,10 @@ describe.sequential('Dairy photo runtime API integration', () => {
       body: { photos: [{ id: `photo-runtime-${process.pid}`, data: photoPath, bytes: bytes.length, createdAt: date }] },
     });
     expect(linked.response.status).toBe(200);
+    const readLog = await request(`/dailylog/${date}`, { token: ownerToken, farmId: farmA });
+    expect(readLog.response.status).toBe(200);
+    expect(readLog.data.photos.some((photo) => photo.data === photoPath)).toBe(true);
+
     const refusedDelete = await request(`/photos/${photoId}`, {
       method: 'DELETE', token: ownerToken, farmId: farmA,
     });
