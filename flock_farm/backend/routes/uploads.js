@@ -152,7 +152,19 @@ router.get('/images/:id', resolveImageFarm, authRequired, async (req, res) => {
     if (!link) return res.status(404).json({ error: 'Image not found' });
     const img = await Image.findOne({ _id: id, farmId: String(req.farmContext?.farmId || '') });
     if (!img) return res.status(404).json({ error: 'Image not found' });
-    if (img.provider === 'cloudinary' && img.secureUrl) return res.redirect(302, img.secureUrl);
+    if (img.provider === 'cloudinary') {
+      let remoteUrl;
+      try { remoteUrl = new URL(img.secureUrl); } catch { return res.status(502).json({ error: 'Stored Cloudinary URL is invalid' }); }
+      if (remoteUrl.protocol !== 'https:' || remoteUrl.hostname !== 'res.cloudinary.com') {
+        return res.status(502).json({ error: 'Stored Cloudinary URL is not trusted' });
+      }
+      const remote = await fetch(remoteUrl);
+      if (!remote.ok) return res.status(502).json({ error: 'Cloudinary photo retrieval failed' });
+      const bytes = Buffer.from(await remote.arrayBuffer());
+      res.setHeader('Content-Type', img.contentType || remote.headers.get('content-type') || 'image/jpeg');
+      res.setHeader('Cache-Control', 'private, max-age=3600');
+      return res.send(bytes);
+    }
 
     res.setHeader('Content-Type', img.contentType || 'image/jpeg');
     // Images are immutable (a new upload = a new id), so cache aggressively.
