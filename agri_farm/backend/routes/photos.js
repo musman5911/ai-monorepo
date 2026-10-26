@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import { PhotoAsset, DiaryMedia, CropPhoto, Spray, Finance, Crop } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { createMufStorage } from '../muf-storage.mjs';
+import { MUF_ENV } from '../muf-env.mjs';
+import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.mjs';
 import { cleanupOrphanPhotoAssets, discoverOrphanPhotoAssets } from '../services/photo-assets.js';
 
 const router = express.Router();
@@ -23,17 +25,46 @@ function parseDataUrl(value) {
   const bytes = Buffer.from(match[2], 'base64');
   return bytes.length ? { bytes, contentType: match[1] } : null;
 }
+let cloudinaryFallbackLogged = false;
+function configuredCloudinary() {
+  const config = { cloudName: MUF_ENV.cloudinaryCloudName, apiKey: MUF_ENV.cloudinaryApiKey, apiSecret: MUF_ENV.cloudinaryApiSecret };
+  if (!cloudinaryConfigured(config)) {
+    if (!cloudinaryFallbackLogged) {
+      console.info('[photo-storage] Cloudinary credentials are incomplete; using MongoDB photo storage.');
+      cloudinaryFallbackLogged = true;
+    }
+    return null;
+  }
+  return createCloudinaryClient(config);
+}
 function storage() {
+  const cloudinary = configuredCloudinary();
   return createMufStorage({ store: {
     async save({ bytes, contentType, metadata = {} }) {
-      const doc = await PhotoAsset.create({ contentType, data: bytes, size: bytes.length, createdBy: String(metadata.createdBy || ''), createdAt: new Date() });
+      if (cloudinary) {
+        const remote = await cloudinary.upload({ bytes, contentType });
+        const doc = await PhotoAsset.create({
+          provider: 'cloudinary', cloudinaryPublicId: remote.publicId, secureUrl: remote.secureUrl,
+          contentType, size: bytes.length, createdBy: String(metadata.createdBy || ''), createdAt: new Date(),
+        });
+        return { id: String(doc._id) };
+      }
+      const doc = await PhotoAsset.create({ provider: 'mongodb', contentType, data: bytes, size: bytes.length, createdBy: String(metadata.createdBy || ''), createdAt: new Date() });
       return { id: String(doc._id) };
     },
     async readLink(id) {
       const doc = await PhotoAsset.findById(id).select('_id').lean();
       return doc ? `/api/photos/${doc._id}` : null;
     },
-    async delete(id) { return (await PhotoAsset.deleteOne({ _id: id })).deletedCount > 0; },
+    async delete(id) {
+      const doc = await PhotoAsset.findById(id);
+      if (!doc) return false;
+      if (doc.provider === 'cloudinary' && doc.cloudinaryPublicId) {
+        if (!cloudinary) throw new Error('Cloudinary credentials are required to delete this photo');
+        await cloudinary.destroy(doc.cloudinaryPublicId);
+      }
+      return (await PhotoAsset.deleteOne({ _id: id })).deletedCount > 0;
+    },
     async list() { return (await PhotoAsset.find({}).select('_id').lean()).map((d) => ({ id: String(d._id) })); },
   }});
 }
@@ -80,6 +111,7 @@ router.get('/photos/:id', protect, async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
     const photo = await PhotoAsset.findById(req.params.id);
     if (!photo) return res.status(404).json({ error: 'Photo not found' });
+    if (photo.provider === 'cloudinary' && photo.secureUrl) return res.redirect(302, photo.secureUrl);
     return res
       .set('Content-Type', photo.contentType || 'application/octet-stream')
       .set('Cache-Control', 'private, max-age=3600')
