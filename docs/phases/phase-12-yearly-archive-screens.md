@@ -36,9 +36,17 @@ The owner runs, reviews and restores archives from a screen.
 4. Add `tests/archive-screens.test.ts` for owner gating, required workflow states, export-before-execute, and explicit archived-report opt-in.
 5. Run the focused test, full suite, sync/UI/workbench/farm/docs checks, and all three production builds; update the phase records with observed results.
 
+## Implementation checkpoint (2026-10-26)
+
+- Added byte-identical `YearlyArchivePanel.tsx` components to all three app frontends and mounted each in Admin > Reports.
+- The panel lists farms from the existing farm API, requests a server-side snapshot preview, downloads the JSON export, requires exact farm name and job ID before archive/restore, lists job history, and offers a separate opt-in view of snapshot records.
+- Existing report datasets are unchanged; archived records are not merged into active totals.
+- Added `tests/archive-screens.test.ts` to assert owner gating, export-before-execute, exact confirmation, restore/report paths, supported collections, and identical panel copies.
+- Still pending: run tests and all three builds, verify UI role mappings and export marker timing, and complete Urdu translations for the new labels. This checkpoint is not a completion claim.
+
 ## New command-line check
 
-`tests/archive-screens.test.ts`: source-contract checks that the Archive screen is owner-only and has the preview, confirm and restore steps.
+`tests/archive-screens.test.ts`: source-contract checks that the Archive screen is owner-only and has the preview, export, confirm, report and restore steps.
 
 ## Command-line checks at the end of this phase
 
