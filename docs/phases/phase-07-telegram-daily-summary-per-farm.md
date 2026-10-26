@@ -36,7 +36,8 @@ Each Telegram chat is linked to one farm, bot entries land in that farm, and dai
 - Added byte-identical `backend/muf-telegram-farms.mjs` twins to all three apps for farm-id validation and single-farm context execution.
 - Updated `tools/check-muf-sync.js` to enforce parity for the new MUF helper.
 - New link codes record the selected farm; legacy links without `farmId` fail closed. Telegram writes, reads and on-demand summaries run inside the linked farm context.
-- Scheduled daily summaries iterate active farms, filter recipients by each link's `farmId`, and use per-farm settings / once-per-day guards.
+- Scheduled Telegram summaries iterate active farms, filter recipients by each link's `farmId`, and use per-farm settings / once-per-day guards. Manual sends are restricted to the selected or assigned farms.
+- Dairy daily-summary email cron sends a separate farm-scoped email for each active farm. Manual email sends use the selected farm or the caller's allowed farm list.
 - Added `tests/telegram-farm-scope.test.ts`. The source is committed but has not yet been run locally; phase acceptance is pending command-line validation and any fixes it reveals.
 
 ## Steps
@@ -68,7 +69,7 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 - [ ] Link a Telegram chat to a farm (owner or manager does it from the existing Telegram panel).
 - [ ] Records created by the bot are stamped with the linked farm.
-- [ ] The daily summary and the monthly email are built per farm; owners may get an overview of all farms.
+- [ ] Telegram daily summaries and Dairy daily-summary emails are farm-scoped; manual sends respect the caller's selected/assigned farms. Audit any separate monthly email/report job before closure.
 - [ ] Unlinked chats get a clear message and create nothing.
 - [ ] The new command-line check above exists and passes.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
