@@ -84,7 +84,7 @@ export default function LedgerBookForm({
     const ok = await confirm({
       title: L('Remove Irrigation Log'),
       message: L('Delete this irrigation entry? Any ledger charge it created stays until removed from the ledger.'),
-      confirmLabel: L('Delete', 'حذف کریں'),
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -105,7 +105,7 @@ export default function LedgerBookForm({
     const ok = await confirm({
       title: L('Remove Spray Log'),
       message: L('Delete this spray entry?'),
-      confirmLabel: L('Delete', 'حذف کریں'),
+      confirmLabel: L('Delete'),
       tone: 'danger',
     });
     if (!ok) return;
@@ -135,8 +135,8 @@ export default function LedgerBookForm({
     <form onSubmit={handleFinanceSubmit} className="space-y-4">
       {tab === 'ledger' && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <div><label className={labelClass}>{L('Field (optional)', 'کھیت (اختیاری)')}</label><select className={fieldClass} value={finForm.fieldId || ''} onChange={event => setFinForm(prev => ({ ...prev, fieldId: event.target.value }))}><option value="">{L('Unassigned / farm-wide', 'غیر مختص / پورا فارم')}</option>{fields.map(field => <option key={field._id} value={field._id}>{field.name}</option>)}</select></div>
-          <div><label className={labelClass}>{L('Crop cycle (optional)', 'فصل کا دورانیہ (اختیاری)')}</label><select className={fieldClass} value={finForm.cropCycleId || ''} onChange={event => setFinForm(prev => ({ ...prev, cropCycleId: event.target.value }))}><option value="">{L('No crop cycle linked', 'فصل کا دورانیہ منسلک نہیں')}</option>{crops.map(crop => <option key={crop._id} value={crop._id}>{crop.name} · {crop.season || L('Season not set', 'موسم درج نہیں')} {crop.crop_year || ''}</option>)}</select></div>
+          <div><label className={labelClass}>{L('Field (optional)')}</label><select className={fieldClass} value={finForm.fieldId || ''} onChange={event => setFinForm(prev => ({ ...prev, fieldId: event.target.value }))}><option value="">{L('Unassigned / farm-wide')}</option>{fields.map(field => <option key={field._id} value={field._id}>{field.name}</option>)}</select></div>
+          <div><label className={labelClass}>{L('Crop cycle (optional)')}</label><select className={fieldClass} value={finForm.cropCycleId || ''} onChange={event => setFinForm(prev => ({ ...prev, cropCycleId: event.target.value }))}><option value="">{L('No crop cycle linked')}</option>{crops.map(crop => <option key={crop._id} value={crop._id}>{crop.name} · {crop.season || L('Season not set')} {crop.crop_year || ''}</option>)}</select></div>
         </div>
       )}
       <div className="flex flex-wrap gap-1.5">
@@ -504,7 +504,7 @@ export default function LedgerBookForm({
       )}
 
       <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-        <button type="button" onClick={onCancel} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel', 'منسوخ کریں')}</button>
+        <button type="button" onClick={onCancel} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
         <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
           {tab === 'irrigation' ? <Droplets size={14} /> : tab === 'spray' ? <FlaskConical size={14} /> : <CheckCircle size={14} />} {submitLabel()}
         </button>
