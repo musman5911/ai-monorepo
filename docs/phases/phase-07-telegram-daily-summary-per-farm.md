@@ -22,6 +22,15 @@ Each Telegram chat is linked to one farm, bot entries land in that farm, and dai
 - No new bot commands.
 - No change to webhook security.
 
+## Initial audit (2026-10-26)
+
+- All three backends already have Telegram webhook routes, link-code flows, settings, manual send-summary endpoints and cron-driven summary pushes.
+- All three frontends use the shared MUF Telegram panel twin, which currently exposes user/worker linking and summary settings.
+- Current link records store user/worker identity and Telegram chat metadata, but no explicit `farmId` in the link payload.
+- Flock's Telegram data-store helpers fall back to the default farm when no farm context is active. The webhook currently runs without a selected chat farm, so default-farm fallback is a key isolation risk. Dairy and Agri have different data models and must be audited independently rather than assuming the same fix applies.
+- Existing webhook secret checks, command parsing, worker attendance, production-drop alerts and summary controls must remain intact. No new bot commands are in scope.
+- Implementation and acceptance tests are not complete yet. Do not mark this phase Done until the farm-B / unlinked-chat / farm-A-summary regression passes.
+
 ## Steps
 
 1. Read the Telegram routes and summary services in the three backends.
