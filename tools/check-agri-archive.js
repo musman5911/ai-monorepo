@@ -21,9 +21,9 @@ async function main() {
  let ready=false;
  for(let i=0;i<60;i++){ if(child.exitCode!==null) throw new Error(`server exited:\n${logs}`); try {const r=await fetch(base+'/api/health'); if(r.status<500){ready=true;break;}} catch {} await sleep(500); }
  if(!ready) throw new Error(`server not ready:\n${logs}`);
- const login=await call('POST','/api/login',{body:{username:'admin',password:'admin123'}});
+ let login; for(let i=0;i<60;i++){ login=await call('POST','/api/login',{body:{username:'admin',password:'admin123'}}); if(login.status!==503) break; await sleep(500); }
  const token=login.json?.access_token;
- check(login.status===200&&!!token,'Agri memory-mode owner login'); if(!token) throw new Error(JSON.stringify(login.json));
+ check(login.status===200&&!!token,'Agri memory-mode owner login'); if(!token) throw new Error(JSON.stringify({status:login.status,body:login.json,serverLogs:logs}));
  const farms=await call('GET','/api/farms',{token}); const defaultFarm=(farms.json?.farms||[])[0];
  check(!!defaultFarm?.id,'Agri default farm exists'); if(!defaultFarm?.id) throw new Error(JSON.stringify(farms.json));
  const createdA=await call('POST','/api/farms',{token,body:{name:'Agri Archive Check Farm A',location:'test'}});
