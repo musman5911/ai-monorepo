@@ -112,7 +112,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
         return;
       }
       setPrepared(data.job as ArchiveJob);
-      setNotice(`Snapshot prepared: ${data.job.sourceCount} record(s) before ${data.job.cutoffDate}. Active records have not been removed.`);
+      setNotice(`${L('Snapshot prepared:')} ${data.job.sourceCount} ${L('record(s) before')} ${data.job.cutoffDate}. ${L('Active records have not been removed.')}`);
       await refreshJobs(farmId);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not prepare archive snapshot');
@@ -138,7 +138,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
       link.click();
       link.remove();
       URL.revokeObjectURL(url);
-      setNotice('Export download started. Wait for the download to finish before executing the archive.');
+      setNotice(L('Export download started. Wait for the download to finish before executing the archive.'));
       let refreshedJob: ArchiveJob | undefined;
       for (let attempt = 0; attempt < 5; attempt += 1) {
         const refreshed = await refreshJobs(farmId);
@@ -147,7 +147,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
         if (attempt < 4) await new Promise((resolve) => window.setTimeout(resolve, 250));
       }
       if (refreshedJob) setPrepared(refreshedJob);
-      if (!refreshedJob?.exportDownloaded) setError('The download started, but the server has not confirmed the export marker yet. Refresh history before executing.');
+      if (!refreshedJob?.exportDownloaded) setError(L('The download started, but the server has not confirmed the export marker yet. Refresh history before executing.'));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Export download failed');
     } finally { setBusy(''); }
@@ -230,22 +230,16 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
         <section className="space-y-3">
           <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{L('Prepare archive snapshot')}</h4>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Farm
-              <select className={fieldClass} value={farmId} onChange={(e) => { setFarmId(e.target.value); setPrepared(null); setReportRecords([]); }} disabled={busy !== '' || farms.length === 0}>
+            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Farm')}<select className={fieldClass} value={farmId} onChange={(e) => { setFarmId(e.target.value); setPrepared(null); setReportRecords([]); }} disabled={busy !== '' || farms.length === 0}>
                 <option value="">{L('Select farm')}</option>
                 {farms.map((farm) => <option key={farm._id || farm.id} value={farm._id || farm.id}>{farm.name}</option>)}
               </select>
             </label>
-            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Collection
-              <select className={fieldClass} value={collection} onChange={(e) => setCollection(e.target.value)} disabled={busy !== ''}>
+            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Collection')}<select className={fieldClass} value={collection} onChange={(e) => setCollection(e.target.value)} disabled={busy !== ''}>
                 {collections.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
               </select>
             </label>
-            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
-              Retention period (years)
-              <input className={fieldClass} type="number" min="1" max="100" step="1" value={retentionYears} onChange={(e) => setRetentionYears(e.target.value)} disabled={busy !== ''} />
+            <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Retention period (years)')}<input className={fieldClass} type="number" min="1" max="100" step="1" value={retentionYears} onChange={(e) => setRetentionYears(e.target.value)} disabled={busy !== ''} />
             </label>
           </div>
           <button type="button" className={`${buttonClass} bg-farm-600 text-white hover:bg-farm-700`} onClick={prepareArchive} disabled={busy !== '' || !farmId || collections.length === 0}>
@@ -262,7 +256,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
               <div><dt className="text-slate-500">{L('Cutoff date')}</dt><dd className="mt-1 font-semibold">{prepared.cutoffDate}</dd></div>
               <div><dt className="text-slate-500">{L('Status')}</dt><dd className="mt-1 font-semibold">{prepared.state}</dd></div>
             </dl>
-            <p className="text-xs text-slate-500">The server has saved a snapshot of the exact eligible records. Download the export before continuing.</p>
+            <p className="text-xs text-slate-500">{L('The server has saved a snapshot of the exact eligible records. Download the export before continuing.')}</p>
             <button type="button" className={`${buttonClass} bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-200 dark:text-slate-900`} onClick={() => downloadExport(prepared)} disabled={busy !== ''}>
               <Download className="h-4 w-4" /> {busy.startsWith('export:') ? 'Preparing download…' : 'Download archive export'}
             </button>
@@ -273,10 +267,9 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
           <div className="flex flex-wrap items-center justify-between gap-2">
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{L('Archive history')}</h4>
             <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800`} onClick={() => refreshJobs().catch((e) => setError(e.message))} disabled={busy !== '' || !farmId}>
-              <RefreshCw className="h-4 w-4" /> Refresh
-            </button>
+              <RefreshCw className="h-4 w-4" />{L('Refresh')}</button>
           </div>
-          {!jobs.length ? <p className="text-xs text-slate-500">No archive jobs for this farm yet.</p> : (
+          {!jobs.length ? <p className="text-xs text-slate-500">{L('No archive jobs for this farm yet.')}</p> : (
             <div className="space-y-2">
               {jobs.map((job) => {
                 const id = String(job._id || job.id);
@@ -288,10 +281,10 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
                       <p className="mt-1 text-xs text-slate-500">{job.sourceCount} records · cutoff {job.cutoffDate} · {job.retentionYears} year(s)</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => downloadExport(job)} disabled={busy !== ''}><Download className="h-4 w-4" /> Export</button>
+                      <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => downloadExport(job)} disabled={busy !== ''}><Download className="h-4 w-4" />{L('Export')}</button>
                       {["snapshot_ready", "archive_partial"].includes(job.state) && <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setPrepared(job); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }}>{L('Continue')}</button>}
-                      <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setReportJobId(id); setIncludeArchived(true); setReportRecords([]); }}><Eye className="h-4 w-4" /> Report</button>
-                      {['archived', 'archive_partial', 'restored'].includes(job.state) && <button type="button" className={`${buttonClass} bg-amber-600 text-white hover:bg-amber-700`} onClick={() => { setRestoreTarget(job); setPrepared(null); setConfirmFarmName(''); setConfirmJobId(''); }}><RotateCcw className="h-4 w-4" /> Restore</button>}
+                      <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setReportJobId(id); setIncludeArchived(true); setReportRecords([]); }}><Eye className="h-4 w-4" />{L('Report')}</button>
+                      {['archived', 'archive_partial', 'restored'].includes(job.state) && <button type="button" className={`${buttonClass} bg-amber-600 text-white hover:bg-amber-700`} onClick={() => { setRestoreTarget(job); setPrepared(null); setConfirmFarmName(''); setConfirmJobId(''); }}><RotateCcw className="h-4 w-4" />{L('Restore')}</button>}
                     </div>
                   </div>
                 </div>;
@@ -303,14 +296,12 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
         {((prepared && ['snapshot_ready', 'archive_partial'].includes(prepared.state)) || restoreTarget) && (
           <section className="space-y-3 rounded-xl border border-amber-200 p-4 dark:border-amber-900">
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{restoreTarget ? 'Confirm archive restoration' : 'Confirm archive execution'}</h4>
-            {!restoreTarget && !prepared?.exportDownloaded && <p className="text-xs text-amber-800 dark:text-amber-200">Download the export first. The server enforces this requirement.</p>}
-            <p className="text-xs text-slate-500">Type the exact farm name and job ID. This is deliberately tedious because deleting records should not be a one-click hobby.</p>
+            {!restoreTarget && !prepared?.exportDownloaded && <p className="text-xs text-amber-800 dark:text-amber-200">{L('Download the export first. The server enforces this requirement.')}</p>}
+            <p className="text-xs text-slate-500">{L('Type the exact farm name and job ID. This is deliberately tedious because deleting records should not be a one-click hobby.')}</p>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-              <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Farm name
-                <input className={fieldClass} value={confirmFarmName} onChange={(e) => setConfirmFarmName(e.target.value)} autoComplete="off" />
+              <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Farm name')}<input className={fieldClass} value={confirmFarmName} onChange={(e) => setConfirmFarmName(e.target.value)} autoComplete="off" />
               </label>
-              <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Job ID
-                <input className={fieldClass} value={confirmJobId} onChange={(e) => setConfirmJobId(e.target.value)} autoComplete="off" />
+              <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Job ID')}<input className={fieldClass} value={confirmJobId} onChange={(e) => setConfirmJobId(e.target.value)} autoComplete="off" />
               </label>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -361,7 +352,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
               </div>
             </div>
           )}
-          {includeArchived && reportJob && reportRecords.length === 0 && <p className="text-xs text-slate-500">No archived records loaded for this report yet.</p>}
+          {includeArchived && reportJob && reportRecords.length === 0 && <p className="text-xs text-slate-500">{L('No archived records loaded for this report yet.')}</p>}
         </section>
       </div>
     </MufAdminCard>
