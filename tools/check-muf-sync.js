@@ -704,6 +704,38 @@ for (const [label, re] of VOICE_TWIN_CHECKS) {
   }
 }
 
+// ─── 9. Backend MUF storage adapter twin parity ────────────────────────────────
+console.log('\n━━ muf-storage backend twin parity ━━');
+const MUF_STORAGE_FILES = {
+  dairy: 'dairy_farm/backend/muf-storage.mjs',
+  flock: 'flock_farm/backend/muf-storage.mjs',
+  agri:  'agri_farm/backend/muf-storage.mjs',
+};
+const storageContents = Object.fromEntries(Object.entries(MUF_STORAGE_FILES).map(([app, file]) => [app, read(file)]));
+const storagePresent = Object.fromEntries(Object.entries(storageContents).map(([app, src]) => [app, Boolean(src)]));
+if (Object.values(storagePresent).every(Boolean) &&
+    storageContents.dairy === storageContents.flock &&
+    storageContents.dairy === storageContents.agri) {
+  console.log('  ✅ muf-storage.mjs byte-identical in all 3 backends');
+} else {
+  console.log(`  ❌ muf-storage.mjs parity: dairy=${storagePresent.dairy ? 'present' : 'missing'}, flock=${storagePresent.flock ? 'present' : 'missing'}, agri=${storagePresent.agri ? 'present' : 'missing'}`);
+  failures++;
+}
+for (const [label, re] of [
+  ['save API with server validation', /async\s+save\s*\(/],
+  ['read-link API', /async\s+readLink\s*\(/],
+  ['delete API', /async\s+delete\s*\(/],
+  ['orphan cleanup API', /async\s+cleanup\s*\(/],
+  ['100 KB default limit', /MUF_STORAGE_MAX_BYTES\s*=\s*100\s*\*\s*1024/],
+]) {
+  const src = storageContents.dairy || '';
+  if (re.test(src)) console.log(`  ✅ ${label}`);
+  else {
+    console.log(`  ❌ ${label} missing from dairy muf-storage.mjs`);
+    failures++;
+  }
+}
+
 // ─── result ───────────────────────────────────────────────────────────────────
 console.log('');
 if (failures === 0) {
