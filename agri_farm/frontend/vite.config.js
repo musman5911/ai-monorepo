@@ -5,18 +5,18 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Split stable third-party libraries into their own cacheable chunks so
-    // the app bundle stays small and a code change doesn't re-download vendors.
-    // (Vite 8 / Rolldown syntax.)
-    rollupOptions: {
+    // Rolldown codeSplitting replaces the deprecated advancedChunks option.
+    // Keep frequently cached vendors separate; PDF code is also dynamically imported
+    // from report actions so it is not downloaded on the initial app load.
+    rolldownOptions: {
       output: {
-        advancedChunks: {
+        codeSplitting: {
           groups: [
-            { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/ },
-            { name: 'motion', test: /node_modules[\\/](framer-motion|motion-dom|motion-utils)[\\/]/ },
-            { name: 'icons', test: /node_modules[\\/]lucide-react[\\/]/ },
-            { name: 'http', test: /node_modules[\\/]axios[\\/]/ },
-            { name: 'pdf', test: /node_modules[\\/](jspdf|jspdf-autotable|fflate|fast-png|iobuffer)[\\/]/ },
+            { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/, priority: 20 },
+            { name: 'motion', test: /node_modules[\\/](framer-motion|motion-dom|motion-utils)[\\/]/, priority: 10 },
+            { name: 'icons', test: /node_modules[\\/]lucide-react[\\/]/, priority: 5 },
+            { name: 'http', test: /node_modules[\\/]axios[\\/]/, priority: 5 },
+            { name: 'pdf', test: /node_modules[\\/](jspdf|jspdf-autotable|fflate|fast-png|iobuffer)[\\/]/, priority: 15 },
           ],
         },
       },
