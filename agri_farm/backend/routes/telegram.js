@@ -254,11 +254,15 @@ async function tgDailyText(date) {
   ].join('\n');
 }
 
-async function tgPushDaily(force = false) {
+async function tgPushDaily(force = false, allowedFarmIds = null) {
   const token = TOKEN();
   if (!token) return { sent: 0, reason: 'not configured' };
   const links = await tgRead('links');
-  const farms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+  let farms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+  if (Array.isArray(allowedFarmIds)) {
+    const allowed = new Set(allowedFarmIds.map(String));
+    farms = farms.filter((farm) => allowed.has(String(farm._id)));
+  }
   const m = await muf();
   const results = [];
   const date = todayStr();
@@ -310,7 +314,10 @@ router.put('/settings', protect, requireAdmin, asyncHandler(async (req, res) => 
 }));
 
 router.post('/send-summary', protect, requireAdmin, asyncHandler(async (_req, res) => {
-  return res.json(await tgPushDaily(true));
+  const context = mufGetFarmContext();
+  if (!context) return res.status(403).json({ detail: 'Farm context is required' });
+  const allowed = context.mode === 'single' ? [context.farmId] : (context.farmIds || []);
+  return res.json(await tgPushDaily(true, allowed));
 }));
 
 // cron-job.org: GET /telegram/cron?key=<CRON_SECRET> (evening ping)
