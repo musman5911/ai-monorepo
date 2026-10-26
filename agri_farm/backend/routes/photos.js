@@ -111,7 +111,19 @@ router.get('/photos/:id', protect, async (req, res) => {
     if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
     const photo = await PhotoAsset.findById(req.params.id);
     if (!photo) return res.status(404).json({ error: 'Photo not found' });
-    if (photo.provider === 'cloudinary' && photo.secureUrl) return res.redirect(302, photo.secureUrl);
+    if (photo.provider === 'cloudinary') {
+      let remoteUrl;
+      try { remoteUrl = new URL(photo.secureUrl); } catch { return res.status(502).json({ error: 'Stored Cloudinary URL is invalid' }); }
+      if (remoteUrl.protocol !== 'https:' || remoteUrl.hostname !== 'res.cloudinary.com') {
+        return res.status(502).json({ error: 'Stored Cloudinary URL is not trusted' });
+      }
+      const remote = await fetch(remoteUrl);
+      if (!remote.ok) return res.status(502).json({ error: 'Cloudinary photo retrieval failed' });
+      const bytes = Buffer.from(await remote.arrayBuffer());
+      return res.set('Content-Type', photo.contentType || remote.headers.get('content-type') || 'application/octet-stream')
+        .set('Cache-Control', 'private, max-age=3600')
+        .send(bytes);
+    }
     return res
       .set('Content-Type', photo.contentType || 'application/octet-stream')
       .set('Cache-Control', 'private, max-age=3600')
