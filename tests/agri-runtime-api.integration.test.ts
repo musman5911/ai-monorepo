@@ -31,11 +31,16 @@ async function request(route, { method = 'GET', token, body, farmId } = {}) {
   if (token) headers.Authorization = `Bearer ${token}`;
   if (farmId) headers['X-Farm-Id'] = farmId;
   if (body !== undefined) headers['Content-Type'] = 'application/json';
-  const response = await fetch(`${baseUrl}/api${route}`, {
-    method,
-    headers,
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let response;
+  try {
+    response = await fetch(`${baseUrl}/api${route}`, {
+      method,
+      headers,
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+  } catch (error) {
+    throw new Error(`Agri API request failed: ${method} /api${route}; server exit=${serverProcess?.exitCode}; server output:\n${serverOutput}\nOriginal error: ${String(error)}`);
+  }
   const raw = await response.text();
   let data = null;
   try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
