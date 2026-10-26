@@ -774,7 +774,12 @@ describe.sequential('Agri runtime API integration', () => {
     const invalid = await request('/photos', { method: 'POST', token: ownerToken, body: { data: 'data:image/gif;base64,R0lGODlh' } });
     expect(invalid.response.status).toBe(400);
 
-    const uploaded = await request('/photos', { method: 'POST', token: ownerToken, body: { data } });
+    let uploaded;
+    try {
+      uploaded = await request('/photos', { method: 'POST', token: ownerToken, body: { data } });
+    } catch (error) {
+      throw new Error(`Photo upload request failed; server exit=${serverProcess?.exitCode}; server output:\n${serverOutput}\nOriginal error: ${String(error)}`);
+    }
     expect(uploaded.response.status).toBe(201);
     expect(uploaded.data.path).toMatch(/^\/api\/photos\/[a-f0-9]{24}$/i);
     const photoPath = uploaded.data.path as string;
