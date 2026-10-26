@@ -4,6 +4,7 @@ import { Crop, CropPhoto, Spray, Field } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { mufIsFullRole } from '../muf-farms.mjs';
+import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 
 const router = express.Router();
 
@@ -128,6 +129,7 @@ router.delete('/crops/:cropId', protect, requireAdmin, asyncHandler(async (req, 
   // so deleted crops never leave orphaned image data in the database.
   await CropPhoto.deleteMany({ crop_id: cropId });
   await Spray.updateMany({ crop_id: cropId }, { $set: { image_base64: '' } });
+  await cleanupOrphanPhotoAssets();
   return res.json({ status: 'ok' });
 }));
 
