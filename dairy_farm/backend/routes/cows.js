@@ -15,6 +15,7 @@ import {
   applyPagination,
 } from './input.js';
 import { todayStr, daysAgoStr } from '../utils/date.js';
+import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 
 function cowPayload(body, { requireBasics = false } = {}) {
   const errors = [];
@@ -256,6 +257,7 @@ router.get('/:id', protect, async (req, res) => {
   try {
     const cow = await Cow.findById(req.params.id);
     if (!cow) return res.status(404).json({ error: 'Not found' });
+    if (Array.isArray(req.body?.gallery)) await cleanupOrphanPhotoAssets();
     res.json(cow);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -445,6 +447,7 @@ router.delete('/:id', protect, adminOnly, async (req, res) => {
     ]);
 
     await Cow.findByIdAndDelete(cowId);
+    await cleanupOrphanPhotoAssets();
     res.json({ deleted: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
