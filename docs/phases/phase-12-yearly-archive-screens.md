@@ -44,7 +44,9 @@ The owner runs, reviews and restores archives from a screen.
 - Added `tests/archive-screens.test.ts` to assert owner gating, export-before-execute, exact confirmation, restore/report paths, supported collections, and identical panel copies.
 - Owner-supplied local verification after commit `2810316`: focused archive-screen test passed (5 tests); full suite passed (40 files, 325 tests); sync, UI safety, workbench (23 checks), farm scope, phase docs, and all three production builds passed. The owner also reported a clean Git working tree.
 - These commands were run by the owner in the Windows checkout and were not independently executed in this editing session.
-- Still pending: complete Urdu translations for all new labels and final review of archive export, execute, and restore workflow behavior. This checkpoint is not a completion claim.
+- Added Urdu dictionary entries for the archive screen and localized its visible controls/status labels in all three apps; a source-contract test now checks key translations and dictionary parity.
+- Workflow review found and fixed two UI safety/usability issues: export completion is now confirmed by polling the server's `exportDownloaded` marker before the UI enables execution, and changing farm/collection/retention clears stale job confirmations. The preview now shows the prepared collection explicitly.
+- The three archive panels and Urdu dictionary twins are byte-identical by source inspection. Local tests and production builds must be rerun after these latest changes; Phase 12 is not yet complete.
 
 ## New command-line check
 
