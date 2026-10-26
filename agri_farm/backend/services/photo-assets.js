@@ -1,3 +1,5 @@
+import { MUF_ENV } from '../muf-env.mjs';
+import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.mjs';
 import { PhotoAsset, DiaryMedia, CropPhoto, Spray, Finance, Crop } from '../db.js';
 
 const MODELS = [DiaryMedia, CropPhoto, Spray, Finance, Crop];
@@ -31,7 +33,19 @@ export async function discoverOrphanPhotoAssets() {
 
 export async function cleanupOrphanPhotoAssets() {
   const { scanned, orphanIds } = await discoverOrphanPhotoAssets();
-  const objectIds = orphanIds;
-  const result = objectIds.length ? await PhotoAsset.deleteMany({ _id: { $in: objectIds } }) : { deletedCount: 0 };
-  return { scanned, candidates: orphanIds.length, deleted: result.deletedCount || 0 };
+  const config = { cloudName: MUF_ENV.cloudinaryCloudName, apiKey: MUF_ENV.cloudinaryApiKey, apiSecret: MUF_ENV.cloudinaryApiSecret };
+  const cloudinary = cloudinaryConfigured(config) ? createCloudinaryClient(config) : null;
+  let deleted = 0;
+  let skippedCloudinary = 0;
+  for (const id of orphanIds) {
+    const asset = await PhotoAsset.findById(id);
+    if (!asset) continue;
+    if (asset.provider === 'cloudinary' && asset.cloudinaryPublicId) {
+      if (!cloudinary) { skippedCloudinary++; continue; }
+      await cloudinary.destroy(asset.cloudinaryPublicId);
+    }
+    const result = await PhotoAsset.deleteOne({ _id: id });
+    deleted += result.deletedCount || 0;
+  }
+  return { scanned, candidates: orphanIds.length, deleted, skippedCloudinary };
 }
