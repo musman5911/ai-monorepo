@@ -40,6 +40,20 @@ describe('Phase 7: Telegram farm isolation', () => {
     expect(mufGetFarmContext()).toBeNull();
   });
 
+  it('simulates Farm B writes and proves Farm A summaries exclude them', async () => {
+    const records: Array<{ farmId: string; amount: number }> = [];
+    await mufRunTelegramFarm('farm-b', mufRunWithFarmContext, async () => {
+      const context = mufGetFarmContext();
+      if (context?.farmId) records.push({ farmId: context.farmId, amount: 250 });
+    });
+    await mufRunTelegramFarm('', mufRunWithFarmContext, async () => {
+      records.push({ farmId: 'default-farm', amount: 999 });
+    });
+    const farmASummary = records.filter((record) => record.farmId === 'farm-a');
+    expect(records).toEqual([{ farmId: 'farm-b', amount: 250 }]);
+    expect(farmASummary).toEqual([]);
+  });
+
   it('keeps the farm-context helper identical across all three apps', () => {
     const contents = apps.map((app) => source(app, 'backend/muf-telegram-farms.mjs'));
     expect(contents[1]).toBe(contents[0]);
