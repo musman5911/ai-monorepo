@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 9 implementation and regression-test correction committed; focused verification is pending).
+Last updated: 2026-10-26 (Phase 9 focused/full tests, checks, builds, and runtime smoke test passed; Phase 9 marked Done).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -19,7 +19,7 @@ Last updated: 2026-10-26 (Phase 9 implementation and regression-test correction 
 | 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
 | 7 | Telegram bot and daily summary per farm | Done | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
-| 9 | Cloudinary photo store | In progress | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
+| 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Not started | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
@@ -49,9 +49,9 @@ The owner ran the focused suite after pulling the initial Phase 9 changes. Resul
 
 
 
-Phase 9, Cloudinary photo store, is **In progress**. Initial implementation has been committed directly to `muf-monorepo`: signed Cloudinary REST client with injectable `fetch`, optional Cloudinary env configuration across Dairy/Flock/Agri, route integration using MongoDB metadata records to preserve existing local API paths, MongoDB fallback when credentials are incomplete, authenticated proxy reads for Cloudinary-backed photos, and Cloudinary-aware photo orphan/batch cleanup. Official Free plan limits are recorded in the Phase 9 document and deployment guide.
+Phase 9, Cloudinary photo store, is **Done for command-line scope**. Initial implementation has been committed directly to `muf-monorepo`: signed Cloudinary REST client with injectable `fetch`, optional Cloudinary env configuration across Dairy/Flock/Agri, route integration using MongoDB metadata records to preserve existing local API paths, MongoDB fallback when credentials are incomplete, authenticated proxy reads for Cloudinary-backed photos, and Cloudinary-aware photo orphan/batch cleanup. Official Free plan limits are recorded in the Phase 9 document and deployment guide.
 
-**Not yet verified:** `tests/cloudinary-store.test.ts` has been added but not run; route-level fallback and old-photo compatibility coverage should be strengthened; `npm test`, `npm run check-sync`, UI/workbench/farm/docs checks, and all three production builds have not been run against this change. Phase 9 remains In progress until the owner runs the command sequence and any failures are fixed. No live Cloudinary credentials or uploads are part of this phase.
+**Verified:** the focused photo suite passed (6 files, 36 tests); the full suite passed (37 files, 307 tests); sync, UI, workbench, farm, docs, all three production builds, and the optional workbench runtime smoke test passed. No live Cloudinary credentials or uploads were used. Phase 9 is Done for command-line scope; live-provider validation remains deferred to the final live-verification phase.
 
 ## Phase 8 final verification (2026-10-26)
 
@@ -74,7 +74,7 @@ Phase 8, Photo storage adapter, is **Done for command-line scope**. Dairy, Flock
 
 The first focused run was 29/30 because Dairy photo deletion returned HTTP 500. The missing model-level `deleteOne(filter)` method was added to the Dairy and Flock in-memory model adapters. The subsequent focused run passed 30/30, and the full suite passed 301/301. These are results supplied by the owner, not commands independently run in this documentation-editing session.
 
-Phase 8 is **Done for command-line scope**. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21. Phase 9 is next: implement the Cloudinary store behind the existing adapter, preserve legacy photo reads, and use mocked HTTP tests. Do not enable live uploads or commit secrets in Phase 9.
+Phase 8 is **Done for command-line scope**. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21. Phase 9 is Done for command-line scope. Next is Phase 10, Smaller downloads and faster screens. Do not enable live Cloudinary uploads until the planned live-verification phase.
 
 ## Phase 3 final local verification (2026-10-25, Windows CMD; output supplied by owner)
 
