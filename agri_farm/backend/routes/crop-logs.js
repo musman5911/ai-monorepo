@@ -120,7 +120,7 @@ router.delete('/crop-photos/:photoId', protect, requireAdmin, asyncHandler(async
   const oid = parseOid(req.params.photoId, 'photo ID');
   const result = await CropPhoto.deleteOne({ _id: oid });
   if (!result.deletedCount) return notFound(res, 'Photo not found');
-  await cleanupOrphanPhotoAssets();
+  try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
   return res.json({ status: 'ok' });
 }));
 
@@ -167,7 +167,7 @@ router.delete('/spray/:logId', protect, requireAdmin, asyncHandler(async (req, r
     }
   }
   await Spray.deleteOne({ _id: oid });
-  await cleanupOrphanPhotoAssets();
+  try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
   return res.json({ status: 'ok' });
 }));
 
