@@ -736,6 +736,30 @@ for (const [label, re] of [
   }
 }
 
+// ─── 10. Cloudinary client parity ─────────────────────────────────────────────
+console.log('\n━━ muf-cloudinary backend twin parity ━━');
+const MUF_CLOUDINARY_FILES = {
+  dairy: 'dairy_farm/backend/muf-cloudinary.mjs',
+  flock: 'flock_farm/backend/muf-cloudinary.mjs',
+  agri:  'agri_farm/backend/muf-cloudinary.mjs',
+};
+const cloudinaryContents = Object.fromEntries(Object.entries(MUF_CLOUDINARY_FILES).map(([app, file]) => [app, read(file)]));
+if (Object.values(cloudinaryContents).every(Boolean) &&
+    cloudinaryContents.dairy === cloudinaryContents.flock &&
+    cloudinaryContents.dairy === cloudinaryContents.agri) {
+  console.log('  ✅ muf-cloudinary.mjs byte-identical in all 3 backends');
+} else {
+  console.log('  ❌ muf-cloudinary.mjs missing or different between backends');
+  failures++;
+}
+for (const [label, re] of [
+  ['Cloudinary signing client', /createCloudinaryClient/],
+  ['optional-credential detector', /cloudinaryConfigured/],
+]) {
+  if (re.test(cloudinaryContents.dairy || '')) console.log(`  ✅ ${label}`);
+  else { console.log(`  ❌ ${label} missing from muf-cloudinary.mjs`); failures++; }
+}
+
 // ─── result ───────────────────────────────────────────────────────────────────
 console.log('');
 if (failures === 0) {
