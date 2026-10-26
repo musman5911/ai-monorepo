@@ -1,5 +1,3 @@
-import express from 'express';
-import mongoose from 'mongoose';
 import { randomUUID } from 'node:crypto';
 
 /**
@@ -8,6 +6,7 @@ import { randomUUID } from 'node:crypto';
  * source documents and are kept in the same database as the source records.
  */
 export function createYearlyArchiveRouter({
+  express, mongoose,
   Farm, sources, ownerUnscoped, runUnscoped, scopeModels,
   ArchiveJob: suppliedJobModel, ArchiveRecord: suppliedRecordModel,
 }) {
