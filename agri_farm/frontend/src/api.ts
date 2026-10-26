@@ -189,7 +189,37 @@ export const getDiaryEntries = () => api.get('/diary-media/entries');
 export const saveDiaryMedia = (date: string, photos?: unknown[], entries?: unknown[]) => api.put(`/diary-media/${encodeURIComponent(date)}`, { ...(photos !== undefined ? { photos } : {}), ...(entries !== undefined ? { entries } : {}) });
 
 
-export const uploadPhoto = (data: string) => api.post('/photos', { data });
+async function fitPhotoDataUrl(data: string): Promise<string> {
+  if (!/^data:image\/(?:jpeg|png|webp);base64,/.test(data)) throw new TypeError('Photo must be a JPEG, PNG or WebP data URL');
+  const encoded = data.slice(data.indexOf(',') + 1);
+  if (Math.floor(encoded.length * 3 / 4) <= 90 * 1024) return data;
+  const image = new Image();
+  image.src = data;
+  await new Promise<void>((resolve, reject) => {
+    image.onload = () => resolve();
+    image.onerror = () => reject(new Error('Could not decode photo for storage'));
+  });
+  let width = image.naturalWidth;
+  let height = image.naturalHeight;
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const scale = Math.min(1, 1280 / Math.max(width, height));
+    const canvas = document.createElement('canvas');
+    canvas.width = Math.max(1, Math.round(width * scale));
+    canvas.height = Math.max(1, Math.round(height * scale));
+    const context = canvas.getContext('2d');
+    if (!context) throw new Error('Photo compression is unavailable in this browser');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+    const quality = Math.max(0.35, 0.82 - attempt * 0.06);
+    const compressed = canvas.toDataURL('image/jpeg', quality);
+    const bytes = Math.floor((compressed.split(',')[1]?.length || 0) * 3 / 4);
+    if (bytes <= 90 * 1024) return compressed;
+    width = Math.max(1, Math.round(width * 0.82));
+    height = Math.max(1, Math.round(height * 0.82));
+  }
+  throw new RangeError('Photo could not be compressed below the 100 KiB storage limit');
+}
+
+export const uploadPhoto = async (data: string) => api.post('/photos', { data: await fitPhotoDataUrl(data) });
 export const getPhotoObjectUrl = async (path: string): Promise<string> => {
     const response = await api.get(path.replace(/^\/api/, ''), { responseType: 'blob' });
     return URL.createObjectURL(response.data);
