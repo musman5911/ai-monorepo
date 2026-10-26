@@ -179,7 +179,7 @@ if (useMock) {
 // Server-side farm scoping: inside a request every query of these models is limited
 // to the selected farm(s) and every create is stamped with it (see muf-farms.mjs).
 const MUF_FARM_MODELS = {
-  Field, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, PhotoAsset, Laborer,
+  ArchiveJob, ArchiveRecord, Field, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, PhotoAsset, Laborer,
   Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia,
 };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
