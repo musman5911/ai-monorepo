@@ -5,6 +5,7 @@ import { mufIsFullRole } from '../muf-farms.mjs';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { HttpError, badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
+import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 
 const router = express.Router();
 
@@ -119,6 +120,7 @@ router.delete('/crop-photos/:photoId', protect, requireAdmin, asyncHandler(async
   const oid = parseOid(req.params.photoId, 'photo ID');
   const result = await CropPhoto.deleteOne({ _id: oid });
   if (!result.deletedCount) return notFound(res, 'Photo not found');
+  await cleanupOrphanPhotoAssets();
   return res.json({ status: 'ok' });
 }));
 
