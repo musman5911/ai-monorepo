@@ -190,6 +190,13 @@ function createModel(name, schema) {
       return d;
     },
 
+    async deleteOne(filter) {
+      const idx = store.findIndex((d) => matches(d, filter || {}));
+      if (idx === -1) return { deletedCount: 0 };
+      store.splice(idx, 1);
+      return { deletedCount: 1 };
+    },
+
     async deleteMany(filter) {
       const before = store.length;
       const keep = [];
