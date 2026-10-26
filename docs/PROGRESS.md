@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 9 focused/full tests, checks, builds, and runtime smoke test passed; Phase 9 marked Done).
+Last updated: 2026-10-26 (Phase 10 started; baseline measurement and lazy-loading work pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -20,7 +20,7 @@ Last updated: 2026-10-26 (Phase 9 focused/full tests, checks, builds, and runtim
 | 7 | Telegram bot and daily summary per farm | Done | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
-| 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
+| 10 | Smaller downloads and faster screens | In progress | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Not started | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
@@ -43,7 +43,7 @@ Phase 7 is **Done for command-line scope**. These are results supplied by the ow
 
 Audit focus: preserve existing webhook secret validation and current bot commands; trace each app's farm context and data stores before changing record writes, daily summary and monthly email flows. Required regression: farm B chat writes only to farm B, an unlinked chat creates nothing, and farm A summary excludes farm B data.
 
-## Phase 9 verification results (2026-10-26)
+## Phase 10 start (2026-10-26)\n\nPhase 10 is now In progress on `muf-monorepo`. Initial source inspection found eager PDF utility imports in the app entry modules, an eager Agri chart import, Agri's Vite `advancedChunks` configuration, and the existing Dairy mixed static/dynamic API import warning. A fresh build baseline has not yet been captured in this work session; historical sizes in the Phase 10 plan are not treated as fresh measurements. First implementation tasks: measure current outputs, lazy-load PDF/chart/workbench code where safe, fix the deprecated Vite chunk setting and Dairy API import warning, then add `npm run check-bundle-size`.\n\n## Phase 9 verification results (2026-10-26)
 
 After commit `3a2ff45` corrected the stale Phase 8 cleanup assertion, the owner reran the focused suite: **6 test files passed, 36 tests passed, 0 failed**. The full suite passed: **37 test files, 307 tests, 0 failed**. `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs`, `tools\\build-all.bat` (Dairy, Flock, Agri all successful), and `npm run check-workbench-runtime` (8 checks) all passed. `npm ci` was not run because dependencies were already installed. No live Cloudinary credentials or uploads were used. Phase 9 is Done for command-line scope; live-provider validation remains deferred to the final live-verification phase.
 
