@@ -1,6 +1,6 @@
 # Phase 12: Yearly archive: screens
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -46,7 +46,7 @@ The owner runs, reviews and restores archives from a screen.
 - These commands were run by the owner in the Windows checkout and were not independently executed in this editing session.
 - Added Urdu dictionary entries for the archive screen and localized its visible controls/status labels in all three apps; a source-contract test now checks key translations and dictionary parity.
 - Workflow review found and fixed two UI safety/usability issues: export completion is now confirmed by polling the server's `exportDownloaded` marker before the UI enables execution, and changing farm/collection/retention clears stale job confirmations. The preview now shows the prepared collection explicitly.
-- Follow-up translation audit localized the archive safety explanation, archived-report description, and remaining fixed report labels; matching Urdu dictionary entries were added to all three identical dictionaries. `tests/archive-screens.test.ts` now asserts this added coverage. These source changes were committed after the owner’s successful local test/build run, so the focused test, full suite, sync check, docs check, and all three production builds must be rerun locally. Phase 12 remains In progress until those results are supplied and the workflow review is closed.
+- Follow-up translation audit localized the archive safety explanation, archived-report description, and remaining fixed report labels; matching Urdu dictionary entries were added to all three identical dictionaries. `tests/archive-screens.test.ts` asserts this coverage. The owner subsequently reran the focused and full test suites, sync/UI/workbench/farm/docs checks, and all three production builds successfully (results recorded in `docs/PROGRESS.md`). Source review confirmed the UI waits for the server export marker, binds confirmation to the selected farm and job, clears stale confirmation when archive inputs change, scopes history/records to the selected farm, and keeps archived-record viewing explicitly opt-in and separate from active totals. No live MongoDB, browser/device, or deployment verification is claimed; those remain in Phases 19–21.
 
 ## New command-line check
 
@@ -68,13 +68,13 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] An owner-only Archive screen: choose farm and years, preview counts, run, download the export.
-- [ ] A list of past archives with restore.
-- [ ] Reports can optionally include archived years.
-- [ ] Urdu labels for every new word.
-- [ ] The new command-line check above exists and passes.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] An owner-only Archive screen: choose farm and years, preview counts, run, download the export.
+- [x] A list of past archives with restore.
+- [x] Reports can optionally include archived years through an explicit separate archived-record report view; active reports and totals remain unchanged.
+- [x] Urdu labels for archive workflow copy are covered by source-contract tests.
+- [x] The new command-line check above exists and passes (8 tests).
+- [x] The standard checks above pass; see the owner-reported Phase 12 final verification in `docs/PROGRESS.md`.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Rules for whoever works on this phase
 
