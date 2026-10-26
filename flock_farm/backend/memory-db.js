@@ -188,6 +188,12 @@ export function makeMemoryModel(name, schema) {
       }
       return docs;
     },
+    async deleteOne(filter = {}) {
+      const idx = store.findIndex((doc) => matches(doc, filter));
+      if (idx === -1) return { deletedCount: 0 };
+      store.splice(idx, 1);
+      return { deletedCount: 1 };
+    },
     async deleteMany(filter = {}) {
       const keep = store.filter((d) => !matches(d, filter));
       const deletedCount = store.length - keep.length;
