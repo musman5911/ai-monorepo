@@ -1,6 +1,6 @@
 # Phase 7: Telegram bot and daily summary per farm
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
