@@ -90,6 +90,27 @@ describe('Phase 12 yearly archive screens', () => {
     ]) expect(read(file)).toBe(read('dairy_farm/client/src/muf/data/muf-urdu-terms-6.ts'));
   });
 
+  it('localizes all fixed archive workflow copy and keeps the dictionary keys present', () => {
+    const source = read(panels[0]);
+    const dictionaryFiles = [
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-1.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-2.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-3.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-4.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-5.ts',
+      'dairy_farm/client/src/muf/data/muf-urdu-terms-6.ts',
+    ].map(read).join('\\n');
+    for (const label of [
+      'Archiving removes records from active lists only after a complete snapshot has been exported and the exact farm name and job ID are confirmed. Preparing a snapshot does not delete active records.',
+      'Archive job', 'Showing', 'archived records from job',
+      'This is a separate archive report view, not merged into active totals.',
+      'records', 'cutoff', 'year(s)',
+    ]) {
+      expect(source).toContain("L('" + label + "')");
+      expect(dictionaryFiles).toContain(JSON.stringify(label) + ':');
+    }
+  });
+
   it('keeps the three archive panels byte-identical', () => {
     expect(read(panels[1])).toBe(read(panels[0]));
     expect(read(panels[2])).toBe(read(panels[0]));
