@@ -8,12 +8,12 @@ The three apps load faster on phones with slow connections.
 
 ## Already in place (from Phase 0)
 
-- Previously recorded build output (Phase 0; must be refreshed): Flock about 977 kB, Dairy about 760 kB, Agri about 659 kB for the largest file.
-- The initial source used Agri's deprecated `advancedChunks` setting and had a mixed static/dynamic import of Dairy's `api.ts`. These source issues have now been corrected; fresh build output still needs to confirm the warnings are gone.
+- Fresh owner-reported production build (2026-10-26): Dairy largest JavaScript file `index-C0HskdMJ.js` = 772.7 KiB; Agri `index-DL0ydQ8A.js` = 659.8 KiB; Flock `index-xqhjsCDQ.js` = 961.9 KiB.
+- The initial source used Agri's deprecated `advancedChunks` setting and had a mixed static/dynamic import of Dairy's `api.ts`. Source corrections are committed and all three builds succeeded. `tools\\build-all.bat` summarizes builds rather than exposing full bundler warnings, so absence of warnings is not confirmed by this output.
 
 ## Scope
 
-Initial per-file JavaScript budgets (largest emitted `.js`/`.mjs` file in each app): Dairy 700 KiB, Agri 600 KiB, Flock 850 KiB. These are provisional upper bounds based on the previously recorded warning sizes; after a fresh build, compare actual output and adjust only with documented evidence. The check fails if an app has no built JavaScript assets.
+Per-file JavaScript budgets (largest emitted `.js`/`.mjs` file in each app): Dairy 700 KiB, Agri 600 KiB, Flock 850 KiB. The first measured build exceeds all three budgets: Dairy by 72.7 KiB, Agri by 59.8 KiB, and Flock by 111.9 KiB. Do not raise budgets just to make the check pass; split or defer the actual large dependencies, then measure again. The check fails if an app has no built JavaScript assets.
 
 - Load PDF, charts and the workbench only when needed (lazy loading).
 - Fix the Agri deprecated build setting and the Dairy mixed import warning.
@@ -30,6 +30,21 @@ Initial per-file JavaScript budgets (largest emitted `.js`/`.mjs` file in each a
 2. Lazy-load PDF utilities, charts and the workbench entry points only at their use points; split the biggest chunks one app at a time.
 3. Rebuild and compare after each change; keep the app's current screens and behavior unchanged.
 4. Add `tools/check-bundle-size.js`, expose `npm run check-bundle-size`, and test pass, over-budget, and missing-build cases.
+
+## Latest verification (owner-reported, 2026-10-26)
+
+- `npm test -- tests/check-bundle-size.test.ts`: **passed**, 1 file / 3 tests.
+- `npm run check-sync`: **passed**; three-app MUF parity checks passed.
+- `npm run check-docs`: **passed**.
+- `tools\\build-all.bat`: **passed**, Dairy, Flock and Agri all built successfully.
+- `npm test`: **passed**, 38 files / 310 tests.
+- `npm run check-ui`: **passed**.
+- `npm run check-workbench`: invoked; the pasted log does not include a final summary line, so treat this as unconfirmed until rerun if needed.
+- `npm run check-farms`: **passed**, farm-scope checks and Dairy breeding runtime checks reported success.
+- `npm run check-bundle-size`: **failed as expected** because all three largest chunks exceed their budgets: Dairy 772.7/700 KiB, Agri 659.8/600 KiB, Flock 961.9/850 KiB.
+- `npm ci` and `npm run check-workbench-runtime` were not shown as run.
+
+The build and full tests pass, but the bundle-size gate does not. Phase 10 remains In progress. Next work is to inspect the actual emitted chunk composition and Vite/Rolldown split behavior, then reduce initial entry chunks and rerun the same checks.
 
 ## New command-line check
 
@@ -51,9 +66,9 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] Load PDF and chart code only when needed (dynamic imports/lazy component); the workbench is already on a dev-only route and is not part of production builds.
-- [ ] Fix the Agri deprecated build setting and the Dairy mixed import warning.
-- [x] Provisional per-file JavaScript budgets recorded: Dairy 700 KiB, Agri 600 KiB, Flock 850 KiB; validate against fresh builds before finalizing.
+- [ ] Confirm PDF/chart/report code is split out of initial entry chunks and materially reduces initial downloads; current bundle measurements show the first pass is not sufficient.
+- [ ] Confirm the Agri deprecated build warning and Dairy mixed-import warning are absent in direct app build output; the wrapper build output alone does not confirm warning status.
+- [x] Per-file JavaScript budgets recorded and compared with fresh output; all three apps currently exceed their limits.
 - [ ] No change to how screens look or behave.
 - [ ] `npm run check-bundle-size` exists and passes after all three production builds.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
