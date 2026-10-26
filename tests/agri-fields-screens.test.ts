@@ -26,7 +26,7 @@ describe('Agri fields and crop-cycle screen contracts', () => {
     const app = read('agri_farm/frontend/src/App.tsx');
     const helpers = read('agri_farm/frontend/src/components/app/agriHelpers.ts');
     expect(helpers).toContain("fieldId: ''");
-    expect(app).toContain("L('Registered field')");
+    expect(app).toContain("L('Registered field', 'رجسٹر شدہ کھیت')");
     expect(app).toContain('value={cropForm.fieldId || \'\'}');
     expect(app).toContain('fieldId: crop.fieldId || \'\'');
     expect(app).toContain('L(\'Manage Fields\')');
