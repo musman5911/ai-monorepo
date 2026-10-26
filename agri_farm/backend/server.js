@@ -28,6 +28,7 @@ import cropLogsRoutes from './routes/crop-logs.js';
 import laborRoutes from './routes/labor.js';
 import telegramRoutes, { initTelegram } from './routes/telegram.js';
 import backupRoutes, { maybeRunMonthlyAutoBackup } from './routes/backup.js';
+import archiveRoutes from './routes/archive.js';
 import cardsRoutes from './routes/cards.js';
 import diaryMediaRoutes from './routes/diary-media.js';
 import photosRoutes from './routes/photos.js';
