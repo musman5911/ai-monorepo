@@ -70,7 +70,7 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [ ] Run and, if needed, extend app-level regression tests for upload/read/delete, farm isolation, legacy photo compatibility and record deletion in Dairy and Agri; rerun all standard checks after implementation.
 - [x] Add regression tests for recursive Flock image reference discovery, retaining images referenced by any bucket, and orphan candidate selection. (Latest run status must be confirmed.)
 - [x] Add `tests/photo-phase8-regression.test.ts` for Dairy/Agri photo migration and cleanup contracts. (Added; not yet executed in this editing session.)
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated. (Latest `npm run check-docs` still needs to run.)
 
 ## Rules for whoever works on this phase
 
