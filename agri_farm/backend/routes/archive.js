@@ -1,7 +1,7 @@
 import { createYearlyArchiveRouter } from '../../../shared/muf-yearly-archive.mjs';
-import { Farm, Finance, mufScopeModels } from '../db.js';
+import { Farm, Finance } from '../db.js';
 import { protectUnscoped, ownerOnly } from '../middleware/auth.js';
-import { mufRunUnscoped } from '../muf-farms.mjs';
+import { mufRunUnscoped, mufScopeModels } from '../muf-farms.mjs';
 
 export default createYearlyArchiveRouter({
   Farm,
