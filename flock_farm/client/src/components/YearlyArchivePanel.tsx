@@ -40,8 +40,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
   const base = apiBase.replace(/\/+$/, '');
   const activeFarm = farms.find((farm) => (farm._id || farm.id) === farmId);
   const farmName = activeFarm?.name || '';
-  const selectedJob = jobs.find((job) => (job._id || job.id) === (prepared?._id || prepared?.id));
-  const targetJob = restoreTarget || selectedJob;
+  const targetJob = restoreTarget || prepared;
   const canConfirm = !!targetJob && confirmFarmName === farmName && confirmJobId === String(targetJob._id || targetJob.id);
 
   const request = useCallback(async (path: string, init: RequestInit = {}) => {
@@ -59,9 +58,11 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
   }, [base, getHeaders]);
 
   const refreshJobs = useCallback(async (selectedFarmId = farmId) => {
-    if (!selectedFarmId) { setJobs([]); return; }
+    if (!selectedFarmId) { setJobs([]); return []; }
     const { data } = await request(`/archive/jobs?farmId=${encodeURIComponent(selectedFarmId)}`);
-    setJobs(Array.isArray(data) ? data : []);
+    const nextJobs = Array.isArray(data) ? data as ArchiveJob[] : [];
+    setJobs(nextJobs);
+    return nextJobs;
   }, [farmId, request]);
 
   const loadFarms = useCallback(async () => {
@@ -120,7 +121,11 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
     setBusy(`export:${job._id || job.id}`);
     try {
       const id = String(job._id || job.id);
-      const { response } = await request(`/archive/jobs/${encodeURIComponent(id)}/export?farmId=${encodeURIComponent(farmId)}`);
+      const response = await fetch(`${base}/archive/jobs/${encodeURIComponent(id)}/export?farmId=${encodeURIComponent(farmId)}`, { headers: getHeaders() });
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || data.message || `Export failed (${response.status})`);
+      }
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -131,7 +136,9 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
       link.remove();
       URL.revokeObjectURL(url);
       setNotice('Export download started. Wait for the download to finish before executing the archive.');
-      await refreshJobs(farmId);
+      const refreshed = await refreshJobs(farmId);
+      const refreshedJob = refreshed.find((item) => String(item._id || item.id) === id);
+      if (refreshedJob) setPrepared(refreshedJob);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Export download failed');
     } finally { setBusy(''); }
