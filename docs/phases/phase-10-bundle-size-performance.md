@@ -6,7 +6,7 @@
 
 The three apps load faster on phones with slow connections.
 
-## Implementation completed
+## Already in place
 
 - Lazy-load the shared PDF shell from zakat, ushr and farm-book report actions.
 - Lazy-load Agri's dashboard chart and Dairy's Reports screen.
