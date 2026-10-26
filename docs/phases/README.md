@@ -28,7 +28,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phase-21-final-testing-live-and-signoff.md) |
 
 
-Phase 8 remains **In progress** on `muf-monorepo`. Dairy cow gallery/receipts and Agri receipts/spray photos are migrated alongside the earlier diary/crop-photo flows. The owner reported passing validation before the latest runtime-test and daily-log fix commits. New Dairy HTTP integration coverage now exercises photo upload/read/delete, farm isolation, referenced-photo protection, orphan discovery, cleanup grace period, and admin role gates; Agri runtime coverage now also checks photo farm isolation. These latest changes still need the owner’s local test/build run before Phase 8 can be marked Done. See [Phase 8 details](phase-08-photo-storage-adapter.md).
+Phase 8 remains **In progress** on `muf-monorepo`. Dairy cow gallery/receipts and Agri receipts/spray photos are migrated alongside the earlier diary/crop-photo flows. The owner reported passing validation before the latest runtime-test and daily-log fix commits. New Dairy HTTP integration coverage now exercises photo upload/read/delete, farm isolation, referenced-photo protection, orphan discovery, cleanup grace period, and admin role gates; Agri runtime coverage now also checks photo farm isolation. The owner’s first focused run reported 29/30 passing; the Dairy photo delete endpoint returned HTTP 500. Added model-level `deleteOne(filter)` support to Dairy and Flock memory adapters. This fix still needs a fresh local test/build run before Phase 8 can be marked Done. See [Phase 8 details](phase-08-photo-storage-adapter.md).
 
 ## How a phase runs
 
