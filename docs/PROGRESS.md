@@ -45,7 +45,7 @@ Audit focus: preserve existing webhook secret validation and current bot command
 
 ## Phase 12 start (2026-10-26)
 
-Phase 12, Yearly archive: screens, is **In progress**. Initial audit confirms that all three apps mount the Phase 11 owner-only archive API and already have an Admin > Reports integration point plus a shared MUF reports component. The UI will be owner-only, require an explicit farm and retention period, preserve export-before-execute and exact typed confirmation, expose archive history/restore, and keep existing reports active-only unless archived years are explicitly selected. No Phase 12 implementation tests or builds have been run at this start checkpoint.
+Phase 12, Yearly archive: screens, remains **In progress**. Added matching `YearlyArchivePanel.tsx` components in Dairy, Flock and Agri and embedded them in each Admin > Reports area. The panel supports farm/collection/retention selection, server-generated eligible-record snapshots, export download, exact farm-name/job-ID confirmation, archive history, record viewing, and conflict-aware restore. The archived-record report is opt-in and separate from active reports. Added `tests/archive-screens.test.ts` for source-contract regression checks. The required owner gate is enforced both in the panel and by the existing owner-only backend routes. Urdu translation coverage and all local tests/builds still need verification; no commands were run in this editing session.
 
 ## Phase 11 final verification (owner-reported, 2026-10-26)
 
