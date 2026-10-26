@@ -256,4 +256,4 @@ Phase 6, Agri fields and crop cycles screens, is **Done for the planned command-
 
 The initial failure was a stale source-contract expectation; the API implementation correctly included its payload argument. The test assertion was corrected, and the owner supplied passing focused and full-suite results afterward. The final correction changed only the test expectation. Results are owner-reported, not commands independently run in this editing session.
 
-The Phase 6 checklist is complete for command-line scope. No browser/phone, real-MongoDB, or live-site verification is claimed; those remain in Phases 19 to 21. Phase 7 is now In progress.
+The Phase 6 checklist is complete for command-line scope. No browser/phone, real-MongoDB, or live-site verification is claimed; those remain in Phases 19 to 21. Phase 7 subsequently completed for command-line scope; see the Phase 7 entry above.
