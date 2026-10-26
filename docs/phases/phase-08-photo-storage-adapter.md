@@ -1,6 +1,6 @@
 # Phase 8: Photo storage adapter
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
