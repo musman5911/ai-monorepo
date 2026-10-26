@@ -29,8 +29,8 @@ Each Telegram chat is linked to one farm, bot entries land in that farm, and dai
 - Before implementation, link records stored user/worker identity without a farm assignment. Phase 7 now adds `farmId` to new link codes and linked-chat records; legacy links without a farm fail closed and require relinking.
 - Flock's Telegram data-store helpers fall back to the default farm when no farm context is active. New webhook handling resolves the linked farm and runs commands in MUF's single-farm context; scheduled summaries now iterate farms independently in all three backends.
 - Existing webhook secret checks, command parsing, worker attendance, production-drop alerts and summary controls must remain intact. No new bot commands are in scope.
-- Validation run on 2026-10-26 initially passed the focused Phase 7 tests (12/12), full test suite (276/276), UI/workbench/docs checks and all three builds. Follow-up checks exposed Dairy/Flock manual-summary handler syntax and Agri Urdu labels outside the shared MUF dictionary; the route/dictionary changes were corrected. The latest uploaded CMD log then showed four stale Agri screen-test assertions expecting inline Urdu arguments after the labels moved into the shared dictionary. Those tests now verify the shared dictionary entries (commit `fb489ee9c3bf947c926ce5b61fbf53f23efbaae2`). The latest docs check and all three builds passed, but focused/full tests, `check-sync` and `check-farms` must be rerun against the fixes before closure.
-- Implementation and acceptance tests are not complete yet. Do not mark this phase Done until the farm-B / unlinked-chat / farm-A-summary regression passes.
+- Validation update (2026-10-26; Windows CMD output supplied by the owner): after pulling through `65ce981`, `npm test -- tests/agri-fields-screens.test.ts` passed (1 file, 4 tests), `npm test` passed (30 files, 276 tests), `npm run check-sync` passed (all three apps and shared MUF checks in sync), `npm run check-farms` passed (Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks), `npm run check-docs` passed, and `tools\\build-all.bat` built Dairy, Flock and Agri successfully. The full suite includes `tests/telegram-farm-scope.test.ts` (12 tests), so the automated farm-B / unlinked-chat / farm-A-summary regression is covered by the passing suite. These are owner-reported results, not commands independently run in this editing session.
+- Phase 7 remains **In progress**: `npm run check-ui` and `npm run check-workbench` from the phase's standard list were not included in this latest output, and the separate monthly email/report path still needs its final farm-scope audit. Run the missing checks and finish that audit before marking the phase Done.
 
 ## Implementation checkpoint (2026-10-26)
 
@@ -72,8 +72,8 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [ ] Records created by the bot are stamped with the linked farm.
 - [ ] Telegram daily summaries and Dairy daily-summary emails are farm-scoped; manual sends respect the caller's selected/assigned farms. Audit any separate monthly email/report job before closure.
 - [ ] Unlinked chats get a clear message and create nothing.
-- [ ] The new command-line check above exists and passes.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
+- [x] The new command-line check above exists and passes: `tests/telegram-farm-scope.test.ts` is included in the passing 276-test full suite (12 tests).
+- [ ] The standard checks above all pass (latest output confirms `npm test`, `check-sync`, `check-farms`, `check-docs` and all three builds; `check-ui` and `check-workbench` still need a fresh run).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Rules for whoever works on this phase
