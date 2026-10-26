@@ -1,6 +1,6 @@
 # Phase 9: Cloudinary photo store
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -13,8 +13,8 @@ New photos can go to Cloudinary (free plan) while old photos keep displaying.
 ## Scope
 
 - A Cloudinary store behind the Phase 8 adapter, using `fetch` and signed requests (no new package).
-- Environment names `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` added to every `.env.example`, to `muf-env.mjs` and to the sync check.
-- When the variables are missing the app keeps using the default store and logs one clear message.
+- Environment names `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` are now in all three `.env.example` files and byte-identical `muf-env.mjs` twins; `tools/check-muf-sync.js` checks the names.
+- When any credential is missing, the three apps keep using MongoDB and log one clear fallback message.
 - Photos saved before the switch still display; no automatic mass move.
 - Free-plan limits written down in this file after checking Cloudinary's pages.
 
@@ -25,14 +25,14 @@ New photos can go to Cloudinary (free plan) while old photos keep displaying.
 
 ## Steps
 
-1. Check Cloudinary's current free-plan limits and write them here.
-2. Implement signing, upload and delete with a mockable HTTP client.
-3. Add environment names everywhere and update `DEPLOYMENT.md`.
-4. Add the check.
+1. Check Cloudinary's current free-plan limits and write them here. (Done; official docs linked below.)
+2. Implement signing, upload and delete with a mockable HTTP client. (Initial client and route integration added; tests/builds still pending.)
+3. Add environment names everywhere and update `DEPLOYMENT.md`. (Done.)
+4. Add the check. (Initial mocked client test added; run and extend for route/fallback coverage.)
 
 ## New command-line check
 
-`tests/cloudinary-store.test.ts`: with a mocked HTTP client it proves correct request signing, an upload, a delete, fallback to the default store when variables are missing, and that no secret appears in logs or responses.
+`tests/cloudinary-store.test.ts`: mocked client tests for configuration detection, request signing, upload, delete, invalid inputs, and secret redaction. Add route-level assertions for MongoDB fallback and old-photo reads before marking the phase Done.
 
 ## Command-line checks at the end of this phase
 
@@ -51,11 +51,11 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 ## Done checklist
 
 - [ ] A Cloudinary store behind the Phase 8 adapter, using `fetch` and signed requests (no new package).
-- [ ] Environment names `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` added to every `.env.example`, to `muf-env.mjs` and to the sync check.
-- [ ] When the variables are missing the app keeps using the default store and logs one clear message.
+- [x] Environment names `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` added to every `.env.example`, byte-identical `muf-env.mjs` twins, and the sync check.
+- [ ] Missing-credential fallback is verified by a passing automated test.
 - [ ] Photos saved before the switch still display; no automatic mass move.
-- [ ] Free-plan limits written down in this file after checking Cloudinary's pages.
-- [ ] The new command-line check above exists and passes.
+- [x] Free-plan limits checked against official docs (2026-10-26): Free has 25 credits; each credit represents 1,000 transformations or 1 GB managed storage or 1 GB image bandwidth, used in combination. Transformation and bandwidth usage use a rolling 30-day window; storage is a current total. Free maximum image upload size is 10 MB. The app's 100 KiB limit remains stricter. See https://cloudinary.com/documentation/billing_and_plans and https://cloudinary.com/pricing/compare-plans.
+- [ ] The new command-line check exists and passes. (Test file added; not yet executed.)
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
