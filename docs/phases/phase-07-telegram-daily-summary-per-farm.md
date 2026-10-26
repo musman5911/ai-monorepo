@@ -1,6 +1,6 @@
 # Phase 7: Telegram bot and daily summary per farm
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -30,7 +30,7 @@ Each Telegram chat is linked to one farm, bot entries land in that farm, and dai
 - Flock's Telegram data-store helpers fall back to the default farm when no farm context is active. New webhook handling resolves the linked farm and runs commands in MUF's single-farm context; scheduled summaries now iterate farms independently in all three backends.
 - Existing webhook secret checks, command parsing, worker attendance, production-drop alerts and summary controls must remain intact. No new bot commands are in scope.
 - Validation update (2026-10-26; Windows CMD output supplied by the owner): after pulling through `65ce981`, `npm test -- tests/agri-fields-screens.test.ts` passed (1 file, 4 tests), `npm test` passed (30 files, 276 tests), `npm run check-sync` passed (all three apps and shared MUF checks in sync), `npm run check-farms` passed (Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks), `npm run check-docs` passed, and `tools\\build-all.bat` built Dairy, Flock and Agri successfully. The full suite includes `tests/telegram-farm-scope.test.ts` (12 tests), so the automated farm-B / unlinked-chat / farm-A-summary regression is covered by the passing suite. These are owner-reported results, not commands independently run in this editing session.
-- Phase 7 remains **In progress**: `npm run check-ui` and `npm run check-workbench` from the phase's standard list were not included in this latest output, and the separate monthly email/report path still needs its final farm-scope audit. Run the missing checks and finish that audit before marking the phase Done.
+- Final validation update (2026-10-26): owner supplied passing `npm run check-ui` output (all MUF UI safety checks) and `npm run check-workbench` output (all 23 workbench source checks). The monthly email-path audit found the only monthly email job is Dairy's monthly **full-database backup**: its payload intentionally includes all farms and farm-tagged records, and it emails one full-role admin as an off-database recovery copy. This is a global backup, not a farm report, so it should remain a single complete snapshot rather than be split per farm. The daily summary email itself is farm-scoped in `dairy_farm/backend/routes/email.js`; each farm is summarized under `mufRunWithFarmContext`, and manual sends are limited to the selected/assigned farms. No separate monthly report job was found in the audited email/backup paths. Phase 7 is **Done for command-line scope**. Real MongoDB, browser/phone, and live deployment verification remain in Phases 19–21.
 
 ## Implementation checkpoint (2026-10-26)
 
@@ -44,9 +44,9 @@ Each Telegram chat is linked to one farm, bot entries land in that farm, and dai
 ## Steps
 
 1. Audit existing Telegram routes, MUF farm scoping and summary services in all three backends. (Done)
-2. Add farm identity to link codes and chat links; reject legacy unscoped links. (Implemented; validate)
-3. Run webhook commands and summaries in the linked farm context. (Implemented; validate)
-4. Add and run the check below, then fix any failures. (Automated regression passed in the owner-supplied full suite; remaining Phase 7 checks/audit are pending)
+2. Add farm identity to link codes and chat links; reject legacy unscoped links. (Done; regression tests pass)
+3. Run webhook commands and summaries in the linked farm context. (Done; regression tests pass)
+4. Add and run the check below, then fix any failures. (Done; all 12 tests pass in the owner-supplied full suite)
 
 ## New command-line check
 
@@ -68,13 +68,13 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] Link a Telegram chat to a farm (owner or manager does it from the existing Telegram panel).
-- [ ] Records created by the bot are stamped with the linked farm.
-- [ ] Telegram daily summaries and Dairy daily-summary emails are farm-scoped; manual sends respect the caller's selected/assigned farms. Audit any separate monthly email/report job before closure.
-- [ ] Unlinked chats get a clear message and create nothing.
+- [x] Link a Telegram chat to a farm (owner or manager does it from the existing Telegram panel).
+- [x] Records created by the bot are stamped with the linked farm.
+- [x] Telegram daily summaries and Dairy daily-summary emails are farm-scoped; manual sends respect the caller's selected/assigned farms. Monthly email audit: the separate monthly job is an intentional all-farm backup snapshot emailed to one full-role admin, not a report; no separate monthly report job was found in the audited paths.
+- [x] Unlinked chats get a clear message and create nothing.
 - [x] The new command-line check above exists and passes: `tests/telegram-farm-scope.test.ts` is included in the passing 276-test full suite (12 tests).
-- [ ] The standard checks above all pass (latest output confirms `npm test`, `check-sync`, `check-farms`, `check-docs` and all three builds; `check-ui` and `check-workbench` still need a fresh run).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] The standard checks above all pass: owner supplied passing output for `npm test` (276/276), `check-sync`, `check-ui`, `check-workbench` (23 checks), `check-farms`, `check-docs`, and `tools\\build-all.bat` (all three apps). `npm ci` was not run; dependencies were already installed. `npm run check-workbench-runtime` remains optional.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Rules for whoever works on this phase
 
