@@ -30,6 +30,7 @@ import telegramRoutes, { initTelegram } from './routes/telegram.js';
 import backupRoutes, { maybeRunMonthlyAutoBackup } from './routes/backup.js';
 import cardsRoutes from './routes/cards.js';
 import diaryMediaRoutes from './routes/diary-media.js';
+import photosRoutes from './routes/photos.js';
 import farmsRoutes from './routes/farms.js';
 import { MUF_ENV } from './muf-env.mjs';
 import { MUF_FULL_ROLE_VALUES } from './muf-farms.mjs';
@@ -133,6 +134,7 @@ const apiRouters = [
   laborRoutes,
   backupRoutes,
   diaryMediaRoutes,
+  photosRoutes,
 ];
 for (const r of apiRouters) {
   app.use('/', r);

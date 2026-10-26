@@ -36,7 +36,7 @@ function expensePayload(body, { requireBasics = false } = {}) {
   // Receipt photo: compressed base64 data-URL from the client (or '' to remove).
   if (typeof body.receiptBase64 === 'string') {
     if (body.receiptBase64.length > 400000) errors.push('receipt photo is too large');
-    else if (body.receiptBase64 === '' || body.receiptBase64.startsWith('data:image/')) payload.receiptBase64 = body.receiptBase64;
+    else if (body.receiptBase64 === '' || body.receiptBase64.startsWith('data:image/') || /^\/api\/photos\/[a-f0-9]{24}$/i.test(body.receiptBase64)) payload.receiptBase64 = body.receiptBase64;
     else errors.push('receipt photo must be an image');
   }
 

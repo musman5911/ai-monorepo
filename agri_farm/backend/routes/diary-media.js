@@ -33,7 +33,7 @@ function safeEntries(entries, date) {
     };
   });
   if (result.some((e) => !e.id || e.photos.length > 10 ||
-    e.photos.some((p) => !p.id || !(p.data.startsWith('data:image/jpeg;base64,') || p.data.startsWith('/api/images/') || /^https?:\/\//i.test(p.data)) || p.data.length > 230000) ||
+    e.photos.some((p) => !p.id || !(p.data.startsWith('data:image/jpeg;base64,') || (p.data.startsWith('/api/images/') || /^\/api\/photos\/[a-f0-9]{24}$/i.test(p.data)) || /^https?:\/\//i.test(p.data)) || p.data.length > 230000) ||
     (e.voiceBase64 && e.voiceBase64.length > 1500000))) return null;
   return result;
 }
@@ -68,7 +68,7 @@ router.put('/diary-media/:date', protect, asyncHandler(async (req, res) => {
     const photos = req.body.photos;
     if (!Array.isArray(photos) || photos.length > 10) return res.status(400).json({ error: 'Photos must be an array with at most 10 items' });
     const safePhotos = photos.map((p) => safePhoto(p, date));
-    if (safePhotos.some((p) => !p.id || !(p.data.startsWith('data:image/jpeg;base64,') || p.data.startsWith('/api/images/') || /^https?:\/\//i.test(p.data)) || p.data.length > 230000)) {
+    if (safePhotos.some((p) => !p.id || !(p.data.startsWith('data:image/jpeg;base64,') || (p.data.startsWith('/api/images/') || /^\/api\/photos\/[a-f0-9]{24}$/i.test(p.data)) || /^https?:\/\//i.test(p.data)) || p.data.length > 230000)) {
       return res.status(400).json({ error: 'Each diary photo must be a compressed image under 160 KB' });
     }
     update.photos = safePhotos;

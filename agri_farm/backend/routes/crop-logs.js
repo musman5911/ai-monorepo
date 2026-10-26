@@ -104,6 +104,7 @@ router.get('/crop-photos', protect, asyncHandler(async (req, res) => {
 router.post('/crop-photos', protect, requireAdmin, asyncHandler(async (req, res) => {
   const { crop_id, image_base64 } = req.body || {};
   if (!crop_id || !image_base64) return badRequest(res, 'Crop and photo are required.');
+  if (typeof image_base64 !== 'string' || (!image_base64.startsWith('data:image/') && !/^\/api\/photos\/[a-f0-9]{24}$/i.test(image_base64))) return badRequest(res, 'Crop photo must be an image data URL or a farm photo path.');
   const crop = await Crop.findOne({ _id: parseOid(crop_id, 'crop ID') });
   if (!crop) return notFound(res, 'Crop not found');
   const existing = await CropPhoto.countDocuments({ crop_id });

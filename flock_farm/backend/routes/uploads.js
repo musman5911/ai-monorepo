@@ -9,12 +9,16 @@ const router = express.Router();
 
 const allowedKinds = new Set(['bird', 'batch', 'diary']);
 
-function storageForCurrentFarm() {
+function storageForCurrentFarm(req) {
+  const farmId = String(req.farmContext?.farmId || '');
+  if (!farmId) throw new Error('Active farm context is required for photo storage');
+  const scopedId = (id) => ({ _id: id, farmId });
   return createMufStorage({
     store: {
       async save({ bytes, contentType, metadata = {} }) {
         const image = await Image.create({
           kind: allowedKinds.has(metadata.kind) ? metadata.kind : 'diary',
+          farmId,
           contentType,
           data: bytes,
           size: bytes.length,
@@ -23,14 +27,14 @@ function storageForCurrentFarm() {
         return { id: String(image._id) };
       },
       async readLink(id) {
-        const image = await Image.findOne({ _id: id }).select('_id').lean();
+        const image = await Image.findOne(scopedId(id)).select('_id').lean();
         return image ? `/api/images/${image._id}` : null;
       },
       async delete(id) {
-        return Boolean(await Image.findOneAndDelete({ _id: id }));
+        return Boolean(await Image.findOneAndDelete(scopedId(id)));
       },
       async list() {
-        const images = await Image.find({}).select('_id').lean();
+        const images = await Image.find({ farmId }).select('_id').lean();
         return images.map((image) => ({ id: String(image._id) }));
       },
     },
@@ -76,7 +80,7 @@ router.post('/uploads/image', authRequired, requireRole('admin'), upload.single(
       return res.status(400).json({ error: 'No image file uploaded' });
     }
 
-    const storage = storageForCurrentFarm();
+    const storage = storageForCurrentFarm(req);
     const saved = await storage.save({
       bytes: req.file.buffer,
       contentType: req.file.mimetype || 'image/jpeg',
@@ -113,10 +117,8 @@ router.post('/uploads/diary-image', authRequired, upload.single('image'), async 
   }
 });
 
-// GET /api/images/:id — serves the stored image bytes. Left unauthenticated on
-// purpose so plain <img src> tags work everywhere (list views, emails,
-// browsers without the auth cookie). IDs are unguessable ObjectIds and the
-// content is farm photos, so exposure risk is negligible.
+// GET /api/images/:id — resolve the owning farm, then authenticate against it.
+// Legacy unscoped image records fail closed instead of bypassing farm checks.
 router.get('/images/:id', resolveImageFarm, authRequired, async (req, res) => {
   try {
     const { id } = req.params;
@@ -126,7 +128,7 @@ router.get('/images/:id', resolveImageFarm, authRequired, async (req, res) => {
     const storage = storageForCurrentFarm();
     const link = await storage.readLink(id);
     if (!link) return res.status(404).json({ error: 'Image not found' });
-    const img = await Image.findOne({ _id: id });
+    const img = await Image.findOne({ _id: id, farmId: String(req.farmContext?.farmId || '') });
     if (!img) return res.status(404).json({ error: 'Image not found' });
 
     res.setHeader('Content-Type', img.contentType || 'image/jpeg');

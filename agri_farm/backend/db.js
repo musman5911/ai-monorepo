@@ -55,6 +55,7 @@ const SupplierSchema = looseSchema('suppliers');
 const SupplierPaymentSchema = looseSchema('supplier_payments');
 const SettingSchema = looseSchema('settings');
 const DiaryMediaSchema = looseSchema('diary_media');
+const PhotoAssetSchema = looseSchema('photo_assets');
 
 // Farms of this project (crop land only). See docs/FARMS_AND_ROLES.md.
 // Timestamps matter here: the oldest farm is the default farm.
@@ -70,7 +71,7 @@ const FarmSchema = new mongoose.Schema({
 const FARM_SCOPED = {
   Field: FieldSchema, Crop: CropSchema, Finance: FinanceSchema, Task: TaskSchema, Inventory: InventorySchema,
   Liability: LiabilitySchema, Irrigation: IrrigationSchema, CropPhoto: CropPhotoSchema,
-  Spray: SpraySchema, Laborer: LaborerSchema, Attendance: AttendanceSchema,
+  Spray: SpraySchema, PhotoAsset: PhotoAssetSchema, Laborer: LaborerSchema, Attendance: AttendanceSchema,
   LaborAdvance: LaborAdvanceSchema, Supplier: SupplierSchema,
   SupplierPayment: SupplierPaymentSchema, DiaryMedia: DiaryMediaSchema,
 };
@@ -96,7 +97,7 @@ for (const schema of Object.values(FARM_SCOPED)) {
 
 // ─── Models ─────────────────────────────────────────────────────────────────
 let User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
-  CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
+  CropPhoto, Spray, PhotoAsset, Laborer, Attendance, LaborAdvance, TelegramMeta,
   Supplier, SupplierPayment, Setting, DiaryMedia, Farm;
 
 if (useMock) {
@@ -123,7 +124,7 @@ if (useMock) {
     Farm: FarmSchema,
   });
   ({ User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
-    CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
+    CropPhoto, Spray, PhotoAsset, Laborer, Attendance, LaborAdvance, TelegramMeta,
     Supplier, SupplierPayment, Setting, DiaryMedia, Farm } = models);
 } else {
   User = mongoose.model('User', UserSchema);
@@ -137,6 +138,7 @@ if (useMock) {
   Irrigation = mongoose.model('Irrigation', IrrigationSchema);
   CropPhoto = mongoose.model('CropPhoto', CropPhotoSchema);
   Spray = mongoose.model('Spray', SpraySchema);
+  PhotoAsset = mongoose.model('PhotoAsset', PhotoAssetSchema);
   Laborer = mongoose.model('Laborer', LaborerSchema);
   Attendance = mongoose.model('Attendance', AttendanceSchema);
   LaborAdvance = mongoose.model('LaborAdvance', LaborAdvanceSchema);
@@ -151,7 +153,7 @@ if (useMock) {
 // Server-side farm scoping: inside a request every query of these models is limited
 // to the selected farm(s) and every create is stamped with it (see muf-farms.mjs).
 const MUF_FARM_MODELS = {
-  Field, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer,
+  Field, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, PhotoAsset, Laborer,
   Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia,
 };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
@@ -218,6 +220,6 @@ export {
   connectDB, useMock,
   User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
-  Supplier, SupplierPayment, Setting, DiaryMedia, Farm,
+  Supplier, SupplierPayment, Setting, DiaryMedia, PhotoAsset, Farm,
   MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES,
 };

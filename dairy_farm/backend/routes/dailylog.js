@@ -80,7 +80,7 @@ router.put('/:date', protect, async (req, res) => {
     if (notes !== undefined) update.notes = notes;
     if (photos !== undefined) {
       if (!Array.isArray(photos) || photos.length > 10) return res.status(400).json({ error: 'photos is limited to 10 per day' });
-      const safePhotos = photos.map((p) => ({ id: String(p.id || ''), date: req.params.date, data: typeof p.data === 'string' && p.data.startsWith('data:image/jpeg;base64,') ? p.data : '', bytes: Math.max(0, Number(p.bytes) || 0), createdAt: String(p.createdAt || '') }));
+      const safePhotos = photos.map((p) => ({ id: String(p.id || ''), date: req.params.date, data: typeof p.data === 'string' && (p.data.startsWith('data:image/jpeg;base64,') || /^\/api\/photos\/[a-f0-9]{24}$/i.test(p.data)) ? p.data : '', bytes: Math.max(0, Number(p.bytes) || 0), createdAt: String(p.createdAt || '') }));
       if (safePhotos.some((p) => !p.id || !p.data || p.data.length > 230000)) return res.status(400).json({ error: 'Each diary photo must be a compressed JPEG under 160 KB' });
       update.photos = safePhotos;
     }
