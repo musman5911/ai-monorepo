@@ -7,6 +7,16 @@ import { cleanupOrphanPhotoAssets, discoverOrphanPhotoAssets } from '../services
 
 const router = express.Router();
 const TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
+function photoBytes(value) {
+  if (Buffer.isBuffer(value)) return value;
+  if (value instanceof Uint8Array || Array.isArray(value)) return Buffer.from(value);
+  if (value && typeof value === 'object') {
+    const indexes = Object.keys(value).filter((key) => /^\\d+$/.test(key)).sort((a, b) => Number(a) - Number(b));
+    if (indexes.length) return Buffer.from(indexes.map((key) => Number(value[key])));
+    if (value.type === 'Buffer' && Array.isArray(value.data)) return Buffer.from(value.data);
+  }
+  return Buffer.alloc(0);
+}
 function parseDataUrl(value) {
   const match = typeof value === 'string' && value.match(/^data:(image\/(?:jpeg|png|webp));base64,([A-Za-z0-9+/=]+)$/);
   if (!match || !TYPES.has(match[1])) return null;
@@ -69,7 +79,7 @@ router.get('/photos/:id', protect, async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
   const photo = await PhotoAsset.findById(req.params.id);
   if (!photo) return res.status(404).json({ error: 'Photo not found' });
-  res.set('Content-Type', photo.contentType).set('Cache-Control', 'private, max-age=3600').send(photo.data);
+  res.set('Content-Type', photo.contentType).set('Cache-Control', 'private, max-age=3600').send(photoBytes(photo.data));
 });
 router.delete('/photos/:id', protect, async (req, res) => {
   if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
