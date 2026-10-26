@@ -174,6 +174,22 @@ function createModel(name, schema) {
       return { matchedCount: 1, modifiedCount: 1 };
     },
 
+    async findOneAndUpdate(filter, update, opts = {}) {
+      let d = store.find((x) => matches(x, filter || {})) || null;
+      if (!d && opts.upsert) {
+        const base = {};
+        for (const [k, v] of Object.entries(filter || {})) {
+          if (v !== null && typeof v !== 'object') base[k] = v;
+        }
+        d = toDoc(base);
+        store.push(d);
+      }
+      if (!d) return null;
+      applyUpdate(d, update || {});
+      if (schema.options && schema.options.timestamps) d.updatedAt = new Date();
+      return opts.new === false ? null : attachSave(cloneValue(d));
+    },
+
     async findByIdAndUpdate(id, update, opts = {}) {
       const d = store.find((x) => String(x._id) === String(id)) || null;
       if (!d) return null;
