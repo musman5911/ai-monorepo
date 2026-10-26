@@ -26,7 +26,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
-| 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
+| 12 | Yearly archive: screens | In progress | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Not started | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
@@ -68,3 +68,5 @@ The earlier plan (Phases 0 to 7) and its dated notes are in `docs/archive/`. Its
 
 
 **Phase 11 is Done for command-line scope (2026-10-26).** Owner-reported Windows CMD results confirm the three-app archive runtime checks, 320 tests, sync/UI/workbench/farm/docs checks, and all three production builds passed. Archive coverage verifies export-before-delete, active-list and totals exclusion, farm isolation, and restoration for Dairy milk/expenses, Flock batch-feed logs, and Agri finance. These are owner-reported results, not commands independently executed in this editing session. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21. See [Phase 11 details](phases/phase-11-yearly-archive-server.md) and [PROGRESS.md](PROGRESS.md).
+
+**Phase 12 is In progress (2026-10-26).** Initial audit: Phase 11 archive APIs exist in Dairy, Flock and Agri; each app has an Admin > Reports integration point and a shared MUF reports component. Implementation will keep archive actions owner-only, require export before execution and exact typed confirmation, provide archive history/restore, and keep archived data out of reports unless explicitly selected. Verification is pending. See [Phase 12 details](phases/phase-12-yearly-archive-screens.md).
