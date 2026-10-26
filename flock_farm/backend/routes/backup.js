@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 // ─── Backup & Monthly Auto-Backup ────────────────
 // Once per calendar month a full snapshot of the whole database (all data
 // buckets + batch collections) is stored inside the DB itself under the name
@@ -63,6 +64,8 @@ async function collectBackupPayload() {
     buckets: {},
     farmBuckets: {},
     images: serializeBackupImages(await Image.find({}).lean()),
+    archiveJobs: await (mongoose.models.MufArchiveJob?.find({}).lean() || Promise.resolve([])),
+    archiveRecords: await (mongoose.models.MufArchiveRecord?.find({}).lean() || Promise.resolve([])),
   };
   payload.farms = (await Farm.find({}).lean()).map((farm) => {
     const out = { ...farm };
@@ -130,6 +133,14 @@ async function restoreBackupPayload(payload) {
     if (payload[name].length > 0) {
       await Model.insertMany(payload[name]);
     }
+  }
+  if (Array.isArray(payload.archiveJobs) && mongoose.models.MufArchiveJob) {
+    await mongoose.models.MufArchiveJob.deleteMany({});
+    if (payload.archiveJobs.length) await mongoose.models.MufArchiveJob.insertMany(payload.archiveJobs);
+  }
+  if (Array.isArray(payload.archiveRecords) && mongoose.models.MufArchiveRecord) {
+    await mongoose.models.MufArchiveRecord.deleteMany({});
+    if (payload.archiveRecords.length) await mongoose.models.MufArchiveRecord.insertMany(payload.archiveRecords);
   }
   if (restoredImages) {
     await Image.deleteMany({});
