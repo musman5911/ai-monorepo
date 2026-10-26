@@ -36,7 +36,7 @@ router.get('/:date', protect, async (req, res) => {
     if (!log) {
       return res.json({ _id: req.params.date, date: req.params.date, checklist: [], notes: '', voiceNotes: [], photos: [], diaryEntries: [] });
     }
-    if (photos !== undefined || diaryEntries !== undefined) await cleanupOrphanPhotoAssets();
+    if (photos !== undefined || diaryEntries !== undefined) try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
     res.json(log);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
