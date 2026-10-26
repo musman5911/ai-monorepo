@@ -55,7 +55,15 @@ const SupplierSchema = looseSchema('suppliers');
 const SupplierPaymentSchema = looseSchema('supplier_payments');
 const SettingSchema = looseSchema('settings');
 const DiaryMediaSchema = looseSchema('diary_media');
-const PhotoAssetSchema = looseSchema('photo_assets');
+const PhotoAssetSchema = new mongoose.Schema({
+  provider: { type: String, enum: ['mongodb', 'cloudinary'], default: 'mongodb' },
+  cloudinaryPublicId: { type: String, default: '' },
+  secureUrl: { type: String, default: '' },
+  contentType: { type: String, default: 'image/jpeg' },
+  data: { type: Buffer, required: false },
+  size: { type: Number, default: 0 },
+  createdBy: { type: String, default: '' },
+}, { strict: false, timestamps: true, collection: 'photo_assets' });
 
 // Farms of this project (crop land only). See docs/FARMS_AND_ROLES.md.
 // Timestamps matter here: the oldest farm is the default farm.
