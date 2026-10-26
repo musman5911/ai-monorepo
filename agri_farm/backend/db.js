@@ -246,6 +246,6 @@ export {
   connectDB, useMock,
   User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
-  Supplier, SupplierPayment, Setting, DiaryMedia, PhotoAsset, Farm,
+  Supplier, SupplierPayment, Setting, DiaryMedia, PhotoAsset, Farm, ArchiveJob, ArchiveRecord,
   MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES,
 };
