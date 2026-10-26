@@ -48,7 +48,8 @@ router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
       farmName: 'Usman Dairy Farm',
       version: 4,
       farms,
-      cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents
+      cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents,
+      archiveJobs: await ArchiveJob.find().lean(), archiveRecords: await ArchiveRecord.find().lean()
     };
     res.setHeader('Content-Disposition', `attachment; filename=usman-dairy-backup-${new Date().toISOString().slice(0,10)}.json`);
     res.setHeader('Content-Type', 'application/json');
