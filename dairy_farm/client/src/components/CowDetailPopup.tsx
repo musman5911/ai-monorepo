@@ -102,8 +102,10 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
       setData({ ...data, cow: mergedCow });
       onCowUpdated?.(mergedCow);
       notify(updated?.offline ? L('Saved on this device. It will sync when internet returns.') : L('Saved'), updated?.offline ? 'info' : 'success');
+      return true;
     } catch (err) {
       notify(err instanceof Error ? err.message : 'Could not save', 'error');
+      return false;
     } finally { setMarketBusy(false); }
   }
 
@@ -295,7 +297,8 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                           const uploaded = await api.uploadPhoto(base64);
                           if (!uploaded.path) throw new Error('Photo upload failed. The gallery was not saved.');
                           const next: GalleryPhoto[] = [...(cow.gallery || []), { id: `g-${Date.now()}`, date: todayStr(), base64: uploaded.path, caption: '' }];
-                          await saveMarket({ gallery: next } as any);
+                          const saved = await saveMarket({ gallery: next } as any);
+                          if (!saved) return;
                           notify(L('Photo added'));
                         } catch (err) {
                           notify(err instanceof Error ? err.message : 'Could not add the photo', 'error');
