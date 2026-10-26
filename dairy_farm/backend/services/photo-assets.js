@@ -12,7 +12,7 @@ function collectPhotoReferences(value, refs, seen = new Set()) {
   for (const child of Array.isArray(value) ? value : Object.values(value)) collectPhotoReferences(child, refs, seen);
 }
 
-export async function cleanupOrphanPhotoAssets() {
+export async function discoverOrphanPhotoAssets() {
   const refs = new Set();
   for (const Model of MODELS) {
     const rows = await Model.find({}).lean();
@@ -25,7 +25,13 @@ export async function cleanupOrphanPhotoAssets() {
   const orphanIds = assets.filter((asset) => {
     const createdAt = asset.createdAt ? new Date(asset.createdAt).getTime() : 0;
     return !refs.has(String(asset._id).toLowerCase()) && createdAt < cutoff;
-  }).map((asset) => asset._id);
-  const result = orphanIds.length ? await PhotoAsset.deleteMany({ _id: { $in: orphanIds } }) : { deletedCount: 0 };
-  return { scanned: assets.length, deleted: result.deletedCount || 0 };
+  }).map((asset) => String(asset._id));
+  return { scanned: assets.length, orphanIds };
+}
+
+export async function cleanupOrphanPhotoAssets() {
+  const { scanned, orphanIds } = await discoverOrphanPhotoAssets();
+  const objectIds = orphanIds;
+  const result = objectIds.length ? await PhotoAsset.deleteMany({ _id: { $in: objectIds } }) : { deletedCount: 0 };
+  return { scanned, candidates: orphanIds.length, deleted: result.deletedCount || 0 };
 }
