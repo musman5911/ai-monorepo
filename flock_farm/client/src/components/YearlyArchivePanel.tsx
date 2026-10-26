@@ -281,7 +281,8 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
                       <p className="mt-1 text-xs text-slate-500">{job.sourceCount} records · cutoff {job.cutoffDate} · {job.retentionYears} year(s)</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
-                      <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setPrepared(job); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }}><Download className="h-4 w-4" /> Export</button>
+                      <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => downloadExport(job)} disabled={busy !== ''}><Download className="h-4 w-4" /> Export</button>
+                      {["snapshot_ready", "archive_partial"].includes(job.state) && <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setPrepared(job); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }}>Continue</button>}
                       <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setReportJobId(id); setIncludeArchived(true); setReportRecords([]); }}><Eye className="h-4 w-4" /> Report</button>
                       {['archived', 'archive_partial', 'restored'].includes(job.state) && <button type="button" className={`${buttonClass} bg-amber-600 text-white hover:bg-amber-700`} onClick={() => { setRestoreTarget(job); setPrepared(null); setConfirmFarmName(''); setConfirmJobId(''); }}><RotateCcw className="h-4 w-4" /> Restore</button>}
                     </div>
