@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import mongoose from 'mongoose';
-import { Cow, Milk, Expense, Rate, Health, Buyer, BuyerPayment, RateHistory, DailyLog, Sale, Meta, Laborer, LaborAttendance, LaborAdvance, Supplier, SupplierPayment, BreedingEvent, User, Farm, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
+import { Cow, Milk, Expense, Rate, Health, Buyer, BuyerPayment, RateHistory, DailyLog, Sale, Meta, Laborer, LaborAttendance, LaborAdvance, Supplier, SupplierPayment, BreedingEvent, User, Farm, ArchiveJob, ArchiveRecord, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
 import { protectUnscoped, ownerOnly } from '../middleware/auth.js';
 import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
 
@@ -73,6 +73,8 @@ const COLLECTIONS = {
   suppliers: Supplier,
   supplierPayments: SupplierPayment,
   breedingEvents: BreedingEvent,
+  archiveJobs: ArchiveJob,
+  archiveRecords: ArchiveRecord,
 };
 
 async function restoreCollections(payload, session) {
@@ -187,7 +189,7 @@ async function collectBackupPayload() {
     exportDate: new Date().toISOString(),
     farmName: 'Usman Dairy Farm',
     version: 3,
-    cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents,
+    cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents, archiveJobs: await ArchiveJob.find().lean(), archiveRecords: await ArchiveRecord.find().lean(),
   };
 }
 
