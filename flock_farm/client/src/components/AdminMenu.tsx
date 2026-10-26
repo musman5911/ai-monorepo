@@ -29,6 +29,7 @@ import MufAdminCard from '../muf/admin/muf-admin-card';
 import MufAdminButton from '../muf/admin/muf-admin-button';
 import MufAdminUsers from '../muf/admin/muf-admin-users';
 import MufAdminReports from '../muf/admin/muf-admin-reports';
+import YearlyArchivePanel from './YearlyArchivePanel';
 import MufAdminGeneral from '../muf/admin/muf-admin-general';
 import { getFarmLocation, saveFarmLocation } from '../api';
 import { useConfirm, notify } from '../muf/core/muf-confirm';
@@ -535,6 +536,24 @@ export default function AdminMenu(props: AdminMenuProps) {
                   vaccinations={vaccinations}
                   customerSales={customerSales}
                   settings={settings}
+                />
+                <YearlyArchivePanel
+                  isOwner={currentUser?.farmRole === 'owner' || currentUser?.role === 'admin'}
+                  apiBase="/api"
+                  collections={[
+                    { value: 'batchFeedLogs', label: 'Batch feed logs' },
+                    { value: 'batchMortalityLogs', label: 'Batch mortality logs' },
+                    { value: 'batchExpenseLogs', label: 'Batch expense logs' },
+                    { value: 'batchSaleLogs', label: 'Batch sale logs' },
+                    { value: 'batchWeightLogs', label: 'Batch weight logs' },
+                    { value: 'batchEggLogs', label: 'Batch egg logs' },
+                    { value: 'batchVaccinationLogs', label: 'Batch vaccination logs' },
+                  ]}
+                  getHeaders={() => {
+                    let token = ''; let farmId = '';
+                    try { token = localStorage.getItem('flockfarm_token') || ''; farmId = localStorage.getItem('muf_active_farm_flock') || ''; } catch { /* storage unavailable */ }
+                    return { ...(token ? { Authorization: `Bearer ${token}`, 'X-Auth-Token': token } : {}), ...(farmId ? { 'X-Farm-Id': farmId } : {}) };
+                  }}
                 />
               </MufAdminReports>
             )}
