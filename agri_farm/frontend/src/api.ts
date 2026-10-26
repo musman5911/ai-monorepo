@@ -188,4 +188,11 @@ export const getDiaryMedia = (date: string) => api.get(`/diary-media/${encodeURI
 export const getDiaryEntries = () => api.get('/diary-media/entries');
 export const saveDiaryMedia = (date: string, photos?: unknown[], entries?: unknown[]) => api.put(`/diary-media/${encodeURIComponent(date)}`, { ...(photos !== undefined ? { photos } : {}), ...(entries !== undefined ? { entries } : {}) });
 
+
+export const uploadPhoto = (data: string) => api.post('/photos', { data });
+export const getPhotoObjectUrl = async (path: string): Promise<string> => {
+    const response = await api.get(path.replace(/^\/api/, ''), { responseType: 'blob' });
+    return URL.createObjectURL(response.data);
+};
+
 export default api;
