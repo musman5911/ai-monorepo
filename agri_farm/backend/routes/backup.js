@@ -6,6 +6,7 @@ import { protectUnscoped, ownerOnly } from '../middleware/auth.js';
 import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
 import { HttpError, badRequest, notFound, asyncHandler } from '../utils/helpers.js';
 import { sendEmail, mufEmail, mailConfigured } from '../utils/mailer.js';
+import { MUF_ENV } from '../muf-env.mjs';
 
 const router = express.Router();
 
@@ -63,8 +64,18 @@ async function collectBackupPayload() {
     payload[key] = stringifyDocs(docs);
   }
   payload.farms = stringifyDocs(await Farm.find({}).limit(10000));
-  payload.archiveJobs = stringifyDocs(await (mongoose.models.MufArchiveJob?.find({}).limit(100000) || Promise.resolve([])));
-  payload.archiveRecords = stringifyDocs(await (mongoose.models.MufArchiveRecord?.find({}).limit(100000) || Promise.resolve([])));
+  // Archive models are regular Mongoose models, not memory-db models. In MEMORY_MODE
+  // there is no Mongo connection, so querying them would buffer until timeout and
+  // make even an ordinary full backup fail. The archive workflow itself is Mongo-backed.
+  if (!MUF_ENV.memoryMode) {
+    const ArchiveJob = mongoose.models.MufArchiveJob;
+    const ArchiveRecord = mongoose.models.MufArchiveRecord;
+    payload.archiveJobs = ArchiveJob ? stringifyDocs(await ArchiveJob.find({}).limit(100000)) : [];
+    payload.archiveRecords = ArchiveRecord ? stringifyDocs(await ArchiveRecord.find({}).limit(100000)) : [];
+  } else {
+    payload.archiveJobs = [];
+    payload.archiveRecords = [];
+  }
   const usersList = await User.find({}).limit(100000);
   payload.users = usersList.map((u) => {
     const d = { ...u, _id: String(u._id) };
@@ -103,12 +114,17 @@ async function applyBackupPayload(payload) {
       restoredAny = true;
     }
   }
-  for (const [key, modelName] of [['archiveJobs','MufArchiveJob'],['archiveRecords','MufArchiveRecord']]) {
-    const Model = mongoose.models[modelName];
-    if (Model && Array.isArray(payload[key])) {
-      await Model.deleteMany({});
-      if (payload[key].length) await Model.insertMany(payload[key]);
-      restoredAny = true;
+  // Do not touch disconnected Mongoose archive models in memory demo mode.
+  // Those collections are not backed by memory-db and the archive workflow is
+  // unavailable there; querying them would hang until Mongoose's buffer timeout.
+  if (!MUF_ENV.memoryMode) {
+    for (const [key, modelName] of [['archiveJobs','MufArchiveJob'],['archiveRecords','MufArchiveRecord']]) {
+      const Model = mongoose.models[modelName];
+      if (Model && Array.isArray(payload[key])) {
+        await Model.deleteMany({});
+        if (payload[key].length) await Model.insertMany(payload[key]);
+        restoredAny = true;
+      }
     }
   }
   if (restoredAny) await tagAfterRestore();
