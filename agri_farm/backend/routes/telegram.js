@@ -8,12 +8,13 @@
 // (any long random string). Both unset → telegram stays silently off.
 import express from 'express';
 import rateLimit from 'express-rate-limit';
-import { TelegramMeta, User, Laborer, Finance, Attendance, Crop } from '../db.js';
+import { TelegramMeta, User, Laborer, Finance, Attendance, Crop, Farm } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
 import { MUF_ENV } from '../muf-env.mjs';
-import { mufIsFullRole } from '../muf-farms.mjs';
+import { mufGetFarmContext, mufRunWithFarmContext, mufIsFullRole } from '../muf-farms.mjs';
+import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
 
 let mufTelegram = null; // ESM twin, loaded once on first use
 async function muf() {
@@ -74,6 +75,8 @@ router.post('/link-code', protect, requireAdmin, asyncHandler(async (req, res) =
   if (!userId && !laborerId) {
     return res.status(400).json({ detail: 'Pick an app user or a wage worker to link' });
   }
+  const farmId = mufGetFarmContext()?.farmId;
+  if (!farmId) return res.status(400).json({ detail: 'Select one farm before creating a Telegram link code' });
   const codes = await tgRead('codes');
   const nowMs = Date.now();
   const fresh = {};
@@ -83,7 +86,7 @@ router.post('/link-code', protect, requireAdmin, asyncHandler(async (req, res) =
   const m = await muf();
   const code = m.tgNewLinkCode();
   fresh[code] = {
-    userId, username, laborerId, laborerName,
+    userId, username, laborerId, laborerName, farmId: String(farmId),
     expires: nowMs + 15 * 60 * 1000,
   };
   await tgWrite('codes', fresh);
@@ -122,7 +125,7 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
       const codes = await tgRead('codes');
       const entry = codes[cmd.code || ''];
       const nowMs = Date.now();
-      if (!entry || (entry.expires || 0) < nowMs) {
+      if (!entry || (entry.expires || 0) < nowMs || !mufTelegramFarmId(entry)) {
         await send(m.TG.linkBad);
         return res.json({ ok: true });
       }
@@ -133,6 +136,7 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
         username: entry.username || '',
         laborerId: entry.laborerId || '',
         laborerName: entry.laborerName || '',
+        farmId: mufTelegramFarmId(entry),
         linkedAt: new Date().toISOString(),
         tgName: [from.first_name, from.last_name].filter(Boolean).join(' '),
       };
@@ -146,7 +150,16 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
       await send(m.TG.notLinked);
       return res.json({ ok: true });
     }
-
+    if (!mufTelegramFarmId(link)) {
+      await send('یہ Telegram لنک پرانا ہے۔ ایڈمن سے نیا فارم لنک کوڈ لیں۔');
+      return res.json({ ok: true });
+    }
+    const farm = await Farm.findById(mufTelegramFarmId(link)).lean();
+    if (!farm || farm.archived) {
+      await send('منسلک فارم دستیاب نہیں۔ ایڈمن سے دوبارہ لنک کروائیں۔');
+      return res.json({ ok: true });
+    }
+    return await mufRunTelegramFarm(link.farmId, mufRunWithFarmContext, async () => {
     const date = todayStr();
     if (['help', 'unknown', 'milk', 'eggs'].includes(cmd.kind)) {
       await send(cmd.kind === 'unknown' ? m.TG.unknown : AGRI_TG_HELP);
@@ -201,6 +214,7 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
       await send(await tgDailyText(date));
       return res.json({ ok: true });
     }
+    });
   } catch (e) {
     console.log(`Telegram webhook error: ${e.message}`);
   }
