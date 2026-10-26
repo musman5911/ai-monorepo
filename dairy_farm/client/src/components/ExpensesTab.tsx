@@ -631,7 +631,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
                 <div className="rounded-xl border border-slate-200 dark:border-slate-700 p-3">
                   <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">{L('Receipt Photo')}</p>
                   <button type="button" onClick={() => setViewReceipt(selectedExpense.receiptBase64!)} className="block w-full rounded-xl overflow-hidden bg-white dark:bg-slate-950" aria-label={L('Open receipt photo')}>
-                    <img src={selectedExpense.receiptBase64} alt={L('Receipt')} className="w-full max-h-56 object-contain" />
+                    <PhotoImage src={selectedExpense.receiptBase64} alt={L('Receipt')} className="w-full max-h-56 object-contain" />
                   </button>
                 </div>
               )}
