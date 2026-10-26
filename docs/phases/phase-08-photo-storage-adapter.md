@@ -64,13 +64,13 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [ ] Deleting a record deletes its photos; a cleanup finds photos nobody uses. (Flock checks farm-scoped references. Dairy/Agri have admin-only orphan discovery, one-hour protection for fresh uploads, and cleanup hooks after relevant parent updates/deletions; latest command-line verification remains pending.)
 - [x] Add the storage twins to `check-muf-sync.js`; owner-reported `npm run check-sync` passed.
 - [x] The new command-line check exists; owner-reported `npm test -- tests/muf-storage.test.ts` passed (8/8).
-- [x] Owner-reported standard checks passed on 2026-10-26: full suite (31 files/284 tests), sync, UI, workbench (23 checks), farm scope, docs and all three builds. See `docs/PROGRESS.md`.
+- [ ] Re-run the full standard checks after the latest runtime-test and memory-adapter commits. Earlier owner-reported results (31 files/284 tests plus checks/builds) predate the current implementation and do not verify the latest code. See `docs/PROGRESS.md`.
 - [x] Migrate identified Dairy and Agri photo fields to upload through `/api/photos` before saving, while preserving legacy data URLs and public API field names. (Latest regression/build verification pending.)
 - [x] Wire relevant parent-record updates/deletions to safe orphan cleanup and expose admin-only production orphan discovery. (Latest regression/build verification pending.)
 - [ ] Run the new Dairy and extended Agri route-level photo integration tests locally; verify upload/read/delete, farm isolation, legacy compatibility, reference-safe deletion, orphan discovery/cleanup grace period and role restrictions; rerun all standard checks after implementation.
-- [x] Add regression tests for recursive Flock image reference discovery, retaining images referenced by any bucket, and orphan candidate selection. (Existing coverage; rerun the suite after latest commits.)
-- [x] Add `tests/photo-phase8-regression.test.ts` for Dairy/Agri photo migration and cleanup contracts. Add Dairy and Agri HTTP photo integration coverage. (Latest commits still need owner-local execution.)
-- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated. (Latest `npm run check-docs` still needs to run.)
+- [ ] Re-run regression tests for recursive Flock image reference discovery, retaining images referenced by any bucket, and orphan candidate selection after the latest commits.
+- [ ] Verify `tests/photo-phase8-regression.test.ts` and the Dairy/Agri HTTP photo integration tests locally after the latest commits.
+- [ ] Re-run `npm run check-docs` against the latest documentation and code changes.
 
 ## Rules for whoever works on this phase
 
