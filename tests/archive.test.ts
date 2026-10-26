@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const read = (file: string) => readFileSync(path.join(root, file), 'utf8');
+const read = (file: string) => readFileSync(path.join(root, file), 'utf8').replace(/\r\n/g, '\n');
 
 describe('Phase 11 shared archive server contracts', () => {
   const shared = read('shared/muf-yearly-archive.mjs');
@@ -26,7 +26,7 @@ describe('Phase 11 shared archive server contracts', () => {
   });
   it('registers Flock and Agri archive models in memory and real database modes', () => {
     for (const s of ["const ArchiveJob = mongoose.model('MufArchiveJob', ArchiveJobSchema)", "const ArchiveRecord = mongoose.model('MufArchiveRecord', ArchiveRecordSchema)", 'MufArchiveJob: ArchiveJob', 'MufArchiveRecord: ArchiveRecord', 'export { Farm, User, ArchiveJob, ArchiveRecord']) expect(flockDb).toContain(s);
-    for (const s of ['ArchiveJob: ArchiveJobSchema', 'ArchiveRecord: ArchiveRecordSchema', 'ArchiveJob, ArchiveRecord', 'MUF_FARM_MODELS = { ArchiveJob, ArchiveRecord']) expect(agriDb).toContain(s);
+    for (const s of ['ArchiveJob: ArchiveJobSchema', 'ArchiveRecord: ArchiveRecordSchema', 'ArchiveJob, ArchiveRecord', 'MUF_FARM_MODELS = {\n  ArchiveJob, ArchiveRecord']) expect(agriDb).toContain(s);
   });
   it('mounts archive routes in each app', () => {
     expect(dairyRoute).toContain('ArchiveJob');
