@@ -52,7 +52,9 @@ Phase 8 is **In progress**. Audited the current photo paths: Flock stores upload
 - Added `tests/muf-storage.test.ts` covering save/read/delete, size and type rejection, signature mismatch, and orphan cleanup.
 - Extended `tools/check-muf-sync.js` to verify all three backend copies are byte-identical and expose the expected API.
 
-**Not yet complete:** per-app MongoDB persistence bindings and route migration; automatic cleanup integration with record deletion; execution of the new test and parity check; full command-line checks and all three builds. No tests or builds have been run in this editing session. The new shared contract is not yet wired into production upload/read/delete routes, so current application behavior is unchanged at this checkpoint.
+**Owner-reported Phase 8 verification update (Windows CMD, 2026-10-26):** after pulling commit `f45be76`, the owner ran `npm test -- tests/muf-storage.test.ts` (8/8 passed), `npm run check-sync` (passed, including the three storage twins), `npm run check-docs` (passed), `npm test` (31 files, 284 tests passed), `npm run check-ui` (passed), `npm run check-workbench` (23 checks passed), `npm run check-farms` (passed), and `tools\\build-all.bat` (Dairy, Flock and Agri builds succeeded). These are owner-supplied results, not independently executed in this editing session.
+
+**Still incomplete despite those passing checks:** the submitted commit integrates the adapter into Flock routes, but Dairy's DailyLog photo flows and Agri's DiaryMedia/CropPhoto/Spray flows still retain inline/database photo payloads and have not been migrated to the adapter. Record-deletion cleanup and production orphan-reference discovery are also not complete. Passing contract tests and builds do not prove those integrations exist. Phase 8 must remain **In progress** until those gaps are implemented, covered by regression tests, and the full check list is rerun.
 
 MUF modules reused/created: existing client `muf-image.ts` compression helper was reviewed; created backend `muf-storage.mjs` twins. Keep the adapter focused and preserve each app's farm scoping, existing data format and image URL contract.
 
