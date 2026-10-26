@@ -10,12 +10,15 @@ describe('Agri fields and crop-cycle screen contracts', () => {
   it('provides field CRUD controls through the authenticated field API', () => {
     const panel = read('agri_farm/frontend/src/components/AgriFieldsPanel.tsx');
     const api = read('agri_farm/frontend/src/api.ts');
+    const urdu = read('agri_farm/frontend/src/muf/data/muf-urdu-terms-6.ts');
     expect(panel).toContain('api.getFields()');
     expect(panel).toContain('api.addField(payload)');
     expect(panel).toContain('api.updateField(editingId, payload)');
     expect(panel).toContain('api.deleteField(field._id)');
-    expect(panel).toContain("L('Field name', 'کھیت کا نام')");
-    expect(panel).toContain("L('Acres', 'ایکڑ')");
+    expect(panel).toContain("L('Field name')");
+    expect(panel).toContain("L('Acres')");
+    expect(urdu).toContain('"Field name": "کھیت کا نام"');
+    expect(urdu).toContain('"Acres": "ایکڑ"');
     expect(api).toContain("api.get('/fields')");
     expect(api).toContain("api.post('/fields'");
     expect(api).toContain("api.put(`/fields/${id}`, field)");
@@ -29,14 +32,18 @@ describe('Agri fields and crop-cycle screen contracts', () => {
     expect(app).toContain("L('Registered field')");
     expect(app).toContain('value={cropForm.fieldId || \'\'}');
     expect(app).toContain('fieldId: crop.fieldId || \'\'');
-    expect(app).toContain("L('Manage Fields', 'کھیتوں کا انتظام')");
+    expect(app).toContain("L('Manage Fields')");
+    expect(read('agri_farm/frontend/src/muf/data/muf-urdu-terms-6.ts')).toContain('"Manage Fields": "کھیتوں کا انتظام"');
   });
 
   it('offers optional field and crop-cycle selectors on ledger entries', () => {
     const ledger = read('agri_farm/frontend/src/components/LedgerBookForm.tsx');
     const app = read('agri_farm/frontend/src/App.tsx');
-    expect(ledger).toContain("L('Field (optional)', 'کھیت (اختیاری)')");
-    expect(ledger).toContain("L('Crop cycle (optional)', 'فصل کا دورانیہ (اختیاری)')");
+    const urdu = read('agri_farm/frontend/src/muf/data/muf-urdu-terms-6.ts');
+    expect(ledger).toContain("L('Field (optional)')");
+    expect(ledger).toContain("L('Crop cycle (optional)')");
+    expect(urdu).toContain('"Field (optional)": "کھیت (اختیاری)"');
+    expect(urdu).toContain('"Crop cycle (optional)": "فصل کا دورانیہ (اختیاری)"');
     expect(ledger).toContain('finForm.fieldId');
     expect(ledger).toContain('finForm.cropCycleId');
     expect(app).toContain('fields={fields}');
@@ -44,11 +51,16 @@ describe('Agri fields and crop-cycle screen contracts', () => {
 
   it('renders field and season profit from the server summary and localizes new labels through L()', () => {
     const app = read('agri_farm/frontend/src/App.tsx');
-    expect(app).toContain("L('Profit by field', 'کھیت کے حساب سے منافع')");
-    expect(app).toContain("L('Profit by season', 'موسم کے حساب سے منافع')");
+    const urdu = read('agri_farm/frontend/src/muf/data/muf-urdu-terms-6.ts');
+    expect(app).toContain("L('Profit by field')");
+    expect(app).toContain("L('Profit by season')");
+    expect(urdu).toContain('"Profit by field": "کھیت کے حساب سے منافع"');
+    expect(urdu).toContain('"Profit by season": "موسم کے حساب سے منافع"');
     expect(app).toContain('analyticsSummary?.financeSummary?.byField');
     expect(app).toContain('analyticsSummary?.financeSummary?.bySeason');
-    expect(app).toContain("L('No field-linked finance data yet.', 'ابھی کھیت سے منسلک مالی معلومات موجود نہیں۔')");
-    expect(app).toContain("L('No season-linked finance data yet.', 'ابھی موسم سے منسلک مالی معلومات موجود نہیں۔')");
+    expect(app).toContain("L('No field-linked finance data yet.')");
+    expect(app).toContain("L('No season-linked finance data yet.')");
+    expect(urdu).toContain('"No field-linked finance data yet.": "ابھی کھیت سے منسلک مالی معلومات موجود نہیں۔"');
+    expect(urdu).toContain('"No season-linked finance data yet.": "ابھی موسم سے منسلک مالی معلومات موجود نہیں۔"');
   });
 });
