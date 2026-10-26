@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { CheckCircle, Droplets, FileText, FlaskConical, HardHat, Leaf, Trash2 } from 'lucide-react';
 import * as api from '../api';
 import ImageUploader from './ImageUploader';
+import PhotoImage from './PhotoImage';
 import { useConfirm } from '../muf/core/muf-confirm';
 import { L } from '../i18n';
 
@@ -424,7 +425,7 @@ export default function LedgerBookForm({
                   {row.notes && <p className="text-[10px] text-slate-500 italic">{row.notes}</p>}
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  {row.image_base64 && <img src={row.image_base64} alt="" className="w-8 h-8 rounded object-cover" />}
+                  {row.image_base64 && <PhotoImage src={row.image_base64} alt="" className="w-8 h-8 rounded object-cover" />}
                   <button type="button" disabled={opsBusy} onClick={() => handleDeleteSpray(row._id)} className="text-slate-400 hover:text-red-500" aria-label={L('Delete spray')}>
                     <Trash2 size={14} />
                   </button>
