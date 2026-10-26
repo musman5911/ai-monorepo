@@ -40,6 +40,18 @@ const UserSchema = looseSchema('users');
 const CropSchema = looseSchema('crops');
 const FieldSchema = looseSchema('fields');
 const FinanceSchema = looseSchema('finance');
+const ArchiveJobSchema = new mongoose.Schema({
+  _id: { type: String }, farmId: { type: String, required: true, index: true }, collection: { type: String, required: true },
+  retentionYears: { type: Number, required: true, min: 1 }, cutoffDate: { type: String, required: true },
+  state: { type: String, default: 'preparing' }, sourceCount: { type: Number, required: true },
+  exportDownloaded: { type: Boolean, default: false }, createdBy: { type: String, default: '' },
+}, { timestamps: true, collection: 'muf_archive_jobs' });
+const ArchiveRecordSchema = new mongoose.Schema({
+  _id: { type: String }, farmId: { type: String, required: true, index: true }, jobId: { type: String, required: true, index: true },
+  sourceCollection: { type: String, required: true }, sourceId: { type: String, required: true },
+  originalRecord: { type: mongoose.Schema.Types.Mixed, required: true },
+}, { timestamps: true, collection: 'muf_archive_records' });
+ArchiveRecordSchema.index({ farmId: 1, jobId: 1, sourceCollection: 1, sourceId: 1 }, { unique: true });
 const TaskSchema = looseSchema('tasks');
 const ResetSchema = looseSchema('resets');
 const InventorySchema = looseSchema('inventory');
@@ -77,6 +89,7 @@ const FarmSchema = new mongoose.Schema({
 // Every record below belongs to exactly one farm. User, Reset, TelegramMeta,
 // Setting and Farm stay global. The server adds the farmId; clients can never set it.
 const FARM_SCOPED = {
+  ArchiveJob: ArchiveJobSchema, ArchiveRecord: ArchiveRecordSchema,
   Field: FieldSchema, Crop: CropSchema, Finance: FinanceSchema, Task: TaskSchema, Inventory: InventorySchema,
   Liability: LiabilitySchema, Irrigation: IrrigationSchema, CropPhoto: CropPhotoSchema,
   Spray: SpraySchema, PhotoAsset: PhotoAssetSchema, Laborer: LaborerSchema, Attendance: AttendanceSchema,
@@ -106,7 +119,7 @@ for (const schema of Object.values(FARM_SCOPED)) {
 // ─── Models ─────────────────────────────────────────────────────────────────
 let User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, PhotoAsset, Laborer, Attendance, LaborAdvance, TelegramMeta,
-  Supplier, SupplierPayment, Setting, DiaryMedia, Farm;
+  Supplier, SupplierPayment, Setting, DiaryMedia, Farm, ArchiveJob, ArchiveRecord;
 
 if (useMock) {
   const models = createStore({
@@ -114,6 +127,8 @@ if (useMock) {
     Field: FieldSchema,
     Crop: CropSchema,
     Finance: FinanceSchema,
+    ArchiveJob: ArchiveJobSchema,
+    ArchiveRecord: ArchiveRecordSchema,
     Task: TaskSchema,
     Reset: ResetSchema,
     Inventory: InventorySchema,
@@ -134,12 +149,14 @@ if (useMock) {
   });
   ({ User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
     CropPhoto, Spray, PhotoAsset, Laborer, Attendance, LaborAdvance, TelegramMeta,
-    Supplier, SupplierPayment, Setting, DiaryMedia, Farm } = models);
+    Supplier, SupplierPayment, Setting, DiaryMedia, Farm, ArchiveJob, ArchiveRecord } = models);
 } else {
   User = mongoose.model('User', UserSchema);
   Field = mongoose.model('Field', FieldSchema);
   Crop = mongoose.model('Crop', CropSchema);
   Finance = mongoose.model('Finance', FinanceSchema);
+  ArchiveJob = mongoose.model('MufArchiveJob', ArchiveJobSchema);
+  ArchiveRecord = mongoose.model('MufArchiveRecord', ArchiveRecordSchema);
   Task = mongoose.model('Task', TaskSchema);
   Reset = mongoose.model('Reset', ResetSchema);
   Inventory = mongoose.model('Inventory', InventorySchema);
