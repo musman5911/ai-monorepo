@@ -16,7 +16,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phase-11-yearly-archive-server.md) |
-| 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phase-12-yearly-archive-screens.md) |
+| 12 | Yearly archive: screens | In progress | [phase-12-yearly-archive-screens.md](phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Not started | [phase-15-mu-farms-product-data.md](phase-15-mu-farms-product-data.md) |
