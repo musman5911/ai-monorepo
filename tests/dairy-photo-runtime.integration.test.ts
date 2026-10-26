@@ -210,6 +210,12 @@ describe.sequential('Dairy photo runtime API integration', () => {
       method: 'PUT', token: ownerToken, farmId: farmA, body: { photos: [] },
     });
     expect(unlinked.response.status).toBe(200);
+    const graceDiscovery = await request('/photos/orphans', { token: ownerToken, farmId: farmA });
+    expect(graceDiscovery.response.status).toBe(200);
+    expect(graceDiscovery.data.orphanIds).not.toContain(photoId);
+    const retainedDuringGrace = await request(photoPath.replace('/api', ''), { token: ownerToken, farmId: farmA });
+    expect(retainedDuringGrace.response.status).toBe(200);
+
     const deleted = await request(`/photos/${photoId}`, {
       method: 'DELETE', token: ownerToken, farmId: farmA,
     });
