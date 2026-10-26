@@ -254,33 +254,43 @@ async function tgDailyText(date) {
 async function tgPushDaily(force = false) {
   const token = TOKEN();
   if (!token) return { sent: 0, reason: 'not configured' };
-  const settings = await tgSettings();
-  if (!force && !settings.dailySummary) return { sent: 0, reason: 'daily summary turned off' };
-  const date = todayStr();
-  if (!force && settings.lastPushDate === date) return { sent: 0, reason: 'already sent today' };
   const links = await tgRead('links');
-  const chatIds = [];
-  for (const [chatId, link] of Object.entries(links)) {
-    const uid = (link || {}).userId;
-    if (!uid) continue;
-    let u = null;
-    try {
-      u = await User.findOne({ _id: parseOid(uid, 'user ID') });
-    } catch { u = null; }
-    if (u && mufIsFullRole(u.role)) chatIds.push(chatId);
-  }
-  if (!chatIds.length) return { sent: 0, reason: 'no linked admin chat' };
-  const text = await tgDailyText(date);
+  const farms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
   const m = await muf();
-  let sent = 0;
-  for (const chatId of chatIds) {
-    if (await m.tgSendMessage(token, chatId, text)) sent += 1;
+  const results = [];
+  const date = todayStr();
+  for (const farm of farms) {
+    const farmId = String(farm._id);
+    const settings = await tgSettings(farmId);
+    if (!force && !settings.dailySummary) {
+      results.push({ farmId, sent: 0, reason: 'daily summary turned off' });
+      continue;
+    }
+    if (!force && settings.lastPushDate === date) {
+      results.push({ farmId, sent: 0, reason: 'already sent today' });
+      continue;
+    }
+    const chatIds = [];
+    for (const [chatId, link] of Object.entries(links)) {
+      if (mufTelegramFarmId(link) !== farmId || !link.userId) continue;
+      let u = null;
+      try { u = await User.findOne({ _id: parseOid(link.userId, 'user ID') }); } catch { u = null; }
+      if (u && mufIsFullRole(u.role)) chatIds.push(chatId);
+    }
+    if (!chatIds.length) {
+      results.push({ farmId, sent: 0, reason: 'no linked admin chat' });
+      continue;
+    }
+    const text = await mufRunTelegramFarm(farmId, mufRunWithFarmContext, () => tgDailyText(date));
+    let sent = 0;
+    for (const chatId of chatIds) if (await m.tgSendMessage(token, chatId, text)) sent += 1;
+    if (!force) {
+      settings.lastPushDate = date;
+      await tgWrite(`settings:${farmId}`, settings);
+    }
+    results.push({ farmId, sent, chats: chatIds.length });
   }
-  if (!force) {
-    settings.lastPushDate = date;
-    await tgWrite('settings', settings);
-  }
-  return { sent, chats: chatIds.length };
+  return { sent: results.reduce((n, r) => n + r.sent, 0), farms: results };
 }
 
 router.get('/settings', protect, requireAdmin, asyncHandler(async (_req, res) => {
