@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-25 (Phase 5 command-line scope complete; Phase 6 screens work started).
+Last updated: 2026-10-26 (Phase 6 screen tests passing; Urdu label coverage remains).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -227,3 +227,15 @@ The owner supplied the output saved in `result.tx` from the latest Phase 6 scree
 | `tools\\build-all.bat` | Owner-reported passed: Dairy, Flock and Agri builds |
 
 **Pending:** rerun `npm test -- tests/agri-fields-screens.test.ts` and the full `npm test` after the assertion fix. Phase 6 remains **In progress** until those results are supplied and Urdu label coverage is checked. The pasted command-output file `result.tx` has been removed from the branch after review.
+
+
+## Phase 6 test-fix verification (2026-10-26; Windows CMD output supplied by owner)
+
+The owner pulled commit `2c55d81` and reran the focused test and full suite after the source-contract assertion was corrected.
+
+| Command/check | Result |
+|---|---|
+| `npm test -- tests/agri-fields-screens.test.ts` | Passed: 1 file, 4 tests |
+| `npm test` | Passed: 29 files, 264 tests, 0 failures |
+
+These are owner-supplied local results. The other Phase 6 standard checks passed before the test assertion fix, as recorded above; they have not been rerun after this fix. Urdu coverage and browser behavior are not yet verified. Phase 6 remains **In progress**.
