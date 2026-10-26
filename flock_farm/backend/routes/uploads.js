@@ -3,10 +3,39 @@ import mongoose from 'mongoose';
 import multer from 'multer';
 import { authRequired, requireRole } from '../middleware/auth.js';
 import Image from '../models/Image.js';
+import { createMufStorage } from '../muf-storage.mjs';
 
 const router = express.Router();
 
 const allowedKinds = new Set(['bird', 'batch', 'diary']);
+
+function storageForCurrentFarm() {
+  return createMufStorage({
+    store: {
+      async save({ bytes, contentType, metadata = {} }) {
+        const image = await Image.create({
+          kind: allowedKinds.has(metadata.kind) ? metadata.kind : 'diary',
+          contentType,
+          data: bytes,
+          size: bytes.length,
+          uploadedBy: String(metadata.uploadedBy || ''),
+        });
+        return { id: String(image._id) };
+      },
+      async readLink(id) {
+        const image = await Image.findOne({ _id: id }).select('_id').lean();
+        return image ? `/api/images/${image._id}` : null;
+      },
+      async delete(id) {
+        return Boolean(await Image.findOneAndDelete({ _id: id }));
+      },
+      async list() {
+        const images = await Image.find({}).select('_id').lean();
+        return images.map((image) => ({ id: String(image._id) }));
+      },
+    },
+  });
+}
 
 // Image URLs are used directly by <img> tags, which cannot attach X-Farm-Id.
 // Resolve the image's stored farm before auth, then let authRequired verify that
@@ -47,15 +76,15 @@ router.post('/uploads/image', authRequired, requireRole('admin'), upload.single(
       return res.status(400).json({ error: 'No image file uploaded' });
     }
 
-    const img = await Image.create({
-      kind,
+    const storage = storageForCurrentFarm();
+    const saved = await storage.save({
+      bytes: req.file.buffer,
       contentType: req.file.mimetype || 'image/jpeg',
-      data: req.file.buffer,
-      size: req.file.buffer.length,
-      uploadedBy: req.user?.username || '',
+      metadata: { kind, uploadedBy: req.user?.username || '' },
     });
-
-    res.status(201).json({ ok: true, path: `/api/images/${img._id}` });
+    const path = await storage.readLink(saved.id);
+    if (!path) throw new Error('Saved image could not be read back');
+    res.status(201).json({ ok: true, path });
   } catch (err) {
     console.error('POST /api/uploads/image error:', err);
     const status = err instanceof RangeError ? 413 : err instanceof TypeError ? 400 : 500;
@@ -68,8 +97,15 @@ router.post('/uploads/image', authRequired, requireRole('admin'), upload.single(
 router.post('/uploads/diary-image', authRequired, upload.single('image'), async (req, res) => {
   try {
     if (!req.file?.buffer?.length) return res.status(400).json({ error: 'No image file uploaded' });
-    const img = await Image.create({ kind: 'diary', contentType: req.file.mimetype || 'image/jpeg', data: req.file.buffer, size: req.file.buffer.length, uploadedBy: req.user?.username || '' });
-    return res.status(201).json({ ok: true, path: `/api/images/${img._id}` });
+    const storage = storageForCurrentFarm();
+    const saved = await storage.save({
+      bytes: req.file.buffer,
+      contentType: req.file.mimetype || 'image/jpeg',
+      metadata: { kind: 'diary', uploadedBy: req.user?.username || '' },
+    });
+    const path = await storage.readLink(saved.id);
+    if (!path) throw new Error('Saved image could not be read back');
+    return res.status(201).json({ ok: true, path });
   } catch (err) {
     console.error('POST /api/uploads/diary-image error:', err);
     const status = err instanceof RangeError ? 413 : err instanceof TypeError ? 400 : 500;
@@ -87,7 +123,10 @@ router.get('/images/:id', resolveImageFarm, authRequired, async (req, res) => {
     if (!mongoose.isValidObjectId(id)) {
       return res.status(404).json({ error: 'Image not found' });
     }
-    const img = await Image.findById(id);
+    const storage = storageForCurrentFarm();
+    const link = await storage.readLink(id);
+    if (!link) return res.status(404).json({ error: 'Image not found' });
+    const img = await Image.findOne({ _id: id });
     if (!img) return res.status(404).json({ error: 'Image not found' });
 
     res.setHeader('Content-Type', img.contentType || 'image/jpeg');
@@ -107,8 +146,9 @@ router.delete('/images/:id', resolveImageFarm, authRequired, requireRole('admin'
     if (!mongoose.isValidObjectId(id)) {
       return res.status(404).json({ error: 'Image not found' });
     }
-    const img = await Image.findByIdAndDelete(id);
-    if (!img) return res.status(404).json({ error: 'Image not found' });
+    const storage = storageForCurrentFarm();
+    const deleted = await storage.delete(id);
+    if (!deleted) return res.status(404).json({ error: 'Image not found' });
     res.json({ ok: true });
   } catch (err) {
     console.error('DELETE /api/images/:id error:', err);
