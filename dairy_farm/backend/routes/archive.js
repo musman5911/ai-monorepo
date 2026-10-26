@@ -44,7 +44,7 @@ router.post('/jobs', ...ownerUnscoped, async (req, res) => {
       await ArchiveRecord.insertMany(source.map((originalRecord) => ({ _id: randomUUID(), farmId, jobId, sourceCollection: collection, sourceId: String(originalRecord._id), originalRecord })), { ordered: true });
       const count = await ArchiveRecord.countDocuments({ farmId, jobId, sourceCollection: collection });
       if (count !== source.length) throw new Error('Snapshot count mismatch');
-      const job = await ArchiveJob.findOneAndUpdate({ _id: jobId, farmId }, { $set: { state: 'snapshot_ready' } }, { new: true }).lean();
+      const job = await ArchiveJob.findOneAndUpdate({ _id: jobId, farmId }, { $set: { state: 'snapshot_ready' } }, { new: true });
       return res.status(201).json({ job: { id: String(job._id), farmId, collection, retentionYears: years, cutoffDate, state: job.state, sourceCount: count, exportDownloaded: false }, exportUrl: `/api/archive/jobs/${jobId}/export?farmId=${encodeURIComponent(farmId)}` });
     } catch (error) {
       await ArchiveJob.findOneAndUpdate({ _id: jobId, farmId }, { $set: { state: 'snapshot_failed' } });
