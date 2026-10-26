@@ -42,7 +42,9 @@ The owner runs, reviews and restores archives from a screen.
 - The panel lists farms from the existing farm API, requests a server-side snapshot preview, downloads the JSON export, requires exact farm name and job ID before archive/restore, lists job history, and offers a separate opt-in view of snapshot records.
 - Existing report datasets are unchanged; archived records are not merged into active totals.
 - Added `tests/archive-screens.test.ts` to assert owner gating, export-before-execute, exact confirmation, restore/report paths, supported collections, and identical panel copies.
-- Still pending: run tests and all three builds, verify UI role mappings and export marker timing, and complete Urdu translations for the new labels. This checkpoint is not a completion claim.
+- Owner-supplied local verification after commit `2810316`: focused archive-screen test passed (5 tests); full suite passed (40 files, 325 tests); sync, UI safety, workbench (23 checks), farm scope, phase docs, and all three production builds passed. The owner also reported a clean Git working tree.
+- These commands were run by the owner in the Windows checkout and were not independently executed in this editing session.
+- Still pending: complete Urdu translations for all new labels and final review of archive export, execute, and restore workflow behavior. This checkpoint is not a completion claim.
 
 ## New command-line check
 
