@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 10 command-line scope completed; all three bundle budgets pass).
+Last updated: 2026-10-26 (Phase 10 command-line scope completed; Phase 11 server archive work started).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -21,7 +21,7 @@ Last updated: 2026-10-26 (Phase 10 command-line scope completed; all three bundl
 | 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
-| 11 | Yearly archive for old records: server | Not started | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
+| 11 | Yearly archive for old records: server | In progress | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
@@ -554,3 +554,8 @@ Phase 6, Agri fields and crop cycles screens, is **Done for the planned command-
 The initial failure was a stale source-contract expectation; the API implementation correctly included its payload argument. The test assertion was corrected, and the owner supplied passing focused and full-suite results afterward. The final correction changed only the test expectation. Results are owner-reported, not commands independently run in this editing session.
 
 The Phase 6 checklist is complete for command-line scope. No browser/phone, real-MongoDB, or live-site verification is claimed; those remain in Phases 19 to 21. Phase 7 subsequently completed for command-line scope; see the Phase 7 entry above.
+
+
+## Phase 11 start (2026-10-26)
+
+Phase 11 is **In progress** on `muf-monorepo`. The first implementation slice will be Dairy milk, followed by Dairy expenses, Flock batch logs, and Agri finance. Archive requests must name one farm and a positive retention period explicitly; no retention default is assumed. The design requires a durable export snapshot and downloadable export before removal, typed confirmation bound to the farm/job, full-record preservation, farm isolation, and retry-safe behavior. No archive endpoint or destructive operation is considered complete until its tests and the standard command-line checks pass.
