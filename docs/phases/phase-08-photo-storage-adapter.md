@@ -36,7 +36,7 @@ Implementation on `muf-monorepo` now uploads Dairy cow-gallery and expense recei
 
 Dairy and Agri now provide admin-only `GET /api/photos/orphans` discovery and `POST /api/photos/cleanup-orphans` cleanup. Reference discovery scans the relevant farm-scoped parent models; cleanup ignores newly uploaded assets for one hour to avoid deleting an upload before its parent record is saved. Relevant cow, expense, daily-log, crop, crop-photo, spray, finance and diary updates/deletions invoke cleanup.
 
-Added `tests/photo-client-migration.test.ts` and `tests/photo-phase8-regression.test.ts`. **Neither test suite nor the build/check sequence has been run against these latest commits in this editing session.** The owner must run the focused tests first, then the full required command sequence. Phase 8 remains In progress until results are clean and any failures are fixed.
+Added `tests/photo-client-migration.test.ts` and `tests/photo-phase8-regression.test.ts`. Added `tests/dairy-photo-runtime.integration.test.ts` to exercise Dairy photo endpoints over HTTP, including authentication, upload/read/delete, farm isolation, reference protection, orphan discovery, grace-period retention and role restrictions. Extended `tests/agri-runtime-api.integration.test.ts` to verify cross-farm photo read/delete denial. Runtime review also found and fixed an undefined-variable check accidentally placed in the Dairy daily-log GET handler; cleanup now runs after successful daily-log saves when photos or diary entries change. **These latest test and fix commits have not been run locally.** The owner must run the focused tests first, then the full required command sequence. Phase 8 remains In progress until results are clean and any failures are fixed.
 
 ## New command-line check
 
@@ -67,9 +67,9 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] Owner-reported standard checks passed on 2026-10-26: full suite (31 files/284 tests), sync, UI, workbench (23 checks), farm scope, docs and all three builds. See `docs/PROGRESS.md`.
 - [x] Migrate identified Dairy and Agri photo fields to upload through `/api/photos` before saving, while preserving legacy data URLs and public API field names. (Latest regression/build verification pending.)
 - [x] Wire relevant parent-record updates/deletions to safe orphan cleanup and expose admin-only production orphan discovery. (Latest regression/build verification pending.)
-- [ ] Run and, if needed, extend app-level regression tests for upload/read/delete, farm isolation, legacy photo compatibility and record deletion in Dairy and Agri; rerun all standard checks after implementation.
-- [x] Add regression tests for recursive Flock image reference discovery, retaining images referenced by any bucket, and orphan candidate selection. (Latest run status must be confirmed.)
-- [x] Add `tests/photo-phase8-regression.test.ts` for Dairy/Agri photo migration and cleanup contracts. (Added; not yet executed in this editing session.)
+- [ ] Run the new Dairy and extended Agri route-level photo integration tests locally; verify upload/read/delete, farm isolation, legacy compatibility, reference-safe deletion, orphan discovery/cleanup grace period and role restrictions; rerun all standard checks after implementation.
+- [x] Add regression tests for recursive Flock image reference discovery, retaining images referenced by any bucket, and orphan candidate selection. (Existing coverage; rerun the suite after latest commits.)
+- [x] Add `tests/photo-phase8-regression.test.ts` for Dairy/Agri photo migration and cleanup contracts. Add Dairy and Agri HTTP photo integration coverage. (Latest commits still need owner-local execution.)
 - [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated. (Latest `npm run check-docs` still needs to run.)
 
 ## Rules for whoever works on this phase
