@@ -539,7 +539,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
       {lightbox && (
         <div className="fixed inset-0 z-[var(--muf-z-popup-step)] bg-black/80 flex items-center justify-center p-4" onClick={() => setLightbox(null)}>
           <div className="max-w-2xl w-full" onClick={(e) => e.stopPropagation()}>
-            <img src={lightbox.base64} alt={lightbox.caption || lightbox.date} className="w-full max-h-[75vh] object-contain rounded-xl" />
+            <img src={galleryUrls[lightbox.id] || (lightbox.base64.startsWith('/api/photos/') ? '' : lightbox.base64)} alt={lightbox.caption || lightbox.date} className="w-full max-h-[75vh] object-contain rounded-xl" />
             <div className="flex items-center justify-between mt-2 text-white text-xs">
               <span>{lightbox.date}{lightbox.caption ? ` · ${lightbox.caption}` : ''}</span>
               <div className="flex gap-2">
