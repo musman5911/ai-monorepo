@@ -16,14 +16,14 @@ import MufWorkerPanel from './muf/ui/muf-worker-panel';
 import ImageUploader from './components/ImageUploader';
 import { L, getLang, setCurrentLang } from './i18n';
 import { openMufPrint, mufEsc } from './muf/data/muf-print';
-import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave } from './muf/data/muf-pdf';
+
 import { zakatStatementBody, ushrStatementBody, pctAmount, ZAKAT_DEFAULT_PCT, USHR_RAIN_PCT, USHR_IRRIGATED_PCT, downloadZakatPdf, downloadUshrPdf } from './muf/domain/muf-zakat';
 import { downloadFarmBookPdf } from './muf/domain/muf-farmbook';
 import HeaderSearch from './muf/ui/muf-header-search';
 import OfflineBanner from './muf/core/muf-offline-banner';
 import FarmProfileCard from './muf/ui/muf-farm-profile';
 import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf/core/muf-applike';
-import { MufAreaChart } from './muf/ui/muf-charts';
+const MufAreaChart = React.lazy(() => import('./muf/ui/muf-charts').then((module) => ({ default: module.MufAreaChart })));
 import { MufCountUpText } from './muf/core/muf-applike';
 import { mufToday, mufMonth } from './muf/data/muf-date';
 import { mufStoryNet, mufVerdictText, mufDaysBetween } from './muf/data/muf-story';
@@ -2501,6 +2501,7 @@ function App() {
   };
 
   const handlePrintMonthlyPDF = async () => {
+    const { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave } = await import('./muf/data/muf-pdf');
     // One-tap PDF download in the shared muf-pdf design (no print window).
     const totalInc = monthlyComparisonRows.reduce((sum, [_, val]) => sum + val.income, 0);
     const totalExp = monthlyComparisonRows.reduce((sum, [_, val]) => sum + val.expense, 0);
@@ -3148,7 +3149,7 @@ function App() {
               <div className="bg-white dark:bg-[#0f172a] border border-[color:var(--muf-color-border)] rounded-2xl shadow-sm p-4">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400">📈 {L('Monthly Income Trend')}</span>
                 <div className="mt-2">
-                  <MufAreaChart data={dashboardIncomeSeries} format={(v) => `Rs ${v.toLocaleString()}`} emptyText={L('No income entries yet')} />
+                  <React.Suspense fallback={<div className="py-8 text-center text-xs text-slate-400">{L('Loading chart…')}</div>}><MufAreaChart data={dashboardIncomeSeries} format={(v) => `Rs ${v.toLocaleString()}`} emptyText={L('No income entries yet')} /></React.Suspense>
                 </div>
               </div>
 
