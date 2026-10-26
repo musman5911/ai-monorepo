@@ -2,6 +2,8 @@ import crypto from 'crypto';
 import express from 'express';
 const router = express.Router();
 import { protect, adminOnly } from '../middleware/auth.js';
+import { Farm } from '../db.js';
+import { mufGetFarmContext, mufRunWithFarmContext } from '../muf-farms.mjs';
 import { sendMail, mailConfigured } from '../utils/mailer.js';
 import { buildSummaryData, renderSummaryHtml } from '../services/dailySummary.js';
 import { todayStr } from '../utils/date.js';
@@ -15,25 +17,35 @@ function timingSafeSecretEquals(provided, expected) {
   return crypto.timingSafeEqual(providedBuf, expectedBuf);
 }
 
-async function sendTodaysSummary() {
+async function sendTodaysSummary(selectedFarmId = null) {
   const { EMAIL_TO } = process.env;
   if (!EMAIL_TO) throw new Error('EMAIL_TO is not set — add the recipient address(es) in your environment/Secrets.');
 
   const recipients = EMAIL_TO.split(',').map((s) => s.trim()).filter(Boolean);
   if (recipients.length === 0) throw new Error('EMAIL_TO is empty — add at least one recipient address.');
 
+  const farms = selectedFarmId
+    ? [await Farm.findById(String(selectedFarmId)).lean()].filter(Boolean)
+    : await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+  if (!farms.length) throw new Error('No active farm is available for the daily summary.');
+
   const date = todayStr();
-  const data = await buildSummaryData(date);
-  const html = renderSummaryHtml(data);
-
-  await sendMail({
-    to: recipients,
-    subject: `Dairy Farm Summary — ${date}`,
-    html,
-    text: `Usman Dairy Farm summary for ${date}. Milk: ${data.totalMilk.toFixed(1)}L, Net today: ₨${data.netToday.toLocaleString()}.`,
-  });
-
-  return { date, recipients };
+  const results = [];
+  for (const farm of farms) {
+    const farmId = String(farm._id);
+    const data = await mufRunWithFarmContext({
+      mode: 'single', farmId, farmIds: [farmId], userId: 'daily-summary-email',
+    }, () => buildSummaryData(date));
+    const html = renderSummaryHtml(data);
+    await sendMail({
+      to: recipients,
+      subject: `${farm.name || 'Dairy Farm'} Summary — ${date}`,
+      html,
+      text: `${farm.name || 'Dairy Farm'} summary for ${date}. Milk: ${data.totalMilk.toFixed(1)}L, Net today: ₨${data.netToday.toLocaleString()}.`,
+    });
+    results.push({ farmId, farmName: farm.name, date, recipients });
+  }
+  return { date, recipients, farms: results };
 }
 
 // Mask each address in a comma-separated list individually, e.g.
@@ -62,8 +74,9 @@ router.get('/status', protect, async (req, res) => {
 // POST /api/email/send-now — admin-triggered manual send, for testing
 router.post('/send-now', protect, adminOnly, async (req, res) => {
   try {
-    const { date, recipients } = await sendTodaysSummary();
-    res.json({ sent: true, date, recipients });
+    const farmId = mufGetFarmContext()?.farmId || null;
+    const result = await sendTodaysSummary(farmId);
+    res.json({ sent: true, ...result });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
@@ -77,8 +90,8 @@ router.post('/cron', async (req, res) => {
     if (!timingSafeSecretEquals(secret, MUF_ENV.cronSecret)) {
       return res.status(401).json({ error: 'Invalid or missing cron secret' });
     }
-    const { date, recipients } = await sendTodaysSummary();
-    res.json({ sent: true, date, recipients });
+    const result = await sendTodaysSummary();
+    res.json({ sent: true, ...result });
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
