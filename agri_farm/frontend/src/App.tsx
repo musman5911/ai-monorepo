@@ -1190,7 +1190,7 @@ function App() {
       message: L('Are you sure you want to sign out of Usman Agri Farm?'),
       tone: 'warning',
       confirmLabel: L('Sign Out'),
-      cancelLabel: L('Cancel', 'منسوخ کریں')
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     performLogout();
@@ -1482,8 +1482,8 @@ function App() {
       title: L('Delete Crop Record'),
       message: L('Delete this crop record? Linked ledger entries will remain. This cannot be undone.'),
       tone: 'danger',
-      confirmLabel: L('Delete', 'حذف کریں'),
-      cancelLabel: L('Cancel', 'منسوخ کریں')
+      confirmLabel: L('Delete'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -1802,7 +1802,7 @@ function App() {
       message: L('Remove this transaction log? This will modify your gross totals.'),
       tone: 'danger',
       confirmLabel: L('Remove'),
-      cancelLabel: L('Cancel', 'منسوخ کریں')
+      cancelLabel: L('Cancel')
     });
     if (!ok) return false;
     setActionId(id);
@@ -1883,7 +1883,7 @@ function App() {
       message: L('Mark this debt as Paid? This will automatically log a corresponding cash outflow expense in your Ledger.'),
       tone: 'warning',
       confirmLabel: L('Pay Off Debt'),
-      cancelLabel: L('Cancel', 'منسوخ کریں')
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -1904,7 +1904,7 @@ function App() {
       message: L('Are you sure you want to delete this liability record? This does not log any cash outflow.'),
       tone: 'danger',
       confirmLabel: L('Delete Record'),
-      cancelLabel: L('Cancel', 'منسوخ کریں')
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -1966,7 +1966,7 @@ function App() {
       message: L('Are you sure you want to permanently delete this stock item from inventory?'),
       tone: 'danger',
       confirmLabel: L('Delete Item'),
-      cancelLabel: L('Cancel', 'منسوخ کریں')
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -2067,8 +2067,8 @@ function App() {
       title: L('Delete Care Task'),
       message: L('Delete this duty roster task? This cannot be undone.'),
       tone: 'danger',
-      confirmLabel: L('Delete', 'حذف کریں'),
-      cancelLabel: L('Cancel', 'منسوخ کریں')
+      confirmLabel: L('Delete'),
+      cancelLabel: L('Cancel')
     });
     if (!ok) return;
     setActionId(id);
@@ -2307,7 +2307,7 @@ function App() {
               {c.status === 'Completed' && (
                 <button onClick={() => handlePlanNext(c)} className="muf-record-btn" title={L('Plan next season')}><CalendarPlus size={15}/> {L('Next')}</button>
               )}
-              <button onClick={() => handleDeleteCrop(c._id)} className="muf-mini-icon danger" title={L('Delete', 'حذف کریں')} aria-label={L('Delete crop')}><Trash2 size={15}/></button>
+              <button onClick={() => handleDeleteCrop(c._id)} className="muf-mini-icon danger" title={L('Delete')} aria-label={L('Delete crop')}><Trash2 size={15}/></button>
             </>
           )}
         </>
@@ -2883,8 +2883,8 @@ function App() {
               <button
                 className="muf-icon-button"
                 onClick={() => setDiaryOpen(true)}
-                title={L('Notes', 'نوٹس')}
-                aria-label={L('Notes', 'نوٹس')}
+                title={L('Notes')}
+                aria-label={L('Notes')}
               >
                 <BookOpen size={19}/>
               </button>
@@ -3624,10 +3624,10 @@ function App() {
                   {cropPageRows.length < cropPageTotal && <div className="flex justify-center py-4"><button type="button" disabled={cropPageLoading} onClick={() => fetchCropPage(cropPageNextSkip, cropListFilters, false)} className="rounded-xl border border-slate-300 dark:border-slate-700 px-4 py-2 text-xs font-bold disabled:opacity-50">{cropPageLoading ? 'Loading crops…' : 'Load more crops (' + cropPageRows.length + ' of ' + cropPageTotal + ')'}</button></div>}
               </section>
 
-              <div className="mb-3 flex justify-end"><button type="button" onClick={() => setShowFieldsPanel(true)} className="rounded-xl border border-farm-300 px-3 py-2 text-xs font-bold text-farm-700 hover:bg-farm-50 dark:border-farm-800 dark:text-farm-300 dark:hover:bg-farm-950/30">{L('Manage Fields', 'کھیتوں کا انتظام')}</button></div>
+              <div className="mb-3 flex justify-end"><button type="button" onClick={() => setShowFieldsPanel(true)} className="rounded-xl border border-farm-300 px-3 py-2 text-xs font-bold text-farm-700 hover:bg-farm-50 dark:border-farm-800 dark:text-farm-300 dark:hover:bg-farm-950/30">{L('Manage Fields')}</button></div>
               <section className="mb-5 grid grid-cols-1 gap-4 lg:grid-cols-2" aria-label={L('Field and season profitability')}>
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-                  <h3 className="mb-3 text-sm font-black">{L('Profit by field', 'کھیت کے حساب سے منافع')}</h3>
+                  <h3 className="mb-3 text-sm font-black">{L('Profit by field')}</h3>
                   <div className="space-y-2">
                     {(analyticsSummary?.financeSummary?.byField || []).map(row => (
                       <div key={row.field} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 p-3 text-xs dark:bg-slate-800/60">
@@ -3635,11 +3635,11 @@ function App() {
                         <span className={row.income - row.expense >= 0 ? 'shrink-0 font-bold text-emerald-700 dark:text-emerald-400' : 'shrink-0 font-bold text-red-600'}>Rs. {formatCurrency(row.income - row.expense)}</span>
                       </div>
                     ))}
-                    {!(analyticsSummary?.financeSummary?.byField || []).length && <p className="text-xs text-slate-500">{L('No field-linked finance data yet.', 'ابھی کھیت سے منسلک مالی معلومات موجود نہیں۔')}</p>}
+                    {!(analyticsSummary?.financeSummary?.byField || []).length && <p className="text-xs text-slate-500">{L('No field-linked finance data yet.')}</p>}
                   </div>
                 </div>
                 <div className="rounded-2xl border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900">
-                  <h3 className="mb-3 text-sm font-black">{L('Profit by season', 'موسم کے حساب سے منافع')}</h3>
+                  <h3 className="mb-3 text-sm font-black">{L('Profit by season')}</h3>
                   <div className="space-y-2">
                     {(analyticsSummary?.financeSummary?.bySeason || []).map(row => (
                       <div key={row.season} className="flex items-center justify-between gap-3 rounded-lg bg-slate-50 p-3 text-xs dark:bg-slate-800/60">
@@ -3647,7 +3647,7 @@ function App() {
                         <span className={row.income - row.expense >= 0 ? 'shrink-0 font-bold text-emerald-700 dark:text-emerald-400' : 'shrink-0 font-bold text-red-600'}>Rs. {formatCurrency(row.income - row.expense)}</span>
                       </div>
                     ))}
-                    {!(analyticsSummary?.financeSummary?.bySeason || []).length && <p className="text-xs text-slate-500">{L('No season-linked finance data yet.', 'ابھی موسم سے منسلک مالی معلومات موجود نہیں۔')}</p>}
+                    {!(analyticsSummary?.financeSummary?.bySeason || []).length && <p className="text-xs text-slate-500">{L('No season-linked finance data yet.')}</p>}
                   </div>
                 </div>
               </section>
@@ -4733,7 +4733,7 @@ function App() {
                 <div>
                   <label className="muf-label">{L('Field / Plot Sector')}</label>
                   <input className="muf-field" value={cropForm.field} onChange={e => setCropForm({...cropForm, field: e.target.value})} placeholder={L('e.g. Sector 3A')} />
-                  <select className="muf-field mt-2" aria-label={L('Registered field', 'رجسٹر شدہ کھیت')} value={cropForm.fieldId || ''} onChange={e => setCropForm({...cropForm, fieldId: e.target.value})}><option value="">{L('No registered field', 'کوئی رجسٹر شدہ کھیت نہیں')}</option>{fields.map(field => <option key={field._id} value={field._id}>{field.name} ({Number(field.acres || 0).toLocaleString()} {L('acres', 'ایکڑ')})</option>)}</select>
+                  <select className="muf-field mt-2" aria-label={L('Registered field')} value={cropForm.fieldId || ''} onChange={e => setCropForm({...cropForm, fieldId: e.target.value})}><option value="">{L('No registered field')}</option>{fields.map(field => <option key={field._id} value={field._id}>{field.name} ({Number(field.acres || 0).toLocaleString()} {L('acres')})</option>)}</select>
                 </div>
                 <div>
                   <label className="muf-label">Sizing Area (Kanal) *</label>
@@ -4864,7 +4864,7 @@ function App() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onClick={() => setShowCropModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel', 'منسوخ کریں')}</button>
+                <button type="button" onClick={() => setShowCropModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
                 <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
                   <CheckCircle size={14} /> {editingCrop ? "Update Crop" : "Plant Crop"}
                 </button>
@@ -4948,7 +4948,7 @@ function App() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onClick={resetLiabilityForm} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel', 'منسوخ کریں')}</button>
+                <button type="button" onClick={resetLiabilityForm} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
                 <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
                   <CheckCircle size={14} /> {editingLiabilityId ? 'Save Changes' : 'Log Debt'}
                 </button>
@@ -5000,7 +5000,7 @@ function App() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onClick={() => setShowInventoryModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel', 'منسوخ کریں')}</button>
+                <button type="button" onClick={() => setShowInventoryModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
                 <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
                   <CheckCircle size={14} /> {invForm._id ? "Adjust Stock" : "Log Stock"}
                 </button>
@@ -5167,7 +5167,7 @@ function App() {
               </div>
 
               <div className="flex justify-end gap-2 pt-4 border-t border-slate-200 dark:border-slate-800">
-                <button type="button" onClick={() => setShowTaskModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel', 'منسوخ کریں')}</button>
+                <button type="button" onClick={() => setShowTaskModal(false)} className="px-4 py-2 text-xs text-slate-500 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-bold uppercase tracking-wider cursor-pointer">{L('Cancel')}</button>
                 <button type="submit" className="px-5 py-2 bg-farm-600 hover:bg-farm-700 text-white text-xs font-bold rounded-lg flex items-center gap-1.5 shadow-md cursor-pointer">
                   <CheckCircle size={14} /> {editingTask ? "Update Assignment" : "Assign Duty"}
                 </button>
@@ -6249,7 +6249,7 @@ function App() {
       </DetailModal>
 
       {/* Shared diary popup: entries, media, links and sharing */}
-      <DetailModal open={diaryOpen} onClose={() => setDiaryOpen(false)} title={L('Notes', 'نوٹس')}
+      <DetailModal open={diaryOpen} onClose={() => setDiaryOpen(false)} title={L('Notes')}
         subtitle={L('Daily notes and observations')} icon={<BookOpen size={16} />} size="big">
         <MufDiary
           entries={diaryEntries}
