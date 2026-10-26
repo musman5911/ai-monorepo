@@ -39,14 +39,14 @@ Each Telegram chat is linked to one farm, bot entries land in that farm, and dai
 - New link codes record the selected farm; legacy links without `farmId` fail closed. Telegram writes, reads and on-demand summaries run inside the linked farm context.
 - Scheduled Telegram summaries iterate active farms, filter recipients by each link's `farmId`, and use per-farm settings / once-per-day guards. Manual sends are restricted to the selected or assigned farms.
 - Dairy daily-summary email cron sends a separate farm-scoped email for each active farm. Manual email sends use the selected farm or the caller's allowed farm list.
-- Added `tests/telegram-farm-scope.test.ts`. The source is committed but has not yet been run locally; phase acceptance is pending command-line validation and any fixes it reveals.
+- Added `tests/telegram-farm-scope.test.ts`. Owner-supplied full-suite output confirms it passes as part of the 276-test run, including all 12 farm-scope regression tests.
 
 ## Steps
 
 1. Audit existing Telegram routes, MUF farm scoping and summary services in all three backends. (Done)
 2. Add farm identity to link codes and chat links; reject legacy unscoped links. (Implemented; validate)
 3. Run webhook commands and summaries in the linked farm context. (Implemented; validate)
-4. Add and run the check below, then fix any failures. (Pending)
+4. Add and run the check below, then fix any failures. (Automated regression passed in the owner-supplied full suite; remaining Phase 7 checks/audit are pending)
 
 ## New command-line check
 
