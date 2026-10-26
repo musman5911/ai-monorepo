@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { PhotoAsset, Cow, Expense, DailyLog } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { createMufStorage } from '../muf-storage.mjs';
+import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 
 const router = express.Router();
 const TYPES = new Set(['image/jpeg', 'image/png', 'image/webp']);
@@ -76,9 +77,7 @@ router.post('/photos', protect, async (req, res) => {
 });
 router.post('/photos/cleanup-orphans', protect, requireAdmin, async (req, res) => {
   try {
-    const { scanned, orphanIds } = await findOrphanPhotoAssets();
-    const result = orphanIds.length ? await PhotoAsset.deleteMany({ _id: { $in: orphanIds } }) : { deletedCount: 0 };
-    return res.json({ scanned, deleted: result.deletedCount || 0 });
+    return res.json(await cleanupOrphanPhotoAssets());
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Photo orphan cleanup failed' });
   }
