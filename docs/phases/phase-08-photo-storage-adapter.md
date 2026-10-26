@@ -13,7 +13,7 @@ One shared place decides where photos are stored and how big they may be, so the
 
 ## Scope
 
-- `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link and delete.
+- `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link, delete and orphan cleanup. The shared contract now exists; app-specific MongoDB adapters and route migration are still in progress.
 - The default store keeps today's behaviour (MongoDB), so nothing changes for users.
 - Size limits (about 100 KB after compression) and a file-type check enforced on the server.
 - Deleting a record deletes its photos; a cleanup finds photos nobody uses.
@@ -25,10 +25,10 @@ One shared place decides where photos are stored and how big they may be, so the
 
 ## Steps
 
-1. Read how each app saves and serves photos today (Agri DiaryMedia and crop photos, Dairy cow gallery, Flock images).
-2. Define the adapter interface in this file.
-3. Add the adapter with the MongoDB store and move each app onto it with no data change.
-4. Add the cleanup job and the check.
+1. Audit how each app saves and serves photos (Agri DiaryMedia/CropPhoto/Spray, Dairy DailyLog photos and cow galleries, Flock Image documents). (Reviewed; migration not complete.)
+2. Define the adapter interface and validation contract. (Initial shared contract implemented in all three backends.)
+3. Add per-app MongoDB store bindings and migrate existing upload/read/delete flows without changing stored data or URLs. (Pending.)
+4. Add safe orphan cleanup, tests, and the shared-file parity check. (Contract-level cleanup/test/check added; app integration and verification pending.)
 
 ## New command-line check
 
@@ -50,12 +50,12 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link and delete.
+- [ ] `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link, delete and orphan cleanup. (Shared contract added; still needs app integration.)
 - [ ] The default store keeps today's behaviour (MongoDB), so nothing changes for users.
 - [ ] Size limits (about 100 KB after compression) and a file-type check enforced on the server.
 - [ ] Deleting a record deletes its photos; a cleanup finds photos nobody uses.
 - [ ] Add the file to `check-muf-sync.js`.
-- [ ] The new command-line check above exists and passes.
+- [ ] The new command-line check above exists and passes. `tests/muf-storage.test.ts` and `check-sync.js` coverage have been added but have not yet been run locally.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
