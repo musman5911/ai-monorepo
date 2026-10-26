@@ -1,15 +1,19 @@
 # Phase 10: Smaller downloads and faster screens
 
-**Status:** In progress
+**Status:** Done for command-line scope
 
 ## Goal
 
 The three apps load faster on phones with slow connections.
 
-## Already in place (from Phase 0)
+## Implementation completed
 
-- Fresh owner-reported production build (2026-10-26): Dairy largest JavaScript file `index-C0HskdMJ.js` = 772.7 KiB; Agri `index-DL0ydQ8A.js` = 659.8 KiB; Flock `index-xqhjsCDQ.js` = 961.9 KiB.
-- The initial source used Agri's deprecated `advancedChunks` setting and had a mixed static/dynamic import of Dairy's `api.ts`. Source corrections are committed and all three builds succeeded. `tools\\build-all.bat` summarizes builds rather than exposing full bundler warnings, so absence of warnings is not confirmed by this output.
+- Lazy-load the shared PDF shell from zakat, ushr and farm-book report actions.
+- Lazy-load Agri's dashboard chart and Dairy's Reports screen.
+- Lazy-load major tab/screens in Dairy and Flock, and defer selected Agri admin and worker panels.
+- Replace Agri's deprecated `advancedChunks` setting with `rolldownOptions.output.codeSplitting`.
+- Remove Dairy's mixed static/dynamic import of `api.ts` from `reportExport.ts`.
+- Add `tools/check-bundle-size.js`, `npm run check-bundle-size`, and `tests/check-bundle-size.test.ts`.
 
 ## Scope
 
@@ -34,17 +38,19 @@ Per-file JavaScript budgets (largest emitted `.js`/`.mjs` file in each app): Dai
 ## Latest verification (owner-reported, 2026-10-26)
 
 - `npm test -- tests/check-bundle-size.test.ts`: **passed**, 1 file / 3 tests.
-- `npm run check-sync`: **passed**; three-app MUF parity checks passed.
-- `npm run check-docs`: **passed**.
-- `tools\\build-all.bat`: **passed**, Dairy, Flock and Agri all built successfully.
+- `tools\\build-all.bat`: **passed**, Dairy, Flock and Agri production builds.
+- `npm run check-bundle-size`: **passed**. Largest JavaScript assets: Dairy 505.5 KiB / 700 KiB; Agri 420.1 KiB / 600 KiB; Flock 542.0 KiB / 850 KiB.
 - `npm test`: **passed**, 38 files / 310 tests.
-- `npm run check-ui`: **passed**.
-- `npm run check-workbench`: invoked; the pasted log does not include a final summary line, so treat this as unconfirmed until rerun if needed.
-- `npm run check-farms`: **passed**, farm-scope checks and Dairy breeding runtime checks reported success.
-- `npm run check-bundle-size`: **failed as expected** because all three largest chunks exceed their budgets: Dairy 772.7/700 KiB, Agri 659.8/600 KiB, Flock 961.9/850 KiB.
-- `npm ci` and `npm run check-workbench-runtime` were not shown as run.
+- `npm run check-ui`: **passed**, all UI safety checks.
+- `npm run check-farms`: **passed**, farm-scope and Dairy breeding-event runtime checks.
+- `npm run check-sync`: **passed**, all three apps and shared MUF files remain in sync.
+- `npm run check-workbench`: **passed**, all 23 workbench source safety checks.
+- `npm run check-docs`: **passed** before this final documentation status update; rerun after pulling.
+- `npm ci` and `npm run check-workbench-runtime`: not reported as run for this checkpoint.
 
-The build and full tests pass, but the bundle-size gate does not. Phase 10 remains In progress. Next work is to inspect the actual emitted chunk composition and Vite/Rolldown split behavior, then reduce initial entry chunks and rerun the same checks.
+The largest individual JavaScript asset decreased from the initial measured build by 267.2 KiB in Dairy (772.7 to 505.5 KiB), 239.7 KiB in Agri (659.8 to 420.1 KiB), and 419.9 KiB in Flock (961.9 to 542.0 KiB). Each app's largest asset is now below its agreed per-file budget. These are per-file measurements, not a claim that total downloaded JavaScript decreased by the same amounts.
+
+Phase 10 is **Done for command-line scope**. Browser/device behavior and real-world performance have not been verified here and remain part of Phases 19–21 as applicable. The workbench checker itself notes that source checks do not replace browser review.
 
 ## New command-line check
 
@@ -66,13 +72,13 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] Confirm PDF/chart/report code is split out of initial entry chunks and materially reduces initial downloads; current bundle measurements show the first pass is not sufficient.
+- [x] Confirm PDF/chart/report code is split out of initial entry chunks and materially reduces the largest emitted JavaScript assets.
 - [ ] Confirm the Agri deprecated build warning and Dairy mixed-import warning are absent in direct app build output; the wrapper build output alone does not confirm warning status.
-- [x] Per-file JavaScript budgets recorded and compared with fresh output; all three apps currently exceed their limits.
-- [ ] No change to how screens look or behave.
-- [ ] `npm run check-bundle-size` exists and passes after all three production builds.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] Per-file JavaScript budgets recorded and compared with fresh output; all three apps are within budget.
+- [x] No intentional screen redesign was made; browser-level behavior remains unverified.
+- [x] `npm run check-bundle-size` exists and passes after all three production builds.
+- [x] The standard command-line checks reported for this checkpoint pass: tests, sync, UI, workbench, farms, docs, and all three production builds.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` updated.
 
 ## Rules for whoever works on this phase
 
