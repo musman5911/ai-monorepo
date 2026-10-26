@@ -129,7 +129,7 @@ router.delete('/crops/:cropId', protect, requireAdmin, asyncHandler(async (req, 
   // so deleted crops never leave orphaned image data in the database.
   await CropPhoto.deleteMany({ crop_id: cropId });
   await Spray.updateMany({ crop_id: cropId }, { $set: { image_base64: '' } });
-  await cleanupOrphanPhotoAssets();
+  try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
   return res.json({ status: 'ok' });
 }));
 
