@@ -9,6 +9,7 @@ import { randomUUID } from 'node:crypto';
  */
 export function createYearlyArchiveRouter({
   Farm, sources, ownerUnscoped, runUnscoped, scopeModels,
+  ArchiveJob: suppliedJobModel, ArchiveRecord: suppliedRecordModel,
 }) {
   const router = express.Router();
   const jobSchema = new mongoose.Schema({
@@ -29,9 +30,9 @@ export function createYearlyArchiveRouter({
     originalRecord: { type: mongoose.Schema.Types.Mixed, required: true },
   }, { timestamps: true, collection: 'muf_archive_records' });
   recordSchema.index({ farmId: 1, jobId: 1, sourceCollection: 1, sourceId: 1 }, { unique: true });
-  const ArchiveJob = mongoose.models.MufArchiveJob || mongoose.model('MufArchiveJob', jobSchema);
-  const ArchiveRecord = mongoose.models.MufArchiveRecord || mongoose.model('MufArchiveRecord', recordSchema);
-  scopeModels({ MufArchiveJob: ArchiveJob, MufArchiveRecord: ArchiveRecord }, ['MufArchiveJob','MufArchiveRecord']);
+  const ArchiveJob = suppliedJobModel || mongoose.models.MufArchiveJob || mongoose.model('MufArchiveJob', jobSchema);
+  const ArchiveRecord = suppliedRecordModel || mongoose.models.MufArchiveRecord || mongoose.model('MufArchiveRecord', recordSchema);
+  if (!suppliedJobModel && !suppliedRecordModel) scopeModels({ MufArchiveJob: ArchiveJob, MufArchiveRecord: ArchiveRecord }, ['MufArchiveJob','MufArchiveRecord']);
 
   const MAX_RECORDS = 5000, MAX_BYTES = 8 * 1024 * 1024;
   const size = value => Buffer.byteLength(JSON.stringify(value), 'utf8');
