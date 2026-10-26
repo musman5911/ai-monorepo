@@ -1,6 +1,6 @@
 # Phase 11: Yearly archive for old records: server
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -12,7 +12,9 @@ Old years of records can be archived and exported so the live data stays small a
 
 ## Scope
 
-- An owner-only archive job per farm: moves records older than a chosen number of years (default to be agreed) into an archive collection and writes a downloadable export first.
+- An owner-only archive job for one explicitly selected farm at a time. The caller must supply a positive retention period in years; no implicit default is applied until the owner approves one.
+- The server prepares a durable export snapshot and exposes it for download before any source records can be removed. The execution step requires an exact typed confirmation tied to the selected farm and archive job.
+- Archive and restore operations must be retry-safe: if a step fails, source records remain available; partial archive copies are detectable and do not authorize deletion.
 - Nothing is deleted without a successful export and a typed confirmation.
 - Archived records are excluded from normal lists and totals but can be read and restored.
 - Covers the high-volume collections first: Dairy milk and expenses, Flock batch logs, Agri finance.
@@ -23,10 +25,11 @@ Old years of records can be archived and exported so the live data stays small a
 
 ## Steps
 
-1. Agree the rules in this file (which collections, how many years, what is kept).
-2. Implement archive, export and restore for one collection, then the others.
-3. Make backups include or reference archives.
-4. Add the check.
+1. Keep retention years explicit in each request until the owner approves a default; use the record's existing date field and preserve the full original document.
+2. Implement and test a safe archive/export/restore flow for Dairy milk first, then Dairy expenses, Flock batch logs, and Agri finance.
+3. Keep all archive/job records farm-scoped. Never infer a farm from the payload or run an archive across all farms.
+4. Make backups include or reference archives before enabling removal from active collections.
+5. Add the check.
 
 ## New command-line check
 
@@ -48,7 +51,9 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] An owner-only archive job per farm: moves records older than a chosen number of years (default to be agreed) into an archive collection and writes a downloadable export first.
+- [ ] An owner-only archive job for one explicitly selected farm at a time, with an explicit positive retention period.
+- [ ] A durable downloadable export is prepared before removal; exact typed confirmation is bound to the farm and archive job.
+- [ ] Archive/export/restore steps are retry-safe and preserve original records.
 - [ ] Nothing is deleted without a successful export and a typed confirmation.
 - [ ] Archived records are excluded from normal lists and totals but can be read and restored.
 - [ ] Covers the high-volume collections first: Dairy milk and expenses, Flock batch logs, Agri finance.
