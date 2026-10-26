@@ -11,7 +11,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 4 | Dairy calves and lineage | Done | [phase-04-dairy-calves-lineage.md](phase-04-dairy-calves-lineage.md) |
 | 5 | Agri fields and crop cycles: server | Done | [phase-05-agri-fields-cycles-server.md](phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phase-06-agri-fields-cycles-screens.md) |
-| 7 | Telegram bot and daily summary per farm | Not started | [phase-07-telegram-daily-summary-per-farm.md](phase-07-telegram-daily-summary-per-farm.md) |
+| 7 | Telegram bot and daily summary per farm | In progress | [phase-07-telegram-daily-summary-per-farm.md](phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Not started | [phase-08-photo-storage-adapter.md](phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Not started | [phase-09-cloudinary-store.md](phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phase-10-bundle-size-performance.md) |
