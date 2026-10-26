@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { mufGetFarmContext, mufRunWithFarmContext } from '../dairy_farm/backend/muf-farms.mjs';
 import {
   mufTelegramFarmContext,
   mufTelegramFarmId,
@@ -30,14 +31,13 @@ describe('Phase 7: Telegram farm isolation', () => {
   });
 
   it('runs webhook work in the linked farm context, never the default farm', async () => {
-    let seen: unknown;
-    const result = await mufRunTelegramFarm('farm-b', (ctx, fn) => fn(ctx), async () => {
-      seen = 'farm-b callback';
+    const result = await mufRunTelegramFarm('farm-b', mufRunWithFarmContext, async () => {
+      expect(mufGetFarmContext()).toMatchObject({ mode: 'single', farmId: 'farm-b', farmIds: ['farm-b'] });
       return 42;
     });
     expect(result).toBe(42);
-    expect(seen).toBe('farm-b callback');
-    await expect(mufRunTelegramFarm('', (ctx, fn) => fn(ctx), async () => 'unsafe')).resolves.toBeNull();
+    await expect(mufRunTelegramFarm('', mufRunWithFarmContext, async () => 'unsafe')).resolves.toBeNull();
+    expect(mufGetFarmContext()).toBeNull();
   });
 
   it('keeps the farm-context helper identical across all three apps', () => {
