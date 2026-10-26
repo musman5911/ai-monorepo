@@ -564,3 +564,10 @@ Phase 11 is **In progress** on `muf-monorepo`. A shared archive workflow now ser
 ## Phase 11 implementation checkpoint (2026-10-26)
 
 Implemented the first server slice on `muf-monorepo`: Dairy archive job and archive-record models are farm-scoped; owner-only `/api/archive` endpoints prepare a bounded durable snapshot, export JSON, require a completed export and exact farm-name/job-ID confirmation before removing source records, expose archived records, and support conflict-aware restoration. Only Dairy milk and expenses are covered so far. The focused static test and disposable memory-mode integration checker have been added but not executed here. Flock batch logs, Agri finance, and full command-line verification remain outstanding. No test/build results are claimed for this checkpoint.
+
+
+## Phase 11 expanded archive-check checkpoint (2026-10-26)
+
+Added app-specific archive persistence models for Agri and Flock memory-mode checks, injected those models into each archive router, and expanded `npm run check-archive` to run Dairy, Flock, and Agri integration checks. The checks exercise Dairy milk/expenses, Flock batch-feed logs, and Agri finance; they assert active-list exclusion, totals excluding archived records, farm isolation, and restored records/totals. The Agri and Flock archive models now use the same durable `muf_archive_jobs` and `muf_archive_records` collections as Dairy.
+
+**Verification pending:** these newly expanded runtime checks, the full standard command list, and all three production builds have not been executed in the owner's local Windows checkout after this update. Phase 11 remains **In progress**. Do not infer a pass from the previous 319-test run, which predates these additional checks.
