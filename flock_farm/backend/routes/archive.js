@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import { createYearlyArchiveRouter } from '../../../shared/muf-yearly-archive.mjs';
 import Farm from '../models/Farm.js';
+import { ArchiveJob, ArchiveRecord } from '../db.js';
 import BatchFeedLog from '../models/BatchFeedLog.js';
 import BatchMortalityLog from '../models/BatchMortalityLog.js';
 import BatchExpenseLog from '../models/BatchExpenseLog.js';
@@ -15,7 +16,7 @@ import { mufRunUnscoped, mufScopeModels } from '../muf-farms.mjs';
 const ownerUnscoped = [authRequiredUnscoped, requireRole('owner'), (_req, _res, next) => mufRunUnscoped(() => next())];
 export default createYearlyArchiveRouter({
   express, mongoose,
-  Farm,
+  Farm, ArchiveJob, ArchiveRecord,
   sources: {
     batchFeedLogs: BatchFeedLog,
     batchMortalityLogs: BatchMortalityLog,
