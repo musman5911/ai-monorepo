@@ -113,6 +113,7 @@ if (useMock) {
     Irrigation: IrrigationSchema,
     CropPhoto: CropPhotoSchema,
     Spray: SpraySchema,
+    PhotoAsset: PhotoAssetSchema,
     Laborer: LaborerSchema,
     Attendance: AttendanceSchema,
     LaborAdvance: LaborAdvanceSchema,
