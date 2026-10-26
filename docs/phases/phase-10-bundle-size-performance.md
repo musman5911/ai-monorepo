@@ -8,8 +8,8 @@ The three apps load faster on phones with slow connections.
 
 ## Already in place (from Phase 0)
 
-- Previously recorded build output (Phase 0; must be refreshed at the start of this phase): Flock about 977 kB, Dairy about 760 kB, Agri about 659 kB for the largest file. Agri uses the deprecated `advancedChunks` setting; Dairy imports `api.ts` both statically and dynamically.
-- Initial repository inspection confirms PDF utilities are imported by main app modules and charts are imported eagerly in Agri. Fresh baseline sizes have not yet been measured in this session.
+- Previously recorded build output (Phase 0; must be refreshed): Flock about 977 kB, Dairy about 760 kB, Agri about 659 kB for the largest file.
+- The initial source used Agri's deprecated `advancedChunks` setting and had a mixed static/dynamic import of Dairy's `api.ts`. These source issues have now been corrected; fresh build output still needs to confirm the warnings are gone.
 
 ## Scope
 
@@ -33,7 +33,7 @@ Initial per-file JavaScript budgets (largest emitted `.js`/`.mjs` file in each a
 
 ## New command-line check
 
-`npm run check-bundle-size`: reads each app's `dist` folder after a build and fails if any file is over its budget.
+`npm run check-bundle-size`: scans built `.js`/`.mjs` assets under all three `dist/assets` folders and fails if any JavaScript asset exceeds its app budget or a build output is missing.
 
 ## Command-line checks at the end of this phase
 
