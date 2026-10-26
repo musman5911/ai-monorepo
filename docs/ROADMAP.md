@@ -26,7 +26,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
-| 12 | Yearly archive: screens | In progress | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
+| 12 | Yearly archive: screens | Done | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Not started | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
@@ -36,6 +36,8 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phases/phase-21-final-testing-live-and-signoff.md) |
+
+**Phase 12 is Done for command-line scope (2026-10-26).** The owner supplied passing Windows CMD results for the focused archive-screen tests (8/8), full suite (40 files / 328 tests), sync, UI safety, workbench (23 checks), farm scope, docs, and all three production builds. The archive UI is owner-only, requires an exported snapshot and exact farm/job confirmation before execution, provides history and conflict-aware restoration, and keeps archived-record reporting opt-in and separate from active totals. Urdu coverage is checked by source-contract tests. These are owner-reported results, not independently executed in this editing session. Real MongoDB, browser/phone and live deployment checks remain in Phases 19–21. See `docs/PROGRESS.md`.
 
 ## Current checkpoint
 
