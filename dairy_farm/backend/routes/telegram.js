@@ -11,7 +11,7 @@ import { randomUUID, timingSafeEqual } from 'crypto';
 const router = express.Router();
 import { protect, adminOnly } from '../middleware/auth.js';
 import { Cow, Milk, Expense, Laborer, LaborAttendance, Meta, User, Farm } from '../db.js';
-import { mufGetFarmContext, mufRunWithFarmContext } from '../muf-farms.mjs';
+import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext } from '../muf-farms.mjs';
 import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
 import { todayStr, daysAgoStr, TZ_OFFSET_HOURS } from '../utils/date.js';
 import { breedingReminders } from '../services/breeding.js';
@@ -215,7 +215,8 @@ const SETTINGS_DEFAULTS = { dailySummary: true, dropPct: 20 };
 
 async function readSettings(farmId = mufGetFarmContext()?.farmId) {
   const key = farmId ? `${SETTINGS_KEY}:${farmId}` : SETTINGS_KEY;
-  const v = await readMeta(key);
+  let v = await readMeta(key);
+  if (!Object.keys(v || {}).length && farmId && String(farmId) === String(mufGetDefaultFarmId() || '')) v = await readMeta(SETTINGS_KEY);
   return { ...SETTINGS_DEFAULTS, ...v };
 }
 
