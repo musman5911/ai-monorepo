@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, lazy, Suspense } from 'react';
 import MufFarmSwitcher from './muf/ui/muf-farm-switcher';
 import { Home, HardHat, Bird as BirdIcon, BarChart2, Egg, Shield, LogOut, Package, ChevronDown, Bell, Moon, Sun, Users, HeartPulse, BookOpen, Languages } from 'lucide-react';
 import { motion } from './muf/core/muf-motion';
@@ -35,19 +35,19 @@ import {
   DateRange,
 } from './types';
 
-import Dashboard from './components/Dashboard';
-import { SuperAdminTab } from "./components/SuperAdminTab";
-import FlockRegister from './components/FlockRegister';
-import FinancialLedger from './components/FinancialLedger';
-import HealthPortal from './components/HealthPortal';
-import BatchHealthPortal from './components/BatchHealthPortal';
-import BatchSummaryPortal from './components/BatchSummaryPortal';
-import MonthlySummary from './components/MonthlySummary';
-import IncubationModule from './components/IncubationModule';
-import DailyChecklist from './components/DailyChecklist';
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const SuperAdminTab = lazy(() => import('./components/SuperAdminTab').then((module) => ({ default: module.SuperAdminTab })));
+const FlockRegister = lazy(() => import('./components/FlockRegister'));
+const FinancialLedger = lazy(() => import('./components/FinancialLedger'));
+const HealthPortal = lazy(() => import('./components/HealthPortal'));
+const BatchHealthPortal = lazy(() => import('./components/BatchHealthPortal'));
+const BatchSummaryPortal = lazy(() => import('./components/BatchSummaryPortal'));
+const MonthlySummary = lazy(() => import('./components/MonthlySummary'));
+const IncubationModule = lazy(() => import('./components/IncubationModule'));
+const DailyChecklist = lazy(() => import('./components/DailyChecklist'));
 import MufDiary, { type MufDiaryEntry } from './muf/ui/muf-diary';
-import BatchesTab from './components/BatchesTab';
-import LaborTab from './components/LaborTab';
+const BatchesTab = lazy(() => import('./components/BatchesTab'));
+const LaborTab = lazy(() => import('./components/LaborTab'));
 import HeaderSearch from './muf/ui/muf-header-search';
 import OfflineBanner from './muf/core/muf-offline-banner';
 import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf/core/muf-applike';
@@ -890,6 +890,7 @@ export default function App() {
             )
           ) : (
             <div key={activeTab} className="tab-panel">
+              <Suspense fallback={<div className="flex items-center justify-center py-12 text-slate-400 text-sm">{L('Loading section…')}</div>}>
               {activeTab === 'dashboard' && (
                 <Dashboard
                   lang={lang}
@@ -1061,7 +1062,7 @@ export default function App() {
               )}
 
               {activeTab === 'super_admin' && currentUser && typeof currentUser === 'object' && currentUser.farmRole === 'owner' && <SuperAdminTab />}
-
+              </Suspense>
             </div>
           )}
         </motion.main>
@@ -1096,7 +1097,7 @@ export default function App() {
           <details className="rounded-xl border border-slate-200 p-3 dark:border-slate-800">
             <summary className="cursor-pointer select-none text-xs font-bold text-slate-600 dark:text-slate-300">{L('Daily checklist')}</summary>
             <div className="mt-4">
-              <DailyChecklist lang={lang} entries={checklist} onSave={handleSaveChecklist} readOnly={!canLogDaily} />
+              <Suspense fallback={<div className="py-4 text-xs text-slate-400">{L('Loading checklist…')}</div>}><DailyChecklist lang={lang} entries={checklist} onSave={handleSaveChecklist} readOnly={!canLogDaily} /></Suspense>
             </div>
           </details>
         </div>
