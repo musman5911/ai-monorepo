@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 12 yearly archive screens complete for command-line scope).
+Last updated: 2026-10-26 (Phase 13 dependency security audit started).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -23,7 +23,7 @@ Last updated: 2026-10-26 (Phase 12 yearly archive screens complete for command-l
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Done | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
-| 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
+| 13 | Dependency security fixes | In progress | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Not started | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Not started | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
@@ -64,3 +64,9 @@ The focused test verifies owner gating, export-before-execute marker checks, exa
 These are owner-supplied Windows checkout results, not commands independently executed in this editing session. No live MongoDB, browser/phone, or deployment verification is claimed; those remain in Phases 19–21. The initial pasted `\`\`cmd`` token was accidentally entered as a command and produced a harmless “not recognized” message; it was not part of the test suite.
 
 
+
+## Phase 13 start (2026-10-26)
+
+Phase 13 is **In progress**. Added `tools/check-audit.js` and exposed it as `npm run check-audit`. The checker explicitly audits all seven npm package sets (root tools, Dairy backend/client, Flock backend/client, Agri backend/frontend) with `npm audit --omit=dev --audit-level=high`; it fails if a package manifest/lockfile is missing, npm cannot run, or an audit reports a high/critical production issue. The checker and documentation have been committed to `muf-monorepo`.
+
+**Verification limitation:** this editing session can update repository files but cannot run npm against the registry or execute the Windows checkout. No current audit result, dependency remediation, test result, or build result is claimed yet. The historical audit counts above are from 2026-10-24 and must not be treated as current. After pulling, run `npm run check-audit` and share its full output; use those live results to make targeted lockfile/package changes, without `npm audit fix --force` or guessed version bumps.
