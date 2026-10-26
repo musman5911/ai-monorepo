@@ -4,6 +4,7 @@ import { Finance, Crop, Field } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
+import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 
 const router = express.Router();
 
@@ -139,6 +140,7 @@ router.delete('/finance/:financeId', protect, requireAdmin, asyncHandler(async (
   const oid = parseOid(req.params.financeId, 'finance ID');
   const result = await Finance.deleteOne({ _id: oid });
   if (!result.deletedCount) return notFound(res, 'Finance entry not found');
+  await cleanupOrphanPhotoAssets();
   return res.json({ status: 'ok' });
 }));
 
