@@ -136,12 +136,10 @@ router.delete('/photos/:id', protect, async (req, res) => {
   try {
     if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
     if (await isReferenced(req.params.id)) return res.status(409).json({ error: 'Photo is still referenced by a farm record' });
-    // Use deleteOne rather than findByIdAndDelete: Mongoose implements the latter
-    // through findOneAndDelete, which the lightweight memory adapter does not expose.
-    const existing = await PhotoAsset.findById(req.params.id).select('_id').lean();
-    if (!existing) return res.status(404).json({ error: 'Photo not found' });
-    const removed = await PhotoAsset.deleteOne({ _id: req.params.id });
-    if (!removed.deletedCount) return res.status(404).json({ error: 'Photo not found' });
+    // The storage adapter removes the remote Cloudinary object before deleting
+    // its metadata, while preserving the MongoDB fallback and old local assets.
+    const deleted = await storage().delete(req.params.id);
+    if (!deleted) return res.status(404).json({ error: 'Photo not found' });
     return res.json({ ok: true });
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Photo deletion failed' });
