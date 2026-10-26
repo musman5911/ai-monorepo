@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import { PhotoAsset, DiaryMedia, CropPhoto, Spray } from '../db.js';
-import { protect } from '../middleware/auth.js';
+import { protect, requireAdmin } from '../middleware/auth.js';
 import { createMufStorage } from '../muf-storage.mjs';
 
 const router = express.Router();
@@ -39,6 +39,30 @@ async function isReferenced(id) {
   }
   return false;
 }
+function collectPhotoReferences(value, refs, seen = new Set()) {
+  if (typeof value === 'string') {
+    const pattern = /\/api\/photos\/([a-f0-9]{24})/ig;
+    for (const match of value.matchAll(pattern)) refs.add(match[1].toLowerCase());
+    return;
+  }
+  if (!value || typeof value !== 'object' || seen.has(value)) return;
+  seen.add(value);
+  for (const child of Array.isArray(value) ? value : Object.values(value)) {
+    collectPhotoReferences(child, refs, seen);
+  }
+}
+async function findOrphanPhotoAssets() {
+  const refs = new Set();
+  for (const Model of [DiaryMedia, CropPhoto, Spray]) {
+    const rows = await Model.find({}).lean();
+    for (const row of rows) collectPhotoReferences(row, refs);
+  }
+  const assets = await PhotoAsset.find({}).select('_id').lean();
+  return {
+    scanned: assets.length,
+    orphanIds: assets.filter((asset) => !refs.has(String(asset._id).toLowerCase())).map((asset) => asset._id),
+  };
+}
 router.post('/photos', protect, async (req, res) => {
   try {
     const parsed = parseDataUrl(req.body?.data);
@@ -48,6 +72,15 @@ router.post('/photos', protect, async (req, res) => {
   } catch (err) {
     const status = err instanceof RangeError ? 413 : err instanceof TypeError ? 400 : 500;
     return res.status(status).json({ error: err.message || 'Photo upload failed' });
+  }
+});
+router.post('/photos/cleanup-orphans', protect, requireAdmin, async (req, res) => {
+  try {
+    const { scanned, orphanIds } = await findOrphanPhotoAssets();
+    const result = orphanIds.length ? await PhotoAsset.deleteMany({ _id: { $in: orphanIds } }) : { deletedCount: 0 };
+    return res.json({ scanned, deleted: result.deletedCount || 0 });
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Photo orphan cleanup failed' });
   }
 });
 router.get('/photos/:id', protect, async (req, res) => {
