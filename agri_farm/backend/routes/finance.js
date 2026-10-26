@@ -133,6 +133,7 @@ router.put('/finance/:financeId', protect, requireAdmin, asyncHandler(async (req
   if (!entry.date) entry.date = todayStr();
   const result = await replaceFarmRecord(Finance, oid, entry);
   if (!result.matchedCount) return notFound(res, 'Finance entry not found');
+  await cleanupOrphanPhotoAssets();
   return res.json({ status: 'ok' });
 }));
 
