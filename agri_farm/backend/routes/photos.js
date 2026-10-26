@@ -16,7 +16,7 @@ function parseDataUrl(value) {
 function storage() {
   return createMufStorage({ store: {
     async save({ bytes, contentType, metadata = {} }) {
-      const doc = await PhotoAsset.create({ contentType, data: bytes, size: bytes.length, createdBy: String(metadata.createdBy || '') });
+      const doc = await PhotoAsset.create({ contentType, data: bytes, size: bytes.length, createdBy: String(metadata.createdBy || ''), createdAt: new Date() });
       return { id: String(doc._id) };
     },
     async readLink(id) {
