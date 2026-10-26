@@ -15,7 +15,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phase-10-bundle-size-performance.md) |
-| 11 | Yearly archive for old records: server | Not started | [phase-11-yearly-archive-server.md](phase-11-yearly-archive-server.md) |
+| 11 | Yearly archive for old records: server | In progress | [phase-11-yearly-archive-server.md](phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phase-14-authorization-and-secrets-review.md) |
