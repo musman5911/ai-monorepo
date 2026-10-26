@@ -107,7 +107,7 @@ const ExpensesTab: React.FC<ExpensesTabProps> = ({ isAdmin, canDelete = isAdmin,
       };
       if (typeof data.receiptBase64 === 'string' && data.receiptBase64.startsWith('data:image/')) {
         const uploaded = await api.uploadPhoto(data.receiptBase64);
-        if (!uploaded.path || uploaded.offline) throw new Error('Receipt upload needs an active connection. The expense was not saved.');
+        if (!uploaded.path) throw new Error('Receipt upload needs an active connection. The expense was not saved.');
         data.receiptBase64 = uploaded.path;
       }
 
