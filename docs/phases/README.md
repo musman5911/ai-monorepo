@@ -32,6 +32,8 @@ Phase 8 is **Done for command-line scope**. Owner-supplied Windows CMD output on
 
 **Phase 9 is Done for command-line scope:** the signed Cloudinary client, optional environment configuration, MongoDB fallback, local metadata records, authenticated proxy reads, and Cloudinary-aware cleanup are implemented. The focused photo suite (36 tests), full suite (307 tests), all sync/UI/workbench/farm/docs checks, all three production builds, and the optional workbench runtime smoke test passed. No live credentials or uploads were used. Next: Phase 10, Smaller downloads and faster screens.
 
+**Phase 10 status (2026-10-26): In progress.** Owner-reported checks: full test suite passed (38 files / 310 tests), all three production builds passed, and sync/UI/docs/farm checks passed. The new bundle-size check fails: Dairy 772.7 KiB / 700 KiB, Agri 659.8 KiB / 600 KiB, Flock 961.9 KiB / 850 KiB. Continue splitting large entry chunks; do not mark Phase 10 Done until the size gate and remaining checks pass.
+
 ## How a phase runs
 
 1. Open the phase file, set the status to `In progress`, and update `docs/PROGRESS.md`.
