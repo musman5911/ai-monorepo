@@ -2,7 +2,7 @@ import { Bird, OtherExpense, FeedRecord, EggProduction, GlobalSettings, Vaccinat
   LaborWorker,
   LaborAttendanceEntry,
   LaborAdvanceEntry } from './types';
-import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave } from './muf/data/muf-pdf';
+
 import { todayStr } from './utils/calculations';
 
 function escapeCsvCell(value: string | number): string {
@@ -21,6 +21,7 @@ async function printReport(
   footerRows?: (string | number)[][],
   summary?: [string, string][]
 ): Promise<void> {
+  const { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave } = await import('./muf/data/muf-pdf');
   const clean = title.replace('Usman Flock Farm — ', '');
   const { doc, y } = await mufPdfStart(clean, `Generated: ${todayStr()}`);
   let cursor = y;
