@@ -76,16 +76,28 @@ router.post('/photos/cleanup-orphans', protect, adminOnly, async (req, res) => {
   }
 });
 router.get('/photos/:id', protect, async (req, res) => {
-  if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
-  const photo = await PhotoAsset.findById(req.params.id);
-  if (!photo) return res.status(404).json({ error: 'Photo not found' });
-  res.set('Content-Type', photo.contentType).set('Cache-Control', 'private, max-age=3600').send(photoBytes(photo.data));
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
+    const photo = await PhotoAsset.findById(req.params.id);
+    if (!photo) return res.status(404).json({ error: 'Photo not found' });
+    return res
+      .set('Content-Type', photo.contentType || 'application/octet-stream')
+      .set('Cache-Control', 'private, max-age=3600')
+      .send(photoBytes(photo.data));
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Photo retrieval failed' });
+  }
 });
 router.delete('/photos/:id', protect, async (req, res) => {
-  if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
-  if (await isReferenced(req.params.id)) return res.status(409).json({ error: 'Photo is still referenced by a farm record' });
-  const removed = await PhotoAsset.findByIdAndDelete(req.params.id);
-  if (!removed) return res.status(404).json({ error: 'Photo not found' });
-  return res.json({ ok: true });
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'Photo not found' });
+    if (await isReferenced(req.params.id)) return res.status(409).json({ error: 'Photo is still referenced by a farm record' });
+    // findByIdAndDelete is supported by both Mongoose and the in-memory test adapter.
+    const removed = await PhotoAsset.findByIdAndDelete(req.params.id);
+    if (!removed) return res.status(404).json({ error: 'Photo not found' });
+    return res.json({ ok: true });
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Photo deletion failed' });
+  }
 });
 export default router;
