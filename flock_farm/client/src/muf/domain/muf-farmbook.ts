@@ -2,7 +2,6 @@
 // TWIN FILE: dairy_farm/client/src/muf-farmbook.ts and flock_farm/client/src/muf-farmbook.ts
 // must stay IDENTICAL (agri_farm/frontend/src/muf-farmbook.js is the JS twin).
 // Run `node check-muf-sync.js` from the repo root after editing.
-import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave, mufPdfCheckPage } from '../data/muf-pdf';
 import {mufToday} from '../data/muf-date';
 
 export interface FarmBookData {
@@ -17,6 +16,7 @@ export interface FarmBookData {
 
 /** Builds and downloads the year-end farm book as a PDF file. */
 export async function downloadFarmBookPdf(data: FarmBookData): Promise<void> {
+  const { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave, mufPdfCheckPage } = await import('../data/muf-pdf');
   const { doc, y } = await mufPdfStart(
     `Farm Book — ${data.year}`,
     `Generated: ${mufToday()}`,
