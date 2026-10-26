@@ -47,6 +47,9 @@ Phases 1 to 6 are **Done for the command-line scope**. On 2026-10-25, the owner 
 
 **Phase 7 is Done for command-line scope:** Telegram link codes and chats are farm-bound, legacy unscoped links fail closed, webhook writes and scheduled/manual summaries run in the correct farm context, and Dairy daily-summary emails are farm-scoped. Owner-supplied Windows CMD results on 2026-10-26 confirm 276/276 tests, `check-sync`, `check-ui`, `check-workbench` (23 checks), `check-farms`, `check-docs`, and all three production builds passed. The 12-test Telegram farm-scope regression is included in the passing suite. The monthly-path audit confirmed the separate monthly email is intentionally a full-database recovery backup including all farms, not a farm report; no separate monthly report job was found in the audited paths. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21. See `docs/PROGRESS.md`.
 
+
+**Phase 8 checkpoint (2026-10-26):** Owner-supplied Windows CMD output confirms the shared storage contract tests (8/8), full suite (31 files/284 tests), sync/UI/workbench/farm/docs checks, and all three builds passed. The current implementation has integrated Flock routes, but Dairy DailyLog and Agri DiaryMedia/CropPhoto/Spray photo flows still need adapter integration. Record-deletion cleanup and production orphan-reference discovery are also outstanding. Phase 8 remains **In progress** until these code paths and regression tests are complete. Details and the exact reported commands are in [PROGRESS.md](PROGRESS.md).
+
 ## Why this order
 
 - Phases 1 to 7 finish the farm-level features that already have a server foundation: Super Admin, Dairy breeding and calves, Agri fields, and Telegram per farm.
