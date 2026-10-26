@@ -12,6 +12,7 @@ import BatchEggLog from '../models/BatchEggLog.js';
 import BatchVaccinationLog from '../models/BatchVaccinationLog.js';
 import DataStore from '../models/DataStore.js';
 import { MUF_ENV } from '../muf-env.mjs';
+import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.mjs';
 import { calculateBatchSummary, validateBatchEggLog } from '../batch-math.mjs';
 import { validateIncubationAllocations } from '../incubation-allocation.mjs';
 import { linkedBatchHistoryConflict } from '../batch-history-guards.mjs';
@@ -25,9 +26,18 @@ const router = express.Router();
 async function deleteImageByPath(imagePath) {
   try {
     const m = String(imagePath || '').match(/^\/api\/images\/([a-f0-9]{24})$/i);
-    if (m && mongoose.isValidObjectId(m[1])) {
-      await Image.findByIdAndDelete(m[1]);
+    if (!m || !mongoose.isValidObjectId(m[1])) return;
+    const image = await Image.findById(m[1]);
+    if (!image) return;
+    if (image.provider === 'cloudinary' && image.cloudinaryPublicId) {
+      const config = { cloudName: MUF_ENV.cloudinaryCloudName, apiKey: MUF_ENV.cloudinaryApiKey, apiSecret: MUF_ENV.cloudinaryApiSecret };
+      if (!cloudinaryConfigured(config)) {
+        console.warn('[photo-storage] Could not remove a Cloudinary batch photo because credentials are missing.');
+        return;
+      }
+      await createCloudinaryClient(config).destroy(image.cloudinaryPublicId);
     }
+    await Image.deleteOne({ _id: m[1] });
   } catch (err) {
     console.error('Batch image cleanup failed (non-fatal):', err.message);
   }
