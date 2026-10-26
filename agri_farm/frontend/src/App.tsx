@@ -6255,6 +6255,8 @@ function App() {
           entries={diaryEntries}
           onSave={saveDiaryEntry}
           onDelete={deleteDiaryEntry}
+          uploadPhoto={async (file) => { const compressed = await compressDiaryPhoto(file); const uploaded = await api.uploadPhoto(compressed.data); return uploaded.data.path; }}
+          resolvePhotoUrl={api.getPhotoObjectUrl}
           entityOptions={[
             ...crops.map((item) => ({ id: String(item._id || item.id), type: 'crop', label: item.name || L('Crop') })),
             ...laborers.map((item) => ({ id: String(item._id || item.id), type: 'labor', label: item.name || L('Laborer') })),
