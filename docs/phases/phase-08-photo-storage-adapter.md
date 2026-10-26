@@ -13,7 +13,7 @@ One shared place decides where photos are stored and how big they may be, so the
 
 ## Scope
 
-- `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link, delete and orphan cleanup. The shared contract and contract tests exist. Flock upload/read/delete routes now call the contract while retaining the Image model and `/api/images/:id` path. Dairy and Agri integrations and full verification remain pending.
+- `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link, delete and orphan cleanup. The shared contract, parity check and contract tests exist. Flock upload/read/delete routes call the contract while retaining the Image model and `/api/images/:id` path. Dairy and Agri production integrations, record-deletion cleanup and orphan-reference discovery remain pending.
 - The default store keeps today's behaviour (MongoDB), so nothing changes for users.
 - Size limits (about 100 KB after compression) and a file-type check enforced on the server.
 - Deleting a record deletes its photos; a cleanup finds photos nobody uses.
@@ -25,10 +25,10 @@ One shared place decides where photos are stored and how big they may be, so the
 
 ## Steps
 
-1. Audit how each app saves and serves photos (Agri DiaryMedia/CropPhoto/Spray, Dairy DailyLog photos and cow galleries, Flock Image documents). (Reviewed; migration not complete.)
+1. Audit how each app saves and serves photos (Agri DiaryMedia/CropPhoto/Spray, Dairy DailyLog photos and cow galleries, Flock Image documents). (Reviewed.)
 2. Define the adapter interface and validation contract. (Initial shared contract implemented in all three backends.)
-3. Add per-app MongoDB store bindings and migrate existing upload/read/delete flows without changing stored data or URLs. (Flock route integration started; Dairy and Agri pending.)
-4. Add safe orphan cleanup, tests, and the shared-file parity check. (Contract-level cleanup and farm-scope tests added; production orphan-reference discovery and verification remain pending.)
+3. Add per-app MongoDB store bindings and migrate existing upload/read/delete flows without changing stored data or URLs. (Flock routes integrated; Dairy DailyLog and Agri DiaryMedia/CropPhoto/Spray flows remain pending.)
+4. Add safe orphan cleanup, tests, and the shared-file parity check. (Contract-level cleanup tests and shared-file parity check pass per owner-supplied output; production record-reference discovery and deletion wiring remain pending.)
 
 ## New command-line check
 
@@ -52,11 +52,14 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 - [x] `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link, delete and orphan cleanup. (Shared contract exists; parity still requires `npm run check-sync`.)
 - [ ] The default store keeps today's behaviour (MongoDB), so nothing changes for users. (Flock route migration is in progress; Dairy and Agri are not integrated yet.)
-- [ ] Size limits (about 100 KB after compression) and a file-type check enforced on the server.
+- [x] Shared contract enforces a 100 KiB byte limit and JPEG/PNG/WebP signature/MIME validation. App-route integration still needs verification in Dairy and Agri.
 - [ ] Deleting a record deletes its photos; a cleanup finds photos nobody uses. (Contract cleanup exists; record-reference discovery and automatic deletion wiring are not complete.)
-- [ ] Add the file to `check-muf-sync.js`.
-- [ ] The new command-line check above exists and passes. Contract tests and farm-scope regression cases have been added; local execution is still required.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
+- [x] Add the storage twins to `check-muf-sync.js`; owner-reported `npm run check-sync` passed.
+- [x] The new command-line check exists; owner-reported `npm test -- tests/muf-storage.test.ts` passed (8/8).
+- [x] Owner-reported standard checks passed on 2026-10-26: full suite (31 files/284 tests), sync, UI, workbench (23 checks), farm scope, docs and all three builds. See `docs/PROGRESS.md`.
+- [ ] Migrate Dairy and Agri production photo flows to the adapter without changing existing photo formats or URLs.
+- [ ] Wire record deletion to photo deletion and implement safe production orphan-reference discovery/cleanup.
+- [ ] Add app-level regression tests for upload/read/delete, farm isolation, legacy photo compatibility and record deletion in Dairy and Agri; rerun all standard checks after implementation.
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Rules for whoever works on this phase
