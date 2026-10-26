@@ -14,6 +14,7 @@ import MufAdminCard from '../muf/admin/muf-admin-card';
 import MufAdminButton from '../muf/admin/muf-admin-button';
 import MufAdminUsers from '../muf/admin/muf-admin-users';
 import MufAdminReports from '../muf/admin/muf-admin-reports';
+import YearlyArchivePanel from './YearlyArchivePanel';
 import MufAdminGeneral from '../muf/admin/muf-admin-general';
 import { useConfirm } from '../muf/core/muf-confirm';
 import { mufPopupCard, mufPopupCloseHover, mufPopupCloseTap } from '../muf/core/muf-motion';
@@ -1042,6 +1043,16 @@ export default function AdminMenu({
                       <p className="text-[11px] text-slate-500">Variety, field and yield kg only — no money.</p>
                     </div>
                     <ExportScopeWizard crops={crops} accent="yield" onExport={(scope) => handleExportPDF('yield', scope)} />
+                    <YearlyArchivePanel
+                      isOwner={userRole === 'admin'}
+                      apiBase="/api"
+                      collections={[{ value: 'finance', label: 'Finance records' }]}
+                      getHeaders={() => {
+                        let token = ''; let farmId = '';
+                        try { token = localStorage.getItem('token') || ''; farmId = localStorage.getItem('muf_active_farm_agri') || ''; } catch { /* storage unavailable */ }
+                        return { ...(token ? { Authorization: `Bearer ${token}`, 'X-Access-Token': token } : {}), ...(farmId ? { 'X-Farm-Id': farmId } : {}) };
+                      }}
+                    />
                   </div>
                 </MufAdminReports>
               )}
