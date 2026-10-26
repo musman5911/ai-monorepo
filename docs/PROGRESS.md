@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 8 implementation continued directly on `muf-monorepo`; latest regression/build verification pending).
+Last updated: 2026-10-26 (Phase 8 validation checkpoint recorded from owner-supplied Windows CMD output; Phase 8 remains in progress pending remaining runtime coverage).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -60,7 +60,7 @@ Phase 8 is **In progress**. Audited the current photo paths: Flock stores upload
 
 **Deletion and orphan cleanup checkpoint:** Dairy and Agri now expose admin-only `GET /api/photos/orphans` discovery and `POST /api/photos/cleanup-orphans` cleanup. Reference discovery scans farm-scoped photo-bearing parent records. Cleanup ignores assets created within the last hour to avoid deleting a fresh upload before its parent record is saved. Cleanup hooks run after relevant Dairy cow/expense/daily-log and Agri crop/crop-photo/spray/finance/diary updates or deletions.
 
-Added `tests/photo-client-migration.test.ts` and `tests/photo-phase8-regression.test.ts`; extended `tests/agri-runtime-api.integration.test.ts` with live HTTP upload, authenticated binary read, invalid-upload, referenced-delete and successful-delete cases. The owner-reported command sequence passed before these latest commits, but **the new changes, tests, sync checks and all three builds have not yet been run against the current branch head in this editing session**. Phase 8 remains In progress until the owner runs the focused tests and full required command sequence and any failures are fixed.
+Added `tests/photo-client-migration.test.ts` and `tests/photo-phase8-regression.test.ts`; extended `tests/agri-runtime-api.integration.test.ts` with live HTTP upload, authenticated binary read, invalid-upload, referenced-delete and successful-delete cases. **Owner-reported current-head verification (Windows CMD, 2026-10-26; output supplied by the owner):** `npm test` passed (35 files, 299 tests); `npm run check-sync`, `npm run check-ui`, `npm run check-workbench` (23 checks), `npm run check-farms`, and `npm run check-docs` passed; `tools\\build-all.bat` built Dairy, Flock and Agri successfully; optional `npm run check-workbench-runtime` passed (8/8). The focused photo migration, Phase 8 regression, and Agri runtime integration tests are included in the 299-test full suite; the earlier focused run reported 20/20 passing. These results are owner-reported, not independently executed in this editing session. Phase 8 remains In progress because the current integration coverage exercises photo routes over HTTP in Agri but does not yet provide equivalent Dairy runtime coverage or fully exercise photo farm-isolation and cleanup behavior over HTTP.
 
 MUF modules reused/created: existing client compression helpers; backend `muf-storage.mjs` twins; new per-app `services/photo-assets.js` cleanup services. Preserve farm scoping, existing data shapes, and byte-identical shared MUF files.
 
