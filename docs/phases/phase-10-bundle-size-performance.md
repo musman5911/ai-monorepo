@@ -13,6 +13,8 @@ The three apps load faster on phones with slow connections.
 
 ## Scope
 
+Initial per-file JavaScript budgets (largest emitted `.js`/`.mjs` file in each app): Dairy 700 KiB, Agri 600 KiB, Flock 850 KiB. These are provisional upper bounds based on the previously recorded warning sizes; after a fresh build, compare actual output and adjust only with documented evidence. The check fails if an app has no built JavaScript assets.
+
 - Load PDF, charts and the workbench only when needed (lazy loading).
 - Fix the Agri deprecated build setting and the Dairy mixed import warning.
 - Set a size budget per app, agreed in this file.
@@ -27,7 +29,7 @@ The three apps load faster on phones with slow connections.
 1. Run `tools\\build-all.bat`, capture the exact largest emitted JS chunks and warnings for each app, and record them here.
 2. Lazy-load PDF utilities, charts and the workbench entry points only at their use points; split the biggest chunks one app at a time.
 3. Rebuild and compare after each change; keep the app's current screens and behavior unchanged.
-4. Add `tools/check-bundle-size.js`, configure an explicit per-app budget based on the measured baseline and achievable reductions, and expose `npm run check-bundle-size`.
+4. Add `tools/check-bundle-size.js`, expose `npm run check-bundle-size`, and test pass, over-budget, and missing-build cases.
 
 ## New command-line check
 
@@ -49,11 +51,11 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] Load PDF, charts and the workbench only when needed (lazy loading).
+- [ ] Load PDF and chart code only when needed (dynamic imports/lazy component); the workbench is already on a dev-only route and is not part of production builds.
 - [ ] Fix the Agri deprecated build setting and the Dairy mixed import warning.
-- [ ] Set a size budget per app, agreed in this file.
+- [x] Provisional per-file JavaScript budgets recorded: Dairy 700 KiB, Agri 600 KiB, Flock 850 KiB; validate against fresh builds before finalizing.
 - [ ] No change to how screens look or behave.
-- [ ] The new command-line check above exists and passes.
+- [ ] `npm run check-bundle-size` exists and passes after all three production builds.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
