@@ -2,6 +2,7 @@ import express from 'express';
 import { DiaryMedia } from '../db.js';
 import { protect } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/helpers.js';
+import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 const router = express.Router();
 
 const validDate = (date) => /^\d{4}-\d{2}-\d{2}$/.test(date);
@@ -80,6 +81,7 @@ router.put('/diary-media/:date', protect, asyncHandler(async (req, res) => {
   }
   await DiaryMedia.updateOne({ date }, { $set: update }, { upsert: true });
   const saved = await DiaryMedia.findOne({ date });
+  if (req.body?.photos !== undefined || req.body?.entries !== undefined) await cleanupOrphanPhotoAssets();
   return res.json({ date, photos: Array.isArray(saved?.photos) ? saved.photos : [], entries: Array.isArray(saved?.entries) ? saved.entries : [] });
 }));
 export default router;
