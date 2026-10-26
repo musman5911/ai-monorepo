@@ -564,7 +564,7 @@ export default function App() {
               <HealthTab isAdmin={canLogDaily} canDelete={isAdmin} />
             )}
             {tab === "labor" && isAdmin && <LaborTab />}
-            {tab === "reports" && (isAdmin ? <ReportsTab /> : (
+            {tab === "reports" && (isAdmin ? <Suspense fallback={<div className="p-8 text-center text-slate-500 text-sm">Loading reports…</div>}><ReportsTab /></Suspense> : (
               <div className="p-8 text-center text-slate-500 text-sm">
                 {L('Reports are available to admin accounts only.')}
               </div>
