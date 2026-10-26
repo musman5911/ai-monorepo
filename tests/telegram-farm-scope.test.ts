@@ -69,10 +69,19 @@ describe('Phase 7: Telegram farm isolation', () => {
     expect(route).toContain('no linked admin chat');
   });
 
+  it('scopes Dairy manual email summaries to the selected or assigned farms', () => {
+    const route = source('dairy_farm', 'backend/routes/email.js');
+    expect(route).toContain('mufRunWithFarmContext');
+    expect(route).toContain('allowedFarmIds');
+    expect(route).toContain('Farm context is required');
+    expect(route).toContain('farm.name || \'Dairy Farm\'');
+  });
+
   it.each(apps)('%s generates scheduled summaries separately per farm', (app) => {
     const route = source(app, 'backend/routes/telegram.js');
     expect(route).toMatch(/Farm\.find\(\{ archived: \{ \$ne: true \} \}\)/);
     expect(route).toContain('mufTelegramFarmId(link)');
     expect(route).toContain('lastPushDate');
+    expect(route).toContain('allowedFarmIds');
   });
 });
