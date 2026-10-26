@@ -21,7 +21,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 4 | Dairy calves and lineage | Done | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
 | 5 | Agri fields and crop cycles: server | Done | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
-| 7 | Telegram bot and daily summary per farm | Not started | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
+| 7 | Telegram bot and daily summary per farm | In progress | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Not started | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Not started | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
@@ -45,7 +45,7 @@ Phases 1 to 6 are **Done for the command-line scope**. On 2026-10-25, the owner 
 
 **Phase 6 is Done for the command-line scope:** Agri fields and crop cycles screens. Owner-supplied Windows CMD output on 2026-10-26 confirms the focused screen tests (4/4), full suite (29 files, 264 tests), documentation check and all three production builds passed. Sync, UI, workbench and farm checks were owner-reported passing before the final test-only assertion correction. Browser/phone, real-MongoDB and live-site verification remain in Phases 19 to 21.
 
-**Phase 7 is next:** Telegram bot and daily summary per farm. Before implementation, audit the existing Telegram integration, configuration/secrets handling, farm ownership and daily-summary data sources.
+**Phase 7 is In progress:** Telegram bot and daily summary per farm. Initial audit found Telegram routes in all three apps and a shared admin panel. Current chat links identify a user/worker but do not yet assign a farm. Preserve webhook security and existing commands while adding farm-specific link and summary behavior. Acceptance check: a chat linked to farm B writes only to farm B, an unlinked chat creates nothing, and farm A's summary excludes farm B. See `docs/PROGRESS.md` for the audit checkpoint.
 
 ## Why this order
 
