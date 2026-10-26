@@ -33,7 +33,7 @@ Old years of records can be archived and exported so the live data stays small a
 
 ## New command-line check
 
-`tests/archive.test.ts` plus `tools/check-dairy-archive.js` wired into `npm run check-farms`: archiving farm B never touches farm A, an archive without a finished export refuses to delete, and restore brings records back unchanged. These checks have been added but have not yet been run in the local project.
+`tests/archive.test.ts` plus `tools/check-dairy-archive.js`, exposed as `npm run check-archive`: archiving farm B never touches farm A, an archive without a finished export refuses to delete, and restore brings records back unchanged. The focused runtime check passed in the prior local revision; rerun it after pulling the shared-service changes. The full cross-app contract tests and builds still need verification.
 
 Current implementation: the shared workflow in `shared/muf-yearly-archive.mjs` is wired to Dairy milk/expenses, all seven Flock batch-log collections, and Agri finance under `/api/archive`. Each app uses durable database snapshots and includes archive jobs/records in full and monthly backup payloads, with restore support. Snapshots are bounded to 5,000 records and 8 MiB per job; oversized jobs are rejected without removing active records. Runtime checks and all three builds still need to be run locally before this phase can be marked done.
 
