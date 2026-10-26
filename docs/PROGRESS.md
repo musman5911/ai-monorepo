@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 7 validation results recorded; final checks and monthly email scope audit remain).
+Last updated: 2026-10-26 (Phase 7 complete for command-line scope; real-world verification remains in Phases 19–21).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -17,7 +17,7 @@ Last updated: 2026-10-26 (Phase 7 validation results recorded; final checks and 
 | 4 | Dairy calves and lineage | Done | [phase-04-dairy-calves-lineage.md](phases/phase-04-dairy-calves-lineage.md) |
 | 5 | Agri fields and crop cycles: server | Done | [phase-05-agri-fields-cycles-server.md](phases/phase-05-agri-fields-cycles-server.md) |
 | 6 | Agri fields and crop cycles: screens | Done | [phase-06-agri-fields-cycles-screens.md](phases/phase-06-agri-fields-cycles-screens.md) |
-| 7 | Telegram bot and daily summary per farm | In progress | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
+| 7 | Telegram bot and daily summary per farm | Done | [phase-07-telegram-daily-summary-per-farm.md](phases/phase-07-telegram-daily-summary-per-farm.md) |
 | 8 | Photo storage adapter | Not started | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Not started | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Not started | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
@@ -35,7 +35,11 @@ Last updated: 2026-10-26 (Phase 7 validation results recorded; final checks and 
 
 ## Phase 7 start (2026-10-26)
 
-The owner approved Phase 7. Implemented farm-bound Telegram link codes and chat links, fail-closed handling for legacy links without `farmId`, MUF single-farm execution for linked webhooks, per-farm scheduled Telegram summaries/settings, and farm-access filtering for manual summary sends in all three backends. Dairy daily-summary email now sends farm-scoped messages and restricts manual sends to the selected/assigned farms. Added identical `backend/muf-telegram-farms.mjs` twins, registered them in `tools/check-muf-sync.js`, and added `tests/telegram-farm-scope.test.ts`. Owner-reported local validation update (Windows CMD, 2026-10-26, after pulling through `65ce981`): `npm test -- tests/agri-fields-screens.test.ts` passed (1 file, 4 tests); `npm test` passed (30 files, 276 tests); `npm run check-sync` passed (all three apps and shared MUF checks in sync); `npm run check-farms` passed (Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks); `npm run check-docs` passed; and `tools\\build-all.bat` built Dairy, Flock and Agri successfully. The passing full suite includes `tests/telegram-farm-scope.test.ts` (12 tests), covering the automated farm-B / unlinked-chat / farm-A-summary regression. These results were supplied by the owner, not independently executed in this editing session. `npm run check-ui` and `npm run check-workbench` were not included in this latest output and still need a fresh run. The separate monthly backup/report email path also needs a final farm-scope audit before Phase 7 can be marked Done.
+The owner approved Phase 7. Implemented farm-bound Telegram link codes and chat links, fail-closed handling for legacy links without `farmId`, MUF single-farm execution for linked webhooks, per-farm scheduled Telegram summaries/settings, and farm-access filtering for manual summary sends in all three backends. Dairy daily-summary email sends farm-scoped messages and restricts manual sends to the selected/assigned farms. Added identical `backend/muf-telegram-farms.mjs` twins, registered them in `tools/check-muf-sync.js`, and added `tests/telegram-farm-scope.test.ts`.
+
+**Owner-reported verification (Windows CMD, 2026-10-26):** focused Agri screen tests passed (4/4); `npm test` passed (30 files, 276 tests); `npm run check-sync`, `npm run check-farms`, `npm run check-docs`, `npm run check-ui`, and `npm run check-workbench` passed; `tools\\build-all.bat` built Dairy, Flock and Agri successfully. The 12 Telegram farm-scope tests passed within the full suite. The monthly-path audit found Dairy's separate monthly email is a full-database backup snapshot intended for off-database recovery, so it intentionally includes all farms and is sent to one full-role admin; it is not a farm report. The daily summary email is farm-scoped, and no separate monthly report job was found in the audited email/backup paths.
+
+Phase 7 is **Done for command-line scope**. These are results supplied by the owner, not commands independently executed in this editing session. `npm ci` and optional `npm run check-workbench-runtime` were not run. Real MongoDB, browser/phone, and live deployment verification remain in Phases 19–21.
 
 Audit focus: preserve existing webhook secret validation and current bot commands; trace each app's farm context and data stores before changing record writes, daily summary and monthly email flows. Required regression: farm B chat writes only to farm B, an unlinked chat creates nothing, and farm A summary excludes farm B data.
 
