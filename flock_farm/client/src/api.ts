@@ -376,30 +376,40 @@ export async function updateMe(patch: { email?: string; displayName?: string; av
 // Compress an image in the browser before upload: resize to a sensible max
 // dimension and re-encode as JPEG. Keeps MongoDB documents small and uploads
 // fast on farm-site mobile connections.
-async function compressImage(file: File, maxDim = 1024, quality = 0.82): Promise<Blob> {
+const UPLOAD_IMAGE_MAX_BYTES = 100 * 1024;
+
+async function compressImage(file: File, maxDim = 1024): Promise<Blob> {
+  // Already-small images can keep their original encoding. The server still
+  // checks the actual bytes and signature, so the filename is not trusted.
+  if (file.size > 0 && file.size <= UPLOAD_IMAGE_MAX_BYTES) return file;
+
+  const bitmap = await createImageBitmap(file);
   try {
-    const bitmap = await createImageBitmap(file);
-    const scale = Math.min(1, maxDim / Math.max(bitmap.width, bitmap.height));
-    const width = Math.max(1, Math.round(bitmap.width * scale));
-    const height = Math.max(1, Math.round(bitmap.height * scale));
+    let width = bitmap.width;
+    let height = bitmap.height;
+    const scale = Math.min(1, maxDim / Math.max(width, height));
+    width = Math.max(1, Math.round(width * scale));
+    height = Math.max(1, Math.round(height * scale));
 
     const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
     const ctx = canvas.getContext('2d');
-    if (!ctx) return file;
-    ctx.drawImage(bitmap, 0, 0, width, height);
-    bitmap.close();
+    if (!ctx) throw new Error('Image compression is not supported by this browser');
 
-    const blob = await new Promise<Blob | null>((resolve) =>
-      canvas.toBlob(resolve, 'image/jpeg', quality)
-    );
-    // Only use the compressed version if it's actually smaller.
-    if (blob && blob.size < file.size) return blob;
-    return file;
-  } catch {
-    // Unsupported format or browser quirk — fall back to the original file.
-    return file;
+    // Reduce quality first, then dimensions. Never fall back to uploading the
+    // original oversized file because the shared server contract caps photos.
+    for (let pass = 0; pass < 10; pass++) {
+      canvas.width = width;
+      canvas.height = height;
+      ctx.drawImage(bitmap, 0, 0, width, height);
+      const quality = Math.max(0.35, 0.82 - pass * 0.06);
+      const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+      if (blob && blob.size <= UPLOAD_IMAGE_MAX_BYTES) return blob;
+      width = Math.max(320, Math.round(width * 0.82));
+      height = Math.max(320, Math.round(height * 0.82));
+    }
+    throw new Error('Photo could not be compressed below 100 KB. Choose a smaller image.');
+  } finally {
+    bitmap.close();
   }
 }
 
