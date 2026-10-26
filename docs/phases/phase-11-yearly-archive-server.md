@@ -35,7 +35,7 @@ Old years of records can be archived and exported so the live data stays small a
 
 `tests/archive.test.ts` plus `tools/check-dairy-archive.js` wired into `npm run check-farms`: archiving farm B never touches farm A, an archive without a finished export refuses to delete, and restore brings records back unchanged. These checks have been added but have not yet been run in the local project.
 
-Current implementation slice: Dairy milk and expenses only, exposed through `/api/archive`. Flock batch logs and Agri finance are not yet implemented. The export snapshot is bounded to 5,000 records and 8 MiB per job; oversized jobs are rejected without removing active records.
+Current implementation: the shared workflow in `shared/muf-yearly-archive.mjs` is wired to Dairy milk/expenses, all seven Flock batch-log collections, and Agri finance under `/api/archive`. Each app uses durable database snapshots and includes archive jobs/records in full and monthly backup payloads, with restore support. Snapshots are bounded to 5,000 records and 8 MiB per job; oversized jobs are rejected without removing active records. Runtime checks and all three builds still need to be run locally before this phase can be marked done.
 
 ## Command-line checks at the end of this phase
 
@@ -58,10 +58,11 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] Dairy server slice: snapshot completeness checks, stale-source preflight, archived-copy retention, idempotent archive retry, and conflict-aware restore.
 - [x] Dairy server slice requires a completed export and typed confirmation before source removal.
 - [ ] Archived records are excluded from normal lists and totals but can be read and restored.
-- [ ] Covers the high-volume collections first: Dairy milk and expenses, Flock batch logs, Agri finance.
-- [ ] The new command-line check above exists and passes.
+- [x] Shared server workflow covers Dairy milk and expenses, all Flock batch-log collections, and Agri finance.
+- [x] Full and monthly backup payloads preserve archive jobs and snapshot records, with restore support in each app.
+- [ ] The new command-line check above exists and passes in the current checkout.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated after local verification.
 
 ## Rules for whoever works on this phase
 
