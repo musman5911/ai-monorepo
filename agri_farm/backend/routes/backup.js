@@ -105,7 +105,11 @@ async function applyBackupPayload(payload) {
   }
   for (const [key, modelName] of [['archiveJobs','MufArchiveJob'],['archiveRecords','MufArchiveRecord']]) {
     const Model = mongoose.models[modelName];
-    if (Model && Array.isArray(payload[key])) { await restoreCollection(Model, payload[key]); restoredAny = true; }
+    if (Model && Array.isArray(payload[key])) {
+      await Model.deleteMany({});
+      if (payload[key].length) await Model.insertMany(payload[key]);
+      restoredAny = true;
+    }
   }
   if (restoredAny) await tagAfterRestore();
   return restoredAny;
