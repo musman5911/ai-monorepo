@@ -35,6 +35,15 @@ The old "frontend only, no backend change" workstream is finished. The current p
 - A shared visual change must not change API behavior, data storage, calculations, or permissions.
 - Do not delete source files merely because a simple text search cannot find their imports. Confirm the file is truly obsolete and not dynamically loaded, referenced by tooling, or reserved for an existing feature.
 
+## 3.1 MUF-first architecture and small modules (mandatory)
+
+- **Prefer MUF before app-specific duplication.** Before adding a feature, search the existing MUF files and extend/reuse them where the behavior is genuinely shared. Do not create a second implementation when a suitable MUF system already exists.
+- **Shared means shared.** If the same behavior, validation, helper, UI primitive, integration contract, or business-independent logic is needed by Dairy, Flock, and Agri, put it in an organized `muf-*` module and keep the required twins byte-identical. Add or extend parity checks when practical.
+- **Improve the MUF system when appropriate.** If an existing MUF module is close but incomplete, enhance it instead of layering a one-off workaround in each app. Keep farm-specific data models, calculations, permissions and workflows in app-specific adapters; share the common contract and mechanics.
+- **Keep files small and focused.** Split large modules into clear, single-purpose files (for example: parsing, storage adapter, farm-context execution, summary formatting). Avoid turning route files into giant catch-all modules. Extract code when it improves cohesion and reuse, not merely to hit an arbitrary line count.
+- **Do not force false sharing.** Shared MUF code must not hide meaningful differences between apps or change farm calculations, storage formats, security or permissions. Use small app-specific adapters around a shared MUF contract when needed.
+- **Before finishing a phase**, record which MUF modules were reused/created/enhanced, run `npm run check-sync` for shared twins, and verify all three apps still build.
+
 ## 4. Colors and visual styling
 
 The canonical tokens currently present in the MUF stylesheet (`muf-style.css` and `muf/styles/*.css`) are:
