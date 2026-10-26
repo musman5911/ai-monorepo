@@ -40,7 +40,7 @@ Still pending: Agri receipts and remaining spray/crop image fields, Dairy cow-ga
 
 ## New command-line check
 
-`tests/muf-storage.test.ts`: a fake store proves save, read, delete, size-limit refusal, wrong-type refusal and orphan cleanup, and `check-sync` proves the three copies are identical.
+`tests/muf-storage.test.ts` proves save, read, delete, size-limit refusal, wrong-type refusal and orphan cleanup with a fake store. `tests/photo-client-migration.test.ts` covers the Dairy/Agri photo-client migration contracts and byte-identical shared diary components. `check-sync` also proves the backend storage twins are identical.
 
 ## Command-line checks at the end of this phase
 
