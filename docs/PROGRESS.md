@@ -559,3 +559,8 @@ The Phase 6 checklist is complete for command-line scope. No browser/phone, real
 ## Phase 11 start (2026-10-26)
 
 Phase 11 is **In progress** on `muf-monorepo`. The first implementation slice will be Dairy milk, followed by Dairy expenses, Flock batch logs, and Agri finance. Archive requests must name one farm and a positive retention period explicitly; no retention default is assumed. The design requires a durable export snapshot and downloadable export before removal, typed confirmation bound to the farm/job, full-record preservation, farm isolation, and retry-safe behavior. No archive endpoint or destructive operation is considered complete until its tests and the standard command-line checks pass.
+
+
+## Phase 11 implementation checkpoint (2026-10-26)
+
+Implemented the first server slice on `muf-monorepo`: Dairy archive job and archive-record models are farm-scoped; owner-only `/api/archive` endpoints prepare a bounded durable snapshot, export JSON, require a completed export and exact farm-name/job-ID confirmation before removing source records, expose archived records, and support conflict-aware restoration. Only Dairy milk and expenses are covered so far. Flock batch logs, Agri finance, runtime archive tests, and full command-line verification remain outstanding. No test/build results are claimed for this checkpoint.

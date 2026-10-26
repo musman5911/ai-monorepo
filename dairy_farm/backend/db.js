@@ -395,6 +395,23 @@ const MetaSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Farms of this project (dairy farms only). See docs/FARMS_AND_ROLES.md.
+const ArchiveJobSchema = new mongoose.Schema({
+  collection: { type: String, enum: ['milk', 'expenses'], required: true },
+  retentionYears: { type: Number, required: true, min: 1 },
+  cutoffDate: { type: String, required: true },
+  state: { type: String, enum: ['preparing', 'snapshot_ready', 'snapshot_failed', 'archive_partial', 'archived', 'restored'], default: 'preparing' },
+  sourceCount: { type: Number, default: 0 },
+  exportDownloaded: { type: Boolean, default: false },
+  createdBy: { type: String, default: '' },
+}, { timestamps: true });
+const ArchiveRecordSchema = new mongoose.Schema({
+  jobId: { type: String, required: true },
+  sourceCollection: { type: String, enum: ['milk', 'expenses'], required: true },
+  sourceId: { type: String, required: true },
+  originalRecord: { type: mongoose.Schema.Types.Mixed, required: true },
+}, { timestamps: true });
+ArchiveRecordSchema.index({ farmId: 1, jobId: 1, sourceCollection: 1, sourceId: 1 }, { unique: true, name: 'archive_record_source_unique' });
+
 const FarmSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true },
   location: { type: String, default: '' },
@@ -409,7 +426,7 @@ const FARM_SCOPED = {
   LaborAttendance: LaborAttendanceSchema, LaborAdvance: LaborAdvanceSchema, Rate: RateSchema,
   Health: HealthSchema, Buyer: BuyerSchema, BuyerPayment: BuyerPaymentSchema,
   Supplier: SupplierSchema, SupplierPayment: SupplierPaymentSchema, RateHistory: RateHistorySchema,
-  DailyLog: DailyLogSchema, Sale: SaleSchema, PhotoAsset: PhotoAssetSchema,
+  DailyLog: DailyLogSchema, Sale: SaleSchema, PhotoAsset: PhotoAssetSchema, ArchiveJob: ArchiveJobSchema, ArchiveRecord: ArchiveRecordSchema,
 };
 export const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
 for (const schema of Object.values(FARM_SCOPED)) {
@@ -417,7 +434,7 @@ for (const schema of Object.values(FARM_SCOPED)) {
 }
 
 // ─── Models ──────────────────────────────────────────────────────────────────
-let Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, Meta, Farm;
+let Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, ArchiveJob, ArchiveRecord, Meta, Farm;
 
 if (USE_MEMORY) {
   const models = createStore({
@@ -440,6 +457,8 @@ if (USE_MEMORY) {
     DailyLog: DailyLogSchema,
     Sale: SaleSchema,
     PhotoAsset: PhotoAssetSchema,
+    ArchiveJob: ArchiveJobSchema,
+    ArchiveRecord: ArchiveRecordSchema,
     Meta: MetaSchema,
     Farm: FarmSchema,
   });
@@ -462,6 +481,8 @@ if (USE_MEMORY) {
   DailyLog = models.DailyLog;
   Sale = models.Sale;
   PhotoAsset = models.PhotoAsset;
+  ArchiveJob = models.ArchiveJob;
+  ArchiveRecord = models.ArchiveRecord;
   Meta = models.Meta;
   Farm = models.Farm;
 } else {
@@ -484,12 +505,14 @@ if (USE_MEMORY) {
   DailyLog = mongoose.model('DailyLog', DailyLogSchema);
   Sale = mongoose.model('Sale', SaleSchema);
   PhotoAsset = mongoose.model('PhotoAsset', PhotoAssetSchema);
+  ArchiveJob = mongoose.model('ArchiveJob', ArchiveJobSchema);
+  ArchiveRecord = mongoose.model('ArchiveRecord', ArchiveRecordSchema);
   Meta = mongoose.model('Meta', MetaSchema);
   Farm = mongoose.model('Farm', FarmSchema);
 }
 
 // Server-side farm scoping for every farm-owned model (works for MongoDB and memory mode).
-const MUF_FARM_MODELS = { Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, RateHistory, DailyLog, Sale, PhotoAsset };
+const MUF_FARM_MODELS = { Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, RateHistory, DailyLog, Sale, PhotoAsset, ArchiveJob, ArchiveRecord };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
 
-export { MUF_FARM_MODELS, Farm, connectDB, Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, Meta };
+export { MUF_FARM_MODELS, Farm, connectDB, Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, ArchiveJob, ArchiveRecord, Meta };

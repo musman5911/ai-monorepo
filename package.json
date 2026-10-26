@@ -8,11 +8,12 @@
     "check-ui": "node tools/check-ui-safety.js",
     "check-workbench": "node tools/check-muf-workbench.js",
     "check-workbench-runtime": "node tools/check-muf-workbench-runtime.js",
-    "check-farms": "node tools/check-farm-scope.js && node tools/check-dairy-breeding-events.js",
+    "check-farms": "node tools/check-farm-scope.js && node tools/check-dairy-breeding-events.js && node tools/check-dairy-archive.js",
     "check-breeding-events": "node tools/check-dairy-breeding-events.js",
     "check-super-admin": "node tools/check-super-admin.js",
     "check-docs": "node tools/check-phase-docs.js",
-    "check-bundle-size": "node tools/check-bundle-size.js"
+    "check-bundle-size": "node tools/check-bundle-size.js",
+    "check-archive": "node tools/check-dairy-archive.js"
   },
   "devDependencies": {
     "vitest": "^3.0.0"

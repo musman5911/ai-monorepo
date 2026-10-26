@@ -33,7 +33,9 @@ Old years of records can be archived and exported so the live data stays small a
 
 ## New command-line check
 
-`tests/archive.test.ts` plus new cases in `npm run check-farms`: archiving farm B never touches farm A, an archive without a finished export refuses to delete, and restore brings records back unchanged.
+`tests/archive.test.ts` plus `tools/check-dairy-archive.js` wired into `npm run check-farms`: archiving farm B never touches farm A, an archive without a finished export refuses to delete, and restore brings records back unchanged.
+
+Current implementation slice: Dairy milk and expenses only, exposed through `/api/archive`. Flock batch logs and Agri finance are not yet implemented. The export snapshot is bounded to 5,000 records and 8 MiB per job; oversized jobs are rejected without removing active records.
 
 ## Command-line checks at the end of this phase
 
@@ -51,10 +53,10 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] An owner-only archive job for one explicitly selected farm at a time, with an explicit positive retention period.
-- [ ] A durable downloadable export is prepared before removal; exact typed confirmation is bound to the farm and archive job.
-- [ ] Archive/export/restore steps are retry-safe and preserve original records.
-- [ ] Nothing is deleted without a successful export and a typed confirmation.
+- [x] Dairy server slice: owner-only jobs for one explicit farm and collection, with a required positive retention period (milk and expenses only; Flock and Agri remain outstanding).
+- [x] Dairy server slice: durable database snapshot, downloadable JSON export, export-completion marker, and exact farm-name/job-ID confirmation before removal.
+- [x] Dairy server slice: snapshot completeness checks, stale-source preflight, archived-copy retention, idempotent archive retry, and conflict-aware restore.
+- [x] Dairy server slice requires a completed export and typed confirmation before source removal.
 - [ ] Archived records are excluded from normal lists and totals but can be read and restored.
 - [ ] Covers the high-volume collections first: Dairy milk and expenses, Flock batch logs, Agri finance.
 - [ ] The new command-line check above exists and passes.
