@@ -25,7 +25,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 8 | Photo storage adapter | Done | [phase-08-photo-storage-adapter.md](phases/phase-08-photo-storage-adapter.md) |
 | 9 | Cloudinary photo store | Done | [phase-09-cloudinary-store.md](phases/phase-09-cloudinary-store.md) |
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
-| 11 | Yearly archive for old records: server | In progress | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
+| 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Not started | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Not started | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
@@ -65,3 +65,6 @@ Phases 1 to 6 are **Done for the command-line scope**. On 2026-10-25, the owner 
 ## History
 
 The earlier plan (Phases 0 to 7) and its dated notes are in `docs/archive/`. Its finished work is summarised in [Phase 0](phases/phase-00-done-and-verified.md); its unfinished work was split into the phases above.
+
+
+**Phase 11 is Done for command-line scope (2026-10-26).** Owner-reported Windows CMD results confirm the three-app archive runtime checks, 320 tests, sync/UI/workbench/farm/docs checks, and all three production builds passed. Archive coverage verifies export-before-delete, active-list and totals exclusion, farm isolation, and restoration for Dairy milk/expenses, Flock batch-feed logs, and Agri finance. These are owner-reported results, not commands independently executed in this editing session. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21. See [Phase 11 details](phases/phase-11-yearly-archive-server.md) and [PROGRESS.md](PROGRESS.md).
