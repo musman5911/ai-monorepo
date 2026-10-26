@@ -30,6 +30,7 @@ import { mufStoryNet, mufVerdictText, mufDaysBetween } from './muf/data/muf-stor
 import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from './muf/data/muf-compare';
 import FormOverlay from './muf/core/muf-form-overlay';
 import CropOpsPanel from './components/CropOpsPanel';
+import PhotoImage from './components/PhotoImage';
 import LaborBoard from './components/LaborBoard';
 import LedgerBookForm from './components/LedgerBookForm';
 import AgriFieldsPanel from './components/AgriFieldsPanel';
@@ -1575,13 +1576,19 @@ function App() {
       }
       if (!String(finForm.chemical || '').trim()) return showAlert('Chemical name is required.', true);
       try {
+        let sprayImage = finForm.spray_image || '';
+        if (sprayImage.startsWith('data:image/')) {
+          const uploaded = await api.uploadPhoto(sprayImage);
+          if (!uploaded.data?.path || uploaded.data?.offline) throw new Error('Photo upload needs an active connection. The spray log was not saved.');
+          sprayImage = uploaded.data.path;
+        }
         await api.addSprayLog({
           crop_id: finForm.crop_id,
           date: finForm.date || mufToday(),
           chemical: String(finForm.chemical).trim(),
           dose: finForm.dose,
           notes: finForm.notes,
-          image_base64: finForm.spray_image,
+          image_base64: sprayImage,
           inventory_item_id: finForm.inventory_item_id || null,
           inventory_qty_consumed: finForm.inventory_item_id ? (parseFloat(finForm.inventory_qty_consumed) || 0) : 0
         });
@@ -1659,6 +1666,11 @@ function App() {
         inventory_qty_consumed,
         ...ledgerFields
       } = bookForm;
+      if (typeof ledgerFields.receipt_base64 === 'string' && ledgerFields.receipt_base64.startsWith('data:image/')) {
+        const uploaded = await api.uploadPhoto(ledgerFields.receipt_base64);
+        if (!uploaded.data?.path || uploaded.data?.offline) throw new Error('Receipt upload needs an active connection. The ledger entry was not saved.');
+        ledgerFields.receipt_base64 = uploaded.data.path;
+      }
       const payload = {
         ...ledgerFields,
         amount: amt,
@@ -5278,9 +5290,7 @@ function App() {
             {selectedFinance.receipt_base64 && (
               <div className="p-4 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/40 space-y-2">
                 <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">{L('Receipt Photo')}</p>
-                <a href={selectedFinance.receipt_base64} target="_blank" rel="noopener noreferrer">
-                  <img src={selectedFinance.receipt_base64} alt="Receipt" className="w-full max-h-64 object-contain rounded-lg bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800 cursor-zoom-in" />
-                </a>
+                <PhotoImage src={selectedFinance.receipt_base64} alt="Receipt" className="w-full max-h-64 object-contain rounded-lg bg-white dark:bg-slate-950 border border-slate-100 dark:border-slate-800" />
               </div>
             )}
 
