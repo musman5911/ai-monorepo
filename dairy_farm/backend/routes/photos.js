@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
 import { PhotoAsset, Cow, Expense, DailyLog } from '../db.js';
-import { protect, requireAdmin } from '../middleware/auth.js';
+import { protect, adminOnly } from '../middleware/auth.js';
 import { createMufStorage } from '../muf-storage.mjs';
 import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 
@@ -75,7 +75,7 @@ router.post('/photos', protect, async (req, res) => {
     return res.status(status).json({ error: err.message || 'Photo upload failed' });
   }
 });
-router.post('/photos/cleanup-orphans', protect, requireAdmin, async (req, res) => {
+router.post('/photos/cleanup-orphans', protect, adminOnly, async (req, res) => {
   try {
     return res.json(await cleanupOrphanPhotoAssets());
   } catch (err) {
