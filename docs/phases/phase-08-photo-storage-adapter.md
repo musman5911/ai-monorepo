@@ -40,7 +40,7 @@ Added `tests/photo-client-migration.test.ts` and `tests/photo-phase8-regression.
 
 ## New command-line check
 
-`tests/muf-storage.test.ts` proves save, read, delete, size-limit refusal, wrong-type refusal and orphan cleanup with a fake store. `tests/photo-client-migration.test.ts` covers the Dairy/Agri photo-client migration contracts and byte-identical shared diary components; `tests/photo-phase8-regression.test.ts` covers upload sequencing, protected reads, reference-safe deletion, orphan discovery/cleanup, and legacy compatibility. `check-sync` also proves the backend storage twins are identical.
+`tests/muf-storage.test.ts` proves save, read, delete, size-limit refusal, wrong-type refusal and orphan cleanup with a fake store. `tests/photo-client-migration.test.ts` covers the Dairy/Agri photo-client migration contracts and byte-identical shared diary components; `tests/photo-phase8-regression.test.ts` covers upload sequencing, protected reads, reference-safe deletion, orphan discovery/cleanup, and legacy compatibility. `tests/agri-runtime-api.integration.test.ts` now exercises upload, authenticated binary retrieval, invalid upload rejection, referenced-delete refusal, and successful deletion over HTTP. `check-sync` also proves the backend storage twins are identical.
 
 ## Command-line checks at the end of this phase
 
