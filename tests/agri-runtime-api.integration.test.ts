@@ -761,6 +761,49 @@ describe.sequential('Agri runtime API integration', () => {
     expect(Number(after.response.headers.get('x-total-count'))).toBe(Number(before.response.headers.get('x-total-count')));
   });
 
+  it('uploads, authenticates reads, protects referenced photos, and deletes unreferenced photo assets', async () => {
+    const bytes = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10, 0x4a, 0x46, 0x01, 0x02]);
+    const data = `data:image/jpeg;base64,${bytes.toString('base64')}`;
+    const invalid = await request('/photos', { method: 'POST', token: ownerToken, body: { data: 'data:image/gif;base64,R0lGODlh' } });
+    expect(invalid.response.status).toBe(400);
+
+    const uploaded = await request('/photos', { method: 'POST', token: ownerToken, body: { data } });
+    expect(uploaded.response.status).toBe(201);
+    expect(uploaded.data.path).toMatch(/^\/api\/photos\/[a-f0-9]{24}$/i);
+    const photoPath = uploaded.data.path as string;
+    const photoId = photoPath.split('/').pop() as string;
+
+    const anonymousRead = await fetch(`${baseUrl}/api${photoPath}`);
+    expect(anonymousRead.status).toBe(401);
+    const authenticatedRead = await fetch(`${baseUrl}/api${photoPath}`, {
+      headers: { Authorization: `Bearer ${ownerToken}` },
+    });
+    expect(authenticatedRead.status).toBe(200);
+    expect(authenticatedRead.headers.get('content-type')).toContain('image/jpeg');
+    expect(Buffer.from(await authenticatedRead.arrayBuffer()).equals(bytes)).toBe(true);
+
+    const date = '2026-10-26';
+    const linked = await request(`/diary-media/${date}`, {
+      method: 'PUT',
+      token: ownerToken,
+      body: { photos: [{ id: 'photo-regression', data: photoPath, bytes: bytes.length, createdAt: date }], entries: [] },
+    });
+    expect(linked.response.status).toBe(200);
+    const refusedDelete = await request(`/photos/${photoId}`, { method: 'DELETE', token: ownerToken });
+    expect(refusedDelete.response.status).toBe(409);
+
+    const unlinked = await request(`/diary-media/${date}`, {
+      method: 'PUT',
+      token: ownerToken,
+      body: { photos: [], entries: [] },
+    });
+    expect(unlinked.response.status).toBe(200);
+    const deleted = await request(`/photos/${photoId}`, { method: 'DELETE', token: ownerToken });
+    expect(deleted.response.status).toBe(200);
+    const missing = await request(`/photos/${photoId}`, { method: 'DELETE', token: ownerToken });
+    expect(missing.response.status).toBe(404);
+  });
+
   it('filters completed crop history and enforces worker task-assignment authorization', async () => {
     const workerCrops = await request('/crops?skip=0&limit=500', { token: workerToken });
     expect(workerCrops.response.status).toBe(200);
