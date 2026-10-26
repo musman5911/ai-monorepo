@@ -28,7 +28,8 @@ describe('Phase 8 photo client migration', () => {
     const api = read('dairy_farm/client/src/api.ts');
     const diaryTab = read('dairy_farm/client/src/components/DiaryTab.tsx');
     const app = read('dairy_farm/client/src/App.tsx');
-    expect(api).toContain("req('/photos', { method: 'POST', body: JSON.stringify({ data }) })");
+    expect(api).toContain("body: JSON.stringify({ data: safeData })");
+    expect(api).toContain('const safeData = await fitPhotoDataUrl(data)');
     expect(api).toContain('Authorization: `Bearer ${token}`');
     expect(api).toContain("BASE + path.replace(/^\\/api/, '')");
     expect(diaryTab).toContain('uploadPhoto={async (file)');
@@ -40,7 +41,7 @@ describe('Phase 8 photo client migration', () => {
     const api = read('agri_farm/frontend/src/api.ts');
     const app = read('agri_farm/frontend/src/App.tsx');
     const cropPanel = read('agri_farm/frontend/src/components/CropOpsPanel.tsx');
-    expect(api).toContain("api.post('/photos', { data })");
+    expect(api).toContain("api.post('/photos', { data: await fitPhotoDataUrl(data) })");
     expect(api).toContain("api.get(path.replace(/^\\/api/, ''), { responseType: 'blob' })");
     expect(app).toContain('resolvePhotoUrl={api.getPhotoObjectUrl}');
     expect(cropPanel).toContain('const uploaded = await api.uploadPhoto(base64)');
