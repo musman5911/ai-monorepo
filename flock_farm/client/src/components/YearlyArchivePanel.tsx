@@ -221,7 +221,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
       <div className="space-y-5">
         <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
-          <p>Archiving removes records from active lists only after a complete snapshot has been exported and the exact farm name and job ID are confirmed. Preparing a snapshot does not delete active records.</p>
+          <p>{L('Archiving removes records from active lists only after a complete snapshot has been exported and the exact farm name and job ID are confirmed. Preparing a snapshot does not delete active records.')}</p>
         </div>
 
         {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">{error}</div>}
@@ -279,7 +279,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
                     <div className="min-w-0">
                       <p className="break-all text-xs font-bold text-slate-800 dark:text-slate-100">{job.collection} · {job.state}</p>
                       <p className="mt-1 break-all font-mono text-[10px] text-slate-500">{id}</p>
-                      <p className="mt-1 text-xs text-slate-500">{job.sourceCount} records · cutoff {job.cutoffDate} · {job.retentionYears} year(s)</p>
+                      <p className="mt-1 text-xs text-slate-500">{job.sourceCount} {L('records')} · {L('cutoff')} {job.cutoffDate} · {job.retentionYears} {L('year(s)')}</p>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => downloadExport(job)} disabled={busy !== ''}><Download className="h-4 w-4" />{L('Export')}</button>
@@ -327,7 +327,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
           </label>
           {includeArchived && (
             <div className="flex flex-wrap items-end gap-2">
-              <label className="min-w-[220px] flex-1 space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Archive job
+              <label className="min-w-[220px] flex-1 space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">{L('Archive job')}
                 <select className={fieldClass} value={reportJobId} onChange={(e) => { setReportJobId(e.target.value); setReportRecords([]); }}>
                   <option value="">{L('Select archived job')}</option>
                   {jobs.map((job) => <option key={job._id || job.id} value={job._id || job.id}>{job.collection} · {job.cutoffDate} · {job.state}</option>)}
@@ -340,7 +340,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
           )}
           {includeArchived && reportJob && reportRecords.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs text-slate-500">Showing {reportRecords.length} archived records from job {reportJob._id || reportJob.id}. This is a separate archive report view, not merged into active totals.</p>
+              <p className="text-xs text-slate-500">{L('Showing')} {reportRecords.length} {L('archived records from job')} {reportJob._id || reportJob.id}. {L('This is a separate archive report view, not merged into active totals.')}</p>
               <div className="max-h-72 overflow-auto rounded-xl border border-slate-200 dark:border-slate-700">
                 <table className="w-full text-left text-xs">
                   <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800"><tr><th className="p-2">{L('Record ID')}</th><th className="p-2">{L('Date')}</th><th className="p-2">{L('Record preview')}</th></tr></thead>
