@@ -18,7 +18,7 @@ describe('Agri fields and crop-cycle screen contracts', () => {
     expect(panel).toContain("L('Acres')");
     expect(api).toContain("api.get('/fields')");
     expect(api).toContain("api.post('/fields'");
-    expect(api).toContain("api.put(`/fields/${id}`)");
+    expect(api).toContain("api.put(`/fields/${id}`, field)");
     expect(api).toContain("api.delete(`/fields/${id}`)");
   });
 
