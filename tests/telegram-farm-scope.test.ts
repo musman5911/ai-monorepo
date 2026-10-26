@@ -65,6 +65,8 @@ describe('Phase 7: Telegram farm isolation', () => {
     expect(route).toContain('farmId:');
     expect(route).toContain('mufTelegramFarmId');
     expect(route).toContain('mufRunTelegramFarm');
+    expect(route).toContain('if (!link)');
+    expect(route).toContain('notLinked');
     expect(route).toContain('Select one farm before creating a Telegram link code');
     expect(route).toContain('no linked admin chat');
   });
