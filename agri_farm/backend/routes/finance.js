@@ -133,7 +133,7 @@ router.put('/finance/:financeId', protect, requireAdmin, asyncHandler(async (req
   if (!entry.date) entry.date = todayStr();
   const result = await replaceFarmRecord(Finance, oid, entry);
   if (!result.matchedCount) return notFound(res, 'Finance entry not found');
-  await cleanupOrphanPhotoAssets();
+  try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
   return res.json({ status: 'ok' });
 }));
 
@@ -141,7 +141,7 @@ router.delete('/finance/:financeId', protect, requireAdmin, asyncHandler(async (
   const oid = parseOid(req.params.financeId, 'finance ID');
   const result = await Finance.deleteOne({ _id: oid });
   if (!result.deletedCount) return notFound(res, 'Finance entry not found');
-  await cleanupOrphanPhotoAssets();
+  try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
   return res.json({ status: 'ok' });
 }));
 
