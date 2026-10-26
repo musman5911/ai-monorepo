@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 11 shared archive implementation added; local verification pending).
+Last updated: 2026-10-26 (Phase 11 three-app archive runtime checks passed; standard checks and builds pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -42,6 +42,19 @@ The owner approved Phase 7. Implemented farm-bound Telegram link codes and chat 
 Phase 7 is **Done for command-line scope**. These are results supplied by the owner, not commands independently executed in this editing session. `npm ci` and optional `npm run check-workbench-runtime` were not run. Real MongoDB, browser/phone, and live deployment verification remain in Phases 19–21.
 
 Audit focus: preserve existing webhook secret validation and current bot commands; trace each app's farm context and data stores before changing record writes, daily summary and monthly email flows. Required regression: farm B chat writes only to farm B, an unlinked chat creates nothing, and farm A summary excludes farm B data.
+
+## Phase 11 runtime verification checkpoint (owner-reported, 2026-10-26)
+
+The owner ran `npm run check-archive` in Windows CMD after commits through `a68ac60`. Dairy milk and expenses, Flock batch-feed logs, and Agri finance archive runtime checks all passed. The checks verified export-before-delete, active-list and totals exclusion after archiving, farm isolation, and restoration of records and totals. Node emitted non-blocking `MODULE_TYPELESS_PACKAGE_JSON` warnings for the three checker `.js` files, which use ES module syntax.
+
+| Command/check | Result |
+|---|---|
+| `npm run check-archive` | Passed: Dairy milk/expenses, Flock batch-feed logs, Agri finance; active lists, totals, farm isolation, export, and restore assertions all passed |
+| `npm test` | Passed: 39 files, 320 tests (owner-reported 2026-10-26) |
+| `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs` | Pending for this Phase 11 checkpoint |
+| `tools\\build-all.bat` | Pending: Dairy, Flock and Agri production builds |
+
+Phase 11 remains **In progress** until the standard checks and three builds pass and their results are recorded. These are results supplied by the owner, not commands independently executed in this editing session.
 
 ## Phase 10 start (2026-10-26)
 
