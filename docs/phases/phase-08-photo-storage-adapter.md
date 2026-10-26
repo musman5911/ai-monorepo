@@ -13,7 +13,7 @@ One shared place decides where photos are stored and how big they may be, so the
 
 ## Scope
 
-- `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link, delete and orphan cleanup. The shared contract now exists; app-specific MongoDB adapters and route migration are still in progress.
+- `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link, delete and orphan cleanup. The shared contract and contract tests exist. Flock upload/read/delete routes now call the contract while retaining the Image model and `/api/images/:id` path. Dairy and Agri integrations and full verification remain pending.
 - The default store keeps today's behaviour (MongoDB), so nothing changes for users.
 - Size limits (about 100 KB after compression) and a file-type check enforced on the server.
 - Deleting a record deletes its photos; a cleanup finds photos nobody uses.
@@ -27,8 +27,8 @@ One shared place decides where photos are stored and how big they may be, so the
 
 1. Audit how each app saves and serves photos (Agri DiaryMedia/CropPhoto/Spray, Dairy DailyLog photos and cow galleries, Flock Image documents). (Reviewed; migration not complete.)
 2. Define the adapter interface and validation contract. (Initial shared contract implemented in all three backends.)
-3. Add per-app MongoDB store bindings and migrate existing upload/read/delete flows without changing stored data or URLs. (Pending.)
-4. Add safe orphan cleanup, tests, and the shared-file parity check. (Contract-level cleanup/test/check added; app integration and verification pending.)
+3. Add per-app MongoDB store bindings and migrate existing upload/read/delete flows without changing stored data or URLs. (Flock route integration started; Dairy and Agri pending.)
+4. Add safe orphan cleanup, tests, and the shared-file parity check. (Contract-level cleanup and farm-scope tests added; production orphan-reference discovery and verification remain pending.)
 
 ## New command-line check
 
@@ -50,12 +50,12 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link, delete and orphan cleanup. (Shared contract added; still needs app integration.)
-- [ ] The default store keeps today's behaviour (MongoDB), so nothing changes for users.
+- [x] `backend/muf-storage.mjs`, a byte-identical twin in all three backends, with save, read link, delete and orphan cleanup. (Shared contract exists; parity still requires `npm run check-sync`.)
+- [ ] The default store keeps today's behaviour (MongoDB), so nothing changes for users. (Flock route migration is in progress; Dairy and Agri are not integrated yet.)
 - [ ] Size limits (about 100 KB after compression) and a file-type check enforced on the server.
-- [ ] Deleting a record deletes its photos; a cleanup finds photos nobody uses.
+- [ ] Deleting a record deletes its photos; a cleanup finds photos nobody uses. (Contract cleanup exists; record-reference discovery and automatic deletion wiring are not complete.)
 - [ ] Add the file to `check-muf-sync.js`.
-- [ ] The new command-line check above exists and passes. `tests/muf-storage.test.ts` and `check-sync.js` coverage have been added but have not yet been run locally.
+- [ ] The new command-line check above exists and passes. Contract tests and farm-scope regression cases have been added; local execution is still required.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
