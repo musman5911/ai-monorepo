@@ -28,18 +28,18 @@ import { todayStr } from "./utils/date";
 import { L, getLang, setCurrentLang, type Lang } from "./i18n";
 import { notify, useConfirm } from './muf/core/muf-confirm';
 import Login from "./components/Login";
-import Dashboard from "./components/Dashboard";
-import { SuperAdminTab } from "./components/SuperAdminTab";
-import CowsTab from "./components/CowsTab";
-import BreedingTab from "./components/BreedingTab";
-import MilkTab from "./components/MilkTab";
-import ExpensesTab from "./components/ExpensesTab";
-import HealthTab from "./components/HealthTab";
+const Dashboard = lazy(() => import("./components/Dashboard"));
+const SuperAdminTab = lazy(() => import("./components/SuperAdminTab").then((module) => ({ default: module.SuperAdminTab })));
+const CowsTab = lazy(() => import("./components/CowsTab"));
+const BreedingTab = lazy(() => import("./components/BreedingTab"));
+const MilkTab = lazy(() => import("./components/MilkTab"));
+const ExpensesTab = lazy(() => import("./components/ExpensesTab"));
+const HealthTab = lazy(() => import("./components/HealthTab"));
 const ReportsTab = lazy(() => import("./components/ReportsTab"));
 import DiaryTab from "./components/DiaryTab";
 import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from "./muf/ui/muf-diary";
 import { compressDiaryPhoto } from "./muf/ui/muf-diary-media";
-import LaborTab from "./components/LaborTab";
+const LaborTab = lazy(() => import("./components/LaborTab"));
 import HeaderSearch from "./muf/ui/muf-header-search";
 import OfflineBanner from "./muf/core/muf-offline-banner";
 import { hideMufSplash, initMufPullToRefresh, MufWhatsNew } from './muf/core/muf-applike';
@@ -546,6 +546,7 @@ export default function App() {
             transition={{ duration: 0.18, ease: "easeOut" }}
             className="bg-white/95 dark:bg-slate-900/95 backdrop-blur rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm p-3.5 sm:p-6 min-h-[60vh]"
           >
+            <Suspense fallback={<div className="p-8 text-center text-slate-500 text-sm">{L("Loading section…")}</div>}>
             {tab === "dashboard" && (
               <Dashboard
                 isAdmin={isAdmin}
@@ -570,6 +571,7 @@ export default function App() {
               </div>
             ))}
             {tab === "super_admin" && farmRole === "owner" && <SuperAdminTab />}
+            </Suspense>
           </motion.main>
         </AnimatePresence>
       </div>
