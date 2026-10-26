@@ -10,7 +10,9 @@ import express from 'express';
 import { randomUUID, timingSafeEqual } from 'crypto';
 const router = express.Router();
 import { protect, adminOnly } from '../middleware/auth.js';
-import { Cow, Milk, Expense, Laborer, LaborAttendance, Meta, User } from '../db.js';
+import { Cow, Milk, Expense, Laborer, LaborAttendance, Meta, User, Farm } from '../db.js';
+import { mufGetFarmContext, mufRunWithFarmContext } from '../muf-farms.mjs';
+import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
 import { todayStr, daysAgoStr, TZ_OFFSET_HOURS } from '../utils/date.js';
 import { breedingReminders } from '../services/breeding.js';
 import { MUF_ENV } from '../muf-env.mjs';
@@ -73,12 +75,14 @@ router.post('/link-code', protect, adminOnly, async (req, res) => {
       laborerName = lw.name;
     }
     if (!userId && !laborerId) return res.status(400).json({ error: 'Pick an app user or a wage worker to link' });
+    const farmId = mufGetFarmContext()?.farmId;
+    if (!farmId) return res.status(400).json({ error: 'Select one farm before creating a Telegram link code' });
     const codes = await readMeta(CODES_KEY);
     // prune expired
     const now = Date.now();
     for (const [c, v] of Object.entries(codes)) if ((v.expires || 0) < now) delete codes[c];
     const code = m.tgNewLinkCode();
-    codes[code] = { userId: userId || '', username, laborerId: laborerId || '', laborerName, expires: now + 15 * 60 * 1000 };
+    codes[code] = { userId: userId || '', username, laborerId: laborerId || '', laborerName, farmId: String(farmId), expires: now + 15 * 60 * 1000 };
     await writeMeta(CODES_KEY, codes);
     res.json({ code, expiresInMinutes: 15 });
   } catch (e) { res.status(500).json({ error: e.message }); }
@@ -113,11 +117,12 @@ router.post('/webhook/:secret', async (req, res) => {
     if (cmd.kind === 'link') {
       const codes = await readMeta(CODES_KEY);
       const entry = codes[cmd.code];
-      if (!entry || (entry.expires || 0) < Date.now()) return send(m.TG.linkBad);
+      if (!entry || (entry.expires || 0) < Date.now() || !mufTelegramFarmId(entry)) return send(m.TG.linkBad);
       delete codes[cmd.code];
       links[chatId] = {
         userId: entry.userId, username: entry.username,
         laborerId: entry.laborerId, laborerName: entry.laborerName,
+        farmId: mufTelegramFarmId(entry),
         linkedAt: new Date().toISOString(),
         tgName: [msg.from?.first_name, msg.from?.last_name].filter(Boolean).join(' '),
       };
@@ -127,7 +132,10 @@ router.post('/webhook/:secret', async (req, res) => {
     }
 
     if (!link) return send(m.TG.notLinked);
-
+    if (!mufTelegramFarmId(link)) return send('یہ Telegram لنک پرانا ہے۔ ایڈمن سے نیا فارم لنک کوڈ لیں۔');
+    const farm = await Farm.findById(mufTelegramFarmId(link)).lean();
+    if (!farm || farm.archived) return send('منسلک فارم دستیاب نہیں۔ ایڈمن سے دوبارہ لنک کروائیں۔');
+    return await mufRunTelegramFarm(link.farmId, mufRunWithFarmContext, async () => {
     const date = todayStr();
     if (cmd.kind === 'help' || cmd.kind === 'unknown') {
       return send(cmd.kind === 'unknown' ? m.TG.unknown : HELP_TEXT);
@@ -180,6 +188,7 @@ router.post('/webhook/:secret', async (req, res) => {
       const spent = expToday.reduce((a, e) => a + (e.amount || 0), 0);
       return send(`🐄 عثمان ڈیری فارم — ${date}\n🥛 آج کا دودھ: ${Math.round(liters * 10) / 10} لیٹر (${milkToday.length} جانور)\n💸 آج کا خرچہ: Rs ${Math.round(spent).toLocaleString()}`);
     }
+    });
   } catch (err) {
     console.error('Telegram webhook error:', err.message);
   }
