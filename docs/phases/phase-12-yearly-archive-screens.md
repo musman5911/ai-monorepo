@@ -1,6 +1,6 @@
 # Phase 12: Yearly archive: screens
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -21,11 +21,20 @@ The owner runs, reviews and restores archives from a screen.
 
 - No new server rules.
 
+## Audit findings and implementation plan (2026-10-26)
+
+- The Phase 11 owner-only archive API is mounted separately in Dairy, Flock and Agri and shares `shared/muf-yearly-archive.mjs`.
+- Each app already has an Admin > Reports section and shared `MufAdminReports` layout. The archive controls should be an owner-only panel embedded in that existing admin flow, not a new public navigation route.
+- The current report datasets are fetched from active-list APIs, so archived records must not silently be mixed into existing totals. The report option must be explicit and use the archive read endpoint, with farm and date scope validated by the server.
+- Keep the shared MUF report twin files byte-identical. Preserve existing API authentication helpers and Urdu translation patterns in each app.
+
 ## Steps
 
-1. Build the screen on the shared popup and form components.
-2. Add the report option.
-3. Add the check and run the builds.
+1. Audit shared archive request/response contracts and each app's owner-role checks, authenticated fetch helper, and reports/admin integration.
+2. Add an owner-only archive panel with explicit farm and retention-year selection, preview, export download before execution, exact typed confirmation, archive history, and restore with conflict/error feedback.
+3. Add an explicit archived-year report option without changing default active-only reports; only include archived records when the user chooses the relevant archive/date scope.
+4. Add `tests/archive-screens.test.ts` for owner gating, required workflow states, export-before-execute, and explicit archived-report opt-in.
+5. Run the focused test, full suite, sync/UI/workbench/farm/docs checks, and all three production builds; update the phase records with observed results.
 
 ## New command-line check
 
