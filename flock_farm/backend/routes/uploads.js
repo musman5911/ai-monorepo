@@ -4,24 +4,40 @@ import multer from 'multer';
 import { authRequired, requireRole } from '../middleware/auth.js';
 import Image from '../models/Image.js';
 import { createMufStorage } from '../muf-storage.mjs';
+import { MUF_ENV } from '../muf-env.mjs';
+import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.mjs';
 
 const router = express.Router();
 
 const allowedKinds = new Set(['bird', 'batch', 'diary']);
 
+let cloudinaryFallbackLogged = false;
 function storageForCurrentFarm(req) {
   const farmId = String(req.farmContext?.farmId || '');
   if (!farmId) throw new Error('Active farm context is required for photo storage');
   const scopedId = (id) => ({ _id: id, farmId });
+  const config = { cloudName: MUF_ENV.cloudinaryCloudName, apiKey: MUF_ENV.cloudinaryApiKey, apiSecret: MUF_ENV.cloudinaryApiSecret };
+  let cloudinary = null;
+  if (cloudinaryConfigured(config)) cloudinary = createCloudinaryClient(config);
+  else if (!cloudinaryFallbackLogged) {
+    console.info('[photo-storage] Cloudinary credentials are incomplete; using MongoDB photo storage.');
+    cloudinaryFallbackLogged = true;
+  }
   return createMufStorage({
     store: {
       async save({ bytes, contentType, metadata = {} }) {
+        if (cloudinary) {
+          const remote = await cloudinary.upload({ bytes, contentType });
+          const image = await Image.create({
+            kind: allowedKinds.has(metadata.kind) ? metadata.kind : 'diary',
+            farmId, provider: 'cloudinary', cloudinaryPublicId: remote.publicId, secureUrl: remote.secureUrl,
+            contentType, size: bytes.length, uploadedBy: String(metadata.uploadedBy || ''),
+          });
+          return { id: String(image._id) };
+        }
         const image = await Image.create({
           kind: allowedKinds.has(metadata.kind) ? metadata.kind : 'diary',
-          farmId,
-          contentType,
-          data: bytes,
-          size: bytes.length,
+          farmId, provider: 'mongodb', contentType, data: bytes, size: bytes.length,
           uploadedBy: String(metadata.uploadedBy || ''),
         });
         return { id: String(image._id) };
@@ -31,7 +47,13 @@ function storageForCurrentFarm(req) {
         return image ? `/api/images/${image._id}` : null;
       },
       async delete(id) {
-        return Boolean(await Image.findOneAndDelete(scopedId(id)));
+        const image = await Image.findOne(scopedId(id));
+        if (!image) return false;
+        if (image.provider === 'cloudinary' && image.cloudinaryPublicId) {
+          if (!cloudinary) throw new Error('Cloudinary credentials are required to delete this photo');
+          await cloudinary.destroy(image.cloudinaryPublicId);
+        }
+        return (await Image.deleteOne(scopedId(id))).deletedCount > 0;
       },
       async list() {
         const images = await Image.find({ farmId }).select('_id').lean();
@@ -130,6 +152,7 @@ router.get('/images/:id', resolveImageFarm, authRequired, async (req, res) => {
     if (!link) return res.status(404).json({ error: 'Image not found' });
     const img = await Image.findOne({ _id: id, farmId: String(req.farmContext?.farmId || '') });
     if (!img) return res.status(404).json({ error: 'Image not found' });
+    if (img.provider === 'cloudinary' && img.secureUrl) return res.redirect(302, img.secureUrl);
 
     res.setHeader('Content-Type', img.contentType || 'image/jpeg');
     // Images are immutable (a new upload = a new id), so cache aggressively.
