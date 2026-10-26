@@ -59,7 +59,33 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
   const [marketBusy, setMarketBusy] = useState(false);
   // Photo gallery state
   const [galleryBusy, setGalleryBusy] = useState(false);
+  const [galleryUrls, setGalleryUrls] = useState<Record<string, string>>({});
   const [lightbox, setLightbox] = useState<GalleryPhoto | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const created: string[] = [];
+    const gallery = data?.cow.gallery || [];
+    void Promise.all(gallery.filter((photo) => photo.base64.startsWith('/api/photos/')).map(async (photo) => {
+      try {
+        const url = await api.getPhotoObjectUrl(photo.base64);
+        created.push(url);
+        return [photo.id, url] as const;
+      } catch {
+        return [photo.id, ''] as const;
+      }
+    })).then((pairs) => {
+      if (cancelled) {
+        created.forEach((url) => URL.revokeObjectURL(url));
+        return;
+      }
+      setGalleryUrls(Object.fromEntries(pairs.filter(([, url]) => Boolean(url))));
+    });
+    return () => {
+      cancelled = true;
+      created.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [data?.cow.gallery]);
 
   // Weight history section state
   const [showWeightForm, setShowWeightForm] = useState(false);
@@ -247,7 +273,7 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {(cow.gallery || []).map((g) => (
                   <button key={g.id} onClick={() => setLightbox(g)} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
-                    <img src={g.base64} alt={g.caption || g.date} className="w-full h-full object-cover" />
+                    <img src={galleryUrls[g.id] || (g.base64.startsWith('/api/photos/') ? '' : g.base64)} alt={g.caption || g.date} className="w-full h-full object-cover" />
                     <span className="absolute bottom-0 inset-x-0 bg-black/50 text-white text-[9px] px-1 py-0.5 truncate">{g.date}</span>
                   </button>
                 ))}
@@ -266,7 +292,8 @@ export default function CowDetailPopup({ cowId, rate, rateHistory = [], rateDate
                         setGalleryBusy(true);
                         try {
                           const base64 = await compressGalleryImage(file);
-                          const next: GalleryPhoto[] = [...(cow.gallery || []), { id: `g-${Date.now()}`, date: todayStr(), base64, caption: '' }];
+                          const uploaded = await api.uploadPhoto(base64);
+                          const next: GalleryPhoto[] = [...(cow.gallery || []), { id: `g-${Date.now()}`, date: todayStr(), base64: uploaded.path, caption: '' }];
                           await saveMarket({ gallery: next } as any);
                           notify(L('Photo added'));
                         } catch (err) {
