@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 12 archive screens started; Phase 11 complete for command-line scope).
+Last updated: 2026-10-26 (Phase 12 archive screen checks and builds passed; translation work remains).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -45,7 +45,7 @@ Audit focus: preserve existing webhook secret validation and current bot command
 
 ## Phase 12 start (2026-10-26)
 
-Phase 12, Yearly archive: screens, remains **In progress**. Added matching `YearlyArchivePanel.tsx` components in Dairy, Flock and Agri and embedded them in each Admin > Reports area. The panel supports farm/collection/retention selection, server-generated eligible-record snapshots, export download, exact farm-name/job-ID confirmation, archive history, record viewing, and conflict-aware restore. The archived-record report is opt-in and separate from active reports. Added `tests/archive-screens.test.ts` for source-contract regression checks. The required owner gate is enforced both in the panel and by the existing owner-only backend routes. Urdu translation coverage and all local tests/builds still need verification; no commands were run in this editing session.
+Phase 12, Yearly archive: screens, remains **In progress**. Added matching `YearlyArchivePanel.tsx` components in Dairy, Flock and Agri and embedded them in each Admin > Reports area. The panel supports farm/collection/retention selection, server-generated eligible-record snapshots, export download, exact farm-name/job-ID confirmation, archive history, record viewing, and conflict-aware restore. The archived-record report is opt-in and separate from active reports. Added `tests/archive-screens.test.ts` for source-contract regression checks. The required owner gate is enforced both in the panel and by the existing owner-only backend routes. The owner ran the checks locally after commit `2810316`: the focused archive-screen test passed (5 tests); the full suite passed (40 files, 325 tests); sync, UI safety, workbench (23 checks), farm scope, phase docs, and all three production builds passed. `git status` reported a clean tree. These results were supplied by the owner and were not independently executed in this editing session. Phase remains In progress because Urdu translations and a final review of workflow behavior remain pending.
 
 ## Phase 11 final verification (owner-reported, 2026-10-26)
 
