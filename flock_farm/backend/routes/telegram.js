@@ -128,11 +128,11 @@ router.post('/webhook/:secret', async (req, res) => {
         links: await readStore(LINKS_KEY, {}),
         codes: cmd.kind === 'link' ? await readStore(CODES_KEY, {}) : {},
       }));
-      if (state?.links?.[chatId]) {
-        targetFarmId = farmId; links = state.links; link = links[chatId]; break;
-      }
       if (cmd.kind === 'link' && state?.codes?.[cmd.code]) {
         targetFarmId = farmId; codes = state.codes; codeEntry = codes[cmd.code]; break;
+      }
+      if (state?.links?.[chatId]) {
+        targetFarmId = farmId; links = state.links; link = links[chatId]; break;
       }
     }
 
@@ -146,6 +146,17 @@ router.post('/webhook/:secret', async (req, res) => {
         linkedAt: new Date().toISOString(),
         tgName: [msg.from?.first_name, msg.from?.last_name].filter(Boolean).join(' '),
       };
+      for (const farm of farms) {
+        const oldFarmId = String(farm._id);
+        if (oldFarmId === targetFarmId) continue;
+        await mufRunTelegramFarm(oldFarmId, mufRunWithFarmContext, async () => {
+          const oldLinks = await readStore(LINKS_KEY, {});
+          if (oldLinks[chatId]) {
+            delete oldLinks[chatId];
+            await writeStore(LINKS_KEY, oldLinks);
+          }
+        });
+      }
       await mufRunTelegramFarm(targetFarmId, mufRunWithFarmContext, async () => {
         await writeStore(CODES_KEY, codes);
         await writeStore(LINKS_KEY, links);
