@@ -292,7 +292,7 @@ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getH
           )}
         </section>
 
-        {(prepared || restoreTarget) && (
+        {((prepared && ['snapshot_ready', 'archive_partial'].includes(prepared.state)) || restoreTarget) && (
           <section className="space-y-3 rounded-xl border border-amber-200 p-4 dark:border-amber-900">
             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{restoreTarget ? 'Confirm archive restoration' : 'Confirm archive execution'}</h4>
             {!restoreTarget && !prepared?.exportDownloaded && <p className="text-xs text-amber-800 dark:text-amber-200">Download the export first. The server enforces this requirement.</p>}
