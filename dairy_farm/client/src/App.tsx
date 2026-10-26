@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from "react";
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
 import MufFarmSwitcher from './muf/ui/muf-farm-switcher';
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence, prefersReducedMotion } from './muf/core/muf-motion';
@@ -35,7 +35,7 @@ import BreedingTab from "./components/BreedingTab";
 import MilkTab from "./components/MilkTab";
 import ExpensesTab from "./components/ExpensesTab";
 import HealthTab from "./components/HealthTab";
-import ReportsTab from "./components/ReportsTab";
+const ReportsTab = lazy(() => import("./components/ReportsTab"));
 import DiaryTab from "./components/DiaryTab";
 import MufDiary, { type MufDiaryEntry, type MufDiaryChoice } from "./muf/ui/muf-diary";
 import { compressDiaryPhoto } from "./muf/ui/muf-diary-media";
