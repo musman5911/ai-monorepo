@@ -1,6 +1,6 @@
 # Phase 13: Dependency security fixes
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -8,7 +8,7 @@ Known vulnerable packages are updated without breaking the apps.
 
 ## Already in place (from Phase 0)
 
-- Measured on 2026-10-24 with `npm audit --omit=dev`: root 0; Dairy backend 5 (3 moderate, 2 high); Flock backend 6 (3 moderate, 3 high); Agri backend 5 (3 moderate, 2 high); Agri frontend 3 (2 high, 1 critical); the Dairy and Flock client audits printed no result, so re-run them first.
+- Historical baseline from 2026-10-24 (must be refreshed locally): root 0; Dairy backend 5 (3 moderate, 2 high); Flock backend 6 (3 moderate, 3 high); Agri backend 5 (3 moderate, 2 high); Agri frontend 3 (2 high, 1 critical). The Dairy and Flock client audits printed no result at that time. This is not a current audit result.
 
 ## Scope
 
@@ -31,7 +31,7 @@ Known vulnerable packages are updated without breaking the apps.
 
 ## New command-line check
 
-`npm run check-audit`: runs `npm audit --omit=dev --audit-level=high` in every package set and fails on any high or critical finding.
+`npm run check-audit`: runs `npm audit --omit=dev --audit-level=high` in all seven package sets (root tools, Dairy backend/client, Flock backend/client, Agri backend/frontend). It fails closed if a manifest/lockfile is missing, npm cannot run, or any high/critical production finding exists.
 
 ## Command-line checks at the end of this phase
 
