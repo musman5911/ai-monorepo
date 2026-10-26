@@ -19,6 +19,7 @@ import MufAdminCard from '../muf/admin/muf-admin-card';
 import MufAdminButton from '../muf/admin/muf-admin-button';
 import MufAdminUsers from '../muf/admin/muf-admin-users';
 import MufAdminReports from '../muf/admin/muf-admin-reports';
+import YearlyArchivePanel from './YearlyArchivePanel';
 import MufAdminGeneral from '../muf/admin/muf-admin-general';
 import { api } from '../api';
 import type { AuthUser, Buyer, Rate, RateHistory, UserRole } from '../types';
@@ -768,9 +769,21 @@ export default function AdminPanel({ username, onClose }: Props) {
           {section === 'farms' && <MyFarmsPanel />}
 
           {section === 'reports' && (
-            <MufAdminReports reportButtons={[]}>
-              <ExportCenter />
-            </MufAdminReports>
+            <div className="space-y-6">
+              <MufAdminReports reportButtons={[]}>
+                <ExportCenter />
+              </MufAdminReports>
+              <YearlyArchivePanel
+                isOwner={(() => { try { return localStorage.getItem('dm_role') === 'admin'; } catch { return false; } })()}
+                apiBase="/api"
+                collections={[{ value: 'milk', label: 'Milk records' }, { value: 'expenses', label: 'Expenses' }]}
+                getHeaders={() => {
+                  let token = ''; let farmId = '';
+                  try { token = localStorage.getItem('dm_token') || ''; farmId = localStorage.getItem('muf_active_farm_dairy') || ''; } catch { /* storage unavailable */ }
+                  return { ...(token ? { Authorization: `Bearer ${token}` } : {}), ...(farmId ? { 'X-Farm-Id': farmId } : {}) };
+                }}
+              />
+            </div>
           )}
 
           {section === 'backup' && (
