@@ -257,7 +257,7 @@ router.get('/:id', protect, async (req, res) => {
   try {
     const cow = await Cow.findById(req.params.id);
     if (!cow) return res.status(404).json({ error: 'Not found' });
-    if (Array.isArray(req.body?.gallery)) await cleanupOrphanPhotoAssets();
+    if (Array.isArray(req.body?.gallery)) try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
     res.json(cow);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -447,7 +447,7 @@ router.delete('/:id', protect, adminOnly, async (req, res) => {
     ]);
 
     await Cow.findByIdAndDelete(cowId);
-    await cleanupOrphanPhotoAssets();
+    try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
     res.json({ deleted: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
