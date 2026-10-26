@@ -775,7 +775,7 @@ describe.sequential('Agri runtime API integration', () => {
 
     const anonymousRead = await fetch(`${baseUrl}${photoPath}`);
     expect(anonymousRead.status).toBe(401);
-    const authenticatedRead = await fetch(`${baseUrl}/api${photoPath}`, {
+    const authenticatedRead = await fetch(`${baseUrl}${photoPath}`, {
       headers: { Authorization: `Bearer ${ownerToken}` },
     });
     expect(authenticatedRead.status).toBe(200);
