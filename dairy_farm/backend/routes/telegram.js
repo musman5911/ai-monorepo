@@ -288,25 +288,38 @@ async function buildDailyText() {
 async function pushDailySummary(force = false) {
   if (!TOKEN()) return { sent: 0, reason: 'not configured' };
   const m = await muf();
-  const settings = await readSettings();
-  if (!force && settings.dailySummary === false) return { sent: 0, reason: 'daily summary turned off' };
-  const date = todayStr();
-  if (!force && settings.lastPushDate === date) return { sent: 0, reason: 'already sent today' };
   const links = await readMeta(LINKS_KEY);
-  const chatIds = [];
-  for (const [chatId, link] of Object.entries(links)) {
-    if (!link.userId) continue;
-    const u = await User.findById(link.userId);
-    if (u && ['owner', 'manager', 'admin'].includes(u.role)) chatIds.push(chatId);
+  const farms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
+  const results = [];
+  for (const farm of farms) {
+    const farmId = String(farm._id);
+    const settings = await readSettings(farmId);
+    if (!force && settings.dailySummary === false) {
+      results.push({ farmId, sent: 0, reason: 'daily summary turned off' });
+      continue;
+    }
+    const date = todayStr();
+    if (!force && settings.lastPushDate === date) {
+      results.push({ farmId, sent: 0, reason: 'already sent today' });
+      continue;
+    }
+    const chatIds = [];
+    for (const [chatId, link] of Object.entries(links)) {
+      if (mufTelegramFarmId(link) !== farmId || !link.userId) continue;
+      const u = await User.findById(link.userId);
+      if (u && ['owner', 'manager', 'admin'].includes(u.role)) chatIds.push(chatId);
+    }
+    if (!chatIds.length) {
+      results.push({ farmId, sent: 0, reason: 'no linked admin chat' });
+      continue;
+    }
+    const text = await mufRunTelegramFarm(farmId, mufRunWithFarmContext, () => buildDailyText());
+    let sent = 0;
+    for (const chatId of chatIds) if (await m.tgSendMessage(TOKEN(), chatId, text)) sent += 1;
+    if (!force) await writeMeta(`${SETTINGS_KEY}:${farmId}`, { ...settings, lastPushDate: date });
+    results.push({ farmId, sent, chats: chatIds.length });
   }
-  if (chatIds.length === 0) return { sent: 0, reason: 'no linked admin chat' };
-  const text = await buildDailyText();
-  let sent = 0;
-  for (const chatId of chatIds) {
-    if (await m.tgSendMessage(TOKEN(), chatId, text)) sent += 1;
-  }
-  if (!force) await writeMeta(SETTINGS_KEY, { ...settings, lastPushDate: date });
-  return { sent, chats: chatIds.length };
+  return { sent: results.reduce((n, r) => n + r.sent, 0), farms: results };
 }
 
 // ── Any logged-in user: drop status for the dashboard red card ──
