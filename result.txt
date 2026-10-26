@@ -1,0 +1,976 @@
+Microsoft Windows [Version 10.0.19045.5965]
+(c) Microsoft Corporation. All rights reserved.
+
+F:\PROJECTS\dairy\muf-monorepo>git pull origin muf-monorepo
+remote: Enumerating objects: 163, done.
+remote: Counting objects: 100% (163/163), done.
+remote: Compressing objects: 100% (143/143), done.
+remote: Total 143 (delta 129), reused 0 (delta 0), pack-reused 0 (from 0)
+Receiving objects: 100% (143/143), 28.50 KiB | 258.00 KiB/s, done.
+Resolving deltas: 100% (129/129), completed with 20 local objects.
+From https://github.com/musman5911/ai-monorepo
+ * branch            muf-monorepo -> FETCH_HEAD
+   6f2009a..8fe7f8b  muf-monorepo -> origin/muf-monorepo
+Updating 6f2009a..8fe7f8b
+Fast-forward
+ agri_farm/frontend/src/App.tsx                     |   1 +
+ agri_farm/frontend/src/components/AdminMenu.tsx    |  12 +
+ .../frontend/src/components/YearlyArchivePanel.tsx | 361 +++++++++++++++++++++
+ dairy_farm/client/src/App.tsx                      |   2 +-
+ dairy_farm/client/src/components/AdminPanel.tsx    |  22 +-
+ .../client/src/components/YearlyArchivePanel.tsx   | 361 +++++++++++++++++++++
+ docs/PROGRESS.md                                   |   2 +-
+ docs/phases/phase-12-yearly-archive-screens.md     |  10 +-
+ flock_farm/client/src/components/AdminMenu.tsx     |  19 ++
+ .../client/src/components/YearlyArchivePanel.tsx   | 361 +++++++++++++++++++++
+ tests/archive-screens.test.ts                      |  64 ++++
+ 11 files changed, 1208 insertions(+), 7 deletions(-)
+ create mode 100644 agri_farm/frontend/src/components/YearlyArchivePanel.tsx
+ create mode 100644 dairy_farm/client/src/components/YearlyArchivePanel.tsx
+ create mode 100644 flock_farm/client/src/components/YearlyArchivePanel.tsx
+ create mode 100644 tests/archive-screens.test.ts
+
+F:\PROJECTS\dairy\muf-monorepo>npx vitest run tests/archive-screens.test.ts
+
+ RUN  v3.2.7 F:/PROJECTS/dairy/muf-monorepo
+
+ ❯ tests/archive-screens.test.ts (5 tests | 1 failed) 27ms
+   ✓ Phase 12 yearly archive screens > provides an owner-gated archive panel in all three farm apps 6ms
+   ✓ Phase 12 yearly archive screens > requires a complete snapshot export and exact farm/job confirmation before execution 1ms
+   × Phase 12 yearly archive screens > supports archive history, explicit record viewing, and conflict-aware restoration 14ms
+     → expected 'import { useCallback, useEffect, useM…' to contain 'A separate archive report view'
+   ✓ Phase 12 yearly archive screens > offers only the source collections supported by each app route 2ms
+   ✓ Phase 12 yearly archive screens > keeps the three archive panels byte-identical 2ms
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/archive-screens.test.ts > Phase 12 yearly archive screens > supports archive history, explicit record viewing, and conflict-aware restoration
+AssertionError: expected 'import { useCallback, useEffect, useM…' to contain 'A separate archive report view'
+
+- Expected
++ Received
+
+- A separate archive report view
++ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
++ import { Archive, Download, Eye, RefreshCw, RotateCcw, ShieldCheck } from 'lucide-react';
++ import MufAdminCard from '../muf/admin/muf-admin-card';
++
++ type ArchiveFarm = { _id: string; id?: string; name: string };
++ type ArchiveJob = {
++   _id: string; id?: string; farmId: string; collection: string; retentionYears: number;
++   cutoffDate: string; state: string; sourceCount: number; exportDownloaded?: boolean;
++   createdAt?: string; updatedAt?: string;
++ };
++ type ArchiveRecord = Record<string, unknown>;
++ type CollectionOption = { value: string; label: string };
++ type Props = {
++   isOwner: boolean;
++   apiBase: string;
++   collections: CollectionOption[];
++   getHeaders: () => Record<string, string>;
++ };
++
++ const fieldClass = 'w-full min-w-0 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm text-slate-800 dark:text-slate-100';
++ const buttonClass = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition disabled:cursor-not-allowed disabled:opacity-50';
++
++ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getHeaders }: Props) {
++   const [farms, setFarms] = useState<ArchiveFarm[]>([]);
++   const [farmId, setFarmId] = useState('');
++   const [collection, setCollection] = useState(collections[0]?.value || '');
++   const [retentionYears, setRetentionYears] = useState('5');
++   const [jobs, setJobs] = useState<ArchiveJob[]>([]);
++   const [prepared, setPrepared] = useState<ArchiveJob | null>(null);
++   const [confirmFarmName, setConfirmFarmName] = useState('');
++   const [confirmJobId, setConfirmJobId] = useState('');
++   const [restoreTarget, setRestoreTarget] = useState<ArchiveJob | null>(null);
++   const [includeArchived, setIncludeArchived] = useState(false);
++   const [reportJobId, setReportJobId] = useState('');
++   const [reportRecords, setReportRecords] = useState<ArchiveRecord[]>([]);
++   const [busy, setBusy] = useState('');
++   const [error, setError] = useState('');
++   const [notice, setNotice] = useState('');
++
++   const base = apiBase.replace(/\/+$/, '');
++   const getHeadersRef = useRef(getHeaders);
++   useEffect(() => { getHeadersRef.current = getHeaders; }, [getHeaders]);
++   const activeFarm = farms.find((farm) => (farm._id || farm.id) === farmId);
++   const farmName = activeFarm?.name || '';
++   const targetJob = restoreTarget || prepared;
++   const canConfirm = !!targetJob && confirmFarmName === farmName && confirmJobId === String(targetJob._id || targetJob.id);
++
++   const request = useCallback(async (path: string, init: RequestInit = {}) => {
++     const response = await fetch(`${base}${path}`, {
++       ...init,
++       headers: {
++         ...getHeadersRef.current(),
++         ...(init.body ? { 'Content-Type': 'application/json' } : {}),
++         ...(init.headers || {}),
++       },
++     });
++     const data = await response.json().catch(() => ({}));
++     if (!response.ok) throw new Error(data.error || data.message || `Request failed (${response.status})`);
++     return { response, data };
++   }, [base]);
++
++   const refreshJobs = useCallback(async (selectedFarmId = farmId) => {
++     if (!selectedFarmId) { setJobs([]); return []; }
++     const { data } = await request(`/archive/jobs?farmId=${encodeURIComponent(selectedFarmId)}`);
++     const nextJobs = Array.isArray(data) ? data as ArchiveJob[] : [];
++     setJobs(nextJobs);
++     return nextJobs;
++   }, [farmId, request]);
++
++   const loadFarms = useCallback(async () => {
++     const { data } = await request('/farms');
++     const list = Array.isArray(data?.farms) ? data.farms : [];
++     setFarms(list.filter((farm: ArchiveFarm & { archived?: boolean }) => !farm.archived));
++     const first = list.find((farm: ArchiveFarm & { archived?: boolean }) => !farm.archived);
++     setFarmId((current) => current && list.some((farm: ArchiveFarm) => (farm._id || farm.id) === current) ? current : (first?._id || first?.id || ''));
++   }, [request]);
++
++   useEffect(() => {
++     if (!isOwner) return;
++     setBusy('loading');
++     setError('');
++     loadFarms().catch((e) => setError(e instanceof Error ? e.message : 'Could not load farms'))
++       .finally(() => setBusy(''));
++   }, [isOwner, loadFarms]);
++
++   useEffect(() => {
++     if (!isOwner || !farmId) return;
++     refreshJobs(farmId).catch((e) => setError(e instanceof Error ? e.message : 'Could not load archive history'));
++   }, [isOwner, farmId, refreshJobs]);
++
++   const clearMessages = () => { setError(''); setNotice(''); };
++
++   const prepareArchive = async () => {
++     clearMessages();
++     setPrepared(null);
++     setConfirmFarmName('');
++     setConfirmJobId('');
++     if (!farmId || !collection || !/^\d+$/.test(retentionYears) || Number(retentionYears) < 1 || Number(retentionYears) > 100) {
++       setError('Choose a farm, collection, and retention period from 1 to 100 years.');
++       return;
++     }
++     setBusy('prepare');
++     try {
++       const { data } = await request('/archive/jobs', {
++         method: 'POST',
++         body: JSON.stringify({ farmId, collection, retentionYears: Number(retentionYears) }),
++       });
++       if (!data.job) {
++         setNotice(data.message || 'No records qualify for this retention period. No active records were changed.');
++         await refreshJobs(farmId);
++         return;
++       }
++       setPrepared(data.job as ArchiveJob);
++       setNotice(`Snapshot prepared: ${data.job.sourceCount} record(s) before ${data.job.cutoffDate}. Active records have not been removed.`);
++       await refreshJobs(farmId);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Could not prepare archive snapshot');
++     } finally { setBusy(''); }
++   };
++
++   const downloadExport = async (job: ArchiveJob) => {
++     clearMessages();
++     setBusy(`export:${job._id || job.id}`);
++     try {
++       const id = String(job._id || job.id);
++       const response = await fetch(`${base}/archive/jobs/${encodeURIComponent(id)}/export?farmId=${encodeURIComponent(farmId)}`, { headers: getHeadersRef.current() });
++       if (!response.ok) {
++         const data = await response.json().catch(() => ({}));
++         throw new Error(data.error || data.message || `Export failed (${response.status})`);
++       }
++       const blob = await response.blob();
++       const url = URL.createObjectURL(blob);
++       const link = document.createElement('a');
++       link.href = url;
++       link.download = `muf-${job.collection}-archive-${id}.json`;
++       document.body.appendChild(link);
++       link.click();
++       link.remove();
++       URL.revokeObjectURL(url);
++       setNotice('Export download started. Wait for the download to finish before executing the archive.');
++       const refreshed = await refreshJobs(farmId);
++       const refreshedJob = refreshed.find((item) => String(item._id || item.id) === id);
++       if (refreshedJob) setPrepared(refreshedJob);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Export download failed');
++     } finally { setBusy(''); }
++   };
++
++   const executeArchive = async () => {
++     if (!targetJob || !canConfirm) return;
++     clearMessages();
++     setBusy('execute');
++     try {
++       const id = String(targetJob._id || targetJob.id);
++       const { data } = await request(`/archive/jobs/${encodeURIComponent(id)}/execute`, {
++         method: 'POST',
++         body: JSON.stringify({ farmId, confirmFarmName, confirmJobId }),
++       });
++       setNotice(`Archive status: ${data.state || 'completed'}; ${data.count ?? targetJob.sourceCount} record(s) processed.`);
++       setPrepared(null);
++       setRestoreTarget(null);
++       setConfirmFarmName('');
++       setConfirmJobId('');
++       await refreshJobs(farmId);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Archive execution failed. Active records should be checked before retrying.');
++     } finally { setBusy(''); }
++   };
++
++   const restoreArchive = async () => {
++     if (!restoreTarget || !canConfirm) return;
++     clearMessages();
++     setBusy('restore');
++     try {
++       const id = String(restoreTarget._id || restoreTarget.id);
++       const { data } = await request(`/archive/jobs/${encodeURIComponent(id)}/restore`, {
++         method: 'POST',
++         body: JSON.stringify({ farmId, confirmFarmName, confirmJobId }),
++       });
++       setNotice(`Restore status: ${data.state || 'completed'}; ${data.count ?? restoreTarget.sourceCount} record(s) processed.`);
++       setRestoreTarget(null);
++       setConfirmFarmName('');
++       setConfirmJobId('');
++       await refreshJobs(farmId);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Restore failed. The archive snapshot remains available.');
++     } finally { setBusy(''); }
++   };
++
++   const loadReportRecords = async () => {
++     clearMessages();
++     if (!includeArchived || !reportJobId) {
++       setReportRecords([]);
++       setError('Enable archived records and select an archive job first.');
++       return;
++     }
++     setBusy('records');
++     try {
++       const { data } = await request(`/archive/jobs/${encodeURIComponent(reportJobId)}/records?farmId=${encodeURIComponent(farmId)}`);
++       setReportRecords(Array.isArray(data.records) ? data.records : []);
++       setNotice(`Loaded ${Array.isArray(data.records) ? data.records.length : 0} archived record(s) for this explicitly selected archive report.`);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Could not read archived records');
++       setReportRecords([]);
++     } finally { setBusy(''); }
++   };
++
++   const reportJob = useMemo(() => jobs.find((job) => String(job._id || job.id) === reportJobId), [jobs, reportJobId]);
++
++   if (!isOwner) return null;
++
++   return (
++     <MufAdminCard icon={<Archive className="w-5 h-5" />} title="Yearly Archive" subtitle="Owner-only archive, export, and restore controls">
++       <div className="space-y-5">
++         <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
++           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
++           <p>Archiving removes records from active lists only after a complete snapshot has been exported and the exact farm name and job ID are confirmed. Preparing a snapshot does not delete active records.</p>
++         </div>
++
++         {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">{error}</div>}
++         {notice && <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">{notice}</div>}
++
++         <section className="space-y-3">
++           <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">Prepare archive snapshot</h4>
++           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
++             <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
++               Farm
++               <select className={fieldClass} value={farmId} onChange={(e) => { setFarmId(e.target.value); setPrepared(null); setReportRecords([]); }} disabled={busy !== '' || farms.length === 0}>
++                 <option value="">Select farm</option>
++                 {farms.map((farm) => <option key={farm._id || farm.id} value={farm._id || farm.id}>{farm.name}</option>)}
++               </select>
++             </label>
++             <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
++               Collection
++               <select className={fieldClass} value={collection} onChange={(e) => setCollection(e.target.value)} disabled={busy !== ''}>
++                 {collections.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
++               </select>
++             </label>
++             <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
++               Retention period (years)
++               <input className={fieldClass} type="number" min="1" max="100" step="1" value={retentionYears} onChange={(e) => setRetentionYears(e.target.value)} disabled={busy !== ''} />
++             </label>
++           </div>
++           <button type="button" className={`${buttonClass} bg-farm-600 text-white hover:bg-farm-700`} onClick={prepareArchive} disabled={busy !== '' || !farmId || collections.length === 0}>
++             <Archive className="h-4 w-4" /> {busy === 'prepare' ? 'Preparing snapshot…' : 'Preview eligible records'}
++           </button>
++         </section>
++
++         {prepared && (
++           <section className="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700">
++             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">Snapshot preview</h4>
++             <dl className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
++               <div><dt className="text-slate-500">Farm</dt><dd className="mt-1 font-semibold">{farmName}</dd></div>
++               <div><dt className="text-slate-500">Eligible records</dt><dd className="mt-1 font-semibold">{prepared.sourceCount}</dd></div>
++               <div><dt className="text-slate-500">Cutoff date</dt><dd className="mt-1 font-semibold">{prepared.cutoffDate}</dd></div>
++               <div><dt className="text-slate-500">Status</dt><dd className="mt-1 font-semibold">{prepared.state}</dd></div>
++             </dl>
++             <p className="text-xs text-slate-500">The server has saved a snapshot of the exact eligible records. Download the export before continuing.</p>
++             <button type="button" className={`${buttonClass} bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-200 dark:text-slate-900`} onClick={() => downloadExport(prepared)} disabled={busy !== ''}>
++               <Download className="h-4 w-4" /> {busy.startsWith('export:') ? 'Preparing download…' : 'Download archive export'}
++             </button>
++           </section>
++         )}
++
++         <section className="space-y-3 border-t border-slate-100 pt-4 dark:border-slate-800">
++           <div className="flex flex-wrap items-center justify-between gap-2">
++             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">Archive history</h4>
++             <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800`} onClick={() => refreshJobs().catch((e) => setError(e.message))} disabled={busy !== '' || !farmId}>
++               <RefreshCw className="h-4 w-4" /> Refresh
++             </button>
++           </div>
++           {!jobs.length ? <p className="text-xs text-slate-500">No archive jobs for this farm yet.</p> : (
++             <div className="space-y-2">
++               {jobs.map((job) => {
++                 const id = String(job._id || job.id);
++                 return <div key={id} className="rounded-xl border border-slate-200 p-3 dark:border-slate-700">
++                   <div className="flex flex-wrap items-start justify-between gap-2">
++                     <div className="min-w-0">
++                       <p className="break-all text-xs font-bold text-slate-800 dark:text-slate-100">{job.collection} · {job.state}</p>
++                       <p className="mt-1 break-all font-mono text-[10px] text-slate-500">{id}</p>
++                       <p className="mt-1 text-xs text-slate-500">{job.sourceCount} records · cutoff {job.cutoffDate} · {job.retentionYears} year(s)</p>
++                     </div>
++                     <div className="flex flex-wrap gap-2">
++                       <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setPrepared(job); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }}><Download className="h-4 w-4" /> Export</button>
++                       <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setReportJobId(id); setIncludeArchived(true); setReportRecords([]); }}><Eye className="h-4 w-4" /> Report</button>
++                       {['archived', 'archive_partial', 'restored'].includes(job.state) && <button type="button" className={`${buttonClass} bg-amber-600 text-white hover:bg-amber-700`} onClick={() => { setRestoreTarget(job); setPrepared(null); setConfirmFarmName(''); setConfirmJobId(''); }}><RotateCcw className="h-4 w-4" /> Restore</button>}
++                     </div>
++                   </div>
++                 </div>;
++               })}
++             </div>
++           )}
++         </section>
++
++         {((prepared && ['snapshot_ready', 'archive_partial'].includes(prepared.state)) || restoreTarget) && (
++           <section className="space-y-3 rounded-xl border border-amber-200 p-4 dark:border-amber-900">
++             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{restoreTarget ? 'Confirm archive restoration' : 'Confirm archive execution'}</h4>
++             {!restoreTarget && !prepared?.exportDownloaded && <p className="text-xs text-amber-800 dark:text-amber-200">Download the export first. The server enforces this requirement.</p>}
++             <p className="text-xs text-slate-500">Type the exact farm name and job ID. This is deliberately tedious because deleting records should not be a one-click hobby.</p>
++             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
++               <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Farm name
++                 <input className={fieldClass} value={confirmFarmName} onChange={(e) => setConfirmFarmName(e.target.value)} autoComplete="off" />
++               </label>
++               <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Job ID
++                 <input className={fieldClass} value={confirmJobId} onChange={(e) => setConfirmJobId(e.target.value)} autoComplete="off" />
++               </label>
++             </div>
++             <div className="flex flex-wrap gap-2">
++               {restoreTarget ? (
++                 <button type="button" className={`${buttonClass} bg-amber-600 text-white hover:bg-amber-700`} onClick={restoreArchive} disabled={busy !== '' || !canConfirm}>
++                   <RotateCcw className="h-4 w-4" /> {busy === 'restore' ? 'Restoring…' : 'Confirm restore'}
++                 </button>
++               ) : (
++                 <button type="button" className={`${buttonClass} bg-red-600 text-white hover:bg-red-700`} onClick={executeArchive} disabled={busy !== '' || !canConfirm || !prepared?.exportDownloaded}>
++                   <Archive className="h-4 w-4" /> {busy === 'execute' ? 'Archiving…' : 'Confirm archive'}
++                 </button>
++               )}
++               <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setPrepared(null); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }}>Cancel</button>
++             </div>
++           </section>
++         )}
++
++         <section className="space-y-3 border-t border-slate-100 pt-4 dark:border-slate-800">
++           <label className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-200">
++             <input type="checkbox" checked={includeArchived} onChange={(e) => { setIncludeArchived(e.target.checked); setReportRecords([]); }} className="mt-0.5" />
++             <span><strong>Include archived records in this report</strong><br /><span className="text-slate-500">Off by default. Existing active-data reports are not changed.</span></span>
++           </label>
++           {includeArchived && (
++             <div className="flex flex-wrap items-end gap-2">
++               <label className="min-w-[220px] flex-1 space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Archive job
++                 <select className={fieldClass} value={reportJobId} onChange={(e) => { setReportJobId(e.target.value); setReportRecords([]); }}>
++                   <option value="">Select archived job</option>
++                   {jobs.map((job) => <option key={job._id || job.id} value={job._id || job.id}>{job.collection} · {job.cutoffDate} · {job.state}</option>)}
++                 </select>
++               </label>
++               <button type="button" className={`${buttonClass} bg-farm-600 text-white hover:bg-farm-700`} onClick={loadReportRecords} disabled={busy !== '' || !reportJobId}>
++                 <Eye className="h-4 w-4" /> {busy === 'records' ? 'Loading…' : 'Load archived report'}
++               </button>
++             </div>
++           )}
++           {includeArchived && reportJob && reportRecords.length > 0 && (
++             <div className="space-y-2">
++               <p className="text-xs text-slate-500">Showing {reportRecords.length} archived records from job {reportJob._id || reportJob.id}. This is a separate archive report view, not merged into active totals.</p>
++               <div className="max-h-72 overflow-auto rounded-xl border border-slate-200 dark:border-slate-700">
++                 <table className="w-full text-left text-xs">
++                   <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800"><tr><th className="p-2">Record ID</th><th className="p-2">Date</th><th className="p-2">Record preview</th></tr></thead>
++                   <tbody>{reportRecords.map((record, index) => <tr key={String(record._id || index)} className="border-t border-slate-100 dark:border-slate-800">
++                     <td className="max-w-32 break-all p-2 font-mono">{String(record._id || '—')}</td>
++                     <td className="whitespace-nowrap p-2">{String(record.date || '—')}</td>
++                     <td className="max-w-80 break-words p-2">{JSON.stringify(record)}</td>
++                   </tr>)}</tbody>
++                 </table>
++               </div>
++             </div>
++           )}
++           {includeArchived && reportJob && reportRecords.length === 0 && <p className="text-xs text-slate-500">No archived records loaded for this report yet.</p>}
++         </section>
++       </div>
++     </MufAdminCard>
++   );
++ }
++
+
+ ❯ tests/archive-screens.test.ts:48:20
+     46|     expect(source).toContain('Include archived records in this report');
+     47|     expect(source).toContain('Off by default. Existing active-data reports are not changed.');
+     48|     expect(source).toContain('A separate archive report view');
+       |                    ^
+     49|   });
+     50|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 passed (5)
+   Start at  23:08:17
+   Duration  664ms (transform 61ms, setup 0ms, collect 68ms, tests 27ms, environment 0ms, prepare 160ms)
+
+
+F:\PROJECTS\dairy\muf-monorepo>npm test
+
+> test
+> vitest run
+
+
+ RUN  v3.2.7 F:/PROJECTS/dairy/muf-monorepo
+
+ ❯ tests/archive-screens.test.ts (5 tests | 1 failed) 34ms
+   ✓ Phase 12 yearly archive screens > provides an owner-gated archive panel in all three farm apps 7ms
+   ✓ Phase 12 yearly archive screens > requires a complete snapshot export and exact farm/job confirmation before execution 1ms
+   × Phase 12 yearly archive screens > supports archive history, explicit record viewing, and conflict-aware restoration 18ms
+     → expected 'import { useCallback, useEffect, useM…' to contain 'A separate archive report view'
+   ✓ Phase 12 yearly archive screens > offers only the source collections supported by each app route 3ms
+   ✓ Phase 12 yearly archive screens > keeps the three archive panels byte-identical 2ms
+ ✓ tests/muf-farms.test.ts (20 tests) 673ms
+   ✓ real mongoose queries (skipped when the dairy backend packages are not installed) > builds scoped filters and strips farmId from updates  629ms
+ ✓ tests/smoke.test.ts (32 tests) 72ms
+ ✓ tests/phase3-pagination.test.ts (39 tests) 48ms
+ ✓ tests/dairy-photo-runtime.integration.test.ts (2 tests) 3120ms
+ ✓ tests/cloudinary-store.test.ts (6 tests) 42ms
+ ✓ tests/phase3-farm-isolation.test.ts (4 tests) 40ms
+ ✓ tests/muf-farms-agri.test.ts (10 tests) 40ms
+ ✓ tests/flock-egg-inventory-coordination.test.ts (12 tests) 29ms
+ ✓ tests/check-bundle-size.test.ts (3 tests) 27ms
+ ✓ tests/agri-bulk-import.test.ts (11 tests) 25ms
+ ✓ tests/flock-image-backup.test.ts (5 tests) 28ms
+ ✓ tests/muf-storage.test.ts (8 tests) 20ms
+ ✓ tests/flock-egg-inventory-lock.test.ts (7 tests) 18ms
+ ✓ tests/phase-1-super-admin.test.ts (13 tests) 26ms
+ ✓ tests/agri-fields-screens.test.ts (4 tests) 19ms
+ ✓ tests/dairy-breeding-screens.test.ts (7 tests) 20ms
+ ✓ tests/telegram-farm-scope.test.ts (12 tests) 21ms
+ ✓ tests/photo-phase8-regression.test.ts (5 tests) 17ms
+ ✓ tests/phase1-backup-farm-context.test.ts (5 tests) 12ms
+ ✓ tests/agri-bulk-api.test.ts (4 tests) 15ms
+ ✓ tests/archive.test.ts (10 tests) 14ms
+ ✓ tests/flock-data-route-allocation.test.ts (4 tests) 16ms
+ ✓ tests/flock-incubation-allocation.test.ts (12 tests) 11ms
+ ✓ tests/agri-fields-cycles.test.ts (5 tests) 13ms
+ ✓ tests/dairy-breeding-events.test.ts (10 tests) 12ms
+ ✓ tests/agri-runtime-api.integration.test.ts (12 tests) 10485ms
+   ✓ Agri runtime API integration > pages a 1,001-row task fixture over real HTTP without missing or duplicating records  2101ms
+ ✓ tests/flock-batch-math.test.ts (6 tests) 10ms
+ ✓ tests/photo-client-migration.test.ts (3 tests) 14ms
+ ✓ tests/muf-charts.test.ts (9 tests) 11ms
+ ✓ tests/flock-batch-history-guards.test.ts (3 tests) 10ms
+ ✓ tests/phase4-breeding-lineage.test.ts (3 tests) 9ms
+ ✓ tests/flock-image-references.test.ts (4 tests) 9ms
+ ✓ tests/muf-compare.test.ts (12 tests) 12ms
+ ✓ tests/dairy-calving-creates-calf.test.ts (5 tests) 11ms
+ ✓ tests/agri-photo-storage.test.ts (2 tests) 9ms
+ ✓ tests/flock-batch-labor.test.ts (3 tests) 8ms
+ ✓ tests/muf-urdu-fallback-coverage.test.ts (2 tests) 8ms
+ ✓ tests/flock-dark-login-background.test.ts (1 test) 6ms
+ ✓ tests/muf-zakat.test.ts (5 tests) 5ms
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/archive-screens.test.ts > Phase 12 yearly archive screens > supports archive history, explicit record viewing, and conflict-aware restoration
+AssertionError: expected 'import { useCallback, useEffect, useM…' to contain 'A separate archive report view'
+
+- Expected
++ Received
+
+- A separate archive report view
++ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
++ import { Archive, Download, Eye, RefreshCw, RotateCcw, ShieldCheck } from 'lucide-react';
++ import MufAdminCard from '../muf/admin/muf-admin-card';
++
++ type ArchiveFarm = { _id: string; id?: string; name: string };
++ type ArchiveJob = {
++   _id: string; id?: string; farmId: string; collection: string; retentionYears: number;
++   cutoffDate: string; state: string; sourceCount: number; exportDownloaded?: boolean;
++   createdAt?: string; updatedAt?: string;
++ };
++ type ArchiveRecord = Record<string, unknown>;
++ type CollectionOption = { value: string; label: string };
++ type Props = {
++   isOwner: boolean;
++   apiBase: string;
++   collections: CollectionOption[];
++   getHeaders: () => Record<string, string>;
++ };
++
++ const fieldClass = 'w-full min-w-0 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3 py-2.5 text-sm text-slate-800 dark:text-slate-100';
++ const buttonClass = 'inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-3 py-2 text-xs font-bold transition disabled:cursor-not-allowed disabled:opacity-50';
++
++ export default function YearlyArchivePanel({ isOwner, apiBase, collections, getHeaders }: Props) {
++   const [farms, setFarms] = useState<ArchiveFarm[]>([]);
++   const [farmId, setFarmId] = useState('');
++   const [collection, setCollection] = useState(collections[0]?.value || '');
++   const [retentionYears, setRetentionYears] = useState('5');
++   const [jobs, setJobs] = useState<ArchiveJob[]>([]);
++   const [prepared, setPrepared] = useState<ArchiveJob | null>(null);
++   const [confirmFarmName, setConfirmFarmName] = useState('');
++   const [confirmJobId, setConfirmJobId] = useState('');
++   const [restoreTarget, setRestoreTarget] = useState<ArchiveJob | null>(null);
++   const [includeArchived, setIncludeArchived] = useState(false);
++   const [reportJobId, setReportJobId] = useState('');
++   const [reportRecords, setReportRecords] = useState<ArchiveRecord[]>([]);
++   const [busy, setBusy] = useState('');
++   const [error, setError] = useState('');
++   const [notice, setNotice] = useState('');
++
++   const base = apiBase.replace(/\/+$/, '');
++   const getHeadersRef = useRef(getHeaders);
++   useEffect(() => { getHeadersRef.current = getHeaders; }, [getHeaders]);
++   const activeFarm = farms.find((farm) => (farm._id || farm.id) === farmId);
++   const farmName = activeFarm?.name || '';
++   const targetJob = restoreTarget || prepared;
++   const canConfirm = !!targetJob && confirmFarmName === farmName && confirmJobId === String(targetJob._id || targetJob.id);
++
++   const request = useCallback(async (path: string, init: RequestInit = {}) => {
++     const response = await fetch(`${base}${path}`, {
++       ...init,
++       headers: {
++         ...getHeadersRef.current(),
++         ...(init.body ? { 'Content-Type': 'application/json' } : {}),
++         ...(init.headers || {}),
++       },
++     });
++     const data = await response.json().catch(() => ({}));
++     if (!response.ok) throw new Error(data.error || data.message || `Request failed (${response.status})`);
++     return { response, data };
++   }, [base]);
++
++   const refreshJobs = useCallback(async (selectedFarmId = farmId) => {
++     if (!selectedFarmId) { setJobs([]); return []; }
++     const { data } = await request(`/archive/jobs?farmId=${encodeURIComponent(selectedFarmId)}`);
++     const nextJobs = Array.isArray(data) ? data as ArchiveJob[] : [];
++     setJobs(nextJobs);
++     return nextJobs;
++   }, [farmId, request]);
++
++   const loadFarms = useCallback(async () => {
++     const { data } = await request('/farms');
++     const list = Array.isArray(data?.farms) ? data.farms : [];
++     setFarms(list.filter((farm: ArchiveFarm & { archived?: boolean }) => !farm.archived));
++     const first = list.find((farm: ArchiveFarm & { archived?: boolean }) => !farm.archived);
++     setFarmId((current) => current && list.some((farm: ArchiveFarm) => (farm._id || farm.id) === current) ? current : (first?._id || first?.id || ''));
++   }, [request]);
++
++   useEffect(() => {
++     if (!isOwner) return;
++     setBusy('loading');
++     setError('');
++     loadFarms().catch((e) => setError(e instanceof Error ? e.message : 'Could not load farms'))
++       .finally(() => setBusy(''));
++   }, [isOwner, loadFarms]);
++
++   useEffect(() => {
++     if (!isOwner || !farmId) return;
++     refreshJobs(farmId).catch((e) => setError(e instanceof Error ? e.message : 'Could not load archive history'));
++   }, [isOwner, farmId, refreshJobs]);
++
++   const clearMessages = () => { setError(''); setNotice(''); };
++
++   const prepareArchive = async () => {
++     clearMessages();
++     setPrepared(null);
++     setConfirmFarmName('');
++     setConfirmJobId('');
++     if (!farmId || !collection || !/^\d+$/.test(retentionYears) || Number(retentionYears) < 1 || Number(retentionYears) > 100) {
++       setError('Choose a farm, collection, and retention period from 1 to 100 years.');
++       return;
++     }
++     setBusy('prepare');
++     try {
++       const { data } = await request('/archive/jobs', {
++         method: 'POST',
++         body: JSON.stringify({ farmId, collection, retentionYears: Number(retentionYears) }),
++       });
++       if (!data.job) {
++         setNotice(data.message || 'No records qualify for this retention period. No active records were changed.');
++         await refreshJobs(farmId);
++         return;
++       }
++       setPrepared(data.job as ArchiveJob);
++       setNotice(`Snapshot prepared: ${data.job.sourceCount} record(s) before ${data.job.cutoffDate}. Active records have not been removed.`);
++       await refreshJobs(farmId);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Could not prepare archive snapshot');
++     } finally { setBusy(''); }
++   };
++
++   const downloadExport = async (job: ArchiveJob) => {
++     clearMessages();
++     setBusy(`export:${job._id || job.id}`);
++     try {
++       const id = String(job._id || job.id);
++       const response = await fetch(`${base}/archive/jobs/${encodeURIComponent(id)}/export?farmId=${encodeURIComponent(farmId)}`, { headers: getHeadersRef.current() });
++       if (!response.ok) {
++         const data = await response.json().catch(() => ({}));
++         throw new Error(data.error || data.message || `Export failed (${response.status})`);
++       }
++       const blob = await response.blob();
++       const url = URL.createObjectURL(blob);
++       const link = document.createElement('a');
++       link.href = url;
++       link.download = `muf-${job.collection}-archive-${id}.json`;
++       document.body.appendChild(link);
++       link.click();
++       link.remove();
++       URL.revokeObjectURL(url);
++       setNotice('Export download started. Wait for the download to finish before executing the archive.');
++       const refreshed = await refreshJobs(farmId);
++       const refreshedJob = refreshed.find((item) => String(item._id || item.id) === id);
++       if (refreshedJob) setPrepared(refreshedJob);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Export download failed');
++     } finally { setBusy(''); }
++   };
++
++   const executeArchive = async () => {
++     if (!targetJob || !canConfirm) return;
++     clearMessages();
++     setBusy('execute');
++     try {
++       const id = String(targetJob._id || targetJob.id);
++       const { data } = await request(`/archive/jobs/${encodeURIComponent(id)}/execute`, {
++         method: 'POST',
++         body: JSON.stringify({ farmId, confirmFarmName, confirmJobId }),
++       });
++       setNotice(`Archive status: ${data.state || 'completed'}; ${data.count ?? targetJob.sourceCount} record(s) processed.`);
++       setPrepared(null);
++       setRestoreTarget(null);
++       setConfirmFarmName('');
++       setConfirmJobId('');
++       await refreshJobs(farmId);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Archive execution failed. Active records should be checked before retrying.');
++     } finally { setBusy(''); }
++   };
++
++   const restoreArchive = async () => {
++     if (!restoreTarget || !canConfirm) return;
++     clearMessages();
++     setBusy('restore');
++     try {
++       const id = String(restoreTarget._id || restoreTarget.id);
++       const { data } = await request(`/archive/jobs/${encodeURIComponent(id)}/restore`, {
++         method: 'POST',
++         body: JSON.stringify({ farmId, confirmFarmName, confirmJobId }),
++       });
++       setNotice(`Restore status: ${data.state || 'completed'}; ${data.count ?? restoreTarget.sourceCount} record(s) processed.`);
++       setRestoreTarget(null);
++       setConfirmFarmName('');
++       setConfirmJobId('');
++       await refreshJobs(farmId);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Restore failed. The archive snapshot remains available.');
++     } finally { setBusy(''); }
++   };
++
++   const loadReportRecords = async () => {
++     clearMessages();
++     if (!includeArchived || !reportJobId) {
++       setReportRecords([]);
++       setError('Enable archived records and select an archive job first.');
++       return;
++     }
++     setBusy('records');
++     try {
++       const { data } = await request(`/archive/jobs/${encodeURIComponent(reportJobId)}/records?farmId=${encodeURIComponent(farmId)}`);
++       setReportRecords(Array.isArray(data.records) ? data.records : []);
++       setNotice(`Loaded ${Array.isArray(data.records) ? data.records.length : 0} archived record(s) for this explicitly selected archive report.`);
++     } catch (e) {
++       setError(e instanceof Error ? e.message : 'Could not read archived records');
++       setReportRecords([]);
++     } finally { setBusy(''); }
++   };
++
++   const reportJob = useMemo(() => jobs.find((job) => String(job._id || job.id) === reportJobId), [jobs, reportJobId]);
++
++   if (!isOwner) return null;
++
++   return (
++     <MufAdminCard icon={<Archive className="w-5 h-5" />} title="Yearly Archive" subtitle="Owner-only archive, export, and restore controls">
++       <div className="space-y-5">
++         <div className="flex items-start gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-200">
++           <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
++           <p>Archiving removes records from active lists only after a complete snapshot has been exported and the exact farm name and job ID are confirmed. Preparing a snapshot does not delete active records.</p>
++         </div>
++
++         {error && <div role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-xs text-red-800 dark:border-red-900 dark:bg-red-950/30 dark:text-red-200">{error}</div>}
++         {notice && <div role="status" className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/30 dark:text-emerald-200">{notice}</div>}
++
++         <section className="space-y-3">
++           <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">Prepare archive snapshot</h4>
++           <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
++             <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
++               Farm
++               <select className={fieldClass} value={farmId} onChange={(e) => { setFarmId(e.target.value); setPrepared(null); setReportRecords([]); }} disabled={busy !== '' || farms.length === 0}>
++                 <option value="">Select farm</option>
++                 {farms.map((farm) => <option key={farm._id || farm.id} value={farm._id || farm.id}>{farm.name}</option>)}
++               </select>
++             </label>
++             <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
++               Collection
++               <select className={fieldClass} value={collection} onChange={(e) => setCollection(e.target.value)} disabled={busy !== ''}>
++                 {collections.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}
++               </select>
++             </label>
++             <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">
++               Retention period (years)
++               <input className={fieldClass} type="number" min="1" max="100" step="1" value={retentionYears} onChange={(e) => setRetentionYears(e.target.value)} disabled={busy !== ''} />
++             </label>
++           </div>
++           <button type="button" className={`${buttonClass} bg-farm-600 text-white hover:bg-farm-700`} onClick={prepareArchive} disabled={busy !== '' || !farmId || collections.length === 0}>
++             <Archive className="h-4 w-4" /> {busy === 'prepare' ? 'Preparing snapshot…' : 'Preview eligible records'}
++           </button>
++         </section>
++
++         {prepared && (
++           <section className="space-y-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700">
++             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">Snapshot preview</h4>
++             <dl className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
++               <div><dt className="text-slate-500">Farm</dt><dd className="mt-1 font-semibold">{farmName}</dd></div>
++               <div><dt className="text-slate-500">Eligible records</dt><dd className="mt-1 font-semibold">{prepared.sourceCount}</dd></div>
++               <div><dt className="text-slate-500">Cutoff date</dt><dd className="mt-1 font-semibold">{prepared.cutoffDate}</dd></div>
++               <div><dt className="text-slate-500">Status</dt><dd className="mt-1 font-semibold">{prepared.state}</dd></div>
++             </dl>
++             <p className="text-xs text-slate-500">The server has saved a snapshot of the exact eligible records. Download the export before continuing.</p>
++             <button type="button" className={`${buttonClass} bg-slate-800 text-white hover:bg-slate-700 dark:bg-slate-200 dark:text-slate-900`} onClick={() => downloadExport(prepared)} disabled={busy !== ''}>
++               <Download className="h-4 w-4" /> {busy.startsWith('export:') ? 'Preparing download…' : 'Download archive export'}
++             </button>
++           </section>
++         )}
++
++         <section className="space-y-3 border-t border-slate-100 pt-4 dark:border-slate-800">
++           <div className="flex flex-wrap items-center justify-between gap-2">
++             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">Archive history</h4>
++             <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 hover:bg-slate-50 dark:border-slate-700 dark:text-slate-200 dark:hover:bg-slate-800`} onClick={() => refreshJobs().catch((e) => setError(e.message))} disabled={busy !== '' || !farmId}>
++               <RefreshCw className="h-4 w-4" /> Refresh
++             </button>
++           </div>
++           {!jobs.length ? <p className="text-xs text-slate-500">No archive jobs for this farm yet.</p> : (
++             <div className="space-y-2">
++               {jobs.map((job) => {
++                 const id = String(job._id || job.id);
++                 return <div key={id} className="rounded-xl border border-slate-200 p-3 dark:border-slate-700">
++                   <div className="flex flex-wrap items-start justify-between gap-2">
++                     <div className="min-w-0">
++                       <p className="break-all text-xs font-bold text-slate-800 dark:text-slate-100">{job.collection} · {job.state}</p>
++                       <p className="mt-1 break-all font-mono text-[10px] text-slate-500">{id}</p>
++                       <p className="mt-1 text-xs text-slate-500">{job.sourceCount} records · cutoff {job.cutoffDate} · {job.retentionYears} year(s)</p>
++                     </div>
++                     <div className="flex flex-wrap gap-2">
++                       <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setPrepared(job); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }}><Download className="h-4 w-4" /> Export</button>
++                       <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setReportJobId(id); setIncludeArchived(true); setReportRecords([]); }}><Eye className="h-4 w-4" /> Report</button>
++                       {['archived', 'archive_partial', 'restored'].includes(job.state) && <button type="button" className={`${buttonClass} bg-amber-600 text-white hover:bg-amber-700`} onClick={() => { setRestoreTarget(job); setPrepared(null); setConfirmFarmName(''); setConfirmJobId(''); }}><RotateCcw className="h-4 w-4" /> Restore</button>}
++                     </div>
++                   </div>
++                 </div>;
++               })}
++             </div>
++           )}
++         </section>
++
++         {((prepared && ['snapshot_ready', 'archive_partial'].includes(prepared.state)) || restoreTarget) && (
++           <section className="space-y-3 rounded-xl border border-amber-200 p-4 dark:border-amber-900">
++             <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">{restoreTarget ? 'Confirm archive restoration' : 'Confirm archive execution'}</h4>
++             {!restoreTarget && !prepared?.exportDownloaded && <p className="text-xs text-amber-800 dark:text-amber-200">Download the export first. The server enforces this requirement.</p>}
++             <p className="text-xs text-slate-500">Type the exact farm name and job ID. This is deliberately tedious because deleting records should not be a one-click hobby.</p>
++             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
++               <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Farm name
++                 <input className={fieldClass} value={confirmFarmName} onChange={(e) => setConfirmFarmName(e.target.value)} autoComplete="off" />
++               </label>
++               <label className="space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Job ID
++                 <input className={fieldClass} value={confirmJobId} onChange={(e) => setConfirmJobId(e.target.value)} autoComplete="off" />
++               </label>
++             </div>
++             <div className="flex flex-wrap gap-2">
++               {restoreTarget ? (
++                 <button type="button" className={`${buttonClass} bg-amber-600 text-white hover:bg-amber-700`} onClick={restoreArchive} disabled={busy !== '' || !canConfirm}>
++                   <RotateCcw className="h-4 w-4" /> {busy === 'restore' ? 'Restoring…' : 'Confirm restore'}
++                 </button>
++               ) : (
++                 <button type="button" className={`${buttonClass} bg-red-600 text-white hover:bg-red-700`} onClick={executeArchive} disabled={busy !== '' || !canConfirm || !prepared?.exportDownloaded}>
++                   <Archive className="h-4 w-4" /> {busy === 'execute' ? 'Archiving…' : 'Confirm archive'}
++                 </button>
++               )}
++               <button type="button" className={`${buttonClass} border border-slate-200 text-slate-700 dark:border-slate-700 dark:text-slate-200`} onClick={() => { setPrepared(null); setRestoreTarget(null); setConfirmFarmName(''); setConfirmJobId(''); }}>Cancel</button>
++             </div>
++           </section>
++         )}
++
++         <section className="space-y-3 border-t border-slate-100 pt-4 dark:border-slate-800">
++           <label className="flex items-start gap-2 text-xs text-slate-700 dark:text-slate-200">
++             <input type="checkbox" checked={includeArchived} onChange={(e) => { setIncludeArchived(e.target.checked); setReportRecords([]); }} className="mt-0.5" />
++             <span><strong>Include archived records in this report</strong><br /><span className="text-slate-500">Off by default. Existing active-data reports are not changed.</span></span>
++           </label>
++           {includeArchived && (
++             <div className="flex flex-wrap items-end gap-2">
++               <label className="min-w-[220px] flex-1 space-y-1 text-xs font-semibold text-slate-600 dark:text-slate-300">Archive job
++                 <select className={fieldClass} value={reportJobId} onChange={(e) => { setReportJobId(e.target.value); setReportRecords([]); }}>
++                   <option value="">Select archived job</option>
++                   {jobs.map((job) => <option key={job._id || job.id} value={job._id || job.id}>{job.collection} · {job.cutoffDate} · {job.state}</option>)}
++                 </select>
++               </label>
++               <button type="button" className={`${buttonClass} bg-farm-600 text-white hover:bg-farm-700`} onClick={loadReportRecords} disabled={busy !== '' || !reportJobId}>
++                 <Eye className="h-4 w-4" /> {busy === 'records' ? 'Loading…' : 'Load archived report'}
++               </button>
++             </div>
++           )}
++           {includeArchived && reportJob && reportRecords.length > 0 && (
++             <div className="space-y-2">
++               <p className="text-xs text-slate-500">Showing {reportRecords.length} archived records from job {reportJob._id || reportJob.id}. This is a separate archive report view, not merged into active totals.</p>
++               <div className="max-h-72 overflow-auto rounded-xl border border-slate-200 dark:border-slate-700">
++                 <table className="w-full text-left text-xs">
++                   <thead className="sticky top-0 bg-slate-50 dark:bg-slate-800"><tr><th className="p-2">Record ID</th><th className="p-2">Date</th><th className="p-2">Record preview</th></tr></thead>
++                   <tbody>{reportRecords.map((record, index) => <tr key={String(record._id || index)} className="border-t border-slate-100 dark:border-slate-800">
++                     <td className="max-w-32 break-all p-2 font-mono">{String(record._id || '—')}</td>
++                     <td className="whitespace-nowrap p-2">{String(record.date || '—')}</td>
++                     <td className="max-w-80 break-words p-2">{JSON.stringify(record)}</td>
++                   </tr>)}</tbody>
++                 </table>
++               </div>
++             </div>
++           )}
++           {includeArchived && reportJob && reportRecords.length === 0 && <p className="text-xs text-slate-500">No archived records loaded for this report yet.</p>}
++         </section>
++       </div>
++     </MufAdminCard>
++   );
++ }
++
+
+ ❯ tests/archive-screens.test.ts:48:20
+     46|     expect(source).toContain('Include archived records in this report');
+     47|     expect(source).toContain('Off by default. Existing active-data reports are not changed.');
+     48|     expect(source).toContain('A separate archive report view');
+       |                    ^
+     49|   });
+     50|
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 39 passed (40)
+      Tests  1 failed | 324 passed (325)
+   Start at  23:08:20
+   Duration  15.31s (transform 1.48s, setup 0ms, collect 5.53s, tests 15.02s, environment 20ms, prepare 9.10s)
+
+
+F:\PROJECTS\dairy\muf-monorepo>npm run check-sync
+
+> check-sync
+> node tools/check-muf-sync.js
+
+
+━━ Twin files (dairy ↔ flock, must be identical after normalizing farm identity) ━━
+  ✅ muf-telegram-farms.mjs (all 3) identical
+  ✅ muf-style.css (all 3)          identical
+  ✅ muf-login.tsx (all 3)          identical
+  ✅ components/MyFarmsPanel.tsx    identical
+  ✅ muf-print.ts                   identical
+  ✅ utils/share.ts                 identical
+  ✅ muf-labor.ts                   identical
+  ✅ muf-zakat.ts                   identical
+  ✅ muf-pdf.ts                     identical
+  ✅ muf-feedstock.ts               identical
+  ✅ muf-khata.ts                   identical
+  ✅ muf-farmbook.ts                identical
+  ✅ muf-image.ts                   identical
+  ✅ muf-voice.ts                   identical
+  ✅ muf-urdu.ts                    identical
+  ✅ muf-urdu-terms-1.ts            identical
+  ✅ muf-urdu-terms-2.ts            identical
+  ✅ muf-urdu-terms-3.ts            identical
+  ✅ muf-urdu-terms-4.ts            identical
+  ✅ muf-urdu-terms-5.ts            identical
+  ✅ muf-urdu-terms-6.ts            identical
+  ✅ muf-search.ts                  identical
+  ✅ muf-offline.ts                 identical
+  ✅ muf-charts.tsx                 identical
+  ✅ muf-profile.ts                 identical
+  ✅ muf-applike.tsx                identical
+  ✅ muf-date.ts                    identical
+  ✅ muf-story.ts                   identical
+  ✅ muf-telegram.mjs               identical
+  ✅ muf-supplier.ts                identical
+  ✅ muf-motion.ts                  identical
+  ✅ muf-modal.tsx                  identical
+  ✅ muf-confirm.tsx                identical
+  ✅ muf-portal.tsx                 identical
+  ✅ muf-offline-banner.tsx         identical
+  ✅ muf-avatar.tsx                 identical
+  ✅ muf-farm-profile.tsx           identical
+  ✅ muf-header-search.tsx          identical
+  ✅ muf-telegram-panel.tsx         identical
+  ✅ muf-form-overlay.tsx           identical
+  ✅ muf-scroll-lock.ts             identical
+  ✅ muf-card-qr.tsx                identical
+  ✅ muf-entity-grid.tsx            identical
+  ✅ muf-diary-media.tsx            identical
+  ✅ muf-login-lang.tsx             identical
+  ✅ muf-login.tsx                  identical
+  ✅ muf-a11y.ts                    identical
+  ✅ muf-worker-panel.tsx           identical
+
+━━ Shared farm switcher (all three apps, byte-identical) ━━
+  ✅ Shared farm switcher identical in all three apps
+
+━━ Backend muf twins (byte-identical in all 3 backends) ━━
+  ✅ muf-telegram.mjs     byte-identical
+  ✅ muf-email.mjs        byte-identical
+  ✅ muf-date.mjs         byte-identical
+  ✅ muf-query.mjs        byte-identical
+  ✅ muf-env.mjs          byte-identical
+  ✅ muf-card.mjs         byte-identical
+  ✅ muf-farms.mjs        byte-identical
+  ✅ backend: telegram parser helper    parseCommand
+  ✅ backend: email factory helper      createMufMailer
+  ✅ backend: farm-local today helper   mufToday
+  ✅ backend: query matcher helper      mufMatches
+  ✅ backend: env resolver (MUF_ENV)    MUF_ENV
+  ✅ backend: card page renderer        renderMufCard
+
+━━ Unified env system (same names in all 3 backends) ━━
+  ✅ env: MONGO_URI                     in all 3 .env.example
+  ✅ env: JWT_SECRET                    in all 3 .env.example
+  ✅ env: APP_URL                       in all 3 .env.example
+  ✅ env: FRONTEND_URL                  in all 3 .env.example
+  ✅ env: SMTP_HOST                     in all 3 .env.example
+  ✅ env: SMTP_PORT                     in all 3 .env.example
+  ✅ env: SMTP_SECURE                   in all 3 .env.example
+  ✅ env: SMTP_USER                     in all 3 .env.example
+  ✅ env: SMTP_PASS                     in all 3 .env.example
+  ✅ env: SMTP_FROM                     in all 3 .env.example
+  ✅ env: TELEGRAM_BOT_TOKEN            in all 3 .env.example
+  ✅ env: TELEGRAM_WEBHOOK_SECRET       in all 3 .env.example
+  ✅ env: CRON_SECRET                   in all 3 .env.example
+  ✅ env: MEMORY_MODE                   in all 3 .env.example
+  ✅ env: CROSS_FARM_KEY                in all 3 .env.example
+  ✅ env: TZ_OFFSET_HOURS               in all 3 .env.example
+  ✅ env: LOG_REQUESTS                  in all 3 .env.example
+  ✅ env: CLOUDINARY_CLOUD_NAME         in all 3 .env.example
+  ✅ env: CLOUDINARY_API_KEY            in all 3 .env.example
+  ✅ env: CLOUDINARY_API_SECRET         in all 3 .env.example
+  ✅ env: PORT                          in all 3 .env.example
+Terminate batch job (Y/N)?
