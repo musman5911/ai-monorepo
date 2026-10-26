@@ -24,12 +24,15 @@ async function main() {
  const login=await call('POST','/api/login',{body:{username:'admin',password:'admin123'}});
  const token=login.json?.access_token;
  check(login.status===200&&!!token,'Agri memory-mode owner login'); if(!token) throw new Error(JSON.stringify(login.json));
- const farms=await call('GET','/api/farms',{token}); const farmA=(farms.json?.farms||[])[0];
- check(!!farmA?.id,'Agri default farm exists'); if(!farmA?.id) throw new Error(JSON.stringify(farms.json));
- const createdFarm=await call('POST','/api/farms',{token,body:{name:'Agri Archive Check Farm B',location:'test'}});
- const farmB=createdFarm.json?.farm||createdFarm.json;
- const bId=farmB?.id||farmB?._id;
- check([200,201].includes(createdFarm.status)&&!!bId,'Agri second farm created'); if(!bId) throw new Error(JSON.stringify(createdFarm.json));
+ const farms=await call('GET','/api/farms',{token}); const defaultFarm=(farms.json?.farms||[])[0];
+ check(!!defaultFarm?.id,'Agri default farm exists'); if(!defaultFarm?.id) throw new Error(JSON.stringify(farms.json));
+ const createdA=await call('POST','/api/farms',{token,body:{name:'Agri Archive Check Farm A',location:'test'}});
+ const farmA=createdA.json?.farm||createdA.json; const aId=farmA?.id||farmA?._id;
+ const createdB=await call('POST','/api/farms',{token,body:{name:'Agri Archive Check Farm B',location:'test'}});
+ const farmB=createdB.json?.farm||createdB.json; const bId=farmB?.id||farmB?._id;
+ check([200,201].includes(createdA.status)&&!!aId&&[200,201].includes(createdB.status)&&!!bId,'two isolated Agri archive test farms created');
+ if(!aId||!bId) throw new Error(JSON.stringify({createdA:createdA.json,createdB:createdB.json}));
+ farmA.id=aId; farmB.id=bId;
  async function finance(farm, amount, category) {
   const result=await call('POST','/api/finance',{token,farm,body:{date:'2010-01-02',type:'expense',amount,category,notes:'archive integration fixture'}});
   if(result.status!==201) throw new Error('finance fixture failed: '+JSON.stringify(result.json));
