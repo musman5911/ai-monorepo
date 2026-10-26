@@ -74,4 +74,53 @@ describe('MUF photo storage contract', () => {
     await expect(storage.cleanup('not-an-array')).rejects.toThrow(/array or Set/i);
     await expect(storage.readLink(' ')).rejects.toThrow(/photo id is required/i);
   });
+
+  it('keeps reads and deletes scoped to the adapter farm', async () => {
+    const records = new Map([
+      ['farm-a-photo', { id: 'farm-a-photo', farmId: 'farm-a' }],
+      ['farm-b-photo', { id: 'farm-b-photo', farmId: 'farm-b' }],
+    ]);
+    const scopedStore = (farmId) => ({
+      async save(item) {
+        const id = item.id || `${farmId}-new-photo`;
+        records.set(id, { ...item, id, farmId });
+        return { id };
+      },
+      async readLink(id) {
+        const item = records.get(String(id));
+        return item?.farmId === farmId ? `/api/images/${id}` : null;
+      },
+      async delete(id) {
+        const item = records.get(String(id));
+        if (!item || item.farmId !== farmId) return false;
+        return records.delete(String(id));
+      },
+      async list() {
+        return [...records.values()].filter((item) => item.farmId === farmId).map(({ id }) => ({ id }));
+      },
+    });
+    const farmA = createMufStorage({ store: scopedStore('farm-a') });
+    expect(await farmA.readLink('farm-a-photo')).toBe('/api/images/farm-a-photo');
+    expect(await farmA.readLink('farm-b-photo')).toBeNull();
+    expect(await farmA.delete('farm-b-photo')).toBe(false);
+    expect(records.has('farm-b-photo')).toBe(true);
+  });
+
+  it('does not delete another farm’s records during orphan cleanup', async () => {
+    const records = new Map([
+      ['farm-a-orphan', { id: 'farm-a-orphan', farmId: 'farm-a' }],
+      ['farm-b-orphan', { id: 'farm-b-orphan', farmId: 'farm-b' }],
+    ]);
+    const store = {
+      async save(item) { records.set(item.id, item); return { id: item.id }; },
+      async readLink(id) { return records.has(id) ? `/api/images/${id}` : null; },
+      async delete(id) { return records.delete(id); },
+      async list() { return [...records.values()].filter((item) => item.farmId === 'farm-a').map(({ id }) => ({ id })); },
+    };
+    const storage = createMufStorage({ store });
+    await expect(storage.cleanup([])).resolves.toEqual({ scanned: 1, deleted: 1 });
+    expect(records.has('farm-a-orphan')).toBe(false);
+    expect(records.has('farm-b-orphan')).toBe(true);
+  });
+
 });
