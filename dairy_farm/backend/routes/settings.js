@@ -3,7 +3,7 @@
 // PUT  /api/settings/location — admin only, saves lat/lon/city
 import express from 'express';
 import { Meta } from '../db.js';
-import { protect, adminOnly } from '../middleware/auth.js';
+import { protect, ownerOnly } from '../middleware/auth.js';
 const router = express.Router();
 
 router.get('/location', async (req, res) => {
@@ -21,7 +21,7 @@ router.get('/location', async (req, res) => {
   }
 });
 
-router.put('/location', protect, adminOnly, async (req, res) => {
+router.put('/location', protect, ownerOnly, async (req, res) => {
   try {
     const rawDms = String(req.body?.raw_dms || '').trim();
     const lat = req.body?.lat;
