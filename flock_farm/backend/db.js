@@ -10,6 +10,10 @@ import { mufScopeModels, mufMigrateFarms, mufLoadDefaultFarm } from './muf-farms
 // ignored — so a leftover MEMORY_MODE flag can never hide your real data.
 // ---------------------------------------------------------------------------
 const memoryMode = MUF_ENV.memoryMode && !MUF_ENV.mongoUri;
+if (MUF_ENV.nodeEnv === 'production' && memoryMode) {
+  console.error('❌ MEMORY_MODE is not allowed in production. Configure MONGO_URI.');
+  process.exit(1);
+}
 if (memoryMode) enableMemoryDb();
 
 // Register models only after the memory adapter has patched mongoose.model().
