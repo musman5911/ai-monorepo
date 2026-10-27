@@ -4,6 +4,7 @@
 // frontend and the external cron jobs use the /api prefix).
 import 'dotenv/config';
 import express from 'express';
+import crypto from 'node:crypto';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -57,7 +58,7 @@ app.use(cors({
   origin: allowedOrigin.length ? allowedOrigin : (MUF_ENV.nodeEnv === 'production' ? false : true),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Access-Token', 'X-Cron-Secret', 'X-Farm-Id'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Access-Token', 'X-Cron-Secret', 'X-Cross-Farm-Key', 'X-Farm-Id'],
 }));
 
 // 10mb JSON limit — unified across all 3 farm backends (dairy, flock, agri).
@@ -162,7 +163,12 @@ async function farmSummaryHandler(req, res) {
     if (req.path !== '/api/super-admin/farm-summary') {
       const expected = MUF_ENV.crossFarmKey || '';
       if (!expected) return res.status(404).json({ error: 'Not enabled' });
-      if (String(req.query.key || '') !== expected) return res.status(401).json({ error: 'Bad key' });
+      const provided = req.headers['x-cross-farm-key'] || req.query.key || '';
+      const expectedBytes = Buffer.from(expected);
+      const providedBytes = Buffer.from(String(provided));
+      if (providedBytes.length !== expectedBytes.length || !crypto.timingSafeEqual(providedBytes, expectedBytes)) {
+        return res.status(401).json({ error: 'Bad key' });
+      }
     }
     const now = new Date();
     const month = now.toISOString().slice(0, 7);
