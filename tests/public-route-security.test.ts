@@ -167,3 +167,45 @@ describe('Flock location settings farm scope', () => {
     expect(inventory).toContain('location is farm-scoped in Flock');
   });
 });
+
+
+describe('backup, restore, archive and deletion boundaries', () => {
+  it('requires owner authorization before running unscoped backup handlers', () => {
+    for (const app of ['dairy_farm', 'agri_farm']) {
+      const routes = source(`${app}/backend/routes/backup.js`);
+      expect(routes).toContain('ownerOnly');
+      expect(routes).toContain('mufRunUnscoped(() => next())');
+    }
+    const flock = source('flock_farm/backend/routes/backup.js');
+    expect(flock).toContain('mufIsOwner(req.user?.farmRole || req.user?.role)');
+    expect(flock).toContain('mufRunUnscoped(() => next())');
+  });
+  it('requires owner authorization before unscoped yearly archive operations', () => {
+    for (const app of ['dairy_farm', 'agri_farm']) {
+      const routes = source(`${app}/backend/routes/archive.js`);
+      expect(routes).toContain('ownerOnly');
+      expect(routes).toContain('protectUnscoped');
+      expect(routes).toContain('mufRunUnscoped(() => next())');
+    }
+    const flock = source('flock_farm/backend/routes/archive.js');
+    expect(flock).toContain("requireRole('owner')");
+    expect(flock).toContain('authRequiredUnscoped');
+    const shared = source('shared/muf-yearly-archive.mjs');
+    expect(shared).toContain('ArchiveJob.findOne({ _id: jobId, farmId })');
+    expect(shared).toContain('ArchiveRecord.find({ farmId, jobId })');
+    expect(shared).toContain('Model.deleteOne({ _id:item.sourceId, farmId })');
+  });
+});
+
+describe('active-user and farm-role enforcement', () => {
+  it('rechecks active status from the database on authenticated requests', () => {
+    expect(source('dairy_farm/backend/middleware/auth.js')).toContain('user.active === false');
+    expect(source('agri_farm/backend/middleware/auth.js')).toContain('user.active === false');
+    expect(source('flock_farm/backend/middleware/auth.js')).toContain('!user.active');
+  });
+  it('restricts manager user creation to workers in Flock', () => {
+    const routes = source('flock_farm/backend/routes/auth.js');
+    expect(routes).toContain("req.user?.farmRole === 'owner'");
+    expect(routes).toContain("req.user?.farmRole === 'manager' && (!req.body?.role || req.body.role === 'worker')");
+  });
+});
