@@ -37,7 +37,8 @@ Every route is checked for the right role, and no secret is in the repository.
 - Cross-farm summary endpoints in Dairy, Flock, and Agri now prefer `X-Cross-Farm-Key`, compare secrets with `crypto.timingSafeEqual` after checking byte lengths, and retain the query-string key only for existing scheduler/client compatibility. Dairy and Agri CORS allowlists include the new header; Flock's CORS middleware reflects requested headers for configured origins.
 - Agri's authenticated-by-secret cron success response now omits configured recipient addresses. The new regression tests cover this and cross-farm key comparison/header preference.
 - Agri `/settings/location` was checked against frontend usage and intentionally remains public because the unauthenticated weather widget reads it. This was not changed.
-- Added `tests/public-route-security.test.ts` to protect the new card privacy headers, rate limits, timing-safe cron comparison, header-based cron authentication, and reduced Flock cron response.
+- Added `tests/public-route-security.test.ts` to protect the new card privacy headers, rate limits, timing-safe cron comparison, header-based cron authentication, reduced Flock cron response, and the CORS headers required for cron-key requests.
+- Follow-up source review found that Dairy and Agri accepted `X-Cron-Key` in the cron handler but did not include it in their explicit CORS allowlists (they only listed the older `X-Cron-Secret`). Added `X-Cron-Key` to both allowlists and a regression assertion. Flock uses the `cors` package default header reflection when no `allowedHeaders` list is configured, so it does not need an explicit entry.
 
 ## Route inventory checkpoint (2026-10-27)
 
@@ -48,7 +49,7 @@ Every route is checked for the right role, and no secret is in the repository.
 
 ## Owner validation checkpoint (2026-10-27)
 
-The owner pulled commit `3d366ac` and supplied these Windows CMD results:
+The owner pulled commit `3d366ac` and supplied these Windows CMD results (before the follow-up CORS correction below):
 
 - `npm run check-route-permissions`: passed, 53 route modules documented.
 - `npm run check-secrets`: passed, 647 tracked paths scanned.
@@ -65,7 +66,7 @@ These are owner-provided results. They validate the current automated suite and 
 
 ## Remaining manual-review limitation
 
-Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The current check catches undocumented route modules, not unclassified individual endpoints within an existing module. Login rate limiting, request-size limits and security-header configuration must also be checked against the actual server configuration. Any gaps found must be fixed and covered by regression tests.
+A follow-up source review found and fixed a CORS allowlist gap for `X-Cron-Key` in Dairy and Agri; the regression test was added after the owner validation above and must be run locally. Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The current check catches undocumented route modules, not unclassified individual endpoints within an existing module. Login rate limiting, request-size limits and security-header configuration must also be checked against the actual server configuration. Any gaps found must be fixed and covered by regression tests.
 
 ## Scope
 
