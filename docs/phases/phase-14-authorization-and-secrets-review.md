@@ -99,9 +99,13 @@ These are owner-provided results. They validate the current automated suite and 
 - Re-reviewed Agri global automation/location settings: all global writes and manual digest triggers require owner authority; the public location read is retained for the unauthenticated weather widget. Secret-authenticated scheduled jobs remain unscoped by design and fail closed when their secret is missing.
 - This is source review plus regression coverage, not a local test run. The owner must pull the resulting commits and run the focused test and full validation commands below before the phase can be marked Done.
 
+## Latest owner validation (2026-10-27)
+
+The owner supplied these results from the local Windows checkout: `npm test` passed (42 files / 347 tests), `npm run check-docs` passed with Phase 14 still In progress, all three production builds passed, and `git status` reported a clean tree with the branch up to date. These results were run before the latest manager-assignment boundary fix and regression assertion were pulled, so current-head validation is still pending. No claim is made that the latest fix has passed tests yet.
+
 ## Remaining manual-review limitation
 
-The owner has since validated the CORS correction and reported 343 passing tests and successful builds. Newer webhook-secret, Telegram cron-header, global Agri settings, and route-mount-checker changes are still awaiting a local run. Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The checker catches undocumented modules and visible mount wiring, not every endpoint's handler-level authorization. Any further gaps found must be fixed and covered by regression tests.
+The owner most recently reported `npm test` passing 42 files / 347 tests, `npm run check-docs` passing, all three builds passing, and a clean, synchronized working tree. These results predate the manager-assignment fix and its regression assertion pushed in the latest follow-up, so they are baseline evidence rather than validation of the current head. The owner has not yet supplied results for the current branch head. Before Phase 14 can be marked Done, rerun the focused security test and the full validation commands, then finish reviewing handler-level role/farm-scope behavior. The inventory checker catches undocumented modules and visible mount wiring, not every endpoint's authorization.
 
 ## Scope
 
@@ -145,9 +149,9 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] Fix identified authorization gaps; manager assignment edits now preserve worker assignments outside the manager's farm scope. Final verification is pending owner-run tests.
 - [x] A secret scan of the repository for keys, tokens and `.env` files (owner-run: 647 tracked paths, passed).
 - [x] Source-reviewed server entry points for security headers, request-size limits and broad API rate limiting, alongside stricter auth-flow rate limits.
-- [x] The new command-line check above exists and passes (53 route modules documented).
-- [x] The standard checks and all three builds pass (owner-run results recorded in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] The new command-line check above exists and passed for 46 actual router modules documented, imported and visibly mounted; the old 53 count included route-folder helpers.
+- [ ] The current-head standard checks and all three builds pass after the latest manager-assignment fix and regression assertion.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` reflect the current phase status and remaining verification gate.
 
 ## Rules for whoever works on this phase
 
