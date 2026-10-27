@@ -54,3 +54,6 @@ Run `npm run check-docs` to check that this index and the phase files agree.
 
 
 **Phase 14 checkpoint (2026-10-27):** the owner reports 347 passing tests, passing docs checks, all three builds passing, and a clean synchronized branch. These results predate the latest manager-assignment fix and regression assertion, so current-head validation remains pending. The 46-module route inventory and coverage guard are in [route-permission-inventory.md](../security/route-permission-inventory.md); the share-card URL remains an explicitly accepted bearer-link risk. Phase 14 remains In progress pending current-head tests and complete handler-level role/farm-scope review. See [Phase 14 details](phase-14-authorization-and-secrets-review.md) and [PROGRESS.md](../PROGRESS.md).
+
+
+**Phase 14 current-head validation (2026-10-27):** the owner supplied passing results for the focused public-route security suite (16 tests), full suite (42 files / 349 tests), route inventory/mount check (46 modules), secret scan (647 tracked paths), sync, farm-scope, docs, and all three builds; `git status` was clean and synchronized. `check-ui` and `check-workbench` were not included in this latest output. Phase 14 remains In progress pending completion of the handler-level authorization review. See [Phase 14 details](phase-14-authorization-and-secrets-review.md).
