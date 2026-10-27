@@ -27,6 +27,10 @@ if (!mufEnvHasMongo()) {
 const memoryRequested = MUF_ENV.memoryMode;
 
 const useMock = memoryRequested && !envUri;
+if (MUF_ENV.nodeEnv === 'production' && useMock) {
+  console.error('❌ MEMORY_MODE is not allowed in production. Configure MONGO_URI.');
+  process.exit(1);
+}
 
 // ─── Schemas (loose on purpose: the docs are plain field bags) ─────────────
 // Collection names match the previous Python backend 1:1, so a real MongoDB
