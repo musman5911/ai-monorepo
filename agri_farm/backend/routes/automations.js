@@ -337,7 +337,7 @@ async function cronDispatch(req, res) {
     value.last_run = Math.floor(Date.now() / 1000);
     await Setting.updateOne({ key: 'automations' }, { $set: { value } });
     await maybeRunMonthlyAutoBackup();
-    return res.json({ status: 'ok', message: `Report dispatched to: ${recipientsStr}`, sent_at_local: localDateTimeStr() });
+    return res.json({ status: 'ok', message: 'Report dispatched successfully.', sent_at_local: localDateTimeStr() });
   } catch (e) {
     console.error(`[Cron] dispatch-report failed:`, e);
     return sendHttpError(res, 500, 'Internal server error');
