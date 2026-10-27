@@ -45,14 +45,14 @@ for (const app of apps) {
     process.exit(1);
   }
   const server = fs.readFileSync(serverPath, 'utf8');
-  const imports = /import\s+([A-Za-z_$][\w$]*)\s*(?:,\s*\\{[^}]*\\})?\s*from\s*['"]\\.\/routes\/([^'"]+)['"]/g;
+  const imports = /import\s+([A-Za-z_$][\w$]*)\s*(?:,\s*\{[^}]*\})?\s*from\s*['"]\.\/routes\/([^'"]+)['"]/g;
   const apiRoutersMatch = server.match(/const\s+apiRouters\s*=\s*\[([\s\S]*?)\]\s*;/);
   const apiRouters = apiRoutersMatch ? apiRoutersMatch[1] : '';
   let match;
   while ((match = imports.exec(server)) !== null) {
     const [, identifier, routePath] = match;
-    const mountCalls = new RegExp(`app\\.use\\(\s*[^,]+,\s*\\b${identifier}\\b\s*\\)`).test(server);
-    const listedInRouterArray = new RegExp(`\\b${identifier}\\b`).test(apiRouters);
+    const mountCalls = new RegExp('app\\.use\\(\\s*[^,]+,\\s*' + identifier + '\\s*\\)').test(server);
+    const listedInRouterArray = new RegExp('\\b' + identifier + '\\b').test(apiRouters);
     if (!mountCalls && !listedInRouterArray) {
       mountProblems.push(`${app}/backend/routes/${routePath}: imported router "${identifier}" is not visibly mounted`);
     }
