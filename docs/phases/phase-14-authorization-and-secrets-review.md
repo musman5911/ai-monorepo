@@ -20,6 +20,15 @@ Every route is checked for the right role, and no secret is in the repository.
 - The scan has not yet been executed against the owner's Windows checkout. Do not treat it as passing until the owner runs it after pulling.
 - No secrets or live deployment settings were changed.
 
+## Validation checkpoint (owner-run, 2026-10-27)
+
+- `npm run check-secrets`: passed, 644 tracked paths.
+- `npx vitest run tests/auth-production-config.test.ts`: passed, 4 tests.
+- `npm test`: passed, 41 files / 332 tests.
+- `npm run check-docs`: all phase documentation checks passed.
+- `tools\\build-all.bat`: Dairy, Flock, and Agri builds passed.
+- These are owner-provided Windows results. The route inventory, route authorization review, and abuse-protection review are not complete yet.
+
 ## Scope
 
 - A written list of every route in the three backends with the role allowed (owner, manager, worker, public) and a test that fails if a route is added without an entry.
