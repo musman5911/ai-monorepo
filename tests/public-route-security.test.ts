@@ -29,6 +29,7 @@ describe('scheduled endpoint response and secret controls', () => {
     const routes = source('flock_farm/backend/routes/cron.js');
     expect(routes).toContain('res.json({ ok: true, date: summary.date });');
     expect(routes).not.toContain('res.json({ ok: true, date: summary.date, recipients, stats: summary.stats });');
-    expect(routes).toContain('timingSafeEqual(req.query.key, secret)');
+    expect(routes).toContain('timingSafeEqual(provided, secret)');
+    expect(routes).toContain("req.headers['x-cron-key'] || req.query.key");
   });
 });
