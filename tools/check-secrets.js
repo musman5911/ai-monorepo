@@ -54,7 +54,10 @@ for (const relative of trackedPaths) {
   if (content.includes('\u0000')) continue;
 
   for (const [label, pattern] of secretPatterns) {
-    if (pattern.test(content)) add(normalized, `possible ${label}`);
+    if (!pattern.test(content)) continue;
+    // Public templates deliberately contain documented placeholders, not credentials.
+    if (label === 'MongoDB URI with embedded credentials' && /mongodb(?:\\+srv)?:\\/\\/user:password@cluster\\.mongodb\\.net\\//i.test(content)) continue;
+    add(normalized, `possible ${label}`);
   }
 }
 
