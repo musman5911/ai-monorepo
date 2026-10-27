@@ -3,7 +3,7 @@ import express from 'express';
 import crypto from 'node:crypto';
 import rateLimit from 'express-rate-limit';
 import { Setting, Crop, Finance, Task } from '../db.js';
-import { protect, requireAdmin, ownerOnly } from '../middleware/auth.js';
+import { protect, ownerOnly } from '../middleware/auth.js';
 import { sendEmail, mufEmail } from '../utils/mailer.js';
 import { todayStr, localParts, localDateTimeStr } from '../utils/date.js';
 import { badRequest, sendHttpError, asyncHandler } from '../utils/helpers.js';
