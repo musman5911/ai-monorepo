@@ -13,7 +13,17 @@ import { renderMufCard, mufCardMonth, mufCardRs, mufCardRsUr } from '../muf-card
 
 const router = Router();
 
-const cardLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 120, standardHeaders: true });
+// Public share cards intentionally work without login. Treat them as sensitive,
+// uncacheable pages: possession of the link grants access to the addressed card.
+router.use((_req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, private');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow, noarchive');
+  res.setHeader('Referrer-Policy', 'no-referrer');
+  next();
+});
+
+const cardLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 60, standardHeaders: true });
 router.use(cardLimiter);
 
 const FARM = {
