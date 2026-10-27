@@ -1,6 +1,6 @@
 # Phase 14: Authorization and secrets review
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -8,7 +8,16 @@ Every route is checked for the right role, and no secret is in the repository.
 
 ## Already in place (from Phase 0)
 
-- Server-side farm scoping and the three roles exist. The old notes say legacy `admin` checks still need review.
+- Server-side farm scoping and the three roles exist. Legacy `admin` role compatibility remains in the review scope.
+- The shared `muf-env.mjs` files are byte-identical and define canonical names plus legacy aliases for secrets.
+- Backend auth middleware re-checks user status and resolves farm context. Initial source review also found app-specific differences in JWT fallback behavior, so production startup/configuration must be compared before making changes.
+
+## Initial audit notes (2026-10-27)
+
+- Added `tools/check-secrets.js`, which scans Git-tracked files for tracked `.env` files, private-key/certificate files, and recognizable credential patterns. Public `.env.example` MongoDB URI placeholders are explicitly tolerated.
+- Exposed the scan as `npm run check-secrets`.
+- The scan has not yet been executed against the owner's Windows checkout. Do not treat it as passing until the owner runs it after pulling.
+- No secrets or live deployment settings were changed.
 
 ## Scope
 
@@ -30,7 +39,7 @@ Every route is checked for the right role, and no secret is in the repository.
 
 ## New command-line check
 
-`tests/route-permissions.test.ts` (fails on an unlisted route) and `npm run check-secrets` (fails on a committed secret or `.env` file).
+`npm run check-secrets` fails on tracked environment files, private-key/certificate files, and recognized credential patterns. `tests/route-permissions.test.ts` will fail when a backend route is added without a documented permission entry.
 
 ## Command-line checks at the end of this phase
 
