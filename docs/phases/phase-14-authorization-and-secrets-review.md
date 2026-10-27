@@ -82,6 +82,10 @@ These are owner-provided results. They validate the current automated suite and 
 - Corrected the Agri inventory to document the public location read as an exception within `routes/automations.js`; there is no separate Agri `routes/settings.js` module.
 - New commits: `7a63247`, `93127ce`, `b069244`, `44b6040`, `a49f096`, `3687c78`, `c03e141`. The owner must pull and run validation before these newest changes are considered verified.
 
+
+- Agri's `Setting` model is global, not farm-scoped. The automation settings, location mutation and manual trigger endpoints previously allowed managers through `requireAdmin`, so a manager assigned to one farm could change global configuration. These routes now require `ownerOnly`; the public location read remains intentionally available to the weather widget. Added a regression assertion in `tests/public-route-security.test.ts`.
+- Server-entry-point review confirmed all three apps configure Helmet, request-body size limits and broad API rate limiting; login/signup/reset paths have stricter rate limiters in their auth implementations or mount configuration. The new mount checker now verifies imported route routers are visibly mounted, but it does not prove role correctness within each handler.
+
 ## Remaining manual-review limitation
 
 A follow-up source review found and fixed a CORS allowlist gap for `X-Cron-Key` in Dairy and Agri; the regression test was added after the owner validation above and must be run locally. Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The current check catches undocumented route modules, not unclassified individual endpoints within an existing module. Login rate limiting, request-size limits and security-header configuration must also be checked against the actual server configuration. Any gaps found must be fixed and covered by regression tests.
@@ -106,7 +110,7 @@ A follow-up source review found and fixed a CORS allowlist gap for `X-Cron-Key` 
 
 ## New command-line check
 
-`npm run check-secrets` fails on tracked environment files, private-key/certificate files, and recognized credential patterns. `npm run check-route-permissions` fails when a JavaScript module under a backend `routes/` directory lacks a matching inventory entry or an app backend entry point is missing.
+`npm run check-secrets` fails on tracked environment files, private-key/certificate files, and recognized credential patterns. `npm run check-route-permissions` fails when a JavaScript module under a backend `routes/` directory lacks a matching inventory entry, an imported route router is not visibly mounted, or an app backend entry point is missing.
 
 ## Command-line checks at the end of this phase
 
