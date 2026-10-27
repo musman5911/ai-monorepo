@@ -125,3 +125,6 @@ Commits on `muf-monorepo`: `52fe5c2`, `ec9151b`, `f5589a7`, `352c9d1`, `de87aa8`
 
 
 Additional handler-review finding (2026-10-27): Dairy's `PUT /api/settings/location` wrote to global `Meta` settings but allowed managers through the owner-or-manager guard. Changed it to owner-only and added regression coverage; the route inventory now states the policy. Flock location settings remain farm-scoped through `DataStore`. Commits: `341aa2c`, `57fdd32`, `0a94161`, `c62f341`. Validation is pending in the owner's Windows checkout. Phase 14 remains In progress.
+
+
+A further inventory cross-check found the Flock `GET /api/settings/location` handler is authenticated and reads the selected farm's `DataStore`, despite the inventory describing it as public. Corrected the policy to authenticated + farm-scoped and added a regression assertion. Commits: `905a422`, `ffd1101`, `4e55328`. Tests remain unrun for these newest commits; Phase 14 is still In progress.
