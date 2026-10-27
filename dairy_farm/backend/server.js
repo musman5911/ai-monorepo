@@ -58,7 +58,7 @@ if (MUF_ENV.nodeEnv === 'production' && !allowedOrigins.length) {
 app.use(cors({
   origin: allowedOrigins.length ? allowedOrigins : (MUF_ENV.nodeEnv === 'production' ? false : true),
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Cron-Secret', 'X-Cross-Farm-Key', 'X-Farm-Id'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Cron-Secret', 'X-Cron-Key', 'X-Cross-Farm-Key', 'X-Farm-Id'],
 }));
 
 const standardJsonParser = express.json({ limit: '10mb' });
