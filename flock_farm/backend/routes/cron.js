@@ -30,7 +30,8 @@ const FB = {
 router.get('/cron/daily-summary', async (req, res) => {
   const secret = MUF_ENV.cronSecret;
   if (!secret) return res.status(503).json({ error: 'CRON_SECRET not configured' });
-  if (!timingSafeEqual(req.query.key, secret)) return res.status(401).json({ error: 'Unauthorized' });
+  const provided = req.headers['x-cron-key'] || req.query.key;
+  if (!timingSafeEqual(provided, secret)) return res.status(401).json({ error: 'Unauthorized' });
 
   const recipients = MUF_ENV.dailySummaryEmails;
   if (recipients.length === 0) return res.status(503).json({ error: 'DAILY_SUMMARY_EMAILS not configured' });
