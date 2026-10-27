@@ -35,4 +35,10 @@ describe('production JWT configuration guards', () => {
     expect(auth).toContain('JWT_SECRET must be set to a strong non-default value in production.');
     expect(auth).toContain('process.exit(1)');
   });
+  it('Agri rejects deactivated users even when their JWT is still valid', () => {
+    const auth = source('agri_farm/backend/middleware/auth.js');
+    expect(auth).toContain('const user = await findUserForSub(sub);');
+    expect(auth).toContain('return user && user.active !== false ? user : null;');
+  });
+
 });
