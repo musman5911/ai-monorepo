@@ -43,12 +43,29 @@ Every route is checked for the right role, and no secret is in the repository.
 
 - Added `docs/security/route-permission-inventory.md`, a module-by-module policy inventory for the route modules in Dairy, Flock and Agri, including public exceptions, owner-only operations, farm-scoped business data, scheduled jobs, webhooks and share-card bearer access.
 - Added `tools/check-route-permissions.js` and `npm run check-route-permissions`. It fails if a `.js` route module under any of the three `backend/routes/` directories lacks a matching inventory entry or an app backend entry point is missing.
-- The inventory check is deliberately a coverage guard, not proof that every handler enforces the documented policy. Source review and behavioral tests are still required for role boundaries and farm-ID tampering. The check has not been run in the owner's checkout during this editing session.
+- The owner ran `npm run check-route-permissions` after pulling: passed, 53 route modules documented and all three backend entry points found. This inventory check is a coverage guard, not proof that every handler enforces the documented policy.
 - Share-card risk is explicitly documented as accepted compatibility risk for existing QR/share links. Links expose the card payload to anyone holding the URL and are not individually revocable in the current ID-based design. A signed/revocable token migration remains recommended if private or revocable sharing becomes a requirement.
+
+## Owner validation checkpoint (2026-10-27)
+
+The owner pulled commit `3d366ac` and supplied these Windows CMD results:
+
+- `npm run check-route-permissions`: passed, 53 route modules documented.
+- `npm run check-secrets`: passed, 647 tracked paths scanned.
+- `npm test`: passed, 42 files / 341 tests.
+- `npm run check-sync`: passed.
+- `npm run check-ui`: passed.
+- `npm run check-workbench`: passed, 23 source checks.
+- `npm run check-farms`: passed, including farm isolation and Dairy breeding-event runtime checks.
+- `npm run check-docs`: passed, all 22 phase files and links consistent.
+- `tools\\build-all.bat`: Dairy, Flock and Agri production builds passed.
+- `git status`: clean; branch up to date with `origin/muf-monorepo`.
+
+These are owner-provided results. They validate the current automated suite and builds, not every route's role behavior. The route-module inventory uses baseline policies and includes a public-link risk acceptance; it does not dynamically inspect every route registration or prove handler-level authorization. Do not claim exhaustive authorization verification based solely on the inventory count.
 
 ## Remaining manual-review limitation
 
-The automated checks cover the identified high-risk public-card and scheduled-report behaviors and guard against unlisted route modules. They do not establish that each handler is behaviorally correct for every role or farm. Keep Phase 14 In progress until the owner runs the route inventory check, full test suite, secret scan, standard checks and all three builds after pulling, and any failures are fixed.
+Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The current check catches undocumented route modules, not unclassified individual endpoints within an existing module. Login rate limiting, request-size limits and security-header configuration must also be checked against the actual server configuration. Any gaps found must be fixed and covered by regression tests.
 
 ## Scope
 
@@ -70,7 +87,7 @@ The automated checks cover the identified high-risk public-card and scheduled-re
 
 ## New command-line check
 
-`npm run check-secrets` fails on tracked environment files, private-key/certificate files, and recognized credential patterns. `npm run check-route-permissions` fails when a backend route module is added without a documented policy entry. `npm run check-secrets` scans tracked files for environment files, private keys and recognized credential patterns.
+`npm run check-secrets` fails on tracked environment files, private-key/certificate files, and recognized credential patterns. `npm run check-route-permissions` fails when a JavaScript module under a backend `routes/` directory lacks a matching inventory entry or an app backend entry point is missing.
 
 ## Command-line checks at the end of this phase
 
@@ -90,10 +107,10 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 - [x] A written module-by-module permission inventory exists, including explicit public exceptions and accepted share-card risk; the inventory coverage check fails if a route module is added without an entry. Handler-level role/farm behavior still requires code review and focused regression tests.
 - [ ] Fix any route that is more open than it should be.
-- [ ] A secret scan of the repository for keys, tokens and `.env` files (the repo is public).
+- [x] A secret scan of the repository for keys, tokens and `.env` files (owner-run: 647 tracked paths, passed).
 - [ ] Basic abuse protection review: login rate limiting, request size limits, security headers.
-- [ ] The new command-line check above exists and passes.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
+- [x] The new command-line check above exists and passes (53 route modules documented).
+- [x] The standard checks and all three builds pass (owner-run results recorded in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Rules for whoever works on this phase
