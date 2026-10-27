@@ -27,7 +27,19 @@ Every route is checked for the right role, and no secret is in the repository.
 - `npm test`: passed, 41 files / 332 tests.
 - `npm run check-docs`: all phase documentation checks passed.
 - `tools\\build-all.bat`: Dairy, Flock, and Agri builds passed.
-- These are owner-provided Windows results. The route inventory, route authorization review, and abuse-protection review are not complete yet.
+- These are owner-provided Windows results. The latest public-route hardening commits have not yet been pulled or tested by the owner.
+
+## Route findings and decisions (2026-10-27)
+
+- Public `/cards/*` routes intentionally disclose the addressed worker/customer/supplier ledger to anyone possessing the URL. This behavior supports QR/shared cards, so login was not added blindly. All three card routers now set `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow, noarchive`, and `Referrer-Policy: no-referrer`; the per-router cap was reduced from 120 to 60 requests per 15 minutes. The link remains a bearer-style access mechanism; a future signed, revocable share-token migration is the stronger option because record IDs alone are not authorization.
+- Agri `/cron/dispatch-report` now compares the shared secret using `crypto.timingSafeEqual` after checking equal byte lengths and prefers `X-Cron-Key` over the legacy query parameter. Flock `/cron/daily-summary` also accepts `X-Cron-Key` while retaining the existing query key for scheduler compatibility. Configure schedulers to send the secret in the header where possible because URLs are more likely to appear in logs.
+- Flock cron success responses no longer return recipient email addresses or farm summary statistics to the caller.
+- Agri `/settings/location` was checked against frontend usage and intentionally remains public because the unauthenticated weather widget reads it. This was not changed.
+- Added `tests/public-route-security.test.ts` to protect the new card privacy headers, rate limits, timing-safe cron comparison, header-based cron authentication, and reduced Flock cron response.
+
+## Remaining manual-review limitation
+
+The automated checks now cover the identified high-risk public-card and scheduled-report behaviors, but this is not a mathematically complete authorization proof for every business route. Each route's role and farm scope still needs a full inventory and behavioral tests; do not mark the phase Done until that inventory and the owner-run test/build checks pass.
 
 ## Scope
 
