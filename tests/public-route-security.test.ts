@@ -73,6 +73,14 @@ describe('Telegram secret validation', () => {
     }
   });
 
+
+  it('Dairy and Flock Telegram cron endpoints prefer X-Cron-Key with query fallback', () => {
+    for (const app of ['dairy_farm', 'flock_farm']) {
+      const routes = source(`${app}/backend/routes/telegram.js`);
+      expect(routes).toContain("secretsMatch(req.headers['x-cron-key'] || req.query.key, MUF_ENV.cronSecret)");
+    }
+  });
+
   it('Agri compares webhook and cron secrets timing-safely and prefers the cron header', () => {
     const routes = source('agri_farm/backend/routes/telegram.js');
     expect(routes).toContain('crypto.timingSafeEqual(a, b)');
