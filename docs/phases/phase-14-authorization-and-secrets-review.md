@@ -78,7 +78,7 @@ These are owner-provided results. They validate the current automated suite and 
 - Source review found Telegram webhook path secrets were compared with ordinary string equality in Dairy, Flock and Agri. Dairy and Flock now use their existing equal-length, timing-safe helper; Agri now has the same protection. Missing webhook secrets continue to fail closed.
 - Agri Telegram's scheduled endpoint now prefers `X-Cron-Key` to the legacy query parameter and compares it timing-safely, matching the other scheduled endpoints.
 - Added regression assertions for all three Telegram webhook comparisons and Agri's cron header/secret behavior in `tests/public-route-security.test.ts`.
-- Strengthened `tools/check-route-permissions.js`: it now checks that each imported default route router is visibly mounted directly or included in Agri's `apiRouters` list, in addition to checking module inventory coverage. This is a mount-wiring check, not a proof of handler authorization.
+- Strengthened `tools/check-route-permissions.js`: it now checks that each imported default or named route router is visibly mounted directly or included in Agri's `apiRouters` list, in addition to checking module inventory coverage. This is a mount-wiring check, not a proof of handler authorization.
 - Corrected the Agri inventory to document the public location read as an exception within `routes/automations.js`; there is no separate Agri `routes/settings.js` module.
 - New commits: `7a63247`, `93127ce`, `b069244`, `44b6040`, `a49f096`, `3687c78`, `c03e141`. The owner must pull and run validation before these newest changes are considered verified.
 
@@ -93,7 +93,7 @@ These are owner-provided results. They validate the current automated suite and 
 
 ## Remaining manual-review limitation
 
-A follow-up source review found and fixed a CORS allowlist gap for `X-Cron-Key` in Dairy and Agri; the regression test was added after the owner validation above and must be run locally. Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The current check catches undocumented route modules, not unclassified individual endpoints within an existing module. Login rate limiting, request-size limits and security-header configuration must also be checked against the actual server configuration. Any gaps found must be fixed and covered by regression tests.
+The owner has since validated the CORS correction and reported 343 passing tests and successful builds. Newer webhook-secret, Telegram cron-header, global Agri settings, and route-mount-checker changes are still awaiting a local run. Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The checker catches undocumented modules and visible mount wiring, not every endpoint's handler-level authorization. Any further gaps found must be fixed and covered by regression tests.
 
 ## Scope
 
