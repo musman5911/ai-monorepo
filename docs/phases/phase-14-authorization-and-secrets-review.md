@@ -194,3 +194,20 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 5. Ask the owner before removing any feature (the Flock Home Birds trims are already allowed).
 6. Stay inside this phase's scope. If a shared MUF file changes, keep the three copies identical (`npm run check-sync`).
 7. Keep the other two apps working: run all three builds even when only one app changed.
+
+
+## Focused handler audit (2026-10-27)
+
+The current source review covered the five requested risk groups:
+
+- **Backup/restore/archive:** Dairy and Agri backup handlers use `ownerOnly` before entering unscoped execution. Flock backup uses an explicit `mufIsOwner` check before `mufRunUnscoped`. All three yearly-archive routers install owner authorization before unscoped operations. The shared archive workflow binds job lookup, snapshot reads, source deletion, and restore conflict checks to both `farmId` and job/record IDs.
+- **Cross-farm object access:** existing farm-scope runtime tests cover forged `farmId`, read/update/delete isolation, assigned-farm constraints, bulk imports, and breeding-event isolation. The photo fix additionally scans references unscoped before deciding an asset is orphaned, while keeping the asset itself farm-scoped.
+- **Photos/assets:** regression assertions check cross-farm reference discovery and the `PhotoAsset` farm field in Dairy and Agri. This is source-contract coverage; production Mongo behavior still depends on the farm-scope adapter and needs real-Mongo validation in the final testing phases.
+- **Users/assignments:** all three auth middleware implementations re-read the backing user and reject inactive accounts. Manager assignment rules are covered by source assertions and farm-scope runtime checks for owner/manager/worker boundaries, including archived-farm access loss.
+- **Cron/Telegram/public links:** cron and cross-farm shared keys use timing-safe comparisons and fail closed when secrets are not configured; Telegram webhook path secrets are checked timing-safely. Public cards remain intentionally bearer-link readable, with no-store/noindex/no-referrer and rate limiting; these controls do not make the URL private or revocable.
+
+A focused test section checks owner-before-unscoped backup/archive middleware, archive farm/job binding, inactive-user rejection, and manager role boundaries.
+
+## Closure criteria
+
+Do not mark Phase 14 Done solely from source-string tests or a passing route inventory. The owner must run the updated suite on the pulled branch. Any remaining Mongo-backed or deployed behavior must be verified in the dedicated final-testing phases. Phase 15 stays Not started until that validation is recorded.
