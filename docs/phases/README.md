@@ -51,3 +51,6 @@ Phase 8 is **Done for command-line scope**. Owner-supplied Windows CMD output on
 Phases 1 to 18 are tested with command-line checks only. Everything that needs a real MongoDB, a browser, a phone or a live website is done in Phases 19 to 21, after all building is finished. Nothing is skipped: if a phase finds something that can only be tested live, it adds it to the matching list in Phase 19, 20 or 21.
 
 Run `npm run check-docs` to check that this index and the phase files agree.
+
+
+**Phase 14 checkpoint (2026-10-27):** the route-module permission inventory is in [route-permission-inventory.md](../security/route-permission-inventory.md), with a new `npm run check-route-permissions` coverage guard. The public share-card link behavior is documented as accepted bearer-link risk, not private access. Phase 14 remains In progress pending owner-run validation of the latest changes and handler-level role/farm-scope review. See [Phase 14 details](phase-14-authorization-and-secrets-review.md) and [PROGRESS.md](../PROGRESS.md).
