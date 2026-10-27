@@ -91,6 +91,14 @@ These are owner-provided results. They validate the current automated suite and 
 - The route-mount checker now handles both default-export route imports and Agri's named `automationsRouter` export. It remains a static wiring check and must be validated by running `npm run check-route-permissions` in the owner's checkout.
 - Additional commits on `muf-monorepo` include `4a3043e`, `cfa0e97`, `8041afc`, `d4fc5ab`, `9f01423`, `de95738`, `4e5f10c`, `76078aa`, and `f04d193`.
 
+## Follow-up handler review (2026-10-27)
+
+- Reviewed the shared farm router factory: farm listing is limited to the owner's full view or the requesting user's active assignments; create, rename, archive, restore and delete require owner authority. Farm deletion and backup/archive flows deliberately run unscoped only after owner authentication, because they must enumerate or move records across farm scopes.
+- Reviewed the three auth/user-management implementations. User listing and management are role-gated; managers are limited to workers sharing an assigned farm, while role changes and owner administration remain owner-only. Flock user edits/deletes are owner-only.
+- Found and fixed an assignment-boundary bug in Dairy and Agri: when a manager edited a worker's farm assignments, the endpoint silently dropped that worker's assignments in farms outside the manager's scope. The handlers now preserve out-of-scope assignments and apply submitted changes only to farms the manager controls. Added a regression assertion to `tests/public-route-security.test.ts`.
+- Re-reviewed Agri global automation/location settings: all global writes and manual digest triggers require owner authority; the public location read is retained for the unauthenticated weather widget. Secret-authenticated scheduled jobs remain unscoped by design and fail closed when their secret is missing.
+- This is source review plus regression coverage, not a local test run. The owner must pull the resulting commits and run the focused test and full validation commands below before the phase can be marked Done.
+
 ## Remaining manual-review limitation
 
 The owner has since validated the CORS correction and reported 343 passing tests and successful builds. Newer webhook-secret, Telegram cron-header, global Agri settings, and route-mount-checker changes are still awaiting a local run. Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The checker catches undocumented modules and visible mount wiring, not every endpoint's handler-level authorization. Any further gaps found must be fixed and covered by regression tests.
@@ -134,9 +142,9 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 ## Done checklist
 
 - [x] A written module-by-module permission inventory exists, including explicit public exceptions and accepted share-card risk; the inventory coverage check fails if a route module is added without an entry. Handler-level role/farm behavior still requires code review and focused regression tests.
-- [ ] Fix any route that is more open than it should be.
+- [x] Fix identified authorization gaps; manager assignment edits now preserve worker assignments outside the manager's farm scope. Final verification is pending owner-run tests.
 - [x] A secret scan of the repository for keys, tokens and `.env` files (owner-run: 647 tracked paths, passed).
-- [ ] Basic abuse protection review: login rate limiting, request size limits, security headers.
+- [x] Source-reviewed server entry points for security headers, request-size limits and broad API rate limiting, alongside stricter auth-flow rate limits.
 - [x] The new command-line check above exists and passes (53 route modules documented).
 - [x] The standard checks and all three builds pass (owner-run results recorded in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
