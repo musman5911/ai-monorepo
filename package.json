@@ -15,7 +15,8 @@
     "check-bundle-size": "node tools/check-bundle-size.js",
     "check-archive": "node tools/check-dairy-archive.js && node tools/check-flock-archive.js && node tools/check-agri-archive.js",
     "check-audit": "node tools/check-audit.js",
-    "check-secrets": "node tools/check-secrets.js"
+    "check-secrets": "node tools/check-secrets.js",
+    "check-route-permissions": "node tools/check-route-permissions.js"
   },
   "devDependencies": {
     "vitest": "^3.0.0"
