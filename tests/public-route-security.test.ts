@@ -24,7 +24,8 @@ describe('scheduled endpoint response and secret controls', () => {
       expect(server).toContain("'X-Cron-Secret', 'X-Cron-Key', 'X-Cross-Farm-Key'");
     }
     const flockServer = source('flock_farm/backend/server.js');
-    expect(flockServer).toContain("req.headers['access-control-request-headers']");
+    expect(flockServer).toContain('app.use(cors(corsOptions))');
+    expect(flockServer).not.toContain('allowedHeaders:');
   });
   it('Agri compares cron secrets with a timing-safe comparison', () => {
     const routes = source('agri_farm/backend/routes/automations.js');
