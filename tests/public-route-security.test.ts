@@ -100,3 +100,14 @@ describe('cross-farm summary key controls', () => {
     });
   }
 });
+
+
+describe('manager user-assignment boundaries', () => {
+  it('preserves worker assignments outside the manager’s farms when editing assignments', () => {
+    for (const app of ['dairy_farm', 'agri_farm']) {
+      const routes = source(`${app}/backend/routes/auth.js`);
+      expect(routes).toContain('const outsideMyFarms = (');
+      expect(routes).toContain('farmIds = [...new Set([...outsideMyFarms, ...farmIds.filter((id) => mine.has(id))])];');
+    }
+  });
+});
