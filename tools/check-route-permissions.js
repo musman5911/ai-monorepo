@@ -20,6 +20,14 @@ function walk(directory, app) {
     if (entry.isDirectory()) walk(fullPath, app);
     else if (entry.isFile() && /\.js$/.test(entry.name)) {
       const relative = path.relative(root, fullPath).replace(/\\/g, '/');
+      const source = fs.readFileSync(fullPath, 'utf8');
+
+      // The routes directory also contains shared validation helpers (for example
+      // Dairy's input.js). Only files that export an Express router are endpoints.
+      const exportsRouter = /export\\s+default\\s+router\\b/.test(source)
+        || /export\\s*\\{[^}]*\\brouter\\b[^}]*\\}/s.test(source);
+      if (!exportsRouter) continue;
+
       checked += 1;
       const modulePath = 'routes/' + relative.slice(relative.indexOf('/backend/routes/') + '/backend/routes/'.length);
       routeModules[app].push(modulePath);
