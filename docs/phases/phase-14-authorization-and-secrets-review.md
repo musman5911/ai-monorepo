@@ -62,7 +62,7 @@ The owner pulled commit `3d366ac` and supplied these Windows CMD results (before
 - `tools\\build-all.bat`: Dairy, Flock and Agri production builds passed.
 - `git status`: clean; branch up to date with `origin/muf-monorepo`.
 
-These are owner-provided results. They validate the current automated suite and builds, not every route's role behavior. The route-module inventory uses baseline policies and includes a public-link risk acceptance; it does not dynamically inspect every route registration or prove handler-level authorization. Do not claim exhaustive authorization verification based solely on the inventory count.
+These are owner-provided results. They validate the current automated suite and builds, not every route's role behavior. The route-module inventory uses baseline policies and includes a public-link risk acceptance; it does not prove handler-level authorization. Do not claim exhaustive authorization verification based solely on the inventory count.
 
 
 ## Follow-up source review (2026-10-27)
@@ -110,7 +110,7 @@ A follow-up source review found and fixed a CORS allowlist gap for `X-Cron-Key` 
 
 ## New command-line check
 
-`npm run check-secrets` fails on tracked environment files, private-key/certificate files, and recognized credential patterns. `npm run check-route-permissions` fails when a JavaScript module under a backend `routes/` directory lacks a matching inventory entry, an imported route router is not visibly mounted, or an app backend entry point is missing.
+`npm run check-secrets` fails on tracked environment files, private-key/certificate files, and recognized credential patterns. `npm run check-route-permissions` fails when a JavaScript module under a backend `routes/` directory lacks a matching inventory entry, an imported default/named route router is not visibly mounted, or an app backend entry point is missing.
 
 ## Command-line checks at the end of this phase
 
