@@ -19,7 +19,8 @@ function walk(directory) {
     else if (entry.isFile() && /\.js$/.test(entry.name)) {
       const relative = path.relative(root, fullPath).replace(/\\/g, '/');
       checked += 1;
-      if (!inventory.includes('`' + relative.replace('/backend/', '/backend/') + '`')) {
+      const modulePath = relative.slice(relative.indexOf('/backend/routes/') + '/backend/'.length);
+      if (!inventory.includes('`' + modulePath + '`')) {
         missing.push(relative);
       }
     }
