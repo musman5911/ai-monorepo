@@ -27,9 +27,11 @@ describe('scheduled endpoint response and secret controls', () => {
 
   it('Flock cron endpoint does not return recipient addresses or farm statistics', () => {
     const routes = source('flock_farm/backend/routes/cron.js');
-    expect(routes).toContain('res.json({ ok: true, date: summary.date });');
-    expect(routes).not.toContain('res.json({ ok: true, date: summary.date, recipients, stats: summary.stats });');
-    expect(routes).toContain('timingSafeEqual(provided, secret)');
-    expect(routes).toContain("req.headers['x-cron-key'] || req.query.key");
+    const cronHandler = routes.split("// POST /api/summary/send-now")[0];
+    expect(cronHandler).toContain('res.json({ ok: true, date: summary.date });');
+    expect(cronHandler).not.toContain('recipients, stats: summary.stats');
+    expect(cronHandler).not.toContain('summary.stats');
+    expect(cronHandler).toContain('timingSafeEqual(provided, secret)');
+    expect(cronHandler).toContain("req.headers['x-cron-key'] || req.query.key");
   });
 });
