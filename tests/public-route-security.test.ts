@@ -30,7 +30,7 @@ describe('scheduled endpoint response and secret controls', () => {
     const routes = source('agri_farm/backend/routes/automations.js');
     const cronHandler = routes.split('async function cronDispatch(req, res)')[1] || '';
     expect(cronHandler).toContain("message: 'Report dispatched successfully.'");
-    expect(cronHandler).not.toContain(`Report dispatched to: ${recipientsStr}`);
+    expect(cronHandler).not.toContain('Report dispatched to:');
   });
 
   it('Flock cron endpoint does not return recipient addresses or farm statistics', () => {
