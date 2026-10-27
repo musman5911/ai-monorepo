@@ -113,3 +113,12 @@ The owner pulled the current muf-monorepo branch and ran the security-focused an
 | `git status` | Clean working tree; branch up to date with `origin/muf-monorepo` |
 
 These results validate the current automated tests, static inventory/mount coverage, secret scan, farm-scope checks and builds reported in the supplied CMD output. `npm run check-ui` and `npm run check-workbench` were not shown in this latest run and are not claimed here. The route inventory checker does not prove every handler's authorization. Phase 14 remains **In progress** until the remaining handler-level role/farm-scope review is complete. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21.
+
+
+## Phase 14 handler audit follow-up (2026-10-27)
+
+Repository source review identified a cross-farm photo-reference issue in Dairy and Agri: orphan discovery and direct photo deletion checked references only in the current farm scope. A photo referenced by another farm could be incorrectly considered unreferenced. Updated the photo-asset services and direct-delete guards to check references across farms in a private unscoped read, while keeping asset enumeration and deletion farm-scoped. Added regression source-contract assertions to `tests/public-route-security.test.ts`.
+
+Commits on `muf-monorepo`: `52fe5c2`, `ec9151b`, `f5589a7`, `352c9d1`, `de87aa8`, `98eb24e`.
+
+**Validation status:** changes are committed to the GitHub branch, but the new tests and standard checks have not yet been executed in the owner's Windows checkout. No test pass or build pass is claimed for these commits. Phase 14 remains **In progress** because this is one finding from the handler audit, not proof that all 46 route modules have been behaviorally verified. The latest required local gate includes `npm test`, `npm run check-route-permissions`, `npm run check-secrets`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs`, and `tools\\build-all.bat`.
