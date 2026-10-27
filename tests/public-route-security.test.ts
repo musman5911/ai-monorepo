@@ -25,6 +25,14 @@ describe('scheduled endpoint response and secret controls', () => {
     expect(routes).toContain("req.headers['x-cron-key'] || req.query.key");
   });
 
+
+  it('Agri cron endpoint does not disclose configured recipient addresses', () => {
+    const routes = source('agri_farm/backend/routes/automations.js');
+    const cronHandler = routes.split('async function cronDispatch(req, res)')[1] || '';
+    expect(cronHandler).toContain("message: 'Report dispatched successfully.'");
+    expect(cronHandler).not.toContain(`Report dispatched to: ${recipientsStr}`);
+  });
+
   it('Flock cron endpoint does not return recipient addresses or farm statistics', () => {
     const routes = source('flock_farm/backend/routes/cron.js');
     const cronHandler = routes.split("// POST /api/summary/send-now")[0];
