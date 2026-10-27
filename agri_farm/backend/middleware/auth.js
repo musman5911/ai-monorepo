@@ -15,6 +15,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // one ONCE and persist it to a local file so restarts all share the same key
 // (otherwise every restart would invalidate all existing sessions).
 let SECRET = MUF_ENV.jwtSecret || '';
+if (MUF_ENV.nodeEnv === 'production' && !SECRET) {
+  console.error('❌ JWT_SECRET must be set to a strong non-default value in production.');
+  process.exit(1);
+}
 // Reject known placeholder secrets in production
 if (MUF_ENV.nodeEnv === 'production' && (SECRET === 'GENERATE-A-LONG-RANDOM-STRING-HERE' || SECRET === 'change-me-to-a-long-random-string')) {
   console.error('❌ JWT_SECRET is still the placeholder from .env.example — generate a real secret!');
