@@ -24,8 +24,8 @@ function walk(directory, app) {
 
       // The routes directory also contains shared validation helpers (for example
       // Dairy's input.js). Only files that export an Express router are endpoints.
-      const exportsRouter = /export\\s+default\\s+router\\b/.test(source)
-        || /export\\s*\\{[^}]*\\brouter\\b[^}]*\\}/s.test(source);
+      const exportsRouter = /export\s+default\s+router\b/.test(source)
+        || /export\s*\{[^}]*\brouter\b[^}]*\}/s.test(source);
       if (!exportsRouter) continue;
 
       checked += 1;
@@ -47,6 +47,18 @@ for (const app of apps) {
   walk(routesDir, app);
 }
 
+
+if (checked === 0) {
+  console.error('Route permission inventory check failed: discovered zero route modules. Refusing to report a false pass.');
+  process.exit(1);
+}
+
+for (const app of apps) {
+  if (routeModules[app].length === 0) {
+    console.error(`Route permission inventory check failed: discovered zero route modules for ${app}.`);
+    process.exit(1);
+  }
+}
 
 for (const app of apps) {
   const serverPath = path.join(root, app, 'backend', 'server.js');
