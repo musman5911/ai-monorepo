@@ -361,7 +361,10 @@ router.patch('/users/:id', userLimiter, protect, adminOnly, async (req, res) => 
       let farmIds = await validFarmIds(req.body.farmIds);
       if (!mufIsOwner(req.user.role)) {
         const mine = new Set((req.user.farmIds || []).map(String));
-        farmIds = farmIds.filter((id) => mine.has(id));
+        // A manager may change a worker's assignments only within farms the
+        // manager controls. Preserve the worker's assignments on other farms.
+        const outsideMyFarms = (user.farmIds || []).map(String).filter((id) => !mine.has(id));
+        farmIds = [...new Set([...outsideMyFarms, ...farmIds.filter((id) => mine.has(id))])];
       }
       if (normalizeRole(user.role) !== 'owner' && farmIds.length === 0) {
         return res.status(400).json({ error: 'Assign at least one farm to this account' });
