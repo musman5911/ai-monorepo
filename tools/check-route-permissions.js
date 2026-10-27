@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 'use strict';
 
-// Fail when a backend route module is added without a policy entry in the Phase 14 inventory.
+// Fail when a backend route module lacks a policy entry or is not imported/mounted by its server entry point.
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -10,6 +10,7 @@ const inventoryPath = path.join(root, 'docs/security/route-permission-inventory.
 const inventory = fs.readFileSync(inventoryPath, 'utf8');
 const apps = ['dairy_farm', 'flock_farm', 'agri_farm'];
 const missing = [];
+const mountProblems = [];
 let checked = 0;
 
 function walk(directory) {
@@ -36,9 +37,37 @@ for (const app of apps) {
   walk(routesDir);
 }
 
+
+for (const app of apps) {
+  const serverPath = path.join(root, app, 'backend', 'server.js');
+  if (!fs.existsSync(serverPath)) {
+    console.error(`Route permission inventory check failed: missing ${app}/backend/server.js`);
+    process.exit(1);
+  }
+  const server = fs.readFileSync(serverPath, 'utf8');
+  const imports = /import\\s+([A-Za-z_$][\\w$]*)\\s*(?:,\\s*\\{[^}]*\\})?\\s*from\\s*['"]\\.\\/routes\\/([^'"]+)['"]/g;
+  const apiRoutersMatch = server.match(/const\\s+apiRouters\\s*=\\s*\\[([\\s\\S]*?)\\]\\s*;/);
+  const apiRouters = apiRoutersMatch ? apiRoutersMatch[1] : '';
+  let match;
+  while ((match = imports.exec(server)) !== null) {
+    const [, identifier, routePath] = match;
+    const mountCalls = new RegExp(`app\\.use\\(\\s*[^,]+,\\s*\\b${identifier}\\b\\s*\\)`).test(server);
+    const listedInRouterArray = new RegExp(`\\b${identifier}\\b`).test(apiRouters);
+    if (!mountCalls && !listedInRouterArray) {
+      mountProblems.push(`${app}/backend/routes/${routePath}: imported router "${identifier}" is not visibly mounted`);
+    }
+  }
+}
+
 if (missing.length) {
   console.error('Route permission inventory check failed. Add a reviewed policy for each missing route module:');
   for (const item of missing) console.error(`  ✗ ${item}`);
+  process.exit(1);
+}
+
+if (mountProblems.length) {
+  console.error('Route permission inventory check failed. Review route imports that are not visibly mounted:');
+  for (const item of mountProblems) console.error(`  ✗ ${item}`);
   process.exit(1);
 }
 
@@ -50,4 +79,4 @@ for (const app of apps) {
   }
 }
 
-console.log(`Route permission inventory passed: ${checked} route modules across Dairy, Flock and Agri are documented; all three backend entry points exist.`);
+console.log(`Route permission inventory passed: ${checked} route modules are documented; all three backend entry points exist and imported route routers are visibly mounted.`);
