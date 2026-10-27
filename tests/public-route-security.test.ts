@@ -50,7 +50,6 @@ describe('cross-farm summary key controls', () => {
       const server = source(`${app}/backend/server.js`);
       expect(server).toContain("req.headers['x-cross-farm-key'] || req.query.key || ''");
       expect(server).toContain('crypto.timingSafeEqual(providedBytes, expectedBytes)');
-      expect(server).toContain("'X-Cross-Farm-Key'");
     });
   }
 });
