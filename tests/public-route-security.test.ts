@@ -43,3 +43,14 @@ describe('scheduled endpoint response and secret controls', () => {
     expect(cronHandler).toContain("req.headers['x-cron-key'] || req.query.key");
   });
 });
+
+describe('cross-farm summary key controls', () => {
+  for (const app of ['dairy_farm', 'flock_farm', 'agri_farm']) {
+    it(`${app} cross-farm summaries prefer a header and compare keys timing-safely`, () => {
+      const server = source(`${app}/backend/server.js`);
+      expect(server).toContain("req.headers['x-cross-farm-key'] || req.query.key || ''");
+      expect(server).toContain('crypto.timingSafeEqual(providedBytes, expectedBytes)');
+      expect(server).toContain("'X-Cross-Farm-Key'");
+    });
+  }
+});
