@@ -21,7 +21,7 @@ function walk(directory, app) {
     else if (entry.isFile() && /\.js$/.test(entry.name)) {
       const relative = path.relative(root, fullPath).replace(/\\/g, '/');
       checked += 1;
-      const modulePath = relative.slice(relative.indexOf('/backend/routes/') + '/backend/'.length);
+      const modulePath = 'routes/' + relative.slice(relative.indexOf('/backend/routes/') + '/backend/routes/'.length);
       routeModules[app].push(modulePath);
       if (!inventory.includes('`' + modulePath + '`')) {
         missing.push(relative);
@@ -81,7 +81,7 @@ for (const app of apps) {
     }
   }
   for (const routePath of routeModules[app]) {
-    if (!importedRoutePaths.has(routePath)) {
+    if (!importedRoutePaths.has(routePath.slice('routes/'.length))) {
       mountProblems.push(`${app}/backend/routes/${routePath}: route module is not imported by server.js`);
     }
   }
