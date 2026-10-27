@@ -47,18 +47,18 @@ for (const app of apps) {
   const server = fs.readFileSync(serverPath, 'utf8');
   const imports = /import\s+([A-Za-z_$][\w$]*)\s*(?:,\s*\{[^}]*\})?\s*from\s*['"]\.\/routes\/([^'"]+)['"]/g;
 
-  const namedRouteImports = /import\\s*\\{([^}]+)\\}\\s*from\\s*['"]\\.\\/routes\\/([^'"]+)['"]/g;
+  const namedRouteImports = /import\s*\{([^}]+)\}\s*from\s*['"]\.\/routes\/([^'"]+)['"]/g;
   let namedMatch;
   while ((namedMatch = namedRouteImports.exec(server)) !== null) {
     const [, importedNames, routePath] = namedMatch;
     // Route modules that use named exports place their router first; helper
     // exports (for example scheduler startup functions) are not routers.
     const firstImport = importedNames.split(',')[0].trim();
-    const identifier = firstImport.split(/\\s+as\\s+/).pop().trim();
-    const apiRoutersBlock = server.match(/const\\s+apiRouters\\s*=\\s*\\[([\\s\\S]*?)\\]\\s*;/);
+    const identifier = firstImport.split(/\s+as\s+/).pop().trim();
+    const apiRoutersBlock = server.match(/const\s+apiRouters\s*=\s*\[([\s\S]*?)\]\s*;/);
     const routerArray = apiRoutersBlock ? apiRoutersBlock[1] : '';
-    const mountCalls = new RegExp('app\\\\.use\\\\(\\\\s*[^,]+,\\\\s*' + identifier + '\\\\s*\\\\)').test(server);
-    const listedInRouterArray = new RegExp('\\\\b' + identifier + '\\\\b').test(routerArray);
+    const mountCalls = new RegExp('app\\.use\\(\\s*[^,]+,\\s*' + identifier + '\\s*\\)').test(server);
+    const listedInRouterArray = new RegExp('\\b' + identifier + '\\b').test(routerArray);
     if (!mountCalls && !listedInRouterArray) {
       mountProblems.push(`${app}/backend/routes/${routePath}: named route router "${identifier}" is not visibly mounted`);
     }
