@@ -57,7 +57,6 @@ for (const relative of trackedPaths) {
     // Strip only the documented template URI; other credential-bearing URIs remain detectable.
     const scanContent = content.replace(/mongodb(?:\+srv)?:\/\/user:password@cluster\.mongodb\.net\/[A-Za-z0-9_-]+/gi, '');
     if (!pattern.test(scanContent)) continue;
-    if (label === 'MongoDB URI with embedded credentials' && (content.includes('mongodb+srv://user:password@cluster.mongodb.net/') || content.includes('mongodb://user:password@cluster.mongodb.net/'))) continue;
     add(normalized, `possible ${label}`);
   }
 }
