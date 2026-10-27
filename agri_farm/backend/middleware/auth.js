@@ -81,7 +81,10 @@ async function resolveUser(req) {
   }
   const sub = payload.sub;
   if (!sub) return null;
-  return findUserForSub(sub);
+  const user = await findUserForSub(sub);
+  // Match Dairy and Flock: deactivated accounts lose API access immediately,
+  // even when an otherwise valid JWT has not expired yet.
+  return user && user.active !== false ? user : null;
 }
 
 // The user doc as routes see it: owner / manager / worker (a legacy 'admin'
