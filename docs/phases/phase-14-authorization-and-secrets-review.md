@@ -123,6 +123,12 @@ The latest supplied output does not show `npm run check-ui` or `npm run check-wo
 - Commits: `52fe5c2`, `ec9151b`, `f5589a7`, `352c9d1`, `de87aa8`.
 - **Validation pending:** these latest commits have not been run in the owner's Windows checkout, and no independent runtime/test execution was available in this editing session. The wider handler-level review remains open; do not mark Phase 14 Done yet.
 
+## Additional global-settings finding (2026-10-27)
+
+- Dairy's `Meta` model is global rather than farm-scoped, but `PUT /api/settings/location` used the owner-or-manager guard. A manager assigned to one farm could therefore change the application-wide weather location. Changed this write to `ownerOnly`, added a regression assertion, and clarified the route inventory. Flock's location setting is stored in the farm-scoped `DataStore`, so it remains controlled within the selected farm.
+- Commits: `341aa2c`, `57fdd32`, `0a94161`.
+- **Validation pending:** the latest change and its regression test have not been run locally. Phase 14 remains In progress pending the broader handler audit and full validation.
+
 ## Remaining manual-review limitation
 
 Phase 14 remains **In progress**. The latest focused and full test suites, secret scan, route coverage check, sync/farm/docs checks and all three builds passed in the owner's checkout. Before marking the phase Done, complete the remaining handler-level role/farm-scope review and add focused regression tests for any gaps found. Do not treat route-module inventory or mount wiring as proof of authorization correctness. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21.
