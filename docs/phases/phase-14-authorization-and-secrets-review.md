@@ -211,3 +211,10 @@ A focused test section checks owner-before-unscoped backup/archive middleware, a
 ## Closure criteria
 
 Do not mark Phase 14 Done solely from source-string tests or a passing route inventory. The owner must run the updated suite on the pulled branch. Any remaining Mongo-backed or deployed behavior must be verified in the dedicated final-testing phases. Phase 15 stays Not started until that validation is recorded.
+
+
+## Latest owner validation and test correction (2026-10-27)
+
+The owner pulled commit `45e9ee2` and supplied Windows CMD results. `npm test` reported 42 files, 356 passed tests and one failed assertion (357 total). The only failure was in the new `active-user and farm-role enforcement` source-contract test: it expected Agri's middleware to contain `user.active === false`, while Agri's actual `resolveUser` rejects missing or explicitly inactive users with `user && user.active !== false ? user : null`. This was an incorrect test expectation, not evidence from this run of an authorization bypass. Corrected the assertion in commit `bab5870` to match the actual guard. **The corrected focused test and full suite are pending owner rerun; no passing result is claimed yet.**
+
+The owner's other reported checks passed: route permission inventory (46 route modules), secret scan (647 tracked paths), sync checks, UI safety, workbench source checks (23), farm-scope and breeding-event checks, phase-doc checks, and all three production builds. `git status --short --branch` showed a clean working tree synced with `origin/muf-monorepo`. Those checks do not erase the failing test or prove all routes behaviorally secure. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
