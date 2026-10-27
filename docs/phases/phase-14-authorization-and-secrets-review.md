@@ -86,6 +86,11 @@ These are owner-provided results. They validate the current automated suite and 
 - Agri's `Setting` model is global, not farm-scoped. The automation settings, location mutation and manual trigger endpoints previously allowed managers through `requireAdmin`, so a manager assigned to one farm could change global configuration. These routes now require `ownerOnly`; the public location read remains intentionally available to the weather widget. Added a regression assertion in `tests/public-route-security.test.ts`.
 - Server-entry-point review confirmed all three apps configure Helmet, request-body size limits and broad API rate limiting; login/signup/reset paths have stricter rate limiters in their auth implementations or mount configuration. The new mount checker now verifies imported route routers are visibly mounted, but it does not prove role correctness within each handler.
 
+
+- Dairy and Flock Telegram cron handlers now accept `X-Cron-Key` with the legacy query parameter as fallback, using their existing timing-safe comparison helper. This removes the remaining header-compatibility gap in the Telegram scheduled endpoints.
+- The route-mount checker now handles both default-export route imports and Agri's named `automationsRouter` export. It remains a static wiring check and must be validated by running `npm run check-route-permissions` in the owner's checkout.
+- Additional commits on `muf-monorepo` include `4a3043e`, `cfa0e97`, `8041afc`, `d4fc5ab`, `9f01423`, `de95738`, `4e5f10c`, `76078aa`, and `f04d193`.
+
 ## Remaining manual-review limitation
 
 A follow-up source review found and fixed a CORS allowlist gap for `X-Cron-Key` in Dairy and Agri; the regression test was added after the owner validation above and must be run locally. Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The current check catches undocumented route modules, not unclassified individual endpoints within an existing module. Login rate limiting, request-size limits and security-header configuration must also be checked against the actual server configuration. Any gaps found must be fixed and covered by regression tests.
