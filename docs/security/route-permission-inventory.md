@@ -30,7 +30,7 @@ This inventory covers every route module under the three backend `routes/` direc
 |---|---|---|
 | `routes/auth.js` | Mixed public/authenticated | Public authentication/recovery endpoints only; user and role management requires owner authority. |
 | `routes/cards.js` | Public bearer link | Anyone with the share URL can read the card payload. Privacy headers and rate limits do not make it private or revocable. |
-| `routes/settings.js` | Mixed public/authenticated | `GET /location` is an explicit public read for the weather widget; sensitive settings and all writes require authorization. |
+| `routes/settings.js` | Authenticated + farm scope | `GET /location` and `PUT /location` both require authentication and use the selected farm's `DataStore` record; location is farm-scoped in Flock. |
 | `routes/archive.js`, `routes/backup.js` | Owner-only | Archive and backup actions are sensitive/destructive. |
 | `routes/farms.js` | Owner-only for mutations; scoped reads | No manager/worker farm creation, rename, archive or delete. |
 | `routes/batches.js`, `routes/data.js`, `routes/uploads.js` | Authenticated + farm scope | Data and uploaded assets must be scoped to assigned farms; worker writes are limited to data-entry operations. |
