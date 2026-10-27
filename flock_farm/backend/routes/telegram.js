@@ -367,7 +367,7 @@ router.post('/send-summary', authRequired, requireRole('admin'), async (_req, re
 router.get('/cron', async (req, res) => {
   try {
     if (!MUF_ENV.cronSecret) return res.status(503).json({ error: 'CRON_SECRET not configured' });
-    if (!secretsMatch(req.query.key, MUF_ENV.cronSecret)) return res.status(401).json({ error: 'Unauthorized' });
+    if (!secretsMatch(req.headers['x-cron-key'] || req.query.key, MUF_ENV.cronSecret)) return res.status(401).json({ error: 'Unauthorized' });
     res.json(await pushDailySummary(false));
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
