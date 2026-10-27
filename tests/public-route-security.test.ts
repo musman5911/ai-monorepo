@@ -200,7 +200,7 @@ describe('backup, restore, archive and deletion boundaries', () => {
 describe('active-user and farm-role enforcement', () => {
   it('rechecks active status from the database on authenticated requests', () => {
     expect(source('dairy_farm/backend/middleware/auth.js')).toContain('user.active === false');
-    expect(source('agri_farm/backend/middleware/auth.js')).toContain('user.active === false');
+    expect(source('agri_farm/backend/middleware/auth.js')).toContain('user && user.active !== false ? user : null');
     expect(source('flock_farm/backend/middleware/auth.js')).toContain('!user.active');
   });
   it('restricts manager user creation to workers in Flock', () => {
