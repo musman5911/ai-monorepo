@@ -2,6 +2,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { startApp, login, req } from './_harness.mjs';
 
+// PH-1/PH-2 are INFORMATIONAL (see README 'NEEDS DESIGN DECISION'): they
+// document current behaviour; whether it is a bug is the owner's decision.
 // Minimal JPEG with a fake EXIF GPS marker appended (round-12 probe style).
 function jpegWithGps() {
   const head = Buffer.from([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]);
@@ -19,7 +21,7 @@ async function uploadPhoto(base, tok, app) {
 }
 
 for (const app of ['dairy', 'agri']) {
-  test(`PH-1: uploaded photo is served without EXIF/GPS bytes (${app})`, async () => {
+  test(`PH-1 (INFO, needs design decision): uploaded photo is served without EXIF/GPS bytes (${app})`, async () => {
     const { base, stop } = await startApp(app);
     try {
       const tok = await login(base, 'admin', 'admin123', app);
@@ -34,7 +36,7 @@ for (const app of ['dairy', 'agri']) {
     } finally { stop(); }
   });
 
-  test(`PH-2: worker cannot delete photos (${app})`, async () => {
+  test(`PH-2 (INFO, needs design decision): worker cannot delete photos (${app})`, async () => {
     const { base, stop } = await startApp(app);
     try {
       const admin = await login(base, 'admin', 'admin123', app);

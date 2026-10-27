@@ -36,18 +36,28 @@ export async function startApp(app, extraEnv = {}) {
 
 export const LOGIN_PATH = { dairy: '/api/auth/login', flock: '/api/auth/login', agri: '/api/login' };
 export async function login(base, username = 'admin', password = '[SECURITY_DATA]', app) {
+  // IMPORTANT: do not poll the login endpoint itself. The login rate limiter
+  // (5 attempts / 15 min / IP in dairy) counts every failed poll, so polling
+  // logins can lock the test out and produce misleading 401/429s. Poll the
+  // public health endpoint instead, then make only a few real login attempts.
   const loginPath = app ? LOGIN_PATH[app] : '/api/auth/login';
   for (let i = 0; i < 40; i++) {
+    try { const r = await fetch(base + '/api/health'); if (r.ok) break; } catch {}
+    await new Promise((r) => setTimeout(r, 500));
+  }
+  let lastStatus = 0;
+  for (let i = 0; i < 3; i++) { // login limiter allows only 5 login POSTs / 15 min / IP — stay well under it
     try {
       const r = await fetch(base + loginPath, { method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }) });
+      lastStatus = r.status;
       const j = await r.json().catch(() => ({}));
       if (j.token || j.access_token) return j.token || j.access_token;
     } catch {}
-    await new Promise((r) => setTimeout(r, 700));
+    await new Promise((r) => setTimeout(r, 4000));
   }
-  throw new Error('login never succeeded for ' + username);
+  throw new Error(`login never succeeded for ${username} (last HTTP ${lastStatus})`);
 }
 export const auth = (t) => ({ Authorization: `Bearer ${t}`, 'Content-Type': 'application/json' });
 export async function req(base, method, p, token, body) {

@@ -80,17 +80,63 @@ for (const app of ['dairy', 'agri', 'flock']) {
   });
 }
 
-// RL-1 (direct-server variant) — rotating X-Forwarded-For must not defeat the login limiter.
-test('RL-1: rotating X-Forwarded-For still hits the login rate limiter (dairy, direct)', async () => {
+// RL-1 — login rate limiter vs X-Forwarded-For, two honest variants.
+// (a) Behind an appending proxy (what Replit does): the proxy APPENDS the real
+//     socket IP to X-Forwarded-For, so a client rotating fake XFF values still
+//     lands in one bucket. This test PASSES today and must keep passing.
+// (b) Direct exposure (P2): no proxy; the client rotates XFF itself and the
+//     server believes it. This test FAILS today — that is the RL-1 bug.
+import http from 'node:http';
+async function appendingProxy(targetBase) {
+  const target = new URL(targetBase);
+  const server = http.createServer((req, res) => {
+    const chunks = [];
+    req.on('data', (c) => chunks.push(c));
+    req.on('end', () => {
+      const body = Buffer.concat(chunks);
+      const socketIp = req.socket.remoteAddress || '';
+      const prior = req.headers['x-forwarded-for'];
+      const headers = { ...req.headers, host: target.host,
+        'x-forwarded-for': prior ? `${prior}, ${socketIp}` : socketIp,
+        'content-length': body.length };
+      const up = http.request({ hostname: target.hostname, port: target.port, path: req.url, method: req.method, headers },
+        (upRes) => { res.writeHead(upRes.statusCode, upRes.headers); upRes.pipe(res); });
+      up.on('error', () => { res.writeHead(502); res.end(); });
+      up.write(body); up.end();
+    });
+  });
+  await new Promise((r) => server.listen(0, '127.0.0.1', r));
+  return { url: `http://127.0.0.1:${server.address().port}`, close: () => server.close() };
+}
+async function wrongLogins(url, loginPath, n, useFakeXff) {
+  const statuses = [];
+  for (let i = 1; i <= n; i++) {
+    const r = await fetch(url + loginPath, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(useFakeXff ? { 'X-Forwarded-For': `198.51.100.${i}` } : {}) },
+      body: JSON.stringify({ username: 'admin', password: 'Wrong' + 'Pass999' }) });
+    statuses.push(r.status);
+    if (r.status === 429) break;
+  }
+  return statuses;
+}
+
+test('RL-1 (behind appending proxy): rotating fake XFF still gets rate-limited 429 (dairy)', async () => {
+  const { base, stop } = await startApp('dairy');
+  const proxy = await appendingProxy(base);
+  try {
+    const statuses = await wrongLogins(proxy.url, '/api/auth/login', 10, true);
+    console.log(`FINDING CHECK RL-1/proxy: wrong-login statuses via appending proxy: ${statuses.join(',')}`);
+    assert.ok(statuses.includes(429),
+      `behind an appending proxy the limiter must block repeated bad logins (got ${statuses.join(',')}, expected a 429)`);
+  } finally { proxy.close(); stop(); }
+});
+
+test('RL-1 (direct exposure, P2): rotating X-Forwarded-For must not defeat the login limiter (dairy)', async () => {
   const { base, stop } = await startApp('dairy');
   try {
-    let saw429 = false;
-    for (let i = 1; i <= 14; i++) {
-      const r = await fetch(base + '/api/auth/login', { method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': `198.51.100.${i}` },
-        body: JSON.stringify({ username: 'admin', password: '[SECURITY_DATA]' }) });
-      if (r.status === 429) { saw429 = true; break; }
-    }
-    assert.ok(saw429, '14 wrong logins with rotating XFF never got a 429');
+    const statuses = await wrongLogins(base, '/api/auth/login', 14, true);
+    console.log(`FINDING CHECK RL-1/direct: wrong-login statuses with rotating XFF, direct: ${statuses.join(',')}`);
+    assert.ok(statuses.includes(429),
+      `RL-1 BUG (direct exposure, P2): 14 wrong logins with rotating X-Forwarded-For never got a 429 (got ${statuses.join(',')}) — the limiter trusts a spoofable header`);
   } finally { stop(); }
 });

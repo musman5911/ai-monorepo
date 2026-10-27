@@ -6,30 +6,43 @@ const WH = 'acceptance' + '-webhook-' + 'secret'; // split: sandbox rewrites cre
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // K1 — one Telegram message must not book a crore-scale expense.
-// Dairy path is fully driven (link a worker, /start the chat, send the message).
-test('K1: telegram bot rejects a 999,999,999 single-message expense (dairy)', async () => {
-  const { base, stop } = await startApp('dairy', { TELEGRAM_WEBHOOK_SECRET: WH });
-  try {
-    const tok = await login(base, 'admin', 'admin123', 'dairy');
-    const w = await req(base, 'POST', '/api/labor/workers', tok, { name: 'ACC TG Worker', dailyWage: 1000 });
-    const wid = w.json?._id || w.json?.id;
-    assert.ok(wid, `worker create failed ${w.status}: ${w.text.slice(0, 100)}`);
-    const code = await req(base, 'POST', '/api/telegram/link-code', tok, { laborerId: wid });
-    assert.equal(code.status, 200, `link-code failed ${code.status}`);
-    const hook = async (chat, text) => {
-      await fetch(`${base}/api/telegram/webhook/${WH}`, { method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ message: { chat: { id: chat }, from: { first_name: 'ACC' }, text } }) });
-      await sleep(400);
-    };
-    await hook(910001, `/start ${code.json.code}`);
-    await hook(910001, 'kharcha 999999999 acc-k1-huge');
-    const list = await req(base, 'GET', '/api/expenses?limit=500', tok);
-    const rows = Array.isArray(list.json) ? list.json : (list.json?.expenses || []);
-    assert.ok(!rows.some((e) => String(e.note || '').includes('acc-k1-huge')),
-      'bot booked a 999,999,999 expense from one message');
-  } finally { stop(); }
-});
+// Driven fully locally: the webhook route is called with a fake update body;
+// no Telegram network access. The bot replies go nowhere observable, so we
+// assert on the app's own data afterwards.
+const K1_APPS = [
+  { app: 'dairy', laborPath: '/api/labor/workers', listPath: '/api/expenses?limit=500', markerInNote: true },
+  { app: 'agri', laborPath: '/api/laborers', listPath: '/api/finance', markerInNote: false },
+  { app: 'flock', laborPath: '/api/data/laborers', listPath: '/api/data/expenses', markerInNote: true },
+];
+for (const cfg of K1_APPS) {
+  test(`K1: telegram bot rejects a 999,999,999 single-message expense (${cfg.app})`, async () => {
+    const { base, stop } = await startApp(cfg.app, { TELEGRAM_WEBHOOK_SECRET: WH });
+    try {
+      const tok = await login(base, 'admin', 'admin123', cfg.app);
+      const l = await req(base, 'GET', cfg.laborPath, tok);
+      assert.equal(l.status, 200, `setup failed: cannot list workers (HTTP ${l.status})`);
+      const rows = Array.isArray(l.json) ? l.json : (l.json?.value || []);
+      const wid = rows[0]?._id || rows[0]?.id;
+      assert.ok(wid, 'setup failed: no seeded worker to link');
+      const code = await req(base, 'POST', '/api/telegram/link-code', tok, { laborerId: wid });
+      assert.equal(code.status, 200, `setup failed: link-code HTTP ${code.status}`);
+      const hook = async (chat, text) => {
+        await fetch(`${base}/api/telegram/webhook/${WH}`, { method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: { chat: { id: chat }, from: { first_name: 'ACC' }, text } }) });
+        await sleep(500);
+      };
+      await hook(930001, `/start ${code.json.code}`);
+      await hook(930001, 'kharcha 999999999 acc-k1-huge');
+      const list = await req(base, 'GET', cfg.listPath, tok);
+      const markerHit = list.text.includes('acc-k1-huge');
+      const amountHit = /999999999/.test(list.text);
+      console.log(`FINDING CHECK K1/${cfg.app}: after one bot message "kharcha 999999999", marker found=${markerHit}, amount 999999999 found=${amountHit}`);
+      assert.ok(!markerHit && !amountHit,
+        `K1 BUG (${cfg.app}): one Telegram message booked a Rs 999,999,999 expense (marker=${markerHit}, amount=${amountHit})`);
+    } finally { stop(); }
+  });
+}
 
 // CRON-LOG-1 — the cron secret in ?key= must not be written to server logs.
 test('CRON-LOG-1: cron secret is not printed to server logs (agri)', async () => {

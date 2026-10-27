@@ -48,13 +48,22 @@ test('ROLE-F1: creating a user with farmIds assigns exactly those farms (flock)'
     const farmA = farms.json?.farms?.[0]?.id || farms.json?.activeFarmId;
     const mk = await reqF(base, 'POST', '/api/farms', tok, { name: 'ACC ROLE Farm B' });
     const farmB = mk.json?.id || mk.json?._id;
-    assert.ok(farmB, 'second farm not created');
+    assert.ok(farmB, 'setup failed: second farm was not created');
+    // POST /users requires: username, password >= 8 chars, role, and (for
+    // manager/owner) a valid email — see flock routes/auth.js:248-251.
     const u = await reqF(base, 'POST', '/api/auth/users', tok,
-      { username: 'acc-rolef1', password: '[SECURITY_DATA]', role: 'manager', farmIds: [farmB] });
-    assert.ok([200, 201].includes(u.status), `user create failed ${u.status}: ${u.text.slice(0, 120)}`);
-    const got = JSON.stringify(u.json?.farmIds || u.json?.user?.farmIds || '');
-    assert.ok(got.includes(farmB) && !got.includes(farmA),
-      `requested [FarmB] but assigned ${got}`);
+      { username: 'acc-rolef1', password: 'Role' + 'F1Pass123', role: 'manager',
+        email: 'acc-rolef1@example.com', farmIds: [farmB] });
+    assert.ok([200, 201].includes(u.status),
+      `setup failed: user create did not succeed (HTTP ${u.status}: ${u.text.slice(0, 120)})`);
+    // Read the user back — the assertion below must fail ONLY on farm assignment.
+    const list = await reqF(base, 'GET', '/api/auth/users', tok);
+    const created = (list.json?.users || list.json || []).find((x) => x.username === 'acc-rolef1')
+      || u.json?.user || {};
+    const got = (created.farmIds || []).map(String);
+    console.log(`FINDING CHECK ROLE-F1: requested farmIds=[${farmB}] (Farm B), server assigned [${got.join(',')}]`);
+    assert.deepEqual(got, [String(farmB)],
+      `ROLE-F1 BUG: owner asked for Farm B [${farmB}] but the new manager was assigned [${got.join(',')}] instead (Farm A is ${farmA})`);
   } finally { stop(); }
 });
 

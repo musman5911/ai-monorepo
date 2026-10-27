@@ -1,0 +1,4 @@
+git rev-parse HEAD: 4dd6c291332ac3b36b826d830b19eb9931569961
+command: node --test --test-reporter=spec tests/acceptance/*.test.mjs
+totals: tests 55, pass 7, fail 45 (41 confirmed-bug + 4 informational PH-1/PH-2), skipped 3 (browser)
+fixed-copy proof: ROLE-F1, G1, A2 turn green in /tmp copy with tiny fake fixes (real repo untouched)
