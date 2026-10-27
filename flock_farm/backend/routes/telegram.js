@@ -110,7 +110,7 @@ router.delete('/links/:chatId', authRequired, requireRole('admin'), async (req, 
 router.post('/webhook/:secret', async (req, res) => {
   res.json({ ok: true }); // always 200 fast — no Telegram retry loops
   try {
-    if (!WH_SECRET() || req.params.secret !== WH_SECRET()) return;
+    if (!WH_SECRET() || !secretsMatch(req.params.secret, WH_SECRET())) return;
     const msg = req.body && req.body.message;
     if (!msg || !msg.chat || typeof msg.text !== 'string') return;
     const chatId = String(msg.chat.id);
