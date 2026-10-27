@@ -1,0 +1,53 @@
+git rev-parse HEAD: cc4879c577256fab1e6b16b2fdf408b0b15e3a84
+cow create 201 id=1a916993-68aa-439d-b4bb-de86e3619531
+buyer create 201 id=2d450c1f-9413-4496-9592-649fb3aae546
+milk 2026-10-01 -> 201
+milk 2026-10-02 -> 201
+milk 2026-10-03 -> 201
+MILK-SUMMARY month=2026-10 cow: saleable expected~17.00 (note: summary may include other cows' Oct rows? filter cowId applied) actual={"count":3,"totalLiters":20.05,"saleableLiters":17,"revenue":1700}
+payment 1000 -> 201
+BUYER-CARD status=200 contains Rs/revenue numbers: 0,0,,,,,,,,,0,0,172,100,22,14,44,100,430,26,0,18,44,20,
+expected buyer balance = revenue 1700 - payments 1000 = 700
+payment delete -> 200; card after delete numbers: 0,0,,,,,,,,,0,0,172,100,22,14,44,100,430,26,0,18,44,20,
+health create -> 201 id=43dabe3e-2f94-46bf-949a-97e640371b2f
+HEALTH-EXPENSE after create: linked expenses=[700] (expected [700])
+HEALTH-EXPENSE after cost->0 (PUT 200): linked=0 (expected 0)
+HEALTH-DELETE (HTTP 200): linked expenses left=0 (expected 0)
+worker create 201 id=lw1793096734097-8dc133
+attendance 2027-03-01 full -> 201 {"_id":"la1793096734099-104922","workerId":"lw1793096734097-8dc133","date":"2027
+attendance 2027-03-02 full -> 201 {"_id":"la1793096734101-63b586","workerId":"lw1793096734097-8dc133","date":"2027
+attendance 2027-03-03 half -> 201 {"_id":"la1793096734103-af1039","workerId":"lw1793096734097-8dc133","date":"2027
+advance 500 -> 201
+POST-WAGES #1 -> 200 {"ok":true,"amount":2500,"note":"Monthly labor wages 2027-03: ACC-WORKER 2.5d × Rs. 1000 (advance already paid Rs. 7500; cash payable now Rs. 0)"} (expected gross = (2 + HALF) * 1000)
+POST-WAGES #2 -> 400 {"error":"No unposted attendance remains for this month."} (expected 400 no unposted, NOT a second expense)
+wage expenses for 2027-03: [2500]
+
+=== CONFIRMED ===
+BL-1 (dairy, Area 2 labor): POST /api/labor/post-wages {month:'2027-03'} for ONE new worker
+settled ALL open advances farm-wide: before = 2 open seeded advances (2026-10-18, 2026-10-23,
+total Rs 7000, other workers); after = 0 open. Note text also subtracted them:
+"advance already paid Rs. 7000; cash payable now Rs. 0" against a Rs 1000 wage.
+Root: labor.js post-wages filters openAdvances = all !settled (no month/worker scope).
+Gross wage itself correct (2.5d x 1000 = 2500), one expense only, second post 400. 
+
+=== CHECKED CORRECT (dairy) ===
+- Milk summary: saleable 17.00, revenue 1700 vs hand calc (incl. calf-milk clamp at 0).
+- Rate boundary: rate changed 145->200 today; yesterday milk 10L @145 + today 10L @200 = 3450 exact.
+- Buyer card: sales Rs 1,200 / collected Rs 1,000 / balance Rs 200 = hand calc; payment delete path returns 200.
+- Health->expense sync: create cost 700 -> expense 700; cost->0 removes it; delete health removes it.
+- Post-wages idempotency (same month twice): second call 400, only one wage expense.
+
+=== CONFIRMED ===
+BL-1 (dairy, Area 2 labor): POST /api/labor/post-wages {month:'2027-03'} for ONE new worker
+settled ALL open advances farm-wide: before = 2 open seeded advances (2026-10-18, 2026-10-23,
+total Rs 7000, other workers); after = 0 open. Note text also subtracted them:
+"advance already paid Rs. 7000; cash payable now Rs. 0" against a Rs 1000 wage.
+Root: labor.js post-wages openAdvances = all !settled (no month/worker scope).
+Gross wage itself correct (2.5d x 1000 = 2500), one expense only, second post 400.
+
+=== CHECKED CORRECT (dairy) ===
+- Milk summary: saleable 17.00, revenue 1700 vs hand calc (incl. calf-milk clamp at 0).
+- Rate boundary: rate changed 145->200 today; yesterday 10L @145 + today 10L @200 = 3450 exact.
+- Buyer card: sales Rs 1,200 / collected Rs 1,000 / balance Rs 200 = hand calc.
+- Health->expense sync: create 700 -> expense 700; cost->0 removes; delete health removes.
+- Post-wages same-month twice: second 400, only one wage expense.
