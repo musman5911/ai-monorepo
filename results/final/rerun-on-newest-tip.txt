@@ -1,0 +1,39 @@
+git rev-parse HEAD: 296e6f8d61948c5b90dba62dceef6a10200630a0
+git log -1 origin/muf-monorepo: 296e6f8 (fetch 2026-10-27; user last saw d51a1d8, upstream advanced 1 commit "exclude shared helpers from route mount audit")
+Environment: memory mode, NODE_ENV=test, direct server, seeded demo accounts. Production/real-DB = UNVERIFIED.
+
+CORRECTED ITEM 1 — Agri G1/G2 (was UNVERIFIED in Phase 3 table):
+G1 POST /api/liabilities {creditor:'PROBE-NEG',amount_owed:-5000} -> 201 {"creditor":"PROBE-NEG","amount_owed":-5000,...} STILL FAILING
+G2 POST /api/inventory {name:'PROBE-INV',quantity:-3} -> 201 stored -3; PUT /api/inventory/<id> {quantity:-7} -> 200, stored -7. STILL FAILING
+Source at tip: agri_farm/backend/routes/liabilities.js POST inserts req.body unchecked; inventory.js PUT does $set: req.body.
+
+CORRECTED ITEM 2 — Agri token reuse "401 variance", plain words:
+The Phase 3 rerun script called POST /api/auth/login, but Agri's login lives at POST /api/login
+(routers mounted at '/' and '/api' with '/login' inside). The 404 body has no token, so the script
+sent the literal header "Authorization: Bearer null" and got 401 "Invalid or expired credentials".
+That 401 was a TESTER BUG, not app behaviour. Correct rerun on 296e6f8:
+  pre-logout GET /api/fields -> 200; POST /api/logout -> 200 (clears cookie only);
+  reuse old Bearer token GET /api/fields -> 200. So A1-Agri is STILL FAILING (cookie is cleared,
+  the Bearer JWT is not revoked).
+
+ACCEPTANCE PACK AS RERUN (node --test tests/acceptance/):
+sessions-auth 8 tests: A1x3 FAIL, A3x2 FAIL, A2 FAIL (fails at change-password step: 401
+  "Current password is incorrect" in memory mode despite admin123 login — A2 marked UNVERIFIED, see master table), BC-1x2 FAIL (variant password logs in, 200)
+money-validation 4: G1,G2,G3,E5 all FAIL (bugs present)
+backups 4: I1,I2,I3,PH-3 all FAIL (PH-3 tightened test: backup JSON has no PhotoAsset collection;
+  an earlier loose version matched "crop_photos" and passed — that was a tester false-pass, corrected)
+flock-cards-farm-scope 4: forward FAIL, reverse FAIL, ROLE-F1 FAIL, J1 FAIL
+telegram 2: K1 FAIL; CRON-LOG-1 FAIL (after split-string secret fix; see note)
+photos 6: PH-1x2 FAIL, PH-2x2 FAIL, PH-F2 FAIL, P8-1 FAIL
+headers-csp 12: C1x2 FAIL, C3x3 FAIL, SG-2x3 PASS (FIXED: production refuses MEMORY_MODE),
+  SG-1 dairy+agri PASS (FIXED: weak secret refused), SG-1 flock FAIL, RL-1 FAIL
+input-bounds 8: E1,FZ-3,FZ-1,D1,FZ-2,A6,A5 FAIL; F1 PASS (flock negative batch now rejected — FIXED)
+frontend-service-worker-logout 4: browser x3 SKIP in this sandbox (Chromium needs libnspr4 which
+  cannot be installed here: no apt lists, no root); source-guard FAIL (R3-FE-1 still present)
+
+EXTRA PROBES on 296e6f8:
+DAIRY B1 anon /api/cards/buyer/b2 -> 200, phone present. STILL FAILING
+DAIRY/AGRI B2 anon /api/settings/location -> 200 but body has empty city/raw_dms (no GPS coords in seed) — NARROWED
+AGRI B3 anon /api/cards/worker/lw-demo-1 -> 404 (demo short-id gone) — UNVERIFIED on new tip
+SG-4 grep: Math.random 6-digit codes still at agri routes/auth.js:280,447 and muf-telegram.mjs:132 (all 3 apps). STILL FAILING (code)
+npm audit (backends, tip): 0 vulnerabilities x3 — AUD-1 FIXED on backends

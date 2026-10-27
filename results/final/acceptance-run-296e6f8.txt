@@ -1,0 +1,903 @@
+TAP version 13
+# Subtest: I1: tampered backup is rejected on restore (dairy)
+not ok 1 - I1: tampered backup is rejected on restore (dairy)
+  ---
+  duration_ms: 24562.696537
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/backups.test.mjs:5:1'
+  failureType: 'testCodeFailure'
+  error: 'tampered backup restored (200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/backups.test.mjs:16:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: I2: another app's backup is rejected, not partially imported (dairy restores agri backup)
+not ok 2 - I2: another app's backup is rejected, not partially imported (dairy restores agri backup)
+  ---
+  duration_ms: 26802.237536
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/backups.test.mjs:20:1'
+  failureType: 'testCodeFailure'
+  error: 'cross-app backup accepted (200: {"success":true,"message":"Data restored successfully (sequential)"})'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/backups.test.mjs:28:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: I3: junk backup payload is rejected cleanly (flock)
+not ok 3 - I3: junk backup payload is rejected cleanly (flock)
+  ---
+  duration_ms: 922.968321
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/backups.test.mjs:32:1'
+  failureType: 'testCodeFailure'
+  error: 'junk backup accepted (200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/backups.test.mjs:37:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: PH-3: agri backup includes uploaded PhotoAsset photos so restore cannot silently lose them
+not ok 4 - PH-3: agri backup includes uploaded PhotoAsset photos so restore cannot silently lose them
+  ---
+  duration_ms: 2394.153728
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/backups.test.mjs:41:1'
+  failureType: 'testCodeFailure'
+  error: 'backup JSON contains no PhotoAsset collection — uploaded photos would be lost on restore'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/backups.test.mjs:53:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B1-B3 (flock forward): anonymous card for sequential id 1 does not expose phone/balance
+not ok 5 - B1-B3 (flock forward): anonymous card for sequential id 1 does not expose phone/balance
+  ---
+  duration_ms: 1085.664045
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/flock-cards-farm-scope.test.mjs:12:1'
+  failureType: 'testCodeFailure'
+  error: 'anonymous card 200 exposes a phone number'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/flock-cards-farm-scope.test.mjs:18:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: B1-B3 (flock reverse): Farm B customer link shows Farm B data, not Farm A
+not ok 6 - B1-B3 (flock reverse): Farm B customer link shows Farm B data, not Farm A
+  ---
+  duration_ms: 1076.183894
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/flock-cards-farm-scope.test.mjs:23:1'
+  failureType: 'testCodeFailure'
+  error: 'Farm B link (id 1) served Farm A private data'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/flock-cards-farm-scope.test.mjs:38:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: ROLE-F1: creating a user with farmIds assigns exactly those farms (flock)
+not ok 7 - ROLE-F1: creating a user with farmIds assigns exactly those farms (flock)
+  ---
+  duration_ms: 1156.860134
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/flock-cards-farm-scope.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: 'user create failed 400: {"error":"Email address is mandatory for administrator accounts"}'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/flock-cards-farm-scope.test.mjs:54:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: J1: importing Farm A batch export into Farm B succeeds (flock)
+not ok 8 - J1: importing Farm A batch export into Farm B succeeds (flock)
+  ---
+  duration_ms: 926.23955
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/flock-cards-farm-scope.test.mjs:61:1'
+  failureType: 'testCodeFailure'
+  error: 'import into Farm B failed (500: {"error":"Failed to import batch data"})'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/flock-cards-farm-scope.test.mjs:73:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: R3-FE-1: service-worker API cache is cleared on logout (dairy)
+ok 9 - R3-FE-1: service-worker API cache is cleared on logout (dairy) # SKIP playwright-core/@sparticuz/chromium unavailable: Cannot find package 'playwright-core' imported from /home/user/bughunt-round3/tests/acceptance/frontend-service-worker-logout.test.mjs
+  ---
+  duration_ms: 1.779614
+  type: 'test'
+  ...
+# Subtest: R3-FE-1: service-worker API cache is cleared on logout (agri)
+ok 10 - R3-FE-1: service-worker API cache is cleared on logout (agri) # SKIP playwright-core/@sparticuz/chromium unavailable: Cannot find package 'playwright-core' imported from /home/user/bughunt-round3/tests/acceptance/frontend-service-worker-logout.test.mjs
+  ---
+  duration_ms: 1.440388
+  type: 'test'
+  ...
+# Subtest: R3-FE-1: service-worker API cache is cleared on logout (flock)
+ok 11 - R3-FE-1: service-worker API cache is cleared on logout (flock) # SKIP playwright-core/@sparticuz/chromium unavailable: Cannot find package 'playwright-core' imported from /home/user/bughunt-round3/tests/acceptance/frontend-service-worker-logout.test.mjs
+  ---
+  duration_ms: 0.351241
+  type: 'test'
+  ...
+# Subtest: R3-FE-1 (source): api-cache cleanup is wired into the real logout path (dairy)
+not ok 12 - R3-FE-1 (source): api-cache cleanup is wired into the real logout path (dairy)
+  ---
+  duration_ms: 2.072769
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/frontend-service-worker-logout.test.mjs:69:1'
+  failureType: 'testCodeFailure'
+  error: 'logout path never deletes the service-worker API cache (dairyfarmapi-v1) in production code'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/frontend-service-worker-logout.test.mjs:78:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C1: production responses include Content-Security-Policy (dairy)
+not ok 13 - C1: production responses include Content-Security-Policy (dairy)
+  ---
+  duration_ms: 865.223129
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: 'no CSP header in production (HTTP 200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ~
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:25:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: C1: production responses include Content-Security-Policy (agri)
+not ok 14 - C1: production responses include Content-Security-Policy (agri)
+  ---
+  duration_ms: 821.951464
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: 'no CSP header in production (HTTP 200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ~
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:25:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C3: authenticated responses send Cache-Control no-store (dairy)
+not ok 15 - C3: authenticated responses send Cache-Control no-store (dairy)
+  ---
+  duration_ms: 24354.877403
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:32:3'
+  failureType: 'testCodeFailure'
+  error: 'Cache-Control is "(absent)"'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:38:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C3: authenticated responses send Cache-Control no-store (agri)
+not ok 16 - C3: authenticated responses send Cache-Control no-store (agri)
+  ---
+  duration_ms: 2366.959165
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:32:3'
+  failureType: 'testCodeFailure'
+  error: 'Cache-Control is "(absent)"'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:38:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C3: authenticated responses send Cache-Control no-store (flock)
+not ok 17 - C3: authenticated responses send Cache-Control no-store (flock)
+  ---
+  duration_ms: 941.996834
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:32:3'
+  failureType: 'testCodeFailure'
+  error: 'Cache-Control is "(absent)"'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:38:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: SG-2: production boot refuses MEMORY_MODE=1 (dairy)
+ok 18 - SG-2: production boot refuses MEMORY_MODE=1 (dairy)
+  ---
+  duration_ms: 403.617469
+  type: 'test'
+  ...
+# Subtest: SG-2: production boot refuses MEMORY_MODE=1 (agri)
+ok 19 - SG-2: production boot refuses MEMORY_MODE=1 (agri)
+  ---
+  duration_ms: 405.378933
+  type: 'test'
+  ...
+# Subtest: SG-2: production boot refuses MEMORY_MODE=1 (flock)
+ok 20 - SG-2: production boot refuses MEMORY_MODE=1 (flock)
+  ---
+  duration_ms: 408.867191
+  type: 'test'
+  ...
+# Subtest: SG-1: production boot refuses weak JWT_SECRET "secret" (dairy)
+ok 21 - SG-1: production boot refuses weak JWT_SECRET "secret" (dairy)
+  ---
+  duration_ms: 10071.804951
+  type: 'test'
+  ...
+# Subtest: SG-1: production boot refuses weak JWT_SECRET "secret" (agri)
+ok 22 - SG-1: production boot refuses weak JWT_SECRET "secret" (agri)
+  ---
+  duration_ms: 5643.354711
+  type: 'test'
+  ...
+# Subtest: SG-1: production boot refuses weak JWT_SECRET "secret" (flock)
+not ok 23 - SG-1: production boot refuses weak JWT_SECRET "secret" (flock)
+  ---
+  duration_ms: 820.428092
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:65:3'
+  failureType: 'testCodeFailure'
+  error: 'production server booted with JWT_SECRET=secret'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:78:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: RL-1: rotating X-Forwarded-For still hits the login rate limiter (dairy, direct)
+not ok 24 - RL-1: rotating X-Forwarded-For still hits the login rate limiter (dairy, direct)
+  ---
+  duration_ms: 25429.138683
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:84:1'
+  failureType: 'testCodeFailure'
+  error: '14 wrong logins with rotating XFF never got a 429'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/headers-csp.test.mjs:94:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: E1: empty crop create is rejected (agri)
+not ok 25 - E1: empty crop create is rejected (agri)
+  ---
+  duration_ms: 2421.776224
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:5:1'
+  failureType: 'testCodeFailure'
+  error: 'empty crop stored (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:10:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: FZ-3: operator objects in crop string fields are rejected, not stored as {} (agri)
+not ok 26 - FZ-3: operator objects in crop string fields are rejected, not stored as {} (agri)
+  ---
+  duration_ms: 2367.100202
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:14:1'
+  failureType: 'testCodeFailure'
+  error: 'operator object stored (201: {"name":{},"status":{},"farmId":"1b5156684cf64da5ad3754eb","_id":"07a880f6b1862da937c89b70"})'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:19:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: FZ-1: a 5 MB single text field is rejected (dairy cow notes)
+not ok 27 - FZ-1: a 5 MB single text field is rejected (dairy cow notes)
+  ---
+  duration_ms: 24535.110305
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:23:1'
+  failureType: 'testCodeFailure'
+  error: '5MB field stored (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:29:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: D1: absurd numeric cow weight is rejected (dairy)
+not ok 28 - D1: absurd numeric cow weight is rejected (dairy)
+  ---
+  duration_ms: 24338.363766
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:33:1'
+  failureType: 'testCodeFailure'
+  error: 'weight=1e15 accepted (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:39:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: FZ-2: impossible calendar date 2026-02-30 is rejected (dairy daily log)
+not ok 29 - FZ-2: impossible calendar date 2026-02-30 is rejected (dairy daily log)
+  ---
+  duration_ms: 24319.628064
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: '2026-02-30 accepted (404: {"error":"API route not found: POST /dailylog"})'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:48:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: F1: batch with negative initial count is rejected (flock)
+ok 30 - F1: batch with negative initial count is rejected (flock)
+  ---
+  duration_ms: 917.446209
+  type: 'test'
+  ...
+# Subtest: A6: create cannot forge role/farm ownership fields (agri crop create)
+not ok 31 - A6: create cannot forge role/farm ownership fields (agri crop create)
+  ---
+  duration_ms: 2354.749906
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:62:1'
+  failureType: 'testCodeFailure'
+  error: 'client-forged _id was stored'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '000000000000000000000001'
+  actual: '000000000000000000000001'
+  operator: 'notStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:72:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A5: stale writer does not silently overwrite a newer update (dairy cow)
+not ok 32 - A5: stale writer does not silently overwrite a newer update (dairy cow)
+  ---
+  duration_ms: 24468.524971
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:77:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    stale overwrite accepted silently (200)
+    
+    200 !== 409
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 409
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/input-bounds.test.mjs:88:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: G1: negative liability amount_owed is rejected (agri)
+not ok 33 - G1: negative liability amount_owed is rejected (agri)
+  ---
+  duration_ms: 2444.910887
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/money-validation.test.mjs:5:1'
+  failureType: 'testCodeFailure'
+  error: 'negative liability stored (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/money-validation.test.mjs:10:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: G2: negative inventory quantity is rejected on create and update (agri)
+not ok 34 - G2: negative inventory quantity is rejected on create and update (agri)
+  ---
+  duration_ms: 2371.615226
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/money-validation.test.mjs:16:1'
+  failureType: 'testCodeFailure'
+  error: 'negative inventory create accepted (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/money-validation.test.mjs:21:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: G3: absurd field area is rejected (agri)
+not ok 35 - G3: absurd field area is rejected (agri)
+  ---
+  duration_ms: 2356.930006
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/money-validation.test.mjs:32:1'
+  failureType: 'testCodeFailure'
+  error: 'acres=1e12 accepted (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/money-validation.test.mjs:37:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: E5: negative finance amount is rejected (agri)
+not ok 36 - E5: negative finance amount is rejected (agri)
+  ---
+  duration_ms: 2355.943557
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/money-validation.test.mjs:41:1'
+  failureType: 'testCodeFailure'
+  error: 'negative finance amount accepted (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/money-validation.test.mjs:46:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: PH-1: uploaded photo is served without EXIF/GPS bytes (dairy)
+not ok 37 - PH-1: uploaded photo is served without EXIF/GPS bytes (dairy)
+  ---
+  duration_ms: 24400.58566
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/photos.test.mjs:22:3'
+  failureType: 'testCodeFailure'
+  error: 'GPS/EXIF marker served back byte-identical'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/photos.test.mjs:33:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: PH-2: worker cannot delete photos (dairy)
+not ok 38 - PH-2: worker cannot delete photos (dairy)
+  ---
+  duration_ms: 24397.938327
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/photos.test.mjs:37:3'
+  failureType: 'testCodeFailure'
+  error: 'worker deleted a photo (200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/photos.test.mjs:46:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: PH-1: uploaded photo is served without EXIF/GPS bytes (agri)
+not ok 39 - PH-1: uploaded photo is served without EXIF/GPS bytes (agri)
+  ---
+  duration_ms: 2370.240092
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/photos.test.mjs:22:3'
+  failureType: 'testCodeFailure'
+  error: 'GPS/EXIF marker served back byte-identical'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/photos.test.mjs:33:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: PH-2: worker cannot delete photos (agri)
+not ok 40 - PH-2: worker cannot delete photos (agri)
+  ---
+  duration_ms: 2674.681876
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/photos.test.mjs:37:3'
+  failureType: 'testCodeFailure'
+  error: 'worker deleted a photo (200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/photos.test.mjs:46:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: PH-F2: flock images are not served with public immutable year-long caching
+not ok 41 - PH-F2: flock images are not served with public immutable year-long caching
+  ---
+  duration_ms: 908.736244
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/photos.test.mjs:51:1'
+  failureType: 'testCodeFailure'
+  error: 'flock upload failed 404: {"error":"API route not found: POST /images"}'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/photos.test.mjs:56:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: P8-1: flock diary photo paths resolve on the backend (no /api/photos 404)
+not ok 42 - P8-1: flock diary photo paths resolve on the backend (no /api/photos 404)
+  ---
+  duration_ms: 915.624714
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/photos.test.mjs:64:1'
+  failureType: 'testCodeFailure'
+  error: 'upload failed 404'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ''
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/photos.test.mjs:70:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A1: token is rejected after logout (dairy)
+not ok 43 - A1: token is rejected after logout (dairy)
+  ---
+  duration_ms: 24383.418506
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: 'logout must exist and succeed, got 404'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:18:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: A1: token is rejected after logout (agri)
+not ok 44 - A1: token is rejected after logout (agri)
+  ---
+  duration_ms: 2356.677007
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    old token still works after logout (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:20:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A1: token is rejected after logout (flock)
+not ok 45 - A1: token is rejected after logout (flock)
+  ---
+  duration_ms: 928.989
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    old token still works after logout (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:20:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A3: token lifetime is at most 24h (dairy)
+not ok 46 - A3: token lifetime is at most 24h (dairy)
+  ---
+  duration_ms: 24308.785219
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:27:3'
+  failureType: 'testCodeFailure'
+  error: 'TTL is 168h'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:32:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A3: token lifetime is at most 24h (flock)
+not ok 47 - A3: token lifetime is at most 24h (flock)
+  ---
+  duration_ms: 921.40344
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:27:3'
+  failureType: 'testCodeFailure'
+  error: 'TTL is 168h'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:32:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A2: old token is rejected after password change (dairy)
+not ok 48 - A2: old token is rejected after password change (dairy)
+  ---
+  duration_ms: 24443.950725
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:38:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    change-password failed: 401 {"error":"Current password is incorrect"}
+    
+    401 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 401
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:44:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: BC-1: login rejects password differing only after byte 72 (dairy)
+not ok 49 - BC-1: login rejects password differing only after byte 72 (dairy)
+  ---
+  duration_ms: 24529.581909
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:52:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    truncated-variant password logged in (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:65:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: BC-1: login rejects password differing only after byte 72 (flock)
+not ok 50 - BC-1: login rejects password differing only after byte 72 (flock)
+  ---
+  duration_ms: 1077.390188
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:52:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    truncated-variant password logged in (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/sessions-auth.test.mjs:65:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: K1: telegram bot rejects a 999,999,999 single-message expense (dairy)
+not ok 51 - K1: telegram bot rejects a 999,999,999 single-message expense (dairy)
+  ---
+  duration_ms: 25256.303309
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/telegram.test.mjs:10:1'
+  failureType: 'testCodeFailure'
+  error: 'bot booked a 999,999,999 expense from one message'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/telegram.test.mjs:29:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: CRON-LOG-1: cron secret is not printed to server logs (agri)
+not ok 52 - CRON-LOG-1: cron secret is not printed to server logs (agri)
+  ---
+  duration_ms: 2955.695571
+  type: 'test'
+  location: '/home/user/bughunt-round3/tests/acceptance/telegram.test.mjs:35:1'
+  failureType: 'testCodeFailure'
+  error: 'cron ?key= secret appeared verbatim in server logs'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/bughunt-round3/tests/acceptance/telegram.test.mjs:41:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..52
+# tests 52
+# suites 0
+# pass 6
+# fail 43
+# cancelled 0
+# skipped 3
+# todo 0
+# duration_ms 434073.350572
