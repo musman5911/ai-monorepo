@@ -3,7 +3,7 @@ import express from 'express';
 import crypto from 'node:crypto';
 import rateLimit from 'express-rate-limit';
 import { Setting, Crop, Finance, Task } from '../db.js';
-import { protect, requireAdmin } from '../middleware/auth.js';
+import { protect, requireAdmin, ownerOnly } from '../middleware/auth.js';
 import { sendEmail, mufEmail } from '../utils/mailer.js';
 import { todayStr, localParts, localDateTimeStr } from '../utils/date.js';
 import { badRequest, sendHttpError, asyncHandler } from '../utils/helpers.js';
@@ -194,7 +194,7 @@ export function startScheduler() {
 }
 
 // ─── Automations settings ───────────────────────────────────────────────────
-router.get('/settings/automations', protect, requireAdmin, asyncHandler(async (req, res) => {
+router.get('/settings/automations', protect, ownerOnly, asyncHandler(async (req, res) => {
   const settings = await Setting.findOne({ key: 'automations' });
   if (!settings) {
     return res.json({
@@ -211,7 +211,7 @@ router.get('/settings/automations', protect, requireAdmin, asyncHandler(async (r
   return res.json(data);
 }));
 
-router.put('/settings/automations', protect, requireAdmin, asyncHandler(async (req, res) => {
+router.put('/settings/automations', protect, ownerOnly, asyncHandler(async (req, res) => {
   await Setting.updateOne({ key: 'automations' }, { $set: { value: req.body || {} } }, { upsert: true });
   return res.json({ status: 'ok' });
 }));
@@ -230,7 +230,7 @@ router.get('/settings/location', asyncHandler(async (_req, res) => {
   });
 }));
 
-router.put('/settings/location', protect, requireAdmin, asyncHandler(async (req, res) => {
+router.put('/settings/location', protect, ownerOnly, asyncHandler(async (req, res) => {
   const rawDms = String(req.body?.raw_dms || '').trim();
   const lat = req.body?.lat;
   const lon = req.body?.lon;
@@ -247,7 +247,7 @@ router.put('/settings/location', protect, requireAdmin, asyncHandler(async (req,
 }));
 
 // ─── Manual trigger from the admin panel ────────────────────────────────────
-router.post('/settings/automations/trigger', protect, requireAdmin, asyncHandler(async (req, res) => {
+router.post('/settings/automations/trigger', protect, ownerOnly, asyncHandler(async (req, res) => {
   const body = req.body || {};
   const settings = await Setting.findOne({ key: 'automations' });
   if (!settings) {
