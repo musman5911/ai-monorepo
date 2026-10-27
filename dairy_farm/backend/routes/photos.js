@@ -4,6 +4,7 @@ import { PhotoAsset, Cow, Expense, DailyLog } from '../db.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { createMufStorage } from '../muf-storage.mjs';
 import { MUF_ENV } from '../muf-env.mjs';
+import { mufRunUnscoped } from '../muf-farms.mjs';
 import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.mjs';
 import { cleanupOrphanPhotoAssets, discoverOrphanPhotoAssets } from '../services/photo-assets.js';
 
@@ -75,11 +76,15 @@ function referencesId(value, id, seen = new Set()) {
   return (Array.isArray(value) ? value : Object.values(value)).some((v) => referencesId(v, id, seen));
 }
 async function isReferenced(id) {
-  for (const Model of [Cow, Expense, DailyLog]) {
-    const rows = await Model.find({}).lean();
-    if (rows.some((row) => referencesId(row, id))) return true;
-  }
-  return false;
+  // An asset must not be deleted just because its reference lives in another
+  // farm. Read reference records across farms, but expose no records to caller.
+  return mufRunUnscoped(async () => {
+    for (const Model of [Cow, Expense, DailyLog]) {
+      const rows = await Model.find({}).lean();
+      if (rows.some((row) => referencesId(row, id))) return true;
+    }
+    return false;
+  });
 }
 router.post('/photos', protect, async (req, res) => {
   try {
