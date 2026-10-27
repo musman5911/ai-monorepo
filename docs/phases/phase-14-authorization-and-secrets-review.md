@@ -64,6 +64,14 @@ The owner pulled commit `3d366ac` and supplied these Windows CMD results (before
 
 These are owner-provided results. They validate the current automated suite and builds, not every route's role behavior. The route-module inventory uses baseline policies and includes a public-link risk acceptance; it does not dynamically inspect every route registration or prove handler-level authorization. Do not claim exhaustive authorization verification based solely on the inventory count.
 
+
+## Follow-up source review (2026-10-27)
+
+- A focused comparison of authentication middleware found that Agri's token resolver accepted a valid JWT for a user whose account had been deactivated, unlike Dairy and Flock. Updated Agri to reject missing or explicitly inactive users during token resolution, so protected requests lose access immediately even before token expiry.
+- Added a regression assertion to `tests/auth-production-config.test.ts` for the Agri inactive-user guard.
+- Commits: `d5a593e` (fix) and `f6f7fd2` (regression test). These commits are on `muf-monorepo`; the owner still needs to pull and run the test suite.
+- Phase 14 remains **In progress**. The route inventory checker verifies module coverage only; the remaining endpoint-level role/farm-scope review and checker-strengthening work are not complete.
+
 ## Remaining manual-review limitation
 
 A follow-up source review found and fixed a CORS allowlist gap for `X-Cron-Key` in Dairy and Agri; the regression test was added after the owner validation above and must be run locally. Before Phase 14 can be marked Done, the remaining source-level review must verify that route handlers actually implement their documented role/farm scope and that the baseline inventory accurately reflects mounted routes and exceptions. The current check catches undocumented route modules, not unclassified individual endpoints within an existing module. Login rate limiting, request-size limits and security-header configuration must also be checked against the actual server configuration. Any gaps found must be fixed and covered by regression tests.
