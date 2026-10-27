@@ -107,4 +107,4 @@ for (const app of apps) {
   }
 }
 
-console.log(`Route permission inventory passed: ${checked} route modules are documented; all three backend entry points exist and imported route routers are visibly mounted.`);
+console.log(`Route permission inventory passed: ${checked} route modules are documented; all route modules are documented, imported by their server, and visibly mounted.`);
