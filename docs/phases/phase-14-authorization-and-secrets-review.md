@@ -218,3 +218,16 @@ Do not mark Phase 14 Done solely from source-string tests or a passing route inv
 The owner pulled commit `45e9ee2` and supplied Windows CMD results. `npm test` reported 42 files, 356 passed tests and one failed assertion (357 total). The only failure was in the new `active-user and farm-role enforcement` source-contract test: it expected Agri's middleware to contain `user.active === false`, while Agri's actual `resolveUser` rejects missing or explicitly inactive users with `user && user.active !== false ? user : null`. This was an incorrect test expectation, not evidence from this run of an authorization bypass. Corrected the assertion in commit `bab5870` to match the actual guard. **The corrected focused test and full suite are pending owner rerun; no passing result is claimed yet.**
 
 The owner's other reported checks passed: route permission inventory (46 route modules), secret scan (647 tracked paths), sync checks, UI safety, workbench source checks (23), farm-scope and breeding-event checks, phase-doc checks, and all three production builds. `git status --short --branch` showed a clean working tree synced with `origin/muf-monorepo`. Those checks do not erase the failing test or prove all routes behaviorally secure. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
+
+## Latest owner validation and corrected assertion (2026-10-27)
+
+After pulling the latest branch update, the owner supplied these Windows CMD results:
+
+- `npx vitest run tests/public-route-security.test.ts`: passed, 1 file / 24 tests.
+- `npm test`: passed, 42 files / 357 tests.
+- `npm run check-docs`: passed, all 22 phase files, statuses, required sections and links consistent.
+- `git status --short --branch`: clean working tree; `muf-monorepo` is up to date with `origin/muf-monorepo`.
+
+The focused suite now includes the corrected Agri active-user source assertion and the expanded backup/archive, farm-role, settings and photo-reference checks. These results supersede the prior note that the corrected assertion was awaiting rerun. They do not establish that every endpoint has been behaviorally tested for every role and farm context. The latest output did not include fresh current-head results for the secret scan, route inventory/mount check, sync/UI/workbench/farm checks, or all three production builds; do not infer those from this run.
+
+**Status remains In progress.** Complete the remaining handler-level review, add behavior-focused regression tests for confirmed gaps, run the full current-head validation gate, and only then consider closure. Phase 15 remains Not started.
