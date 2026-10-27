@@ -58,7 +58,7 @@ app.use(cors({
   origin: allowedOrigin.length ? allowedOrigin : (MUF_ENV.nodeEnv === 'production' ? false : true),
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Access-Token', 'X-Cron-Secret', 'X-Cross-Farm-Key', 'X-Farm-Id'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Access-Token', 'X-Cron-Secret', 'X-Cron-Key', 'X-Cross-Farm-Key', 'X-Farm-Id'],
 }));
 
 // 10mb JSON limit — unified across all 3 farm backends (dairy, flock, agri).
