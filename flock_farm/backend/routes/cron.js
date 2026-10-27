@@ -52,7 +52,7 @@ router.get('/cron/daily-summary', async (req, res) => {
       text: summary.text,
       html: summary.html,
     });
-    res.json({ ok: true, date: summary.date, recipients, stats: summary.stats });
+    res.json({ ok: true, date: summary.date });
   } catch (err) {
     console.error('cron daily-summary error:', err);
     res.status(500).json({ error: 'Failed to send summary' });
