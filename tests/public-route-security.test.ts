@@ -122,3 +122,26 @@ describe('manager farm-assignment boundaries', () => {
     }
   });
 });
+
+
+describe('photo asset cross-farm reference protection', () => {
+  it('checks references across farms before deleting a Dairy or Agri photo asset', () => {
+    for (const app of ['dairy_farm', 'agri_farm']) {
+      const routes = source(`${app}/backend/routes/photos.js`);
+      const service = source(`${app}/backend/services/photo-assets.js`);
+      expect(routes).toContain("import { mufRunUnscoped } from '../muf-farms.mjs'");
+      expect(routes).toContain('return mufRunUnscoped(async () => {');
+      expect(service).toContain("import { mufRunUnscoped } from '../muf-farms.mjs'");
+      expect(service).toContain('const refs = await mufRunUnscoped(async () => {');
+    }
+  });
+
+  it('keeps photo asset storage farm-scoped in Agri and Dairy models', () => {
+    const agri = source('agri_farm/backend/db.js');
+    const dairy = source('dairy_farm/backend/db.js');
+    expect(agri).toContain('PhotoAsset: PhotoAssetSchema');
+    expect(agri).toContain('schema.add({ farmId: { type: String } })');
+    expect(dairy).toContain('farmId: { type: String, index: true }');
+    expect(dairy).toContain('PhotoAsset: PhotoAssetSchema');
+  });
+});
