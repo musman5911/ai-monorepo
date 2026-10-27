@@ -78,7 +78,7 @@ These are owner-provided results. They validate the current automated suite and 
 - Source review found Telegram webhook path secrets were compared with ordinary string equality in Dairy, Flock and Agri. Dairy and Flock now use their existing equal-length, timing-safe helper; Agri now has the same protection. Missing webhook secrets continue to fail closed.
 - Agri Telegram's scheduled endpoint now prefers `X-Cron-Key` to the legacy query parameter and compares it timing-safely, matching the other scheduled endpoints.
 - Added regression assertions for all three Telegram webhook comparisons and Agri's cron header/secret behavior in `tests/public-route-security.test.ts`.
-- Strengthened `tools/check-route-permissions.js`: it now checks that each imported default or named route router is visibly mounted directly or included in Agri's `apiRouters` list, in addition to checking module inventory coverage. This is a mount-wiring check, not a proof of handler authorization.
+- Strengthened `tools/check-route-permissions.js`: it now checks that every route module has an inventory entry, is imported by its server, and is visibly mounted directly or included in Agri's `apiRouters` list. This is a mount-wiring check, not a proof of handler authorization.
 - Corrected the Agri inventory to document the public location read as an exception within `routes/automations.js`; there is no separate Agri `routes/settings.js` module.
 - New commits: `7a63247`, `93127ce`, `b069244`, `44b6040`, `a49f096`, `3687c78`, `c03e141`. The owner must pull and run validation before these newest changes are considered verified.
 
@@ -115,7 +115,7 @@ The owner has since validated the CORS correction and reported 343 passing tests
 
 ## New command-line check
 
-`npm run check-secrets` fails on tracked environment files, private-key/certificate files, and recognized credential patterns. `npm run check-route-permissions` fails when a JavaScript module under a backend `routes/` directory lacks a matching inventory entry, an imported default/named route router is not visibly mounted, or an app backend entry point is missing.
+`npm run check-secrets` fails on tracked environment files, private-key/certificate files, and recognized credential patterns. `npm run check-route-permissions` fails when a JavaScript module under a backend `routes/` directory lacks a matching inventory entry, is not imported/mounted by its server, or an app backend entry point is missing.
 
 ## Command-line checks at the end of this phase
 
