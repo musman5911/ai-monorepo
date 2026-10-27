@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-26 (Phase 13 dependency security audit started).
+Last updated: 2026-10-27 (Phase 13 completion recorded; Phase 14 started).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -23,8 +23,8 @@ Last updated: 2026-10-26 (Phase 13 dependency security audit started).
 | 10 | Smaller downloads and faster screens | Done | [phase-10-bundle-size-performance.md](phases/phase-10-bundle-size-performance.md) |
 | 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Done | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
-| 13 | Dependency security fixes | In progress | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
-| 14 | Authorization and secrets review | Not started | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
+| 13 | Dependency security fixes | Done | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
+| 14 | Authorization and secrets review | In progress | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Not started | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Not started | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
@@ -70,3 +70,10 @@ These are owner-supplied Windows checkout results, not commands independently ex
 Phase 13 is **In progress**. Added `tools/check-audit.js` and exposed it as `npm run check-audit`. The checker explicitly audits all seven npm package sets (root tools, Dairy backend/client, Flock backend/client, Agri backend/frontend) with `npm audit --omit=dev --audit-level=high`; it fails if a package manifest/lockfile is missing, npm cannot run, or an audit reports a high/critical production issue. The checker and documentation have been committed to `muf-monorepo`.
 
 **Verification limitation:** this editing session can update repository files but cannot run npm against the registry or execute the Windows checkout. No current audit result, dependency remediation, test result, or build result is claimed yet. The historical audit counts above are from 2026-10-24 and must not be treated as current. After pulling, run `npm run check-audit` and share its full output; use those live results to make targeted lockfile/package changes, without `npm audit fix --force` or guessed version bumps.
+
+
+## Phase 14 start (2026-10-27)
+
+Phase 14, Authorization and secrets review, is **In progress**. Initial repository review covered the deployment guide, shared environment loader, production start configuration, and authentication middleware in all three backends. Existing safeguards include production JWT-secret requirements in Dairy/Flock, farm-context middleware, user-active checks, Helmet headers, request limits, and rate limiting; exact behavior differs between apps and needs route-by-route verification.
+
+Added `tools/check-secrets.js` and the root `npm run check-secrets` command. It checks Git-tracked paths for tracked `.env` files, private-key/certificate files, and common credential patterns, with explicit allowance for documented MongoDB placeholders in public `.env.example` templates. **The scan has not been run in the owner's Windows checkout yet.** Route inventory and regression tests are still pending. No live secrets, databases, or deployments were accessed or changed.
