@@ -1,6 +1,6 @@
 # Phase 13: Dependency security fixes
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -66,3 +66,17 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 5. Ask the owner before removing any feature (the Flock Home Birds trims are already allowed).
 6. Stay inside this phase's scope. If a shared MUF file changes, keep the three copies identical (`npm run check-sync`).
 7. Keep the other two apps working: run all three builds even when only one app changed.
+
+
+## Completion record (2026-10-26)
+
+Phase 13 is **Done for command-line scope** based on owner-supplied Windows CMD output. The owner upgraded affected dependency lockfiles and moved Nodemailer to `^10.2.1` in all three backends.
+
+- `npm run check-audit`: passed across all seven package sets, with zero high/critical production findings.
+- `npm test`: passed, 40 files / 328 tests.
+- `tools\\build-all.bat`: Dairy, Flock, and Agri builds passed.
+- Git commit `376c869` was pushed to `muf-monorepo`; the owner confirmed the working tree was clean and up to date.
+- The Dairy client still reports development-only Vite/esbuild findings in the full audit. They were not force-upgraded because the remediation would be breaking; production-only audit is clean.
+- `check-audit.js` emits a Node `DEP0190` warning related to `shell: true`; it did not fail the check and remains a separate maintenance item.
+
+These are owner-reported results, not commands independently executed in this editing session. No live deployment or database verification is claimed.
