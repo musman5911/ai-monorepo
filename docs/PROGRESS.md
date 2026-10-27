@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-27 (Phase 14 owner validation updated; current-head retest remains pending).
+Last updated: 2026-10-27 (Phase 14 current-head command-line validation recorded; handler-level review remains open).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -95,3 +95,21 @@ Added `docs/security/route-permission-inventory.md` covering the route modules i
 
 
 **Latest owner validation (2026-10-27):** `npm test` passed (42 files / 347 tests), `npm run check-docs` passed, `tools\\build-all.bat` passed for Dairy, Flock and Agri, and `git status` was clean with the branch up to date. These results were supplied before the latest manager farm-assignment boundary fix and its regression assertion. The current branch head must be pulled and retested before Phase 14 can be marked Done. Phase 14 remains **In progress**.
+
+## Phase 14 current-head validation (2026-10-27; owner-supplied Windows CMD output)
+
+The owner pulled the current muf-monorepo branch and ran the security-focused and standard command-line checks. Results:
+
+| Command/check | Result |
+|---|---|
+| `npx vitest run tests/public-route-security.test.ts` | Passed: 1 file, 16 tests |
+| `npm test` | Passed: 42 files, 349 tests |
+| `npm run check-route-permissions` | Passed: 46 route modules documented, imported and visibly mounted |
+| `npm run check-secrets` | Passed: 647 tracked paths scanned; no tracked .env files, private keys or recognized credential patterns found |
+| `npm run check-sync` | Passed: all three apps' shared files, backend twins, environment names and listed invariants in sync |
+| `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks |
+| `npm run check-docs` | Passed: all 22 phase files, statuses and links consistent |
+| `tools\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `git status` | Clean working tree; branch up to date with `origin/muf-monorepo` |
+
+These results validate the current automated tests, static inventory/mount coverage, secret scan, farm-scope checks and builds reported in the supplied CMD output. `npm run check-ui` and `npm run check-workbench` were not shown in this latest run and are not claimed here. The route inventory checker does not prove every handler's authorization. Phase 14 remains **In progress** until the remaining handler-level role/farm-scope review is complete. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21.
