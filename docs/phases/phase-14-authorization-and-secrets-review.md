@@ -44,14 +44,14 @@ Every route is checked for the right role, and no secret is in the repository.
 
 - Added `docs/security/route-permission-inventory.md`, a module-by-module policy inventory for the route modules in Dairy, Flock and Agri, including public exceptions, owner-only operations, farm-scoped business data, scheduled jobs, webhooks and share-card bearer access.
 - Added `tools/check-route-permissions.js` and `npm run check-route-permissions`. It fails if a `.js` route module under any of the three `backend/routes/` directories lacks a matching inventory entry or an app backend entry point is missing.
-- The owner ran `npm run check-route-permissions` after pulling: passed, 53 route modules documented and all three backend entry points found. This inventory check is a coverage guard, not proof that every handler enforces the documented policy.
+- The owner ran `npm run check-route-permissions` after pulling: passed, 46 actual route modules documented, imported by their server, and visibly mounted. The earlier 53 count included route-folder helper modules and was corrected. This inventory check is a coverage guard, not proof that every handler enforces the documented policy.
 - Share-card risk is explicitly documented as accepted compatibility risk for existing QR/share links. Links expose the card payload to anyone holding the URL and are not individually revocable in the current ID-based design. A signed/revocable token migration remains recommended if private or revocable sharing becomes a requirement.
 
 ## Owner validation checkpoint (2026-10-27)
 
 The owner pulled commit `3d366ac` and supplied these Windows CMD results (before the follow-up CORS correction below):
 
-- `npm run check-route-permissions`: passed, 53 route modules documented.
+- `npm run check-route-permissions`: passes for 46 actual route modules documented, imported and visibly mounted.
 - `npm run check-secrets`: passed, 647 tracked paths scanned.
 - `npm test`: passed, 42 files / 341 tests.
 - `npm run check-sync`: passed.
