@@ -217,7 +217,8 @@ router.put('/settings/automations', protect, requireAdmin, asyncHandler(async (r
 }));
 
 // ─── Farm location (GET open — weather widget needs it without auth) ────────
-router.get('/settings/location', protect, requireAdmin, asyncHandler(async (_req, res) => {
+// Public by design: the unauthenticated weather widget reads the farm's configured location.
+router.get('/settings/location', asyncHandler(async (_req, res) => {
   const settings = await Setting.findOne({ key: 'farm_location' });
   if (!settings) return res.json({});
   const value = settings.value || {};
