@@ -53,6 +53,24 @@ describe('scheduled endpoint response and secret controls', () => {
   });
 });
 
+describe('Telegram secret validation', () => {
+  it('Dairy and Flock compare webhook path secrets timing-safely', () => {
+    for (const app of ['dairy_farm', 'flock_farm']) {
+      const routes = source(`${app}/backend/routes/telegram.js`);
+      expect(routes).toContain('!secretsMatch(req.params.secret, WH_SECRET())');
+    }
+  });
+
+  it('Agri compares webhook and cron secrets timing-safely and prefers the cron header', () => {
+    const routes = source('agri_farm/backend/routes/telegram.js');
+    expect(routes).toContain('crypto.timingSafeEqual(a, b)');
+    expect(routes).toContain('!timingSafeSecretEqual(req.params.secret, expected)');
+    expect(routes).toContain("req.headers['x-cron-key'] || req.query.key || ''");
+    expect(routes).toContain('timingSafeSecretEqual(provided, cronSecret)');
+    expect(routes).not.toContain('provided !== cronSecret');
+  });
+});
+
 describe('cross-farm summary key controls', () => {
   for (const app of ['dairy_farm', 'flock_farm', 'agri_farm']) {
     it(`${app} cross-farm summaries prefer a header and compare keys timing-safely`, () => {
