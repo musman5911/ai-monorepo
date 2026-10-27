@@ -1,6 +1,7 @@
 import { MUF_ENV } from '../muf-env.mjs';
 import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.mjs';
 import { PhotoAsset, Cow, Expense, DailyLog } from '../db.js';
+import { mufRunUnscoped } from '../muf-farms.mjs';
 
 const MODELS = [Cow, Expense, DailyLog];
 
@@ -15,11 +16,17 @@ function collectPhotoReferences(value, refs, seen = new Set()) {
 }
 
 export async function discoverOrphanPhotoAssets() {
-  const refs = new Set();
-  for (const Model of MODELS) {
-    const rows = await Model.find({}).lean();
-    for (const row of rows) collectPhotoReferences(row, refs);
-  }
+  // References must be checked across every farm before deleting an asset.
+  // The asset query itself remains farm-scoped below, so this never exposes
+  // another farm's asset metadata to the current caller.
+  const refs = await mufRunUnscoped(async () => {
+    const found = new Set();
+    for (const Model of MODELS) {
+      const rows = await Model.find({}).lean();
+      for (const row of rows) collectPhotoReferences(row, found);
+    }
+    return found;
+  });
   const assets = await PhotoAsset.find({}).select('_id createdAt').lean();
   // Give newly uploaded photos time to be attached to their parent record.
   // Legacy assets without timestamps remain eligible for cleanup.
