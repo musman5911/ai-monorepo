@@ -1,5 +1,6 @@
 // ─── Automations (scheduled email digests) + farm location + external cron ──
 import express from 'express';
+import crypto from 'node:crypto';
 import rateLimit from 'express-rate-limit';
 import { Setting, Crop, Finance, Task } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
@@ -282,12 +283,18 @@ router.post('/settings/automations/trigger', protect, requireAdmin, asyncHandler
 router.get('/cron/dispatch-report', cronDispatch);
 router.post('/cron/dispatch-report', cronDispatch);
 
+function timingSafeSecretEqual(provided, expected) {
+  const a = Buffer.from(String(provided || ''));
+  const b = Buffer.from(String(expected || ''));
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+
 async function cronDispatch(req, res) {
   try {
     const cronSecret = MUF_ENV.cronSecret || '';
     if (!cronSecret) return sendHttpError(res, 503, 'CRON_SECRET is not configured on the server.');
-    const provided = req.query.key || req.headers['x-cron-key'] || '';
-    if (!provided || provided !== cronSecret) {
+    const provided = req.headers['x-cron-key'] || req.query.key || '';
+    if (!timingSafeSecretEqual(provided, cronSecret)) {
       return sendHttpError(res, 401, 'Invalid cron key.');
     }
 
