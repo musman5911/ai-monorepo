@@ -15,6 +15,7 @@ Every route is checked for the right role, and no secret is in the repository.
 ## Initial audit notes (2026-10-27)
 
 - Added `tools/check-secrets.js`, which scans Git-tracked files for tracked `.env` files, private-key/certificate files, and recognizable credential patterns. Public `.env.example` MongoDB URI placeholders are explicitly tolerated.
+- Fixed a production fail-open configuration: all three database modules now refuse `MEMORY_MODE` when `NODE_ENV=production`, preventing demo accounts/data from being served if the production MongoDB URI is missing. Agri also now refuses to generate a fallback JWT key in production.
 - Exposed the scan as `npm run check-secrets`.
 - The scan has not yet been executed against the owner's Windows checkout. Do not treat it as passing until the owner runs it after pulling.
 - No secrets or live deployment settings were changed.
