@@ -9,6 +9,10 @@ import { MUF_ENV } from './muf-env.mjs';
 // ALWAYS wins and MEMORY_MODE is ignored — a leftover flag can never hide
 // your real farm data.
 const USE_MEMORY = MUF_ENV.memoryMode && !MUF_ENV.mongoUri;
+if (MUF_ENV.nodeEnv === 'production' && USE_MEMORY) {
+  console.error('❌ MEMORY_MODE is not allowed in production. Configure MONGO_URI.');
+  process.exit(1);
+}
 
 const connectDB = async () => {
   if (USE_MEMORY) {
