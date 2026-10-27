@@ -11,16 +11,18 @@ const inventory = fs.readFileSync(inventoryPath, 'utf8');
 const apps = ['dairy_farm', 'flock_farm', 'agri_farm'];
 const missing = [];
 const mountProblems = [];
+const routeModules = Object.fromEntries(apps.map((app) => [app, []]));
 let checked = 0;
 
-function walk(directory) {
+function walk(directory, app) {
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     const fullPath = path.join(directory, entry.name);
-    if (entry.isDirectory()) walk(fullPath);
+    if (entry.isDirectory()) walk(fullPath, app);
     else if (entry.isFile() && /\.js$/.test(entry.name)) {
       const relative = path.relative(root, fullPath).replace(/\/g, '/');
       checked += 1;
       const modulePath = relative.slice(relative.indexOf('/backend/routes/') + '/backend/'.length);
+      routeModules[app].push(modulePath);
       if (!inventory.includes('`' + modulePath + '`')) {
         missing.push(relative);
       }
@@ -34,7 +36,7 @@ for (const app of apps) {
     missing.push(`${app}/backend/routes (directory missing)`);
     continue;
   }
-  walk(routesDir);
+  walk(routesDir, app);
 }
 
 
@@ -45,12 +47,14 @@ for (const app of apps) {
     process.exit(1);
   }
   const server = fs.readFileSync(serverPath, 'utf8');
+  const importedRoutePaths = new Set();
   const imports = /import\s+([A-Za-z_$][\w$]*)\s*(?:,\s*\{[^}]*\})?\s*from\s*['"]\.\/routes\/([^'"]+)['"]/g;
 
   const namedRouteImports = /import\s*\{([^}]+)\}\s*from\s*['"]\.\/routes\/([^'"]+)['"]/g;
   let namedMatch;
   while ((namedMatch = namedRouteImports.exec(server)) !== null) {
     const [, importedNames, routePath] = namedMatch;
+    importedRoutePaths.add(routePath);
     // Route modules that use named exports place their router first; helper
     // exports (for example scheduler startup functions) are not routers.
     const firstImport = importedNames.split(',')[0].trim();
@@ -69,10 +73,16 @@ for (const app of apps) {
   let match;
   while ((match = imports.exec(server)) !== null) {
     const [, identifier, routePath] = match;
+    importedRoutePaths.add(routePath);
     const mountCalls = new RegExp('app\\.use\\(\\s*[^,]+,\\s*' + identifier + '\\s*\\)').test(server);
     const listedInRouterArray = new RegExp('\\b' + identifier + '\\b').test(apiRouters);
     if (!mountCalls && !listedInRouterArray) {
       mountProblems.push(`${app}/backend/routes/${routePath}: imported router "${identifier}" is not visibly mounted`);
+    }
+  }
+  for (const routePath of routeModules[app]) {
+    if (!importedRoutePaths.has(routePath)) {
+      mountProblems.push(`${app}/backend/routes/${routePath}: route module is not imported by server.js`);
     }
   }
 }
