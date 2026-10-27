@@ -53,6 +53,18 @@ describe('scheduled endpoint response and secret controls', () => {
   });
 });
 
+
+describe('Agri global settings authorization', () => {
+  it('keeps global automation and location writes owner-only', () => {
+    const routes = source('agri_farm/backend/routes/automations.js');
+    expect(routes).toContain("router.get('/settings/automations', protect, ownerOnly,");
+    expect(routes).toContain("router.put('/settings/automations', protect, ownerOnly,");
+    expect(routes).toContain("router.put('/settings/location', protect, ownerOnly,");
+    expect(routes).toContain("router.post('/settings/automations/trigger', protect, ownerOnly,");
+    expect(routes).not.toContain("router.put('/settings/automations', protect, requireAdmin,");
+  });
+});
+
 describe('Telegram secret validation', () => {
   it('Dairy and Flock compare webhook path secrets timing-safely', () => {
     for (const app of ['dairy_farm', 'flock_farm']) {
