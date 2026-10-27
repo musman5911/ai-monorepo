@@ -111,3 +111,14 @@ describe('manager user-assignment boundaries', () => {
     }
   });
 });
+
+
+describe('manager farm-assignment boundaries', () => {
+  it('preserves worker assignments outside a manager’s farm scope in Dairy and Agri', () => {
+    for (const app of ['dairy_farm', 'agri_farm']) {
+      const authRoutes = source(`${app}/backend/routes/auth.js`);
+      expect(authRoutes).toContain('const outsideMyFarms = (');
+      expect(authRoutes).toContain('farmIds = [...new Set([...outsideMyFarms, ...farmIds.filter((id) => mine.has(id))])];');
+    }
+  });
+});
