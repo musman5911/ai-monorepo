@@ -105,7 +105,7 @@ router.post('/webhook/:secret', async (req, res) => {
   // Always 200 fast — Telegram retries on errors and we never want loops.
   res.json({ ok: true });
   try {
-    if (!WH_SECRET() || req.params.secret !== WH_SECRET()) return;
+    if (!WH_SECRET() || !secretsMatch(req.params.secret, WH_SECRET())) return;
     const msg = req.body && req.body.message;
     if (!msg || !msg.chat || typeof msg.text !== 'string') return;
     const chatId = String(msg.chat.id);
