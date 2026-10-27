@@ -101,11 +101,23 @@ These are owner-provided results. They validate the current automated suite and 
 
 ## Latest owner validation (2026-10-27)
 
-The owner supplied these results from the local Windows checkout: `npm test` passed (42 files / 347 tests), `npm run check-docs` passed with Phase 14 still In progress, all three production builds passed, and `git status` reported a clean tree with the branch up to date. These results were run before the latest manager-assignment boundary fix and regression assertion were pulled, so current-head validation is still pending. No claim is made that the latest fix has passed tests yet.
+The owner supplied the following results from the current Windows checkout after pulling the latest branch:
+
+- `npx vitest run tests/public-route-security.test.ts`: passed, 1 file / 16 tests.
+- `npm test`: passed, 42 files / 349 tests.
+- `npm run check-route-permissions`: passed; 46 route modules are documented, imported and visibly mounted.
+- `npm run check-secrets`: passed; 647 tracked paths scanned with no tracked .env files, private keys or recognized credential patterns.
+- `npm run check-sync`: passed; shared MUF files, backend twins, environment names and listed invariants are in sync.
+- `npm run check-farms`: passed, including the three apps' farm-scope checks and Dairy breeding-event runtime checks.
+- `npm run check-docs`: passed.
+- `tools\build-all.bat`: all three production builds passed.
+- `git status`: clean; branch up to date with `origin/muf-monorepo`.
+
+The latest supplied output does not show `npm run check-ui` or `npm run check-workbench`; neither is claimed for this checkpoint. This is owner-supplied evidence, not a command run independently in this editing session. Passing tests and the 46-module inventory/mount guard do not prove every handler enforces its intended role and farm scope.
 
 ## Remaining manual-review limitation
 
-The owner most recently reported `npm test` passing 42 files / 347 tests, `npm run check-docs` passing, all three builds passing, and a clean, synchronized working tree. These results predate the manager-assignment fix and its regression assertion pushed in the latest follow-up, so they are baseline evidence rather than validation of the current head. The owner has not yet supplied results for the current branch head. Before Phase 14 can be marked Done, rerun the focused security test and the full validation commands, then finish reviewing handler-level role/farm-scope behavior. The inventory checker catches undocumented modules and visible mount wiring, not every endpoint's authorization.
+Phase 14 remains **In progress**. The latest focused and full test suites, secret scan, route coverage check, sync/farm/docs checks and all three builds passed in the owner's checkout. Before marking the phase Done, complete the remaining handler-level role/farm-scope review and add focused regression tests for any gaps found. Do not treat route-module inventory or mount wiring as proof of authorization correctness. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21.
 
 ## Scope
 
