@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import crypto from 'node:crypto';
 import cors from 'cors';
 import helmet from 'helmet';
 import cookieParser from 'cookie-parser';
@@ -57,7 +58,7 @@ if (MUF_ENV.nodeEnv === 'production' && !allowedOrigins.length) {
 app.use(cors({
   origin: allowedOrigins.length ? allowedOrigins : (MUF_ENV.nodeEnv === 'production' ? false : true),
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Cron-Secret', 'X-Farm-Id'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Cron-Secret', 'X-Cross-Farm-Key', 'X-Farm-Id'],
 }));
 
 const standardJsonParser = express.json({ limit: '10mb' });
@@ -144,9 +145,14 @@ async function dairyFarmSummaryHandler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.path !== '/api/super-admin/farm-summary') {
-      const key = MUF_ENV.crossFarmKey;
+      const key = MUF_ENV.crossFarmKey || '';
       if (!key) return res.status(404).json({ error: 'Not enabled' });
-      if (String(req.query.key || '') !== key) return res.status(401).json({ error: 'Bad key' });
+      const provided = req.headers['x-cross-farm-key'] || req.query.key || '';
+      const expectedBytes = Buffer.from(key);
+      const providedBytes = Buffer.from(String(provided));
+      if (providedBytes.length !== expectedBytes.length || !crypto.timingSafeEqual(providedBytes, expectedBytes)) {
+        return res.status(401).json({ error: 'Bad key' });
+      }
     }
     const today = new Date().toISOString().slice(0, 10);
     const month = today.slice(0, 7);
