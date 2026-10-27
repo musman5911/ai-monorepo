@@ -17,7 +17,7 @@ This inventory covers every route module under the three backend `routes/` direc
 |---|---|---|
 | `routes/auth.js` | Mixed public/authenticated | Login, registration/setup and recovery flows are public only where explicitly intended; user-management operations require owner authority. |
 | `routes/cards.js` | Public bearer link | Share-card payload is disclosed to anyone with the link. No-store, noindex, no-referrer and per-router rate limit are defense-in-depth, not access control. |
-| `routes/settings.js` | Mixed public/authenticated | `GET /location` is an explicit public read for the weather widget; all settings writes and sensitive settings reads require authorization. |
+| `routes/settings.js` | Mixed public/authenticated | `GET /location` is an explicit public read for the weather widget; `PUT /location` is owner-only because Dairy stores this location in global `Meta`, not farm-scoped settings. |
 | `routes/archive.js` | Owner-only | Archive/export/delete/restore are destructive or sensitive operations. |
 | `routes/backup.js` | Owner-only | Backup/restore exposes or replaces farm data. |
 | `routes/farms.js` | Owner-only for mutations; scoped reads | Farm administration is owner-only; reads must not reveal unassigned farms to managers/workers. |
