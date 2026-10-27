@@ -18,6 +18,14 @@ describe('public share-card privacy controls', () => {
 });
 
 describe('scheduled endpoint response and secret controls', () => {
+  it('CORS allows the X-Cron-Key header used by scheduled endpoints', () => {
+    for (const app of ['dairy_farm', 'agri_farm']) {
+      const server = source(`${app}/backend/server.js`);
+      expect(server).toContain("'X-Cron-Secret', 'X-Cron-Key', 'X-Cross-Farm-Key'");
+    }
+    const flockServer = source('flock_farm/backend/server.js');
+    expect(flockServer).toContain("req.headers['access-control-request-headers']");
+  });
   it('Agri compares cron secrets with a timing-safe comparison', () => {
     const routes = source('agri_farm/backend/routes/automations.js');
     expect(routes).toContain('crypto.timingSafeEqual(a, b)');
