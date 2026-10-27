@@ -145,3 +145,12 @@ describe('photo asset cross-farm reference protection', () => {
     expect(dairy).toContain('PhotoAsset: PhotoAssetSchema');
   });
 });
+
+
+describe('Dairy global settings authorization', () => {
+  it('keeps the global farm location write owner-only', () => {
+    const routes = source('dairy_farm/backend/routes/settings.js');
+    expect(routes).toContain("router.put('/location', protect, ownerOnly,");
+    expect(routes).not.toContain("router.put('/location', protect, adminOnly,");
+  });
+});
