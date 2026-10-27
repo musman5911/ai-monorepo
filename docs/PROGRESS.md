@@ -122,3 +122,6 @@ Repository source review identified a cross-farm photo-reference issue in Dairy 
 Commits on `muf-monorepo`: `52fe5c2`, `ec9151b`, `f5589a7`, `352c9d1`, `de87aa8`, `98eb24e`.
 
 **Validation status:** changes are committed to the GitHub branch, but the new tests and standard checks have not yet been executed in the owner's Windows checkout. No test pass or build pass is claimed for these commits. Phase 14 remains **In progress** because this is one finding from the handler audit, not proof that all 46 route modules have been behaviorally verified. The latest required local gate includes `npm test`, `npm run check-route-permissions`, `npm run check-secrets`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs`, and `tools\\build-all.bat`.
+
+
+Additional handler-review finding (2026-10-27): Dairy's `PUT /api/settings/location` wrote to global `Meta` settings but allowed managers through the owner-or-manager guard. Changed it to owner-only and added regression coverage; the route inventory now states the policy. Flock location settings remain farm-scoped through `DataStore`. Commits: `341aa2c`, `57fdd32`, `0a94161`, `c62f341`. Validation is pending in the owner's Windows checkout. Phase 14 remains In progress.
