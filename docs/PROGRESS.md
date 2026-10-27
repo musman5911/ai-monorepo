@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-27 (focused Phase 14 source audit and regression assertions added; updated-branch validation pending).
+Last updated: 2026-10-27 (owner validation found one incorrect Agri auth source assertion; corrected in bab5870, rerun pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
