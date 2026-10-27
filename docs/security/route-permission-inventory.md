@@ -22,7 +22,7 @@ This inventory covers every route module under the three backend `routes/` direc
 | `routes/backup.js` | Owner-only | Backup/restore exposes or replaces farm data. |
 | `routes/farms.js` | Owner-only for mutations; scoped reads | Farm administration is owner-only; reads must not reveal unassigned farms to managers/workers. |
 | `routes/breeding-events.js`, `routes/breeding.js`, `routes/buyers.js`, `routes/cows.js`, `routes/dailylog.js`, `routes/expenses.js`, `routes/feedstock.js`, `routes/health.js`, `routes/input.js`, `routes/labor.js`, `routes/milk.js`, `routes/photos.js`, `routes/rates.js`, `routes/sales.js`, `routes/suppliers.js` | Authenticated + farm scope | Writes require manager/owner or the explicitly allowed worker data-entry capability; all record queries and ID-based operations must be farm-scoped. |
-| `routes/email.js`, `routes/telegram.js` | Authenticated + farm scope; webhook exceptions require secrets | Manual sends require authorization and farm assignment. Inbound webhooks must validate their configured secret and bind writes to a resolved farm. |
+| `routes/email.js`, `routes/telegram.js` | Authenticated + farm scope; webhook exceptions require secrets | Manual sends require authorization and farm assignment. Inbound webhooks must validate their configured secret using a timing-safe comparison and bind writes to a resolved farm. |
 
 ## Flock backend
 
@@ -35,7 +35,7 @@ This inventory covers every route module under the three backend `routes/` direc
 | `routes/farms.js` | Owner-only for mutations; scoped reads | No manager/worker farm creation, rename, archive or delete. |
 | `routes/batches.js`, `routes/data.js`, `routes/uploads.js` | Authenticated + farm scope | Data and uploaded assets must be scoped to assigned farms; worker writes are limited to data-entry operations. |
 | `routes/cron.js` | Secret-authenticated job for scheduled send; authenticated + farm scope for manual send | Cron secret must fail closed and compare timing-safely. Do not disclose recipient addresses or farm statistics in the response. |
-| `routes/telegram.js` | Authenticated + farm scope; webhook exceptions require secrets | Webhook writes must resolve a linked farm and fail closed for unlinked/legacy unscoped chats. |
+| `routes/telegram.js` | Authenticated + farm scope; webhook exceptions require secrets | Webhook path secrets must be compared timing-safely. Writes must resolve a linked farm and fail closed for unlinked/legacy unscoped chats. |
 
 ## Agri backend
 
@@ -45,8 +45,8 @@ This inventory covers every route module under the three backend `routes/` direc
 | `routes/cards.js` | Public bearer link | Anyone with the share URL can read the card payload. Privacy headers and rate limits do not make it private or revocable. |
 | `routes/farms.js` | Owner-only for mutations; scoped reads | Farm administration is owner-only; assigned-farm visibility applies to non-owners. |
 | `routes/archive.js`, `routes/backup.js` | Owner-only | Archive and backup actions are sensitive/destructive. |
-| `routes/automations.js` | Secret-authenticated job for cron dispatch; authenticated + farm scope for manual actions | Cron secret must fail closed and compare timing-safely; response must not disclose recipient addresses. |
-| `routes/settings` (if mounted through server) | Public read exception only for location; sensitive settings require authorization | `GET /settings/location` is intentionally public for the weather widget. |
+| `routes/automations.js` | Secret-authenticated job for cron dispatch; authenticated + farm scope for manual actions; public read exception for location | Cron secret must fail closed and compare timing-safely; response must not disclose recipient addresses. `/settings/location` is public for the weather widget; automation settings and manual triggers require owner/manager authorization. |
+
 | `routes/analytics.js`, `routes/crop-logs.js`, `routes/crops.js`, `routes/diary-media.js`, `routes/fields.js`, `routes/finance.js`, `routes/inventory.js`, `routes/labor.js`, `routes/liabilities.js`, `routes/photos.js`, `routes/suppliers.js`, `routes/tasks.js` | Authenticated + farm scope | Data reads/writes must be restricted to assigned farms; worker write access is data-entry only. |
 | `routes/telegram.js` | Authenticated + farm scope; webhook exceptions require secrets | Webhook writes must resolve a linked farm and fail closed for unlinked/legacy unscoped chats. |
 
