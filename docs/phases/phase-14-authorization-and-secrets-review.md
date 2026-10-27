@@ -129,6 +129,12 @@ The latest supplied output does not show `npm run check-ui` or `npm run check-wo
 - Commits: `341aa2c`, `57fdd32`, `0a94161`.
 - **Validation pending:** the latest change and its regression test have not been run locally. Phase 14 remains In progress pending the broader handler audit and full validation.
 
+## Inventory-to-handler consistency correction (2026-10-27)
+
+- Cross-checking the Flock settings inventory against `routes/settings.js` showed the inventory incorrectly described `GET /location` as public. The actual handler requires `authRequired` and reads the farm-scoped `DataStore`; corrected the inventory and added a regression assertion so this mismatch is less likely to return.
+- Commit: `905a422`; test assertion: `ffd1101`.
+- Validation pending; this correction reinforces that inventory entries must be checked against actual route declarations, not copied assumptions.
+
 ## Remaining manual-review limitation
 
 Phase 14 remains **In progress**. The latest focused and full test suites, secret scan, route coverage check, sync/farm/docs checks and all three builds passed in the owner's checkout. Before marking the phase Done, complete the remaining handler-level role/farm-scope review and add focused regression tests for any gaps found. Do not treat route-module inventory or mount wiring as proof of authorization correctness. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21.
