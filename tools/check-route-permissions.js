@@ -19,7 +19,7 @@ function walk(directory, app) {
     const fullPath = path.join(directory, entry.name);
     if (entry.isDirectory()) walk(fullPath, app);
     else if (entry.isFile() && /\.js$/.test(entry.name)) {
-      const relative = path.relative(root, fullPath).replace(/\/g, '/');
+      const relative = path.relative(root, fullPath).replace(/\\/g, '/');
       checked += 1;
       const modulePath = relative.slice(relative.indexOf('/backend/routes/') + '/backend/'.length);
       routeModules[app].push(modulePath);
