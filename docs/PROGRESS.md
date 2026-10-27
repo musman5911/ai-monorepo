@@ -128,3 +128,14 @@ Additional handler-review finding (2026-10-27): Dairy's `PUT /api/settings/locat
 
 
 A further inventory cross-check found the Flock `GET /api/settings/location` handler is authenticated and reads the selected farm's `DataStore`, despite the inventory describing it as public. Corrected the policy to authenticated + farm-scoped and added a regression assertion. Commits: `905a422`, `ffd1101`, `4e55328`. Tests remain unrun for these newest commits; Phase 14 is still In progress.
+
+## Phase 14 latest owner validation (2026-10-27)
+
+After pulling the latest branch update, the owner reported:
+
+- `npx vitest run tests/public-route-security.test.ts`: passed, 1 file / 24 tests.
+- `npm test`: passed, 42 files / 357 tests.
+- `npm run check-docs`: passed; all 22 phase files, statuses, links and required sections were consistent.
+- `git status --short --branch`: clean working tree, `muf-monorepo` aligned with `origin/muf-monorepo`.
+
+This validates the corrected active-user source assertion and the expanded public-route security regression suite on the pulled checkout. The latest output did not include fresh runs of `check-route-permissions`, `check-secrets`, `check-sync`, `check-ui`, `check-workbench`, `check-farms`, or the three production builds, so those are not claimed for this exact checkpoint. Phase 14 remains **In progress**: the full handler-by-handler authorization audit is not complete, and source-contract tests are not equivalent to behavior-level tests for every role and farm combination. Phase 15 remains **Not started**.
