@@ -7,6 +7,7 @@
 // Secrets: TELEGRAM_BOT_TOKEN (from @BotFather), TELEGRAM_WEBHOOK_SECRET
 // (any long random string). Both unset → telegram stays silently off.
 import express from 'express';
+import crypto from 'node:crypto';
 import rateLimit from 'express-rate-limit';
 import { TelegramMeta, User, Laborer, Finance, Attendance, Crop, Farm } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
@@ -26,6 +27,12 @@ const router = express.Router();
 
 const TOKEN = () => MUF_ENV.telegramBotToken || '';
 const WH_SECRET = () => MUF_ENV.telegramWebhookSecret || '';
+
+function timingSafeSecretEqual(provided, expected) {
+  const a = Buffer.from(String(provided || ''));
+  const b = Buffer.from(String(expected || ''));
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
 
 async function tgRead(key) {
   const doc = await TelegramMeta.findOne({ key });
@@ -104,7 +111,7 @@ router.delete('/links/:chatId', protect, requireAdmin, asyncHandler(async (req, 
 
 router.post('/webhook/:secret', asyncHandler(async (req, res) => {
   const expected = WH_SECRET();
-  if (!expected || req.params.secret !== expected) {
+  if (!expected || !timingSafeSecretEqual(req.params.secret, expected)) {
     return res.json({ ok: true }); // bad secret: stay silent, look uninteresting
   }
   try {
@@ -328,8 +335,8 @@ async function telegramCron(req, res) {
   try {
     const cronSecret = MUF_ENV.cronSecret || '';
     if (!cronSecret) return res.status(503).json({ detail: 'CRON_SECRET is not configured on the server.' });
-    const provided = req.query.key || req.headers['x-cron-key'] || '';
-    if (!provided || provided !== cronSecret) {
+    const provided = req.headers['x-cron-key'] || req.query.key || '';
+    if (!timingSafeSecretEqual(provided, cronSecret)) {
       return res.status(401).json({ detail: 'Invalid cron key.' });
     }
     return res.json(await tgPushDaily(false));
