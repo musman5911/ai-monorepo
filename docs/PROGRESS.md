@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-27 (Phase 13 completion recorded; Phase 14 started).
+Last updated: 2026-10-27 (Phase 14 route inventory and share-card risk policy added).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -82,3 +82,10 @@ Added `tools/check-secrets.js` and the root `npm run check-secrets` command. It 
 ## Phase 14 update (2026-10-27)
 
 Owner validation of the initial security checkpoint passed: secret scan (644 tracked paths), 4 production-configuration tests, full suite (41 files / 332 tests), docs check, and all three builds. Further route review added public-card privacy headers and reduced per-card-router limits (120 to 60 per 15 minutes) in Dairy/Flock/Agri; timing-safe Agri cron-secret comparison with header preference; header support for Flock cron; smaller Flock cron responses; timing-safe cross-farm summary key checks with `X-Cross-Farm-Key` preference in all three servers; and removal of configured recipient addresses from Agri cron responses. Added regression coverage in `tests/public-route-security.test.ts`. These changes are pushed but require owner pull/test/build validation. Full route-by-route role and farm-scope inventory remains incomplete, so Phase 14 remains In progress.
+
+
+## Phase 14 route inventory checkpoint (2026-10-27)
+
+Added `docs/security/route-permission-inventory.md` covering the route modules in Dairy, Flock and Agri, their baseline role/farm-scope policies, public exceptions, scheduled jobs, webhook expectations and the accepted compatibility risk for public share-card bearer links. Added `tools/check-route-permissions.js` and `npm run check-route-permissions`; the command checks that every JavaScript module in each backend `routes/` directory has a matching inventory entry and that all three backend entry points exist. The public share-link policy is now explicit: the URL grants read access to its payload, it is not account-bound or individually revocable in the current design, and privacy headers/rate limits are only defense-in-depth. Signed, revocable tokens are recommended if the product requires private/revocable sharing.
+
+**Not yet verified in the owner checkout:** the new route inventory command and the latest source/docs changes have not been run through npm tests or builds in this editing session. The inventory check guards module coverage; it does not prove every handler correctly enforces role permissions or resists farm-ID tampering. Phase 14 remains In progress until the owner pulls and runs the new check plus the standard test/build suite, and any handler-level gaps found during review are fixed. Existing previously reported passing test/build results predate this latest checkpoint and are not current validation for it.
