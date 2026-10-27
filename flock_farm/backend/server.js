@@ -1,5 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
+import crypto from 'node:crypto';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
@@ -156,9 +157,14 @@ async function flockFarmSummaryHandler(req, res) {
   try {
     res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.path !== '/api/super-admin/farm-summary') {
-      const key = MUF_ENV.crossFarmKey;
+      const key = MUF_ENV.crossFarmKey || '';
       if (!key) return res.status(404).json({ error: 'Not enabled' });
-      if (String(req.query.key || '') !== key) return res.status(401).json({ error: 'Bad key' });
+      const provided = req.headers['x-cross-farm-key'] || req.query.key || '';
+      const expectedBytes = Buffer.from(key);
+      const providedBytes = Buffer.from(String(provided));
+      if (providedBytes.length !== expectedBytes.length || !crypto.timingSafeEqual(providedBytes, expectedBytes)) {
+        return res.status(401).json({ error: 'Bad key' });
+      }
     }
     const DataStore = (await import('./models/DataStore.js')).default;
     const activeFarms = await Farm.find({ archived: { $ne: true } }).sort({ createdAt: 1 }).lean();
