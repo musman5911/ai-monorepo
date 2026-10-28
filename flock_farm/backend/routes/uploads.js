@@ -10,6 +10,20 @@ import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.
 const router = express.Router();
 
 const allowedKinds = new Set(['bird', 'batch', 'diary']);
+const allowedImageTypes = new Set(['image/jpeg', 'image/png', 'image/webp']);
+
+function detectImageContentType(bytes) {
+  if (!Buffer.isBuffer(bytes)) return '';
+  if (bytes.length >= 3 && bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) return 'image/jpeg';
+  if (bytes.length >= 8 && bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) return 'image/png';
+  if (bytes.length >= 12 && bytes.toString('ascii', 0, 4) === 'RIFF' && bytes.toString('ascii', 8, 12) === 'WEBP') return 'image/webp';
+  return '';
+}
+
+function validatedImageContentType(file) {
+  const detected = detectImageContentType(file?.buffer);
+  return detected && allowedImageTypes.has(file?.mimetype) && detected === file.mimetype ? detected : '';
+}
 
 let cloudinaryFallbackLogged = false;
 function storageForCurrentFarm(req) {
@@ -86,8 +100,8 @@ const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype && file.mimetype.startsWith('image/')) return cb(null, true);
-    return cb(new Error('Only image uploads are allowed'));
+    if (allowedImageTypes.has(file.mimetype)) return cb(null, true);
+    return cb(new Error('Only JPEG, PNG, and WebP image uploads are allowed'));
   },
 });
 
@@ -102,10 +116,13 @@ router.post('/uploads/image', authRequired, requireRole('admin'), upload.single(
       return res.status(400).json({ error: 'No image file uploaded' });
     }
 
+    const contentType = validatedImageContentType(req.file);
+    if (!contentType) return res.status(400).json({ error: 'Image content does not match a supported JPEG, PNG, or WebP file' });
+
     const storage = storageForCurrentFarm(req);
     const saved = await storage.save({
       bytes: req.file.buffer,
-      contentType: req.file.mimetype || 'image/jpeg',
+      contentType,
       metadata: { kind, uploadedBy: req.user?.username || '' },
     });
     const path = await storage.readLink(saved.id);
@@ -123,10 +140,12 @@ router.post('/uploads/image', authRequired, requireRole('admin'), upload.single(
 router.post('/uploads/diary-image', authRequired, upload.single('image'), async (req, res) => {
   try {
     if (!req.file?.buffer?.length) return res.status(400).json({ error: 'No image file uploaded' });
+    const contentType = validatedImageContentType(req.file);
+    if (!contentType) return res.status(400).json({ error: 'Image content does not match a supported JPEG, PNG, or WebP file' });
     const storage = storageForCurrentFarm(req);
     const saved = await storage.save({
       bytes: req.file.buffer,
-      contentType: req.file.mimetype || 'image/jpeg',
+      contentType,
       metadata: { kind: 'diary', uploadedBy: req.user?.username || '' },
     });
     const path = await storage.readLink(saved.id);
@@ -162,13 +181,14 @@ router.get('/images/:id', resolveImageFarm, authRequired, async (req, res) => {
       if (!remote.ok) return res.status(502).json({ error: 'Cloudinary photo retrieval failed' });
       const bytes = Buffer.from(await remote.arrayBuffer());
       res.setHeader('Content-Type', img.contentType || remote.headers.get('content-type') || 'image/jpeg');
-      res.setHeader('Cache-Control', 'private, max-age=3600');
+      res.setHeader('Cache-Control', 'private, no-store');
       return res.send(bytes);
     }
 
     res.setHeader('Content-Type', img.contentType || 'image/jpeg');
-    // Images are immutable (a new upload = a new id), so cache aggressively.
-    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+    // The response is farm-authorized. Never permit shared caches to reuse it
+    // across users or farm contexts, even though each upload has its own ID.
+    res.setHeader('Cache-Control', 'private, no-store');
     res.send(img.data);
   } catch (err) {
     console.error('GET /api/images/:id error:', err);
