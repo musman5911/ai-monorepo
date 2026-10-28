@@ -28,7 +28,7 @@ This inventory covers every route module under the three backend `routes/` direc
 
 | Route module | Baseline policy | Notes |
 |---|---|---|
-| `routes/auth.js` | Mixed public/authenticated | Public authentication/recovery endpoints only; user and role management requires owner authority. |
+| `routes/auth.js` | Mixed public/authenticated | Public authentication/recovery endpoints only; user and role management requires owner authority. Agri owner lifecycle guards count active owners only, so inactive accounts do not falsely satisfy the last-active-owner safeguard. |
 | `routes/cards.js` | Public bearer link | Anyone with the share URL can read the card payload. Privacy headers and rate limits do not make it private or revocable. |
 | `routes/settings.js` | Authenticated + farm scope | `GET /location` and `PUT /location` both require authentication and use the selected farm's `DataStore` record; location is farm-scoped in Flock. |
 | `routes/archive.js`, `routes/backup.js` | Owner-only | Archive and backup actions are sensitive/destructive. |
