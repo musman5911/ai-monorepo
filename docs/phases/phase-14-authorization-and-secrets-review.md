@@ -387,3 +387,20 @@ Checks made in this pass:
 No additional confirmed authorization defect was established from these reviewed snippets, so no speculative code changes were made. This is a source-level review, not runtime proof of all role/farm combinations. The next review pass must cover the remaining route handlers and strengthen behavior-level coverage where current tests only assert source text. The accepted public bearer-card disclosure remains a documented compatibility risk, not a private/revocable sharing model.
 
 **Phase 14 remains In progress.** Do not close it solely on this source review; closure still requires the complete remaining route review, regression coverage for any discovered gaps, and owner-run validation after any new code changes. Phase 15 remains Not started.
+
+
+## Confirmed Flock cross-farm image deletion and reference gap (2026-10-28)
+
+The continued handler review found a concrete cross-farm boundary defect in Flock: the Image model is not wrapped by the shared farm-scoped model helper, but batch cleanup and orphan collection had relied on an assumed automatic scope. Batch import/wipe used `Image.deleteMany({ kind: 'batch' })`, and per-path/orphan cleanup looked up or deleted image IDs without an explicit farm predicate. Batch create/edit/gallery handlers also accepted image paths without confirming that the referenced image belonged to the selected farm.
+
+Fixed on `muf-monorepo`:
+- Batch import and wipe now require a single selected farm and delete only `Image` rows matching both `kind: 'batch'` and that farm ID.
+- Batch image cleanup now requires the active farm ID and uses the same farm-scoped filter for image lookup and deletion.
+- Batch create, edit and gallery attachment validate that image IDs resolve to a batch image in the selected farm.
+- Orphan image collection now requires the selected farm and applies an explicit farm predicate to image lookup/deletion.
+- Added three source-contract regression tests covering scoped bulk cleanup, scoped path cleanup, and rejection of cross-farm image references.
+- Updated the route permission inventory to call out that Flock Image operations require explicit farm predicates.
+
+Commits: `7469dfe` (batch image scoping), `181ee01` (orphan cleanup scoping), `4de6a48` (regression tests), `f1cf04d` (inventory).
+
+**Validation pending:** these changes were made after the owner's last green checkout. The focused tests and full suite, farm/archive runtime checks, repository safety checks and all three production builds must be rerun after pulling. This is a confirmed source-level defect and a targeted regression guard, but the new tests are source-contract checks rather than full HTTP tests. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
