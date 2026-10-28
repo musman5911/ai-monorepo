@@ -367,6 +367,7 @@ describe('Flock image upload validation and cache isolation', () => {
     const routes = source('flock_farm/backend/routes/uploads.js');
     expect(routes).toContain("new Set(['image/jpeg', 'image/png', 'image/webp'])");
     expect(routes).toContain('function detectImageContentType(bytes)');
+    expect(routes).toContain("bytes.subarray(0, 8).equals(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]))) return 'image/png';");
     expect(routes).toContain('validatedImageContentType(req.file)');
     expect(routes).toContain("Image content does not match a supported JPEG, PNG, or WebP file");
     expect(routes).not.toContain("file.mimetype && file.mimetype.startsWith('image/')");
