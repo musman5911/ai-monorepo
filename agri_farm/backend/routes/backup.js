@@ -198,10 +198,13 @@ function validateBackupPayload(payload) {
   if (!present.length) {
     throw new HttpError(400, "Backup has no valid data to restore. Expected keys like 'crops', 'finance', 'tasks'...");
   }
-  for (const key of present) {
+
+  // Validate every collection that the restore path can mutate, including the
+  // auxiliary farm/archive collections. A malformed optional section must not
+  // be silently skipped or partially applied during a database-wide restore.
+  const mutableKeys = [...knownKeys, 'farms', 'archiveJobs', 'archiveRecords'];
+  for (const key of mutableKeys.filter((k) => k in payload)) {
     const data = payload[key];
-    // A present section must be an explicit array. Treating null as an empty
-    // array during applyBackupPayload would silently wipe that collection.
     if (!Array.isArray(data) || data.some((doc) => !doc || typeof doc !== 'object' || Array.isArray(doc))) {
       throw new HttpError(400, `Backup section '${key}' is malformed: expected a list of records. Restore aborted — nothing was changed.`);
     }
@@ -250,6 +253,7 @@ router.post('/restore/auto', protectUnscoped, ...requireAdmin, asyncHandler(asyn
   const value = (existing && existing.value) || {};
   const payload = value.payload;
   if (!payload) return notFound(res, 'No automatic monthly backup is stored yet.');
+  validateBackupPayload(payload);
   await applyBackupPayload(payload);
   return res.json({ status: 'ok', name: value.name });
 }));
