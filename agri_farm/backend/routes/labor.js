@@ -174,9 +174,9 @@ router.delete('/labor-advances/:advId', protect, requireAdmin, asyncHandler(asyn
 // ─── Post month wages into the finance ledger ───────────────────────────────
 router.post('/labor/post-wages', protect, requireAdmin, asyncHandler(async (req, res) => {
   const month = String(req.body?.month || todayStr().slice(0, 7)).trim();
-  if (month.length < 7) return badRequest(res, 'Month must be YYYY-MM.');
+  if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)) return badRequest(res, 'Month must be a valid YYYY-MM value.');
 
-  const rows = await Attendance.find({ date: { $regex: `^${month}` }, posted: { $ne: true } }).limit(100000);
+  const rows = await Attendance.find({ date: { $regex: `^${month}-` }, posted: { $ne: true } }).limit(100000);
   if (!rows.length) return badRequest(res, 'No unposted attendance remains for this month.');
 
   const laborersList = await Laborer.find({}).limit(100000);
