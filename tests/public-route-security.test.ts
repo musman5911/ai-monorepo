@@ -350,6 +350,16 @@ describe('Telegram user-link farm boundaries', () => {
   });
 });
 
+describe('Agri owner lifecycle safety', () => {
+  it('counts only active owners when protecting the last owner account', () => {
+    const routes = source('agri_farm/backend/routes/auth.js');
+    expect(routes).toContain("select('_id role active')");
+    expect(routes).toContain("u.active !== false && mufIsOwner(u.role)");
+    expect(routes).toContain("target.active !== false && mufIsOwner(target.role)");
+    expect(routes).toContain("'At least one active owner must remain.'");
+  });
+});
+
 describe('Dairy owner lifecycle safety', () => {
   it('prevents deleting the last active owner account', () => {
     const routes = source('dairy_farm/backend/routes/auth.js');
