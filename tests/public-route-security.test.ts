@@ -360,3 +360,23 @@ describe('Dairy owner lifecycle safety', () => {
     expect(handler.indexOf('remainingActiveOwners')).toBeLessThan(handler.indexOf('User.findByIdAndDelete(req.params.id)'));
   });
 });
+
+
+describe('Flock image upload validation and cache isolation', () => {
+  it('accepts only JPEG, PNG and WebP with matching file signatures', () => {
+    const routes = source('flock_farm/backend/routes/uploads.js');
+    expect(routes).toContain("new Set(['image/jpeg', 'image/png', 'image/webp'])");
+    expect(routes).toContain('function detectImageContentType(bytes)');
+    expect(routes).toContain('validatedImageContentType(req.file)');
+    expect(routes).toContain("Image content does not match a supported JPEG, PNG, or WebP file");
+    expect(routes).not.toContain("file.mimetype && file.mimetype.startsWith('image/')");
+  });
+
+  it('prevents shared caching of authenticated farm images', () => {
+    const routes = source('flock_farm/backend/routes/uploads.js');
+    expect(routes).toContain("res.setHeader('Cache-Control', 'private, no-store')");
+    expect(routes).not.toContain("public, max-age=31536000, immutable");
+    expect(routes).toContain("Image.findOne({ _id: id, farmId: String(req.farmContext?.farmId || '') })");
+    expect(routes).toContain('resolveImageFarm, authRequired');
+  });
+});
