@@ -157,3 +157,6 @@ The continued source audit found the same class of risk in stored automatic back
 Commits on `muf-monorepo`: `8456eb7`, `e06f911`, `94fbce3`, `eed8209`, `dc886f2`, `63813b8`.
 
 **Validation pending:** these latest changes have not yet been pulled or run in the owner's Windows checkout. Do not mark the test suite as passing or Phase 14 as Done until the focused test, full suite, standard checks, and all three builds pass on the current head. Phase 15 remains Not started.
+
+
+Phase 14 current-head validation (2026-10-28): owner pulled branch update e44ed46..8c6ff58. Reported results: public-route security 26/26; full suite 42 files / 359 tests; route inventory (46 modules), secret scan (647 tracked paths), sync, UI, workbench (23 checks), farm scope, archive, docs and all three production builds passed. Git status is clean and local branch is aligned with origin. Archive scripts emitted non-fatal Node module-type warnings. The restore-validation follow-up is now validated on the owner's checkout. Phase 14 remains In progress because the handler-level authorization audit is not complete; Phase 15 remains Not started.
