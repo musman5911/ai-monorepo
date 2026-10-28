@@ -6,6 +6,7 @@ import { sendSummaryEmail } from '../mailer.js';
 import { authRequired, requireRole } from '../middleware/auth.js';
 import User from '../models/User.js';
 import { MUF_ENV } from '../muf-env.mjs';
+import { mufGetDefaultFarmId } from '../muf-farms.mjs';
 
 const router = express.Router();
 
@@ -16,9 +17,19 @@ function timingSafeEqual(a, b) {
   return crypto.timingSafeEqual(bufA, bufB);
 }
 
-async function loadBucket(key, fallback) {
-  const doc = await DataStore.findOne({ key });
+async function loadBucket(key, fallback, farmId) {
+  if (!farmId) throw new Error('Farm scope is required to load summary data');
+  const doc = await DataStore.findOne({ key, farmId: String(farmId) });
   return doc?.value ?? fallback;
+}
+
+function selectedFarmId(req, res) {
+  const context = req.farmContext;
+  if (!context || context.mode !== 'single' || !context.farmId) {
+    res.status(400).json({ error: 'Select one farm before viewing or sending a summary' });
+    return null;
+  }
+  return String(context.farmId);
 }
 
 const FB = {
@@ -35,16 +46,18 @@ router.get('/cron/daily-summary', async (req, res) => {
 
   const recipients = MUF_ENV.dailySummaryEmails;
   if (recipients.length === 0) return res.status(503).json({ error: 'DAILY_SUMMARY_EMAILS not configured' });
+  const farmId = mufGetDefaultFarmId();
+  if (!farmId) return res.status(503).json({ error: 'Default farm is not configured' });
 
   try {
     const [birds, expenses, feed, eggs, settings, vaccinations, customerSales] = await Promise.all([
-      loadBucket('birds', FB.birds),
-      loadBucket('expenses', FB.expenses),
-      loadBucket('feed', FB.feed),
-      loadBucket('eggs', FB.eggs),
-      loadBucket('settings', FB.settings),
-      loadBucket('vaccinations', FB.vaccinations),
-      loadBucket('customerSales', FB.customerSales),
+      loadBucket('birds', FB.birds, farmId),
+      loadBucket('expenses', FB.expenses, farmId),
+      loadBucket('feed', FB.feed, farmId),
+      loadBucket('eggs', FB.eggs, farmId),
+      loadBucket('settings', FB.settings, farmId),
+      loadBucket('vaccinations', FB.vaccinations, farmId),
+      loadBucket('customerSales', FB.customerSales, farmId),
     ]);
     const summary = buildDailySummary({ birds, expenses, feed, eggs, vaccinations, customerSales, settings });
     await sendSummaryEmail({
@@ -64,6 +77,8 @@ router.get('/cron/daily-summary', async (req, res) => {
 // server-side allowlist (DAILY_SUMMARY_EMAILS + registered user emails) so the
 // SMTP account can never be used to email arbitrary addresses.
 router.post('/summary/send-now', authRequired, requireRole('admin'), async (req, res) => {
+  const farmId = selectedFarmId(req, res);
+  if (!farmId) return;
   const configured = MUF_ENV.dailySummaryEmails.map(s => s.toLowerCase());
   const explicit = Array.isArray(req.body?.to) ? req.body.to.map(s => String(s).trim().toLowerCase()).filter(Boolean) : [];
 
@@ -71,7 +86,7 @@ router.post('/summary/send-now', authRequired, requireRole('admin'), async (req,
   if (explicit.length > 0) {
     let users;
     try {
-      users = await User.find({ email: { $ne: null }, active: true }).select('email');
+      users = await User.find({ email: { $ne: null }, active: true, farmIds: farmId }).select('email');
     } catch (err) {
       return res.status(500).json({ error: err.message || 'Failed to load user emails' });
     }
@@ -91,13 +106,13 @@ router.post('/summary/send-now', authRequired, requireRole('admin'), async (req,
   }
   try {
     const [birds, expenses, feed, eggs, settings, vaccinations, customerSales] = await Promise.all([
-      loadBucket('birds', FB.birds),
-      loadBucket('expenses', FB.expenses),
-      loadBucket('feed', FB.feed),
-      loadBucket('eggs', FB.eggs),
-      loadBucket('settings', FB.settings),
-      loadBucket('vaccinations', FB.vaccinations),
-      loadBucket('customerSales', FB.customerSales),
+      loadBucket('birds', FB.birds, farmId),
+      loadBucket('expenses', FB.expenses, farmId),
+      loadBucket('feed', FB.feed, farmId),
+      loadBucket('eggs', FB.eggs, farmId),
+      loadBucket('settings', FB.settings, farmId),
+      loadBucket('vaccinations', FB.vaccinations, farmId),
+      loadBucket('customerSales', FB.customerSales, farmId),
     ]);
     const summary = buildDailySummary({ birds, expenses, feed, eggs, vaccinations, customerSales, settings });
     await sendSummaryEmail({
@@ -106,7 +121,7 @@ router.post('/summary/send-now', authRequired, requireRole('admin'), async (req,
       text: summary.text,
       html: summary.html,
     });
-    res.json({ ok: true, date: summary.date, recipients, stats: summary.stats });
+    res.json({ ok: true, date: summary.date });
   } catch (err) {
     console.error('send-now error:', err);
     res.status(500).json({ error: err.message || 'Failed to send summary' });
@@ -115,15 +130,17 @@ router.post('/summary/send-now', authRequired, requireRole('admin'), async (req,
 
 // GET /api/summary/today — authenticated; returns today's summary text for sharing
 router.get('/summary/today', authRequired, async (req, res) => {
+  const farmId = selectedFarmId(req, res);
+  if (!farmId) return;
   try {
     const [birds, expenses, feed, eggs, settings, vaccinations, customerSales] = await Promise.all([
-      loadBucket('birds', FB.birds),
-      loadBucket('expenses', FB.expenses),
-      loadBucket('feed', FB.feed),
-      loadBucket('eggs', FB.eggs),
-      loadBucket('settings', FB.settings),
-      loadBucket('vaccinations', FB.vaccinations),
-      loadBucket('customerSales', FB.customerSales),
+      loadBucket('birds', FB.birds, farmId),
+      loadBucket('expenses', FB.expenses, farmId),
+      loadBucket('feed', FB.feed, farmId),
+      loadBucket('eggs', FB.eggs, farmId),
+      loadBucket('settings', FB.settings, farmId),
+      loadBucket('vaccinations', FB.vaccinations, farmId),
+      loadBucket('customerSales', FB.customerSales, farmId),
     ]);
     const summary = buildDailySummary({ birds, expenses, feed, eggs, vaccinations, customerSales, settings });
     res.json({ ok: true, date: summary.date, text: summary.text, html: summary.html, stats: summary.stats });
