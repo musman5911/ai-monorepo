@@ -25,7 +25,7 @@ import cardsRoutes from './routes/cards.js';
 import settingsRoutes from './routes/settings.js';
 import farmsRoutes from './routes/farms.js';
 import { authRequiredUnscoped, requireRole } from './middleware/auth.js';
-import { MUF_ENV } from './muf-env.mjs';
+import { MUF_ENV, mufTestRateLimitMax } from './muf-env.mjs';
 
 dotenv.config();
 
@@ -94,7 +94,7 @@ const loginLimiter = rateLimit({
 // Gentle global rate limit for all API routes (300 req/min per IP — generous for a farm app)
 const apiLimiter = rateLimit({
   windowMs: 60 * 1000,
-  max: 300,
+  max: mufTestRateLimitMax(300),
   standardHeaders: true,
   legacyHeaders: false,
 });
