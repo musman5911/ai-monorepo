@@ -1,11 +1,20 @@
 // ─── Field labor: laborers, attendance, advances, month-end wage posting ─────
 import express from 'express';
-import { Laborer, Attendance, LaborAdvance, Finance } from '../db.js';
+import { Laborer, Attendance, LaborAdvance, Finance, Crop } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
 
 const router = express.Router();
+
+async function validateCropLink(cropId) {
+  const id = String(cropId || '').trim();
+  if (!id) return '';
+  if (!/^[0-9a-fA-F]{24}$/.test(id) || !(await Crop.findOne({ _id: id }))) {
+    return 'Crop must exist in the selected farm.';
+  }
+  return '';
+}
 
 // ─── Laborers ────────────────────────────────────────────────────────────────
 router.get('/laborers', protect, requireAdmin, asyncHandler(async (_req, res) => {
@@ -56,6 +65,8 @@ router.post('/attendance', protect, requireAdmin, asyncHandler(async (req, res) 
   const payload = { ...body };
   payload.date = payload.date || todayStr();
   payload.crop_id = payload.crop_id || null;
+  const cropError = await validateCropLink(payload.crop_id);
+  if (cropError) return badRequest(res, cropError);
   payload.posted = false;
   payload.day_units = payload.day_type === 'full' ? 1.0 : 0.5;
 
@@ -89,7 +100,12 @@ router.put('/attendance/:attId', protect, requireAdmin, asyncHandler(async (req,
     if (clash) return badRequest(res, 'This worker already has attendance on that date.');
     payload.date = String(body.date);
   }
-  if (body.crop_id !== undefined) payload.crop_id = body.crop_id || null;
+  if (body.crop_id !== undefined) {
+    const cropId = body.crop_id || null;
+    const cropError = await validateCropLink(cropId);
+    if (cropError) return badRequest(res, cropError);
+    payload.crop_id = cropId;
+  }
   if (body.notes !== undefined) payload.notes = String(body.notes || '');
   await Attendance.updateOne({ _id: oid }, { $set: payload });
   return res.json({ ...row, ...payload, _id: String(row._id) });
