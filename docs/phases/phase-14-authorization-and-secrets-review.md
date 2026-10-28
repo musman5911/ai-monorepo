@@ -404,3 +404,33 @@ Fixed on `muf-monorepo`:
 Commits: `7469dfe` (batch image scoping), `181ee01` (orphan cleanup scoping), `4de6a48` (regression tests), `f1cf04d` (inventory).
 
 **Validation pending:** these changes were made after the owner's last green checkout. The focused tests and full suite, farm/archive runtime checks, repository safety checks and all three production builds must be rerun after pulling. This is a confirmed source-level defect and a targeted regression guard, but the new tests are source-contract checks rather than full HTTP tests. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
+
+
+## Owner validation after cross-farm image fixes (2026-10-28)
+
+The owner supplied a fresh Windows CMD run from the branch after pulling the latest changes. Results:
+
+| Command/check | Result |
+|---|---|
+| `npx vitest run tests/public-route-security.test.ts` | Passed: 1 file / 41 tests |
+| `npm test` | Passed: 42 files / 374 tests |
+| `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks |
+| `npm run check-archive` | Passed: Dairy, Flock and Agri archive checks; Node emitted non-fatal module-type warnings |
+| `npm run check-route-permissions` | Passed: 46 route modules documented, imported by their server and visibly mounted |
+| `npm run check-secrets` | Passed: 647 tracked paths scanned; no tracked .env files, private keys or recognized credential patterns |
+| `npm run check-sync` | Passed: shared MUF files, backend twins, environment names and listed invariants in sync |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source checks |
+| `npm run check-docs` | Passed: all 22 phase files, statuses, required sections and links consistent |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `git status --short --branch` | Clean working tree; local `muf-monorepo` is up to date with `origin/muf-monorepo` |
+
+This current-head run validates the recent Flock image-boundary and wage-month regression changes. It also confirms that the backend runtime checks now start and complete. The archive scripts' module-type warnings are non-fatal.
+
+## Handler audit disposition after current-head validation (2026-10-28)
+
+The focused source review covered user/role assignment boundaries, Telegram link and webhook flows, scheduled secret-authenticated jobs, public share-card behavior, photo upload/read/delete and orphan cleanup, Agri finance/task/labor linked-record validation, Dairy labor posting, Flock batch image references and destructive operations, and owner-only backup/archive operations. Confirmed defects found during this audit were fixed and regression guards were added, including manager assignment preservation, cross-farm Telegram link prevention, linked-record validation, wage month validation, private image caching/MIME-signature checks, and explicit Flock image farm predicates.
+
+The share-card routes remain an explicitly accepted public bearer-link risk. They are not account-bound, private, or individually revocable. Query-string secret compatibility also remains for existing schedulers, with headers preferred.
+
+**Closure decision: Phase 14 remains In progress.** The green current-head suite and source-contract assertions are not equivalent to behavioral authorization tests across every role/farm combination, and this review has not established exhaustive handler-by-handler runtime coverage for every route in all three apps. Do not mark Done or start Phase 15 on the strength of green builds alone. The remaining closure task is a final route-by-route review of handlers not specifically covered above, with focused behavioral tests for any uncovered boundaries, followed by another current-head validation if code changes are made. Real MongoDB, browser/device and live-deployment checks remain assigned to Phases 19–21.
