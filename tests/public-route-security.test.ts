@@ -251,3 +251,32 @@ describe('Dairy and Flock backup restore payload validation', () => {
     expect(flock).toContain("typeof row.farmId !== 'string'");
   });
 });
+
+
+describe('Dairy cross-farm linked-record validation', () => {
+  it('validates cow references before creating or updating health records', () => {
+    const routes = source('dairy_farm/backend/routes/health.js');
+    expect(routes).toContain("import { Health, Expense, Cow } from '../db.js'");
+    expect(routes).toContain('async function validateCowReference(cowId)');
+    expect(routes).toContain("'Cow must exist in the selected farm'");
+    expect(routes).toContain('await validateCowReference(row.payload.cowId)');
+    expect(routes).toContain('await validateCowReference(payload.cowId)');
+  });
+
+  it('validates milk cow and buyer references before writes', () => {
+    const routes = source('dairy_farm/backend/routes/milk.js');
+    expect(routes).toContain("import { Milk, Rate, RateHistory, Buyer, Cow } from '../db.js'");
+    expect(routes).toContain('async function validateMilkLinks(payload)');
+    expect(routes).toContain('await validateMilkLinks(row.payload)');
+    expect(routes).toContain('await validateMilkLinks(payload)');
+    expect(routes).toContain("'Buyer must exist in the selected farm'");
+  });
+
+  it('validates expense cow and supplier references before writes', () => {
+    const routes = source('dairy_farm/backend/routes/expenses.js');
+    expect(routes).toContain("import { Expense, Health, Cow, Supplier } from '../db.js'");
+    expect(routes).toContain('async function validateExpenseLinks(payload)');
+    expect(routes).toContain('await validateExpenseLinks(payload)');
+    expect(routes).toContain("'Supplier must exist in the selected farm'");
+  });
+});
