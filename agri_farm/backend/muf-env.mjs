@@ -91,6 +91,18 @@ export const MUF_ENV = {
   cookieSecure: pick('COOKIE_SECURE') === '1',
 };
 
+/**
+ * Optional rate-limit ceiling for isolated automated tests only.
+ * Ignored unless both MEMORY_MODE=1 and NODE_ENV=test; production and real
+ * database runs always retain the caller's normal ceiling.
+ */
+export function mufTestRateLimitMax(defaultMax) {
+  const raw = env.MUF_TEST_RATE_LIMIT_MAX;
+  if (!MUF_ENV.memoryMode || MUF_ENV.nodeEnv !== 'test' || !/^\\d+$/.test(String(raw || ''))) return defaultMax;
+  const requested = Number(raw);
+  return Number.isSafeInteger(requested) && requested >= defaultMax && requested <= 1000000 ? requested : defaultMax;
+}
+
 /** True when a real Mongo URI is configured (placeholder template URIs don't count). */
 export function mufEnvHasMongo() {
   const uri = MUF_ENV.mongoUri;
