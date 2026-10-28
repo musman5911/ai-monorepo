@@ -200,7 +200,8 @@ function validateBackupPayload(payload) {
   }
   for (const key of present) {
     const data = payload[key];
-    if (data == null) continue;
+    // A present section must be an explicit array. Treating null as an empty
+    // array during applyBackupPayload would silently wipe that collection.
     if (!Array.isArray(data) || data.some((doc) => !doc || typeof doc !== 'object' || Array.isArray(doc))) {
       throw new HttpError(400, `Backup section '${key}' is malformed: expected a list of records. Restore aborted — nothing was changed.`);
     }
