@@ -67,3 +67,8 @@ The current share-card feature is an intentional public-link feature in all thre
 ## Review boundary
 
 This is a source-level policy inventory, not a claim that every route has been behaviorally tested against every role and farm combination. The route modules above must be checked against their actual registrations and middleware whenever touched. The existing command-line suite and production builds still need to be run in the owner's checkout after pulling. Real MongoDB, browser/device and live-deployment checks remain in Phases 19–21.
+
+
+## Runtime matrix check
+
+`npm run check-route-matrix` starts disposable memory-mode servers and compares route responses for anonymous, worker, manager and owner identities. The inventory's module policy is the baseline, with documented public exceptions and owner-only operations taking precedence. This runtime check is a guard against authorization regressions, not a proof of every possible business-data invariant. Any mismatches must be triaged against the handler and the policy; under Phase 14 scope, only confirmed cross-farm data disclosures and unauthenticated writes are fixed immediately. Other findings go to [SESSION-2-PROBLEMS.md](SESSION-2-PROBLEMS.md).
