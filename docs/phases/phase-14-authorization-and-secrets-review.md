@@ -135,6 +135,14 @@ The latest supplied output does not show `npm run check-ui` or `npm run check-wo
 - Commit: `905a422`; test assertion: `ffd1101`.
 - Validation pending; this correction reinforces that inventory entries must be checked against actual route declarations, not copied assumptions.
 
+## Additional Telegram link authorization finding (2026-10-28)
+
+- The handler-level review found that all three Telegram `/link-code` routes accepted a client-supplied app-user ID after checking only that the user existed. A manager in one farm could therefore create a Telegram link code for a user assigned to a different farm.
+- Dairy, Flock and Agri now require a selected farm before creating the code and verify that a non-owner target user is assigned to that farm. Owners retain the intended ability to link their account to the selected farm. The lookup returns a not-found response for out-of-farm users to avoid disclosing their existence.
+- Added a source-contract regression test covering the farm-context and assignment guard in all three Telegram routers.
+- Commits: `ae35f22`, `699fc69`, `6b728b9`, `a081f00`.
+- Validation is pending in the owner's Windows checkout. This source-level fix does not close the full audit; link-code behavior and the remaining financial, labor, upload/deletion, scheduled-job and share-link boundaries still require continued review.
+
 ## Remaining manual-review limitation
 
 Phase 14 remains **In progress**. The latest focused and full test suites, secret scan, route coverage check, sync/farm/docs checks and all three builds passed in the owner's checkout. Before marking the phase Done, complete the remaining handler-level role/farm-scope review and add focused regression tests for any gaps found. Do not treat route-module inventory or mount wiring as proof of authorization correctness. Real MongoDB, browser/phone and live deployment verification remain in Phases 19–21.
