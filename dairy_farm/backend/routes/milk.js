@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import express from 'express';
 const router = express.Router();
-import { Milk, Rate, RateHistory, Buyer } from '../db.js';
+import { Milk, Rate, RateHistory, Buyer, Cow } from '../db.js';
 import { protect, adminOnly, workerOrAdmin } from '../middleware/auth.js';
 import {
   readString,
@@ -31,6 +31,20 @@ function milkPayload(body, { requireBasics = false } = {}) {
   if (buyerId !== undefined) payload.buyerId = buyerId;
 
   return { payload, errors };
+}
+
+async function validateMilkLinks(payload) {
+  if (payload.cowId !== undefined) {
+    if (!String(payload.cowId || '').trim() || !(await Cow.findById(String(payload.cowId).trim()).lean())) {
+      return 'Cow must exist in the selected farm';
+    }
+  }
+  if (payload.buyerId !== undefined && String(payload.buyerId || '').trim()) {
+    if (!(await Buyer.findById(String(payload.buyerId).trim()).lean())) {
+      return 'Buyer must exist in the selected farm';
+    }
+  }
+  return '';
 }
 
 function buildMilkFilter(query) {
@@ -160,6 +174,10 @@ router.post('/bulk', protect, workerOrAdmin, async (req, res) => {
       }
       normalized.push({ index, payload, forceOverwrite: row?.forceOverwrite === true });
     });
+    for (const row of normalized) {
+      const linkError = await validateMilkLinks(row.payload);
+      if (linkError) errors.push(`row ${row.index + 1}: ${linkError}`);
+    }
     if (errors.length) return res.status(400).json({ error: errors.join('; '), errors });
 
     const results = [];
@@ -198,6 +216,8 @@ router.post('/', protect, workerOrAdmin, async (req, res) => {
   try {
     const { payload, errors } = milkPayload(req.body, { requireBasics: true });
     if (errors.length) return sendValidationError(res, errors);
+    const linkError = await validateMilkLinks(payload);
+    if (linkError) return res.status(400).json({ error: linkError });
 
     const existing = await Milk.findOne({ cowId: payload.cowId, date: payload.date });
     if (existing && !req.body.forceOverwrite) {
@@ -239,6 +259,8 @@ router.put('/:id', protect, workerOrAdmin, async (req, res) => {
   try {
     const { payload, errors } = milkPayload(req.body);
     if (errors.length) return sendValidationError(res, errors);
+    const linkError = await validateMilkLinks(payload);
+    if (linkError) return res.status(400).json({ error: linkError });
 
     // If cowId/date change would collide with another row, reject
     if (payload.cowId || payload.date) {
