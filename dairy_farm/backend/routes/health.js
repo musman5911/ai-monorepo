@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import express from 'express';
 const router = express.Router();
-import { Health, Expense } from '../db.js';
+import { Health, Expense, Cow } from '../db.js';
 import { protect, adminOnly, workerOrAdmin } from '../middleware/auth.js';
 import { todayStr, daysAgoStr } from '../utils/date.js';
 import {
@@ -35,6 +35,12 @@ function healthPayload(body, { requireBasics = false } = {}) {
   if (cost !== undefined) payload.cost = cost;
 
   return { payload, errors };
+}
+
+async function validateCowReference(cowId) {
+  if (cowId === undefined || cowId === null || String(cowId).trim() === '') return '';
+  const cow = await Cow.findById(String(cowId).trim()).lean();
+  return cow ? '' : 'Cow must exist in the selected farm';
 }
 
 router.get('/', protect, async (req, res) => {
@@ -76,6 +82,10 @@ router.post('/bulk', protect, workerOrAdmin, async (req, res) => {
       if (rowErrors.length) errors.push(`row ${index + 1}: ${rowErrors.join(', ')}`);
       normalized.push({ index, payload });
     });
+    for (const row of normalized) {
+      const linkError = await validateCowReference(row.payload.cowId);
+      if (linkError) errors.push(`row ${row.index + 1}: ${linkError}`);
+    }
     if (errors.length) return res.status(400).json({ error: errors.join('; '), errors });
 
     const results = [];
@@ -114,6 +124,8 @@ router.post('/', protect, workerOrAdmin, async (req, res) => {
   try {
     const { payload, errors } = healthPayload(req.body, { requireBasics: true });
     if (errors.length) return sendValidationError(res, errors);
+    const linkError = await validateCowReference(payload.cowId);
+    if (linkError) return res.status(400).json({ error: linkError });
 
     const id = randomUUID();
     const record = await Health.create({ ...payload, _id: id });
@@ -141,6 +153,8 @@ router.put('/:id', protect, workerOrAdmin, async (req, res) => {
   try {
     const { payload, errors } = healthPayload(req.body);
     if (errors.length) return sendValidationError(res, errors);
+    const linkError = await validateCowReference(payload.cowId);
+    if (linkError) return res.status(400).json({ error: linkError });
 
     const record = await Health.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
     if (!record) return res.status(404).json({ error: 'Not found' });
