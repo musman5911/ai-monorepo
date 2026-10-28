@@ -237,3 +237,12 @@ The focused suite now includes the corrected Agri active-user source assertion a
 Reviewed the backup and archive boundaries across Dairy, Flock and Agri. Backup/restore routes are owner-only before unscoped operations; the shared yearly-archive handlers bind jobs, snapshots and source deletion/restoration to the selected farm ID. Found and fixed an Agri restore validation flaw: a present section with a `null` value was accepted, while the restore path interpreted it as an empty array and could wipe that collection. The validator now rejects null/non-array sections before snapshot or mutation. Added a regression source-contract test.
 
 Commits: `bf1946d` (Agri restore validation), `5751685` (regression test). Owner-run validation is pending. The broader audit and current-head checks are still required; Phase 14 remains **In progress**, Phase 15 remains **Not started**.
+
+
+## Phase 14 restore-validation follow-up (2026-10-28)
+
+- The owner's latest Windows run exposed a brittle regression assertion: it compared the first textual occurrence of the validator with the first textual occurrence of the apply helper, which are function declarations rather than calls inside the manual restore handler. The route's manual restore call was already after validation; the test now scopes its ordering assertion to each route handler.
+- Continued the restore audit across all three apps. Agri now validates its stored monthly auto-backup before applying it and rejects malformed auxiliary `farms`, `archiveJobs`, and `archiveRecords` sections as well as malformed business collections. Dairy now rejects malformed record arrays and farm sections before both manual and automatic restores. Flock now validates the payload, farm rows, per-farm bucket rows, batch collections, archive sections, and image-section shape before acquiring restore locks or mutating records; manual and automatic restore use the same validator.
+- Added regression source-contract assertions for manual and automatic restore validation ordering in all three apps.
+- GitHub branch commits: `8456eb7` (Agri auto-restore validation), `e06f911` (Agri test), `94fbce3` (Dairy validation), `eed8209` (Flock validation), `dc886f2` and `63813b8` (restore tests/assertion correction).
+- **Validation pending:** the owner has not pulled these newest commits or rerun the focused test/full suite. The last supplied local result was 357 passed and one failed test, so it must not be described as green. Phase 14 remains **In progress** and Phase 15 remains **Not started**.
