@@ -383,6 +383,36 @@ describe('Flock image upload validation and cache isolation', () => {
 });
 
 
+describe('Flock batch image farm boundaries', () => {
+  it('scopes image cleanup and bulk deletion to the selected farm', () => {
+    const batches = source('flock_farm/backend/routes/batches.js');
+    expect(batches).toContain("Image.deleteMany({ kind: 'batch', farmId })");
+    expect(batches).not.toContain("Image.deleteMany({ kind: 'batch' })");
+    expect(batches).toContain("async function deleteImageByPath(imagePath, farmId)");
+    expect(batches).toContain("const imageFilter = { _id: m[1], farmId: scopedFarmId, kind: 'batch' }");
+    expect(batches).toContain("await Image.deleteOne(imageFilter)");
+    expect(batches).toContain("deleteImageByPath(batch.image_path, req.farmContext?.farmId)");
+  });
+
+  it('rejects cross-farm image references when creating or editing a batch or gallery', () => {
+    const batches = source('flock_farm/backend/routes/batches.js');
+    expect(batches).toContain("Image.findOne({ _id: imageId, farmId, kind: 'batch' })");
+    expect(batches).toContain("Batch photo must belong to the selected farm");
+    expect(batches).toContain("Select one farm before importing batch data");
+    expect(batches).toContain("Select one farm before wiping batch data");
+  });
+
+  it('scopes orphan image collection and deletion to the authenticated farm', () => {
+    const data = source('flock_farm/backend/routes/data.js');
+    expect(data).toContain("async function cleanupOrphanedImages(candidateIds, farmId)");
+    expect(data).toContain("Image.findOne({ _id: id, farmId: scopedFarmId })");
+    expect(data).toContain("Image.deleteOne({ _id: id, farmId: scopedFarmId })");
+    expect(data).toContain("cleanupOrphanedImages(candidates, req.farmContext?.farmId)");
+    expect(data).not.toContain("Image.findById(id)");
+  });
+});
+
+
 describe('labor wage posting month validation', () => {
   it('rejects malformed months before selecting unposted attendance', () => {
     const agri = source('agri_farm/backend/routes/labor.js');
