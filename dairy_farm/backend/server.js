@@ -33,7 +33,7 @@ import suppliersRoutes from './routes/suppliers.js';
 import cardsRoutes from './routes/cards.js';
 import settingsRoutes from './routes/settings.js';
 import farmsRoutes from './routes/farms.js';
-import { MUF_ENV } from './muf-env.mjs';
+import { MUF_ENV, mufTestRateLimitMax } from './muf-env.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -84,7 +84,7 @@ app.use(mongoSanitize());
 // Broad API rate limiter: authenticated data routes still need a safety net in case a token leaks or a script loops.
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 300,
+  max: mufTestRateLimitMax(300),
   message: { error: 'Too many API requests. Please try again later.' },
   standardHeaders: true,
   legacyHeaders: false,
