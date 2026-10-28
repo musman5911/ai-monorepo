@@ -146,3 +146,14 @@ This validates the corrected active-user source assertion and the expanded publi
 - Found a destructive input-validation gap in Agri backup restore: a present collection section set to `null` passed validation, then `applyBackupPayload` treated it as an empty array and deleted that collection. Validation now rejects null/non-array sections and malformed records before taking the pre-restore snapshot or applying any changes.
 - Added a regression source-contract test for the validation-before-mutation ordering. Commits: `bf1946d` (fix), `5751685` (test).
 - This is a source review and code change made through GitHub. The owner has not yet run the new test or current-head validation, so the fix is not marked locally verified. Phase 14 remains **In progress**.
+
+
+## Phase 14 restore validation follow-up (2026-10-28)
+
+The owner's latest pull passed 357 tests and failed one source-contract assertion in `tests/public-route-security.test.ts`. The assertion searched globally for the validator and apply helper, so the validator function declaration appeared after the apply helper declaration even though the manual restore handler called validation before applying the payload. The regression test now checks ordering inside each restore handler rather than comparing function declaration positions.
+
+The continued source audit found the same class of risk in stored automatic backups and cross-app restore payloads. Added pre-mutation validation for Agri manual and automatic restore, Dairy manual and automatic restore, and Flock manual and automatic restore. The validators reject malformed collection records and auxiliary farm/archive/image/farm-bucket sections before restore locks or destructive writes. Regression source-contract tests now check both manual and automatic restore paths for all three apps.
+
+Commits on `muf-monorepo`: `8456eb7`, `e06f911`, `94fbce3`, `eed8209`, `dc886f2`, `63813b8`.
+
+**Validation pending:** these latest changes have not yet been pulled or run in the owner's Windows checkout. Do not mark the test suite as passing or Phase 14 as Done until the focused test, full suite, standard checks, and all three builds pass on the current head. Phase 15 remains Not started.
