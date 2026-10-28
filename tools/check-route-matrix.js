@@ -107,7 +107,7 @@ function discoverRoutes(app) {
   if (files.some(f => f.relative.endsWith('/routes/farms.js'))) {
     const farmPrefix = app.key === 'dairy' ? '/api/farms' : app.key === 'agri' ? '/api/farms' : '/api/farms';
     for (const [method, suffix] of [
-      ['GET', ''], ['POST', ''], ['PATCH', '/:id'], ['PUT', '/:id'], ['DELETE', '/:id'],
+      ['GET', ''], ['POST', ''], ['PUT', '/:id'], ['DELETE', '/:id'],
       ['POST', '/:id/archive'], ['POST', '/:id/restore']
     ]) entries.push({
       app: app.key, mod: 'routes/farms', method, path: farmPrefix + suffix, localPath: suffix || '/',
