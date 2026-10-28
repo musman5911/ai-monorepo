@@ -201,3 +201,12 @@ A confirmed Flock handler gap was found and fixed: the Image model is not automa
 Commits: `7469dfe`, `181ee01`, `4de6a48`, `f1cf04d`, `62d9202`.
 
 **Validation pending:** the owner must pull and rerun the focused security tests, full test suite, farm/archive checks, route/secrets/sync/UI/workbench/docs checks and all three production builds. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
+
+
+## Phase 14 owner validation and audit disposition (2026-10-28)
+
+The owner supplied a current Windows run after pulling the cross-farm image fixes: focused security tests passed (41 tests), full suite passed (42 files / 374 tests), farm and archive checks passed, all route/secret/sync/UI/workbench/docs checks passed, and all three production builds passed. Archive scripts emitted non-fatal Node module-type warnings. The working tree is clean and synchronized with `origin/muf-monorepo`.
+
+The latest source review covered user/role assignment, Telegram link/webhook flows, scheduled secrets, public share cards, photo and image cleanup, Agri finance/tasks/labor links, Dairy wage posting, Flock batch image boundaries, and owner-only backup/archive operations. Confirmed gaps were fixed with focused regression assertions. Public share cards remain intentionally public bearer links and are not private or revocable.
+
+**Phase 14 remains In progress; Phase 15 remains Not started.** The checks are green, but source-contract tests do not behaviorally prove every role/farm combination for every handler. Complete the remaining route-by-route review before closure; do not infer exhaustive authorization correctness from module inventory or passing builds.
