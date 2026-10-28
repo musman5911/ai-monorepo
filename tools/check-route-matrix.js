@@ -174,7 +174,7 @@ async function start(app, port) {
   const cwd = path.join(ROOT, app.dir, 'backend');
   const child = spawn(process.execPath, ['server.js'], {
     cwd,
-    env: { ...process.env, MEMORY_MODE: '1', PORT: String(port), JWT_SECRET: 'route-matrix-disposable-secret-not-for-production', NODE_ENV: 'test', MONGO_URI: '', MONGODB_URI: '', DATABASE_URL: '', LOG_REQUESTS: '0', TELEGRAM_BOT_TOKEN: '', TELEGRAM_WEBHOOK_SECRET: '', CRON_SECRET: '', CROSS_FARM_KEY: '' },
+    env: { ...process.env, MEMORY_MODE: '1', PORT: String(port), JWT_SECRET: 'route-matrix-disposable-secret-not-for-production', NODE_ENV: 'test', MONGO_URI: '', MONGODB_URI: '', DATABASE_URL: '', LOG_REQUESTS: '0', MUF_TEST_RATE_LIMIT_MAX: '100000', TELEGRAM_BOT_TOKEN: '', TELEGRAM_WEBHOOK_SECRET: '', CRON_SECRET: '', CROSS_FARM_KEY: '' },
     stdio: ['ignore','pipe','pipe'],
   });
   let logs = '';
