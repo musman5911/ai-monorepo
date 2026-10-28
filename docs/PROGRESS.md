@@ -192,3 +192,12 @@ The owner pulled `6a9760a..118f730` and supplied a complete Windows CMD validati
 - `git status --short --branch`: clean working tree, branch aligned with `origin/muf-monorepo`.
 
 The upload syntax fix and current command-line validation are now verified in the owner's checkout. Phase 14 remains **In progress** because the endpoint-by-endpoint authorization review is not yet complete; source-contract tests and route inventory coverage do not prove every handler's behavior for every role/farm combination. Phase 15 remains **Not started**.
+
+
+## Phase 14 audit continuation: Flock cross-farm image boundary (2026-10-28)
+
+A confirmed Flock handler gap was found and fixed: the Image model is not automatically farm-scoped, while batch import/wipe and per-path/orphan cleanup had relied on implicit scope. These paths now use explicit farm predicates; batch create/edit/gallery attachment rejects image IDs not belonging to the selected farm; import/wipe require a single selected farm. Added three source-contract regression tests and updated the route permission inventory.
+
+Commits: `7469dfe`, `181ee01`, `4de6a48`, `f1cf04d`, `62d9202`.
+
+**Validation pending:** the owner must pull and rerun the focused security tests, full test suite, farm/archive checks, route/secrets/sync/UI/workbench/docs checks and all three production builds. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
