@@ -11,7 +11,7 @@ import { timingSafeEqual } from 'crypto';
 import { authRequired, requireRole } from '../middleware/auth.js';
 import DataStore from '../models/DataStore.js';
 import Farm from '../models/Farm.js';
-import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext } from '../muf-farms.mjs';
+import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext, mufIsOwner } from '../muf-farms.mjs';
 import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
 import User from '../models/User.js';
 import { buildDailySummary } from '../utils/summary.js';
@@ -70,11 +70,17 @@ router.get('/status', authRequired, requireRole('admin'), async (_req, res) => {
 router.post('/link-code', authRequired, requireRole('admin'), async (req, res) => {
   try {
     const { userId, laborerId } = req.body || {};
+    const farmId = mufGetFarmContext()?.farmId;
+    if (!farmId) return res.status(400).json({ error: 'Select one farm before creating a Telegram link code' });
     let username = '';
     let laborerName = '';
     if (userId) {
       const u = await User.findById(userId);
       if (!u) return res.status(404).json({ error: 'User not found' });
+      const assignedFarmIds = (u.farmIds || []).map(String);
+      if (!mufIsOwner(u.role) && !assignedFarmIds.includes(String(farmId))) {
+        return res.status(404).json({ error: 'User not found in the selected farm' });
+      }
       username = u.username;
     }
     if (laborerId) {
@@ -84,8 +90,6 @@ router.post('/link-code', authRequired, requireRole('admin'), async (req, res) =
       laborerName = lw.name;
     }
     if (!userId && !laborerId) return res.status(400).json({ error: 'Pick an app user or a wage worker to link' });
-    const farmId = mufGetFarmContext()?.farmId;
-    if (!farmId) return res.status(400).json({ error: 'Select one farm before creating a Telegram link code' });
     const codes = await readStore(CODES_KEY, {});
     const now = Date.now();
     for (const [c, v] of Object.entries(codes)) if ((v.expires || 0) < now) delete codes[c];
