@@ -227,3 +227,27 @@ describe('Agri backup restore payload validation', () => {
     expect(validator).toContain("'farms', 'archiveJobs', 'archiveRecords'");
   });
 });
+
+
+describe('Dairy and Flock backup restore payload validation', () => {
+  it('validates manual and automatic restore payloads before mutation', () => {
+    const dairy = source('dairy_farm/backend/routes/backup.js');
+    expect(dairy).toContain('function validateBackupPayload(payload)');
+    const dairyManual = dairy.split("router.post('/restore',")[1]?.split("// ─── Monthly Auto-Backup")[0] || '';
+    expect(dairyManual.indexOf('validateBackupPayload(payload)')).toBeGreaterThanOrEqual(0);
+    expect(dairyManual.indexOf('validateBackupPayload(payload)')).toBeLessThan(dairyManual.indexOf('restoreMissingFarms(payload)'));
+    const dairyAuto = dairy.split("router.post('/restore-auto',")[1] || '';
+    expect(dairyAuto.indexOf('validateBackupPayload(value.payload)')).toBeGreaterThanOrEqual(0);
+    expect(dairyAuto.indexOf('validateBackupPayload(value.payload)')).toBeLessThan(dairyAuto.indexOf('restoreMissingFarms(value.payload)'));
+
+    const flock = source('flock_farm/backend/routes/backup.js');
+    expect(flock).toContain('function validateBackupPayload(payload)');
+    const flockManual = flock.split("router.post('/backup/restore',")[1]?.split("// GET /api/backup/auto")[0] || '';
+    expect(flockManual.indexOf('validateBackupPayload(payload)')).toBeGreaterThanOrEqual(0);
+    expect(flockManual.indexOf('validateBackupPayload(payload)')).toBeLessThan(flockManual.indexOf('acquireEggInventoryLocks'));
+    const flockAuto = flock.split("router.post('/backup/restore-auto',")[1] || '';
+    expect(flockAuto.indexOf('validateBackupPayload(payload)')).toBeGreaterThanOrEqual(0);
+    expect(flockAuto.indexOf('validateBackupPayload(payload)')).toBeLessThan(flockAuto.indexOf('acquireEggInventoryLocks'));
+    expect(flock).toContain("row.farmId !== 'string'");
+  });
+});
