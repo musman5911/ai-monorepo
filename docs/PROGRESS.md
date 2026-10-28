@@ -166,3 +166,5 @@ Phase 14 handler audit follow-up (2026-10-28): added selected-farm validation fo
 
 
 Phase 14 owner lifecycle follow-up (2026-10-28): Dairy user deletion now refuses to delete an owner when no other active owner remains. Added a regression assertion. Commits: 3e2881f, 5977efb. Validation is pending owner pull/run.
+
+Phase 14 handler audit follow-up (2026-10-28): continued reviewing cross-farm links in Dairy lineage and Agri finance, task, and labor handlers. Added same-farm validation for Dairy cow mother/farm-sire references; Agri finance crop references on create/update; Agri task crop/inventory references on create/update; and Agri attendance crop references on create/update. Added source-contract regression tests. Also fixed the Dairy archive test fixture to use the actual cow ID returned by the API, since cow creation intentionally generates its own ID and ignores a client-supplied _id. Commits: a4a9fb5, a8c3e53, 8a1cd22, 07e57fb, a754185, 13a9cef. Validation is pending owner pull/run. Phase 14 remains In progress; Phase 15 remains Not started.
