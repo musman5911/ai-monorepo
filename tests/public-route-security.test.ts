@@ -248,6 +248,6 @@ describe('Dairy and Flock backup restore payload validation', () => {
     const flockAuto = flock.split("router.post('/backup/restore-auto',")[1] || '';
     expect(flockAuto.indexOf('validateBackupPayload(payload)')).toBeGreaterThanOrEqual(0);
     expect(flockAuto.indexOf('validateBackupPayload(payload)')).toBeLessThan(flockAuto.indexOf('acquireEggInventoryLocks'));
-    expect(flock).toContain("row.farmId !== 'string'");
+    expect(flock).toContain("typeof row.farmId !== 'string'");
   });
 });
