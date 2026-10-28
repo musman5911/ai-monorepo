@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-28 (Phase 14 restore validation expanded across all three apps; owner-run verification pending).
+Last updated: 2026-10-28 (Phase 14 current-head checks exposed and fixed a Flock upload syntax error; rerun validation pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -172,3 +172,6 @@ Phase 14 handler audit follow-up (2026-10-28): Telegram `/link-code` in Dairy, F
 
 
 Phase 14 handler audit follow-up (2026-10-28): strict `YYYY-MM` validation now protects Agri and Dairy labor wage posting from malformed month filters; Agri's attendance query is anchored to the full month prefix. Flock image uploads now allow only JPEG/PNG/WebP with matching file signatures, and authenticated image responses are no-store to prevent shared-cache leakage across farm contexts. Added source-contract regression assertions. Commits: `6e51a2b`, `34c26cc`, `ecf364d`, `7eb31aa`, `75e9551`, `32b2985`, `ff5ba56`, `9db2c19`. Validation is pending on the owner's Windows checkout; Phase 14 remains In progress and Phase 15 remains Not started.
+
+
+Phase 14 owner validation update (2026-10-28): on branch head `6a9760a`, the owner reported 38 public-route security tests and 371 total tests passing, along with route inventory, secret scan, MUF sync, UI, workbench, docs checks and all three frontend production builds. However, `npm run check-farms` and `npm run check-archive` failed because `flock_farm/backend/routes/uploads.js` had a missing closing parenthesis in the PNG signature check, preventing the Flock backend from starting. Fixed the syntax on `muf-monorepo` and added a regression source assertion. The fix has not yet been validated in the owner's checkout. After pulling, rerun the focused security tests, full suite, farm and archive checks, docs, all standard checks, and all three builds. Phase 14 remains In progress; Phase 15 remains Not started.
