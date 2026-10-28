@@ -314,3 +314,19 @@ Continued the source-level handler review for client-supplied IDs that connect r
 Commits: a4a9fb5, a8c3e53, 8a1cd22, 07e57fb, a754185, 13a9cef.
 
 **Validation pending.** Pull these changes and rerun the focused security tests, full suite, farm and archive checks, route/secrets/docs checks, and production builds. The archive fixture correction has not yet been verified locally. This is still a source-level audit with source-contract tests, not a complete behavioral test of every endpoint and role/farm combination. User management, remaining finance/inventory/labor/task mutation paths, photo deletion authorization, Telegram/cron/public-share boundaries, and scheduled jobs still require continued review. Phase 14 remains In progress; Phase 15 remains Not started.
+
+
+## Handler audit follow-up: wage posting and farm image delivery (2026-10-28)
+
+Reviewed financial/labor mutation handlers, user-management boundaries, farm photo routes, Telegram webhook/link flows, scheduled endpoints, and the documented public share-card routes.
+
+- Agri and Dairy wage-posting handlers previously accepted any month string of length seven or more. In Agri, the string was interpolated into a database regular expression, so malformed input could select attendance outside the intended month and post it to the ledger. Both handlers now require a strict `YYYY-MM` month with month 01-12 before reading unposted attendance; Agri's query now anchors to the month separator.
+- Flock image upload now accepts only JPEG, PNG, and WebP, verifies the bytes' file signature against the declared MIME type, and rejects mismatches before storage.
+- Flock image responses now use `Cache-Control: private, no-store`. The previous public one-year cache directive was inappropriate for images behind farm authorization because shared caches must not reuse a farm-authorized response.
+- Added source-contract regression assertions for the month validation, image signature checks, farm-scoped image lookup, and private cache behavior.
+- The reviewed share-card routes remain intentionally public bearer links. Existing no-store/noindex/no-referrer and rate-limit protections reduce accidental exposure but do not make these cards private or revocable.
+- User assignment handlers in Agri and Dairy preserve a worker's assignments outside the manager's farm scope; Flock user mutations are owner-only. Telegram link-code handlers now require a selected farm and validate target-user assignment. Cron/webhook secret checks use timing-safe comparison and fail closed when the secret is missing.
+
+Commits on `muf-monorepo`: `6e51a2b` (Flock image hardening), `34c26cc` (image regression tests), `ecf364d` / `7eb31aa` (initial wage month validation), `75e9551` / `32b2985` (regex correction), and `ff5ba56` (wage validation tests).
+
+**Validation pending on the owner's Windows checkout.** These commits were made after the last owner-reported green run, so the prior 368-test/build results do not validate this new code. Run the focused security test, full suite, farm/archive checks, route/secret/sync/UI/workbench/docs checks, and all three production builds after pulling. Phase 14 remains **In progress** until current-head validation and the remaining endpoint review are complete; Phase 15 remains **Not started**.
