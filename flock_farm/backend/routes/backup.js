@@ -90,7 +90,39 @@ async function collectBackupPayload() {
   }
 }
 
+function validateBackupPayload(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error('Backup payload must be an object.');
+  }
+  const requireRecords = (key, value) => {
+    if (value !== undefined && (!Array.isArray(value) || value.some((doc) => !doc || typeof doc !== 'object' || Array.isArray(doc)))) {
+      throw new Error(`Backup section '${key}' must be an array of records.`);
+    }
+  };
+  requireRecords('farms', payload.farms);
+  requireRecords('images', payload.images);
+  requireRecords('archiveJobs', payload.archiveJobs);
+  requireRecords('archiveRecords', payload.archiveRecords);
+  for (const [key, Model] of Object.entries(BATCH_MODELS)) {
+    void Model;
+    requireRecords(key, payload[key]);
+  }
+  if (payload.buckets !== undefined && (!payload.buckets || typeof payload.buckets !== 'object' || Array.isArray(payload.buckets))) {
+    throw new Error("Backup section 'buckets' must be an object.");
+  }
+  if (payload.farmBuckets !== undefined && (!payload.farmBuckets || typeof payload.farmBuckets !== 'object' || Array.isArray(payload.farmBuckets))) {
+    throw new Error("Backup section 'farmBuckets' must be an object.");
+  }
+  for (const key of BUCKET_KEYS) {
+    const rows = payload.farmBuckets?.[key];
+    if (rows !== undefined && (!Array.isArray(rows) || rows.some((row) => !row || typeof row !== 'object' || Array.isArray(row) || typeof row.farmId !== 'string' || !row.farmId.trim()))) {
+      throw new Error(`Backup farm bucket '${key}' must contain records with farmId.`);
+    }
+  }
+}
+
 async function restoreBackupPayload(payload) {
+  validateBackupPayload(payload);
   // Validate the complete image section before any restore mutation. Older backups
   // without an images key remain compatible and leave current images untouched.
   const restoredImages = Array.isArray(payload.images) ? restoreBackupImages(payload.images) : null;
@@ -277,7 +309,7 @@ router.post('/backup/restore', authRequiredUnscoped, ownerUnscoped, async (req, 
   let releaseLocks;
   try {
     const payload = req.body;
-    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) return res.status(400).json({ error: 'Backup payload must be an object.' });
+    validateBackupPayload(payload);
     if (Array.isArray(payload.images)) restoreBackupImages(payload.images);
     const farmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
     releaseLocks = await acquireEggInventoryLocks(DataStore, farmIds);
@@ -323,6 +355,7 @@ router.post('/backup/restore-auto', authRequiredUnscoped, ownerUnscoped, async (
     const value = (existing && existing.value) || null;
     if (!value || !value.payload) return res.status(404).json({ error: 'No auto-backup available yet' });
     const payload = await expandMonthlyImagePayload(value);
+    validateBackupPayload(payload);
     const existingFarmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
     const backupFarmIds = [
       ...(Array.isArray(payload.farms) ? payload.farms.map((farm) => farm.id || farm._id) : []),
