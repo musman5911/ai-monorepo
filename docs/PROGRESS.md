@@ -139,3 +139,10 @@ After pulling the latest branch update, the owner reported:
 - `git status --short --branch`: clean working tree, `muf-monorepo` aligned with `origin/muf-monorepo`.
 
 This validates the corrected active-user source assertion and the expanded public-route security regression suite on the pulled checkout. The latest output did not include fresh runs of `check-route-permissions`, `check-secrets`, `check-sync`, `check-ui`, `check-workbench`, `check-farms`, or the three production builds, so those are not claimed for this exact checkpoint. Phase 14 remains **In progress**: the full handler-by-handler authorization audit is not complete, and source-contract tests are not equivalent to behavior-level tests for every role and farm combination. Phase 15 remains **Not started**.
+
+## Phase 14 follow-up review (2026-10-28)
+
+- Reviewed all three apps' full backup/restore route guards and the shared yearly-archive workflow. Database-wide backup/restore handlers are owner-only and intentionally run unscoped; yearly archive handlers also require owner authority and bind job/record reads and source mutations to the supplied farm ID. The farm ID is treated as a resource selector, not as authorization by itself; the owner-only guard is what permits cross-farm archive administration.
+- Found a destructive input-validation gap in Agri backup restore: a present collection section set to `null` passed validation, then `applyBackupPayload` treated it as an empty array and deleted that collection. Validation now rejects null/non-array sections and malformed records before taking the pre-restore snapshot or applying any changes.
+- Added a regression source-contract test for the validation-before-mutation ordering. Commits: `bf1946d` (fix), `5751685` (test).
+- This is a source review and code change made through GitHub. The owner has not yet run the new test or current-head validation, so the fix is not marked locally verified. Phase 14 remains **In progress**.
