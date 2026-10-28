@@ -371,3 +371,19 @@ The owner pulled branch update `6a9760a..118f730` and supplied Windows CMD outpu
 The Flock upload signature-check syntax error is fixed on the current branch, and the focused test, full suite, farm/archive runtime checks, repository safety checks and all three production builds now pass in the owner's checkout. The workbench check explicitly notes that it is a source-safety check, not a TypeScript build or browser review. Archive scripts emitted non-fatal Node module-type warnings.
 
 **Phase status remains In progress.** These results validate the current automated checks and builds but do not establish that every sensitive endpoint has been behaviorally tested for every role and farm context. Continue the handler-level authorization review, add focused behavior-level tests for confirmed gaps, and only close the phase once the remaining audit findings and acceptance criteria are addressed. Phase 15 remains Not started.
+
+
+## Additional handler-level source review (2026-10-28)
+
+Reviewed the current branch implementations for Agri/Dairy/Flock authentication and user management, Telegram webhook/link-code flows, scheduled email/summary endpoints, Flock image upload/read/delete, Agri inventory and task/finance/labor writes, Dairy labor writes, Flock batch destructive operations, and the three backup/archive route guards.
+
+Checks made in this pass:
+- User creation and mutation paths apply role restrictions; manager operations are constrained to workers and farm assignments within their authority, while Flock user mutation routes require owner authority. Owner lifecycle safeguards are present in the reviewed delete paths.
+- Telegram link creation requires a selected farm and validates target-user assignment; webhook and cron secrets use timing-safe comparison and missing secrets fail closed. Legacy query-string secret fallback remains for scheduler compatibility and should be migrated to headers where possible.
+- Flock image access resolves the stored image's farm before authentication, queries storage with the authenticated farm ID, verifies stored Cloudinary URLs against HTTPS and the expected hostname, and sends private/no-store cache headers. Upload MIME types are checked against file signatures.
+- Agri inventory, finance, tasks and Dairy labor mutation routes reviewed here have authentication/role middleware; Agri task and finance linked-record checks and labor month validation are already covered by regression assertions.
+- Backup and archive routes use explicit owner-only guards before entering unscoped execution contexts. Flock batch import/wipe operations are admin-role-gated and operate through the farm-scoped model/data context.
+
+No additional confirmed authorization defect was established from these reviewed snippets, so no speculative code changes were made. This is a source-level review, not runtime proof of all role/farm combinations. The next review pass must cover the remaining route handlers and strengthen behavior-level coverage where current tests only assert source text. The accepted public bearer-card disclosure remains a documented compatibility risk, not a private/revocable sharing model.
+
+**Phase 14 remains In progress.** Do not close it solely on this source review; closure still requires the complete remaining route review, regression coverage for any discovered gaps, and owner-run validation after any new code changes. Phase 15 remains Not started.
