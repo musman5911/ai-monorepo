@@ -380,3 +380,17 @@ describe('Flock image upload validation and cache isolation', () => {
     expect(routes).toContain('resolveImageFarm, authRequired');
   });
 });
+
+
+describe('labor wage posting month validation', () => {
+  it('rejects malformed months before selecting unposted attendance', () => {
+    const agri = source('agri_farm/backend/routes/labor.js');
+    const agriHandler = agri.split("router.post('/labor/post-wages'")[1] || '';
+    expect(agriHandler).toContain("/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)");
+    expect(agriHandler.indexOf("Month must be a valid YYYY-MM value.")).toBeLessThan(agriHandler.indexOf("Attendance.find({ date:"));
+    const dairy = source('dairy_farm/backend/routes/labor.js');
+    const dairyHandler = dairy.split("router.post('/post-wages'")[1] || '';
+    expect(dairyHandler).toContain("/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)");
+    expect(dairyHandler.indexOf("Month must be a valid YYYY-MM value.")).toBeLessThan(dairyHandler.indexOf("LaborAttendance.find()"));
+  });
+});
