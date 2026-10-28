@@ -100,8 +100,12 @@ router.post('/finance/bulk', protect, requireAdmin, asyncHandler(async (req, res
 }));
 
 async function validateFinanceLinks(entry) {
+  const cropId = String(entry.crop_id || '').trim();
   const fieldId = String(entry.fieldId || '').trim();
   const cropCycleId = String(entry.cropCycleId || '').trim();
+  if (cropId && (!/^[0-9a-fA-F]{24}$/.test(cropId) || !(await Crop.findOne({ _id: cropId })))) {
+    return 'Crop must exist in the selected farm.';
+  }
   if (fieldId && (!/^[0-9a-fA-F]{24}$/.test(fieldId) || !(await Field.findOne({ _id: fieldId })))) {
     return 'Field must exist in the selected farm.';
   }
