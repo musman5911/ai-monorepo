@@ -34,7 +34,7 @@ import cardsRoutes from './routes/cards.js';
 import diaryMediaRoutes from './routes/diary-media.js';
 import photosRoutes from './routes/photos.js';
 import farmsRoutes from './routes/farms.js';
-import { MUF_ENV } from './muf-env.mjs';
+import { MUF_ENV, mufTestRateLimitMax } from './muf-env.mjs';
 import { MUF_FULL_ROLE_VALUES } from './muf-farms.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -92,7 +92,7 @@ app.use(mongoSanitize());
 // ceiling; the production/default limit remains 300 requests per 15 minutes.
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: MUF_ENV.nodeEnv === 'test' ? 5000 : 300,
+  max: mufTestRateLimitMax(MUF_ENV.nodeEnv === 'test' ? 5000 : 300),
   standardHeaders: true,
   legacyHeaders: false,
   handler: (_req, res) => res.status(429).json({ detail: 'Too many request attempts. Please wait a few minutes before trying again.' }),
