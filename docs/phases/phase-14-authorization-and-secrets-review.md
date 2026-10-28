@@ -451,3 +451,19 @@ Commits: `1507543` (Agri guard), `fd28bb8` (regression assertion), `82853c2` and
 **Validation pending for these latest commits.** The 41-test focused run and 374-test full run predate the active-owner fix and must not be reported as validating it. After pulling, rerun the focused security test, full test suite, route/secret/sync/UI/workbench/farm/archive/docs checks, and all three production builds; then confirm a clean Git status.
 
 The handler review has now examined the remaining major route families in source, including user management, Dairy financial/labor handlers, Agri crop/finance/inventory/labor/liability/supplier handlers, Flock batch/data/upload/cron handlers, and the documented backup/archive/public-link exceptions. The source review did not establish exhaustive behavior-level authorization coverage for every handler and role/farm combination. Keep Phase 14 **In progress** until the new fix passes current-head validation and the closure criteria are explicitly reconciled. Phase 15 remains **Not started**. Real MongoDB, browser/device and live-deployment verification remain assigned to Phases 19–21.
+
+## Phase 14 current-head validation update (2026-10-28; owner-supplied Windows CMD output)
+
+The owner pulled `4d6215a..f69334a` and supplied the following results for the updated branch:
+
+- `npx vitest run tests/public-route-security.test.ts`: passed, 1 file / 42 tests.
+- `npm test`: passed, 42 files / 375 tests.
+- `npm run check-farms`: passed, including Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks.
+- `npm run check-archive`: passed for Dairy, Flock and Agri. Node emitted non-fatal module-type warnings from the archive scripts.
+- `npm run check-route-permissions`: passed; 46 route modules documented, imported and visibly mounted.
+- `npm run check-secrets`: passed; 647 tracked paths scanned, with no tracked `.env` files, private keys or recognized credential patterns.
+- `npm run check-sync`, `npm run check-ui`, `npm run check-workbench` (23 checks), and `npm run check-docs`: passed.
+- `tools\\build-all.bat`: Dairy, Flock and Agri production builds passed.
+- `git status --short --branch`: clean working tree; local `muf-monorepo` aligned with `origin/muf-monorepo`.
+
+This validates the latest Agri active-user authorization change and its regression coverage alongside the current automated checks and builds in the owner's checkout. It does not establish behavioral coverage of every handler for every role/farm combination. The handler-level authorization review remains open, so Phase 14 stays **In progress** and Phase 15 stays **Not started**. Real MongoDB, browser/phone and live deployment verification remain assigned to Phases 19–21.
