@@ -337,6 +337,19 @@ describe('linked-record validation in handler writes', () => {
   });
 });
 
+describe('Telegram user-link farm boundaries', () => {
+  it('requires a selected farm and validates target-user assignment before issuing a link code', () => {
+    for (const app of ['dairy_farm', 'flock_farm', 'agri_farm']) {
+      const routes = source(`${app}/backend/routes/telegram.js`);
+      expect(routes).toContain('const farmId = mufGetFarmContext()?.farmId');
+      expect(routes).toContain('if (!farmId) return res.status(400)');
+      expect(routes).toContain('const assignedFarmIds = (u.farmIds || []).map(String)');
+      expect(routes).toContain('!mufIsOwner(u.role) && !assignedFarmIds.includes(String(farmId))');
+      expect(routes).toContain('User not found in the selected farm');
+    }
+  });
+});
+
 describe('Dairy owner lifecycle safety', () => {
   it('prevents deleting the last active owner account', () => {
     const routes = source('dairy_farm/backend/routes/auth.js');
