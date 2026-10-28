@@ -114,9 +114,10 @@ function validateWorkerBirdWrite(existingBirds, incomingBirds) {
 // ─── Image space GC ─────────────────────────────────────────────────────────
 // Photos may be shared by a bird and a diary entry. Before deleting a candidate,
 // inspect every current bucket in the active farm, not only the bucket just saved.
-async function cleanupOrphanedImages(candidateIds) {
+async function cleanupOrphanedImages(candidateIds, farmId) {
   try {
-    if (!candidateIds?.size) return;
+    const scopedFarmId = String(farmId || '');
+    if (!scopedFarmId || !candidateIds?.size) return;
     const buckets = await DataStore.find({}).select('value').lean();
     const unreferenced = findUnreferencedImageIds(candidateIds, buckets.map((bucket) => bucket.value));
     let deleted = 0;
@@ -125,14 +126,14 @@ async function cleanupOrphanedImages(candidateIds) {
     const cloudinary = cloudinaryConfigured(config) ? createCloudinaryClient(config) : null;
     for (const id of unreferenced) {
       if (!mongoose.isValidObjectId(id)) continue;
-      // Image queries inherit the active farm scope from auth middleware.
-      const image = await Image.findById(id);
+      // Image has no automatic farm-scope plugin: enforce ownership explicitly.
+      const image = await Image.findOne({ _id: id, farmId: scopedFarmId });
       if (!image) continue;
       if (image.provider === 'cloudinary' && image.cloudinaryPublicId) {
         if (!cloudinary) { skippedCloudinary++; continue; }
         await cloudinary.destroy(image.cloudinaryPublicId);
       }
-      const result = await Image.deleteOne({ _id: id });
+      const result = await Image.deleteOne({ _id: id, farmId: scopedFarmId });
       deleted += result.deletedCount || 0;
     }
     if (deleted > 0) console.log(`🗑️  Freed ${deleted} orphaned farm image(s) from storage.`);
@@ -301,7 +302,7 @@ router.put('/data/:key', authRequired, async (req, res) => {
     if ((key === 'birds' || key === 'diary') && oldImageIds) {
       const newImageIds = extractImageIds(doc.value);
       const candidates = new Set([...oldImageIds].filter((id) => !newImageIds.has(id)));
-      await cleanupOrphanedImages(candidates);
+      await cleanupOrphanedImages(candidates, req.farmContext?.farmId);
     }
 
     res.json({ key, exists: true, value: doc.value, version: doc.version || 0 });
