@@ -23,11 +23,14 @@ const router = express.Router();
 // Delete a stored Image doc referenced by an '/api/images/<id>' path — used
 // whenever a batch photo is replaced or its batch is deleted, so the old
 // image's space in the DB is freed instead of leaking forever.
-async function deleteImageByPath(imagePath) {
+async function deleteImageByPath(imagePath, farmId) {
   try {
     const m = String(imagePath || '').match(/^\/api\/images\/([a-f0-9]{24})$/i);
-    if (!m || !mongoose.isValidObjectId(m[1])) return;
-    const image = await Image.findById(m[1]);
+    const scopedFarmId = String(farmId || '');
+    if (!scopedFarmId || !m || !mongoose.isValidObjectId(m[1])) return;
+    // Image has no automatic farm-scope plugin: enforce ownership in every query.
+    const imageFilter = { _id: m[1], farmId: scopedFarmId, kind: 'batch' };
+    const image = await Image.findOne(imageFilter);
     if (!image) return;
     if (image.provider === 'cloudinary' && image.cloudinaryPublicId) {
       const config = { cloudName: MUF_ENV.cloudinaryCloudName, apiKey: MUF_ENV.cloudinaryApiKey, apiSecret: MUF_ENV.cloudinaryApiSecret };
@@ -37,7 +40,7 @@ async function deleteImageByPath(imagePath) {
       }
       await createCloudinaryClient(config).destroy(image.cloudinaryPublicId);
     }
-    await Image.deleteOne({ _id: m[1] });
+    await Image.deleteOne(imageFilter);
   } catch (err) {
     console.error('Batch image cleanup failed (non-fatal):', err.message);
   }
@@ -185,6 +188,8 @@ function stripMeta({ _id, __v, ...rest }) {
 router.post('/batches/import-all', authRequired, requireRole('admin'), async (req, res) => {
   let releaseInventoryLock;
   try {
+    const farmId = String(req.farmContext?.farmId || '');
+    if (!farmId) return res.status(400).json({ error: 'Select one farm before importing batch data' });
     releaseInventoryLock = await acquireEggInventoryLock(DataStore);
     const historyConflict = linkedBatchHistoryConflict(await findLinkedBatchHistory());
     if (historyConflict) return res.status(409).json(historyConflict);
@@ -255,7 +260,7 @@ router.post('/batches/import-all', authRequired, requireRole('admin'), async (re
       BatchEggLog.deleteMany({}),
       BatchVaccinationLog.deleteMany({}),
       // wipe stored batch photos too — free the space
-      Image.deleteMany({ kind: 'batch' }),
+      Image.deleteMany({ kind: 'batch', farmId }),
     ]);
     for (const [Model, docs] of prepared) {
       if (docs.length) await Model.insertMany(docs);
@@ -271,9 +276,11 @@ router.post('/batches/import-all', authRequired, requireRole('admin'), async (re
   }
 });
 
-router.delete('/batches/wipe-all', authRequired, requireRole('admin'), async (_req, res) => {
+router.delete('/batches/wipe-all', authRequired, requireRole('admin'), async (req, res) => {
   let releaseInventoryLock;
   try {
+    const farmId = String(req.farmContext?.farmId || '');
+    if (!farmId) return res.status(400).json({ error: 'Select one farm before wiping batch data' });
     releaseInventoryLock = await acquireEggInventoryLock(DataStore);
     const historyConflict = linkedBatchHistoryConflict(await findLinkedBatchHistory());
     if (historyConflict) return res.status(409).json(historyConflict);
@@ -287,7 +294,7 @@ router.delete('/batches/wipe-all', authRequired, requireRole('admin'), async (_r
       BatchEggLog.deleteMany({}),
       BatchVaccinationLog.deleteMany({}),
       // wipe stored batch photos too — free the space
-      Image.deleteMany({ kind: 'batch' }),
+      Image.deleteMany({ kind: 'batch', farmId }),
     ]);
     res.json({ ok: true });
   } catch (err) {
@@ -340,6 +347,14 @@ router.post('/batches', authRequired, requireRole('admin'), async (req, res) => 
     const intake_count = Number(req.body?.intake_count || 0);
     const source = cleanText(req.body?.source);
     const image_path = cleanText(req.body?.image_path);
+    if (image_path) {
+      const imageId = image_path.match(/^\/api\/images\/([a-f0-9]{24})$/i)?.[1];
+      const farmId = String(req.farmContext?.farmId || '');
+      const image = imageId && farmId
+        ? await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean()
+        : null;
+      if (!image) return res.status(400).json({ error: 'Batch photo must belong to the selected farm' });
+    }
     const cost_per_bird = Number(req.body?.cost_per_bird || 0);
 
     if (!name) return res.status(400).json({ error: 'Batch name is required' });
@@ -402,8 +417,16 @@ router.patch('/batches/:batchId', authRequired, requireRole('admin'), async (req
     if (req.body?.image_path !== undefined) {
       patch.image_path = cleanText(req.body.image_path);
       // Photo replaced or removed -> free the old image's DB space
+      if (patch.image_path) {
+        const imageId = patch.image_path.match(/^\/api\/images\/([a-f0-9]{24})$/i)?.[1];
+        const farmId = String(req.farmContext?.farmId || '');
+        const image = imageId && farmId
+          ? await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean()
+          : null;
+        if (!image) return res.status(400).json({ error: 'Batch photo must belong to the selected farm' });
+      }
       if (batch.image_path && batch.image_path !== patch.image_path) {
-        await deleteImageByPath(batch.image_path);
+        await deleteImageByPath(batch.image_path, req.farmContext?.farmId);
       }
     }
     if (req.body?.cost_per_bird !== undefined) {
@@ -834,8 +857,8 @@ router.delete('/batches/:batchId', authRequired, requireRole('admin'), async (re
     }
 
     // Free the batch photos' DB space along with the batch itself
-    if (batch.image_path) await deleteImageByPath(batch.image_path);
-    for (const path of batch.gallery || []) await deleteImageByPath(path);
+    if (batch.image_path) await deleteImageByPath(batch.image_path, req.farmContext?.farmId);
+    for (const path of batch.gallery || []) await deleteImageByPath(path, req.farmContext?.farmId);
 
     await Promise.all([
       BatchFeedLog.deleteMany({ batch_id: batch.batch_id }),
@@ -867,9 +890,13 @@ router.post('/batches/:batchId/gallery', authRequired, async (req, res) => {
     const batch = await getBatchByCode(req.params.batchId);
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
     const imagePath = String(req.body?.image_path || '').trim();
-    if (!/^\/api\/images\/[a-f0-9]{24}$/i.test(imagePath)) {
-      return res.status(400).json({ error: 'image_path must be an uploaded /api/images/<id> path' });
+    const imageId = imagePath.match(/^\/api\/images\/([a-f0-9]{24})$/i)?.[1];
+    const farmId = String(req.farmContext?.farmId || '');
+    if (!imageId || !farmId) {
+      return res.status(400).json({ error: 'image_path must be an uploaded /api/images/<id> path in the selected farm' });
     }
+    const image = await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean();
+    if (!image) return res.status(400).json({ error: 'Batch photo must belong to the selected farm' });
     const gallery = Array.isArray(batch.gallery) ? batch.gallery : [];
     if (gallery.length >= 10) return res.status(400).json({ error: 'Gallery is limited to 10 photos' });
     if (!gallery.includes(imagePath)) {
@@ -893,7 +920,7 @@ router.delete('/batches/:batchId/gallery', authRequired, requireRole('admin'), a
     }
     batch.gallery = (batch.gallery || []).filter((g) => g !== imagePath);
     await batch.save();
-    await deleteImageByPath(imagePath);
+    await deleteImageByPath(imagePath, req.farmContext?.farmId);
     res.json({ gallery: batch.gallery });
   } catch (err) {
     console.error('DELETE batch gallery error:', err);
