@@ -330,3 +330,20 @@ Reviewed financial/labor mutation handlers, user-management boundaries, farm pho
 Commits on `muf-monorepo`: `6e51a2b` (Flock image hardening), `34c26cc` (image regression tests), `ecf364d` / `7eb31aa` (initial wage month validation), `75e9551` / `32b2985` (regex correction), and `ff5ba56` (wage validation tests).
 
 **Validation pending on the owner's Windows checkout.** These commits were made after the last owner-reported green run, so the prior 368-test/build results do not validate this new code. Run the focused security test, full suite, farm/archive checks, route/secret/sync/UI/workbench/docs checks, and all three production builds after pulling. Phase 14 remains **In progress** until current-head validation and the remaining endpoint review are complete; Phase 15 remains **Not started**.
+
+
+## Owner validation and Flock upload syntax correction (2026-10-28)
+
+The owner pulled branch head `bf558e4..6a9760a` and reported:
+
+- `npx vitest run tests/public-route-security.test.ts`: passed, 38 tests.
+- `npm test`: passed, 42 files / 371 tests.
+- `npm run check-route-permissions`, `check-secrets`, `check-sync`, `check-ui`, `check-workbench`, and `check-docs`: passed.
+- `tools\\build-all.bat`: all three production builds passed.
+- `npm run check-farms`: failed when the Flock backend tried to load `flock_farm/backend/routes/uploads.js`.
+- `npm run check-archive`: Dairy archive checks passed, then the Flock archive check failed for the same startup error.
+- `git status --short --branch`: clean and aligned with `origin/muf-monorepo`.
+
+The failure was a missing closing parenthesis in the PNG signature check inside `detectImageContentType`. This is a backend JavaScript syntax error; the frontend production build and source-text regression tests did not catch it. Corrected the condition and added a source-contract assertion for the closing syntax.
+
+**Validation still required:** pull the new fix, then rerun `npx vitest run tests/public-route-security.test.ts`, `npm test`, `npm run check-farms`, `npm run check-archive`, `npm run check-docs`, and `tools\\build-all.bat`. Also rerun `npm run check-route-permissions`, `npm run check-secrets`, `npm run check-sync`, `npm run check-ui`, and `npm run check-workbench` for a current-head checkpoint. Do not mark Phase 14 Done until these checks pass and the remaining handler-level authorization audit is complete. Phase 15 remains Not started.
