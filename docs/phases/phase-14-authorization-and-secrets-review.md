@@ -268,3 +268,19 @@ The owner pulled the latest branch update (e44ed46 to 8c6ff58) and supplied Wind
 | `git status --short --branch` | Clean working tree; muf-monorepo aligned with origin/muf-monorepo |
 
 This confirms the current restore-validation changes pass the reported source-contract tests, repository checks, archive checks and production builds. It does not complete the handler-by-handler authorization audit: the route inventory and source-contract assertions do not behaviorally test every sensitive endpoint against every role and farm context. Continue the remaining handler review and add behavior-focused regression coverage for confirmed gaps before considering Phase 14 complete. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
+
+
+## Handler-level audit follow-up: linked-record validation (2026-10-28)
+
+The next source-review pass examined Dairy health, milk and expense writes, alongside Agri finance, inventory, labor and task handlers, the three user-management route modules, and Flock's farm-scoped DataStore/Image models and upload handlers.
+
+**Confirmed gap fixed:** Dairy accepted client-supplied cow IDs on health and milk writes without first confirming that the cow exists in the authenticated farm. Milk also accepted a buyer ID without verifying that the buyer belongs to that farm. Expense create/update accepted cow and supplier IDs without validating those links. Model-level farm scoping protects the primary record itself, but it does not by itself prove a linked ID is valid; invalid cross-farm links could produce inconsistent or misleading records. Added selected-farm checks before writes, including validating every row in bulk health/milk requests before the first mutation.
+
+- `dairy_farm/backend/routes/health.js`: validates cow links for single and bulk create/update.
+- `dairy_farm/backend/routes/milk.js`: validates cow and buyer links for single and bulk create/update.
+- `dairy_farm/backend/routes/expenses.js`: validates cow and supplier links for create/update.
+- `tests/public-route-security.test.ts`: added source-contract regression checks for the new validations.
+
+Commits: `4c296a6` (health links), `f09430b` (milk links), `7b5f73e` (expense links), `b89f9aa` (regression tests).
+
+**Validation is pending.** These changes were committed directly to the branch through GitHub; they have not yet been pulled and executed in the owner's Windows checkout. This source-contract coverage is not a substitute for behavior-level HTTP tests or the rest of the audit. The remaining review still includes complete finance/inventory/labor/task mutation paths, user lifecycle and role changes, photo deletion/ownership, and Telegram/cron/public-share boundaries. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
