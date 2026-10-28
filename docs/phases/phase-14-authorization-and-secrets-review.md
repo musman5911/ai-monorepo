@@ -347,3 +347,27 @@ The owner pulled branch head `bf558e4..6a9760a` and reported:
 The failure was a missing closing parenthesis in the PNG signature check inside `detectImageContentType`. This is a backend JavaScript syntax error; the frontend production build and source-text regression tests did not catch it. Corrected the condition and added a source-contract assertion for the closing syntax.
 
 **Validation still required:** pull the new fix, then rerun `npx vitest run tests/public-route-security.test.ts`, `npm test`, `npm run check-farms`, `npm run check-archive`, `npm run check-docs`, and `tools\\build-all.bat`. Also rerun `npm run check-route-permissions`, `npm run check-secrets`, `npm run check-sync`, `npm run check-ui`, and `npm run check-workbench` for a current-head checkpoint. Do not mark Phase 14 Done until these checks pass and the remaining handler-level authorization audit is complete. Phase 15 remains Not started.
+
+
+## Phase 14 current-head validation after Flock upload fix (2026-10-28)
+
+The owner pulled branch update `6a9760a..118f730` and supplied Windows CMD output for the current head:
+
+| Command/check | Result |
+|---|---|
+| `npx vitest run tests/public-route-security.test.ts` | Passed: 1 file / 38 tests |
+| `npm test` | Passed: 42 files / 371 tests |
+| `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks |
+| `npm run check-archive` | Passed: Dairy, Flock and Agri archive checks; Node emitted non-fatal module-type warnings |
+| `npm run check-route-permissions` | Passed: 46 route modules documented, imported by their server and visibly mounted |
+| `npm run check-secrets` | Passed: 647 tracked paths scanned; no tracked .env files, private keys or recognized credential patterns |
+| `npm run check-sync` | Passed: shared MUF files, backend twins, environment names and listed invariants in sync |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source checks |
+| `npm run check-docs` | Passed: all 22 phase files, statuses, required sections and links consistent |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `git status --short --branch` | Clean working tree; local `muf-monorepo` is up to date with `origin/muf-monorepo` |
+
+The Flock upload signature-check syntax error is fixed on the current branch, and the focused test, full suite, farm/archive runtime checks, repository safety checks and all three production builds now pass in the owner's checkout. The workbench check explicitly notes that it is a source-safety check, not a TypeScript build or browser review. Archive scripts emitted non-fatal Node module-type warnings.
+
+**Phase status remains In progress.** These results validate the current automated checks and builds but do not establish that every sensitive endpoint has been behaviorally tested for every role and farm context. Continue the handler-level authorization review, add focused behavior-level tests for confirmed gaps, and only close the phase once the remaining audit findings and acceptance criteria are addressed. Phase 15 remains Not started.
