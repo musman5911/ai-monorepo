@@ -217,7 +217,7 @@ router.delete('/advances/:id', protect, adminOnly, async (req, res) => {
 router.post('/post-wages', protect, adminOnly, async (req, res) => {
   try {
     const month = String((req.body && req.body.month) || todayStr().slice(0, 7)).trim();
-    if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)) return res.status(400).json({ error: 'Month must be a valid YYYY-MM value.' });
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return res.status(400).json({ error: 'Month must be a valid YYYY-MM value.' });
 
     const all = await LaborAttendance.find();
     const rows = all.filter((r) => String(r.date || '').startsWith(month) && !r.posted);
