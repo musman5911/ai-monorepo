@@ -280,3 +280,15 @@ describe('Dairy cross-farm linked-record validation', () => {
     expect(routes).toContain("'Supplier must exist in the selected farm'");
   });
 });
+
+
+describe('Dairy owner lifecycle safety', () => {
+  it('prevents deleting the last active owner account', () => {
+    const routes = source('dairy_farm/backend/routes/auth.js');
+    const handler = routes.split("router.delete('/users/:id'")[1] || '';
+    expect(handler).toContain('if (mufIsOwner(target.role))');
+    expect(handler).toContain('remainingActiveOwners');
+    expect(handler).toContain("'At least one active owner must remain.'");
+    expect(handler.indexOf('remainingActiveOwners')).toBeLessThan(handler.indexOf('User.findByIdAndDelete(req.params.id)'));
+  });
+});
