@@ -484,3 +484,11 @@ Added a focused source-contract regression test to tests/public-route-security.t
 Commit references: 14f828b (Flock summary farm scoping), 94825c5 (regression test).
 
 **Validation pending:** the owner must pull these commits and rerun the focused test, full suite, all security/farm/archive/docs checks and three production builds. This is the last confirmed finding from the current pass, not proof that every handler has behavior-level role/farm coverage. Keep Phase 14 **In progress** until the new head passes validation and the remaining review boundaries are signed off.
+
+
+## Runtime authorization matrix check (2026-10-28)
+
+- Added `tools/check-route-matrix.js` and exposed it as `npm run check-route-matrix`. It starts the three backends with memory mode enabled, disposable JWT secrets, and free local ports; it creates disposable worker/manager identities and checks route responses for anonymous, worker, manager, and owner requests.
+- Added `docs/SESSION-2-PROBLEMS.md` as a provisional register for the owner's deferred A–O and ROLE-F1 findings. The original report was not available in the current branch/project files, so unspecified item descriptions are explicitly marked not checked rather than invented. The confirmed A4 and C2 false findings and the owner-reported true identifiers are recorded with this limitation.
+- **Validation is pending.** The new matrix has not yet been run in the owner's Windows checkout, and the standard checks have not been rerun against this new commit. Do not mark Phase 14 Done until the owner runs the required command list, any matrix mismatches are triaged within the agreed scope, and confirms the results.
+- Phase 15 remains **Not started**.
