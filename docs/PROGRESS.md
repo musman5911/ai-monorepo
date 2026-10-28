@@ -160,3 +160,6 @@ Commits on `muf-monorepo`: `8456eb7`, `e06f911`, `94fbce3`, `eed8209`, `dc886f2`
 
 
 Phase 14 current-head validation (2026-10-28): owner pulled branch update e44ed46..8c6ff58. Reported results: public-route security 26/26; full suite 42 files / 359 tests; route inventory (46 modules), secret scan (647 tracked paths), sync, UI, workbench (23 checks), farm scope, archive, docs and all three production builds passed. Git status is clean and local branch is aligned with origin. Archive scripts emitted non-fatal Node module-type warnings. The restore-validation follow-up is now validated on the owner's checkout. Phase 14 remains In progress because the handler-level authorization audit is not complete; Phase 15 remains Not started.
+
+
+Phase 14 handler audit follow-up (2026-10-28): added selected-farm validation for Dairy health cow links, milk cow/buyer links, and expense cow/supplier links, including bulk health/milk payloads. Added source-contract regression checks in tests/public-route-security.test.ts. Commits: 4c296a6, f09430b, 7b5f73e, b89f9aa. Validation is pending owner pull/run. Phase 14 remains In progress; Phase 15 remains Not started.
