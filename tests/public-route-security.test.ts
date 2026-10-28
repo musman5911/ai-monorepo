@@ -42,6 +42,23 @@ describe('scheduled endpoint response and secret controls', () => {
     expect(cronHandler).not.toContain('Report dispatched to:');
   });
 
+
+  it('scopes authenticated Flock summaries to one selected farm and hides recipient metadata', () => {
+    const routes = source('flock_farm/backend/routes/cron.js');
+    expect(routes).toContain("const doc = await DataStore.findOne({ key, farmId: String(farmId) })");
+    expect(routes).toContain("context.mode !== 'single'");
+    expect(routes).toContain("users = await User.find({ email: { $ne: null }, active: true, farmIds: farmId }).select('email')");
+    expect(routes).toContain("res.json({ ok: true, date: summary.date });");
+    expect(routes).not.toContain("res.json({ ok: true, date: summary.date, recipients, stats: summary.stats })");
+    const cronHandler = routes.split("// POST /api/summary/send-now")[0];
+    expect(cronHandler).toContain("const farmId = mufGetDefaultFarmId()");
+    expect(cronHandler).toContain("loadBucket('birds', FB.birds, farmId)");
+    expect(cronHandler).toContain("if (!farmId) return res.status(503)");
+    const todayHandler = routes.split("router.get('/summary/today'")[1] || '';
+    expect(todayHandler).toContain('const farmId = selectedFarmId(req, res)');
+    expect(todayHandler).toContain("loadBucket('birds', FB.birds, farmId)");
+  });
+
   it('Flock cron endpoint does not return recipient addresses or farm statistics', () => {
     const routes = source('flock_farm/backend/routes/cron.js');
     const cronHandler = routes.split("// POST /api/summary/send-now")[0];
