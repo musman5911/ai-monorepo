@@ -72,3 +72,8 @@ This is a source-level policy inventory, not a claim that every route has been b
 ## Runtime matrix check
 
 `npm run check-route-matrix` starts disposable memory-mode servers and compares route responses for anonymous, worker, manager and owner identities. The inventory's module policy is the baseline, with documented public exceptions and owner-only operations taking precedence. This runtime check is a guard against authorization regressions, not a proof of every possible business-data invariant. Any mismatches must be triaged against the handler and the policy; under Phase 14 scope, only confirmed cross-farm data disclosures and unauthenticated writes are fixed immediately. Other findings go to [SESSION-2-PROBLEMS.md](SESSION-2-PROBLEMS.md).
+
+
+## Route-matrix test limiter
+
+The disposable route matrix launches each backend with `MEMORY_MODE=1`, `NODE_ENV=test`, and `MUF_TEST_RATE_LIMIT_MAX=100000`. The override is accepted only when memory mode and test environment are both active; otherwise it is ignored and the configured rate-limit ceiling remains in force. Do not set this variable in deployed environments. The matrix sends deliberately invalid login credentials (401 is expected), does not send `X-Farm-Id` to public routes, and treats secret-gated webhook/cron handlers separately from ordinary farm-scoped routes.
