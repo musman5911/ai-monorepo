@@ -231,3 +231,9 @@ After pulling the latest branch update, the owner supplied these Windows CMD res
 The focused suite now includes the corrected Agri active-user source assertion and the expanded backup/archive, farm-role, settings and photo-reference checks. These results supersede the prior note that the corrected assertion was awaiting rerun. They do not establish that every endpoint has been behaviorally tested for every role and farm context. The latest output did not include fresh current-head results for the secret scan, route inventory/mount check, sync/UI/workbench/farm checks, or all three production builds; do not infer those from this run.
 
 **Status remains In progress.** Complete the remaining handler-level review, add behavior-focused regression tests for confirmed gaps, run the full current-head validation gate, and only then consider closure. Phase 15 remains Not started.
+
+## Phase 14 follow-up review (2026-10-28)
+
+Reviewed the backup and archive boundaries across Dairy, Flock and Agri. Backup/restore routes are owner-only before unscoped operations; the shared yearly-archive handlers bind jobs, snapshots and source deletion/restoration to the selected farm ID. Found and fixed an Agri restore validation flaw: a present section with a `null` value was accepted, while the restore path interpreted it as an empty array and could wipe that collection. The validator now rejects null/non-array sections before snapshot or mutation. Added a regression source-contract test.
+
+Commits: `bf1946d` (Agri restore validation), `5751685` (regression test). Owner-run validation is pending. The broader audit and current-head checks are still required; Phase 14 remains **In progress**, Phase 15 remains **Not started**.
