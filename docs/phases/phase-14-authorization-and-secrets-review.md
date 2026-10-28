@@ -284,3 +284,10 @@ The next source-review pass examined Dairy health, milk and expense writes, alon
 Commits: `4c296a6` (health links), `f09430b` (milk links), `7b5f73e` (expense links), `b89f9aa` (regression tests).
 
 **Validation is pending.** These changes were committed directly to the branch through GitHub; they have not yet been pulled and executed in the owner's Windows checkout. This source-contract coverage is not a substitute for behavior-level HTTP tests or the rest of the audit. The remaining review still includes complete finance/inventory/labor/task mutation paths, user lifecycle and role changes, photo deletion/ownership, and Telegram/cron/public-share boundaries. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
+
+
+## Owner lifecycle safeguard (2026-10-28)
+
+A further review of Dairy user lifecycle handling found that deleting a target account did not protect the last active owner. The edit path already had owner-safety checks in the broader lifecycle flow, and Agri/Flock protect the last active owner, but Dairy's delete handler could remove the final owner and lock out administration. Added a guard that checks for another active owner before deletion and a regression source-contract assertion.
+
+Commits: `3e2881f` (guard), `5977efb` (regression test). Validation is pending owner pull/run. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
