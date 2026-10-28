@@ -209,3 +209,14 @@ describe('active-user and farm-role enforcement', () => {
     expect(routes).toContain("req.user?.farmRole === 'manager' && (!req.body?.role || req.body.role === 'worker')");
   });
 });
+
+describe('Agri backup restore payload validation', () => {
+  it('rejects null or malformed collection sections before destructive restore', () => {
+    const routes = source('agri_farm/backend/routes/backup.js');
+    const validator = routes.split('function validateBackupPayload(payload)')[1]?.split('// ─── Routes')[0] || '';
+    expect(validator).toContain('if (!Array.isArray(data)');
+    expect(validator).toContain('data.some((doc) => !doc || typeof doc !== \'object\' || Array.isArray(doc))');
+    expect(validator).not.toContain('if (data == null) continue');
+    expect(routes.indexOf('validateBackupPayload(payload)')).toBeLessThan(routes.indexOf('applyBackupPayload(payload)'));
+  });
+});
