@@ -190,7 +190,7 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] A secret scan of the repository for keys, tokens and `.env` files (owner-run: 647 tracked paths, passed).
 - [x] Source-reviewed server entry points for security headers, request-size limits and broad API rate limiting, alongside stricter auth-flow rate limits.
 - [x] The new command-line check above exists and passed for 46 actual router modules documented, imported and visibly mounted; the old 53 count included route-folder helpers.
-- [ ] The current-head standard checks and all three builds pass after the latest manager-assignment fix and regression assertion.
+- [x] The current-head standard checks and all three builds pass after the latest authorization fixes and regression assertions (owner-validated 2026-10-28; see the current-head validation checkpoint below).
 - [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` reflect the current phase status and remaining verification gate.
 
 ## Rules for whoever works on this phase
