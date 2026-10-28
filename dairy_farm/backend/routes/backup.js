@@ -78,6 +78,22 @@ const COLLECTIONS = {
   archiveRecords: ArchiveRecord,
 };
 
+function validateBackupPayload(payload) {
+  if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+    throw new Error('Invalid backup payload');
+  }
+  for (const [key, Model] of Object.entries(COLLECTIONS)) {
+    void Model;
+    const data = payload[key];
+    if (data !== undefined && (!Array.isArray(data) || data.some((doc) => !doc || typeof doc !== 'object' || Array.isArray(doc)))) {
+      throw new Error(`"${key}" must be an array of records if present`);
+    }
+  }
+  if (payload.farms !== undefined && (!Array.isArray(payload.farms) || payload.farms.some((farm) => !farm || typeof farm !== 'object' || Array.isArray(farm)))) {
+    throw new Error('"farms" must be an array of records if present');
+  }
+}
+
 async function restoreCollections(payload, session) {
   const opts = session ? { session } : {};
   for (const [key, Model] of Object.entries(COLLECTIONS)) {
@@ -102,15 +118,10 @@ async function restoreCollections(payload, session) {
 // Falls back to sequential restore on standalone MongoDB.
 router.post('/restore', protectUnscoped, ...adminOnly, async (req, res) => {
   const payload = req.body;
-  if (!payload || typeof payload !== 'object') {
-    return res.status(400).json({ error: 'Invalid backup payload' });
-  }
-
-  for (const key of Object.keys(COLLECTIONS)) {
-    const val = payload[key];
-    if (val !== undefined && !Array.isArray(val)) {
-      return res.status(400).json({ error: `"${key}" must be an array if present` });
-    }
+  try {
+    validateBackupPayload(payload);
+  } catch (validationError) {
+    return res.status(400).json({ error: validationError.message });
   }
 
   const hasData = Object.keys(COLLECTIONS).some(key => Array.isArray(payload[key]) && payload[key].length > 0);
@@ -274,6 +285,7 @@ router.post('/restore-auto', protectUnscoped, ...adminOnly, async (_req, res) =>
     const existing = await Meta.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
     if (!value || !value.payload) return res.status(404).json({ error: 'No auto-backup available yet' });
+    validateBackupPayload(value.payload);
     await restoreMissingFarms(value.payload);
     await restoreCollections(value.payload, null);
     await tagAfterRestore();
