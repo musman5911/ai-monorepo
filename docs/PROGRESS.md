@@ -210,3 +210,10 @@ The owner supplied a current Windows run after pulling the cross-farm image fixe
 The latest source review covered user/role assignment, Telegram link/webhook flows, scheduled secrets, public share cards, photo and image cleanup, Agri finance/tasks/labor links, Dairy wage posting, Flock batch image boundaries, and owner-only backup/archive operations. Confirmed gaps were fixed with focused regression assertions. Public share cards remain intentionally public bearer links and are not private or revocable.
 
 **Phase 14 remains In progress; Phase 15 remains Not started.** The checks are green, but source-contract tests do not behaviorally prove every role/farm combination for every handler. Complete the remaining route-by-route review before closure; do not infer exhaustive authorization correctness from module inventory or passing builds.
+
+
+## Phase 14 active-owner lifecycle follow-up (2026-10-28)
+
+A final pass over user lifecycle handlers found that Agri's last-owner guard counted inactive owner-role accounts. The guard now counts active owners only and protects the target when that target is active. Added a focused source-contract regression assertion and clarified the Agri route inventory. Commits: `1507543`, `fd28bb8`, `82853c2`, `3ba993c`, `8bb8b35`.
+
+The owner-reported validation from branch head `4d6215a` passed (41 focused security tests, 374 total tests, farm/archive/route/secret/sync/UI/workbench/docs checks and all three production builds), but it predates this final fix. Current-head validation is pending. Phase 14 remains **In progress** and Phase 15 remains **Not started** until the new code passes the full validation set.
