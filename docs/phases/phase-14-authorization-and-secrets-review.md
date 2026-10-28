@@ -291,3 +291,18 @@ Commits: `4c296a6` (health links), `f09430b` (milk links), `7b5f73e` (expense li
 A further review of Dairy user lifecycle handling found that deleting a target account did not protect the last active owner. The edit path already had owner-safety checks in the broader lifecycle flow, and Agri/Flock protect the last active owner, but Dairy's delete handler could remove the final owner and lock out administration. Added a guard that checks for another active owner before deletion and a regression source-contract assertion.
 
 Commits: `3e2881f` (guard), `5977efb` (regression test). Validation is pending owner pull/run. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
+
+## Handler-level audit follow-up: lineage and Agri operational links (2026-10-28)
+
+Continued the source-level handler review for client-supplied IDs that connect records across farms.
+
+- Dairy cow create/update now validates mother and farm-sire references against the authenticated farm before writing, preventing invalid cross-farm lineage links.
+- Agri finance create/update now validates crop_id as well as field and crop-cycle references. Bulk finance already performed crop checks, but the single-record validator did not.
+- Agri task create/update now validates crop and inventory references and rejects invalid inventory quantities. Bulk task import already had link checks; the single-record handlers lacked equivalent validation.
+- Agri attendance create/update now validates optional crop references against the authenticated farm.
+- tests/public-route-security.test.ts adds source-contract regression checks for the above ordering and guards.
+- The Dairy archive integration fixture now uses the cow ID returned by /api/cows; the API generates IDs server-side, so the previous fixture's supplied _id was not the ID actually persisted and caused the milk link check to fail.
+
+Commits: a4a9fb5, a8c3e53, 8a1cd22, 07e57fb, a754185, 13a9cef.
+
+**Validation pending.** Pull these changes and rerun the focused security tests, full suite, farm and archive checks, route/secrets/docs checks, and production builds. The archive fixture correction has not yet been verified locally. This is still a source-level audit with source-contract tests, not a complete behavioral test of every endpoint and role/farm combination. User management, remaining finance/inventory/labor/task mutation paths, photo deletion authorization, Telegram/cron/public-share boundaries, and scheduled jobs still require continued review. Phase 14 remains In progress; Phase 15 remains Not started.
