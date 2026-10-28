@@ -217,6 +217,13 @@ describe('Agri backup restore payload validation', () => {
     expect(validator).toContain('if (!Array.isArray(data)');
     expect(validator).toContain('data.some((doc) => !doc || typeof doc !== \'object\' || Array.isArray(doc))');
     expect(validator).not.toContain('if (data == null) continue');
-    expect(routes.indexOf('validateBackupPayload(payload)')).toBeLessThan(routes.indexOf('applyBackupPayload(payload)'));
+    const manualRestore = routes.split("router.post('/restore',")[1]?.split("router.get('/backup/auto'")[0] || '';
+    expect(manualRestore.indexOf('validateBackupPayload(payload)')).toBeGreaterThanOrEqual(0);
+    expect(manualRestore.indexOf('validateBackupPayload(payload)')).toBeLessThan(manualRestore.indexOf('applyBackupPayload(payload)'));
+
+    const autoRestore = routes.split("router.post('/restore/auto',")[1] || '';
+    expect(autoRestore.indexOf('validateBackupPayload(payload)')).toBeGreaterThanOrEqual(0);
+    expect(autoRestore.indexOf('validateBackupPayload(payload)')).toBeLessThan(autoRestore.indexOf('applyBackupPayload(payload)'));
+    expect(validator).toContain("'farms', 'archiveJobs', 'archiveRecords'");
   });
 });
