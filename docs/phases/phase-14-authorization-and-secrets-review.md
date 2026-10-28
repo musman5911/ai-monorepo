@@ -467,3 +467,20 @@ The owner pulled `4d6215a..f69334a` and supplied the following results for the u
 - `git status --short --branch`: clean working tree; local `muf-monorepo` aligned with `origin/muf-monorepo`.
 
 This validates the latest Agri active-user authorization change and its regression coverage alongside the current automated checks and builds in the owner's checkout. It does not establish behavioral coverage of every handler for every role/farm combination. The handler-level authorization review remains open, so Phase 14 stays **In progress** and Phase 15 stays **Not started**. Real MongoDB, browser/phone and live deployment verification remain assigned to Phases 19–21.
+
+## Summary endpoint farm-scope finding (2026-10-28)
+
+The final pass over scheduled and manually triggered Flock summary handlers found that they loaded DataStore buckets by key alone. Although authenticated requests use the model's farm-scope wrapper, the manual summary handler could accept the all-farms context and its own bucket reads did not state the selected farm explicitly. The scheduled handler also relied on an implicit unscoped lookup, making its data boundary depend on surrounding model setup.
+
+Fixed flock_farm/backend/routes/cron.js so:
+- every summary bucket read requires and includes an explicit farmId;
+- scheduled delivery uses the configured default farm and fails closed if no default farm is configured;
+- manual summary send and /summary/today reject all-farms mode and require one selected farm;
+- explicit manual recipients must be active users assigned to the selected farm or addresses on the configured server-side allowlist;
+- the manual-send response no longer returns recipient addresses or summary statistics.
+
+Added a focused source-contract regression test to tests/public-route-security.test.ts.
+
+Commit references: 14f828b (Flock summary farm scoping), 94825c5 (regression test).
+
+**Validation pending:** the owner must pull these commits and rerun the focused test, full suite, all security/farm/archive/docs checks and three production builds. This is the last confirmed finding from the current pass, not proof that every handler has behavior-level role/farm coverage. Keep Phase 14 **In progress** until the new head passes validation and the remaining review boundaries are signed off.
