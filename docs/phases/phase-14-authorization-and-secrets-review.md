@@ -434,3 +434,20 @@ The focused source review covered user/role assignment boundaries, Telegram link
 The share-card routes remain an explicitly accepted public bearer-link risk. They are not account-bound, private, or individually revocable. Query-string secret compatibility also remains for existing schedulers, with headers preferred.
 
 **Closure decision: Phase 14 remains In progress.** The green current-head suite and source-contract assertions are not equivalent to behavioral authorization tests across every role/farm combination, and this review has not established exhaustive handler-by-handler runtime coverage for every route in all three apps. Do not mark Done or start Phase 15 on the strength of green builds alone. The remaining closure task is a final route-by-route review of handlers not specifically covered above, with focused behavioral tests for any uncovered boundaries, followed by another current-head validation if code changes are made. Real MongoDB, browser/device and live-deployment checks remain assigned to Phases 19–21.
+
+
+## Final handler review pass and active-owner safeguard (2026-10-28)
+
+The owner supplied a fresh Windows validation run from branch head `4d6215a`:
+- `npx vitest run tests/public-route-security.test.ts`: passed, 1 file / 41 tests.
+- `npm test`: passed, 42 files / 374 tests.
+- `npm run check-farms`, `npm run check-archive`, `npm run check-route-permissions`, `npm run check-secrets`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-docs`, and all three production builds passed.
+- `git status --short --branch`: clean and aligned with `origin/muf-monorepo`.
+
+A further comparison of user lifecycle safeguards found that Agri counted all owner-role records when preventing removal/demotion of the last owner, even if the other account was inactive and could not authenticate. Updated the count to include only active owners, and applied the last-active-owner safeguard only when the target owner is active. Added a regression assertion in `tests/public-route-security.test.ts` and clarified the Agri policy inventory.
+
+Commits: `1507543` (Agri guard), `fd28bb8` (regression assertion), `82853c2` and `3ba993c` (inventory clarification).
+
+**Validation pending for these latest commits.** The 41-test focused run and 374-test full run predate the active-owner fix and must not be reported as validating it. After pulling, rerun the focused security test, full test suite, route/secret/sync/UI/workbench/farm/archive/docs checks, and all three production builds; then confirm a clean Git status.
+
+The handler review has now examined the remaining major route families in source, including user management, Dairy financial/labor handlers, Agri crop/finance/inventory/labor/liability/supplier handlers, Flock batch/data/upload/cron handlers, and the documented backup/archive/public-link exceptions. The source review did not establish exhaustive behavior-level authorization coverage for every handler and role/farm combination. Keep Phase 14 **In progress** until the new fix passes current-head validation and the closure criteria are explicitly reconciled. Phase 15 remains **Not started**. Real MongoDB, browser/device and live-deployment verification remain assigned to Phases 19–21.
