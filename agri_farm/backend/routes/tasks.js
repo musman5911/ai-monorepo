@@ -112,6 +112,20 @@ router.post('/tasks/bulk', protect, requireAdmin, asyncHandler(async (req, res) 
   return res.status(201).json({ status: 'ok', inserted: inserted.length });
 }));
 
+async function validateTaskLinks(task) {
+  const cropId = String(task.crop_id || '').trim();
+  const inventoryId = String(task.inventory_item_id || '').trim();
+  const quantity = task.inventory_qty_consumed === undefined || task.inventory_qty_consumed === '' ? 0 : Number(task.inventory_qty_consumed);
+  if (!Number.isFinite(quantity) || quantity < 0) return 'Inventory quantity must be a non-negative number.';
+  if (cropId && (!/^[0-9a-fA-F]{24}$/.test(cropId) || !(await Crop.findOne({ _id: cropId })))) {
+    return 'Crop must exist in the selected farm.';
+  }
+  if (inventoryId && (!/^[0-9a-fA-F]{24}$/.test(inventoryId) || !(await Inventory.findOne({ _id: inventoryId })))) {
+    return 'Inventory item must exist in the selected farm.';
+  }
+  return '';
+}
+
 // Keep only valid, existing laborer ids (deduped, max 30). Names are
 // resolved server-side so task cards can display the crew without needing
 // wage-bearing /laborers access.
@@ -134,6 +148,8 @@ async function cleanLaborerIds(rawIds) {
 
 router.post('/tasks', protect, requireAdmin, asyncHandler(async (req, res) => {
   const task = { ...(req.body || {}), status: 'Pending' };
+  const linkError = await validateTaskLinks(task);
+  if (linkError) return res.status(400).json({ error: linkError });
   [task.laborer_ids, task.laborer_names] = await cleanLaborerIds(task.laborer_ids);
   await Task.insertMany([task]);
   return res.status(201).json({ status: 'ok' });
@@ -142,6 +158,8 @@ router.post('/tasks', protect, requireAdmin, asyncHandler(async (req, res) => {
 router.put('/tasks/:taskId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.taskId, 'task ID');
   const task = { ...(req.body || {}) };
+  const linkError = await validateTaskLinks(task);
+  if (linkError) return res.status(400).json({ error: linkError });
   [task.laborer_ids, task.laborer_names] = await cleanLaborerIds(task.laborer_ids);
   const result = await replaceFarmRecord(Task, oid, task);
   if (!result.matchedCount) return notFound(res, 'Task not found');
