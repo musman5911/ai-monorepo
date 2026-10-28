@@ -221,3 +221,8 @@ The owner-reported validation from branch head `4d6215a` passed (41 focused secu
 **Phase 14 current-head validation (2026-10-28; owner-supplied Windows CMD output):** after pulling `4d6215a..f69334a`, the owner reported 42/42 focused public-route security tests and 375/375 tests across 42 files passing. Farm and archive checks passed; route inventory (46 modules), secret scan (647 tracked paths), MUF sync, UI, workbench (23 checks), docs, and all three production builds passed. Archive scripts emitted non-fatal Node module-type warnings. `git status --short --branch` showed a clean working tree aligned with `origin/muf-monorepo`. Phase 14 remains **In progress** because the handler-level authorization review is not exhaustive; Phase 15 remains **Not started**.
 
 **Phase 14 summary-boundary fix (2026-10-28):** source review found Flock scheduled/manual summary handlers reading DataStore buckets without an explicit farm ID. Updated them to scope all bucket reads to a required farm, require a single selected farm for authenticated summary endpoints, bind scheduled sends to the configured default farm, constrain manual recipients to the selected farm plus the configured allowlist, and omit recipients/statistics from the manual-send response. Added a regression assertion. Commits: 14f828b, 94825c5. Validation of this latest change is pending owner-run tests/builds; Phase 14 remains **In progress**.
+
+
+## Phase 14 route-matrix checkpoint (2026-10-28)
+
+Added `npm run check-route-matrix` and the provisional `docs/SESSION-2-PROBLEMS.md` register. Current-head Windows validation and mismatch triage are pending; Phase 14 stays **In progress**, Phase 15 stays **Not started**.
