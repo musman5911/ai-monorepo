@@ -282,6 +282,61 @@ describe('Dairy cross-farm linked-record validation', () => {
 });
 
 
+
+describe('linked-record validation in handler writes', () => {
+  it('validates Dairy cow lineage links in the selected farm', () => {
+    const routes = source('dairy_farm/backend/routes/cows.js');
+    expect(routes).toContain('async function validateCowLinks(payload)');
+    expect(routes).toContain("'Mother cow must exist in the selected farm'");
+    expect(routes).toContain("'Farm sire must exist in the selected farm'");
+    const create = routes.split("router.post('/', protect, adminOnly")[1]?.split("router.put('/:id'")[0] || '';
+    const update = routes.split("router.put('/:id', protect, adminOnly")[1]?.split("router.delete('/:id'")[0] || '';
+    expect(create.indexOf('validateCowLinks(payload)')).toBeGreaterThanOrEqual(0);
+    expect(create.indexOf('validateCowLinks(payload)')).toBeLessThan(create.indexOf('Cow.create('));
+    expect(update.indexOf('validateCowLinks(payload)')).toBeGreaterThanOrEqual(0);
+    expect(update.indexOf('validateCowLinks(payload)')).toBeLessThan(update.indexOf('Cow.findByIdAndUpdate'));
+  });
+
+  it('validates Agri finance crop links on single-record writes as well as bulk writes', () => {
+    const routes = source('agri_farm/backend/routes/finance.js');
+    const validator = routes.split('async function validateFinanceLinks(entry)')[1]?.split("router.post('/finance'")[0] || '';
+    expect(validator).toContain('Crop.findOne({ _id: cropId })');
+    expect(validator).toContain('Field.findOne({ _id: fieldId })');
+    expect(validator).toContain('Crop.findOne({ _id: cropCycleId })');
+    const create = routes.split("router.post('/finance',")[1]?.split("router.put('/finance/:financeId'")[0] || '';
+    expect(create.indexOf('validateFinanceLinks(entry)')).toBeGreaterThanOrEqual(0);
+    expect(create.indexOf('validateFinanceLinks(entry)')).toBeLessThan(create.indexOf('Finance.insertMany'));
+    const update = routes.split("router.put('/finance/:financeId'")[1]?.split("router.delete('/finance/:financeId'")[0] || '';
+    expect(update.indexOf('validateFinanceLinks(entry)')).toBeGreaterThanOrEqual(0);
+    expect(update.indexOf('validateFinanceLinks(entry)')).toBeLessThan(update.indexOf('replaceFarmRecord'));
+  });
+
+  it('validates Agri task crop and inventory links on single-record writes', () => {
+    const routes = source('agri_farm/backend/routes/tasks.js');
+    expect(routes).toContain('async function validateTaskLinks(task)');
+    expect(routes).toContain('Crop.findOne({ _id: cropId })');
+    expect(routes).toContain('Inventory.findOne({ _id: inventoryId })');
+    const create = routes.split("router.post('/tasks',")[1]?.split("router.put('/tasks/:taskId'")[0] || '';
+    expect(create.indexOf('validateTaskLinks(task)')).toBeGreaterThanOrEqual(0);
+    expect(create.indexOf('validateTaskLinks(task)')).toBeLessThan(create.indexOf('Task.insertMany'));
+    const update = routes.split("router.put('/tasks/:taskId'")[1]?.split("router.patch('/tasks/:taskId'")[0] || '';
+    expect(update.indexOf('validateTaskLinks(task)')).toBeGreaterThanOrEqual(0);
+    expect(update.indexOf('validateTaskLinks(task)')).toBeLessThan(update.indexOf('replaceFarmRecord'));
+  });
+
+  it('validates Agri attendance crop links on create and update', () => {
+    const routes = source('agri_farm/backend/routes/labor.js');
+    expect(routes).toContain('async function validateCropLink(cropId)');
+    expect(routes).toContain("import { Laborer, Attendance, LaborAdvance, Finance, Crop } from '../db.js'");
+    const create = routes.split("router.post('/attendance',")[1]?.split("router.put('/attendance/:attId'")[0] || '';
+    expect(create.indexOf('validateCropLink(payload.crop_id)')).toBeGreaterThanOrEqual(0);
+    expect(create.indexOf('validateCropLink(payload.crop_id)')).toBeLessThan(create.indexOf('Attendance.insertMany'));
+    const update = routes.split("router.put('/attendance/:attId'")[1]?.split("router.delete('/attendance/:attId'")[0] || '';
+    expect(update.indexOf('validateCropLink(cropId)')).toBeGreaterThanOrEqual(0);
+    expect(update.indexOf('validateCropLink(cropId)')).toBeLessThan(update.indexOf('Attendance.updateOne'));
+  });
+});
+
 describe('Dairy owner lifecycle safety', () => {
   it('prevents deleting the last active owner account', () => {
     const routes = source('dairy_farm/backend/routes/auth.js');
