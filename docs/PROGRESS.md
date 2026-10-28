@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-28 (Phase 14 current-head checks exposed and fixed a Flock upload syntax error; rerun validation pending).
+Last updated: 2026-10-28 (Phase 14 current-head validation passed after the Flock upload syntax fix; handler-level audit remains open).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -175,3 +175,20 @@ Phase 14 handler audit follow-up (2026-10-28): strict `YYYY-MM` validation now p
 
 
 Phase 14 owner validation update (2026-10-28): on branch head `6a9760a`, the owner reported 38 public-route security tests and 371 total tests passing, along with route inventory, secret scan, MUF sync, UI, workbench, docs checks and all three frontend production builds. However, `npm run check-farms` and `npm run check-archive` failed because `flock_farm/backend/routes/uploads.js` had a missing closing parenthesis in the PNG signature check, preventing the Flock backend from starting. Fixed the syntax on `muf-monorepo` and added a regression source assertion. The fix has not yet been validated in the owner's checkout. After pulling, rerun the focused security tests, full suite, farm and archive checks, docs, all standard checks, and all three builds. Phase 14 remains In progress; Phase 15 remains Not started.
+
+
+## Phase 14 current-head validation update (2026-10-28)
+
+The owner pulled `6a9760a..118f730` and supplied a complete Windows CMD validation run after the Flock upload syntax fix:
+
+- `npx vitest run tests/public-route-security.test.ts`: passed, 1 file / 38 tests.
+- `npm test`: passed, 42 files / 371 tests.
+- `npm run check-farms`: passed, including all three farm-scope suites and Dairy breeding-event runtime checks.
+- `npm run check-archive`: passed for Dairy, Flock and Agri; Node emitted non-fatal module-type warnings.
+- `npm run check-route-permissions`: passed, 46 route modules documented, imported and visibly mounted.
+- `npm run check-secrets`: passed, 647 tracked paths checked with no tracked .env files, private keys or recognized credential patterns.
+- `npm run check-sync`, `npm run check-ui`, `npm run check-workbench` (23 checks), and `npm run check-docs`: passed.
+- `tools\\build-all.bat`: all three production builds passed.
+- `git status --short --branch`: clean working tree, branch aligned with `origin/muf-monorepo`.
+
+The upload syntax fix and current command-line validation are now verified in the owner's checkout. Phase 14 remains **In progress** because the endpoint-by-endpoint authorization review is not yet complete; source-contract tests and route inventory coverage do not prove every handler's behavior for every role/farm combination. Phase 15 remains **Not started**.
