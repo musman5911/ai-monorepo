@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import express from 'express';
 const router = express.Router();
-import { Expense, Health, Cow } from '../db.js';
+import { Expense, Health, Cow, Supplier } from '../db.js';
 import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 import { protect, adminOnly, workerOrAdmin } from '../middleware/auth.js';
 import {
@@ -44,6 +44,16 @@ function expensePayload(body, { requireBasics = false } = {}) {
   return { payload, errors };
 }
 
+async function validateExpenseLinks(payload) {
+  if (payload.cowId !== undefined && payload.cowId !== null && String(payload.cowId).trim()) {
+    if (!(await Cow.findById(String(payload.cowId).trim()).lean())) return 'Cow must exist in the selected farm';
+  }
+  if (payload.supplierId !== undefined && payload.supplierId !== null && String(payload.supplierId).trim()) {
+    if (!(await Supplier.findById(String(payload.supplierId).trim()).lean())) return 'Supplier must exist in the selected farm';
+  }
+  return '';
+}
+
 router.get('/', protect, async (req, res) => {
   try {
     const filter = {};
@@ -64,6 +74,8 @@ router.post('/', protect, workerOrAdmin, async (req, res) => {
   try {
     const { payload, errors } = expensePayload(req.body, { requireBasics: true });
     if (errors.length) return sendValidationError(res, errors);
+    const linkError = await validateExpenseLinks(payload);
+    if (linkError) return res.status(400).json({ error: linkError });
     const id = randomUUID();
     const exp = await Expense.create({ ...payload, _id: id });
     res.status(201).json(exp);
@@ -74,6 +86,8 @@ router.put('/:id', protect, workerOrAdmin, async (req, res) => {
   try {
     const { payload, errors } = expensePayload(req.body);
     if (errors.length) return sendValidationError(res, errors);
+    const linkError = await validateExpenseLinks(payload);
+    if (linkError) return res.status(400).json({ error: linkError });
     const exp = await Expense.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
     if (!exp) return res.status(404).json({ error: 'Not found' });
 
