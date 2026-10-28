@@ -16,7 +16,8 @@
     "check-archive": "node tools/check-dairy-archive.js && node tools/check-flock-archive.js && node tools/check-agri-archive.js",
     "check-audit": "node tools/check-audit.js",
     "check-secrets": "node tools/check-secrets.js",
-    "check-route-permissions": "node tools/check-route-permissions.js"
+    "check-route-permissions": "node tools/check-route-permissions.js",
+    "check-route-matrix": "node tools/check-route-matrix.js"
   },
   "devDependencies": {
     "vitest": "^3.0.0"
