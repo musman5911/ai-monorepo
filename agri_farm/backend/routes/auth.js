@@ -59,8 +59,9 @@ async function creatorFarmIds(req) {
 }
 
 async function ownerCountExcluding(userId) {
-  const all = await User.find({}).lean();
-  return all.filter((u) => String(u._id) !== String(userId) && mufIsOwner(u.role)).length;
+  const all = await User.find({}).select('_id role active').lean();
+  // An inactive owner cannot sign in and must not count as the recovery owner.
+  return all.filter((u) => String(u._id) !== String(userId) && u.active !== false && mufIsOwner(u.role)).length;
 }
 
 const jsonLimiter = (handler) => rateLimit({
@@ -383,8 +384,8 @@ router.patch('/users/:userId/edit', protect, requireAdmin, asyncHandler(async (r
     if (nextRole !== 'worker' && !String(target.email || '').trim()) {
       return badRequest(res, 'Email address is mandatory for owner and manager accounts.');
     }
-    if (mufIsOwner(target.role) && nextRole !== 'owner' && (await ownerCountExcluding(target._id)) === 0) {
-      return badRequest(res, 'At least one owner must remain.');
+    if (target.active !== false && mufIsOwner(target.role) && nextRole !== 'owner' && (await ownerCountExcluding(target._id)) === 0) {
+      return badRequest(res, 'At least one active owner must remain.');
     }
     updates.role = nextRole;
   }
@@ -431,8 +432,8 @@ router.delete('/users/:userId', protect, requireAdmin, asyncHandler(async (req, 
   if (!managerCanHandle(req, target)) {
     return forbidden(res, 'You can only manage workers in your own farms.');
   }
-  if (mufIsOwner(target.role) && (await ownerCountExcluding(target._id)) === 0) {
-    return badRequest(res, 'At least one owner must remain.');
+  if (target.active !== false && mufIsOwner(target.role) && (await ownerCountExcluding(target._id)) === 0) {
+    return badRequest(res, 'At least one active owner must remain.');
   }
   const result = await User.deleteOne({ _id: oid });
   if (!result.deletedCount) return notFound(res, 'User not found');
