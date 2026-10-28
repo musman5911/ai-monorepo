@@ -14,7 +14,7 @@ import { protect, requireAdmin } from '../middleware/auth.js';
 import { parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
 import { MUF_ENV } from '../muf-env.mjs';
-import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext, mufIsFullRole } from '../muf-farms.mjs';
+import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext, mufIsFullRole, mufIsOwner } from '../muf-farms.mjs';
 import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
 
 let mufTelegram = null; // ESM twin, loaded once on first use
@@ -67,11 +67,17 @@ router.post('/link-code', protect, requireAdmin, asyncHandler(async (req, res) =
   const body = req.body || {};
   const userId = String(body.userId || '');
   const laborerId = String(body.laborerId || '');
+  const farmId = mufGetFarmContext()?.farmId;
+  if (!farmId) return res.status(400).json({ detail: 'Select one farm before creating a Telegram link code' });
   let username = '';
   let laborerName = '';
   if (userId) {
     const u = await User.findOne({ _id: parseOid(userId, 'user ID') });
     if (!u) return res.status(404).json({ detail: 'User not found' });
+    const assignedFarmIds = (u.farmIds || []).map(String);
+    if (!mufIsOwner(u.role) && !assignedFarmIds.includes(String(farmId))) {
+      return res.status(404).json({ detail: 'User not found in the selected farm' });
+    }
     username = u.username || '';
   }
   if (laborerId) {
@@ -82,8 +88,6 @@ router.post('/link-code', protect, requireAdmin, asyncHandler(async (req, res) =
   if (!userId && !laborerId) {
     return res.status(400).json({ detail: 'Pick an app user or a wage worker to link' });
   }
-  const farmId = mufGetFarmContext()?.farmId;
-  if (!farmId) return res.status(400).json({ detail: 'Select one farm before creating a Telegram link code' });
   const codes = await tgRead('codes');
   const nowMs = Date.now();
   const fresh = {};
