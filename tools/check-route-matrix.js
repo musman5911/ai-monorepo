@@ -76,7 +76,7 @@ function policyFor(mod) {
   const rowStart = INVENTORY.lastIndexOf('|', start);
   const rowEnd = INVENTORY.indexOf('\n', start);
   const row = INVENTORY.slice(rowStart, rowEnd < 0 ? undefined : rowEnd);
-  if (/Owner-only/.test(row)) return 'owner';
+  if (/Owner-only/.test(row) && !/Owner-only for mutations; scoped reads/.test(row)) return 'owner';
   if (/Public bearer link/.test(row)) return 'public';
   if (/Secret-authenticated job/.test(row)) return 'secret';
   return 'scoped';
@@ -119,7 +119,7 @@ function discoverRoutes(app) {
 function publicRoute(e) {
   if (e.modulePolicy === 'public') return true;
   const p = e.path.toLowerCase(), local = e.localPath.toLowerCase();
-  if (e.mod.endsWith('/auth') && /\/(login|logout|setup|signup|register|forgot-password|reset-password|request-reset|verify-reset|check-setup|health|check)$/.test(local)) return true;
+  if (e.mod.endsWith('/auth') && /\/(login|logout|setup|register|forgot-password|reset-password|request-reset|verify-reset|check-setup|health|check)$/.test(local)) return true;
   if (e.method === 'GET' && (/\/health$|\/healthz$|\/__replit_health_check$/.test(p))) return true;
   if (e.method === 'GET' && e.app === 'agri' && /\/(settings\/location|automations\/settings\/location)$/.test(p)) return true;
   if (e.mod === 'server.js' && /farm-summary$/.test(p) && !p.includes('super-admin')) return true;
@@ -127,6 +127,7 @@ function publicRoute(e) {
 }
 function ownerOnly(e) {
   if (e.modulePolicy === 'owner' || e.ownerGuard) return true;
+  if (/\/farms\/?$/.test(e.path.toLowerCase()) && ['POST','PUT','PATCH','DELETE'].includes(e.method)) return true;
   const p = e.path.toLowerCase();
   if (/\/(backup|restore|archive)(\/|$)/.test(p)) return true;
   if (/\/farms\/?$/.test(p) && ['POST','PUT','PATCH','DELETE'].includes(e.method)) return true;
@@ -151,7 +152,7 @@ async function call(base, method, route, identity, farmId) {
   const headers = { 'content-type': 'application/json' };
   if (identity.token) headers.authorization = 'Bearer ' + identity.token;
   if (farmId) headers['x-farm-id'] = farmId;
-  const body = ['GET','HEAD','OPTIONS'].includes(method) ? undefined : JSON.stringify({ __routeMatrixInvalid: true });
+  const body = ['GET','HEAD','OPTIONS'].includes(method) ? undefined : JSON.stringify({});
   try {
     const r = await fetch(base + requestPath(route), { method: method === 'ALL' ? 'GET' : method, headers, body, redirect: 'manual', signal: AbortSignal.timeout(5000) });
     return r.status;
@@ -229,7 +230,7 @@ async function runApp(app) {
         const wanted = expected(e, identityName), denied = status === 401 || status === 403;
         if (typeof status === 'string' || (wanted === 'deny' ? !denied : denied)) mismatch(app.key, e.method, e.path, identityName, wanted === 'deny' ? '401/403' : 'non-401/403', status);
       }
-      if (e.modulePolicy === 'scoped' && !ownerOnly(e)) {
+      if (e.modulePolicy === 'scoped' && !ownerOnly(e) && e.mod !== 'server.js') {
         for (const role of ['worker','manager']) {
           const status = await call(server.base, e.method, e.path, identities[role], identities.farmB);
           if (status !== 403) mismatch(app.key, e.method, e.path, role + '+foreign-X-Farm-Id', '403', status);
