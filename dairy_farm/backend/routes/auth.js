@@ -416,6 +416,16 @@ router.delete('/users/:id', userLimiter, protect, adminOnly, async (req, res) =>
     const target = await User.findById(req.params.id);
     if (!target) return res.status(404).json({ error: 'User not found' });
     if (!managerCanHandle(req, target)) return res.status(403).json({ error: 'You can only manage workers in your own farms' });
+    if (mufIsOwner(target.role)) {
+      const remainingActiveOwners = await User.find({
+        _id: { $ne: target._id },
+        role: { $in: MUF_FULL_ROLE_VALUES },
+        active: { $ne: false },
+      }).select('_id').lean();
+      if (!remainingActiveOwners.length) {
+        return res.status(400).json({ error: 'At least one active owner must remain.' });
+      }
+    }
     await User.findByIdAndDelete(req.params.id);
     res.json({ ok: true });
   } catch (err) {
