@@ -246,3 +246,25 @@ Commits: `bf1946d` (Agri restore validation), `5751685` (regression test). Owner
 - Added regression source-contract assertions for manual and automatic restore validation ordering in all three apps.
 - GitHub branch commits: `8456eb7` (Agri auto-restore validation), `e06f911` (Agri test), `94fbce3` (Dairy validation), `eed8209` (Flock validation), `dc886f2` and `63813b8` (restore tests/assertion correction).
 - **Validation pending:** the owner has not pulled these newest commits or rerun the focused test/full suite. The last supplied local result was 357 passed and one failed test, so it must not be described as green. Phase 14 remains **In progress** and Phase 15 remains **Not started**.
+
+
+## Phase 14 current-head owner validation (2026-10-28)
+
+The owner pulled the latest branch update (e44ed46 to 8c6ff58) and supplied Windows CMD results. The restore-validation regression fixes are now validated in the local checkout:
+
+| Command/check | Result |
+|---|---|
+| `npx vitest run tests/public-route-security.test.ts` | Passed: 1 file / 26 tests |
+| `npm test` | Passed: 42 files / 359 tests |
+| `npm run check-route-permissions` | Passed: all 46 route modules documented, imported by their server and visibly mounted |
+| `npm run check-secrets` | Passed: 647 tracked paths scanned; no tracked .env files, private keys or recognized credential patterns |
+| `npm run check-sync` | Passed: shared app files, backend twins, environment names and listed invariants in sync |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source checks |
+| `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks |
+| `npm run check-archive` | Passed: Dairy, Flock and Agri archive checks; Node emitted non-fatal module-type warnings |
+| `npm run check-docs` | Passed: all 22 phase files, statuses and links consistent |
+| `tools\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `git status --short --branch` | Clean working tree; muf-monorepo aligned with origin/muf-monorepo |
+
+This confirms the current restore-validation changes pass the reported source-contract tests, repository checks, archive checks and production builds. It does not complete the handler-by-handler authorization audit: the route inventory and source-contract assertions do not behaviorally test every sensitive endpoint against every role and farm context. Continue the remaining handler review and add behavior-focused regression coverage for confirmed gaps before considering Phase 14 complete. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
