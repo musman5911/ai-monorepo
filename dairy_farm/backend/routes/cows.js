@@ -17,6 +17,16 @@ import {
 import { todayStr, daysAgoStr } from '../utils/date.js';
 import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
 
+async function validateCowLinks(payload) {
+  if (payload.motherId && !(await Cow.findById(String(payload.motherId)).lean())) {
+    return 'Mother cow must exist in the selected farm';
+  }
+  if (payload.fatherId && payload.fatherType !== 'outside' && !(await Cow.findById(String(payload.fatherId)).lean())) {
+    return 'Farm sire must exist in the selected farm';
+  }
+  return '';
+}
+
 function cowPayload(body, { requireBasics = false } = {}) {
   const errors = [];
   const payload = {};
@@ -361,6 +371,8 @@ router.post('/', protect, adminOnly, async (req, res) => {
   try {
     const { payload, errors } = cowPayload(req.body, { requireBasics: true });
     if (errors.length) return sendValidationError(res, errors);
+    const linkError = await validateCowLinks(payload);
+    if (linkError) return res.status(400).json({ error: linkError });
 
     const id = randomUUID();
     const cow = await Cow.create({ ...payload, _id: id });
@@ -393,6 +405,8 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
   try {
     const { payload, errors } = cowPayload(req.body);
     if (errors.length) return sendValidationError(res, errors);
+    const linkError = await validateCowLinks(payload);
+    if (linkError) return res.status(400).json({ error: linkError });
     const cow = await Cow.findByIdAndUpdate(req.params.id, { $set: payload }, { new: true });
     if (!cow) return res.status(404).json({ error: 'Not found' });
 
