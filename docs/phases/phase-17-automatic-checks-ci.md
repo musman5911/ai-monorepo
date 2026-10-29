@@ -55,14 +55,30 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [ ] Repository-level Dependabot alerts are confirmed enabled and any automatic security-update pull requests are confirmed off in GitHub Settings.
 - [x] The automatic workflow runs the documented quick checks and keeps builds/workbench runtime manual.
 - [x] The new `tests/workflow-contract.test.ts` command-line guard exists and is included in `npm test`.
-- [ ] The actual GitHub Actions result and current-head local checks are recorded in `docs/PROGRESS.md`.
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] The initial GitHub Actions run and its results are recorded in `docs/PROGRESS.md`.
+- [ ] Current-head Windows validation and all three production builds are recorded.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Command-line validation record
 
-Pending the initial automated workflow run and current-head Windows validation. The workflow file deliberately does not run production builds or the Vite workbench runtime smoke test automatically; those remain in the manual full-validation workflow.
+**Owner-approved automatic run:** GitHub Actions workflow [MUF quick checks](https://github.com/musman5911/ai-monorepo/actions/runs/40842550494) completed successfully on commit `dd2892768065908614e13e8fcf37196c1cb5fa6e` (push event, 2026-10-29).
 
-`.github/dependabot.yml` disables scheduled version-update pull requests by setting `open-pull-requests-limit: 0` for each npm package set and GitHub Actions. This does not itself enable Dependabot alerts or prove the repository-level security-update pull-request toggle is off; those settings must be checked separately in GitHub Settings.
+| Check | Result |
+|---|---|
+| Dependency installs | Passed: root tools, Dairy client, and Agri, Dairy and Flock backends |
+| `npm test` | Passed: 47 files / 412 tests, including 3 workflow-contract tests |
+| `npm run check-sync` | Passed: all shared MUF files and invariants in sync |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source checks |
+| `npm run check-farms` | Passed: all farm-scope and Dairy breeding-event checks |
+| `npm run check-docs` | Passed: phase statuses, sections and links consistent |
+| `npm run check-audit` | Passed: all seven npm package sets reported 0 high/critical production vulnerabilities |
+
+This proves the automatic push trigger works on this branch; it is not evidence of any Actions quota limitation. The PR trigger is covered by the workflow-contract test but has not separately been observed on a pull request.
+
+The workflow intentionally leaves all frontend production builds and the Vite workbench runtime smoke test in the manual full-validation workflow. Current-head Windows validation and `tools\\build-all.bat` remain outstanding.
+
+`.github/dependabot.yml` disables scheduled version-update pull requests by setting `open-pull-requests-limit: 0` for each of the seven npm package sets and GitHub Actions. The repository-level Dependabot alerts toggle and the separate security-update pull-request setting still need confirmation in GitHub Settings; the available GitHub connector cannot toggle or verify them.
 
 ## Rules for whoever works on this phase
 

@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-29 (Phase 17 automatic quick-check workflow started; GitHub run and security settings verification pending).
+Last updated: 2026-10-29 (Phase 17 push-triggered quick-check workflow passed; Dependabot settings and Windows build validation pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -315,4 +315,19 @@ Added `.github/workflows/muf-quick-checks.yml`, configured for `push`, `pull_req
 
 Added `.github/dependabot.yml` with `open-pull-requests-limit: 0` across all seven npm package sets and GitHub Actions to disable scheduled version-update pull requests. **Settings limitation:** the GitHub connector available for this edit can update repository contents but cannot toggle or verify the repository-level Dependabot alerts and security-update PR setting. This portion remains unverified and Phase 17 is not marked Done.
 
-Validation status at commit creation: the workflow is designed to trigger on the push that adds it, but the actual Actions run has not yet been observed. No CI pass, quota diagnosis, Windows test result or build result is claimed yet. These will be recorded only after the actual results are inspected or supplied.
+**Actual GitHub Actions result:** [MUF quick checks run 40842550494](https://github.com/musman5911/ai-monorepo/actions/runs/40842550494) completed successfully on push commit `dd2892768065908614e13e8fcf37196c1cb5fa6e`.
+
+| Check | Result |
+|---|---|
+| Dependency installs | Passed: root, Dairy client, Agri backend, Dairy backend, Flock backend |
+| `npm test` | Passed: 47 files / 412 tests, including 3 workflow-contract tests |
+| `npm run check-sync` | Passed |
+| `npm run check-ui` | Passed |
+| `npm run check-workbench` | Passed: 23 checks |
+| `npm run check-farms` | Passed: all farm-scope and Dairy breeding-event checks |
+| `npm run check-docs` | Passed |
+| `npm run check-audit` | Passed: seven package sets reported 0 high/critical production vulnerabilities |
+
+The push trigger has been confirmed working; no quota limitation was inferred. The pull-request trigger has not yet been independently observed. The GitHub CI run does not replace current-head Windows validation or the three production builds.
+
+Dependabot config disables scheduled version-update PRs with `open-pull-requests-limit: 0` for all npm package sets and GitHub Actions. The repository-level alerts/security-update setting remains to be verified in Settings, which the available connector cannot control or read.
