@@ -15,7 +15,7 @@ import {
   sendHttpError, badRequest, notFound, unauthorized, forbidden,
   parseOid, asyncHandler, validateNewPassword, isValidEmail,
 } from '../utils/helpers.js';
-import { MUF_ENV } from '../muf-env.mjs';
+import { MUF_ENV, mufTestRateLimitMax } from '../muf-env.mjs';
 
 const router = express.Router();
 
@@ -66,7 +66,7 @@ async function ownerCountExcluding(userId) {
 
 const jsonLimiter = (handler) => rateLimit({
   windowMs: 5 * 60 * 1000,
-  max: 10,
+  max: mufTestRateLimitMax(10),
   standardHeaders: true,
   legacyHeaders: false,
   handler,
