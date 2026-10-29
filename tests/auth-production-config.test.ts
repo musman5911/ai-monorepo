@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { execFileSync } from 'node:child_process';
 
 const root = resolve(__dirname, '..');
 const source = (relativePath: string) => readFileSync(resolve(root, relativePath), 'utf8');
@@ -41,4 +42,33 @@ describe('production JWT configuration guards', () => {
     expect(auth).toContain('return user && user.active !== false ? user : null;');
   });
 
+});
+
+
+describe('mufTestRateLimitMax', () => {
+  const runWithEnv = (values: Record<string, string | undefined>, raw: string) => {
+    const envPrefix = Object.entries(values)
+      .map(([key, value]) => value === undefined
+        ? `delete process.env[${JSON.stringify(key)}];`
+        : `process.env[${JSON.stringify(key)}] = ${JSON.stringify(value)};`)
+      .join('');
+    const script = `${envPrefix} const mod = await import('./dairy_farm/backend/muf-env.mjs?case=' + Math.random()); console.log(mod.mufTestRateLimitMax(60));`;
+    return Number(execFileSync(process.execPath, ['--input-type=module', '-e', script], {
+      encoding: 'utf8',
+      env: { ...process.env, MUF_TEST_RATE_LIMIT_MAX: raw },
+    }).trim());
+  };
+
+  it('keeps the default in production or outside memory mode', () => {
+    expect(runWithEnv({ NODE_ENV: 'production', MEMORY_MODE: '1' }, '200')).toBe(60);
+    expect(runWithEnv({ NODE_ENV: 'test', MEMORY_MODE: '0' }, '200')).toBe(60);
+    expect(runWithEnv({ NODE_ENV: 'development', MEMORY_MODE: '1' }, '200')).toBe(60);
+  });
+
+  it('uses the requested value only in test memory mode and caps it at one million', () => {
+    expect(runWithEnv({ NODE_ENV: 'test', MEMORY_MODE: '1' }, '200')).toBe(200);
+    expect(runWithEnv({ NODE_ENV: 'test', MEMORY_MODE: '1' }, '1000001')).toBe(1000000);
+    expect(runWithEnv({ NODE_ENV: 'test', MEMORY_MODE: '1' }, 'not-a-number')).toBe(60);
+    expect(runWithEnv({ NODE_ENV: 'test', MEMORY_MODE: '1' }, '0')).toBe(60);
+  });
 });
