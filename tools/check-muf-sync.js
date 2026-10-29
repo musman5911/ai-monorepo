@@ -192,7 +192,7 @@ if (productCopies.some((s) => s === null)) { console.log('  ❌ Product manager 
 else if (productCopies.every((s) => s === productCopies[0])) console.log('  ✅ Product manager component identical in all three apps');
 else { console.log('  ❌ Product manager component copies differ'); failures++; }
 
-console.log('\\n━━ MU Farms public shop (all three apps, byte-identical) ━━');
+console.log('\n━━ MU Farms public shop (all three apps, byte-identical) ━━');
 const MUF_SHOP_GROUPS = [
   ['MufShop.tsx', 'dairy_farm/client/src/muf-shop/MufShop.tsx', 'flock_farm/client/src/muf-shop/MufShop.tsx', 'agri_farm/frontend/src/muf-shop/MufShop.tsx'],
   ['muf-shop.css', 'dairy_farm/client/src/muf-shop/muf-shop.css', 'flock_farm/client/src/muf-shop/muf-shop.css', 'agri_farm/frontend/src/muf-shop/muf-shop.css'],

@@ -1,12 +1,13 @@
 import { StrictMode, lazy, Suspense } from 'react';
 import {createRoot} from 'react-dom/client';
+import './index.css';
+import './muf-style.css';
+import { initMufA11y } from './muf/core/muf-a11y';
+
 const App = lazy(() => import('./App'));
 const ConfirmProvider = lazy(() => import('./muf/core/muf-confirm'));
 const MufShop = lazy(() => import('./muf-shop/MufShop'));
 const isMufShopRoute = /^\/shop\/?$/.test(window.location.pathname);
-import './index.css';
-import './muf-style.css';
-import { initMufA11y } from './muf/core/muf-a11y';
 
 // PWA service worker — same system as the other Malik Usman Farms apps.
 if ('serviceWorker' in navigator && !isMufShopRoute) {
