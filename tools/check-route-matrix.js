@@ -59,7 +59,7 @@ function routeSignatureHash(signatures) {
 function routeSignatureInventory() {
   const section = INVENTORY.split('## Reviewed route method signatures')[1] || '';
   const rows = new Map();
-  for (const match of section.matchAll(/^\\|\\s*(dairy|agri|flock)\\s*\\|\\s*(routes\\/[a-z0-9-]+|server\\.js)\\s*\\|\\s*([a-f0-9]{8})\\s*\\|\\s*(\\d+)\\s*\\|/gim)) {
+  for (const match of section.matchAll(/^\|\s*(dairy|agri|flock)\s*\|\s*(routes\/[a-z0-9-]+|server\.js)\s*\|\s*([a-f0-9]{8})\s*\|\s*(\d+)\s*\|/gim)) {
     rows.set(match[1] + '|' + match[2], { hash: match[3].toLowerCase(), count: Number(match[4]) });
   }
   return rows;
@@ -146,9 +146,9 @@ function discoverRoutes(app) {
   }
   const signatureInventory = routeSignatureInventory();
   const signatureModules = files.map(file => {
-    const mod = 'routes/' + file.relative.split('/backend/routes/')[1].replace(/\\.js$/, '');
+    const mod = 'routes/' + file.relative.split('/backend/routes/')[1].replace(/\.js$/, '');
     const declarations = [];
-    const routeDecl = /\\brouter\\.(get|post|put|patch|delete|options|head|all)\\s*\\(\\s*(['"])([^'"]+)\\2/g;
+    const routeDecl = /\brouter\.(get|post|put|patch|delete|options|head|all)\s*\(\s*(['"])([^'"]+)\2/g;
     let match;
     while ((match = routeDecl.exec(file.source))) declarations.push(match[1].toUpperCase() + ' ' + match[3]);
     if (mod === 'routes/farms') {
@@ -157,7 +157,7 @@ function discoverRoutes(app) {
     return { mod, declarations, hash: routeSignatureHash(declarations) };
   });
   const serverSignatures = [];
-  const directDecl = /\\bapp\\.(get|post|put|patch|delete|options|head|all)\\s*\\(\\s*(['"])(\\/[^'"]*)\\2/g;
+  const directDecl = /\bapp\.(get|post|put|patch|delete|options|head|all)\s*\(\s*(['"])(\/[^'"]*)\2/g;
   let directMatch;
   while ((directMatch = directDecl.exec(server))) {
     if (directMatch[3].startsWith('/api/') || directMatch[3] === '/api') serverSignatures.push(directMatch[1].toUpperCase() + ' ' + directMatch[3]);
