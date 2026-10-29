@@ -11,7 +11,7 @@ const MIN_PASSWORD_LENGTH = 8;
 
 const passwordResetRequestLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: mufTestRateLimitMax(5),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many reset-code requests. Try again later.' },
@@ -19,7 +19,7 @@ const passwordResetRequestLimiter = rateLimit({
 
 const passwordResetVerifyLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: mufTestRateLimitMax(10),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many reset attempts. Try again later.' },
@@ -27,7 +27,7 @@ const passwordResetVerifyLimiter = rateLimit({
 
 const signupRequestLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: mufTestRateLimitMax(5),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many signup-code requests. Try again later.' },
@@ -35,7 +35,7 @@ const signupRequestLimiter = rateLimit({
 
 const signupVerifyLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: mufTestRateLimitMax(10),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many signup attempts. Try again later.' },
@@ -94,7 +94,7 @@ function maxAgeFromExpiresIn(exp) {
 
 const isProd = MUF_ENV.nodeEnv === 'production';
 import { JWT_EXPIRES_IN } from '../middleware/auth.js';
-import { MUF_ENV } from '../muf-env.mjs';
+import { MUF_ENV, mufTestRateLimitMax } from '../muf-env.mjs';
 const cookieOptions = {
   httpOnly: true,
   sameSite: 'lax',
