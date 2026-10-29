@@ -185,7 +185,10 @@ async function start(app, port) {
     if (child.exitCode !== null) throw new Error(app.key + ' server exited: ' + logs.slice(-3000));
     try {
       const r = await fetch(base + app.ready, { signal: AbortSignal.timeout(1500) });
-      if (r.status < 500) return { child, base };
+      if (r.status === 200) {
+        const login = await jsonCall(base, 'POST', app.login, null, { username: 'admin', password: 'admin123' }).catch(() => null);
+        if (login && login.status === 200 && app.token(login.json || {})) return { child, base };
+      }
     } catch {}
     await sleep(250);
   }
@@ -217,7 +220,7 @@ async function setupIdentities(app, base) {
   for (const role of ['worker','manager']) {
     const suffix = role + '-' + app.key + '-matrix';
     let body = { username: suffix, password: 'RouteMatrix-Only-Password-123', displayName: 'Route Matrix ' + role, role, farmIds: [farmA] };
-    if (app.key === 'agri') body = { ...body, email: suffix + '@example.invalid' };
+    body = { ...body, email: suffix + '@example.invalid' };
     const created = await jsonCall(base, 'POST', app.users, ownerToken, body, farmA);
     if (![200,201].includes(created.status)) throw new Error(app.key + ' could not create disposable ' + role + ': ' + created.status + ' ' + JSON.stringify(created.json));
     const logged = await jsonCall(base, 'POST', app.login, null, { username: suffix, password: body.password });
