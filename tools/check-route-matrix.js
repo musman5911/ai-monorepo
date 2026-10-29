@@ -185,10 +185,8 @@ async function start(app, port) {
     if (child.exitCode !== null) throw new Error(app.key + ' server exited: ' + logs.slice(-3000));
     try {
       const r = await fetch(base + app.ready, { signal: AbortSignal.timeout(1500) });
-      if (r.status === 200) {
-        const login = await jsonCall(base, 'POST', app.login, null, { username: 'admin', password: 'admin123' }).catch(() => null);
-        if (login && login.status === 200 && app.token(login.json || {})) return { child, base };
-      }
+      const login = await jsonCall(base, 'POST', app.login, null, { username: 'admin', password: 'admin123' }).catch(() => null);
+      if (login && login.status === 200 && app.token(login.json || {})) return { child, base };
     } catch {}
     await sleep(250);
   }
