@@ -209,7 +209,8 @@ function adminOnly(e) {
 function secretRoute(e) {
   const local = e.localPath.toLowerCase();
   return (e.modulePolicy === 'secret' && (/\/cron\//.test(local) || /\/cron$/.test(local) || /dispatch-report/.test(local)))
-    || /\/webhook\//.test(local);
+    || /\/webhook\//.test(local)
+    || (/\/cron$/.test(local) && e.mod.endsWith('/telegram'));
 }
 function expected(e, identity) {
   if (secretRoute(e)) return 'deny';
