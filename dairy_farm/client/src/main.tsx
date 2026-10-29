@@ -8,6 +8,7 @@ const App = lazy(() => import('./App'));
 const ConfirmProvider = lazy(() => import('./muf/core/muf-confirm'));
 const MufShop = lazy(() => import('./muf-shop/MufShop'));
 const isMufShopRoute = /^\/shop\/?$/.test(window.location.pathname);
+if (isMufShopRoute) document.getElementById('muf-splash')?.remove();
 
 // PWA service worker — same system as the other Malik Usman Farms apps.
 if ('serviceWorker' in navigator && !isMufShopRoute) {

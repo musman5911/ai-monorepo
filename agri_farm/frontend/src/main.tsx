@@ -8,6 +8,7 @@ const App = lazy(() => import('./App'));
 const ConfirmProvider = lazy(() => import('./muf/core/muf-confirm'));
 const MufShop = lazy(() => import('./muf-shop/MufShop'));
 const isMufShopRoute = /^\/shop\/?$/.test(window.location.pathname);
+if (isMufShopRoute) document.getElementById('muf-splash')?.remove();
 
 if ('serviceWorker' in navigator && !isMufShopRoute) {
   window.addEventListener('load', async () => {

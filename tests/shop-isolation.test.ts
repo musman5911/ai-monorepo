@@ -30,6 +30,7 @@ describe('MU Farms public shop isolation', () => {
       expect(main).toContain("const App = lazy(() => import('./App'))");
       expect(main).toContain("const MufShop = lazy(() => import('./muf-shop/MufShop'))");
       expect(main).toContain('const isMufShopRoute');
+      expect(main).toContain("document.getElementById('muf-splash')?.remove()");
       expect(main).toContain('/shop');
       expect(main).toContain('<MufShop currentFarm="' + shop.farm + '" />');
       expect(main).not.toMatch(/import\s+App\s+from/);
