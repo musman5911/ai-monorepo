@@ -1,0 +1,49 @@
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/dairy_farm/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/dairy_farm/client"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/flock_farm/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/flock_farm/client"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/agri_farm/backend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "npm"
+    directory: "/agri_farm/frontend"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 0

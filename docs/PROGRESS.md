@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-29 (Phase 16 public shop passed command-line validation; live verification remains in Phases 19–21).
+Last updated: 2026-10-29 (Phase 17 automatic quick-check workflow started; GitHub run and security settings verification pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -27,7 +27,7 @@ Last updated: 2026-10-29 (Phase 16 public shop passed command-line validation; l
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Done | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
-| 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
+| 17 | Automatic command-line checks on GitHub | In progress | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
@@ -306,3 +306,13 @@ Phase 16, MU Farms public shop, is **Done for command-line scope**. The public s
 `npm ci` was not repeated because the dependency set and lockfiles were unchanged. The previous install reported five audit findings (1 moderate, 2 high, 2 critical); triage them before release and do not run `npm audit fix --force` blindly. These results were supplied from the owner's Windows checkout and were not independently run in this editing session.
 
 No browser/phone behavior, real MongoDB, deployed cross-origin feeds or live WhatsApp delivery is claimed. Those checks remain in Phases 19–21.
+
+## Phase 17 start (2026-10-29)
+
+Phase 17, Automatic command-line checks on GitHub, is **In progress**. The owner approved the requested automation in the conversation and explicitly asked us to attempt GitHub Actions rather than presume any quota restriction.
+
+Added `.github/workflows/muf-quick-checks.yml`, configured for `push`, `pull_request` and manual dispatch. It installs the root test tools and the app/backend packages required by regression and farm-scope tests, then runs `npm test`, `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs` and `npm run check-audit`. Added `tests/workflow-contract.test.ts` to assert the three triggers, exact install/check command list, read-only permissions and absence of embedded credentials. The existing `muf-frontend-checks.yml` remains manual-only for the workbench runtime smoke test, design-system audit and three frontend builds.
+
+Added `.github/dependabot.yml` with `open-pull-requests-limit: 0` across all seven npm package sets and GitHub Actions to disable scheduled version-update pull requests. **Settings limitation:** the GitHub connector available for this edit can update repository contents but cannot toggle or verify the repository-level Dependabot alerts and security-update PR setting. This portion remains unverified and Phase 17 is not marked Done.
+
+Validation status at commit creation: the workflow is designed to trigger on the push that adds it, but the actual Actions run has not yet been observed. No CI pass, quota diagnosis, Windows test result or build result is claimed yet. These will be recorded only after the actual results are inspected or supplied.

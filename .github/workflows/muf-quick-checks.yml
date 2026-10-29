@@ -1,0 +1,72 @@
+name: MUF quick checks
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quick-checks:
+    name: Tests and quick source checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            dairy_farm/client/package-lock.json
+            flock_farm/client/package-lock.json
+            agri_farm/frontend/package-lock.json
+            dairy_farm/backend/package-lock.json
+            flock_farm/backend/package-lock.json
+            agri_farm/backend/package-lock.json
+
+      - name: Install root test tools
+        run: npm ci
+
+      - name: Install Dairy frontend dependencies used by root tests
+        working-directory: dairy_farm/client
+        run: npm ci
+
+      - name: Install Agri backend dependencies for farm-scope checks
+        working-directory: agri_farm/backend
+        run: npm ci
+
+      - name: Install Dairy backend dependencies for farm-scope checks
+        working-directory: dairy_farm/backend
+        run: npm ci
+
+      - name: Install Flock backend dependencies for farm-scope checks
+        working-directory: flock_farm/backend
+        run: npm ci
+
+      - name: Run root test suite (includes workflow contract test)
+        run: npm test
+
+      - name: Check shared MUF parity
+        run: npm run check-sync
+
+      - name: Check UI safety
+        run: npm run check-ui
+
+      - name: Check workbench source safety
+        run: npm run check-workbench
+
+      - name: Check farm scope and Dairy breeding events
+        run: npm run check-farms
+
+      - name: Check phase documentation
+        run: npm run check-docs
+
+      - name: Audit production dependencies in all package sets
+        run: npm run check-audit

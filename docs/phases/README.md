@@ -21,7 +21,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Done | [phase-16-mu-farms-public-shop.md](phase-16-mu-farms-public-shop.md) |
-| 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phase-17-automatic-checks-ci.md) |
+| 17 | Automatic command-line checks on GitHub | In progress | [phase-17-automatic-checks-ci.md](phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phase-20-final-testing-browser-and-phones.md) |
@@ -99,3 +99,5 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 16 is Done for command-line scope (2026-10-29).** Owner-supplied Windows results confirm 409 full-suite tests, 7 shop isolation tests, sync/docs/UI/workbench/farm checks, and all three production builds passed. The shop is isolated in a lazy-loaded `/shop` route and dedicated, byte-identical `src/muf-shop/` folders with published-only public feeds. Real MongoDB, browser/phone, deployed cross-origin feed and live WhatsApp checks remain in Phases 19–21. See [Phase 16 details](phase-16-mu-farms-public-shop.md).
+
+**Phase 17 is In progress (2026-10-29).** A dedicated workflow defines automatic quick checks on pushes and pull requests, and the existing full validation remains manual-only. Its real Actions result and repository-level Dependabot setting remain pending. See [Phase 17 details](phase-17-automatic-checks-ci.md).

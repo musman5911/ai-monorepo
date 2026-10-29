@@ -1,6 +1,6 @@
 # Phase 17: Automatic command-line checks on GitHub
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -8,13 +8,14 @@ The quick checks run by themselves on every push, so breakage is caught early.
 
 ## Already in place (from Phase 0)
 
-- GitHub Actions is manual-only today (the owner or an earlier agent chose that). It already has a job for root tests and builds.
+- The existing `.github/workflows/muf-frontend-checks.yml` is deliberately manual-only and includes longer validation (workbench runtime smoke test and all three frontend builds).
+- The owner instructed us in chat on 2026-10-29 to start Phase 17 and explicitly asked us to try GitHub Actions without assuming a quota issue if no run appeared.
 
 ## Scope
 
-- Ask the owner first: switch on automatic runs for the quick checks (tests, sync, UI, workbench, farms, docs, audit), keeping long checks manual.
-- Dependabot alerts on, with automatic update pull requests off.
-- The workflow runs the same commands as this file lists, nothing more.
+- The owner approved automatic quick checks. `.github/workflows/muf-quick-checks.yml` runs on every push, pull request and manual dispatch. The existing full-validation workflow remains manual.
+- `.github/dependabot.yml` sets the version-update pull-request limit to zero for all seven npm package sets and GitHub Actions. The repository-level Dependabot alerts/security-update setting still needs confirmation in GitHub Settings; the contents-only GitHub connector cannot change or confirm that setting.
+- The automatic workflow contains only the requested test/sync/UI/workbench/farm/docs/production-dependency-audit checks (plus dependency installs). Builds and the workbench runtime smoke test stay in the manual workflow.
 
 ## Out of scope
 
@@ -22,9 +23,10 @@ The quick checks run by themselves on every push, so breakage is caught early.
 
 ## Steps
 
-1. Get the owner's answer in writing in this file.
-2. Edit the workflow.
-3. Run it once and record the real result.
+1. Owner approval recorded above from the 2026-10-29 conversation.
+2. Add a dedicated push/pull-request quick-check workflow and a workflow-contract regression test.
+3. Keep frontend builds and the live workbench smoke test in the manually triggered full-validation workflow.
+4. Attempt a real GitHub Actions run after pushing and record its actual result. Do not infer quota limits if no run appears.
 
 ## New command-line check
 
@@ -40,18 +42,27 @@ npm run check-ui
 npm run check-workbench
 npm run check-farms
 npm run check-docs
+npm run check-audit
 tools\build-all.bat
 ```
 Run the build in each app that this phase touched (or `tools\build-all.bat` for all three). `npm run check-workbench-runtime` is optional and needs port 5000 free.
 
 ## Done checklist
 
-- [ ] Ask the owner first: switch on automatic runs for the quick checks (tests, sync, UI, workbench, farms, docs, audit), keeping long checks manual.
-- [ ] Dependabot alerts on, with automatic update pull requests off.
-- [ ] The workflow runs the same commands as this file lists, nothing more.
-- [ ] The new command-line check above exists and passes.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
+- [x] Owner approval for automatic runs is recorded in this file.
+- [x] A push/pull-request/manual quick-check workflow is added; the old full-validation workflow remains manual-only.
+- [x] Version-update pull requests are disabled by `.github/dependabot.yml` for all npm package sets and GitHub Actions.
+- [ ] Repository-level Dependabot alerts are confirmed enabled and any automatic security-update pull requests are confirmed off in GitHub Settings.
+- [x] The automatic workflow runs the documented quick checks and keeps builds/workbench runtime manual.
+- [x] The new `tests/workflow-contract.test.ts` command-line guard exists and is included in `npm test`.
+- [ ] The actual GitHub Actions result and current-head local checks are recorded in `docs/PROGRESS.md`.
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+
+## Command-line validation record
+
+Pending the initial automated workflow run and current-head Windows validation. The workflow file deliberately does not run production builds or the Vite workbench runtime smoke test automatically; those remain in the manual full-validation workflow.
+
+`.github/dependabot.yml` disables scheduled version-update pull requests by setting `open-pull-requests-limit: 0` for each npm package set and GitHub Actions. This does not itself enable Dependabot alerts or prove the repository-level security-update pull-request toggle is off; those settings must be checked separately in GitHub Settings.
 
 ## Rules for whoever works on this phase
 
