@@ -1,6 +1,6 @@
 # Phase 14: Authorization and secrets review
 
-**Status:** Done (command-line scope)
+**Status:** Done
 
 ## Goal
 

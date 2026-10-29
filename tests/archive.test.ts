@@ -25,7 +25,10 @@ describe('Phase 11 shared archive server contracts', () => {
     for (const s of ['const ArchiveJobSchema = new mongoose.Schema','const ArchiveRecordSchema = new mongoose.Schema','ArchiveJob: ArchiveJobSchema','ArchiveRecord: ArchiveRecordSchema',"ArchiveJob = mongoose.model('ArchiveJob', ArchiveJobSchema)","ArchiveRecord = mongoose.model('ArchiveRecord', ArchiveRecordSchema)",'ArchiveJob, ArchiveRecord']) expect(dairyDb).toContain(s);
   });
   it('registers Flock and Agri archive models in memory and real database modes', () => {
-    for (const s of ["const ArchiveJob = mongoose.model('MufArchiveJob', ArchiveJobSchema)", "const ArchiveRecord = mongoose.model('MufArchiveRecord', ArchiveRecordSchema)", 'MufArchiveJob: ArchiveJob', 'MufArchiveRecord: ArchiveRecord', 'export { Farm, User, ArchiveJob, ArchiveRecord']) expect(flockDb).toContain(s);
+    for (const s of ["const ArchiveJob = mongoose.model('MufArchiveJob', ArchiveJobSchema)", "const ArchiveRecord = mongoose.model('MufArchiveRecord', ArchiveRecordSchema)", 'MufArchiveJob: ArchiveJob', 'MufArchiveRecord: ArchiveRecord']) expect(flockDb).toContain(s);
+    const flockExports = flockDb.match(/export\s*\{([^}]+)\}/)?.[1] ?? '';
+    const flockExportNames = flockExports.split(',').map((name) => name.trim().split(/\s+as\s+/)[0]);
+    expect(flockExportNames).toEqual(expect.arrayContaining(['Farm', 'User', 'ArchiveJob', 'ArchiveRecord']));
     for (const s of ['ArchiveJob: ArchiveJobSchema', 'ArchiveRecord: ArchiveRecordSchema', 'ArchiveJob, ArchiveRecord', 'MUF_FARM_MODELS = {\n  ArchiveJob, ArchiveRecord']) expect(agriDb).toContain(s);
   });
   it('mounts archive routes in each app', () => {
