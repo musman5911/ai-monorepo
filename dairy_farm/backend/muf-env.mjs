@@ -98,9 +98,9 @@ export const MUF_ENV = {
  */
 export function mufTestRateLimitMax(defaultMax) {
   const raw = env.MUF_TEST_RATE_LIMIT_MAX;
-  if (!MUF_ENV.memoryMode || MUF_ENV.nodeEnv !== 'test' || !/^\\d+$/.test(String(raw || ''))) return defaultMax;
+  if (!MUF_ENV.memoryMode || MUF_ENV.nodeEnv !== 'test' || !/^\d+$/.test(String(raw || ''))) return defaultMax;
   const requested = Number(raw);
-  return Number.isSafeInteger(requested) && requested >= defaultMax && requested <= 1000000 ? requested : defaultMax;
+  return Number.isSafeInteger(requested) && requested > 0 ? Math.min(requested, 1000000) : defaultMax;
 }
 
 /** True when a real Mongo URI is configured (placeholder template URIs don't count). */
