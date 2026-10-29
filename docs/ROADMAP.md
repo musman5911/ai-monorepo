@@ -124,3 +124,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 **Phase 17 is Done for command-line scope (2026-10-29).** Two automatic push-triggered Actions runs passed; the latest passed all quick checks and reported 47 test files / 412 tests. The owner also confirmed the Windows suite (47 files / 412 tests), docs check and all three production builds passed, and confirmed Dependabot alerts enabled with security updates disabled. The audit reported no high/critical production vulnerabilities in the seven npm package sets. See [Phase 17 details](phases/phase-17-automatic-checks-ci.md).
 
 **Phase 18 started (2026-10-29):** refresh the developer/user documentation, fix outdated links and commands, add Owner/Manager/Worker task guides, and extend `npm run check-docs` to validate guide commands. No application behavior changes are in scope. See [Phase 18 details](phases/phase-18-documentation-and-handoff.md).
+
+
+**Phase 18 progress (2026-10-29):** first documentation pass added Owner/Manager/Worker and daily-entry guides, a reproducible developer-start page, a documentation index, refreshed the three app READMEs, and a command-validation extension to `npm run check-docs`. Historical phase-content audit and CI/Windows validation remain open. See [Phase 18 details](phases/phase-18-documentation-and-handoff.md).

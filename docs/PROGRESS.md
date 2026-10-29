@@ -356,3 +356,6 @@ Version-update pull requests are disabled via `.github/dependabot.yml`. The push
 ## Phase 18 start (2026-10-29)
 
 Phase 18, Documentation and handoff, is **In progress**. Initial review found outdated instructions in the monorepo README, a duplicate copy in `docs/README.md`, stale `docs/AUDIT.md` links in all three app READMEs, missing practical role workflows, and no guard to validate commands printed in guides. This phase will repair docs and add the guide-command check without changing application behavior.
+
+
+**Phase 18 documentation pass (2026-10-29):** added `docs/USER_GUIDE.md` for role boundaries and Dairy milk, Flock egg/batch/finance, and Agri finance entry instructions; added `docs/DEVELOPER_START.md`; turned `docs/README.md` into a documentation index; refreshed the root and all three app READMEs; removed stale links to the nonexistent `docs/AUDIT.md`; and extended `npm run check-docs` to run `tools/check-guide-commands.js`. The checker validates commands inside executable quick-start blocks against the current package scripts, lockfiles, and repository helper files. Phase 18 remains In progress until its new guard passes in CI/current-head checkout, the historical phase files are reviewed against the delivered scope, and the documented test/build gate passes.

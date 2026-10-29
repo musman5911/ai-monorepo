@@ -103,3 +103,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 **Phase 17 is Done for command-line scope (2026-10-29).** Two push-triggered Actions runs passed; the full suite passed (47 files / 412 tests), the sync/UI/workbench/farm/docs/audit checks passed, all three Windows production builds passed, and the owner confirmed Dependabot alerts on/security-update PRs off. See [Phase 17 details](phase-17-automatic-checks-ci.md).
 
 **Phase 18 is In progress (2026-10-29).** The docs/handoff phase is fixing outdated README instructions and links, adding practical role guides and a new command validation guard. See [Phase 18 details](phase-18-documentation-and-handoff.md).
+
+
+**Phase 18 progress (2026-10-29).** The user and developer guides, app/root README refreshes, and guide-command checker are implemented. Phase 18 remains In progress pending checker results, broader historical phase-content review, and final test/build gate. See [Phase 18 details](phase-18-documentation-and-handoff.md).

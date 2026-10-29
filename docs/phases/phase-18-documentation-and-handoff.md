@@ -49,13 +49,17 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] Short guides for Owner, Manager and Worker: what they can do and how to enter milk, eggs and expenses.
-- [ ] Refresh `README.md` files so every command works as written.
+- [x] `docs/USER_GUIDE.md` documents Owner/Manager/Worker boundaries plus Dairy milk, Flock egg/batch/finance, and Agri finance entry guidance.
+- [x] Root/docs README pages are distinct; root and all three app READMEs are refreshed and stale `docs/AUDIT.md` links removed.
 - [ ] Make every phase file match what was really built.
-- [ ] A short "how to start working" page for a new developer or agent.
-- [ ] The new command-line check above exists and passes.
+- [x] `docs/DEVELOPER_START.md` documents package setup, validation, build/start order and repository safety rules.
+- [ ] `tools/check-guide-commands.js` exists and passes under `npm run check-docs` on CI/current-head validation.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+
+## Implementation update (2026-10-29)
+
+Added the Owner/Manager/Worker user guide and developer-start guide. `docs/README.md` is now a documentation index instead of a duplicate of the root README. The root and three app README pages were refreshed, stale links to the nonexistent `docs/AUDIT.md` were removed, and the root `check-docs` command is being extended to validate executable guide command blocks against package manifests and repository helper files. The guide-command checker and final validation gate still need to pass before this phase can be marked Done.
 
 ## Initial findings (2026-10-29)
 

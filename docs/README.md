@@ -1,67 +1,29 @@
-# MUF Farm Apps Monorepo
+# Documentation index
 
-The source of truth for three independent farm-management web apps: Agri Farm, Dairy Farm, and Flock Farm. Each app has its own frontend and backend; MUF is the shared frontend design system.
+This folder contains the operating guides and phase records for the MUF Farm Apps monorepo.
 
-## Projects
+## Start here
 
-| Project | Frontend | Backend | Local URL |
-|---|---|---|---|
-| Agri Farm | agri_farm/frontend | agri_farm/backend | http://localhost:8000 |
-| Dairy Farm | dairy_farm/client | dairy_farm/backend | http://localhost:3000 |
-| Flock Farm | flock_farm/client | flock_farm/backend | http://localhost:3001 |
+- Developer start (DEVELOPER_START.md): dependency setup, checks, builds and starting the apps.
+- User guide (USER_GUIDE.md): Owner, Manager and Worker responsibilities and common data-entry steps.
+- Farms and roles (FARMS_AND_ROLES.md): role matrix, farm isolation and shared-system architecture.
+- Deployment (DEPLOYMENT.md): deployment setup, environment values, migrations and live smoke tests.
 
-The URLs above are the local URLs printed by tools\start-all.bat. The command starts services; it does not rebuild the frontends.
+## Architecture and design
 
-Project status is tracked in `docs/PROGRESS.md`; the plan for what comes next is `docs/ROADMAP.md`, with one file per phase in `docs/phases/`.
+- MUF overview (MUF_OVERVIEW.md): shared component system and repository structure.
+- MUF rules (muf-rules.md): styling, components, popup and workbench constraints.
+- Workbench (WORKBENCH.md): local design editor and its safety boundaries.
+- Flock egg inventory lock (FLOCK_EGG_INVENTORY_LOCK.md): documented Flock inventory behavior.
 
-## First commands on Windows
+## Status and decisions
 
-From the repository root, run these in order after pulling `main`. All helper scripts live in the `tools` folder:
+- Progress (PROGRESS.md): what is done, verified and still open.
+- Roadmap (ROADMAP.md): ordered plan.
+- Phase index (phases/README.md): index of all phases.
+- Phase details (phases/): one scope/checklist/validation record per phase.
+- Local role test accounts (LOCAL-ROLE-TEST-ACCOUNTS.md): local-only testing notes. Never use demo credentials on a live site.
+- Session 2 problems (SESSION-2-PROBLEMS.md): policy decisions requiring owner review.
+- Archive (archive/): historical notes; not the current source of truth.
 
-1. git pull --ff-only origin main
-2. npm ci
-3. node tools/check-muf-sync.js
-4. node tools/check-ui-safety.js
-5. npm run check-workbench
-6. node --check tools/audit-muf-design-system.mjs
-7. node tools/audit-muf-design-system.mjs
-8. tools\build-all.bat (installs every app's packages)
-9. npm test (needs step 8 first: some tests import code from the Dairy app, which needs its packages)
-10. npm run check-farms (needs `npm ci` inside `dairy_farm\backend` and `agri_farm\backend`; no database required). To check one project: `node tools/check-farm-scope.js agri`
-11. tools\start-all.bat
-
-Run the design audit with `node tools/audit-muf-design-system.mjs`. It writes local reports to `.audit-output`, which is intentionally ignored by Git.
-
-## Development-only MUF workbench
-
-The component preview builder is exposed by the Dairy Vite development server only. From `dairy_farm/client`, run `npm run dev`, then open `http://localhost:5000/__muf-workbench`. The editor uses sample content, saves drafts in the browser, and exports reviewable CSS/JSON files. It does not call farm APIs or apply styles automatically.
-
-Run `node tools/check-muf-workbench.js` from the monorepo root to run the workbench source-safety guard. This guard complements rather than replaces the TypeScript build, MUF synchronization/UI-safety checks, or browser review. The workbench is a dependency-free custom MUF builder; the Puck package is not installed in this workstream.
-
-## Documentation map
-
-- `RULES.md` (repository root): repository workflow, scope limits, safety requirements and validation. The only Markdown file in the root.
-- `docs/README.md`: this file.
-- `docs/MUF_OVERVIEW.md`: MUF architecture, folder layout and approved design decisions.
-- `docs/muf-rules.md`: detailed rules for shared components, tokens, popups and editor safety.
-- `docs/WORKBENCH.md`: the development-only visual workbench, how to open it and what it can and cannot do.
-- `docs/ROADMAP.md`: the ordered plan and principles; `docs/phases/`: one file per phase (scope, steps, command-line checks, done checklist). Phase 0 holds everything already done and verified.
-- `docs/PROGRESS.md`: the status of every phase, the latest verification results and the owner's decisions. Update it with every change. The old dated log is in `docs/archive/`.
-- `docs/FARMS_AND_ROLES.md`: the rulebook for the new system: farms, the three roles, data scope, migration, shared MUF file locations, Flock/Dairy/Agri structure.
-- `docs/DEPLOYMENT.md`: Replit build/run configuration, canonical environment names, migration steps and the production smoke-test checklist.
-- `agri_farm/README.md`, `dairy_farm/README.md`, `flock_farm/README.md`: app-specific orientation.
-
-## Folder map
-
-- `agri_farm/`, `dairy_farm/`, `flock_farm/`: the three apps (frontend and backend each).
-- `docs/`: documentation.
-- `tools/`: check scripts, the design audit, build and start scripts, and the repository helper scripts (`get-update`, `push-main-update`, `send-to-projects`) with `project-config.json`.
-- `tests/`: the root Vitest suite.
-
-## Project scope
-
-The current project is the scale-up described in `docs/ROADMAP.md`: many farms per project, three roles (owner, manager, worker), the Flock restructure, bulk entry, scroll loading, photo storage, a Super Admin overview and, later, the MU Farms shop.
-
-Backend changes are allowed phase by phase, each only after the owner approves that phase's plan. Back up before every migration, ask before removing anything, keep the three projects separate, and do not deploy or sync to live mirror repositories without explicit approval.
-
-See `RULES.md` (repository root) before making changes.
+The root RULES.md is authoritative for phase order, shared-file parity, data safety, review and deployment restrictions.
