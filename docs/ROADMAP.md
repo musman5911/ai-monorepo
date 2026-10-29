@@ -33,7 +33,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 16 | MU Farms: public shop | Done | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Done | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Done | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
-| 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
+| 19 | Final testing A: real MongoDB | In progress | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phases/phase-21-final-testing-live-and-signoff.md) |
 
@@ -133,3 +133,5 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 18 completion (2026-10-29):** Phase 18 is Done for command-line scope. The owner-supplied current-head Windows gate passed `npm run check-docs`, `npm test` (47 files / 412 tests), and `tools\\build-all.bat` (Dairy, Flock, and Agri all built). Latest CI run [40847463200](https://github.com/musman5911/ai-monorepo/actions/runs/40847463200) passed tests, sync/UI/workbench/farm/docs/guide-command checks, and production audit across all seven package sets with zero high/critical production findings. Phase 10's direct-build warning absence remains unverified. Real MongoDB, browser/phone and live deployment checks remain in Phases 19–21. See [Phase 18 details](phases/phase-18-documentation-and-handoff.md).
+
+**Phase 19 started (2026-10-29):** real-MongoDB validation is now In progress. Added a fail-closed preflight that requires a dedicated per-app test database, a fresh backup verified by the operator, and an explicit target-host confirmation, plus a migration wrapper that defaults to dry-run. No live database checks are claimed yet because no disposable MongoDB target or fresh backup has been verified in this session. See [Phase 19 details](phases/phase-19-final-testing-database.md).

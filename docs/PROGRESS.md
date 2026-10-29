@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-29 (Phases 17 and 18 complete for command-line scope; final testing Phases 19–21 remain).
+Last updated: 2026-10-29 (Phases 17 and 18 complete for command-line scope; Phase 19 real-MongoDB testing started).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -29,7 +29,7 @@ Last updated: 2026-10-29 (Phases 17 and 18 complete for command-line scope; fina
 | 16 | MU Farms: public shop | Done | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Done | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Done | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
-| 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
+| 19 | Final testing A: real MongoDB | In progress | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phases/phase-21-final-testing-live-and-signoff.md) |
 
@@ -380,3 +380,10 @@ Latest automatic CI run [40847463200](https://github.com/musman5911/ai-monorepo/
 
 The Phase 18 sweep reviewed all 22 phase records and corrected stale checklist/reminder text in Phases 2, 3, 8, 10 and 13. Phase 10's direct-build warning absence remains explicitly unverified. Results are owner-supplied Windows output, not commands independently run in this editing session. No real MongoDB, browser/phone or deployed-site verification is claimed; those remain in Phases 19–21.
 
+## Phase 19 start (2026-10-29)
+
+Phase 19, Final testing A: real MongoDB, is **In progress**. Initial repository review identified farm migrations for all three apps, each app's backup/restore routes, Flock binary-safe image backup helpers, archive collections, and the Flock egg-inventory lock. Existing automated tests include memory-store simulations and source-contract assertions; those do not count as live MongoDB verification.
+
+Added `tools/final-db-preflight.mjs` and `tools/final-db-migrate.mjs`, plus `tests/final-db-preflight.test.ts`. The preflight fails closed unless one app is selected, the explicit target URI uses a dedicated `muf_phase19_<app>_<copy>` database, the target host matches an explicit host acknowledgement, a fresh non-empty backup exists, and the operator confirms that the backup opens and has been restored. It never prints connection credentials. The migration wrapper overrides the normal `MONGO_URI` with the explicit Phase 19 URI and defaults to dry-run; mutation requires `--apply`.
+
+**Blocked external prerequisite:** no safe disposable MongoDB target and fresh backup have been supplied or independently verified in this session. No real MongoDB connection, migration, restore, farm deletion, index/query-plan inspection, or multi-process contention test has been attempted. Do not mark those items passed based on the existing in-memory test suite. The unit tests and automatic CI can validate the safety guard, but actual database testing must wait for a confirmed disposable target and backup.

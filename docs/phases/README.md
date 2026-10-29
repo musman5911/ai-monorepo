@@ -23,7 +23,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 16 | MU Farms: public shop | Done | [phase-16-mu-farms-public-shop.md](phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Done | [phase-17-automatic-checks-ci.md](phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Done | [phase-18-documentation-and-handoff.md](phase-18-documentation-and-handoff.md) |
-| 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phase-19-final-testing-database.md) |
+| 19 | Final testing A: real MongoDB | In progress | [phase-19-final-testing-database.md](phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phase-21-final-testing-live-and-signoff.md) |
 
@@ -112,3 +112,5 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 18 completion (2026-10-29).** Phase 18 is Done for command-line scope. Owner-supplied Windows CMD output on the current head shows `npm run check-docs` passed, `npm test` passed 47 test files / 412 tests, and `tools\\build-all.bat` built Dairy, Flock, and Agri. Latest Actions run [40847463200](https://github.com/musman5911/ai-monorepo/actions/runs/40847463200) passed tests and all configured sync/UI/workbench/farm/docs/guide-command/audit checks, with zero high/critical production findings in seven package sets. Phase 10's direct-build warning absence remains explicitly unverified. Real MongoDB, browser/phone and deployment validation remain in Phases 19–21. See [Phase 18 details](phase-18-documentation-and-handoff.md).
+
+**Phase 19 started (2026-10-29).** The real-MongoDB phase is In progress. Repository review found existing app migrations, backups/restores and the Flock egg lock. New safety scripts require a dedicated test database and a fresh, verified backup, but no live database check is claimed until a disposable target is confirmed and actual outputs are captured. See [Phase 19 details](phase-19-final-testing-database.md).
