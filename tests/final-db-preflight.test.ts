@@ -91,7 +91,7 @@ describe('Phase 19 MongoDB safety preflight', () => {
     expect(failedOutput).not.toContain('test-user');
   });
 
-  it('rejects a host mismatch before any MongoDB operation', async () =>
+  it('rejects a host mismatch before any MongoDB operation', async () => {
     const result = await evaluateFinalDbPreflight(validEnv({
       MUF_FINAL_DB_EXPECTED_HOST: 'another-host.example'
     }));
