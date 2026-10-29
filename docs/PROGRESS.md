@@ -224,5 +224,7 @@ The owner-reported validation from branch head `4d6215a` passed (41 focused secu
 
 
 ## Phase 14 route-matrix checkpoint (2026-10-28)
+**Phase 14 route-matrix correction (2026-10-29):** fixed the test-only rate-limit digit check and applied its guarded override to auth and card limiters in all three apps; corrected disposable-user emails and owner-login readiness; added method/path declaration fingerprints, including generated farm/archive routes, and adjusted public, profile-update, login, webhook and cron expectations. Added unit tests for the limiter helper. Owner Windows CMD validation is pending; Phase 14 remains In progress and Phase 15 remains Not started.
+
 
 Added `npm run check-route-matrix` and the provisional `docs/SESSION-2-PROBLEMS.md` register. Current-head Windows validation and mismatch triage are pending; Phase 14 stays **In progress**, Phase 15 stays **Not started**.
