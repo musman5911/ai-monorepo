@@ -500,7 +500,7 @@ The route-matrix implementation was corrected in code to address the specific fa
 - Disposable manager and worker accounts now always receive an example.invalid email address in all three apps.
 - Startup polling now waits for a successful disposable owner login with HTTP 200 and a token, rather than treating any response below 500 as ready. This allows Flock's seed-time 503 response without mistaking it for readiness.
 - The mufTestRateLimitMax digit validation now uses the correct digit expression. The helper accepts a positive integer override only when MEMORY_MODE=1 and NODE_ENV=test, caps it at 1,000,000, and otherwise retains each limiter's normal default.
-- Auth/setup/user/reset limiters and public-card limiters use the guarded helper in Dairy, Agri and Flock. Added unit coverage for production mode, non-memory mode, a valid test override, invalid values, zero, and the upper cap.
+- Every existing auth and public-card rate limiter uses the guarded helper in Dairy, Agri and Flock. Added unit coverage for production mode, non-memory mode, a valid test override, invalid values, zero, and the upper cap.
 - The matrix checks invalid login credentials as the designed HTTP 401 response, excludes public routes from foreign X-Farm-Id assertions, treats PUT /users/me as available to any authenticated user, and expects secret-gated webhook/cron handlers to reject requests when test secrets are unset.
 - The route inventory now records ordered method/path declaration fingerprints for route modules and direct server routes. A changed or missing fingerprint fails the matrix until the declarations are reviewed and the inventory entry is deliberately updated. Factory-generated farm and yearly-archive routes are included in the matrix signature set.
 
