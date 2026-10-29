@@ -19,7 +19,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 12 | Yearly archive: screens | Done | [phase-12-yearly-archive-screens.md](phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Done | [phase-13-dependency-security.md](phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phase-14-authorization-and-secrets-review.md) |
-| 15 | MU Farms: products and publish switch | In progress | [phase-15-mu-farms-product-data.md](phase-15-mu-farms-product-data.md) |
+| 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Not started | [phase-16-mu-farms-public-shop.md](phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phase-18-documentation-and-handoff.md) |
@@ -93,3 +93,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 **Dependency note:** the `npm ci` audit warning is not a failed Phase 14 check, but the five reported vulnerabilities must be triaged before release. Next: [Phase 15, MU Farms products and publish switch](phase-15-mu-farms-product-data.md). Real-MongoDB, browser/phone and deployment verification remains scheduled in Phases 19–21.
 
 **Phase 15 started (2026-10-29):** owner/manager product management and published-only public data endpoints are under implementation across the three apps. Current-head tests and builds are pending. See [Phase 15 details](phase-15-mu-farms-product-data.md).
+
+
+**Phase 15 is Done for command-line scope (2026-10-29).** Owner-supplied Windows results confirm 402 full-suite tests passing and all three production builds passing, alongside the product/archive focused tests and repository checks. `npm ci` was not rerun because the lockfiles and package manifests were unchanged from the successful Phase 14 install. The prior npm audit reported five findings; see [Phase 15 details](phase-15-mu-farms-product-data.md) and [PROGRESS.md](../PROGRESS.md). Phase 16, the public shop, is next. Real database/browser/deployment checks remain in Phases 19–21.

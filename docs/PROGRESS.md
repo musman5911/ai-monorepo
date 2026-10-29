@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-29 (Phase 14 done for command-line scope; Phase 15 product publishing started).
+Last updated: 2026-10-29 (Phases 14 and 15 done for command-line scope; Phase 16 public shop next).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -25,7 +25,7 @@ Last updated: 2026-10-29 (Phase 14 done for command-line scope; Phase 15 product
 | 12 | Yearly archive: screens | Done | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Done | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
-| 15 | MU Farms: products and publish switch | In progress | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
+| 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Not started | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
@@ -260,3 +260,30 @@ Phase 14 is Done for command-line scope after owner-supplied current-head result
 Phase 15 is now **In progress**. Implementation adds farm-scoped Product models, manager/owner management endpoints, a published-only public endpoint with an explicit allowlist, and the shared product-management screen in Dairy, Agri and Flock. New products default to unpublished. Product types are Dairy milk/animals without a buyer, Agri harvested produce, and Flock eggs/birds. The public shop and payments remain in Phase 16.
 
 Phase 15 changes have not yet been tested in the owner's Windows checkout. Do not mark it Done until focused tests, the full suite, standard checks, and all three builds pass.
+
+
+## Phase 15 completion validation (2026-10-29; owner-supplied Windows CMD output)
+
+Phase 15, MU Farms products and publish switch, is **Done for command-line scope**.
+
+| Command/check | Result |
+|---|---|
+| `npm test -- tests/public-products.test.ts` | Passed: 1 file / 5 tests |
+| `npm test -- tests/archive.test.ts` | Passed: 1 file / 10 tests |
+| `npm run check-route-permissions` | Passed: 49 route modules documented, imported and visibly mounted |
+| `npm run check-route-matrix` | Passed: 362 route declarations checked (Dairy 135, Agri 140, Flock 87); no authorization mismatches |
+| `npm run check-sync` | Passed: all MUF sync checks, including byte-identical ProductManager components and product backend helpers |
+| `npm run check-secrets` | Passed: 662 tracked paths scanned; no recognized tracked secrets found |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source checks |
+| `npm run check-farms` | Passed: farm-scope tests and Dairy breeding-event runtime checks |
+| `npm run check-archive` | Passed: Dairy, Flock and Agri archive runtime checks (non-fatal Node module-type warnings) |
+| `npm run check-docs` | Passed after fixing a Phase 14 status mismatch |
+| `npm test` | Passed: 45 files / 402 tests |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri builds |
+
+The owner interrupted the first build attempt earlier, then supplied a later complete run showing all three builds passed. The archive-contract test initially failed because an export-list assertion depended on item order; the assertion was corrected to check for required exports independent of order. The Phase 14 status text was also normalized to `Done`, allowing `check-docs` to pass.
+
+`npm ci` was not rerun specifically for Phase 15 because package manifests and lockfiles were unchanged from the successful Phase 14 install. The earlier install reported 5 audit findings (1 moderate, 2 high, 2 critical), which remain a release-triage item. Do not run `npm audit fix --force` blindly.
+
+**Scope note:** Dairy's `animal` product kind is a manually maintained catalogue item. It is not automatically synchronized with or filtered by the Buyers records. Public shop UI and ordering/payments are Phase 16. Real MongoDB, browser/phone and live deployment remain unverified until Phases 19–21.

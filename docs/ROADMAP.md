@@ -29,7 +29,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 | 12 | Yearly archive: screens | Done | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Done | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
-| 15 | MU Farms: products and publish switch | In progress | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
+| 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Not started | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
@@ -114,3 +114,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 **Dependency note:** the `npm ci` audit warning is not a failed Phase 14 check, but the five reported vulnerabilities must be triaged before release. The next project phase is [Phase 15: MU Farms products and publish switch](phases/phase-15-mu-farms-product-data.md).
 
 **Phase 15 started (2026-10-29):** farm-scoped product models, manager/owner endpoints, published-only public lists, admin controls in all three apps, and product privacy tests are under implementation. Current-head Windows validation is pending. See [Phase 15 details](phases/phase-15-mu-farms-product-data.md).
+
+
+**Phase 15 completion (2026-10-29):** owner-supplied Windows results confirm the full suite (45 files / 402 tests), product and archive focused tests, route permission/matrix checks, repository sync/security/UI/workbench/farm/archive/docs checks, and all three production builds passed. Phase 15 is Done for command-line scope. `npm ci` was not repeated because lockfiles and package manifests were unchanged from the successful Phase 14 install; its five audit findings (1 moderate, 2 high, 2 critical) remain to be triaged before release. Next: Phase 16, MU Farms public shop. Manual Dairy animal catalogue entries are not automatically joined to Buyers records. Live database/browser/deployment validation remains in Phases 19–21.
