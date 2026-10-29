@@ -127,3 +127,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 18 progress (2026-10-29):** first documentation pass added Owner/Manager/Worker and daily-entry guides, a reproducible developer-start page, a documentation index, refreshed the three app READMEs, and a command-validation extension to `npm run check-docs`. Historical phase-content audit and CI/Windows validation remain open. See [Phase 18 details](phases/phase-18-documentation-and-handoff.md).
+
+
+**Phase 18 audit update (2026-10-29):** the first guide-command checker run passed in GitHub Actions (47 files / 412 tests; sync/UI/workbench/farm/docs/audit checks green). Phase records in Phases 2, 3, 8, 10 and 13 were reconciled with later validation evidence; the Agri/Dairy direct-build warning absence in Phase 10 is still unverified and is not claimed as resolved. The current-head Windows gate remains open. See [Phase 18 details](phases/phase-18-documentation-and-handoff.md).

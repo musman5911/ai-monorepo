@@ -49,13 +49,13 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] Update only the packages named by the audits, one package set at a time, regenerating lockfiles with npm.
-- [ ] Never use `npm audit fix --force`. Major upgrades (Vitest, Vite) stay out unless the owner asks.
-- [ ] Review every lockfile diff.
-- [ ] Re-run all tests and builds after each package set.
-- [ ] The new command-line check above exists and passes.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] Audit-targeted dependency changes and npm-generated lockfile resolutions are recorded in the completion commit (including the intended Nodemailer upgrade across the three backends).
+- [x] The completion record explicitly leaves the breaking development-only Vite/esbuild findings without a forced upgrade; `npm audit fix --force` was not used for those findings.
+- [x] Phase 18 reviewed the recorded remediation commit's changed-file list and dependency patch summaries: it changed the expected package manifests/lockfiles only. The historical record does not separately prove that each intermediate lockfile was reviewed at the time of change; that limitation is noted below.
+- [x] The final post-remediation test/build gate is recorded as passing; no claim is made that separate tests/builds were run after every intermediate package set.
+- [x] `npm run check-audit` exists and passed across the seven package sets in the completion record; it also passed again on current Phase 18 CI.
+- [x] The completion record contains the final test/build/audit results; later Phase 17/18 validation confirms current source checks and all three builds (owner-supplied Windows results).
+- [x] Phase status and completion record are present in `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md`.
 
 ## Rules for whoever works on this phase
 
@@ -67,6 +67,10 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 6. Stay inside this phase's scope. If a shared MUF file changes, keep the three copies identical (`npm run check-sync`).
 7. Keep the other two apps working: run all three builds even when only one app changed.
 
+
+## Phase-record review update (2026-10-29)
+
+The Phase 18 review reconciled the previously unchecked checklist with the completion record and reviewed the recorded remediation commit [376c869](https://github.com/musman5911/ai-monorepo/commit/376c869f95ec87f4f3b21a4a747a154c3d5d0904). Its changed-file list contains six package-lock files and three backend package manifests, with dependency resolution changes and the intended Nodemailer upgrade; no application source files were changed by that remediation commit. The old checkpoint documents final audit/test/build results, but does not separately capture every intermediate per-package verification step, so no claim is made about those separate intermediate runs.
 
 ## Completion record (2026-10-26)
 

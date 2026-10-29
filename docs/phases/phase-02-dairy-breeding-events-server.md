@@ -80,8 +80,12 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] The existing date fields on the cow keep working; new events keep them in step (additive, no forced migration).
 - [x] Included in backup and restore and demo data. Farm deletion integration was not separately verified.
 - [x] The new command-line check above exists and passes.
-- [ ] Remaining standard checks and all three production builds pass (record results in `docs/PROGRESS.md`).
+- [x] Remaining standard command-line checks and all three production builds were subsequently validated on the current app source (owner-supplied Windows results plus GitHub Actions; record below).
 - [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+
+## Later validation superseding the original open item (2026-10-29)
+
+After the original Phase 2 checkpoint, the owner reported the Windows full suite passing (47 files / 412 tests), `npm run check-docs` passing, and `tools\\build-all.bat` building all three apps. GitHub Actions run [40846510097](https://github.com/musman5911/ai-monorepo/actions/runs/40846510097) also passed the current test suite, check-sync, check-ui, check-workbench, check-farms, check-docs and check-audit. This later validation closes the generic standard-check/build item; real MongoDB behavior remains reserved for Phases 19–21.
 
 ## Rules for whoever works on this phase
 

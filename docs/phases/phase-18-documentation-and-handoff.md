@@ -53,9 +53,9 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] Root/docs README pages are distinct; root and all three app READMEs are refreshed and stale `docs/AUDIT.md` links removed.
 - [ ] Make every phase file match what was really built.
 - [x] `docs/DEVELOPER_START.md` documents package setup, validation, build/start order and repository safety rules.
-- [ ] `tools/check-guide-commands.js` exists and passes under `npm run check-docs` on CI/current-head validation.
+- [x] `tools/check-guide-commands.js` exists and passed under `npm run check-docs` on GitHub Actions run 40846510097.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated with current Phase 17/18 status and validation notes.
 
 ## Implementation update (2026-10-29)
 
@@ -67,6 +67,10 @@ Added the Owner/Manager/Worker user guide and developer-start guide. `docs/READM
 - All three app README files contained a stale link to `docs/AUDIT.md`, which is not present in the repository at this branch head, and an extra punctuation error in the progress-file sentence.
 - `docs/FARMS_AND_ROLES.md` describes role boundaries but does not yet give concise, practical role-specific entry instructions.
 - The root `check-docs` script validates phase/index/link consistency but does not yet check commands named in quick-start/user/developer guides.
+
+## Current CI validation (2026-10-29)
+
+GitHub Actions run [40846510097](https://github.com/musman5911/ai-monorepo/actions/runs/40846510097) passed on commit `9783ab0afaae0b80145c7cde6e5b319db0f8bbbd`: 47 test files / 412 tests; check-sync, check-ui, check-workbench (23 checks), check-farms, phase-document validation, guide-command validation, and production dependency audit across all seven package sets. The production audit reported zero high/critical vulnerabilities in those package sets. This CI workflow does not run the three production builds; the owner previously supplied successful Windows builds on the unchanged app source in commit `17c72c3`. Current-head Windows check-docs/test validation and a current-head Windows build are still requested before Phase 18 closes.
 
 ## Rules for whoever works on this phase
 

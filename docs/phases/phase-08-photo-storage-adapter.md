@@ -57,7 +57,7 @@ Regression coverage includes adapter validation, upload sequencing, authenticate
 | `npm run check-ui` | Passed: all MUF UI safety checks |
 | `npm run check-workbench` | Passed: 23 source safety checks |
 | `npm run check-farms` | Passed: Agri, Flock and Dairy farm-scope checks plus Dairy breeding-event runtime checks |
-| `npm run check-docs` | Passed on the pre-final documentation snapshot; rerun after pulling this update |
+| `npm run check-docs` | Passed on the pre-final snapshot at that historical checkpoint; later `check-docs` also passed after Phase 18 guide and README edits (Actions run 40846510097) |
 | `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
 | `npm run check-workbench-runtime` | Passed: 8 runtime smoke checks |
 | `npm ci` | Not run; existing local dependencies were used |
@@ -80,7 +80,7 @@ tools\\build-all.bat
 npm run check-workbench-runtime
 ```
 
-The owner reported all of these checks passing on 2026-10-26, except `npm run check-docs` must be rerun after this documentation repair. The optional runtime check requires port 5000 to be available. `npm ci` was not run.
+The owner reported the listed checks passing on 2026-10-26. The earlier docs-check reminder is superseded: the later GitHub Actions run [40846510097](https://github.com/musman5911/ai-monorepo/actions/runs/40846510097) passed `check-docs` after subsequent guide/README edits. The optional runtime check requires port 5000 to be available. `npm ci` was not run for the Phase 8 checkpoint.
 
 ## Done checklist
 
@@ -94,7 +94,7 @@ The owner reported all of these checks passing on 2026-10-26, except `npm run ch
 - [x] Full test suite passed: 36 files, 301 tests, including Flock image-reference regressions.
 - [x] Sync, UI, workbench, farm-scope and production build checks passed.
 - [x] Optional workbench runtime smoke test passed: 8/8.
-- [x] Documentation statuses updated consistently; rerun `npm run check-docs` after pulling this commit.
+- [x] Documentation statuses were updated consistently; a later `npm run check-docs` passed after the Phase 18 documentation changes (GitHub Actions run 40846510097).
 
 ## Rules for whoever works on this phase
 

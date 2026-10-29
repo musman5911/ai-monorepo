@@ -65,7 +65,7 @@ npm run check-docs
 tools\build-all.bat
 ```
 
-`npm run check-workbench-runtime` is optional and requires port 5000 to be free. Run all three builds even when only Dairy was changed. Do not mark the documentation check as passed until it has been rerun after the latest docs edits.
+`npm run check-workbench-runtime` is optional and requires port 5000 to be free. Run all three builds even when only Dairy was changed. The earlier reminder to rerun the docs check was superseded: `npm run check-docs` passed on the post-Phase-18 documentation state in GitHub Actions run [40846510097](https://github.com/musman5911/ai-monorepo/actions/runs/40846510097). The Windows owner-provided Phase 3 results remain the historical screen-specific validation.
 
 ## Done checklist
 

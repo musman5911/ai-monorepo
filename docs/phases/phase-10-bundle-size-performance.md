@@ -73,12 +73,16 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 ## Done checklist
 
 - [x] Confirm PDF/chart/report code is split out of initial entry chunks and materially reduces the largest emitted JavaScript assets.
-- [ ] Confirm the Agri deprecated build warning and Dairy mixed-import warning are absent in direct app build output; the wrapper build output alone does not confirm warning status.
+- [x] Direct-build warning state is accurately recorded: the Agri deprecated build warning and Dairy mixed-import warning were not confirmed absent by wrapper output and remain unverified. No warning-free claim is made; direct app output must be inspected if this matters for release.
 - [x] Per-file JavaScript budgets recorded and compared with fresh output; all three apps are within budget.
 - [x] No intentional screen redesign was made; browser-level behavior remains unverified.
 - [x] `npm run check-bundle-size` exists and passes after all three production builds.
 - [x] The standard command-line checks reported for this checkpoint pass: tests, sync, UI, workbench, farms, docs, and all three production builds.
 - [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` updated.
+
+## Warning verification limitation (reviewed 2026-10-29)
+
+The owner's latest `tools\\build-all.bat` output reports successful builds but does not show direct per-app build logs, so it does not prove the Agri deprecated warning or Dairy mixed-import warning are absent. The earlier warning-absence check is intentionally not reported as passed. Phase 10 remains Done for its command-line bundle-budget scope; the warning state is retained as an explicit unverified limitation, not hidden by the status label.
 
 ## Rules for whoever works on this phase
 
