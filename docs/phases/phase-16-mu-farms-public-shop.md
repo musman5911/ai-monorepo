@@ -1,6 +1,6 @@
 # Phase 16: MU Farms: public shop
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -9,6 +9,16 @@ Customers can browse published products from all three projects and place an ord
 ## Already in place (from Phase 0)
 
 - The Phase 15 public product endpoints.
+
+
+
+## Location decision (2026-10-29)
+
+The first implementation uses a separate `/shop` route in each existing frontend and keeps the UI, styles and module notes in the dedicated `src/muf-shop/` folder. The three copies must stay byte-identical. This reuses existing hosting and avoids adding another domain or server. The shop is lazy-loaded separately from the signed-in farm-management shell and does not render admin forms.
+
+The current app's public feed is read at `/api/products/public`. To aggregate all three deployed projects, configure `VITE_MUF_SHOP_DAIRY_API`, `VITE_MUF_SHOP_AGRI_API` and `VITE_MUF_SHOP_FLOCK_API` with their corresponding API roots, and include every shop frontend origin in each backend's `FRONTEND_URL` CORS allowlist. If the URLs are not configured, the local feed still works and disconnected sections clearly say they need setup. Configure `VITE_MUF_SHOP_WHATSAPP_NUMBER` with the real shop contact; if it is unset, the prefilled order opens WhatsApp's recipient picker. No live host or phone number is guessed.
+
+The shop calls only the published-only public read endpoint, sends no auth token or cookies, and uses no private routes or write endpoints. The endpoint's server-side field allowlist and published filter remain the data-security boundary. Online payments and customer accounts are out of scope.
 
 ## Scope
 
@@ -29,7 +39,7 @@ Customers can browse published products from all three projects and place an ord
 
 ## New command-line check
 
-`tests/shop-isolation.test.ts`: proves the shop only calls the public endpoints and no admin route or private field is reachable from it.
+`npm run check-shop`: runs `tests/shop-isolation.test.ts` to guard the public-only endpoint, public-field mapping, isolated route, WhatsApp order links and byte-identical shop folder.
 
 ## Command-line checks at the end of this phase
 

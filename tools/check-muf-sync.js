@@ -192,6 +192,22 @@ if (productCopies.some((s) => s === null)) { console.log('  ❌ Product manager 
 else if (productCopies.every((s) => s === productCopies[0])) console.log('  ✅ Product manager component identical in all three apps');
 else { console.log('  ❌ Product manager component copies differ'); failures++; }
 
+console.log('\\n━━ MU Farms public shop (all three apps, byte-identical) ━━');
+const MUF_SHOP_GROUPS = [
+  ['MufShop.tsx', 'dairy_farm/client/src/muf-shop/MufShop.tsx', 'flock_farm/client/src/muf-shop/MufShop.tsx', 'agri_farm/frontend/src/muf-shop/MufShop.tsx'],
+  ['muf-shop.css', 'dairy_farm/client/src/muf-shop/muf-shop.css', 'flock_farm/client/src/muf-shop/muf-shop.css', 'agri_farm/frontend/src/muf-shop/muf-shop.css'],
+  ['README.md', 'dairy_farm/client/src/muf-shop/README.md', 'flock_farm/client/src/muf-shop/README.md', 'agri_farm/frontend/src/muf-shop/README.md'],
+];
+for (const [label, ...paths] of MUF_SHOP_GROUPS) {
+  const sources = paths.map(read);
+  if (sources.every((src) => src !== null && src === sources[0])) {
+    console.log('  ✅ ' + pad(label, 24) + ' identical in all three apps');
+  } else {
+    console.log('  ❌ ' + pad(label, 24) + ' missing or different copies');
+    failures++;
+  }
+}
+
 if (farmSwitcherCopies.some((source) => source === null)) { console.log('  ❌ Shared farm switcher missing'); failures++; }
 else if (farmSwitcherCopies.every((source) => source === farmSwitcherCopies[0])) console.log('  ✅ Shared farm switcher identical in all three apps');
 else { console.log('  ❌ Shared farm switcher copies differ'); failures++; }

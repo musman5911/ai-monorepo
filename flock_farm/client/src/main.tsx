@@ -1,13 +1,15 @@
-import {StrictMode} from 'react';
+import { StrictMode, lazy, Suspense } from 'react';
 import {createRoot} from 'react-dom/client';
-import App from './App.tsx';
-import ConfirmProvider from './muf/core/muf-confirm';
+const App = lazy(() => import('./App'));
+const ConfirmProvider = lazy(() => import('./muf/core/muf-confirm'));
+const MufShop = lazy(() => import('./muf-shop/MufShop'));
+const isMufShopRoute = /^\/shop\/?$/.test(window.location.pathname);
 import './index.css';
 import './muf-style.css';
 import { initMufA11y } from './muf/core/muf-a11y';
 
 // PWA service worker — same system as the other Malik Usman Farms apps.
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && !isMufShopRoute) {
   window.addEventListener('load', async () => {
     // Never let an old production service worker serve stale UI while using Vite dev.
     if (import.meta.env.DEV) {
@@ -29,12 +31,18 @@ if ('serviceWorker' in navigator) {
   });
 }
 
-initMufA11y();
+if (!isMufShopRoute) initMufA11y();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ConfirmProvider>
-      <App />
-    </ConfirmProvider>
-  </StrictMode>,
+    {isMufShopRoute ? (
+      <Suspense fallback={<div role="status">Loading MU Farms shop…</div>}>
+        <MufShop currentFarm="flock" />
+      </Suspense>
+    ) : (
+      <Suspense fallback={<div role="status">Loading farm app…</div>}>
+        <ConfirmProvider><App /></ConfirmProvider>
+      </Suspense>
+    )}
+  </StrictMode>
 );

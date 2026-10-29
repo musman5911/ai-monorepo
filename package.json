@@ -17,7 +17,8 @@
     "check-audit": "node tools/check-audit.js",
     "check-secrets": "node tools/check-secrets.js",
     "check-route-permissions": "node tools/check-route-permissions.js",
-    "check-route-matrix": "node tools/check-route-matrix.js"
+    "check-route-matrix": "node tools/check-route-matrix.js",
+    "check-shop": "vitest run tests/shop-isolation.test.ts"
   },
   "devDependencies": {
     "vitest": "^3.0.0"

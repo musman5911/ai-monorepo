@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-29 (Phases 14 and 15 done for command-line scope; Phase 16 public shop next).
+Last updated: 2026-10-29 (Phase 16 public shop implementation started; command-line validation pending).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -26,7 +26,7 @@ Last updated: 2026-10-29 (Phases 14 and 15 done for command-line scope; Phase 16
 | 13 | Dependency security fixes | Done | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
-| 16 | MU Farms: public shop | Not started | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
+| 16 | MU Farms: public shop | In progress | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
@@ -287,3 +287,12 @@ The owner interrupted the first build attempt earlier, then supplied a later com
 `npm ci` was not rerun specifically for Phase 15 because package manifests and lockfiles were unchanged from the successful Phase 14 install. The earlier install reported 5 audit findings (1 moderate, 2 high, 2 critical), which remain a release-triage item. Do not run `npm audit fix --force` blindly.
 
 **Scope note:** Dairy's `animal` product kind is a manually maintained catalogue item. It is not automatically synchronized with or filtered by the Buyers records. Public shop UI and ordering/payments are Phase 16. Real MongoDB, browser/phone and live deployment remain unverified until Phases 19–21.
+
+
+## Phase 16 start (2026-10-29)
+
+Phase 16, MU Farms public shop, is **In progress**. The chosen layout is a separate `/shop` route in each existing frontend, with identical `src/muf-shop/MufShop.tsx`, `muf-shop.css` and `README.md` copies. The shop is lazy-loaded separately from the farm-management app and reads only `GET /api/products/public` feeds. Crops accepts Agri `produce`, Dairy accepts `milk` and manually managed `animal` listings, and Poultry accepts Flock `egg` and `bird` listings. WhatsApp order messages include product, farm, type, listed price and availability.
+
+Cross-project data needs the three build-time public API root variables and CORS allowlisting for shop frontend origins in each backend's `FRONTEND_URL`. No production host or seller number has been guessed. Added `npm run check-shop` and a sync guard for all three shop copies.
+
+**Validation pending:** the new tests, docs, sync checks, full suite and all three builds have not yet run on the owner's Windows checkout. No live browser, real MongoDB, cross-origin deployment or WhatsApp delivery is claimed; live checks remain in Phases 19–21.
