@@ -21,8 +21,8 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Done | [phase-16-mu-farms-public-shop.md](phase-16-mu-farms-public-shop.md) |
-| 17 | Automatic command-line checks on GitHub | In progress | [phase-17-automatic-checks-ci.md](phase-17-automatic-checks-ci.md) |
-| 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phase-18-documentation-and-handoff.md) |
+| 17 | Automatic command-line checks on GitHub | Done | [phase-17-automatic-checks-ci.md](phase-17-automatic-checks-ci.md) |
+| 18 | Documentation and handoff | In progress | [phase-18-documentation-and-handoff.md](phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phase-21-final-testing-live-and-signoff.md) |
@@ -100,4 +100,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 **Phase 16 is Done for command-line scope (2026-10-29).** Owner-supplied Windows results confirm 409 full-suite tests, 7 shop isolation tests, sync/docs/UI/workbench/farm checks, and all three production builds passed. The shop is isolated in a lazy-loaded `/shop` route and dedicated, byte-identical `src/muf-shop/` folders with published-only public feeds. Real MongoDB, browser/phone, deployed cross-origin feed and live WhatsApp checks remain in Phases 19–21. See [Phase 16 details](phase-16-mu-farms-public-shop.md).
 
-**Phase 17 is In progress (2026-10-29).** The first automatic push-triggered quick-check run passed: 47 files / 412 tests, sync/UI/workbench/farm/docs checks, and the production dependency audit across seven package sets. Three-app builds remain manual; repository-level Dependabot settings and current-head Windows validation are outstanding. See [Phase 17 details](phase-17-automatic-checks-ci.md).
+**Phase 17 is Done for command-line scope (2026-10-29).** Two push-triggered Actions runs passed; the full suite passed (47 files / 412 tests), the sync/UI/workbench/farm/docs/audit checks passed, all three Windows production builds passed, and the owner confirmed Dependabot alerts on/security-update PRs off. See [Phase 17 details](phase-17-automatic-checks-ci.md).
+
+**Phase 18 is In progress (2026-10-29).** The docs/handoff phase is fixing outdated README instructions and links, adding practical role guides and a new command validation guard. See [Phase 18 details](phase-18-documentation-and-handoff.md).

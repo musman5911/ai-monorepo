@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-29 (Phase 17 push-triggered quick-check workflow passed; Dependabot settings and Windows build validation pending).
+Last updated: 2026-10-29 (Phase 17 complete for command-line scope; Phase 18 documentation/handoff started).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -27,8 +27,8 @@ Last updated: 2026-10-29 (Phase 17 push-triggered quick-check workflow passed; D
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Done | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
-| 17 | Automatic command-line checks on GitHub | In progress | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
-| 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
+| 17 | Automatic command-line checks on GitHub | Done | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
+| 18 | Documentation and handoff | In progress | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phases/phase-21-final-testing-live-and-signoff.md) |
@@ -331,3 +331,28 @@ Added `.github/dependabot.yml` with `open-pull-requests-limit: 0` across all sev
 The push trigger has been confirmed working; no quota limitation was inferred. The pull-request trigger has not yet been independently observed. The GitHub CI run does not replace current-head Windows validation or the three production builds.
 
 Dependabot config disables scheduled version-update PRs with `open-pull-requests-limit: 0` for all npm package sets and GitHub Actions. The repository-level alerts/security-update setting remains to be verified in Settings, which the available connector cannot control or read.
+
+## Phase 17 completion (2026-10-29; owner-supplied Windows results and GitHub Actions runs)
+
+Phase 17, Automatic command-line checks on GitHub, is **Done for command-line scope**. The GitHub Actions quick-check workflow ran successfully on the initial implementation and again after the tracking docs were updated. The latest verified run is [40842866579](https://github.com/musman5911/ai-monorepo/actions/runs/40842866579) on commit `17c72c34b9220faaa574e02bb7daf466c8c6e22f`.
+
+| Check | Result |
+|---|---|
+| CI dependency installation | Passed: root tools, Dairy client and Agri/Dairy/Flock backends installed with `npm ci` |
+| `npm test` in GitHub Actions | Passed: 47 files / 412 tests (including 3 workflow-contract tests) |
+| `npm run check-sync` | Passed |
+| `npm run check-ui` | Passed |
+| `npm run check-workbench` | Passed: 23 checks |
+| `npm run check-farms` | Passed: farm-scope and Dairy breeding-event checks |
+| `npm run check-docs` in GitHub Actions | Passed |
+| `npm run check-audit` | Passed: seven package sets reported zero high/critical production dependency vulnerabilities |
+| Owner's `npm test` on Windows | Passed: 47 files / 412 tests |
+| Owner's `npm run check-docs` on Windows | Passed: all phase statuses, sections and links consistent |
+| Owner's `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| Dependabot Settings | Owner confirmed alerts enabled and security updates disabled |
+
+Version-update pull requests are disabled via `.github/dependabot.yml`. The push trigger was observed twice. A separate pull-request-triggered run has not been observed, though the trigger is protected by the workflow contract test. The optional Vite workbench runtime test remains manual. These results do not claim real MongoDB or live-site verification.
+
+## Phase 18 start (2026-10-29)
+
+Phase 18, Documentation and handoff, is **In progress**. Initial review found outdated instructions in the monorepo README, a duplicate copy in `docs/README.md`, stale `docs/AUDIT.md` links in all three app READMEs, missing practical role workflows, and no guard to validate commands printed in guides. This phase will repair docs and add the guide-command check without changing application behavior.

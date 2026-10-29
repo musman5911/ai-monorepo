@@ -1,6 +1,6 @@
 # Phase 18: Documentation and handoff
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -8,7 +8,7 @@ Anyone new can understand the system and each person can use their screens.
 
 ## Already in place (from Phase 0)
 
-- A rulebook (`RULES.md`), farms and roles doc, phase files and a deployment guide exist.
+- A rulebook (`RULES.md`), farms and roles doc, phase files, deployment guide, and readmes for the monorepo and each app exist. The initial audit found duplicated root/docs landing pages and stale `docs/AUDIT.md` references in app READMEs; these are now targets for review.
 
 ## Scope
 
@@ -23,9 +23,11 @@ Anyone new can understand the system and each person can use their screens.
 
 ## Steps
 
-1. Walk through each guide against the real screens' source.
-2. Fix mismatches.
-3. Run the docs check.
+1. Compare the role and task guides against the role policy and the relevant Milk, Flock batch/egg, and Finance/expense screen sources.
+2. Fix stale repository/app README instructions and links, including the root branch instructions and missing documentation links.
+3. Add a developer-start page for a new contributor/agent.
+4. Extend `npm run check-docs` to validate commands explicitly documented in the guides.
+5. Run `npm test`, docs checks, shared checks and the three production builds; record results.
 
 ## New command-line check
 
@@ -54,6 +56,13 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [ ] The new command-line check above exists and passes.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+
+## Initial findings (2026-10-29)
+
+- `README.md` and `docs/README.md` were byte-identical but documented older branch instructions (`main`) and a check order that left app dependency prerequisites unclear.
+- All three app README files contained a stale link to `docs/AUDIT.md`, which is not present in the repository at this branch head, and an extra punctuation error in the progress-file sentence.
+- `docs/FARMS_AND_ROLES.md` describes role boundaries but does not yet give concise, practical role-specific entry instructions.
+- The root `check-docs` script validates phase/index/link consistency but does not yet check commands named in quick-start/user/developer guides.
 
 ## Rules for whoever works on this phase
 

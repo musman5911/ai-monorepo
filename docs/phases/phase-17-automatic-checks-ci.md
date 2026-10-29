@@ -1,6 +1,6 @@
 # Phase 17: Automatic command-line checks on GitHub
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -14,7 +14,7 @@ The quick checks run by themselves on every push, so breakage is caught early.
 ## Scope
 
 - The owner approved automatic quick checks. `.github/workflows/muf-quick-checks.yml` runs on every push, pull request and manual dispatch. The existing full-validation workflow remains manual.
-- `.github/dependabot.yml` sets the version-update pull-request limit to zero for all seven npm package sets and GitHub Actions. The repository-level Dependabot alerts/security-update setting still needs confirmation in GitHub Settings; the contents-only GitHub connector cannot change or confirm that setting.
+- `.github/dependabot.yml` sets the version-update pull-request limit to zero for all seven npm package sets and GitHub Actions. The owner confirmed repository-level Dependabot alerts are enabled and Dependabot security updates are disabled (owner-reported Settings validation, 2026-10-29).
 - The automatic workflow contains only the requested test/sync/UI/workbench/farm/docs/production-dependency-audit checks (plus dependency installs). Builds and the workbench runtime smoke test stay in the manual workflow.
 
 ## Out of scope
@@ -52,11 +52,11 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] Owner approval for automatic runs is recorded in this file.
 - [x] A push/pull-request/manual quick-check workflow is added; the old full-validation workflow remains manual-only.
 - [x] Version-update pull requests are disabled by `.github/dependabot.yml` for all npm package sets and GitHub Actions.
-- [ ] Repository-level Dependabot alerts are confirmed enabled and any automatic security-update pull requests are confirmed off in GitHub Settings.
+- [x] Owner confirmed Dependabot alerts enabled and Dependabot security updates disabled in GitHub Settings (2026-10-29).
 - [x] The automatic workflow runs the documented quick checks and keeps builds/workbench runtime manual.
 - [x] The new `tests/workflow-contract.test.ts` command-line guard exists and is included in `npm test`.
 - [x] The initial GitHub Actions run and its results are recorded in `docs/PROGRESS.md`.
-- [ ] Current-head Windows validation and all three production builds are recorded.
+- [x] Owner-supplied current-head Windows validation recorded: `npm test` (47 files / 412 tests), `npm run check-docs`, and `tools\\build-all.bat` (all three apps built).
 - [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
 ## Command-line validation record
@@ -74,11 +74,15 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 | `npm run check-docs` | Passed: phase statuses, sections and links consistent |
 | `npm run check-audit` | Passed: all seven npm package sets reported 0 high/critical production vulnerabilities |
 
-This proves the automatic push trigger works on this branch; it is not evidence of any Actions quota limitation. The PR trigger is covered by the workflow-contract test but has not separately been observed on a pull request.
+This proves the automatic push trigger works on this branch; it is not evidence of any Actions quota limitation. The PR trigger is covered by the workflow-contract test but has not separately been observed on a pull request. The owner subsequently ran the current-head Windows gate after pulling commit `17c72c3`: `npm test` passed (47 files / 412 tests), `npm run check-docs` passed, and `tools\\build-all.bat` built Dairy, Flock and Agri successfully.
 
-The workflow intentionally leaves all frontend production builds and the Vite workbench runtime smoke test in the manual full-validation workflow. Current-head Windows validation and `tools\\build-all.bat` remain outstanding.
+The workflow intentionally leaves all frontend production builds and the Vite workbench runtime smoke test in the manual full-validation workflow. Current-head Windows builds were supplied by the owner and all three succeeded. The optional `npm run check-workbench-runtime` was not part of this phase's required gate.
 
 `.github/dependabot.yml` disables scheduled version-update pull requests by setting `open-pull-requests-limit: 0` for each of the seven npm package sets and GitHub Actions. The repository-level Dependabot alerts toggle and the separate security-update pull-request setting still need confirmation in GitHub Settings; the available GitHub connector cannot toggle or verify them.
+
+## Disposition
+
+**Phase 17 is Done for command-line scope.** The first and follow-up push-triggered GitHub Actions runs both passed. The owner-supplied Windows suite and all three production builds passed, and the owner confirmed the Dependabot Settings. A pull-request-triggered run has not yet been observed separately. No live application checks are claimed here.
 
 ## Rules for whoever works on this phase
 
