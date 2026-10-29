@@ -109,3 +109,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 18 audit update (2026-10-29).** The guide-command validation passed in GitHub Actions with the 412-test suite and all other quick checks. Stale historical checklist/reminder text was reconciled in Phases 2, 3, 8, 10 and 13; the Phase 10 direct-build warning status remains explicitly unverified. Current-head Windows validation remains pending. See [Phase 18 details](phase-18-documentation-and-handoff.md).
+
+
+**Phase 18 record-review update (2026-10-29).** The 22-phase status/checklist sweep reconciled Phases 2, 3, 8, 10 and 13; Phase 10 warning absence remains explicitly unverified. Latest Actions run 40847197129 passed 47 test files / 412 tests plus sync, UI, workbench, farms, docs, guide commands and audit. Current-head Windows validation is still required before Phase 18 is closed. See [Phase 18 details](phase-18-documentation-and-handoff.md).
