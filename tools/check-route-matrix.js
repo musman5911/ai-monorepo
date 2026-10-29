@@ -226,7 +226,7 @@ async function call(base, method, route, identity, farmId) {
   const headers = { 'content-type': 'application/json' };
   if (identity.token) headers.authorization = 'Bearer ' + identity.token;
   if (farmId) headers['x-farm-id'] = farmId;
-  const body = ['GET','HEAD','OPTIONS'].includes(method) ? undefined : JSON.stringify(/\\/login$/.test(route) && method === 'POST' ? { username: 'admin', password: 'route-matrix-invalid-password' } : {});
+  const body = ['GET','HEAD','OPTIONS'].includes(method) ? undefined : JSON.stringify(/\/login$/.test(route) && method === 'POST' ? { username: 'admin', password: 'route-matrix-invalid-password' } : {});
   try {
     const r = await fetch(base + requestPath(route), { method: method === 'ALL' ? 'GET' : method, headers, body, redirect: 'manual', signal: AbortSignal.timeout(5000) });
     return r.status;
@@ -314,7 +314,7 @@ async function runApp(app) {
     }
     for (const e of discovered.entries) {
       if (e.modulePolicy === 'missing') { mismatch(app.key, e.method, e.path, 'inventory', 'documented route policy', 'missing'); continue; }
-      const isLoginRoute = e.method === 'POST' && /\\/login$/.test(e.localPath.toLowerCase());
+      const isLoginRoute = e.method === 'POST' && /\/login$/.test(e.localPath.toLowerCase());
       if (isLoginRoute) {
         const status = await call(server.base, e.method, e.path, identities.anonymous);
         if (status !== 401) mismatch(app.key, e.method, e.path, 'anonymous+wrong-password', '401', status);
