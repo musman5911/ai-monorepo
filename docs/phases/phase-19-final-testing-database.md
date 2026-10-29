@@ -35,7 +35,7 @@ Everything that needs a real MongoDB is tested on disposable copies of your back
 
 ## New command-line check
 
-Use `node tools/final-db-preflight.mjs` and `node tools/final-db-migrate.mjs` as the fail-closed safety gate and repeatable migration runner; keep every later database-test script under `tools/final-db-*.mjs`.
+Use `node tools/final-db-preflight.mjs`, `node tools/final-db-migrate.mjs`, and the read-only `node tools/final-db-inspect.mjs` for repeatable safety, migration, index/query-plan and database-size checks; keep every later database-test script under `tools/final-db-*.mjs`.
 
 ## Safety gate and repeatable migration commands
 
@@ -50,14 +50,16 @@ The scripts never read an ordinary app `.env` connection URI as their target. Se
 | `MUF_FINAL_DB_DISPOSABLE_CONFIRMED` | Set to `YES` only after independently confirming the target is not production |
 | `MUF_FINAL_DB_BACKUP_VALIDATED` | Set to `YES` only after the backup has been opened/read successfully |
 | `MUF_FINAL_DB_RESTORE_VERIFIED` | Set to `YES` only after restoring the backup to the target and sanity-checking records |
+| `MUF_FINAL_DB_FREE_TIER_CAP_MB` | Actual documented storage cap for this provider/tier, in MB; do not guess |
 
-The database name must start with `muf_phase19_agri_`, `muf_phase19_dairy_`, or `muf_phase19_flock_` according to the selected app. The backup file must be no older than 24 hours at preflight time. The preflight prints only the target host/database, backup name, size and SHA-256; it does not print URI credentials.
+The database name must start with `muf_phase19_agri_`, `muf_phase19_dairy_`, or `muf_phase19_flock_` according to the selected app. The backup file must be outside the repository and no older than 24 hours at preflight time. The preflight prints only the target host/database, backup name, size and SHA-256; it does not print URI credentials. After a restore is confirmed, set `MUF_FINAL_DB_FREE_TIER_CAP_MB` to the provider's actual documented cap, then run the read-only database inspector to list collections, estimated counts, index listings, representative query-plan metrics and the selected database's size share of that cap.
 
 Run `node tools\final-db-preflight.mjs --pre-restore` before restoring the backup. After restoring it and checking records, set `MUF_FINAL_DB_RESTORE_VERIFIED=YES` and run `node tools\final-db-preflight.mjs` again. The migration runner defaults to a dry run; applying changes requires the explicit `--apply` flag:
 
 ```cmd
 node tools\final-db-preflight.mjs --pre-restore
 node tools\final-db-preflight.mjs
+node tools\final-db-inspect.mjs
 node tools\final-db-migrate.mjs
 node tools\final-db-migrate.mjs --apply
 node tools\final-db-migrate.mjs --apply

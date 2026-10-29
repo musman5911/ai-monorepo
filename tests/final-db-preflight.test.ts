@@ -4,6 +4,7 @@ import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { evaluateFinalDbPreflight } from '../tools/final-db-preflight.mjs';
 import { parseFinalDbMigrationMode } from '../tools/final-db-migrate.mjs';
+import { requiredIndexFailures } from '../tools/final-db-inspect.mjs';
 
 let folder;
 let backup;
@@ -106,3 +107,33 @@ describe('Phase 19 migration wrapper safety contract', () => {
     expect(() => parseFinalDbMigrationMode(['--force'])).toThrow(/Only --apply or --dry-run/);
   });
 });
+
+describe('Phase 19 required live index contracts', () => {
+  it('requires the unique Flock farm/key index', () => {
+    expect(requiredIndexFailures('flock', {
+      datastores: [{ name: 'datastore_farm_key_unique', key: { farmId: 1, key: 1 }, unique: true }]
+    })).toEqual([]);
+    expect(requiredIndexFailures('flock', {
+      datastores: [{ name: 'key_1', key: { key: 1 }, unique: true }]
+    })).toHaveLength(1);
+  });
+
+  it('requires the Dairy per-farm non-empty ear-tag index', () => {
+    expect(requiredIndexFailures('dairy', {
+      cows: [{
+        name: 'cow_farm_ear_tag_unique',
+        key: { farmId: 1, earTag: 1 },
+        unique: true,
+        partialFilterExpression: { earTag: { $type: 'string', $gt: '' } }
+      }]
+    })).toEqual([]);
+    expect(requiredIndexFailures('dairy', {
+      cows: [{ name: 'cow_farm_ear_tag_unique', key: { farmId: 1, earTag: 1 }, unique: true }]
+    })).toHaveLength(1);
+  });
+
+  it('does not impose those two app-specific indexes on Agri', () => {
+    expect(requiredIndexFailures('agri', {})).toEqual([]);
+  });
+});
+

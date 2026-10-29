@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const MAX_BACKUP_AGE_MS = 24 * 60 * 60 * 1000;
+const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const APPS = new Set(['agri', 'dairy', 'flock']);
 
 function hashFile(filePath) {
@@ -73,6 +74,10 @@ export async function evaluateFinalDbPreflight(env = process.env, options = {}) 
     errors.push('MUF_FINAL_DB_BACKUP must be an absolute file path.');
   } else {
     backupPath = path.resolve(backupInput);
+    const relativeBackupPath = path.relative(REPO_ROOT, backupPath);
+    if (relativeBackupPath === '' || (!relativeBackupPath.startsWith('..' + path.sep) && relativeBackupPath !== '..' && !path.isAbsolute(relativeBackupPath))) {
+      errors.push('MUF_FINAL_DB_BACKUP must be outside the repository so backup data cannot be committed accidentally.');
+    }
     if (!existsSync(backupPath)) {
       errors.push('The backup file does not exist at MUF_FINAL_DB_BACKUP.');
     } else {
@@ -84,7 +89,7 @@ export async function evaluateFinalDbPreflight(env = process.env, options = {}) 
           backupBytes = stat.size;
           backupAgeHours = (now - stat.mtimeMs) / (60 * 60 * 1000);
           if (backupAgeHours < -0.1) errors.push('The backup file timestamp is unexpectedly in the future.');
-          if (backupAgeHours > 24) errors.push('The backup file must have been created or copied within the last 24 hours.');
+          if (now - stat.mtimeMs > MAX_BACKUP_AGE_MS) errors.push('The backup file must have been created or copied within the last 24 hours.');
           backupSha256 = await hashFile(backupPath);
         }
       } catch {
