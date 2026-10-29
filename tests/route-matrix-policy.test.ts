@@ -52,6 +52,14 @@ describe('inventory-driven route-matrix role policy', () => {
     }])).toContainEqual(expect.objectContaining({ identity: 'inventory', status: 'missing/invalid role' }));
   });
 
+  it('keeps route-signature fingerprints limited to modules with HTTP declarations', () => {
+    const inventory = readFileSync(resolve(root, 'docs/security/route-permission-inventory.md'), 'utf8');
+    const signatureSection = inventory.split('## Reviewed route method signatures')[1] || '';
+    const fingerprints = [...signatureSection.matchAll(/^\|\s*(dairy|agri|flock)\s*\|\s*(routes\/[a-z0-9-]+|server\.js)\s*\|\s*([a-f0-9]{8})\s*\|\s*(\d+)\s*\|/gim)];
+    expect(fingerprints.length).toBeGreaterThan(0);
+    expect(fingerprints.every(row => Number(row[4]) > 0)).toBe(true);
+  });
+
   it('closed signup accepts only 400, 401, 403 or 404', () => {
     for (const status of [400, 401, 403, 404]) {
       expect(checkRouteStatuses([{ app: 'flock', method: 'POST', route: '/signup/verify', minimumRole: 'public', closedSignup: true, statuses: { anonymous: status } }])).toEqual([]);

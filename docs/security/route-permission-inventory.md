@@ -280,16 +280,16 @@ Each row is one reviewed local router method/path declaration. The minimum-role 
 | dairy | routes/health | PUT | `/:id` | worker |
 | dairy | routes/health | POST | `/bulk` | worker |
 | dairy | routes/health | GET | `/upcoming` | worker |
-| dairy | routes/labor | GET | `/advances` | worker |
+| dairy | routes/labor | GET | `/advances` | manager |
 | dairy | routes/labor | POST | `/advances` | manager |
 | dairy | routes/labor | DELETE | `/advances/:id` | manager |
 | dairy | routes/labor | PUT | `/advances/:id` | manager |
-| dairy | routes/labor | GET | `/attendance` | worker |
+| dairy | routes/labor | GET | `/attendance` | manager |
 | dairy | routes/labor | POST | `/attendance` | manager |
 | dairy | routes/labor | DELETE | `/attendance/:id` | manager |
 | dairy | routes/labor | PUT | `/attendance/:id` | manager |
 | dairy | routes/labor | POST | `/post-wages` | manager |
-| dairy | routes/labor | GET | `/workers` | worker |
+| dairy | routes/labor | GET | `/workers` | manager |
 | dairy | routes/labor | POST | `/workers` | manager |
 | dairy | routes/labor | DELETE | `/workers/:id` | manager |
 | dairy | routes/labor | PUT | `/workers/:id` | manager |
@@ -303,7 +303,7 @@ Each row is one reviewed local router method/path declaration. The minimum-role 
 | dairy | routes/photos | DELETE | `/photos/:id` | worker |
 | dairy | routes/photos | GET | `/photos/:id` | worker |
 | dairy | routes/photos | POST | `/photos/cleanup-orphans` | manager |
-| dairy | routes/photos | GET | `/photos/orphans` | worker |
+| dairy | routes/photos | GET | `/photos/orphans` | manager |
 | dairy | routes/rates | GET | `/` | worker |
 | dairy | routes/rates | GET | `/1` | worker |
 | dairy | routes/rates | PUT | `/1` | manager |
@@ -457,7 +457,6 @@ The route matrix first requires one reviewed entry under `Reviewed individual ro
 | dairy | routes/feedstock | 42702840 | 2 |
 | dairy | routes/health | bcd73fc1 | 6 |
 
-| dairy | routes/input | 811c9dc5 | 0 |
 | dairy | routes/labor | d71ffc70 | 13 |
 | dairy | routes/milk | 5e0d0d5b | 6 |
 | dairy | routes/photos | 44f31bf1 | 5 |

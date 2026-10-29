@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-28 (Phase 14 current-head validation passed after the Flock upload syntax fix; handler-level audit remains open).
+Last updated: 2026-10-29 (Phase 14 route-matrix mismatches triaged; corrected inventory awaits final validation).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -223,8 +223,6 @@ The owner-reported validation from branch head `4d6215a` passed (41 focused secu
 **Phase 14 summary-boundary fix (2026-10-28):** source review found Flock scheduled/manual summary handlers reading DataStore buckets without an explicit farm ID. Updated them to scope all bucket reads to a required farm, require a single selected farm for authenticated summary endpoints, bind scheduled sends to the configured default farm, constrain manual recipients to the selected farm plus the configured allowlist, and omit recipients/statistics from the manual-send response. Added a regression assertion. Commits: 14f828b, 94825c5. Validation of this latest change is pending owner-run tests/builds; Phase 14 remains **In progress**.
 
 
-## Phase 14 route-matrix checkpoint (2026-10-28)
-**Phase 14 route-matrix correction (2026-10-29):** fixed the test-only rate-limit digit check and applied its guarded override to auth and card limiters in all three apps; corrected disposable-user emails and owner-login readiness; added method/path declaration fingerprints, including generated farm/archive routes, and adjusted public, profile-update, login, webhook and cron expectations. Added unit tests for the limiter helper. Owner Windows CMD validation is pending; Phase 14 remains In progress and Phase 15 remains Not started.
+**Owner-supplied validation on 2026-10-29 (branch `8bf5f29`; Windows CMD):** both matrix JavaScript files passed `node --check`; `npm run check-sync`, `npm run check-docs`, and `npm run check-route-permissions` passed; the focused matrix policy suite passed 4 tests; and `npm test` passed 44 files / 396 tests. The runtime matrix exercised 347 route declarations (Dairy 130, Agri 135, Flock 82) but correctly failed with five inventory mismatches: a stale zero-count `dairy routes/input` fingerprint and four protected Dairy reads whose inventory roles were too low. The source handlers use `protect, adminOnly` on `GET /api/labor/workers`, `GET /api/labor/attendance`, `GET /api/labor/advances`, and `GET /api/photos/orphans`, so their minimum role is manager.
 
-
-Added `npm run check-route-matrix` and the provisional `docs/SESSION-2-PROBLEMS.md` register. Current-head Windows validation and mismatch triage are pending; Phase 14 stays **In progress**, Phase 15 stays **Not started**.
+**Correction prepared after the reported run:** the four Dairy inventory roles are now `manager`, the helper-only zero-count fingerprint is removed, and a regression test rejects zero-count signature rows. The supplied test output predates these corrections. No passing result is claimed for the corrected route matrix or for the full current-head validation until the owner reruns the matrix and standard checks on this corrected commit. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
