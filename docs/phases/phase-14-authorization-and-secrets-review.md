@@ -492,3 +492,16 @@ Commit references: 14f828b (Flock summary farm scoping), 94825c5 (regression tes
 - Added `docs/SESSION-2-PROBLEMS.md` as a provisional register for the owner's deferred A–O and ROLE-F1 findings. The original report was not available in the current branch/project files, so unspecified item descriptions are explicitly marked not checked rather than invented. The confirmed A4 and C2 false findings and the owner-reported true identifiers are recorded with this limitation.
 - **Validation is pending.** The new matrix has not yet been run in the owner's Windows checkout, and the standard checks have not been rerun against this new commit. Do not mark Phase 14 Done until the owner runs the required command list, any matrix mismatches are triaged within the agreed scope, and confirms the results.
 - Phase 15 remains **Not started**.
+
+## Route-matrix corrections (2026-10-29; owner validation pending)
+
+The route-matrix implementation was corrected in code to address the specific false results and route coverage gaps found during review:
+
+- Disposable manager and worker accounts now always receive an example.invalid email address in all three apps.
+- Startup polling now waits for a successful disposable owner login with HTTP 200 and a token, rather than treating any response below 500 as ready. This allows Flock's seed-time 503 response without mistaking it for readiness.
+- The mufTestRateLimitMax digit validation now uses the correct digit expression. The helper accepts a positive integer override only when MEMORY_MODE=1 and NODE_ENV=test, caps it at 1,000,000, and otherwise retains each limiter's normal default.
+- Auth/setup/user/reset limiters and public-card limiters use the guarded helper in Dairy, Agri and Flock. Added unit coverage for production mode, non-memory mode, a valid test override, invalid values, zero, and the upper cap.
+- The matrix checks invalid login credentials as the designed HTTP 401 response, excludes public routes from foreign X-Farm-Id assertions, treats PUT /users/me as available to any authenticated user, and expects secret-gated webhook/cron handlers to reject requests when test secrets are unset.
+- The route inventory now records ordered method/path declaration fingerprints for route modules and direct server routes. A changed or missing fingerprint fails the matrix until the declarations are reviewed and the inventory entry is deliberately updated. Factory-generated farm and yearly-archive routes are included in the matrix signature set.
+
+**Not yet validated in the owner's Windows CMD checkout.** These are code and documentation changes only; no test, matrix, sync, docs check, or production build result is claimed here. Phase 14 remains **In progress** and Phase 15 remains **Not started**.
