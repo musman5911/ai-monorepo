@@ -37,7 +37,7 @@ describe('Phase 19 MongoDB safety preflight', () => {
     expect(result.ok).toBe(false);
     expect(result.errors.join(' ')).toContain('MUF_FINAL_DB_URI is required');
     expect(result.errors.join(' ')).toContain('MUF_FINAL_DB_BACKUP must point');
-    expect(result.errors.join(' ')).toContain('not production');
+    expect(result.errors.join(' ')).toContain('not a production database');
   });
 
   it('accepts a fresh backup and explicitly named disposable target without exposing credentials', async () => {
