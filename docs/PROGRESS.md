@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-29 (Phase 14 route-matrix mismatches triaged; corrected inventory awaits final validation).
+Last updated: 2026-10-29 (Phase 14 passed owner-supplied current-head validation and is Done for command-line scope).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -24,7 +24,7 @@ Last updated: 2026-10-29 (Phase 14 route-matrix mismatches triaged; corrected in
 | 11 | Yearly archive for old records: server | Done | [phase-11-yearly-archive-server.md](phases/phase-11-yearly-archive-server.md) |
 | 12 | Yearly archive: screens | Done | [phase-12-yearly-archive-screens.md](phases/phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Done | [phase-13-dependency-security.md](phases/phase-13-dependency-security.md) |
-| 14 | Authorization and secrets review | In progress | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
+| 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phases/phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Not started | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Not started | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
@@ -223,6 +223,32 @@ The owner-reported validation from branch head `4d6215a` passed (41 focused secu
 **Phase 14 summary-boundary fix (2026-10-28):** source review found Flock scheduled/manual summary handlers reading DataStore buckets without an explicit farm ID. Updated them to scope all bucket reads to a required farm, require a single selected farm for authenticated summary endpoints, bind scheduled sends to the configured default farm, constrain manual recipients to the selected farm plus the configured allowlist, and omit recipients/statistics from the manual-send response. Added a regression assertion. Commits: 14f828b, 94825c5. Validation of this latest change is pending owner-run tests/builds; Phase 14 remains **In progress**.
 
 
-**Owner-supplied validation on 2026-10-29 (branch `8bf5f29`; Windows CMD):** both matrix JavaScript files passed `node --check`; `npm run check-sync`, `npm run check-docs`, and `npm run check-route-permissions` passed; the focused matrix policy suite passed 4 tests; and `npm test` passed 44 files / 396 tests. The runtime matrix exercised 347 route declarations (Dairy 130, Agri 135, Flock 82) but correctly failed with five inventory mismatches: a stale zero-count `dairy routes/input` fingerprint and four protected Dairy reads whose inventory roles were too low. The source handlers use `protect, adminOnly` on `GET /api/labor/workers`, `GET /api/labor/attendance`, `GET /api/labor/advances`, and `GET /api/photos/orphans`, so their minimum role is manager.
+## Phase 14 completion validation (2026-10-29; owner-supplied Windows CMD results)
 
-**Correction prepared after the reported run:** the four Dairy inventory roles are now `manager`, the helper-only zero-count fingerprint is removed, and a regression test rejects zero-count signature rows. The supplied test output predates these corrections. No passing result is claimed for the corrected route matrix or for the full current-head validation until the owner reruns the matrix and standard checks on this corrected commit. Phase 14 remains **In progress**; Phase 15 remains **Not started**.
+The owner pulled commit `18aeb2a`, completed the documented Phase 14 validation gate, and confirmed a clean, synchronized working tree (`muf-monorepo...origin/muf-monorepo`).
+
+| Command/check | Result |
+|---|---|
+| `npm ci` | Completed successfully. npm reported 5 dependency audit findings (1 moderate, 2 high, 2 critical); investigate separately, and do not run `npm audit fix --force` blindly. |
+| `node --check tools/check-route-matrix.js` | Passed |
+| `node --check tools/route-matrix-policy.cjs` | Passed |
+| `npm test -- tests/route-matrix-policy.test.ts` | Passed: 1 file / 5 tests |
+| `npm test -- tests/public-route-security.test.ts` | Passed: 1 file / 45 tests |
+| `npm run check-route-permissions` | Passed: 46 route modules documented, imported and visibly mounted |
+| `npm run check-route-matrix` | Passed: 347 route declarations checked (Dairy 130, Agri 135, Flock 82); zero authorization mismatches |
+| `npm run check-secrets` | Passed: 652 tracked paths scanned; no tracked .env files, private keys or recognized credential patterns |
+| `npm run check-sync` | Passed: shared MUF files and invariants synchronized across all three apps |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source checks |
+| `npm run check-farms` | Passed: all three farm-scope suites and Dairy breeding-event runtime checks |
+| `npm run check-archive` | Passed: Dairy, Flock and Agri archive checks. Node printed non-fatal module-type warnings. |
+| `npm run check-docs` | Passed: all 22 phase files, statuses, sections and links consistent |
+| `npm test` | Passed: 44 files / 397 tests |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+| `git status --short --branch` | Clean; `muf-monorepo` aligned with `origin/muf-monorepo` |
+
+The corrected inventory records manager access for Dairy labor worker/attendance/advance reads and the orphan-photo listing, removes the zero-declaration helper fingerprint, and includes a regression test that rejects zero-count route signatures.
+
+**Disposition:** Phase 14 is **Done for command-line scope**. The owner-supplied tests verify the documented runtime matrix and regression suite, but do not claim real-MongoDB, browser/phone, or live-deployment verification; those remain in Phases 19–21. Five potential route-policy decisions (P14-R1 to P14-R5) remain documented in `docs/SESSION-2-PROBLEMS.md` for separate owner review and were not changed without an explicit policy decision. Public share cards remain intentionally bearer-link accessible with their documented safeguards.
+
+**Dependency note:** the `npm ci` audit warning is not a failed Phase 14 check, but the five reported vulnerabilities must be triaged before release.
