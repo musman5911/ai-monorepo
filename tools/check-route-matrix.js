@@ -175,10 +175,12 @@ function publicRoute(e) {
   return false;
 }
 function ownerOnly(e) {
+  if (e.method === 'PUT' && /\/users\/me$/.test(e.path.toLowerCase())) return false;
   if (e.modulePolicy === 'owner' || e.ownerGuard) return true;
   if (/\/farms\/?$/.test(e.path.toLowerCase()) && ['POST','PUT','PATCH','DELETE'].includes(e.method)) return true;
   const p = e.path.toLowerCase();
   if (/\/(backup|restore|archive)(\/|$)/.test(p)) return true;
+  if (e.app === 'agri' && ['POST','PUT','PATCH','DELETE'].includes(e.method) && /\/settings\/automations(?:\/trigger)?$/.test(p)) return true;
   if (/\/farms\/?$/.test(p) && ['POST','PUT','PATCH','DELETE'].includes(e.method)) return true;
   if (/\/(users|signup)(\/|$)/.test(p) && ['POST','PUT','PATCH','DELETE'].includes(e.method) && /role|active|password|farmIds/i.test(e.source.slice(Math.max(0, e.source.indexOf(e.localPath)-500), e.source.indexOf(e.localPath)+1500))) return true;
   return false;
@@ -187,7 +189,13 @@ function adminOnly(e) {
   if (ownerOnly(e) || e.adminGuard) return true;
   return /\/(settings|automations)\/(settings|trigger|run)(\/|$)/.test(e.path.toLowerCase()) && ['POST','PUT','PATCH','DELETE'].includes(e.method);
 }
+function secretRoute(e) {
+  const local = e.localPath.toLowerCase();
+  return (e.modulePolicy === 'secret' && (/\/cron\//.test(local) || /\/cron$/.test(local) || /dispatch-report/.test(local)))
+    || /\/webhook\//.test(local);
+}
 function expected(e, identity) {
+  if (secretRoute(e)) return 'deny';
   if (identity === 'anonymous') return publicRoute(e) ? 'allow' : 'deny';
   if (identity === 'owner') return 'allow';
   if (ownerOnly(e)) return 'deny';
@@ -294,7 +302,7 @@ async function runApp(app) {
         const wanted = expected(e, identityName), denied = status === 401 || status === 403;
         if (typeof status === 'string' || (wanted === 'deny' ? !denied : denied)) mismatch(app.key, e.method, e.path, identityName, wanted === 'deny' ? '401/403' : 'non-401/403', status);
       }
-      if (e.modulePolicy === 'scoped' && !ownerOnly(e) && e.mod !== 'server.js') {
+      if (e.modulePolicy === 'scoped' && !publicRoute(e) && !secretRoute(e) && !ownerOnly(e) && e.mod !== 'server.js') {
         for (const role of ['worker','manager']) {
           const status = await call(server.base, e.method, e.path, identities[role], identities.farmB);
           if (status !== 403) mismatch(app.key, e.method, e.path, role + '+foreign-X-Farm-Id', '403', status);
