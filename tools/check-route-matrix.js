@@ -123,9 +123,11 @@ function discoverRoutes(app) {
     while ((m = declaration.exec(file.source))) {
       const method = m[1].toUpperCase(), localPath = m[3];
       const tail = file.source.slice(m.index, Math.min(file.source.length, m.index + 700));
-      const line = tail.split(/\r?\n/).slice(0, 5).join(' ');
-      const ownerGuard = /ownerOnly|requireRole\(\s*['"]owner['"]\s*\)|ownerUnscoped/.test(line);
-      const adminGuard = /adminOnly|requireAdmin|requireRole\(\s*['"]admin['"]\s*\)/.test(line);
+      // Inspect only the registration line. Looking ahead into handler bodies
+      // accidentally inherits guards from neighboring declarations.
+      const declarationLine = tail.split(/\r?\n/, 1)[0];
+      const ownerGuard = /ownerOnly|requireRole\(\s*['"]owner['"]\s*\)|ownerUnscoped/.test(declarationLine);
+      const adminGuard = /adminOnly|requireAdmin|requireRole\(\s*['"]admin['"]\s*\)|userListAccess|userCreateAccess/.test(declarationLine);
       const modulePolicy = policyFor(mod);
       for (const mount of foundMounts) entries.push({
         app: app.key, mod, method, path: joinRoute(mount.prefix, localPath), localPath,
@@ -166,8 +168,8 @@ function discoverRoutes(app) {
     const p = dm[3];
     if (p.startsWith('/api/') || p === '/api') entries.push({
       app: app.key, mod: 'server.js', method: dm[1].toUpperCase(), path: p, localPath: p,
-      source: server, ownerGuard: /ownerOnly|requireRole\(\s*['"]owner['"]\s*\)/.test(server.slice(dm.index, dm.index + 600)),
-      adminGuard: /adminOnly|requireAdmin/.test(server.slice(dm.index, dm.index + 600)), modulePolicy: 'server'
+      source: server, ownerGuard: /ownerOnly|requireRole\(\s*['"]owner['"]\s*\)/.test(server.slice(dm.index).split(/\r?\n/, 1)[0]),
+      adminGuard: /adminOnly|requireAdmin/.test(server.slice(dm.index).split(/\r?\n/, 1)[0]), modulePolicy: 'server'
     });
   }
   const signatureInventory = routeSignatureInventory();
@@ -197,10 +199,10 @@ function discoverRoutes(app) {
 function publicRoute(e) {
   if (e.modulePolicy === 'public') return true;
   const p = e.path.toLowerCase(), local = e.localPath.toLowerCase();
-  if (e.mod.endsWith('/auth') && /\/(login|logout|setup|register|forgot-password|reset-password|request-reset|verify-reset|check-setup|health|check)$/.test(local)) return true;
+  if (e.mod.endsWith('/auth') && /\/(login|logout|setup|register|forgot-password|reset-password|request-reset|verify-reset|check-setup|health|check|mail-status|can-signup)$/.test(local)) return true;
   if (e.method === 'GET' && (/\/health$|\/healthz$|\/__replit_health_check$/.test(p))) return true;
+  if (e.method === 'GET' && e.app === 'dairy' && /\/settings\/location$/.test(p)) return true;
   if (e.method === 'GET' && e.app === 'agri' && /\/(settings\/location|automations\/settings\/location)$/.test(p)) return true;
-  if (e.mod === 'server.js' && /farm-summary$/.test(p) && !p.includes('super-admin')) return true;
   return false;
 }
 function ownerOnly(e) {
@@ -211,21 +213,46 @@ function ownerOnly(e) {
   if (/\/(backup|restore|archive)(\/|$)/.test(p)) return true;
   if (e.app === 'agri' && ['POST','PUT','PATCH','DELETE'].includes(e.method) && /\/settings\/automations(?:\/trigger)?$/.test(p)) return true;
   if (/\/farms\/?$/.test(p) && ['POST','PUT','PATCH','DELETE'].includes(e.method)) return true;
-  if (/\/(users|signup)(\/|$)/.test(p) && ['PUT','PATCH','DELETE'].includes(e.method) && /role|active|password|farmIds/i.test(e.source.slice(Math.max(0, e.source.indexOf(e.localPath)-500), e.source.indexOf(e.localPath)+1500))) return true;
+  // User-management endpoints are not uniformly owner-only: managers can
+  // manage workers in assigned farms; handler logic reserves privileged changes
+  // for owners. Do not infer a global owner guard from nearby code.
   return false;
 }
 function adminOnly(e) {
   if (ownerOnly(e) || e.adminGuard) return true;
+  // Agri's change-password handler limits password updates to full roles even
+  // though that check lives inside the handler rather than its route header.
+  if (e.app === 'agri' && e.method === 'POST' && e.localPath.toLowerCase() === '/change-password') return true;
   return /\/(settings|automations)\/(settings|trigger|run)(\/|$)/.test(e.path.toLowerCase()) && ['POST','PUT','PATCH','DELETE'].includes(e.method);
+}
+function webhookRoute(e) {
+  return /\/webhook\//.test(e.localPath.toLowerCase());
+}
+function closedSignupRoute(e) {
+  const local = e.localPath.toLowerCase();
+  return e.method === 'POST' && e.mod.endsWith('/auth')
+    && ((e.app === 'agri' && local === '/signup')
+      || (e.app === 'flock' && /^\/signup\/(request-code|verify)$/.test(local)));
 }
 function secretRoute(e) {
   const local = e.localPath.toLowerCase();
   return /\/cron(?:\/|$)/.test(local)
-    || /\/webhook\//.test(local)
-    || (e.modulePolicy === 'secret' && /dispatch-report/.test(local));
+    || webhookRoute(e)
+    || (e.modulePolicy === 'secret' && /dispatch-report/.test(local))
+    || (e.mod === 'server.js' && /\/api\/farm-summary$/.test(e.path.toLowerCase()) && !/super-admin/.test(e.path.toLowerCase()));
+}
+function deniedStatus(e, status) {
+  if (status === 401 || status === 403) return true;
+  // Secret-protected endpoints deliberately fail closed when a key is absent
+  // or not configured; 404/503 conceal disabled endpoints and 429 is throttling.
+  if (secretRoute(e) && [404, 429, 503].includes(status)) return true;
+  // The matrix seeds an owner first, so first-owner signup is expected to be
+  // closed. Its empty probe body may be rejected with a different 4xx first.
+  if (closedSignupRoute(e) && Number.isInteger(status) && status >= 400 && status < 500) return true;
+  return false;
 }
 function expected(e, identity) {
-  if (secretRoute(e)) return 'deny';
+  if (closedSignupRoute(e) || secretRoute(e)) return 'deny';
   if (identity === 'anonymous') return publicRoute(e) ? 'allow' : 'deny';
   if (identity === 'owner') return 'allow';
   if (ownerOnly(e)) return 'deny';
@@ -346,6 +373,13 @@ async function runApp(app) {
     }
     for (const e of discovered.entries) {
       if (e.modulePolicy === 'missing') { mismatch(app.key, e.method, e.path, 'inventory', 'documented route policy', 'missing'); continue; }
+      // Telegram intentionally ACKs invalid/missing webhook secrets with HTTP
+      // 200 to stop retries. Guard-before-processing is asserted separately.
+      if (webhookRoute(e)) {
+        const status = await call(server.base, e.method, e.path, identities.anonymous);
+        if (status !== 200) mismatch(app.key, e.method, e.path, 'anonymous+invalid-secret', '200 no-op acknowledgement', status);
+        continue;
+      }
       const isLoginRoute = e.method === 'POST' && /\/login$/.test(e.localPath.toLowerCase());
       if (isLoginRoute) {
         const status = await call(server.base, e.method, e.path, identities.anonymous);
@@ -354,10 +388,10 @@ async function runApp(app) {
       }
       for (const identityName of ['anonymous','worker','manager','owner']) {
         const status = await call(server.base, e.method, e.path, identities[identityName]);
-        const wanted = expected(e, identityName), denied = status === 401 || status === 403;
-        if (typeof status === 'string' || (wanted === 'deny' ? !denied : denied)) mismatch(app.key, e.method, e.path, identityName, wanted === 'deny' ? '401/403' : 'non-401/403', status);
+        const wanted = expected(e, identityName), denied = deniedStatus(e, status);
+        if (typeof status === 'string' || (wanted === 'deny' ? !denied : denied)) mismatch(app.key, e.method, e.path, identityName, wanted === 'deny' ? 'denial response' : 'non-auth-denial response', status);
       }
-      if (e.modulePolicy === 'scoped' && !publicRoute(e) && !secretRoute(e) && !ownerOnly(e) && e.mod !== 'server.js') {
+      if (e.modulePolicy === 'scoped' && !publicRoute(e) && !secretRoute(e) && !closedSignupRoute(e) && !ownerOnly(e) && e.mod !== 'server.js') {
         for (const role of ['worker','manager']) {
           const status = await call(server.base, e.method, e.path, identities[role], identities.farmB);
           if (status !== 403) mismatch(app.key, e.method, e.path, role + '+foreign-X-Farm-Id', '403', status);

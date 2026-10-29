@@ -15,7 +15,7 @@ This inventory covers every route module under the three backend `routes/` direc
 
 | Route module | Baseline policy | Notes |
 |---|---|---|
-| `routes/auth.js` | Mixed public/authenticated | Login, registration/setup and recovery flows are public only where explicitly intended; user-management operations require owner authority. |
+| `routes/auth.js` | Mixed public/authenticated | Login, setup and recovery flows are public only where intended. Owners control role and privileged account changes; managers may manage workers within their assigned farms. |
 | `routes/cards.js` | Public bearer link | Share-card payload is disclosed to anyone with the link. No-store, noindex, no-referrer and per-router rate limit are defense-in-depth, not access control. |
 | `routes/settings.js` | Mixed public/authenticated | `GET /location` is an explicit public read for the weather widget; `PUT /location` is owner-only because Dairy stores this location in global `Meta`, not farm-scoped settings. |
 | `routes/archive.js` | Owner-only | Archive/export/delete/restore are destructive or sensitive operations. |
@@ -28,7 +28,7 @@ This inventory covers every route module under the three backend `routes/` direc
 
 | Route module | Baseline policy | Notes |
 |---|---|---|
-| `routes/auth.js` | Mixed public/authenticated | Public authentication/recovery endpoints only; user and role management requires owner authority. |
+| `routes/auth.js` | Mixed public/authenticated | Public authentication/recovery endpoints only where intended. Managers may list users and create workers within role limits; editing, deletion and role management require owner authority. |
 | `routes/cards.js` | Public bearer link | Anyone with the share URL can read the card payload. Privacy headers and rate limits do not make it private or revocable. |
 | `routes/settings.js` | Authenticated + farm scope | `GET /location` and `PUT /location` both require authentication and use the selected farm's `DataStore` record; location is farm-scoped in Flock. |
 | `routes/archive.js`, `routes/backup.js` | Owner-only | Archive and backup actions are sensitive/destructive. |
@@ -41,7 +41,7 @@ This inventory covers every route module under the three backend `routes/` direc
 
 | Route module | Baseline policy | Notes |
 |---|---|---|
-| `routes/auth.js` | Mixed public/authenticated | Public authentication/recovery endpoints only; user and role management requires owner authority. Owner lifecycle guards count active owners only, so inactive accounts do not falsely satisfy the last-active-owner safeguard. |
+| `routes/auth.js` | Mixed public/authenticated | Public authentication/recovery endpoints only where intended. Managers may manage workers within their assigned farms; role changes and privileged account changes require owner authority. Owner lifecycle guards count active owners only. |
 | `routes/cards.js` | Public bearer link | Anyone with the share URL can read the card payload. Privacy headers and rate limits do not make it private or revocable. |
 | `routes/farms.js` | Owner-only for mutations; scoped reads | Farm administration is owner-only; assigned-farm visibility applies to non-owners. |
 | `routes/archive.js`, `routes/backup.js` | Owner-only | Archive and backup actions are sensitive/destructive. |
@@ -446,7 +446,7 @@ The route matrix first requires one reviewed entry under `Reviewed individual ro
 | dairy | routes/farms | 5eca6f03 | 6 |
 | dairy | routes/feedstock | 42702840 | 2 |
 | dairy | routes/health | bcd73fc1 | 6 |
-| dairy | routes/input | 811c9dc5 | 0 |
+
 | dairy | routes/labor | d71ffc70 | 13 |
 | dairy | routes/milk | 5e0d0d5b | 6 |
 | dairy | routes/photos | 44f31bf1 | 5 |
@@ -473,9 +473,9 @@ The route matrix first requires one reviewed entry under `Reviewed individual ro
 
 ## Runtime matrix check
 
-`npm run check-route-matrix` starts disposable memory-mode servers and compares route responses for anonymous, worker, manager and owner identities. The inventory's module policy is the baseline, with documented public exceptions and owner-only operations taking precedence. This runtime check is a guard against authorization regressions, not a proof of every possible business-data invariant. Any mismatches must be triaged against the handler and the policy; under Phase 14 scope, only confirmed cross-farm data disclosures and unauthenticated writes are fixed immediately. Other findings go to [SESSION-2-PROBLEMS.md](SESSION-2-PROBLEMS.md).
+`npm run check-route-matrix` starts disposable memory-mode servers and compares route responses for anonymous, worker, manager and owner identities. It requires reviewed per-route entries and module fingerprints before the runtime matrix runs. The inventory's module policy is the baseline, with documented public exceptions and owner-only operations taking precedence. Telegram webhook handlers deliberately return a 200 acknowledgement even for invalid secrets to prevent provider retries; source-level regression tests verify that the timing-safe secret gate runs before message processing. Missing cron secrets may return 503, and disabled cross-farm summary endpoints may return 404; the matrix treats these as denials only for the corresponding secret-gated routes. The matrix is a guard against authorization regressions, not proof of every business-data invariant. Any mismatches must be triaged against handlers and policy; under Phase 14 scope, only confirmed cross-farm data disclosures and unauthenticated writes are fixed immediately. Other findings go to [SESSION-2-PROBLEMS.md](SESSION-2-PROBLEMS.md).
 
 
 ## Route-matrix test limiter
 
-The disposable route matrix launches each backend with `MEMORY_MODE=1`, `NODE_ENV=test`, and `MUF_TEST_RATE_LIMIT_MAX=100000`. The override is accepted only when memory mode and test environment are both active; otherwise it is ignored and the configured rate-limit ceiling remains in force. The positive integer is capped at 1,000,000. The Flock server-level login limiter and the auth and public-card route limiters in all three apps use this helper. Do not set this variable in deployed environments. The matrix sends deliberately invalid login credentials (401 is expected), does not send `X-Farm-Id` to public routes, and treats secret-gated webhook/cron handlers separately from ordinary farm-scoped routes.
+The disposable route matrix launches each backend with `MEMORY_MODE=1`, `NODE_ENV=test`, and `MUF_TEST_RATE_LIMIT_MAX=100000`. The override is accepted only when memory mode and test environment are both active; otherwise it is ignored and the configured rate-limit ceiling remains in force. The positive integer is capped at 1,000,000. The Flock server-level login limiter, Agri's Telegram cron limiter, and all auth and public-card route limiters in the three apps use this helper. Do not set this variable in deployed environments. The matrix sends deliberately invalid login credentials (401 is expected), does not send `X-Farm-Id` to public routes, and treats secret-gated webhook/cron handlers separately from ordinary farm-scoped routes.

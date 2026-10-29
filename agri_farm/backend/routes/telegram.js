@@ -13,7 +13,7 @@ import { TelegramMeta, User, Laborer, Finance, Attendance, Crop, Farm } from '..
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
-import { MUF_ENV } from '../muf-env.mjs';
+import { MUF_ENV, mufTestRateLimitMax } from '../muf-env.mjs';
 import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext, mufIsFullRole, mufIsOwner } from '../muf-farms.mjs';
 import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
 
@@ -333,7 +333,7 @@ router.post('/send-summary', protect, requireAdmin, asyncHandler(async (_req, re
 
 // cron-job.org: GET /telegram/cron?key=<CRON_SECRET> (evening ping)
 const cronRateHandler = (_req, res) => res.status(429).json({ detail: 'Too many request attempts. Please wait a few minutes before trying again.' });
-const cronLimiter = rateLimit({ windowMs: 5 * 60 * 1000, max: 10, standardHeaders: true, legacyHeaders: false, handler: cronRateHandler });
+const cronLimiter = rateLimit({ windowMs: 5 * 60 * 1000, max: mufTestRateLimitMax(10), standardHeaders: true, legacyHeaders: false, handler: cronRateHandler });
 
 async function telegramCron(req, res) {
   try {

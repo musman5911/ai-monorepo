@@ -12,7 +12,7 @@ describe('public share-card privacy controls', () => {
       expect(cards).toContain("Cache-Control', 'no-store, no-cache, must-revalidate, private'");
       expect(cards).toContain("X-Robots-Tag', 'noindex, nofollow, noarchive'");
       expect(cards).toContain("Referrer-Policy', 'no-referrer'");
-      expect(cards).toContain('max: 60');
+      expect(cards).toContain('max: mufTestRateLimitMax(60)');
     });
   }
 });
@@ -105,6 +105,32 @@ describe('Telegram secret validation', () => {
     expect(routes).toContain("req.headers['x-cron-key'] || req.query.key || ''");
     expect(routes).toContain('timingSafeSecretEqual(provided, cronSecret)');
     expect(routes).not.toContain('provided !== cronSecret');
+  });
+});
+
+describe('Telegram webhook and limiter runtime guards', () => {
+  it('uses the test-only limiter override for Agri Telegram cron requests', () => {
+    const routes = source('agri_farm/backend/routes/telegram.js');
+    expect(routes).toContain("import { MUF_ENV, mufTestRateLimitMax } from '../muf-env.mjs'");
+    expect(routes).toContain('max: mufTestRateLimitMax(10)');
+  });
+
+  it('checks webhook secrets before processing Telegram updates', () => {
+    for (const app of ['dairy_farm', 'flock_farm']) {
+      const routes = source(`${app}/backend/routes/telegram.js`);
+      const webhook = routes.split("router.post('/webhook/:secret'")[1] || '';
+      const gate = webhook.indexOf("if (!WH_SECRET() || !secretsMatch(req.params.secret, WH_SECRET())) return;");
+      const processing = webhook.indexOf('const msg = req.body && req.body.message;');
+      expect(gate).toBeGreaterThanOrEqual(0);
+      expect(processing).toBeGreaterThan(gate);
+    }
+
+    const agri = source('agri_farm/backend/routes/telegram.js');
+    const webhook = agri.split("router.post('/webhook/:secret'")[1] || '';
+    const gate = webhook.indexOf('if (!expected || !timingSafeSecretEqual(req.params.secret, expected))');
+    const processing = webhook.indexOf('const m = await muf();');
+    expect(gate).toBeGreaterThanOrEqual(0);
+    expect(processing).toBeGreaterThan(gate);
   });
 });
 
