@@ -1,6 +1,6 @@
 # Phase 18: Documentation and handoff
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -53,13 +53,13 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] Root/docs README pages are distinct; root and all three app READMEs are refreshed and stale `docs/AUDIT.md` links removed.
 - [x] Swept all 22 phase records for status/index agreement, stale validation reminders and checklist/evidence mismatches. Corrected Phase 2, 3, 8, 10 and 13 records; future final-testing phases remain unstarted, and the Phase 10 warning state remains explicitly unverified.
 - [x] `docs/DEVELOPER_START.md` documents package setup, validation, build/start order and repository safety rules.
-- [x] `tools/check-guide-commands.js` exists and passed under `npm run check-docs` on GitHub Actions run 40846510097.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
+- [x] `tools/check-guide-commands.js` exists and passed under `npm run check-docs` on the latest GitHub Actions run 40847463200.
+- [x] The current-head Windows documentation check, full test suite, all three production builds, and automatic CI quick checks passed; real results are recorded in `docs/PROGRESS.md`.
 - [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated with current Phase 17/18 status and validation notes.
 
 ## Implementation update (2026-10-29)
 
-Added the Owner/Manager/Worker user guide and developer-start guide. `docs/README.md` is now a documentation index instead of a duplicate of the root README. The root and three app README pages were refreshed, stale links to the nonexistent `docs/AUDIT.md` were removed, and the root `check-docs` command is being extended to validate executable guide command blocks against package manifests and repository helper files. The guide-command checker and final validation gate still need to pass before this phase can be marked Done.
+Added the Owner/Manager/Worker user guide and developer-start guide. `docs/README.md` is now a documentation index instead of a duplicate of the root README. The root and three app README pages were refreshed, stale links to the nonexistent `docs/AUDIT.md` were removed, and `npm run check-docs` now validates executable guide command blocks against package manifests and repository helper files. The guide-command checker, current-head Windows test/build gate, and automatic CI quick checks have passed. Phase 18 is Done for command-line scope; live database, browser/phone, and deployment checks remain in Phases 19–21.
 
 ## Initial findings (2026-10-29)
 
@@ -68,9 +68,19 @@ Added the Owner/Manager/Worker user guide and developer-start guide. `docs/READM
 - `docs/FARMS_AND_ROLES.md` describes role boundaries but does not yet give concise, practical role-specific entry instructions.
 - The root `check-docs` script validates phase/index/link consistency but does not yet check commands named in quick-start/user/developer guides.
 
-## Current CI validation (2026-10-29)
+## Current-head validation (2026-10-29)
 
-GitHub Actions run [40846510097](https://github.com/musman5911/ai-monorepo/actions/runs/40846510097) passed on commit `9783ab0afaae0b80145c7cde6e5b319db0f8bbbd`: 47 test files / 412 tests; check-sync, check-ui, check-workbench (23 checks), check-farms, phase-document validation, guide-command validation, and production dependency audit across all seven package sets. The production audit reported zero high/critical vulnerabilities in those package sets. After correcting historical phase records, Actions run [40847197129](https://github.com/musman5911/ai-monorepo/actions/runs/40847197129) also passed: 47 files / 412 tests, sync/UI/workbench/farm/docs/guide-command/audit checks all green. This CI workflow does not run the three production builds; the owner previously supplied successful Windows builds on the unchanged app source in commit `17c72c3`. Current-head Windows check-docs/test validation and a current-head Windows build are still requested before Phase 18 closes.
+**Owner-supplied Windows CMD results (branch `muf-monorepo`, after pulling commit `5f22777266fcd08274431ab636c5fe2c5c133f8b`):**
+
+| Command | Result |
+|---|---|
+| `npm run check-docs` | Passed: all 22 phase records, status/index agreement, links, and documented quick-start commands resolved. |
+| `npm test` | Passed: 47 test files / 412 tests; zero failures. |
+| `tools\\build-all.bat` | Passed: Dairy, Flock, and Agri production builds all reported OK. |
+
+**GitHub Actions:** run [40847463200](https://github.com/musman5911/ai-monorepo/actions/runs/40847463200) passed on commit `5f22777266fcd08274431ab636c5fe2c5c133f8b` with 47 test files / 412 tests and all configured quick checks: shared MUF sync, UI safety, workbench source checks (23 checks), farm scope, phase docs, guide-command validation, and production dependency audit across all seven package sets. The audit reported zero high/critical production findings. This CI workflow does not build the three frontend apps; the owner-supplied Windows build gate above did.
+
+These are current-head command-line results supplied by the owner. `npm ci` and optional `npm run check-workbench-runtime` were not run in this final Windows gate. No real MongoDB, live browser/phone, or deployment verification is claimed; those remain in Phases 19–21. Phase 10's direct-build warning absence remains explicitly unverified.
 
 ## Rules for whoever works on this phase
 

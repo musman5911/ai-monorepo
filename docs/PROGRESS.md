@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-29 (Phase 17 complete for command-line scope; Phase 18 documentation/handoff started).
+Last updated: 2026-10-29 (Phases 17 and 18 complete for command-line scope; final testing Phases 19–21 remain).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -28,7 +28,7 @@ Last updated: 2026-10-29 (Phase 17 complete for command-line scope; Phase 18 doc
 | 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phases/phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Done | [phase-16-mu-farms-public-shop.md](phases/phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Done | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
-| 18 | Documentation and handoff | In progress | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
+| 18 | Documentation and handoff | Done | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phases/phase-21-final-testing-live-and-signoff.md) |
@@ -355,13 +355,28 @@ Version-update pull requests are disabled via `.github/dependabot.yml`. The push
 
 ## Phase 18 start (2026-10-29)
 
-Phase 18, Documentation and handoff, is **In progress**. Initial review found outdated instructions in the monorepo README, a duplicate copy in `docs/README.md`, stale `docs/AUDIT.md` links in all three app READMEs, missing practical role workflows, and no guard to validate commands printed in guides. This phase will repair docs and add the guide-command check without changing application behavior.
+Phase 18, Documentation and handoff, began with outdated monorepo/app README instructions and links, missing practical role workflows, and no guard for commands printed in guides. The review findings were addressed without changing application behavior; see the completion record below.
 
 
-**Phase 18 documentation pass (2026-10-29):** added `docs/USER_GUIDE.md` for role boundaries and Dairy milk, Flock egg/batch/finance, and Agri finance entry instructions; added `docs/DEVELOPER_START.md`; turned `docs/README.md` into a documentation index; refreshed the root and all three app READMEs; removed stale links to the nonexistent `docs/AUDIT.md`; and extended `npm run check-docs` to run `tools/check-guide-commands.js`. The checker validates commands inside executable quick-start blocks against the current package scripts, lockfiles, and repository helper files. Phase 18 remains In progress until its new guard passes in CI/current-head checkout, the historical phase files are reviewed against the delivered scope, and the documented test/build gate passes.
+**Phase 18 documentation pass (2026-10-29):** added `docs/USER_GUIDE.md` for role boundaries and Dairy milk, Flock egg/batch/finance, and Agri finance entry instructions; added `docs/DEVELOPER_START.md`; turned `docs/README.md` into a documentation index; refreshed the root and all three app READMEs; removed stale links to the nonexistent `docs/AUDIT.md`; and extended `npm run check-docs` to run `tools/check-guide-commands.js`. The checker validates commands inside executable quick-start blocks against the current package scripts, lockfiles, and repository helper files. At this historical checkpoint, the current-head validation gate and phase-record sweep were still pending; both were subsequently completed as recorded below.
 
 
-**Phase 18 current CI validation (2026-10-29):** GitHub Actions run [40846510097](https://github.com/musman5911/ai-monorepo/actions/runs/40846510097) passed on commit `9783ab0afaae0b80145c7cde6e5b319db0f8bbbd`: 47 test files / 412 tests; sync, UI, workbench (23 checks), farm, phase-doc, guide-command and audit checks passed. The production dependency audit reported zero high/critical vulnerabilities in the seven package sets. The owner-supplied Windows build-all result predates the latest documentation-only commit; current-head Windows validation remains pending. The Phase 18 audit also corrected stale checklist/reminder text in Phases 2, 3, 8, 10 and 13. Phase 10's direct build warning absence remains explicitly unverified.
+**Phase 18 current CI validation (2026-10-29):** GitHub Actions run [40846510097](https://github.com/musman5911/ai-monorepo/actions/runs/40846510097) passed on commit `9783ab0afaae0b80145c7cde6e5b319db0f8bbbd`: 47 test files / 412 tests; sync, UI, workbench (23 checks), farm, phase-doc, guide-command and audit checks passed. The production dependency audit reported zero high/critical vulnerabilities in the seven package sets. The owner-supplied Windows build-all result at this earlier checkpoint predated the latest documentation-only commit; current-head Windows validation subsequently passed as recorded in the completion entry below. The Phase 18 audit also corrected stale checklist/reminder text in Phases 2, 3, 8, 10 and 13. Phase 10's direct build warning absence remains explicitly unverified.
 
 
-**Phase 18 historical-record sweep and current CI (2026-10-29):** reviewed all 22 phase records for status/index alignment, checklist/evidence mismatches, and stale validation reminders. Corrected Phase 2, 3, 8, 10 and 13. Phase 10's missing direct-build warning evidence remains explicitly unverified; Phase 13's completion record now distinguishes the final passing tests/audit/build gate from intermediate per-package checks that were not separately captured. Latest CI run [40847197129](https://github.com/musman5911/ai-monorepo/actions/runs/40847197129) passed: 47 files / 412 tests; shared MUF sync, UI safety, workbench (23 checks), farm checks, phase docs, guide-command validation, and production audit across all seven package sets. The owner still needs to run the short current-head Windows gate before Phase 18 closes.
+**Phase 18 historical-record sweep and current CI (2026-10-29):** reviewed all 22 phase records for status/index alignment, checklist/evidence mismatches, and stale validation reminders. Corrected Phase 2, 3, 8, 10 and 13. Phase 10's missing direct-build warning evidence remains explicitly unverified; Phase 13's completion record now distinguishes the final passing tests/audit/build gate from intermediate per-package checks that were not separately captured. Latest CI run [40847197129](https://github.com/musman5911/ai-monorepo/actions/runs/40847197129) passed: 47 files / 412 tests; shared MUF sync, UI safety, workbench (23 checks), farm checks, phase docs, guide-command validation, and production audit across all seven package sets. At this historical checkpoint, the current-head Windows gate was still pending; it subsequently passed as recorded in the completion entry below.
+
+## Phase 18 completion (2026-10-29; owner-supplied Windows CMD output)
+
+Phase 18, Documentation and handoff, is **Done for command-line scope**. On the current branch head `5f22777266fcd08274431ab636c5fe2c5c133f8b`, the owner reported:
+
+| Command/check | Result |
+|---|---|
+| `npm run check-docs` | Passed: all phase/status/index checks and documented guide commands resolved. |
+| `npm test` | Passed: 47 test files / 412 tests, zero failures. |
+| `tools\\build-all.bat` | Passed: Dairy, Flock, and Agri production builds all reported successful. |
+
+Latest automatic CI run [40847463200](https://github.com/musman5911/ai-monorepo/actions/runs/40847463200) passed on the same head: 47 files / 412 tests, shared sync, UI, workbench (23 checks), farm-scope, phase-doc, guide-command and production audit checks all passed. The audit reported zero high/critical production dependency findings across seven package sets. This CI workflow does not perform the three frontend builds; those are supported by the owner-supplied Windows output above.
+
+The Phase 18 sweep reviewed all 22 phase records and corrected stale checklist/reminder text in Phases 2, 3, 8, 10 and 13. Phase 10's direct-build warning absence remains explicitly unverified. Results are owner-supplied Windows output, not commands independently run in this editing session. No real MongoDB, browser/phone or deployed-site verification is claimed; those remain in Phases 19–21.
+
