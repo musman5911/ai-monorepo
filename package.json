@@ -18,7 +18,8 @@
     "check-secrets": "node tools/check-secrets.js",
     "check-route-permissions": "node tools/check-route-permissions.js",
     "check-route-matrix": "node tools/check-route-matrix.js",
-    "check-shop": "vitest run tests/shop-isolation.test.ts"
+    "check-shop": "vitest run tests/shop-isolation.test.ts",
+    "check-final-db": "vitest run tests/final-db-preflight.test.ts"
   },
   "devDependencies": {
     "vitest": "^3.0.0"

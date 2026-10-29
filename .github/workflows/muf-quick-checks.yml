@@ -53,6 +53,9 @@ jobs:
       - name: Run root test suite (includes workflow contract test)
         run: npm test
 
+      - name: Run Phase 19 database safety tests
+        run: npm run check-final-db
+
       - name: Check shared MUF parity
         run: npm run check-sync
 

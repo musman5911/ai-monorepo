@@ -22,6 +22,7 @@ describe('GitHub Actions quick-check workflow contract', () => {
       'npm ci',
       'npm ci',
       'npm test',
+      'npm run check-final-db',
       'npm run check-sync',
       'npm run check-ui',
       'npm run check-workbench',

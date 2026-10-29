@@ -35,7 +35,7 @@ Everything that needs a real MongoDB is tested on disposable copies of your back
 
 ## New command-line check
 
-Use `node tools/final-db-preflight.mjs`, `node tools/final-db-migrate.mjs`, and the read-only `node tools/final-db-inspect.mjs` for repeatable safety, migration, index/query-plan and database-size checks; keep every later database-test script under `tools/final-db-*.mjs`.
+`npm run check-final-db` runs the offline regression tests for the Phase 19 safety gate and migration wrapper. It must pass before live operations, but it does not connect to MongoDB and is not evidence that a real database test passed. Use `node tools/final-db-preflight.mjs`, `node tools/final-db-migrate.mjs`, and the read-only `node tools/final-db-inspect.mjs` for repeatable safety, migration, index/query-plan and database-size checks; keep every later database-test script under `tools/final-db-*.mjs`.
 
 ## Safety gate and repeatable migration commands
 
@@ -71,6 +71,7 @@ Do not paste a connection URI, username, password, backup contents, or real farm
 ```
 npm ci
 npm test
+npm run check-final-db
 npm run check-sync
 npm run check-ui
 npm run check-workbench

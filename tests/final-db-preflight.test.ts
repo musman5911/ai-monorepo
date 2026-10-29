@@ -2,8 +2,8 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mkdtempSync, rmSync, writeFileSync, utimesSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import path from 'node:path';
-import { evaluateFinalDbPreflight } from '../tools/final-db-preflight.mjs';
-import { parseFinalDbMigrationMode } from '../tools/final-db-migrate.mjs';
+import { evaluateFinalDbPreflight, formatFinalDbPreflight } from '../tools/final-db-preflight.mjs';
+import { parseFinalDbMigrationMode, runFinalDbMigration } from '../tools/final-db-migrate.mjs';
 import { requiredIndexFailures } from '../tools/final-db-inspect.mjs';
 
 let folder;
@@ -60,7 +60,38 @@ describe('Phase 19 MongoDB safety preflight', () => {
     expect(result.errors.join(' ')).toContain('dedicated name');
   });
 
-  it('rejects a host mismatch before any MongoDB operation', async () => {
+  it('never falls back to the ordinary app MONGO_URI when the explicit Phase 19 URI is missing', async () => {
+    const result = await evaluateFinalDbPreflight(validEnv({
+      MUF_FINAL_DB_URI: '',
+      MONGO_URI: 'mongodb://production-host.example:27017/production'
+    }));
+    expect(result.ok).toBe(false);
+    expect(result.errors.join(' ')).toContain('MUF_FINAL_DB_URI is required');
+  });
+
+  it('rejects a database name belonging to a different app', async () => {
+    const result = await evaluateFinalDbPreflight(validEnv({
+      MUF_FINAL_DB_APP: 'dairy',
+      MUF_FINAL_DB_URI: 'mongodb://test-user:top-secret@localhost:27017/muf_phase19_agri_copy1'
+    }));
+    expect(result.ok).toBe(false);
+    expect(result.errors.join(' ')).toContain('dedicated name');
+  });
+
+  it('keeps both success and failure diagnostics free of connection credentials', async () => {
+    const result = await evaluateFinalDbPreflight(validEnv());
+    const output = formatFinalDbPreflight(result);
+    expect(result.ok).toBe(true);
+    expect(output).not.toContain('top-secret');
+    expect(output).not.toContain('test-user');
+    expect(output).toContain('Target host: localhost');
+    const failed = await evaluateFinalDbPreflight(validEnv({ MUF_FINAL_DB_URI: '' }));
+    const failedOutput = formatFinalDbPreflight(failed);
+    expect(failedOutput).not.toContain('top-secret');
+    expect(failedOutput).not.toContain('test-user');
+  });
+
+  it('rejects a host mismatch before any MongoDB operation', async () =>
     const result = await evaluateFinalDbPreflight(validEnv({
       MUF_FINAL_DB_EXPECTED_HOST: 'another-host.example'
     }));
@@ -96,6 +127,16 @@ describe('Phase 19 MongoDB safety preflight', () => {
 });
 
 describe('Phase 19 migration wrapper safety contract', () => {
+  it('refuses to run before restore confirmation without changing process connection settings', async () => {
+    const previousUri = process.env.MONGO_URI;
+    const previousArgv = process.argv;
+    const result = await runFinalDbMigration(validEnv({ MUF_FINAL_DB_RESTORE_VERIFIED: 'NO' }), ['--apply']);
+    expect(result.ok).toBe(false);
+    expect(result.errors.join(' ')).toContain('restoring this backup');
+    expect(process.env.MONGO_URI).toBe(previousUri);
+    expect(process.argv).toBe(previousArgv);
+  });
+
   it('defaults to dry-run and only applies when explicitly requested', () => {
     expect(parseFinalDbMigrationMode([])).toEqual({ apply: false });
     expect(parseFinalDbMigrationMode(['--dry-run'])).toEqual({ apply: false });
