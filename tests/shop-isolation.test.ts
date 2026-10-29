@@ -40,8 +40,8 @@ describe('MU Farms public shop isolation', () => {
 
   it('reads public product endpoints without sending credentials', () => {
     expect(component).toContain('/products/public');
-    expect(component).toContain("credentials: 'omit'");
-    expect(component).toContain("cache: 'no-store'");
+    expect(component).toMatch(/credentials\s*:\s*['"]omit['"]/);
+    expect(component).toMatch(/cache\s*:\s*['"]no-store['"]/);
     expect(component).not.toMatch(/\/api\/(?:admin|auth|buyers|users)\b/i);
     expect(component).not.toMatch(/\b(?:getToken|Authorization|localStorage)\b/);
   });
