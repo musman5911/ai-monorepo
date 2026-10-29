@@ -199,7 +199,7 @@ function ownerOnly(e) {
   if (/\/(backup|restore|archive)(\/|$)/.test(p)) return true;
   if (e.app === 'agri' && ['POST','PUT','PATCH','DELETE'].includes(e.method) && /\/settings\/automations(?:\/trigger)?$/.test(p)) return true;
   if (/\/farms\/?$/.test(p) && ['POST','PUT','PATCH','DELETE'].includes(e.method)) return true;
-  if (/\/(users|signup)(\/|$)/.test(p) && ['POST','PUT','PATCH','DELETE'].includes(e.method) && /role|active|password|farmIds/i.test(e.source.slice(Math.max(0, e.source.indexOf(e.localPath)-500), e.source.indexOf(e.localPath)+1500))) return true;
+  if (/\/(users|signup)(\/|$)/.test(p) && ['PUT','PATCH','DELETE'].includes(e.method) && /role|active|password|farmIds/i.test(e.source.slice(Math.max(0, e.source.indexOf(e.localPath)-500), e.source.indexOf(e.localPath)+1500))) return true;
   return false;
 }
 function adminOnly(e) {
