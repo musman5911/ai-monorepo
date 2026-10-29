@@ -1,6 +1,6 @@
 # Phase 16: MU Farms: public shop
 
-**Status:** In progress
+**Status:** Done
 
 ## Goal
 
@@ -45,6 +45,7 @@ The shop calls only the published-only public read endpoint, sends no auth token
 
 ```
 npm ci
+npm run check-shop
 npm test
 npm run check-sync
 npm run check-ui
@@ -57,13 +58,32 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] A decision, written first in this file: where the shop lives (a clearly separated public section inside one app, or a free-subdomain site), with the security reasons.
-- [ ] A simple shop with Crops, Dairy and Poultry sections reading the public endpoints.
-- [ ] An "Order on WhatsApp" button with the product details filled in.
-- [ ] No admin or private data reachable from the shop.
-- [ ] The new command-line check above exists and passes.
-- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
-- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+- [x] Location decision documented: separate lazy-loaded `/shop` route in each existing frontend, with public-only data flow and deployment-configured cross-app feeds.
+- [x] Shop provides Crops, Dairy and Poultry sections reading the public product endpoints.
+- [x] "Order on WhatsApp" prepares a product-specific message with available listing details.
+- [x] Source-contract checks guard against auth credentials, private endpoints and private product properties; no admin forms are mounted in the shop.
+- [x] The new `npm run check-shop` command exists and passes (1 file, 7 tests).
+- [x] Standard command-line checks passed; exact results are recorded in `docs/PROGRESS.md`.
+- [x] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+
+## Command-line validation record (2026-10-29)
+
+Owner-supplied Windows CMD results on the current branch:
+
+| Command/check | Result |
+|---|---|
+| `npm run check-shop` | Passed: 1 file, 7 tests |
+| `npm run check-sync` | Passed: shared frontend/shop copies, backend twins and MUF invariants are in sync |
+| `npm run check-docs` | Passed: all 22 phase files, statuses and links consistent |
+| `npm run check-ui` | Passed: all MUF UI safety checks |
+| `npm run check-workbench` | Passed: 23 source checks |
+| `npm run check-farms` | Passed: all farm-scope checks and Dairy breeding-event runtime checks |
+| `npm test` | Passed: 46 files, 409 tests |
+| `tools\\build-all.bat` | Passed: Dairy, Flock and Agri production builds |
+
+`npm ci` was not rerun for this phase because the dependency set and lockfiles were unchanged. The previous install reported five audit findings (1 moderate, 2 high, 2 critical), which still need release triage; do not use `npm audit fix --force` blindly.
+
+These are owner-supplied command-line results, not commands independently run in this editing session. They do not establish browser/phone behavior, real-MongoDB behavior, deployed cross-origin feeds, or live WhatsApp delivery. Those remain for Phases 19–21.
 
 ## Rules for whoever works on this phase
 

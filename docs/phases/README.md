@@ -20,7 +20,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 13 | Dependency security fixes | Done | [phase-13-dependency-security.md](phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phase-14-authorization-and-secrets-review.md) |
 | 15 | MU Farms: products and publish switch | Done | [phase-15-mu-farms-product-data.md](phase-15-mu-farms-product-data.md) |
-| 16 | MU Farms: public shop | In progress | [phase-16-mu-farms-public-shop.md](phase-16-mu-farms-public-shop.md) |
+| 16 | MU Farms: public shop | Done | [phase-16-mu-farms-public-shop.md](phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | Not started | [phase-19-final-testing-database.md](phase-19-final-testing-database.md) |
@@ -98,4 +98,4 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 **Phase 15 is Done for command-line scope (2026-10-29).** Owner-supplied Windows results confirm 402 full-suite tests passing and all three production builds passing, alongside the product/archive focused tests and repository checks. `npm ci` was not rerun because the lockfiles and package manifests were unchanged from the successful Phase 14 install. The prior npm audit reported five findings; see [Phase 15 details](phase-15-mu-farms-product-data.md) and [PROGRESS.md](../PROGRESS.md). Phase 16, the public shop, is next. Real database/browser/deployment checks remain in Phases 19–21.
 
 
-**Phase 16 is In progress (2026-10-29).** The public shop is isolated in a lazy-loaded `/shop` route and a dedicated, byte-identical `src/muf-shop/` folder in each frontend. Only published-product public feeds are used; cross-project URLs and the WhatsApp contact are deployment configuration. Run `npm run check-shop`, `npm run check-sync`, the standard checks and all three builds after pulling. See [Phase 16 details](phase-16-mu-farms-public-shop.md).
+**Phase 16 is Done for command-line scope (2026-10-29).** Owner-supplied Windows results confirm 409 full-suite tests, 7 shop isolation tests, sync/docs/UI/workbench/farm checks, and all three production builds passed. The shop is isolated in a lazy-loaded `/shop` route and dedicated, byte-identical `src/muf-shop/` folders with published-only public feeds. Real MongoDB, browser/phone, deployed cross-origin feed and live WhatsApp checks remain in Phases 19–21. See [Phase 16 details](phase-16-mu-farms-public-shop.md).
