@@ -73,5 +73,19 @@ Status key: **TRUE** (confirmed in the code), **FALSE** (the report is wrong), *
 |---|---|---|---|
 | X1 | A breeding event cannot be edited after its cow is sold: the server answers 400 "requires an active female animal", even for a notes-only edit | TRUE (reproduced in memory mode on 2026-10-26; not re-checked) | The cow should be re-validated only when the cow or bull changes |
 
+
+## Phase 14 route-role review findings (deferred, not fixed)
+
+These routes are recorded for a separate owner decision. The inventory now states their current minimum role so the matrix tests that policy; these notes do not change route middleware in Phase 14.
+
+| ID | Route | Concern | Phase 14 action |
+|---|---|---|---|
+| P14-R1 | Dairy `POST /api/breeding/events`, `PUT /api/breeding/events/:id` | Both declarations use authentication without a route-level manager guard. Worker ability to create or rewrite reproductive events needs explicit product-owner approval. | Review only; no route code changed. |
+| P14-R2 | Dairy `DELETE /api/photos/:id`; Agri `DELETE /api/photos/:id` | These handlers are authenticated but lack a route-level manager guard. Confirm whether workers should be able to delete shared photo records/assets. | Review only; no route code changed. |
+| P14-R3 | Agri `PATCH /api/tasks/:taskId` | The route uses authentication without the manager guard used on neighboring task create/update/delete operations. Confirm that worker patch fields are restricted to task-status/data-entry fields. | Review only; no route code changed. |
+| P14-R4 | Flock `PUT /api/data/:key` | A generic key-based datastore write is available to any authenticated farm role. Confirm that the key allowlist and accepted payload cannot mutate manager/owner-only settings or business state. | Review only; no route code changed. |
+| P14-R5 | Flock `POST /api/batches/import-all`, `DELETE /api/batches/wipe-all` | Both use the manager-capable `requireRole('admin')` guard although import-all and wipe-all have broad/destructive effects. Confirm whether these should be owner-only. | Review only; no route code changed. |
+
+
 ## Re-test rule
 Phases 19 to 21 test the code before these fixes. After the second session, repeat the parts of Phases 19 to 21 that touch validation, tokens, headers, CORS and uploads.

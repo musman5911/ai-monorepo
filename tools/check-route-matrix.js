@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const net = require('node:net');
 const { spawn } = require('node:child_process');
+const { parseRouteRoleInventory, checkRouteStatuses, MINIMUM_ROLES } = require('./route-matrix-policy.cjs');
 const ROOT = path.resolve(__dirname, '..');
 const INVENTORY = fs.readFileSync(path.join(ROOT, 'docs/security/route-permission-inventory.md'), 'utf8');
 const APPS = [
@@ -99,18 +100,8 @@ function joinRoute(prefix, route) {
   const r = ('/' + String(route || '').replace(/^\/+/, '')).replace(/\/+/g, '/');
   return (p + r).replace(/\/+/g, '/') || '/';
 }
-function policyFor(mod) {
-  const escaped = String.fromCharCode(96) + mod + '.js' + String.fromCharCode(96);
-  const start = INVENTORY.indexOf(escaped);
-  if (start < 0) return 'missing';
-  const rowStart = INVENTORY.lastIndexOf('|', start);
-  const rowEnd = INVENTORY.indexOf('\n', start);
-  const row = INVENTORY.slice(rowStart, rowEnd < 0 ? undefined : rowEnd);
-  if (/Owner-only/.test(row) && !/Owner-only for mutations; scoped reads/.test(row)) return 'owner';
-  if (/Public bearer link/.test(row)) return 'public';
-  if (/Secret-authenticated job/.test(row)) return 'secret';
-  return 'scoped';
-}
+function individualRouteInventory() { return parseRouteRoleInventory(INVENTORY); }
+
 function discoverRoutes(app) {
   const files = routeModules(app), mountRows = mounts(app), entries = [], covered = new Set();
   const declaration = /\brouter\.(get|post|put|patch|delete|options|head|all)\s*\(\s*(['"])([^'"]+)\2/g;
@@ -122,16 +113,8 @@ function discoverRoutes(app) {
     let m;
     while ((m = declaration.exec(file.source))) {
       const method = m[1].toUpperCase(), localPath = m[3];
-      const tail = file.source.slice(m.index, Math.min(file.source.length, m.index + 700));
-      // Inspect only the registration line. Looking ahead into handler bodies
-      // accidentally inherits guards from neighboring declarations.
-      const declarationLine = tail.split(/\r?\n/, 1)[0];
-      const ownerGuard = /ownerOnly|requireRole\(\s*['"]owner['"]\s*\)|ownerUnscoped/.test(declarationLine);
-      const adminGuard = /adminOnly|requireAdmin|requireRole\(\s*['"]admin['"]\s*\)|userListAccess|userCreateAccess/.test(declarationLine);
-      const modulePolicy = policyFor(mod);
       for (const mount of foundMounts) entries.push({
-        app: app.key, mod, method, path: joinRoute(mount.prefix, localPath), localPath,
-        source: file.source, ownerGuard, adminGuard, modulePolicy
+        app: app.key, mod, method, path: joinRoute(mount.prefix, localPath), localPath
       });
     }
   }
@@ -145,7 +128,7 @@ function discoverRoutes(app) {
     for (const mount of mountRows.filter(m => m.module === 'routes/archive')) {
       for (const [method, localPath] of archiveRoutes) entries.push({
         app: app.key, mod: 'routes/archive', method, path: joinRoute(mount.prefix, localPath), localPath,
-        source: archiveFile.source, ownerGuard: true, adminGuard: false, modulePolicy: 'owner'
+        
       });
     }
   }
@@ -157,8 +140,7 @@ function discoverRoutes(app) {
       ['POST', '/:id/archive'], ['POST', '/:id/restore']
     ]) entries.push({
       app: app.key, mod: 'routes/farms', method, path: farmPrefix + suffix, localPath: suffix || '/',
-      source: read(app.dir + '/backend/routes/farms.js'), ownerGuard: method !== 'GET',
-      adminGuard: false, modulePolicy: 'scoped'
+      
     });
   }
   const server = read(app.dir + '/backend/server.js');
@@ -168,8 +150,7 @@ function discoverRoutes(app) {
     const p = dm[3];
     if (p.startsWith('/api/') || p === '/api') entries.push({
       app: app.key, mod: 'server.js', method: dm[1].toUpperCase(), path: p, localPath: p,
-      source: server, ownerGuard: /ownerOnly|requireRole\(\s*['"]owner['"]\s*\)/.test(server.slice(dm.index).split(/\r?\n/, 1)[0]),
-      adminGuard: /adminOnly|requireAdmin/.test(server.slice(dm.index).split(/\r?\n/, 1)[0]), modulePolicy: 'server'
+
     });
   }
   const signatureInventory = routeSignatureInventory();
@@ -196,68 +177,14 @@ function discoverRoutes(app) {
   signatureModules.push({ mod: 'server.js', declarations: serverSignatures, hash: routeSignatureHash(serverSignatures) });
   return { entries, moduleCount: files.length, covered, signatureModules, signatureInventory };
 }
-function publicRoute(e) {
-  if (e.modulePolicy === 'public') return true;
-  const p = e.path.toLowerCase(), local = e.localPath.toLowerCase();
-  if (e.mod.endsWith('/auth') && /\/(login|logout|setup|register|forgot-password|reset-password|request-reset|verify-reset|check-setup|health|check|mail-status|can-signup)$/.test(local)) return true;
-  if (e.method === 'GET' && (/\/health$|\/healthz$|\/__replit_health_check$/.test(p))) return true;
-  if (e.method === 'GET' && e.app === 'dairy' && /\/settings\/location$/.test(p)) return true;
-  if (e.method === 'GET' && e.app === 'agri' && /\/(settings\/location|automations\/settings\/location)$/.test(p)) return true;
-  return false;
-}
-function ownerOnly(e) {
-  if (e.method === 'PUT' && /\/users\/me$/.test(e.path.toLowerCase())) return false;
-  if (e.modulePolicy === 'owner' || e.ownerGuard) return true;
-  if (/\/farms\/?$/.test(e.path.toLowerCase()) && ['POST','PUT','PATCH','DELETE'].includes(e.method)) return true;
-  const p = e.path.toLowerCase();
-  if (/\/(backup|restore|archive)(\/|$)/.test(p)) return true;
-  if (e.app === 'agri' && ['POST','PUT','PATCH','DELETE'].includes(e.method) && /\/settings\/automations(?:\/trigger)?$/.test(p)) return true;
-  if (/\/farms\/?$/.test(p) && ['POST','PUT','PATCH','DELETE'].includes(e.method)) return true;
-  // User-management endpoints are not uniformly owner-only: managers can
-  // manage workers in assigned farms; handler logic reserves privileged changes
-  // for owners. Do not infer a global owner guard from nearby code.
-  return false;
-}
-function adminOnly(e) {
-  if (ownerOnly(e) || e.adminGuard) return true;
-  // Agri's change-password handler limits password updates to full roles even
-  // though that check lives inside the handler rather than its route header.
-  if (e.app === 'agri' && e.method === 'POST' && e.localPath.toLowerCase() === '/change-password') return true;
-  return /\/(settings|automations)\/(settings|trigger|run)(\/|$)/.test(e.path.toLowerCase()) && ['POST','PUT','PATCH','DELETE'].includes(e.method);
-}
-function webhookRoute(e) {
-  return /\/webhook\//.test(e.localPath.toLowerCase());
-}
-function closedSignupRoute(e) {
+function isClosedSignupRoute(e) {
   const local = e.localPath.toLowerCase();
-  return e.method === 'POST' && e.mod.endsWith('/auth')
+  return e.method === 'POST' && e.mod === 'routes/auth'
     && ((e.app === 'agri' && local === '/signup')
       || (e.app === 'flock' && /^\/signup\/(request-code|verify)$/.test(local)));
 }
-function secretRoute(e) {
-  const local = e.localPath.toLowerCase();
-  return /\/cron(?:\/|$)/.test(local)
-    || webhookRoute(e)
-    || (e.modulePolicy === 'secret' && /dispatch-report/.test(local))
-    || (e.mod === 'server.js' && /\/api\/farm-summary$/.test(e.path.toLowerCase()) && !/super-admin/.test(e.path.toLowerCase()));
-}
-function deniedStatus(e, status) {
-  if (status === 401 || status === 403) return true;
-  // Secret-protected endpoints deliberately fail closed when a key is absent
-  // or not configured; 404/503 conceal disabled endpoints and 429 is throttling.
-  if (secretRoute(e) && [404, 429, 503].includes(status)) return true;
-  // The matrix seeds an owner first, so first-owner signup is expected to be
-  // closed. Its empty probe body may be rejected with a different 4xx first.
-  if (closedSignupRoute(e) && Number.isInteger(status) && status >= 400 && status < 500) return true;
-  return false;
-}
-function expected(e, identity) {
-  if (closedSignupRoute(e) || secretRoute(e)) return 'deny';
-  if (identity === 'anonymous') return publicRoute(e) ? 'allow' : 'deny';
-  if (identity === 'owner') return 'allow';
-  if (ownerOnly(e)) return 'deny';
-  if (adminOnly(e) && identity === 'worker') return 'deny';
-  return 'allow';
+function isWebhookAcknowledgementRoute(e) {
+  return e.minimumRole === 'secret' && /\/webhook\//.test(e.localPath.toLowerCase());
 }
 function requestPath(route) {
   return route.replace(/:[A-Za-z_$][\w$]*/g, '000000000000000000000001').replace(/\*/g, 'matrix-invalid').replace(/\([^)]*\)/g, 'matrix-invalid');
@@ -341,13 +268,19 @@ async function runApp(app) {
     const expectedSignatures = new Set();
     const reviewedRoutes = individualRouteInventory();
     const sourceRoutes = new Set();
+    const routeRoleByKey = new Map();
     for (const module of discovered.signatureModules) {
       for (const declaration of module.declarations) {
         const routeKey = app.key + '|' + module.mod + '|' + declaration;
         sourceRoutes.add(routeKey);
-        const count = reviewedRoutes.get(routeKey) || 0;
+        const review = reviewedRoutes.get(routeKey);
+        const count = review?.count || 0;
         if (count !== 1) {
           mismatch(app.key, 'ROUTE-ENTRY', module.mod + ' ' + declaration, 'inventory', 'exactly one reviewed route entry', count === 0 ? 'missing' : 'duplicate entries: ' + count);
+        } else if (!MINIMUM_ROLES.includes(review.role)) {
+          mismatch(app.key, 'ROUTE-ROLE', module.mod + ' ' + declaration, 'inventory', MINIMUM_ROLES.join('|'), review.rawRole || 'missing/invalid role');
+        } else {
+          routeRoleByKey.set(routeKey, review.role);
         }
       }
       const key = app.key + '|' + module.mod;
@@ -357,13 +290,13 @@ async function runApp(app) {
         mismatch(app.key, 'ROUTE-SIGNATURES', module.mod, 'inventory', reviewed ? reviewed.hash + '/' + reviewed.count : 'reviewed signature entry', module.hash + '/' + module.declarations.length);
       }
     }
-    for (const [routeKey, count] of reviewedRoutes) {
+    for (const [routeKey, review] of reviewedRoutes) {
       if (!routeKey.startsWith(app.key + '|')) continue;
       if (!sourceRoutes.has(routeKey)) {
         mismatch(app.key, 'ROUTE-ENTRY', routeKey.slice(app.key.length + 1).replace('|', ' '), 'inventory', 'route declaration in source', 'stale inventory entry');
       }
-      if (count > 1 && sourceRoutes.has(routeKey)) {
-        mismatch(app.key, 'ROUTE-ENTRY', routeKey.slice(app.key.length + 1).replace('|', ' '), 'inventory', 'one reviewed route entry', 'duplicate entries: ' + count);
+      if (review.count > 1 && sourceRoutes.has(routeKey)) {
+        mismatch(app.key, 'ROUTE-ENTRY', routeKey.slice(app.key.length + 1).replace('|', ' '), 'inventory', 'one reviewed route entry', 'duplicate entries: ' + review.count);
       }
     }
     for (const key of discovered.signatureInventory.keys()) {
@@ -372,12 +305,12 @@ async function runApp(app) {
       }
     }
     for (const e of discovered.entries) {
-      if (e.modulePolicy === 'missing') { mismatch(app.key, e.method, e.path, 'inventory', 'documented route policy', 'missing'); continue; }
-      // Telegram intentionally ACKs invalid/missing webhook secrets with HTTP
-      // 200 to stop retries. Guard-before-processing is asserted separately.
-      if (webhookRoute(e)) {
-        const status = await call(server.base, e.method, e.path, identities.anonymous);
-        if (status !== 200) mismatch(app.key, e.method, e.path, 'anonymous+invalid-secret', '200 no-op acknowledgement', status);
+      const roleKey = app.key + '|' + e.mod + '|' + e.method + ' ' + e.localPath;
+      e.minimumRole = routeRoleByKey.get(roleKey) || null;
+    }
+    for (const e of discovered.entries) {
+      if (!e.minimumRole) {
+        mismatch(app.key, 'ROUTE-ROLE', e.method + ' ' + e.path, 'inventory', MINIMUM_ROLES.join('|'), 'missing/invalid role');
         continue;
       }
       const isLoginRoute = e.method === 'POST' && /\/login$/.test(e.localPath.toLowerCase());
@@ -386,15 +319,24 @@ async function runApp(app) {
         if (status !== 401) mismatch(app.key, e.method, e.path, 'anonymous+wrong-password', '401', status);
         continue;
       }
-      for (const identityName of ['anonymous','worker','manager','owner']) {
-        const status = await call(server.base, e.method, e.path, identities[identityName]);
-        const wanted = expected(e, identityName), denied = deniedStatus(e, status);
-        if (typeof status === 'string' || (wanted === 'deny' ? !denied : denied)) mismatch(app.key, e.method, e.path, identityName, wanted === 'deny' ? 'denial response' : 'non-auth-denial response', status);
+      const webhookAck = isWebhookAcknowledgementRoute(e);
+      const closedSignup = isClosedSignupRoute(e);
+      const statuses = {};
+      const identityNames = webhookAck ? ['anonymous'] : ['anonymous','worker','manager','owner'];
+      for (const identityName of identityNames) {
+        statuses[identityName] = await call(server.base, e.method, e.path, identities[identityName]);
       }
-      if (e.modulePolicy === 'scoped' && !publicRoute(e) && !secretRoute(e) && !closedSignupRoute(e) && !ownerOnly(e) && e.mod !== 'server.js') {
-        for (const role of ['worker','manager']) {
-          const status = await call(server.base, e.method, e.path, identities[role], identities.farmB);
-          if (status !== 403) mismatch(app.key, e.method, e.path, role + '+foreign-X-Farm-Id', '403', status);
+      const roleMismatches = checkRouteStatuses([{
+        app: app.key, method: e.method, route: e.path, minimumRole: e.minimumRole,
+        statuses, closedSignup, webhookAck, rateLimitedCheck: false
+      }]);
+      for (const item of roleMismatches) {
+        mismatch(item.app, item.method, item.route, item.identity, item.expected, item.status);
+      }
+      if (['worker','manager'].includes(e.minimumRole) && !closedSignup && !webhookAck && e.mod !== 'server.js') {
+        for (const identityName of ['worker','manager']) {
+          const status = await call(server.base, e.method, e.path, identities[identityName], identities.farmB);
+          if (status !== 403) mismatch(app.key, e.method, e.path, identityName + '+foreign-X-Farm-Id', '403', status);
         }
       }
     }
