@@ -9,7 +9,7 @@ import {
   mufNormalizeRole, mufLegacyRole, mufIsOwner, MUF_FULL_ROLE_VALUES, mufMigrateFarms,
 } from '../muf-farms.mjs';
 import { sendVerificationCodeEmail, sendProfileCodeEmail, mailConfigured } from '../utils/mailer.js';
-import { MUF_ENV } from '../muf-env.mjs';
+import { MUF_ENV, mufTestRateLimitMax } from '../muf-env.mjs';
 
 // In dev mode, fall back to the same dev secret as middleware/auth.js
 const SECRET = MUF_ENV.jwtSecret || (MUF_ENV.nodeEnv === 'production' ? null : 'dev-jwt-secret-change-me');
@@ -27,7 +27,7 @@ const TOKEN_TTL = MUF_ENV.jwtExpiresIn || '7d';
 // Rate limiters
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: mufTestRateLimitMax(5),
   message: { error: 'Too many login attempts. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -35,7 +35,7 @@ const loginLimiter = rateLimit({
 
 const setupLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 3,
+  max: mufTestRateLimitMax(3),
   message: { error: 'Too many setup attempts. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -43,7 +43,7 @@ const setupLimiter = rateLimit({
 
 const userLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: mufTestRateLimitMax(20),
   message: { error: 'Too many user-management requests. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
@@ -51,7 +51,7 @@ const userLimiter = rateLimit({
 
 const resetLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 5,
+  max: mufTestRateLimitMax(5),
   message: { error: 'Too many password reset attempts. Please try again in 15 minutes.' },
   standardHeaders: true,
   legacyHeaders: false,
