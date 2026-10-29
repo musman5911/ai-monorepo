@@ -46,6 +46,24 @@ function routeModules(app) {
   walk(base);
   return result;
 }
+
+function routeSignatureHash(signatures) {
+  let hash = 2166136261;
+  for (const char of signatures.join('\\n')) {
+    hash ^= char.charCodeAt(0);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(16).padStart(8, '0');
+}
+
+function routeSignatureInventory() {
+  const section = INVENTORY.split('## Reviewed route method signatures')[1] || '';
+  const rows = new Map();
+  for (const match of section.matchAll(/^\\|\\s*(dairy|agri|flock)\\s*\\|\\s*(routes\\/[a-z0-9-]+|server\\.js)\\s*\\|\\s*([a-f0-9]{8})\\s*\\|\\s*(\\d+)\\s*\\|/gim)) {
+    rows.set(match[1] + '|' + match[2], { hash: match[3].toLowerCase(), count: Number(match[4]) });
+  }
+  return rows;
+}
 function mounts(app) {
   const source = read(app.dir + '/backend/server.js');
   const aliases = new Map();
@@ -126,7 +144,26 @@ function discoverRoutes(app) {
       adminGuard: /adminOnly|requireAdmin/.test(server.slice(dm.index, dm.index + 600)), modulePolicy: 'server'
     });
   }
-  return { entries, moduleCount: files.length, covered };
+  const signatureInventory = routeSignatureInventory();
+  const signatureModules = files.map(file => {
+    const mod = 'routes/' + file.relative.split('/backend/routes/')[1].replace(/\\.js$/, '');
+    const declarations = [];
+    const routeDecl = /\\brouter\\.(get|post|put|patch|delete|options|head|all)\\s*\\(\\s*(['"])([^'"]+)\\2/g;
+    let match;
+    while ((match = routeDecl.exec(file.source))) declarations.push(match[1].toUpperCase() + ' ' + match[3]);
+    if (mod === 'routes/farms') {
+      declarations.splice(0, declarations.length, 'GET /', 'POST /', 'PUT /:id', 'DELETE /:id', 'POST /:id/archive', 'POST /:id/restore');
+    }
+    return { mod, declarations, hash: routeSignatureHash(declarations) };
+  });
+  const serverSignatures = [];
+  const directDecl = /\\bapp\\.(get|post|put|patch|delete|options|head|all)\\s*\\(\\s*(['"])(\\/[^'"]*)\\2/g;
+  let directMatch;
+  while ((directMatch = directDecl.exec(server))) {
+    if (directMatch[3].startsWith('/api/') || directMatch[3] === '/api') serverSignatures.push(directMatch[1].toUpperCase() + ' ' + directMatch[3]);
+  }
+  signatureModules.push({ mod: 'server.js', declarations: serverSignatures, hash: routeSignatureHash(serverSignatures) });
+  return { entries, moduleCount: files.length, covered, signatureModules, signatureInventory };
 }
 function publicRoute(e) {
   if (e.modulePolicy === 'public') return true;
@@ -236,6 +273,20 @@ async function runApp(app) {
     const identities = await setupIdentities(app, server.base);
     const discovered = discoverRoutes(app);
     if (!discovered.entries.length) throw new Error(app.key + ' discovered zero HTTP routes');
+    const expectedSignatures = new Set();
+    for (const module of discovered.signatureModules) {
+      const key = app.key + '|' + module.mod;
+      expectedSignatures.add(key);
+      const reviewed = discovered.signatureInventory.get(key);
+      if (!reviewed || reviewed.hash !== module.hash || reviewed.count !== module.declarations.length) {
+        mismatch(app.key, 'ROUTE-SIGNATURES', module.mod, 'inventory', reviewed ? reviewed.hash + '/' + reviewed.count : 'reviewed signature entry', module.hash + '/' + module.declarations.length);
+      }
+    }
+    for (const key of discovered.signatureInventory.keys()) {
+      if (key.startsWith(app.key + '|') && !expectedSignatures.has(key)) {
+        mismatch(app.key, 'ROUTE-SIGNATURES', key.split('|')[1], 'inventory', 'existing reviewed route module', 'module missing');
+      }
+    }
     for (const e of discovered.entries) {
       if (e.modulePolicy === 'missing') { mismatch(app.key, e.method, e.path, 'inventory', 'documented route policy', 'missing'); continue; }
       for (const identityName of ['anonymous','worker','manager','owner']) {
