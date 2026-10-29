@@ -7,7 +7,7 @@
 import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import DataStore from '../models/DataStore.js';
-import { MUF_ENV } from '../muf-env.mjs';
+import { MUF_ENV, mufTestRateLimitMax } from '../muf-env.mjs';
 import { mufToday } from '../muf-date.mjs';
 import { renderMufCard, mufCardMonth, mufCardRs, mufCardRsUr } from '../muf-card.mjs';
 
@@ -23,7 +23,7 @@ router.use((_req, res, next) => {
   next();
 });
 
-const cardLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 60, standardHeaders: true });
+const cardLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: mufTestRateLimitMax(60), standardHeaders: true });
 router.use(cardLimiter);
 
 const FARM = {
