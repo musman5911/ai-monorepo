@@ -422,6 +422,11 @@ const FarmSchema = new mongoose.Schema({
   archived: { type: Boolean, default: false },
   createdBy: { type: String, default: '' },
 }, { timestamps: true });
+const ProductSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true, maxlength: 120 }, kind: { type: String, required: true, trim: true, maxlength: 32 },
+  unit: { type: String, required: true, trim: true, maxlength: 32 }, price: { type: Number, required: true, min: 0, max: 1000000000 },
+  quantity: { type: Number, required: true, min: 0, max: 1000000000 }, photoUrl: { type: String, default: '', maxlength: 500 }, published: { type: Boolean, default: false },
+}, { timestamps: true, collection: 'muf_products' });
 
 // Every record below belongs to exactly one farm. User, PasswordReset, Meta and
 // Farm stay global. The server adds the farmId; clients can never set it.
@@ -430,15 +435,16 @@ const FARM_SCOPED = {
   LaborAttendance: LaborAttendanceSchema, LaborAdvance: LaborAdvanceSchema, Rate: RateSchema,
   Health: HealthSchema, Buyer: BuyerSchema, BuyerPayment: BuyerPaymentSchema,
   Supplier: SupplierSchema, SupplierPayment: SupplierPaymentSchema, RateHistory: RateHistorySchema,
-  DailyLog: DailyLogSchema, Sale: SaleSchema, PhotoAsset: PhotoAssetSchema, ArchiveJob: ArchiveJobSchema, ArchiveRecord: ArchiveRecordSchema,
+  DailyLog: DailyLogSchema, Sale: SaleSchema, PhotoAsset: PhotoAssetSchema, Product: ProductSchema, ArchiveJob: ArchiveJobSchema, ArchiveRecord: ArchiveRecordSchema,
 };
 export const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
 for (const schema of Object.values(FARM_SCOPED)) {
   schema.add({ farmId: { type: String, index: true } });
 }
+ProductSchema.index({ farmId: 1, published: 1, updatedAt: -1 });
 
 // ─── Models ──────────────────────────────────────────────────────────────────
-let Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, ArchiveJob, ArchiveRecord, Meta, Farm;
+let Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, Product, ArchiveJob, ArchiveRecord, Meta, Farm;
 
 if (USE_MEMORY) {
   const models = createStore({
@@ -461,6 +467,7 @@ if (USE_MEMORY) {
     DailyLog: DailyLogSchema,
     Sale: SaleSchema,
     PhotoAsset: PhotoAssetSchema,
+    Product: ProductSchema,
     ArchiveJob: ArchiveJobSchema,
     ArchiveRecord: ArchiveRecordSchema,
     Meta: MetaSchema,
@@ -485,6 +492,7 @@ if (USE_MEMORY) {
   DailyLog = models.DailyLog;
   Sale = models.Sale;
   PhotoAsset = models.PhotoAsset;
+  Product = models.Product;
   ArchiveJob = models.ArchiveJob;
   ArchiveRecord = models.ArchiveRecord;
   Meta = models.Meta;
@@ -509,6 +517,7 @@ if (USE_MEMORY) {
   DailyLog = mongoose.model('DailyLog', DailyLogSchema);
   Sale = mongoose.model('Sale', SaleSchema);
   PhotoAsset = mongoose.model('PhotoAsset', PhotoAssetSchema);
+  Product = mongoose.model('Product', ProductSchema);
   ArchiveJob = mongoose.model('ArchiveJob', ArchiveJobSchema);
   ArchiveRecord = mongoose.model('ArchiveRecord', ArchiveRecordSchema);
   Meta = mongoose.model('Meta', MetaSchema);
@@ -516,7 +525,7 @@ if (USE_MEMORY) {
 }
 
 // Server-side farm scoping for every farm-owned model (works for MongoDB and memory mode).
-const MUF_FARM_MODELS = { Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, RateHistory, DailyLog, Sale, PhotoAsset, ArchiveJob, ArchiveRecord };
+const MUF_FARM_MODELS = { Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, RateHistory, DailyLog, Sale, PhotoAsset, Product, ArchiveJob, ArchiveRecord };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
 
-export { MUF_FARM_MODELS, Farm, connectDB, Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, ArchiveJob, ArchiveRecord, Meta };
+export { MUF_FARM_MODELS, Farm, connectDB, Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, Product, ArchiveJob, ArchiveRecord, Meta };

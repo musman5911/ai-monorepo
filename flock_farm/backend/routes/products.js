@@ -1,0 +1,10 @@
+import express from 'express';
+import { Product, Farm } from '../db.js';
+import { authRequired, requireRole } from '../middleware/auth.js';
+import { createMufProductHandlers } from '../muf-products.mjs';
+const router=express.Router();
+const h=createMufProductHandlers({Product,Farm,kinds:['egg','bird']});
+const managerOnly=requireRole('admin');
+router.get('/public',h.publicList); router.get('/',authRequired,h.list);
+router.post('/',authRequired,managerOnly,h.create); router.put('/:id',authRequired,managerOnly,h.update); router.delete('/:id',authRequired,managerOnly,h.remove);
+export default router;

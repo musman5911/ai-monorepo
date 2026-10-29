@@ -19,7 +19,7 @@ One file per phase. Work top to bottom; do not start a phase before the one abov
 | 12 | Yearly archive: screens | Done | [phase-12-yearly-archive-screens.md](phase-12-yearly-archive-screens.md) |
 | 13 | Dependency security fixes | Done | [phase-13-dependency-security.md](phase-13-dependency-security.md) |
 | 14 | Authorization and secrets review | Done | [phase-14-authorization-and-secrets-review.md](phase-14-authorization-and-secrets-review.md) |
-| 15 | MU Farms: products and publish switch | Not started | [phase-15-mu-farms-product-data.md](phase-15-mu-farms-product-data.md) |
+| 15 | MU Farms: products and publish switch | In progress | [phase-15-mu-farms-product-data.md](phase-15-mu-farms-product-data.md) |
 | 16 | MU Farms: public shop | Not started | [phase-16-mu-farms-public-shop.md](phase-16-mu-farms-public-shop.md) |
 | 17 | Automatic command-line checks on GitHub | Not started | [phase-17-automatic-checks-ci.md](phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Not started | [phase-18-documentation-and-handoff.md](phase-18-documentation-and-handoff.md) |
@@ -91,3 +91,5 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 **Disposition:** Phase 14 is **Done for command-line scope**. The owner-supplied tests verify the documented runtime matrix and regression suite, but do not claim real-MongoDB, browser/phone, or live-deployment verification; those remain in Phases 19–21. Five potential route-policy decisions (P14-R1 to P14-R5) remain documented in `docs/SESSION-2-PROBLEMS.md` for separate owner review and were not changed without an explicit policy decision. Public share cards remain intentionally bearer-link accessible with their documented safeguards.
 
 **Dependency note:** the `npm ci` audit warning is not a failed Phase 14 check, but the five reported vulnerabilities must be triaged before release. Next: [Phase 15, MU Farms products and publish switch](phase-15-mu-farms-product-data.md). Real-MongoDB, browser/phone and deployment verification remains scheduled in Phases 19–21.
+
+**Phase 15 started (2026-10-29):** owner/manager product management and published-only public data endpoints are under implementation across the three apps. Current-head tests and builds are pending. See [Phase 15 details](phase-15-mu-farms-product-data.md).

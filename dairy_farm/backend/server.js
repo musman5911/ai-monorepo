@@ -33,6 +33,7 @@ import suppliersRoutes from './routes/suppliers.js';
 import cardsRoutes from './routes/cards.js';
 import settingsRoutes from './routes/settings.js';
 import farmsRoutes from './routes/farms.js';
+import productsRoutes from './routes/products.js';
 import { MUF_ENV, mufTestRateLimitMax } from './muf-env.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -138,6 +139,7 @@ app.use('/api/suppliers', suppliersRoutes);
 app.use('/api/cards', cardsRoutes);
 app.use('/api/settings', settingsRoutes);
 app.use('/api/farms',    farmsRoutes);
+app.use('/api/products', productsRoutes);
 
 // Cross-farm summary — tiny read-only aggregates for the "My Farms" tab in
 // the sibling apps. Protected by the shared CROSS_FARM_KEY; CORS-open.

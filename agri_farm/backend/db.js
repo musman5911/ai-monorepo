@@ -89,6 +89,11 @@ const FarmSchema = new mongoose.Schema({
   archived: { type: Boolean, default: false },
   createdBy: { type: String, default: '' },
 }, { timestamps: true, versionKey: false, collection: 'farms' });
+const ProductSchema = new mongoose.Schema({
+  name: { type: String, required: true, trim: true, maxlength: 120 }, kind: { type: String, required: true, trim: true, maxlength: 32 },
+  unit: { type: String, required: true, trim: true, maxlength: 32 }, price: { type: Number, required: true, min: 0, max: 1000000000 },
+  quantity: { type: Number, required: true, min: 0, max: 1000000000 }, photoUrl: { type: String, default: '', maxlength: 500 }, published: { type: Boolean, default: false },
+}, { timestamps: true, versionKey: false, collection: 'muf_products' });
 
 // Every record below belongs to exactly one farm. User, Reset, TelegramMeta,
 // Setting and Farm stay global. The server adds the farmId; clients can never set it.
@@ -96,7 +101,7 @@ const FARM_SCOPED = {
   ArchiveJob: ArchiveJobSchema, ArchiveRecord: ArchiveRecordSchema,
   Field: FieldSchema, Crop: CropSchema, Finance: FinanceSchema, Task: TaskSchema, Inventory: InventorySchema,
   Liability: LiabilitySchema, Irrigation: IrrigationSchema, CropPhoto: CropPhotoSchema,
-  Spray: SpraySchema, PhotoAsset: PhotoAssetSchema, Laborer: LaborerSchema, Attendance: AttendanceSchema,
+  Spray: SpraySchema, PhotoAsset: PhotoAssetSchema, Product: ProductSchema, Laborer: LaborerSchema, Attendance: AttendanceSchema,
   LaborAdvance: LaborAdvanceSchema, Supplier: SupplierSchema,
   SupplierPayment: SupplierPaymentSchema, DiaryMedia: DiaryMediaSchema,
 };
@@ -119,10 +124,11 @@ for (const schema of Object.values(FARM_SCOPED)) {
   if (indexes) for (const keys of indexes) schema.index(keys);
   else schema.index({ farmId: 1 });
 }
+ProductSchema.index({ farmId: 1, published: 1, updatedAt: -1 });
 
 // ─── Models ─────────────────────────────────────────────────────────────────
 let User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
-  CropPhoto, Spray, PhotoAsset, Laborer, Attendance, LaborAdvance, TelegramMeta,
+  CropPhoto, Spray, PhotoAsset, Product, Laborer, Attendance, LaborAdvance, TelegramMeta,
   Supplier, SupplierPayment, Setting, DiaryMedia, Farm, ArchiveJob, ArchiveRecord;
 
 if (useMock) {
@@ -141,6 +147,7 @@ if (useMock) {
     CropPhoto: CropPhotoSchema,
     Spray: SpraySchema,
     PhotoAsset: PhotoAssetSchema,
+    Product: ProductSchema,
     Laborer: LaborerSchema,
     Attendance: AttendanceSchema,
     LaborAdvance: LaborAdvanceSchema,
@@ -152,7 +159,7 @@ if (useMock) {
     Farm: FarmSchema,
   });
   ({ User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
-    CropPhoto, Spray, PhotoAsset, Laborer, Attendance, LaborAdvance, TelegramMeta,
+    CropPhoto, Spray, PhotoAsset, Product, Laborer, Attendance, LaborAdvance, TelegramMeta,
     Supplier, SupplierPayment, Setting, DiaryMedia, Farm, ArchiveJob, ArchiveRecord } = models);
 } else {
   User = mongoose.model('User', UserSchema);
@@ -169,6 +176,7 @@ if (useMock) {
   CropPhoto = mongoose.model('CropPhoto', CropPhotoSchema);
   Spray = mongoose.model('Spray', SpraySchema);
   PhotoAsset = mongoose.model('PhotoAsset', PhotoAssetSchema);
+  Product = mongoose.model('Product', ProductSchema);
   Laborer = mongoose.model('Laborer', LaborerSchema);
   Attendance = mongoose.model('Attendance', AttendanceSchema);
   LaborAdvance = mongoose.model('LaborAdvance', LaborAdvanceSchema);
@@ -183,7 +191,7 @@ if (useMock) {
 // Server-side farm scoping: inside a request every query of these models is limited
 // to the selected farm(s) and every create is stamped with it (see muf-farms.mjs).
 const MUF_FARM_MODELS = {
-  ArchiveJob, ArchiveRecord, Field, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, PhotoAsset, Laborer,
+  ArchiveJob, ArchiveRecord, Field, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, PhotoAsset, Product, Laborer,
   Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia,
 };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
@@ -250,6 +258,6 @@ export {
   connectDB, useMock,
   User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
-  Supplier, SupplierPayment, Setting, DiaryMedia, PhotoAsset, Farm, ArchiveJob, ArchiveRecord,
+  Supplier, SupplierPayment, Setting, DiaryMedia, PhotoAsset, Product, Farm, ArchiveJob, ArchiveRecord,
   MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES,
 };

@@ -4,7 +4,7 @@ import {
   Shield, LogOut, X, AlertCircle, Check, Settings,
   Languages, Save, RotateCcw, AlertTriangle, RefreshCw,
   FileSpreadsheet, Download, Upload, Users, UserRound,
-  Database, FileText, Send, Loader2, MessageCircle, Mail, Globe2,
+  Database, FileText, Send, Loader2, MessageCircle, Mail, Globe2, Store,
 } from 'lucide-react';
 import { AnimatePresence, motion } from '../muf/core/muf-motion';
 import { Lang, GlobalSettings, Bird, OtherExpense, FeedRecord, EggProduction, VaccinationRecord, Customer, CustomerSale, IncubationRecord, DailyChecklistEntry, DiaryEntry, LaborWorker, LaborAttendanceEntry, LaborAdvanceEntry } from '../types';
@@ -17,6 +17,7 @@ import {
 } from '../api';
 import AvatarUploader from '../muf/ui/muf-avatar';
 import MyFarmsPanel from './MyFarmsPanel';
+import ProductManager from './ProductManager';
 import TelegramPanel from '../muf/ui/muf-telegram-panel';
 import { shareBackupFile } from '../utils/share';
 import ExportCenter from './ExportCenter';
@@ -74,10 +75,11 @@ interface AdminMenuProps {
   onUserUpdate?: (u: AuthUser) => void;
 }
 
-type Section = 'general' | 'users' | 'farms' | 'reports' | 'backup' | 'danger' | 'telegram';
+type Section = 'general' | 'users' | 'farms' | 'reports' | 'backup' | 'danger' | 'telegram' | 'products';
 const ADMIN_TABS: { id: Section; icon: React.ElementType; en: string }[] = [
   { id: 'general',  icon: Settings,    en: 'General' },
   { id: 'farms',    icon: Globe2,      en: 'My Farms' },
+  { id: 'products', icon: Store,       en: 'MU Farms products' },
   { id: 'users',    icon: Users,       en: 'Users' },
   { id: 'reports',  icon: FileText,    en: 'Reports' },
   { id: 'backup',   icon: Database,    en: 'Backup' },
@@ -97,6 +99,8 @@ export default function AdminMenu(props: AdminMenuProps) {
   } = props;
 
   const [section, setSection] = useState<Section>('general');
+  const canManageProducts = currentUser?.farmRole === 'owner' || currentUser?.farmRole === 'manager' || currentUser?.role === 'admin';
+  const visibleAdminTabs = ADMIN_TABS.filter((tab) => tab.id !== 'products' || canManageProducts);
   const [eggPrice, setEggPrice] = useState(settings.defaultPricePerEgg.toString());
   const [vacInterval, setVacInterval] = useState(settings.vaccinationIntervalDays.toString());
   // Farm location
@@ -358,7 +362,7 @@ export default function AdminMenu(props: AdminMenuProps) {
           title={L('Settings & Admin Hub')}
           subtitle={`${currentUser?.username || ''} · Control Panel`}
           icon={<Shield className="w-5 h-5" />}
-          sections={ADMIN_TABS.map(t => ({ id: t.id, label: mufL(lang, t.en), icon: t.icon }))}
+          sections={visibleAdminTabs.map(t => ({ id: t.id, label: mufL(lang, t.en), icon: t.icon }))}
           activeSection={section}
           onSectionChange={(id) => setSection(id as Section)}
           headerActions={
@@ -494,6 +498,11 @@ export default function AdminMenu(props: AdminMenuProps) {
             )}
 
             {section === 'farms' && <MyFarmsPanel />}
+            {section === 'products' && canManageProducts && <ProductManager kinds={[{ value: 'egg', label: 'Eggs' }, { value: 'bird', label: 'Birds' }]} getHeaders={() => {
+              const token = getToken() || ''; let farmId = '';
+              try { farmId = localStorage.getItem('muf_active_farm_flock') || ''; } catch { /* storage unavailable */ }
+              return { ...(token ? { Authorization: 'Bearer ' + token, 'X-Auth-Token': token } : {}), ...(farmId ? { 'X-Farm-Id': farmId } : {}) };
+            }} />}
             {section === 'telegram' && (
             <TelegramPanel
               lang={lang}

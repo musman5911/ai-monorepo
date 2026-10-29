@@ -21,6 +21,7 @@ This inventory covers every route module under the three backend `routes/` direc
 | `routes/archive.js` | Owner-only | Archive/export/delete/restore are destructive or sensitive operations. |
 | `routes/backup.js` | Owner-only | Backup/restore exposes or replaces farm data. |
 | `routes/farms.js` | Owner-only for mutations; scoped reads | Farm administration is owner-only; reads must not reveal unassigned farms to managers/workers. |
+| `routes/products.js` | Mixed public/authenticated + farm scope | Public reads expose published products only; management requires manager/owner in the selected farm. |
 | `routes/breeding-events.js`, `routes/breeding.js`, `routes/buyers.js`, `routes/cows.js`, `routes/dailylog.js`, `routes/expenses.js`, `routes/feedstock.js`, `routes/health.js`, `routes/input.js`, `routes/labor.js`, `routes/milk.js`, `routes/photos.js`, `routes/rates.js`, `routes/sales.js`, `routes/suppliers.js` | Authenticated + farm scope | Writes require manager/owner or the explicitly allowed worker data-entry capability; all record queries and ID-based operations must be farm-scoped. |
 | `routes/email.js`, `routes/telegram.js` | Authenticated + farm scope; webhook exceptions require secrets | Manual sends require authorization and farm assignment. Inbound webhooks must validate their configured secret using a timing-safe comparison and bind writes to a resolved farm. |
 
@@ -33,6 +34,7 @@ This inventory covers every route module under the three backend `routes/` direc
 | `routes/settings.js` | Authenticated + farm scope | `GET /location` and `PUT /location` both require authentication and use the selected farm's `DataStore` record; location is farm-scoped in Flock. |
 | `routes/archive.js`, `routes/backup.js` | Owner-only | Archive and backup actions are sensitive/destructive. |
 | `routes/farms.js` | Owner-only for mutations; scoped reads | No manager/worker farm creation, rename, archive or delete. |
+| `routes/products.js` | Mixed public/authenticated + farm scope | Public reads expose published products only; management requires manager/owner in the selected farm. |
 | `routes/batches.js`, `routes/data.js`, `routes/uploads.js` | Authenticated + farm scope | Data and uploaded assets must be scoped to assigned farms; worker writes are limited to data-entry operations. Flock `Image` is not automatically wrapped by the farm-scoped model helper, so image lookup/deletion must include the authenticated `farmId` explicitly. Batch create/edit/gallery references and bulk image cleanup must reject or exclude images from other farms. |
 | `routes/cron.js` | Secret-authenticated job for scheduled send; authenticated + farm scope for manual send | Cron secret must fail closed and compare timing-safely. Do not disclose recipient addresses or farm statistics in the response. |
 | `routes/telegram.js` | Authenticated + farm scope; webhook exceptions require secrets | Webhook path secrets must be compared timing-safely. Writes must resolve a linked farm and fail closed for unlinked/legacy unscoped chats. |
@@ -46,6 +48,7 @@ This inventory covers every route module under the three backend `routes/` direc
 | `routes/farms.js` | Owner-only for mutations; scoped reads | Farm administration is owner-only; assigned-farm visibility applies to non-owners. |
 | `routes/archive.js`, `routes/backup.js` | Owner-only | Archive and backup actions are sensitive/destructive. |
 | `routes/automations.js` | Secret-authenticated job for cron dispatch; owner-only global settings and manual trigger; public read exception for location | Cron secret must fail closed and compare timing-safely; response must not disclose recipient addresses. `/settings/location` is public for the weather widget. Automation settings, location changes, and manual triggers are owner-only because the underlying `Setting` records are global rather than farm-scoped. |
+| `routes/products.js` | Mixed public/authenticated + farm scope | Public reads expose published products only; management requires manager/owner in the selected farm. |
 
 | `routes/analytics.js`, `routes/crop-logs.js`, `routes/crops.js`, `routes/diary-media.js`, `routes/fields.js`, `routes/finance.js`, `routes/inventory.js`, `routes/labor.js`, `routes/liabilities.js`, `routes/photos.js`, `routes/suppliers.js`, `routes/tasks.js` | Authenticated + farm scope | Data reads/writes must be restricted to assigned farms; worker write access is data-entry only. |
 | `routes/telegram.js` | Authenticated + farm scope; webhook exceptions require secrets | Webhook writes must resolve a linked farm and fail closed for unlinked/legacy unscoped chats. |
@@ -417,6 +420,22 @@ Each row is one reviewed local router method/path declaration. The minimum-role 
 | flock | server.js | GET | `/api/health` | public |
 | flock | server.js | GET | `/api/super-admin/farm-summary` | owner |
 
+| agri | routes/products | GET | `/public` | public |
+| agri | routes/products | GET | `/` | worker |
+| agri | routes/products | POST | `/` | manager |
+| agri | routes/products | PUT | `/:id` | manager |
+| agri | routes/products | DELETE | `/:id` | manager |
+| dairy | routes/products | GET | `/public` | public |
+| dairy | routes/products | GET | `/` | worker |
+| dairy | routes/products | POST | `/` | manager |
+| dairy | routes/products | PUT | `/:id` | manager |
+| dairy | routes/products | DELETE | `/:id` | manager |
+| flock | routes/products | GET | `/public` | public |
+| flock | routes/products | GET | `/` | worker |
+| flock | routes/products | POST | `/` | manager |
+| flock | routes/products | PUT | `/:id` | manager |
+| flock | routes/products | DELETE | `/:id` | manager |
+
 ## Reviewed route method signatures
 
 The route matrix first requires one reviewed entry under `Reviewed individual route entries` for every exact method/path declaration, including direct server registrations and routes generated by shared factories. It also checks per-module fingerprints and counts. Any added, removed, or changed method/path fails `npm run check-route-matrix` until the route entry is reviewed and updated here and the affected module fingerprint is deliberately updated. Fingerprints use ordered `METHOD localPath` declarations and are a review gate, not a substitute for inspecting handler authorization.
@@ -476,6 +495,9 @@ The route matrix first requires one reviewed entry under `Reviewed individual ro
 | flock | routes/settings | 41e090c0 | 2 |
 | flock | routes/telegram | 18c20021 | 9 |
 | flock | routes/uploads | a087ff70 | 4 |
+| agri | routes/products | d7447ed1 | 5 |
+| dairy | routes/products | d7447ed1 | 5 |
+| flock | routes/products | d7447ed1 | 5 |
 | dairy | server.js | 6299c5ff | 2 |
 | agri | server.js | 6299c5ff | 2 |
 | flock | server.js | 8922c94d | 4 |

@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { mufToday, mufShiftDays } from '../muf/data/muf-date';
 import TelegramPanel from '../muf/ui/muf-telegram-panel';
-import { X, Settings, Users, Database, UserPlus, ShieldCheck, Check, Loader, Clock, FileText, Download, Upload, RefreshCw, Sparkles, Send, Globe2 } from 'lucide-react';
+import { X, Settings, Users, Database, UserPlus, ShieldCheck, Check, Loader, Clock, FileText, Download, Upload, RefreshCw, Sparkles, Send, Globe2, Store } from 'lucide-react';
 import { AnimatePresence, motion } from '../muf/core/muf-motion';
 import * as api from '../api';
 import { getLang } from '../i18n';
@@ -9,6 +9,7 @@ import AvatarUploader from '../muf/ui/muf-avatar';
 import { mufPdfStart, mufPdfSummary, mufPdfTable, mufPdfFooter, mufPdfSave, mufPdfCheckPage } from '../muf/data/muf-pdf';
 import { shareBackupFile } from '../utils/share';
 import MyFarmsPanel from './MyFarmsPanel';
+import ProductManager from './ProductManager';
 import MufAdminShell from '../muf/admin/muf-admin-shell';
 import MufAdminCard from '../muf/admin/muf-admin-card';
 import MufAdminButton from '../muf/admin/muf-admin-button';
@@ -55,6 +56,7 @@ export default function AdminMenu({
   const ADMIN_TABS = [
     { id: 'general', icon: Settings, label: 'General' },
     { id: 'farms', icon: Globe2, label: 'My Farms' },
+    { id: 'products', icon: Store, label: 'MU Farms products' },
     { id: 'users', icon: Users, label: 'Users' },
     { id: 'reports', icon: FileText, label: 'Reports' },
     { id: 'backup', icon: Database, label: 'Backup' },
@@ -742,6 +744,12 @@ export default function AdminMenu({
               )}
 
                             {/* ─── TAB: USERS ─── */}
+              {activeTab === 'products' && isAdmin && <ProductManager kinds={[{ value: 'produce', label: 'Harvested produce' }]} apiRoot={import.meta.env.VITE_API_URL || '/api'} getHeaders={() => {
+                let token = ''; let farmId = '';
+                try { token = localStorage.getItem('token') || ''; farmId = localStorage.getItem('muf_active_farm_agri') || ''; } catch { /* storage unavailable */ }
+                return { ...(token ? { Authorization: 'Bearer ' + token, 'X-Access-Token': token } : {}), ...(farmId ? { 'X-Farm-Id': farmId } : {}) };
+              }} />}
+
               {activeTab === 'telegram' && (
               <TelegramPanel
                 lang={getLang()}

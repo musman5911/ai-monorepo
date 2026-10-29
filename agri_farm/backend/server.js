@@ -34,6 +34,7 @@ import cardsRoutes from './routes/cards.js';
 import diaryMediaRoutes from './routes/diary-media.js';
 import photosRoutes from './routes/photos.js';
 import farmsRoutes from './routes/farms.js';
+import productsRoutes from './routes/products.js';
 import { MUF_ENV, mufTestRateLimitMax } from './muf-env.mjs';
 import { MUF_FULL_ROLE_VALUES } from './muf-farms.mjs';
 
@@ -154,6 +155,7 @@ app.use('/api/cards', cardsRoutes);
 // Farms of this project: list for everyone (own farms), manage for owners only.
 app.use('/farms', farmsRoutes);
 app.use('/api/farms', farmsRoutes);
+app.use('/api/products', productsRoutes);
 
 // Cross-farm summary — tiny read-only aggregates for the "My Farms" tab in
 // the sibling apps. Protected by the shared CROSS_FARM_KEY; CORS-open.

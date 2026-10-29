@@ -1,6 +1,6 @@
 # Phase 15: MU Farms: products and publish switch
 
-**Status:** Not started
+**Status:** In progress
 
 ## Goal
 
@@ -8,7 +8,7 @@ Each project can mark products as published, and a safe public read-only list ex
 
 ## Already in place (from Phase 0)
 
-- No product or shop code exists yet.
+- Phase 15 implementation started on 2026-10-29 after Phase 14 passed current-head command-line validation.
 
 ## Scope
 
@@ -24,9 +24,10 @@ Each project can mark products as published, and a safe public read-only list ex
 
 ## Steps
 
-1. Agree product fields in this file.
-2. Build model, routes and screens in one app first, then copy to the others.
-3. Add the public endpoint and the leak test.
+1. Keep Product schema and public response fields synchronized across all three apps.
+2. Add farm-scoped Product models, manager/owner CRUD routes, and a shared management screen.
+3. Add a published-only public endpoint with an explicit public field allowlist.
+4. Add product boundary tests and route/sync checks.
 
 ## New command-line check
 
@@ -48,11 +49,12 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 ## Done checklist
 
-- [ ] A farm-scoped `Product` collection in each app: name, unit, price, quantity, photo, published flag.
-- [ ] Owner and manager screens to add products and flip "Publish to MU Farms".
-- [ ] A public read-only endpoint per app that returns only published products and only public fields (no costs, buyers or users).
-- [ ] Dairy: option to list milk or animals that have no buyer. Agri: harvested produce. Flock: eggs and birds.
-- [ ] The new command-line check above exists and passes.
+- [ ] Farm-scoped Product model in each app with name, kind, unit, price, quantity, photo URL, published flag.
+- [ ] Owner/manager screens can add, edit, delete, and publish products.
+- [ ] Public endpoint returns published products only and exposes allowlisted public fields.
+- [ ] Dairy supports milk/animals without a buyer; Agri supports harvested produce; Flock supports eggs/birds.
+- [ ] Product boundary tests, updated route matrix, repository checks and all three builds pass.
+- [ ] Live database, browser/device and deployment checks remain in Phases 19–21.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 

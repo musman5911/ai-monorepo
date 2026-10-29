@@ -186,6 +186,12 @@ const FARM_SWITCHER_PATHS = [
   'flock_farm/client/src/muf/ui/muf-farm-switcher.tsx',
 ];
 const farmSwitcherCopies = FARM_SWITCHER_PATHS.map(read);
+const PRODUCT_MANAGER_PATHS = ['dairy_farm/client/src/components/ProductManager.tsx', 'agri_farm/frontend/src/components/ProductManager.tsx', 'flock_farm/client/src/components/ProductManager.tsx'];
+const productCopies = PRODUCT_MANAGER_PATHS.map(read);
+if (productCopies.some((s) => s === null)) { console.log('  ❌ Product manager component missing'); failures++; }
+else if (productCopies.every((s) => s === productCopies[0])) console.log('  ✅ Product manager component identical in all three apps');
+else { console.log('  ❌ Product manager component copies differ'); failures++; }
+
 if (farmSwitcherCopies.some((source) => source === null)) { console.log('  ❌ Shared farm switcher missing'); failures++; }
 else if (farmSwitcherCopies.every((source) => source === farmSwitcherCopies[0])) console.log('  ✅ Shared farm switcher identical in all three apps');
 else { console.log('  ❌ Shared farm switcher copies differ'); failures++; }
@@ -200,6 +206,7 @@ const BACKEND_TWINS = [
   ['muf-env.mjs',      'dairy_farm/backend/muf-env.mjs',      'flock_farm/backend/muf-env.mjs',      'agri_farm/backend/muf-env.mjs'],
   ['muf-card.mjs',     'dairy_farm/backend/muf-card.mjs',     'flock_farm/backend/muf-card.mjs',     'agri_farm/backend/muf-card.mjs'],
   ['muf-farms.mjs',    'dairy_farm/backend/muf-farms.mjs',    'flock_farm/backend/muf-farms.mjs',    'agri_farm/backend/muf-farms.mjs'],
+  ['muf-products.mjs', 'dairy_farm/backend/muf-products.mjs', 'flock_farm/backend/muf-products.mjs', 'agri_farm/backend/muf-products.mjs'],
 ];
 for (const [label, pa, pb, pc] of BACKEND_TWINS) {
   const a = read(pa), b = read(pb), c = read(pc);

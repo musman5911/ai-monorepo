@@ -5,12 +5,13 @@ import {
   Shield, Users, Database, Send,
   Download, Upload, History, Baby, Settings,
   Check, AlertCircle,
-  FileText, RefreshCw, Globe2,
+  FileText, RefreshCw, Globe2, Store,
 } from 'lucide-react';
 import AvatarUploader from '../muf/ui/muf-avatar';
 import { useConfirm, usePromptInput, notify } from '../muf/core/muf-confirm';
 import ExportCenter from './ExportCenter';
 import MyFarmsPanel from './MyFarmsPanel';
+import ProductManager from './ProductManager';
 import BuyerKhata from './BuyerKhata';
 import { shareBackupFile, shareViaWhatsAppTo } from '../utils/share';
 import TelegramPanel from '../muf/ui/muf-telegram-panel';
@@ -32,7 +33,7 @@ interface Props {
   onClose: () => void;
 }
 
-type Section = 'profile' | 'users' | 'buyers' | 'reports' | 'backup' | 'farms' | 'telegram';
+type Section = 'profile' | 'users' | 'buyers' | 'reports' | 'backup' | 'farms' | 'telegram' | 'products';
 
 type Status = { type: 'success' | 'error'; msg: string } | null;
 
@@ -521,6 +522,7 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
   const sections: { id: string; label: string; icon: any }[] = [
     { id: 'profile', label: L('General'), icon: Settings },
     { id: 'farms', label: L('My Farms'), icon: Globe2 },
+    { id: 'products', label: L('MU Farms products'), icon: Store },
     { id: 'users', label: L('Users'), icon: Users },
     { id: 'reports', label: L('Reports'), icon: FileText },
     { id: 'backup', label: L('Backup'), icon: Database },
@@ -768,6 +770,12 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
           )}
 
           {section === 'farms' && <MyFarmsPanel />}
+          {section === 'products' && <ProductManager kinds={[{ value: 'milk', label: 'Milk' }, { value: 'animal', label: 'Animal without a buyer' }]} getHeaders={() => {
+            let token = ''; let farmId = '';
+            try { token = localStorage.getItem('dm_token') || ''; farmId = localStorage.getItem('muf_active_farm_dairy') || ''; } catch { /* storage unavailable */ }
+            return { ...(token ? { Authorization: 'Bearer ' + token } : {}), ...(farmId ? { 'X-Farm-Id': farmId } : {}) };
+          }} />}
+
 
           {section === 'reports' && (
             <div className="space-y-6">

@@ -24,6 +24,7 @@ import telegramRoutes, { initTelegram } from './routes/telegram.js';
 import cardsRoutes from './routes/cards.js';
 import settingsRoutes from './routes/settings.js';
 import farmsRoutes from './routes/farms.js';
+import productsRoutes from './routes/products.js';
 import { authRequiredUnscoped, requireRole } from './middleware/auth.js';
 import { MUF_ENV, mufTestRateLimitMax } from './muf-env.mjs';
 
@@ -208,6 +209,7 @@ app.get('/api/super-admin/farm-summary', authRequiredUnscoped, requireRole('owne
 
 app.use('/api/auth', authRoutes);
 app.use('/api/farms', farmsRoutes);
+app.use('/api/products', productsRoutes);
 app.use('/api', uploadRoutes);
 app.use('/api', backupRoutes);
 app.use('/api/archive', archiveRoutes);
