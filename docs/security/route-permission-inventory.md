@@ -76,7 +76,7 @@ The route matrix checks these reviewed fingerprints for each route module's lite
 | App | Module | Fingerprint | Declarations |
 |---|---|---:|---:|
 | agri | routes/analytics | 2b55a785 | 1 |
-| agri | routes/archive | 811c9dc5 | 0 |
+| agri | routes/archive | 8fb0b8bc | 6 |
 | agri | routes/auth | d70933d0 | 14 |
 | agri | routes/automations | d1f05c6f | 7 |
 | agri | routes/backup | a44ba383 | 4 |
@@ -94,7 +94,7 @@ The route matrix checks these reviewed fingerprints for each route module's lite
 | agri | routes/suppliers | 75390295 | 8 |
 | agri | routes/tasks | 65336c23 | 6 |
 | agri | routes/telegram | 55ae43e6 | 9 |
-| dairy | routes/archive | 811c9dc5 | 0 |
+| dairy | routes/archive | 8fb0b8bc | 6 |
 | dairy | routes/auth | 35262ba3 | 14 |
 | dairy | routes/backup | 5cfc7b68 | 5 |
 | dairy | routes/breeding-events | b83d2817 | 4 |
@@ -117,7 +117,7 @@ The route matrix checks these reviewed fingerprints for each route module's lite
 | dairy | routes/settings | 41e090c0 | 2 |
 | dairy | routes/suppliers | bd8b2b6f | 9 |
 | dairy | routes/telegram | 18c20021 | 9 |
-| flock | routes/archive | 811c9dc5 | 0 |
+| flock | routes/archive | 8fb0b8bc | 6 |
 | flock | routes/auth | 91117797 | 16 |
 | flock | routes/backup | 23aeea24 | 5 |
 | flock | routes/batches | 1eb4da48 | 22 |
