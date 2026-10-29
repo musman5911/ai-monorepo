@@ -86,7 +86,7 @@ app.use(helmet({
 // Rate limit login to mitigate brute-force attacks (10 attempts per 15 minutes per IP)
 const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 10,
+  max: mufTestRateLimitMax(10),
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'Too many login attempts. Try again later.' },

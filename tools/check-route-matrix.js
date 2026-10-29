@@ -64,6 +64,18 @@ function routeSignatureInventory() {
   }
   return rows;
 }
+
+function individualRouteInventory() {
+  const section = (INVENTORY.split('## Reviewed individual route entries')[1] || '').split(/^## /m)[0] || '';
+  const rows = new Map();
+  const pattern = /^\|\s*(dairy|agri|flock)\s*\|\s*(routes\/[a-z0-9-]+|server\.js)\s*\|\s*(GET|POST|PUT|PATCH|DELETE|OPTIONS|HEAD|ALL)\s*\|\s*`([^`]+)`\s*\|/gim;
+  for (const match of section.matchAll(pattern)) {
+    const key = match[1] + '|' + match[2] + '|' + match[3].toUpperCase() + ' ' + match[4];
+    rows.set(key, (rows.get(key) || 0) + 1);
+  }
+  return rows;
+}
+
 function mounts(app) {
   const source = read(app.dir + '/backend/server.js');
   const aliases = new Map();
@@ -300,12 +312,31 @@ async function runApp(app) {
     const discovered = discoverRoutes(app);
     if (!discovered.entries.length) throw new Error(app.key + ' discovered zero HTTP routes');
     const expectedSignatures = new Set();
+    const reviewedRoutes = individualRouteInventory();
+    const sourceRoutes = new Set();
     for (const module of discovered.signatureModules) {
+      for (const declaration of module.declarations) {
+        const routeKey = app.key + '|' + module.mod + '|' + declaration;
+        sourceRoutes.add(routeKey);
+        const count = reviewedRoutes.get(routeKey) || 0;
+        if (count !== 1) {
+          mismatch(app.key, 'ROUTE-ENTRY', module.mod + ' ' + declaration, 'inventory', 'exactly one reviewed route entry', count === 0 ? 'missing' : 'duplicate entries: ' + count);
+        }
+      }
       const key = app.key + '|' + module.mod;
       expectedSignatures.add(key);
       const reviewed = discovered.signatureInventory.get(key);
       if (!reviewed || reviewed.hash !== module.hash || reviewed.count !== module.declarations.length) {
         mismatch(app.key, 'ROUTE-SIGNATURES', module.mod, 'inventory', reviewed ? reviewed.hash + '/' + reviewed.count : 'reviewed signature entry', module.hash + '/' + module.declarations.length);
+      }
+    }
+    for (const [routeKey, count] of reviewedRoutes) {
+      if (!routeKey.startsWith(app.key + '|')) continue;
+      if (!sourceRoutes.has(routeKey)) {
+        mismatch(app.key, 'ROUTE-ENTRY', routeKey.slice(app.key.length + 1).replace('|', ' '), 'inventory', 'route declaration in source', 'stale inventory entry');
+      }
+      if (count > 1 && sourceRoutes.has(routeKey)) {
+        mismatch(app.key, 'ROUTE-ENTRY', routeKey.slice(app.key.length + 1).replace('|', ' '), 'inventory', 'one reviewed route entry', 'duplicate entries: ' + count);
       }
     }
     for (const key of discovered.signatureInventory.keys()) {
