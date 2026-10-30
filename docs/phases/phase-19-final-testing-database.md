@@ -116,3 +116,23 @@ GitHub Actions run [40852928322](https://github.com/musman5911/ai-monorepo/actio
 5. Stop and report if a safe disposable target cannot be confirmed.
 6. Run destructive migration tests only through `tools/final-db-migrate.mjs`; never run the backend migration scripts directly against an ordinary `.env` target during Phase 19.
 7. A passing preflight proves only that the target/backup declarations satisfy the guard. It does not prove the database is disposable; the operator must independently verify the host and restore.
+
+## Empty disposable database setup track (2026-10-30)
+
+The owner selected the empty-database integration-test path for the three disposable Atlas targets:
+
+- Agri: `muf_phase19_agri_local`
+- Dairy: `muf_phase19_dairy_local`
+- Flock: `muf_phase19_flock_local`
+
+These are intentionally blank databases. This track does not need a production export or a backup of empty databases. It must not be used as evidence for the separate legacy-data restore/migration checklist above.
+
+First-owner setup differs by app:
+
+- Agri: `GET /api/check-setup`, then `POST /api/signup`; the first-owner path invokes `mufMigrateFarms` and creates the initial `Farm 1`.
+- Dairy: `GET /api/auth/check`, then `POST /api/auth/setup`; setup also invokes `mufMigrateFarms` and creates the initial `Farm 1`.
+- Flock: `GET /api/auth/can-signup`, then email verification through `POST /api/auth/signup/request-code` and `POST /api/auth/signup/verify`. SMTP must be configured for this flow. The Flock first-owner verification route now invokes `mufMigrateFarms` after creating the owner, so the first farm and in-process default farm are initialized before the owner uses farm-scoped routes or monthly image backups.
+
+The Flock first-owner fix is source/test coverage only until the updated branch is pulled and exercised against the local Flock test database. After owner setup, verify farm creation, test-record CRUD, farm isolation, and backup behavior. Keep all production databases untouched.
+
+The existing `tools/final-db-*.mjs` migration workflow remains reserved for the restored-copy/legacy-data track. Do not bypass its backup/restore guards for empty-database setup tests, and do not run migrations against production.

@@ -2,6 +2,8 @@ import express from 'express';
 import rateLimit from 'express-rate-limit';
 import User from '../models/User.js';
 import Farm from '../models/Farm.js';
+import { MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
+import { mufMigrateFarms } from '../muf-farms.mjs';
 import PasswordReset from '../models/PasswordReset.js';
 import { signToken, authRequired, requireRole } from '../middleware/auth.js';
 import { sendVerificationCodeEmail, mailConfigured } from '../mailer.js';
@@ -636,6 +638,18 @@ router.post('/signup/verify', signupVerifyLimiter, async (req, res) => {
     });
     user.lastLoginAt = new Date();
     await user.save();
+
+    // Complete first-install farm setup just like Agri and Dairy. Flock's
+    // authenticated farm routes require an existing farm, so without this
+    // migration the first owner is locked out by MIGRATION_REQUIRED and the
+    // default farm needed by monthly image backups remains unset.
+    await mufMigrateFarms({
+      Farm,
+      User,
+      models: MUF_FARM_MODELS,
+      names: MUF_FARM_SCOPED_NAMES,
+    });
+
     // Invalidate any other pending signups
     await PasswordReset.updateMany(
       { purpose: 'signup_admin', usedAt: null },
