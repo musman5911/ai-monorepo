@@ -40,6 +40,8 @@ export default function LoginScreen({ lang, onLoginSuccess, onToggleLang }: Prop
   // Signup
   const [signupAllowed, setSignupAllowed] = useState(false);
   const [mailConfigured, setMailConfigured] = useState(false);
+  const [localCodeDelivery, setLocalCodeDelivery] = useState(false);
+  const [signupCodeDelivery, setSignupCodeDelivery] = useState<'email' | 'console'>('email');
   const [suUsername, setSuUsername] = useState('');
   const [suEmail, setSuEmail] = useState('');
   const [suPw, setSuPw] = useState('');
@@ -54,9 +56,10 @@ export default function LoginScreen({ lang, onLoginSuccess, onToggleLang }: Prop
   const CODE_LEN = 6;
 
   useEffect(() => {
-    getCanSignup().then(({ allowed, mailConfigured: mc }) => {
+    getCanSignup().then(({ allowed, mailConfigured: mc, localCodeDelivery: lcd }) => {
       setSignupAllowed(allowed);
       setMailConfigured(mc);
+      setLocalCodeDelivery(Boolean(lcd));
     });
     getMailStatus().then(({ configured }) => setMailConfigured(configured));
   }, []);
@@ -142,15 +145,19 @@ export default function LoginScreen({ lang, onLoginSuccess, onToggleLang }: Prop
     if (suPw !== suPw2) { setErr(L('Passwords do not match')); return; }
     setBusy(true);
     try {
-      await signupRequestCode({
+      const result = await signupRequestCode({
         username: suUsername.trim(),
         email: suEmail.trim().toLowerCase(),
         password: suPw,
         displayName: suName.trim() || undefined,
       });
-      setInfo(L('A verification code has been sent to your email.'));
+      setSignupCodeDelivery(result.delivery);
+      setErr(null);
+      setInfo(result.delivery === 'console'
+        ? L('SMTP is not configured. Copy the one-time verification code from the Flock server CMD window.')
+        : L('A verification code has been sent to your email.'));
+      setView('signupCode');
       setBusy(false);
-      goTo('signupCode');
     } catch (err) {
       setBusy(false);
       setErr(err instanceof Error ? err.message : 'Failed');
@@ -363,7 +370,9 @@ export default function LoginScreen({ lang, onLoginSuccess, onToggleLang }: Prop
               >
                 <BackHeader onBack={() => goTo('login')} title={L('Create admin account')} />
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {L('First-time setup: create the first administrator. A verification code will be sent to your email.')}
+                  {localCodeDelivery
+                    ? L('Local first-time setup: the verification code will be printed in the Flock server CMD window.')
+                    : L('First-time setup: create the first administrator. A verification code will be sent to your email.')}
                 </p>
                 {err && <AlertBox type="err" text={err} />}
                 <div className="grid grid-cols-2 gap-3">
@@ -410,7 +419,9 @@ export default function LoginScreen({ lang, onLoginSuccess, onToggleLang }: Prop
               >
                 <BackHeader onBack={() => goTo('signup')} title={L('Verify your email')} />
                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                  {L('Enter the 6-digit code sent to')} <span className="font-semibold text-slate-700 dark:text-slate-300">{suEmail}</span>
+                  {signupCodeDelivery === 'console'
+                    ? L('Enter the 6-digit code shown in the Flock server CMD window.')
+                    : <>{L('Enter the 6-digit code sent to')} <span className="font-semibold text-slate-700 dark:text-slate-300">{suEmail}</span></>}
                 </p>
                 {info && <AlertBox type="ok" text={info} />}
                 {err && <AlertBox type="err" text={err} />}

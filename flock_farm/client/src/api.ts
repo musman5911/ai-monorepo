@@ -447,7 +447,7 @@ export async function getMailStatus(): Promise<{ configured: boolean }> {
   return res.json();
 }
 
-export async function getCanSignup(): Promise<{ allowed: boolean; mailConfigured: boolean }> {
+export async function getCanSignup(): Promise<{ allowed: boolean; mailConfigured: boolean; localCodeDelivery?: boolean }> {
   const res = await fetch(`${AUTH_BASE}/can-signup`);
   if (!res.ok) return { allowed: false, mailConfigured: false };
   return res.json();
@@ -482,7 +482,7 @@ export async function signupRequestCode(data: {
   email: string;
   password: string;
   displayName?: string;
-}): Promise<void> {
+}): Promise<{ delivery: 'email' | 'console' }> {
   const res = await fetch(`${AUTH_BASE}/signup/request-code`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -492,6 +492,8 @@ export async function signupRequestCode(data: {
     const err = await res.json().catch(() => ({}));
     throw new Error(err.error || 'Failed to send verification code');
   }
+  const result = await res.json().catch(() => ({}));
+  return { delivery: result.delivery === 'console' ? 'console' : 'email' };
 }
 
 // ----- Daily summary -----

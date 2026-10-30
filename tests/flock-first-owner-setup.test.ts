@@ -58,3 +58,35 @@ describe('Flock first-owner setup', () => {
     mufSetDefaultFarmId(null);
   });
 });
+
+
+describe('Flock local first-owner verification delivery', () => {
+  it('prints a verification code only for development without SMTP, never for production', () => {
+    const source = readFileSync(
+      resolve(process.cwd(), 'flock_farm/backend/routes/auth.js'),
+      'utf8',
+    );
+    expect(source).toContain("MUF_ENV.nodeEnv === 'development'");
+    expect(source).toContain("!mailConfigured() && MUF_ENV.nodeEnv === 'development'");
+    expect(source).toContain('[LOCAL FIRST-OWNER SETUP] SMTP is not configured.');
+    expect(source).toContain("delivery: localConsoleDelivery ? 'console' : 'email'");
+    expect(source).toContain("if (!mailConfigured() && !localConsoleDelivery)");
+  });
+
+  it('advertises local console-code setup only while first-owner registration is allowed', () => {
+    const source = readFileSync(
+      resolve(process.cwd(), 'flock_farm/backend/routes/auth.js'),
+      'utf8',
+    );
+    expect(source).toContain("localCodeDelivery: count === 0 && !configured && MUF_ENV.nodeEnv === 'development'");
+  });
+
+  it('tells local first-time owners where to find the console verification code', () => {
+    const source = readFileSync(
+      resolve(process.cwd(), 'flock_farm/client/src/components/LoginScreen.tsx'),
+      'utf8',
+    );
+    expect(source).toContain('Flock server CMD window');
+    expect(source).toContain("signupCodeDelivery === 'console'");
+  });
+});

@@ -554,7 +554,14 @@ router.post('/reset-password', passwordResetVerifyLimiter, async (req, res) => {
 router.get('/can-signup', async (_req, res) => {
   try {
     const count = await activeAdminCount();
-    res.json({ allowed: count === 0, mailConfigured: mailConfigured() });
+    const configured = mailConfigured();
+    res.json({
+      allowed: count === 0,
+      mailConfigured: configured,
+      // Local development may verify the first owner using a one-time code
+      // printed to this machine's Flock server console instead of SMTP.
+      localCodeDelivery: count === 0 && !configured && MUF_ENV.nodeEnv === 'development',
+    });
   } catch (err) {
     // A rejected await outside try/catch would crash the whole process.
     res.status(500).json({ error: err.message || 'Failed to check signup availability' });
@@ -569,7 +576,8 @@ router.post('/signup/request-code', signupRequestLimiter, async (req, res) => {
     if (count > 0) {
       return res.status(403).json({ error: 'Signup is closed — an active administrator already exists.' });
     }
-    if (!mailConfigured()) {
+    const localConsoleDelivery = !mailConfigured() && MUF_ENV.nodeEnv === 'development';
+    if (!mailConfigured() && !localConsoleDelivery) {
       return res.status(503).json({ error: 'Email is not configured on this server. Set SMTP_* env vars first.' });
     }
     const username = String(req.body?.username || '').trim().toLowerCase();
@@ -591,13 +599,19 @@ router.post('/signup/request-code', signupRequestLimiter, async (req, res) => {
       purpose: 'signup_admin',
       pendingSignup: { username, email, passwordHash, displayName },
     });
-    try {
-      await sendVerificationCodeEmail({ to: email, code, purpose: 'signup_admin', username });
-    } catch (mailErr) {
-      console.error('Failed to send signup email:', mailErr);
-      return res.status(500).json({ error: 'Failed to send verification email. Check SMTP configuration.' });
+    if (localConsoleDelivery) {
+      // Development-only fallback for a brand-new local installation. Never
+      // expose the code through the HTTP response or enable this in production.
+      console.warn(`[LOCAL FIRST-OWNER SETUP] SMTP is not configured. Verification code for ${username}: ${code}`);
+    } else {
+      try {
+        await sendVerificationCodeEmail({ to: email, code, purpose: 'signup_admin', username });
+      } catch (mailErr) {
+        console.error('Failed to send signup email:', mailErr);
+        return res.status(500).json({ error: 'Failed to send verification email. Check SMTP configuration.' });
+      }
     }
-    res.json({ ok: true });
+    res.json({ ok: true, delivery: localConsoleDelivery ? 'console' : 'email' });
   } catch (err) {
     console.error('POST /auth/signup/request-code error:', err);
     res.status(500).json({ error: 'Failed to create signup' });

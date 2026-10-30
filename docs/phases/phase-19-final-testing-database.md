@@ -131,7 +131,7 @@ First-owner setup differs by app:
 
 - Agri: `GET /api/check-setup`, then `POST /api/signup`; the first-owner path invokes `mufMigrateFarms` and creates the initial `Farm 1`.
 - Dairy: `GET /api/auth/check`, then `POST /api/auth/setup`; setup also invokes `mufMigrateFarms` and creates the initial `Farm 1`.
-- Flock: `GET /api/auth/can-signup`, then email verification through `POST /api/auth/signup/request-code` and `POST /api/auth/signup/verify`. SMTP must be configured for this flow. The Flock first-owner verification route now invokes `mufMigrateFarms` after creating the owner, so the first farm and in-process default farm are initialized before the owner uses farm-scoped routes or monthly image backups.
+- Flock: `GET /api/auth/can-signup`, then verification through `POST /api/auth/signup/request-code` and `POST /api/auth/signup/verify`. With SMTP configured, the code is emailed. For `NODE_ENV=development` only, when SMTP is not configured, the one-time code is printed to the local Flock server console; the code is never included in the HTTP response, and production continues to require SMTP email. The Flock first-owner verification route invokes `mufMigrateFarms` after creating the owner, so the first farm and in-process default farm are initialized before the owner uses farm-scoped routes or monthly image backups.
 
 The Flock first-owner fix is source/test coverage only until the updated branch is pulled and exercised against the local Flock test database. After owner setup, verify farm creation, test-record CRUD, farm isolation, and backup behavior. Keep all production databases untouched.
 
