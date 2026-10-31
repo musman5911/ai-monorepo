@@ -1,0 +1,23 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-workbench-runtime"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-workbench-runtime
+> node tools/check-muf-workbench-runtime.js
+
+
+MUF workbench runtime smoke test
+  Base URL: http://127.0.0.1:5000
+  ✓ workbench route responds with HTML
+  ✓ workbench mount point is present
+  ✓ workbench editor module is referenced
+  ✓ Vite client and React refresh are injected into the custom HTML
+  ✓ editor TSX is transformed and served as JavaScript
+  ✓ editor module compiles and contains the expected mount/draft code
+  ✓ workbench stylesheet is served without a transform error
+  ✓ Vite client and React refresh endpoints return HTTP 200
+
+All 8 workbench runtime checks passed.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=2.48

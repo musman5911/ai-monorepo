@@ -1,0 +1,58 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+INITIAL SCALE ATTEMPT (superseded by scale-final.txt)
+TAP version 13
+# {"app":"dairy","route":"/farms","method":"GET","status":200,"ms":14,"bytes":430}
+# {"app":"dairy","route":"/cows","method":"POST","status":201,"ms":48,"bytes":494}
+# {"app":"dairy","route":"/buyers","method":"POST","status":201,"ms":15,"bytes":199}
+# {"app":"dairy","fixture":{"ok":true,"count":50000,"insertMs":1004.2592099999997,"rssBefore":128950272,"rssAfter":193441792}}
+# {"app":"dairy","route":"/milk/summary?cowId=6af2d674-9eed-428a-9c4f-38f4309dfa30","method":"GET","status":200,"ms":455,"bytes":76}
+# {"expected":{"count":50000,"liters":15000,"revenue":1500000},"actual":{"count":50000,"totalLiters":15000,"saleableLiters":15000,"revenue":1500000}}
+# {"app":"dairy","route":"/milk?cowId=6af2d674-9eed-428a-9c4f-38f4309dfa30&page=1&limit=100","method":"GET","status":200,"ms":635,"bytes":29478}
+# {"app":"dairy","route":"/backup","method":"GET","status":200,"ms":1707,"bytes":15785869}
+# Subtest: NEW-SCALE-1: 50k milk records over three years retain penny precision and untruncated summary
+ok 1 - NEW-SCALE-1: 50k milk records over three years retain penny precision and untruncated summary
+  ---
+  duration_ms: 7605.656344
+  type: 'test'
+  ...
+# {"app":"agri","route":"/farms","method":"GET","status":200,"ms":5,"bytes":430}
+# {"app":"agri","route":"/analytics/summary","method":"GET","status":200,"ms":45,"bytes":26167}
+# {"app":"agri","fixture":{"ok":true,"count":100000,"insertMs":795.7792959999997,"rssBefore":111194112,"rssAfter":161202176}}
+# {"app":"agri","route":"/analytics/summary","method":"GET","status":200,"ms":1695,"bytes":29034}
+# {"before":{"entries":56,"income":1166000,"expense":1414600,"net":-248600,"farmWideIncome":8000,"farmWideExpense":906200},"after":{"entries":100056,"income":1166500.0000004657,"expense":1415100.0000004657,"net":-248600,"farmWideIncome":8500.000000010914,"farmWideExpense":906700.0000004657},"expectedDelta":{"entries":100000,"income":500,"expense":500,"net":0}}
+# {"app":"agri","route":"/backup","method":"GET","status":200,"ms":2822,"bytes":17326491}
+# Subtest: NEW-SCALE-2: 100k finance records over three years do not truncate analytics
+not ok 2 - NEW-SCALE-2: 100k finance records over three years do not truncate analytics
+  ---
+  duration_ms: 13162.116235
+  type: 'test'
+  location: '/home/user/full-rerun/tests/full-rerun/scale.test.mjs:38:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+    
+    99944 !== 100000
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 100000
+  actual: 99944
+  operator: 'strictEqual'
+  stack: |-
+    file:///home/user/full-rerun/tests/full-rerun/scale.test.mjs:48:130
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async fixture (file:///home/user/full-rerun/tests/full-rerun/scale.test.mjs:22:3)
+    async TestContext.<anonymous> (file:///home/user/full-rerun/tests/full-rerun/scale.test.mjs:39:2)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 21096.176826
+EXIT=1

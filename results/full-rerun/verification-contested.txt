@@ -1,0 +1,31 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["bash", "tests/verification/contested-probes.sh"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+================ A4: Set-Cookie on login ================
+-- Agri POST /api/login (form):
+(no Set-Cookie header)
+-- Flock POST /api/auth/login (json):
+Set-Cookie: token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4OTVkY2I0Yjg4ZjliYWRhZGJhN2YzMWMiLCJ1c2VybmFtZSI6ImFkbWluIiwicm9sZSI6Im93bmVyIiwiZGlzcGxheU5hbWUiOiJNYWxpayBVc21hbiIsImlhdCI6MTc5MzQ3NDAwMywiZXhwIjoxNzk0MDc4ODAzfQ.YlUFWQYDh29r0oG1NDHP7kMV7PRXoWiRXRN5uzajYW0; Max-Age=604800; Path=/; Expires=Sat, 07 Nov 2026 19:13:23 GMT; HttpOnly; SameSite=Lax
+-- Dairy POST /api/auth/login (json):
+(no Set-Cookie header)
+================ C2: CORS reflection by environment ================
+-- Dairy, NODE_ENV=test (harness default), no FRONTEND_URL:
+Access-Control-Allow-Origin: https://evil.example
+-- Dairy, NODE_ENV=production, no FRONTEND_URL:
+(no ACAO)
+================ E11: Agri automations role test ================
+-- worker PUT /api/settings/automations:
+403
+-- owner PUT /api/settings/automations with garbage payload:
+200
+-- owner GET /api/settings/automations (was garbage stored?):
+{"garbage":"payload","nested":{"x":1},"recipient":"admin@agrifarm.com"}
+================ N1/D4: Dairy double-delete semantics ================
+-- DELETE /api/health/ (first):
+404
+-- DELETE same id again (double-delete):
+{"error":"API route not found: DELETE /health/"} 404
+DONE
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=29.14

@@ -1,0 +1,16 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+               
+               
+┌─────────────┐
+│ Scan Status │
+└─────────────┘
+  Scanning 525 files tracked by git with 10 Code rules:
+                                                                                                                        
+  Language   Rules   Files          Origin   Rules                                                                      
+ ──────────────────────────        ────────────────                                                                     
+  ts            10     295          Custom      10                                                                      
+  js            10     144                                                                                              
+                                                                                                                        
+SEMGREP_EXIT=124
+DETECT_SECRETS_EXIT=124
+NJSSCAN_EXIT=124

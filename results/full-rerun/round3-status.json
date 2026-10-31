@@ -1,0 +1,140 @@
+{
+  "revision": "2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0",
+  "jobs": [
+    {
+      "name": "phase1-dynamic",
+      "args": [
+        "node",
+        "tests/round3/phase1-dynamic.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 16.4,
+      "log": "results/full-rerun/round3-phase1-dynamic.txt"
+    },
+    {
+      "name": "phase1b-prod-proxy-cards",
+      "args": [
+        "node",
+        "tests/round3/phase1b-prod-proxy-cards.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 60.06,
+      "log": "results/full-rerun/round3-phase1b-prod-proxy-cards.txt"
+    },
+    {
+      "name": "phase1c-protocol-chaos-load",
+      "args": [
+        "node",
+        "tests/round3/phase1c-protocol-chaos-load.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 40.21,
+      "log": "results/full-rerun/round3-phase1c-protocol-chaos-load.txt"
+    },
+    {
+      "name": "phase1d-followups",
+      "args": [
+        "node",
+        "tests/round3/phase1d-followups.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 20.93,
+      "log": "results/full-rerun/round3-phase1d-followups.txt"
+    },
+    {
+      "name": "phase3-flock-cards-reverse",
+      "args": [
+        "node",
+        "tests/round3/phase3-flock-cards-reverse.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 2.08,
+      "log": "results/full-rerun/round3-phase3-flock-cards-reverse.txt"
+    },
+    {
+      "name": "final-p1-rerun",
+      "args": [
+        "node",
+        "tests/round3/final-p1-rerun.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 48.57,
+      "log": "results/full-rerun/round3-final-p1-rerun.txt"
+    },
+    {
+      "name": "fastcheck-commands",
+      "args": [
+        "node",
+        "tests/round3/fastcheck-commands.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 5.46,
+      "log": "results/full-rerun/round3-fastcheck-commands.txt"
+    },
+    {
+      "name": "build-full-specs",
+      "args": [
+        "node",
+        "tests/round3/build-full-specs.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.18,
+      "log": "results/full-rerun/round3-build-full-specs.txt"
+    },
+    {
+      "name": "idor-dairy",
+      "args": [
+        "node",
+        "tests/round3/idor-authz-matrix.mjs",
+        "dairy"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 13.89,
+      "log": "results/full-rerun/round3-idor-dairy.txt"
+    },
+    {
+      "name": "idor-agri",
+      "args": [
+        "node",
+        "tests/round3/idor-authz-matrix.mjs",
+        "agri"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 42.83,
+      "log": "results/full-rerun/round3-idor-agri.txt"
+    },
+    {
+      "name": "idor-flock",
+      "args": [
+        "node",
+        "tests/round3/idor-authz-matrix.mjs",
+        "flock"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 16.79,
+      "log": "results/full-rerun/round3-idor-flock.txt"
+    },
+    {
+      "name": "hypothesis-agri",
+      "args": [
+        "python",
+        "tests/round3/hypothesis_agri.py"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 20.95,
+      "log": "results/full-rerun/round3-hypothesis-agri.txt"
+    }
+  ]
+}

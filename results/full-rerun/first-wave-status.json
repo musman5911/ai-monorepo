@@ -1,0 +1,35 @@
+{
+  "revision": "2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0",
+  "status": [
+    {
+      "name": "upstream-vitest",
+      "exit": 0,
+      "signal": null,
+      "log": "/home/user/full-rerun/results/full-rerun/upstream-vitest.txt"
+    },
+    {
+      "name": "build-dairy_farm",
+      "exit": 0,
+      "signal": null,
+      "log": "/home/user/full-rerun/results/full-rerun/build-dairy_farm.txt"
+    },
+    {
+      "name": "build-agri_farm",
+      "exit": 0,
+      "signal": null,
+      "log": "/home/user/full-rerun/results/full-rerun/build-agri_farm.txt"
+    },
+    {
+      "name": "build-flock_farm",
+      "exit": 0,
+      "signal": null,
+      "log": "/home/user/full-rerun/results/full-rerun/build-flock_farm.txt"
+    },
+    {
+      "name": "business-acceptance",
+      "exit": 1,
+      "signal": null,
+      "log": "/home/user/full-rerun/results/full-rerun/business-acceptance.txt"
+    }
+  ]
+}

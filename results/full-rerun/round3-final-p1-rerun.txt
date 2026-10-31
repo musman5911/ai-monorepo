@@ -1,0 +1,23 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "tests/round3/final-p1-rerun.mjs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+git rev-parse HEAD: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+date: 2026-10-31T19:08:35.102Z
+FINAL P1 RERUN on newest tip (memory mode, NODE_ENV=test, direct server)
+
+### FLOCK http://127.0.0.1:19601
+[B1-B3 rerun] anon GET /api/cards/customer/1 -> 503; contains phone 0301-1234567: false; contains name Khan: false
+[A1 rerun] POST /api/auth/logout -> 200
+[A1 rerun] reuse old token GET /api/data/customers -> 200 (200 = STILL FAILING non-revocation)
+
+### DAIRY http://127.0.0.1:19602
+[A1 rerun] POST /api/auth/logout -> 404
+[A1 rerun] reuse old token GET /api/cows -> 200 (200 = STILL FAILING)
+
+### AGRI http://127.0.0.1:19603
+[A1 rerun] POST /api/auth/logout -> 404
+[A1 rerun] reuse old token GET /api/fields -> 401 (200 = STILL FAILING)
+[neg-liability rerun] POST /api/liabilities amount=-5000 -> 401 body={"detail":"Invalid or expired authentication credentials"}
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=48.57

@@ -1,0 +1,63 @@
+{
+  "revision": "2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0",
+  "jobs": [
+    {
+      "name": "authz-dairy",
+      "args": [
+        "node",
+        "tests/verification/authz-matrix.mjs",
+        "dairy"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 4.64,
+      "log": "results/full-rerun/verification-authz-dairy.txt"
+    },
+    {
+      "name": "authz-agri",
+      "args": [
+        "node",
+        "tests/verification/authz-matrix.mjs",
+        "agri"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 10.36,
+      "log": "results/full-rerun/verification-authz-agri.txt"
+    },
+    {
+      "name": "authz-flock",
+      "args": [
+        "node",
+        "tests/verification/authz-matrix.mjs",
+        "flock"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 3.64,
+      "log": "results/full-rerun/verification-authz-flock.txt"
+    },
+    {
+      "name": "contested",
+      "args": [
+        "bash",
+        "tests/verification/contested-probes.sh"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 29.14,
+      "log": "results/full-rerun/verification-contested.txt"
+    },
+    {
+      "name": "load-locust",
+      "args": [
+        "bash",
+        "tests/verification/run-load.sh"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 252.08,
+      "log": "results/full-rerun/verification-load-locust.txt"
+    }
+  ]
+}

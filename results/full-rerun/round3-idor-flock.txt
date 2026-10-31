@@ -1,0 +1,109 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "tests/round3/idor-authz-matrix.mjs", "flock"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+SETUP login admin -> 503 tokenLen=0 body={"error":"Server is starting, please retry in a few seconds."}
+SETUP login admin -> 503 tokenLen=0 body={"error":"Server is starting, please retry in a few seconds."}
+SETUP login admin -> 503 tokenLen=0 body={"error":"Server is starting, please retry in a few seconds."}
+SETUP login admin -> 503 tokenLen=0 body={"error":"Server is starting, please retry in a few seconds."}
+SETUP login admin -> 200 tokenLen=255
+SETUP login worker -> 200 tokenLen=257
+SETUP login authzamvws0k2z -> 200 tokenLen=255
+SETUP mkManager a: signup=201 tokenLen=255 sanityMe=200
+SETUP login authzbmvws0l8n -> 200 tokenLen=255
+SETUP mkManager b: signup=201 tokenLen=255 sanityMe=200
+METHOD PATH | anon | worker | mgrA | mgrB-other | owner
+POST /api/auth/login | 400 | 400 | 400 | 400 | 400
+GET /api/farm-summary | 404 | 404 | 404 | 404 | 404
+GET /api/super-admin/farm-summary | 401 | 403 | 403 | 403 | 200
+GET /api/health | 200 | 200 | 200 | 200 | 200
+GET /healthz | 200 | 200 | 200 | 200 | 200
+GET /__replit_health_check | 200 | 200 | 200 | 200 | 200
+GET /api/auth/me | 401 | 200 | 200 | 403 | 200
+POST /api/auth/logout | 200 | 200 | 200 | 200 | 200
+PATCH /api/auth/me | 401 | 200 | 200 | 403 | 200
+GET /api/auth/users | 401 | 403 | 200 | 403 | 200
+POST /api/auth/users | 401 | 403 | 400 | 403 | 400
+PATCH /api/auth/users/:id | 401 | 403 | 403 | 403 | 400
+DELETE /api/auth/users/:id | 401 | 403 | 403 | 403 | 404
+POST /api/auth/request-profile-code | 401 | 503 | 503 | 403 | 503
+POST /api/auth/change-password | 401 | 400 | 400 | 403 | 400
+GET /api/auth/mail-status | 200 | 200 | 200 | 200 | 200
+POST /api/auth/forgot-password | 503 | 503 | 503 | 503 | 503
+POST /api/auth/reset-password | 400 | 400 | 400 | 400 | 400
+GET /api/auth/can-signup | 200 | 200 | 200 | 200 | 200
+POST /api/auth/signup/request-code | 403 | 403 | 403 | 403 | 403
+POST /api/auth/signup/verify | 403 | 403 | 403 | 403 | 403
+GET /api/products/public | 200 | 200 | 200 | 200 | 200
+GET /api/products | 401 | 200 | 200 | 403 | 200
+POST /api/products | 401 | 403 | 400 | 403 | 400
+PUT /api/products/:id | 401 | 403 | 400 | 403 | 400
+DELETE /api/products/:id | 401 | 403 | 404 | 403 | 404
+POST /api/uploads/image | 401 | 403 | 400 | 403 | 400
+POST /api/uploads/diary-image | 401 | 400 | 400 | 403 | 400
+GET /api/images/:id | 401 | 404 | 404 | 403 | 404
+DELETE /api/images/:id | 401 | 403 | 404 | 403 | 404
+GET /api/backup | 401 | 403 | 403 | 403 | 200
+POST /api/backup/restore | 401 | 403 | 403 | 403 | 200
+GET /api/backup/auto | 401 | 403 | 403 | 403 | 200
+POST /api/backup/auto/run | 401 | 403 | 403 | 403 | 200
+POST /api/backup/restore-auto | 401 | 403 | 403 | 403 | 200
+GET /api/batches | 401 | 200 | 200 | 403 | 200
+GET /api/batches/export-all | 401 | 403 | 200 | 403 | 200
+POST /api/batches/import-all | 401 | 403 | 200 | 403 | 200
+DELETE /api/batches/wipe-all | 401 | 403 | 200 | 403 | 200
+GET /api/batches/:batchId | 401 | 404 | 404 | 403 | 404
+POST /api/batches | 401 | 403 | 400 | 403 | 400
+PATCH /api/batches/:batchId | 401 | 403 | 404 | 403 | 404
+POST /api/batches/:batchId/intake | 401 | 403 | 404 | 403 | 404
+POST /api/batches/:batchId/feed-logs | 401 | 404 | 404 | 403 | 404
+POST /api/batches/:batchId/logs/:logType/bulk | 401 | 400 | 400 | 403 | 400
+POST /api/batches/:batchId/egg-logs | 401 | 404 | 404 | 403 | 404
+POST /api/batches/:batchId/egg-logs/bulk | 401 | 400 | 400 | 403 | 400
+POST /api/batches/:batchId/vaccination-logs | 401 | 404 | 404 | 403 | 404
+POST /api/batches/:batchId/weight-logs | 401 | 404 | 404 | 403 | 404
+POST /api/batches/:batchId/mortality-logs | 401 | 404 | 404 | 403 | 404
+POST /api/batches/:batchId/expense-logs | 401 | 404 | 404 | 403 | 404
+POST /api/batches/:batchId/sales-logs | 401 | 404 | 404 | 403 | 404
+PATCH /api/batches/:batchId/close | 401 | 403 | 404 | 403 | 404
+DELETE /api/batches/:batchId | 401 | 403 | 404 | 403 | 404
+POST /api/batches/:batchId/gallery | 401 | 404 | 404 | 403 | 404
+DELETE /api/batches/:batchId/gallery | 401 | 403 | 404 | 403 | 404
+DELETE /api/batches/logs/:kind/:logId | 401 | 403 | 400 | 403 | 400
+GET /api/cron/daily-summary | 503 | 503 | 503 | 503 | 503
+POST /api/summary/send-now | 401 | 403 | 400 | 403 | 400
+GET /api/summary/today | 401 | 200 | 200 | 403 | 200
+GET /api/data/:key | 401 | 400 | 400 | 403 | 400
+PUT /api/data/:key | 401 | 400 | 400 | 403 | 400
+GET /api/telegram/status | 401 | 403 | 200 | 403 | 200
+POST /api/telegram/link-code | 401 | 403 | 400 | 403 | 400
+DELETE /api/telegram/links/:chatId | 401 | 403 | 200 | 403 | 200
+POST /api/telegram/webhook/:secret | 200 | 200 | 200 | 200 | 200
+GET /api/telegram/alerts | 401 | 200 | 200 | 403 | 200
+GET /api/telegram/settings | 401 | 403 | 200 | 403 | 200
+PUT /api/telegram/settings | 401 | 403 | 200 | 403 | 200
+POST /api/telegram/send-summary | 401 | 403 | 200 | 403 | 200
+GET /api/telegram/cron | 503 | 503 | 503 | 503 | 503
+GET /api/cards/customer/:id | 404 | 404 | 404 | 404 | 404
+GET /api/cards/supplier/:id | 404 | 404 | 404 | 404 | 404
+GET /api/cards/worker/:id | 404 | 404 | 404 | 404 | 404
+GET /api/settings/location | 401 | 200 | 200 | 403 | 200
+PUT /api/settings/location | 401 | 403 | 400 | 403 | 400
+
+TOTAL ROUTES: 76
+OPEN-WITHOUT-LOGIN (anon not 401/403/404): 13
+  OPEN: POST /api/auth/login → anon 400
+  OPEN: GET /api/health → anon 200
+  OPEN: GET /healthz → anon 200
+  OPEN: GET /__replit_health_check → anon 200
+  OPEN: POST /api/auth/logout → anon 200
+  OPEN: GET /api/auth/mail-status → anon 200
+  OPEN: POST /api/auth/forgot-password → anon 503
+  OPEN: POST /api/auth/reset-password → anon 400
+  OPEN: GET /api/auth/can-signup → anon 200
+  OPEN: GET /api/products/public → anon 200
+  OPEN: GET /api/cron/daily-summary → anon 503
+  OPEN: POST /api/telegram/webhook/:secret → anon 200
+  OPEN: GET /api/telegram/cron → anon 503
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=16.79

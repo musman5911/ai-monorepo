@@ -1,0 +1,39 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND npm run build
+CWD /home/user/full-rerun/dairy_farm/client
+
+> dairy-farm-client@1.0.0 build
+> tsc --noEmit && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 3224 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                            2.27 kB │ gzip:   1.00 kB
+dist/assets/MufShop-BsbbKl5o.css          12.91 kB │ gzip:   3.39 kB
+dist/assets/index-Bq2uAWuo.css           232.65 kB │ gzip:  38.55 kB
+dist/assets/react-DlywE_9j.js              0.06 kB │ gzip:   0.07 kB
+dist/assets/muf-fab-D9r-vssb.js            1.99 kB │ gzip:   0.95 kB
+dist/assets/muf-charts-DooLn8d_.js         5.12 kB │ gzip:   2.11 kB
+dist/assets/index-ZiCS3eLt.js              5.71 kB │ gzip:   2.58 kB
+dist/assets/MufShop-Ea4pYqbJ.js           10.03 kB │ gzip:   3.53 kB
+dist/assets/LaborTab-D40SaQNA.js          21.97 kB │ gzip:   5.04 kB
+dist/assets/CowDetailPopup-Ua2JOLDr.js    22.58 kB │ gzip:   6.64 kB
+dist/assets/HealthTab-kwgiWrAB.js         24.08 kB │ gzip:   6.01 kB
+dist/assets/BreedingTab-DAhqh8z7.js       24.69 kB │ gzip:   6.62 kB
+dist/assets/CowsTab-_ymSDo0y.js           25.91 kB │ gzip:   7.29 kB
+dist/assets/MilkTab-nm27S17m.js           25.91 kB │ gzip:   6.62 kB
+dist/assets/ReportsTab-Cfoh3iHk.js        27.36 kB │ gzip:   7.31 kB
+dist/assets/SuperAdminTab-Cab3VOjR.js     28.98 kB │ gzip:   7.55 kB
+dist/assets/purify.es-CAi2OJFm.js         30.47 kB │ gzip:  11.73 kB
+dist/assets/ExpensesTab-Wns1wVYi.js       41.29 kB │ gzip:  10.37 kB
+dist/assets/icons-DIhYAdTV.js             48.91 kB │ gzip:  10.79 kB
+dist/assets/Dashboard-D6-Uar6n.js         59.58 kB │ gzip:  15.82 kB
+dist/assets/index.es-DbOVPuzu.js         150.84 kB │ gzip:  51.61 kB
+dist/assets/html2canvas.esm-CBrSDip1.js  201.42 kB │ gzip:  48.03 kB
+dist/assets/muf-confirm-BwixlWkc.js      243.33 kB │ gzip:  85.59 kB
+dist/assets/App-BfqoPhO8.js              260.09 kB │ gzip:  74.47 kB
+dist/assets/pdf-BixZ_Ng6.js              421.99 kB │ gzip: 138.64 kB
+dist/assets/charts-D67smA6d.js           517.64 kB │ gzip: 148.61 kB
+✓ built in 16m 59s

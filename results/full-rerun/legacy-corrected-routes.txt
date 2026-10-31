@@ -1,0 +1,48 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND vitest run --maxWorkers=1 --testTimeout=30000 corrected backup + shared-router contract suites
+
+ RUN  v3.2.7 /home/user/full-rerun
+
+ ❯ tests/api-matrix/backup-import-export.test.ts (11 tests | 1 failed) 18649ms
+   ✓ Backup / import / export (all apps) > dairy > owner downloads a structured backup; worker is forbidden 115ms
+   ✓ Backup / import / export (all apps) > dairy > junk restore is rejected and data survives 91ms
+   ✓ Backup / import / export (all apps) > dairy > export → restore into a fresh instance round-trips the marker record  2638ms
+   ✓ Backup / import / export (all apps) > flock > owner downloads a structured backup; worker is forbidden 17ms
+   × Backup / import / export (all apps) > flock > junk restore is rejected and data survives 16ms
+     → flock junk restore {}: expected 200 to be 400 // Object.is equality
+   ✓ Backup / import / export (all apps) > flock > export → restore into a fresh instance round-trips the marker record  1635ms
+   ✓ Backup / import / export (all apps) > agri > owner downloads a structured backup; worker is forbidden 15ms
+   ✓ Backup / import / export (all apps) > agri > junk restore is rejected and data survives 21ms
+   ✓ Backup / import / export (all apps) > agri > export → restore into a fresh instance round-trips the marker record  2835ms
+   ✓ Backup / import / export (all apps) > flock: batch export-all endpoint responds with export data 8ms
+   ✓ Backup / import / export (all apps) > cross-app farm-summary gate rejects wrong keys everywhere 11ms
+ ✓ tests/api-deep/frontend-contract-deep.test.ts (3 tests) 62ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api-matrix/backup-import-export.test.ts > Backup / import / export (all apps) > flock > junk restore is rejected and data survives
+AssertionError: flock junk restore {}: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/backup-import-export.test.ts:51:98
+     49|         for (const junk of [{}, { backup: 'nope' }, { version: 999 }, …
+     50|           const r = await raw(ctx, restorePath, { method: 'POST', toke…
+     51|           expect(r.response.status, `${name} junk restore ${JSON.strin…
+       |                                                                                                  ^
+     52|         }
+     53|         const worker = await raw(ctx, restorePath, { method: 'POST', t…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 13 passed (14)
+   Start at  19:19:57
+   Duration  19.64s (transform 145ms, setup 0ms, collect 163ms, tests 18.71s, environment 0ms, prepare 243ms)
+
+EXIT=1

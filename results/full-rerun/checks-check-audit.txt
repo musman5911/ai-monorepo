@@ -1,0 +1,33 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-audit"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-audit
+> node tools/check-audit.js
+
+
+=== root tools (.) ===
+found 0 vulnerabilities
+
+=== Dairy backend (dairy_farm/backend) ===
+found 0 vulnerabilities
+
+=== Dairy client (dairy_farm/client) ===
+found 0 vulnerabilities
+
+=== Flock backend (flock_farm/backend) ===
+found 0 vulnerabilities
+
+=== Flock client (flock_farm/client) ===
+found 0 vulnerabilities
+
+=== Agri backend (agri_farm/backend) ===
+found 0 vulnerabilities
+
+=== Agri frontend (agri_farm/frontend) ===
+found 0 vulnerabilities
+
+All package sets passed: no high or critical production dependency findings.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=8.53

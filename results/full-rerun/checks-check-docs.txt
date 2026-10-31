@@ -1,0 +1,188 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-docs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-docs
+> node tools/check-phase-docs.js && node tools/check-guide-commands.js
+
+
+Phase docs check
+  ✓ docs/phases/README.md exists
+  ✓ the index lists Phase 0 plus at least 12 later phases (found 22)
+  ✓ phase numbers run 0, 1, 2 ... without gaps
+  ✓ Phase 0 is Done
+  ✓ the last three phases are the final testing phases
+  ✓ no final-testing phase appears before the end
+  ✓ every phase file is listed and every row has a file (22 files, 22 rows)
+  ✓ Phase 0: title line starts with "# Phase 0:"
+  ✓ Phase 0: status matches the index (Done)
+  ✓ Phase 0: has all required sections
+  ✓ Phase 1: title line starts with "# Phase 1:"
+  ✓ Phase 1: status matches the index (Done)
+  ✓ Phase 1: has all required sections
+  ✓ Phase 1: names a new command-line check
+  ✓ Phase 2: title line starts with "# Phase 2:"
+  ✓ Phase 2: status matches the index (Done)
+  ✓ Phase 2: has all required sections
+  ✓ Phase 2: names a new command-line check
+  ✓ Phase 3: title line starts with "# Phase 3:"
+  ✓ Phase 3: status matches the index (Done)
+  ✓ Phase 3: has all required sections
+  ✓ Phase 3: names a new command-line check
+  ✓ Phase 4: title line starts with "# Phase 4:"
+  ✓ Phase 4: status matches the index (Done)
+  ✓ Phase 4: has all required sections
+  ✓ Phase 4: names a new command-line check
+  ✓ Phase 5: title line starts with "# Phase 5:"
+  ✓ Phase 5: status matches the index (Done)
+  ✓ Phase 5: has all required sections
+  ✓ Phase 5: names a new command-line check
+  ✓ Phase 6: title line starts with "# Phase 6:"
+  ✓ Phase 6: status matches the index (Done)
+  ✓ Phase 6: has all required sections
+  ✓ Phase 6: names a new command-line check
+  ✓ Phase 7: title line starts with "# Phase 7:"
+  ✓ Phase 7: status matches the index (Done)
+  ✓ Phase 7: has all required sections
+  ✓ Phase 7: names a new command-line check
+  ✓ Phase 8: title line starts with "# Phase 8:"
+  ✓ Phase 8: status matches the index (Done)
+  ✓ Phase 8: has all required sections
+  ✓ Phase 8: names a new command-line check
+  ✓ Phase 9: title line starts with "# Phase 9:"
+  ✓ Phase 9: status matches the index (Done)
+  ✓ Phase 9: has all required sections
+  ✓ Phase 9: names a new command-line check
+  ✓ Phase 10: title line starts with "# Phase 10:"
+  ✓ Phase 10: status matches the index (Done)
+  ✓ Phase 10: has all required sections
+  ✓ Phase 10: names a new command-line check
+  ✓ Phase 11: title line starts with "# Phase 11:"
+  ✓ Phase 11: status matches the index (Done)
+  ✓ Phase 11: has all required sections
+  ✓ Phase 11: names a new command-line check
+  ✓ Phase 12: title line starts with "# Phase 12:"
+  ✓ Phase 12: status matches the index (Done)
+  ✓ Phase 12: has all required sections
+  ✓ Phase 12: names a new command-line check
+  ✓ Phase 13: title line starts with "# Phase 13:"
+  ✓ Phase 13: status matches the index (Done)
+  ✓ Phase 13: has all required sections
+  ✓ Phase 13: names a new command-line check
+  ✓ Phase 14: title line starts with "# Phase 14:"
+  ✓ Phase 14: status matches the index (Done)
+  ✓ Phase 14: has all required sections
+  ✓ Phase 14: names a new command-line check
+  ✓ Phase 15: title line starts with "# Phase 15:"
+  ✓ Phase 15: status matches the index (Done)
+  ✓ Phase 15: has all required sections
+  ✓ Phase 15: names a new command-line check
+  ✓ Phase 16: title line starts with "# Phase 16:"
+  ✓ Phase 16: status matches the index (Done)
+  ✓ Phase 16: has all required sections
+  ✓ Phase 16: names a new command-line check
+  ✓ Phase 17: title line starts with "# Phase 17:"
+  ✓ Phase 17: status matches the index (Done)
+  ✓ Phase 17: has all required sections
+  ✓ Phase 17: names a new command-line check
+  ✓ Phase 18: title line starts with "# Phase 18:"
+  ✓ Phase 18: status matches the index (Done)
+  ✓ Phase 18: has all required sections
+  ✓ Phase 18: names a new command-line check
+  ✓ Phase 19: title line starts with "# Phase 19:"
+  ✓ Phase 19: status matches the index (In progress)
+  ✓ Phase 19: has all required sections
+  ✓ Phase 19: names a new command-line check
+  ✓ Phase 20: title line starts with "# Phase 20:"
+  ✓ Phase 20: status matches the index (Not started)
+  ✓ Phase 20: has all required sections
+  ✓ Phase 20: names a new command-line check
+  ✓ Phase 21: title line starts with "# Phase 21:"
+  ✓ Phase 21: status matches the index (Not started)
+  ✓ Phase 21: has all required sections
+  ✓ Phase 21: names a new command-line check
+  ✓ docs/PROGRESS.md has a row for every phase
+  ✓ docs/PROGRESS.md shows the same status as the index
+  ✓ docs/ROADMAP.md has a row for every phase
+  ✓ docs/ROADMAP.md shows the same status as the index
+  ✓ relative links resolve
+  ✓ RULES.md points at docs/phases
+  ✓ RULES.md requires a new command-line check for every phase
+  ✓ RULES.md requires the docs to be updated by whoever works on a phase
+
+All phase docs checks passed.
+
+Guide command check
+  ✓ README.md exists
+  ✓ README.md block 1: Git command
+  ✓ README.md block 1: Git command
+  ✓ README.md block 1: package.json exists for npm run check-sync
+  ✓ README.md block 1: script exists: check-sync
+  ✓ README.md block 1: package.json exists for npm run check-ui
+  ✓ README.md block 1: script exists: check-ui
+  ✓ README.md block 1: package.json exists for npm run check-workbench
+  ✓ README.md block 1: script exists: check-workbench
+  ✓ README.md block 1: package.json exists for npm run check-farms
+  ✓ README.md block 1: script exists: check-farms
+  ✓ README.md block 1: package.json exists for npm run check-docs
+  ✓ README.md block 1: script exists: check-docs
+  ✓ README.md block 1: package.json exists for npm test
+  ✓ README.md block 1: test script exists
+  ✓ README.md block 1: package.json exists for npm run check-audit
+  ✓ README.md block 1: script exists: check-audit
+  ✓ README.md block 1: helper script exists: tools/build-all.bat
+  ✓ README.md block 2: directory exists: dairy_farm/client
+  ✓ README.md block 2: package.json exists for npm run dev
+  ✓ README.md block 2: script exists: dev
+  ✓ README.md contains checked command blocks
+  ✓ docs/DEVELOPER_START.md exists
+  ✓ docs/DEVELOPER_START.md block 1: Git command
+  ✓ docs/DEVELOPER_START.md block 1: Git command
+  ✓ docs/DEVELOPER_START.md block 1: package.json exists for npm ci
+  ✓ docs/DEVELOPER_START.md block 1: package-lock.json exists
+  ✓ docs/DEVELOPER_START.md block 1: directory exists: dairy_farm/backend
+  ✓ docs/DEVELOPER_START.md block 1: package.json exists for npm ci
+  ✓ docs/DEVELOPER_START.md block 1: package-lock.json exists
+  ✓ docs/DEVELOPER_START.md block 1: directory exists: dairy_farm/client
+  ✓ docs/DEVELOPER_START.md block 1: package.json exists for npm ci
+  ✓ docs/DEVELOPER_START.md block 1: package-lock.json exists
+  ✓ docs/DEVELOPER_START.md block 1: directory exists: 
+  ✓ docs/DEVELOPER_START.md block 1: directory exists: flock_farm/backend
+  ✓ docs/DEVELOPER_START.md block 1: package.json exists for npm ci
+  ✓ docs/DEVELOPER_START.md block 1: package-lock.json exists
+  ✓ docs/DEVELOPER_START.md block 1: directory exists: flock_farm/client
+  ✓ docs/DEVELOPER_START.md block 1: package.json exists for npm ci
+  ✓ docs/DEVELOPER_START.md block 1: package-lock.json exists
+  ✓ docs/DEVELOPER_START.md block 1: directory exists: 
+  ✓ docs/DEVELOPER_START.md block 1: directory exists: agri_farm/backend
+  ✓ docs/DEVELOPER_START.md block 1: package.json exists for npm ci
+  ✓ docs/DEVELOPER_START.md block 1: package-lock.json exists
+  ✓ docs/DEVELOPER_START.md block 1: directory exists: agri_farm/frontend
+  ✓ docs/DEVELOPER_START.md block 1: package.json exists for npm ci
+  ✓ docs/DEVELOPER_START.md block 1: package-lock.json exists
+  ✓ docs/DEVELOPER_START.md block 1: directory exists: 
+  ✓ docs/DEVELOPER_START.md block 2: package.json exists for npm run check-sync
+  ✓ docs/DEVELOPER_START.md block 2: script exists: check-sync
+  ✓ docs/DEVELOPER_START.md block 2: package.json exists for npm run check-ui
+  ✓ docs/DEVELOPER_START.md block 2: script exists: check-ui
+  ✓ docs/DEVELOPER_START.md block 2: package.json exists for npm run check-workbench
+  ✓ docs/DEVELOPER_START.md block 2: script exists: check-workbench
+  ✓ docs/DEVELOPER_START.md block 2: package.json exists for npm run check-farms
+  ✓ docs/DEVELOPER_START.md block 2: script exists: check-farms
+  ✓ docs/DEVELOPER_START.md block 2: package.json exists for npm run check-docs
+  ✓ docs/DEVELOPER_START.md block 2: script exists: check-docs
+  ✓ docs/DEVELOPER_START.md block 2: package.json exists for npm run check-audit
+  ✓ docs/DEVELOPER_START.md block 2: script exists: check-audit
+  ✓ docs/DEVELOPER_START.md block 2: package.json exists for npm test
+  ✓ docs/DEVELOPER_START.md block 2: test script exists
+  ✓ docs/DEVELOPER_START.md block 2: helper script exists: tools/build-all.bat
+  ✓ docs/DEVELOPER_START.md block 3: directory exists: dairy_farm/client
+  ✓ docs/DEVELOPER_START.md block 3: package.json exists for npm run dev
+  ✓ docs/DEVELOPER_START.md block 3: script exists: dev
+  ✓ docs/DEVELOPER_START.md contains checked command blocks
+  ✓ at least one executable command was checked
+
+All documented quick-start commands resolve.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=0.68

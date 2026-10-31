@@ -1,0 +1,150 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "tests/verification/authz-matrix.mjs", "dairy"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+SETUP login admin -> 200 tokenLen=216
+SETUP login worker -> 200 tokenLen=219
+SETUP login authzamvws3pe6 -> 200 tokenLen=231
+SETUP mkManager a: signup=201 tokenLen=231 sanityMe=200
+SETUP login authzbmvws3plc -> 200 tokenLen=231
+SETUP mkManager b: signup=201 tokenLen=231 sanityMe=200
+METHOD PATH | anon | worker | mgrA | mgrB-other | owner
+GET /api/farm-summary | 404 | 404 | 404 | 404 | 404
+GET /api/super-admin/farm-summary | 401 | 403 | 403 | 403 | 200
+GET / | 200 | 200 | 200 | 200 | 200
+POST /api/auth/setup | 400 | 400 | 400 | 400 | 400
+POST /api/auth/login | 401 | 401 | 401 | 401 | 401
+GET /api/auth/me | 401 | 200 | 200 | 403 | 200
+PATCH /api/auth/me | 401 | 200 | 200 | 403 | 200
+GET /api/auth/users | 401 | 403 | 200 | 403 | 200
+POST /api/auth/users | 401 | 403 | 400 | 403 | 400
+PATCH /api/auth/users/:id | 401 | 403 | 400 | 403 | 400
+DELETE /api/auth/users/:id | 401 | 403 | 404 | 403 | 404
+POST /api/auth/request-profile-code | 401 | 503 | 503 | 403 | 503
+POST /api/auth/change-password | 401 | 400 | 400 | 403 | 400
+GET /api/auth/mail-status | 200 | 200 | 200 | 200 | 200
+POST /api/auth/forgot-password | 503 | 503 | 503 | 503 | 503
+POST /api/auth/reset-password | 400 | 400 | 400 | 400 | 400
+GET /api/auth/check | 200 | 200 | 200 | 200 | 200
+GET /api/cows/stats | 401 | 200 | 200 | 403 | 200
+GET /api/cows/mothers | 401 | 200 | 200 | 403 | 200
+GET /api/cows | 401 | 200 | 200 | 403 | 200
+GET /api/cows/batches | 401 | 200 | 200 | 403 | 200
+GET /api/cows/profitability | 401 | 200 | 200 | 403 | 200
+GET /api/cows/:id | 401 | 200 | 200 | 403 | 200
+GET /api/cows/:id/offspring | 401 | 200 | 200 | 403 | 200
+GET /api/cows/:id/summary | 401 | 200 | 200 | 403 | 200
+POST /api/cows | 401 | 403 | 400 | 403 | 400
+PUT /api/cows/:id | 401 | 403 | 200 | 403 | 200
+DELETE /api/cows/:id | 401 | 403 | 200 | 403 | 404
+GET /api/milk/summary | 401 | 200 | 200 | 403 | 200
+GET /api/milk | 401 | 200 | 200 | 403 | 200
+POST /api/milk/bulk | 401 | 400 | 400 | 403 | 400
+POST /api/milk | 401 | 400 | 400 | 403 | 400
+PUT /api/milk/:id | 401 | 404 | 404 | 403 | 404
+DELETE /api/milk/:id | 401 | 403 | 200 | 403 | 200
+GET /api/expenses | 401 | 200 | 200 | 403 | 200
+POST /api/expenses | 401 | 400 | 400 | 403 | 400
+PUT /api/expenses/:id | 401 | 404 | 404 | 403 | 404
+DELETE /api/expenses/:id | 401 | 403 | 404 | 403 | 404
+GET /api/rates | 401 | 200 | 200 | 403 | 200
+GET /api/rates/1 | 401 | 200 | 200 | 403 | 200
+PUT /api/rates/1 | 401 | 403 | 400 | 403 | 400
+GET /api/rates/history | 401 | 200 | 200 | 403 | 200
+GET /api/health | 401 | 200 | 200 | 403 | 200
+GET /api/health/upcoming | 401 | 200 | 200 | 403 | 200
+POST /api/health/bulk | 401 | 400 | 400 | 403 | 400
+POST /api/health | 401 | 400 | 400 | 403 | 400
+PUT /api/health/:id | 401 | 404 | 404 | 403 | 404
+DELETE /api/health/:id | 401 | 403 | 200 | 403 | 200
+GET /api/buyers | 401 | 200 | 200 | 403 | 200
+POST /api/buyers | 401 | 403 | 400 | 403 | 400
+PUT /api/buyers/:id | 401 | 403 | 404 | 403 | 404
+DELETE /api/buyers/:id | 401 | 403 | 200 | 403 | 200
+GET /api/buyers/:id/payments | 401 | 200 | 200 | 403 | 200
+POST /api/buyers/:id/payments | 401 | 400 | 400 | 403 | 400
+PUT /api/buyers/:id/payments/:paymentId | 401 | 403 | 404 | 403 | 404
+DELETE /api/buyers/:id/payments/:paymentId | 401 | 403 | 200 | 403 | 200
+GET /api/backup | 401 | 403 | 403 | 403 | 200
+POST /api/backup/restore | 401 | 403 | 403 | 403 | 400
+GET /api/backup/auto | 401 | 403 | 403 | 403 | 200
+POST /api/backup/auto/run | 401 | 403 | 403 | 403 | 200
+POST /api/backup/restore-auto | 401 | 403 | 403 | 403 | 200
+GET /api/dailylog/entries | 401 | 200 | 200 | 403 | 200
+GET /api/dailylog/:date | 401 | 200 | 200 | 403 | 200
+PUT /api/dailylog/:date | 401 | 200 | 200 | 403 | 200
+POST /api/photos | 401 | 400 | 400 | 403 | 400
+GET /api/photos/orphans | 401 | 403 | 200 | 403 | 200
+POST /api/photos/cleanup-orphans | 401 | 403 | 200 | 403 | 200
+GET /api/photos/:id | 401 | 404 | 404 | 403 | 404
+DELETE /api/photos/:id | 401 | 404 | 404 | 403 | 404
+GET /api/sales | 401 | 200 | 200 | 403 | 200
+POST /api/sales | 401 | 403 | 400 | 403 | 400
+PUT /api/sales/:id | 401 | 403 | 404 | 403 | 404
+DELETE /api/sales/:id | 401 | 403 | 404 | 403 | 404
+GET /api/email/status | 401 | 200 | 200 | 403 | 200
+POST /api/email/send-now | 401 | 403 | 500 | 403 | 500
+POST /api/email/cron | 401 | 401 | 401 | 401 | 401
+GET /api/labor/workers | 401 | 403 | 200 | 403 | 200
+POST /api/labor/workers | 401 | 403 | 400 | 403 | 400
+PUT /api/labor/workers/:id | 401 | 403 | 400 | 403 | 400
+DELETE /api/labor/workers/:id | 401 | 403 | 404 | 403 | 404
+GET /api/labor/attendance | 401 | 403 | 200 | 403 | 200
+POST /api/labor/attendance | 401 | 403 | 400 | 403 | 400
+PUT /api/labor/attendance/:id | 401 | 403 | 404 | 403 | 404
+DELETE /api/labor/attendance/:id | 401 | 403 | 404 | 403 | 404
+GET /api/labor/advances | 401 | 403 | 200 | 403 | 200
+POST /api/labor/advances | 401 | 403 | 400 | 403 | 400
+PUT /api/labor/advances/:id | 401 | 403 | 404 | 403 | 404
+DELETE /api/labor/advances/:id | 401 | 403 | 404 | 403 | 404
+POST /api/labor/post-wages | 401 | 403 | 400 | 403 | 400
+GET /api/feedstock/settings | 401 | 200 | 200 | 403 | 200
+PUT /api/feedstock/settings | 401 | 403 | 200 | 403 | 200
+GET /api/telegram/status | 401 | 403 | 200 | 403 | 200
+POST /api/telegram/link-code | 401 | 403 | 400 | 403 | 400
+DELETE /api/telegram/links/:chatId | 401 | 403 | 404 | 403 | 404
+POST /api/telegram/webhook/:secret | 200 | 200 | 200 | 200 | 200
+GET /api/telegram/alerts | 401 | 200 | 200 | 403 | 200
+GET /api/telegram/settings | 401 | 403 | 200 | 403 | 200
+PUT /api/telegram/settings | 401 | 403 | 200 | 403 | 200
+POST /api/telegram/send-summary | 401 | 403 | 200 | 403 | 200
+GET /api/telegram/cron | 503 | 503 | 503 | 503 | 503
+GET /api/breeding/events | 401 | 200 | 200 | 403 | 200
+POST /api/breeding/events | 401 | 400 | 400 | 403 | 400
+PUT /api/breeding/events/:id | 401 | 404 | 404 | 403 | 404
+DELETE /api/breeding/events/:id | 401 | 403 | 404 | 403 | 404
+GET /api/breeding | 401 | 200 | 200 | 403 | 200
+GET /api/suppliers | 401 | 200 | 200 | 403 | 200
+POST /api/suppliers | 401 | 403 | 400 | 403 | 400
+PUT /api/suppliers/:id | 401 | 403 | 404 | 403 | 404
+DELETE /api/suppliers/:id | 401 | 403 | 200 | 403 | 200
+GET /api/suppliers/:id/payments | 401 | 200 | 200 | 403 | 200
+GET /api/suppliers/payments/all | 401 | 200 | 200 | 403 | 200
+POST /api/suppliers/:id/payments | 401 | 403 | 400 | 403 | 400
+PUT /api/suppliers/:id/payments/:paymentId | 401 | 403 | 404 | 403 | 404
+DELETE /api/suppliers/:id/payments/:paymentId | 401 | 403 | 200 | 403 | 200
+GET /api/cards/worker/:id | 404 | 404 | 404 | 404 | 404
+GET /api/cards/buyer/:id | 404 | 404 | 404 | 404 | 404
+GET /api/cards/supplier/:id | 404 | 404 | 404 | 404 | 404
+GET /api/settings/location | 200 | 200 | 200 | 200 | 200
+PUT /api/settings/location | 401 | 403 | 403 | 403 | 400
+GET /api/products/public | 200 | 200 | 200 | 200 | 200
+GET /api/products | 401 | 200 | 200 | 403 | 200
+POST /api/products | 401 | 403 | 400 | 403 | 400
+PUT /api/products/:id | 401 | 403 | 400 | 403 | 400
+DELETE /api/products/:id | 401 | 403 | 404 | 403 | 404
+
+TOTAL ROUTES: 124
+OPEN-WITHOUT-LOGIN (anon not 401/403/404): 10
+  OPEN: GET / → anon 200
+  OPEN: POST /api/auth/setup → anon 400
+  OPEN: GET /api/auth/mail-status → anon 200
+  OPEN: POST /api/auth/forgot-password → anon 503
+  OPEN: POST /api/auth/reset-password → anon 400
+  OPEN: GET /api/auth/check → anon 200
+  OPEN: POST /api/telegram/webhook/:secret → anon 200
+  OPEN: GET /api/telegram/cron → anon 503
+  OPEN: GET /api/settings/location → anon 200
+  OPEN: GET /api/products/public → anon 200
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=4.64

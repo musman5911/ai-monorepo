@@ -1,0 +1,12 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["python", "tests/round3/hypothesis_agri.py"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+git rev-parse HEAD: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+command: python3 tests/round3/hypothesis_agri.py
+environment: Agri direct local server, NODE_ENV=test, MEMORY_MODE=1
+setup token acquired: True
+Hypothesis liability: FAIL counterexample -> negative liability stored: {'creditor': 'Hyp Cred', 'amount_owed': -1, 'farmId': 'd813d34c15f2eb17f2f5870f', '_id': '1229267ecf1ff135ef82816d'}
+Hypothesis inventory: FAIL counterexample -> negative inventory stored: {'name': 'Hyp Item', 'quantity': -1, 'unit': 'bags', 'farmId': 'd813d34c15f2eb17f2f5870f', '_id': 'e1a9ccdf37322db349b7b2b4'}
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=20.95

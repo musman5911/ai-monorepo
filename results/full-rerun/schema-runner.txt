@@ -1,0 +1,14 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND node tests/round3/run-schemathesis-full.mjs
+results/round3/schemathesis-full-dairy-owner.txt
+results/round3/schemathesis-full-dairy-worker.txt
+results/round3/schemathesis-full-dairy-anon.txt
+results/round3/schemathesis-full-agri-owner.txt
+results/round3/schemathesis-full-agri-worker.txt
+results/round3/schemathesis-full-agri-anon.txt
+results/round3/schemathesis-full-flock-owner.txt
+results/round3/schemathesis-full-flock-worker.txt
+results/round3/schemathesis-full-flock-anon.txt
+done
+
+EXIT=0

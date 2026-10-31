@@ -1,0 +1,20 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-shop"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-shop
+> vitest run tests/shop-isolation.test.ts
+
+
+ RUN  v3.2.7 /home/user/full-rerun
+
+ ✓ tests/shop-isolation.test.ts (7 tests) 14ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  19:07:19
+   Duration  1.01s (transform 129ms, setup 0ms, collect 93ms, tests 14ms, environment 0ms, prepare 380ms)
+
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=3.39

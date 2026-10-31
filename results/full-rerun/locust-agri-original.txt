@@ -1,0 +1,39 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND locust -f tests/verification/locust-agri.py --headless -u 10 -r 10 -t 30s --host http://127.0.0.1:22516 --only-summary
+
+[2026-10-31 19:21:42,427] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-10-31 19:21:42,428] e2b/INFO/locust.main: Run time limit set to 30 seconds
+[2026-10-31 19:21:42,428] e2b/INFO/locust.runners: Ramping to 10 users at a rate of 10.00 per second
+[2026-10-31 19:21:42,459] e2b/INFO/locust.runners: All users spawned: {"AgriUser": 10} (10 total users)
+[2026-10-31 19:22:11,963] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-10-31 19:22:11,993] e2b/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/login                                                                        10    1(10.00%) |   2801     451    4825   3200 |    0.34        0.03
+GET      crops                                                                            956   97(10.15%) |     14       1    3947      3 |   32.37        3.28
+GET      fields                                                                           634   65(10.25%) |     11       1    4436      3 |   21.47        2.20
+GET      summary                                                                          318    28(8.81%) |     20       1    3407      4 |   10.77        0.95
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                      1918   191(9.96%) |     28       1    4825      3 |   64.95        6.47
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/login                                                                           3200   3700   4200   4800   4800   4800   4800   4800   4800   4800   4800     10
+GET      crops                                                                                   3      3      3      4      5      6     10     18   3900   3900   3900    956
+GET      fields                                                                                  3      3      3      4      5      7     10     15   4400   4400   4400    634
+GET      summary                                                                                 4      4      5      5      7      8     12     18   3400   3400   3400    318
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                              3      3      4      4      5      7     12     85   4800   4800   4800   1918
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+1                  POST /api/login: HTTPError('429 Client Error: Too Many Requests for url: /api/login')               
+97                 GET crops: HTTPError('401 Client Error: Unauthorized for url: crops')                               
+65                 GET fields: HTTPError('401 Client Error: Unauthorized for url: fields')                             
+28                 GET summary: HTTPError('401 Client Error: Unauthorized for url: summary')                           
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+
+EXIT=1

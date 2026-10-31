@@ -1,0 +1,78 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND node --test --test-concurrency=1 tests/full-rerun/scale.test.mjs
+TAP version 13
+# {"app":"dairy","route":"/farms","method":"GET","status":200,"ms":25,"bytes":430}
+# {"app":"dairy","route":"/cows","method":"POST","status":201,"ms":77,"bytes":494}
+# {"app":"dairy","route":"/buyers","method":"POST","status":201,"ms":81,"bytes":199}
+# {"app":"dairy","fixture":{"ok":true,"count":50000,"insertMs":2046.2288639999988,"rssBefore":127700992,"rssAfter":182792192}}
+# {"app":"dairy","route":"/milk/summary?cowId=c2732159-4ca8-4e2e-a79c-41a4c9d045b3","method":"GET","status":200,"ms":1307,"bytes":76}
+# {"expected":{"count":50000,"liters":15000,"revenue":1500000},"actual":{"count":50000,"totalLiters":15000,"saleableLiters":15000,"revenue":1500000}}
+# {"app":"dairy","route":"/milk?cowId=c2732159-4ca8-4e2e-a79c-41a4c9d045b3&page=1&limit=100","method":"GET","status":200,"ms":1268,"bytes":29478}
+# {"app":"dairy","route":"/backup","method":"GET","status":200,"ms":4787,"bytes":15780751}
+# Subtest: NEW-SCALE-1: 50k milk records over three years retain penny precision and untruncated summary
+ok 1 - NEW-SCALE-1: 50k milk records over three years retain penny precision and untruncated summary
+  ---
+  duration_ms: 17106.878517
+  type: 'test'
+  ...
+# {"app":"agri","route":"/farms","method":"GET","status":200,"ms":42,"bytes":430}
+# {"app":"agri","route":"/analytics/summary","method":"GET","status":200,"ms":159,"bytes":26167}
+# {"app":"agri","fixture":{"ok":true,"count":100000,"insertMs":1889.9686970000002,"rssBefore":110862336,"rssAfter":168701952}}
+# {"app":"agri","route":"/analytics/summary","method":"GET","status":200,"ms":2848,"bytes":29034}
+# {"before":{"entries":56,"income":1166000,"expense":1414600,"net":-248600,"farmWideIncome":8000,"farmWideExpense":906200},"after":{"entries":100056,"income":1166500.0000004657,"expense":1415100.0000004657,"net":-248600,"farmWideIncome":8500.000000010914,"farmWideExpense":906700.0000004657},"expectedDelta":{"entries":100000,"income":500,"expense":500,"net":0}}
+# Subtest: NEW-SCALE-2: 100k finance records over three years do not truncate analytics
+    # Subtest: 100k finance analytics totals use all rows
+    ok 1 - 100k finance analytics totals use all rows
+      ---
+      duration_ms: 0.284746
+      type: 'test'
+      ...
+# {"app":"agri","route":"/backup","method":"GET","status":200,"ms":2989,"bytes":17326491}
+# {"backupTotal":100000,"expectedFixture":100000,"actualFixture":99944}
+    # Subtest: NEW-SCALE-3: full backup includes every finance fixture beyond 100000 total rows
+    not ok 2 - NEW-SCALE-3: full backup includes every finance fixture beyond 100000 total rows
+      ---
+      duration_ms: 3191.591104
+      type: 'test'
+      location: '/home/user/full-rerun/tests/full-rerun/scale.test.mjs:50:11'
+      failureType: 'testCodeFailure'
+      error: |-
+        Expected values to be strictly equal:
+        
+        99944 !== 100000
+        
+      code: 'ERR_ASSERTION'
+      name: 'AssertionError'
+      expected: 100000
+      actual: 99944
+      operator: 'strictEqual'
+      stack: |-
+        TestContext.<anonymous> (file:///home/user/full-rerun/tests/full-rerun/scale.test.mjs:51:282)
+        process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+        async Test.run (node:internal/test_runner/test:1054:7)
+        async file:///home/user/full-rerun/tests/full-rerun/scale.test.mjs:50:3
+        async fixture (file:///home/user/full-rerun/tests/full-rerun/scale.test.mjs:22:3)
+        async TestContext.<anonymous> (file:///home/user/full-rerun/tests/full-rerun/scale.test.mjs:39:2)
+        async Test.run (node:internal/test_runner/test:1054:7)
+        async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+      ...
+    1..2
+not ok 2 - NEW-SCALE-2: 100k finance records over three years do not truncate analytics
+  ---
+  duration_ms: 23341.002499
+  type: 'test'
+  location: '/home/user/full-rerun/tests/full-rerun/scale.test.mjs:38:1'
+  failureType: 'subtestsFailed'
+  error: '1 subtest failed'
+  code: 'ERR_TEST_FAILURE'
+  ...
+1..2
+# tests 4
+# suites 0
+# pass 2
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 41147.720418
+EXIT=1

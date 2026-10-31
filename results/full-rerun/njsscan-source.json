@@ -1,0 +1,8 @@
+{
+  "errors": [
+    "semgrep not found. Install with: pip install semgrep"
+  ],
+  "njsscan_version": "0.4.2",
+  "nodejs": {},
+  "templates": {}
+}

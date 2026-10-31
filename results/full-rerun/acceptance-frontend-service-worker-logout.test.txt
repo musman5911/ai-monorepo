@@ -1,0 +1,52 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "--test", "tests/acceptance/frontend-service-worker-logout.test.mjs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+TAP version 13
+# Subtest: R3-FE-1: service-worker API cache is cleared on logout (dairy)
+ok 1 - R3-FE-1: service-worker API cache is cleared on logout (dairy) # SKIP playwright-core/@sparticuz/chromium unavailable: Cannot find package 'playwright-core' imported from /home/user/full-rerun/tests/acceptance/frontend-service-worker-logout.test.mjs
+  ---
+  duration_ms: 4.038188
+  type: 'test'
+  ...
+# Subtest: R3-FE-1: service-worker API cache is cleared on logout (agri)
+ok 2 - R3-FE-1: service-worker API cache is cleared on logout (agri) # SKIP playwright-core/@sparticuz/chromium unavailable: Cannot find package 'playwright-core' imported from /home/user/full-rerun/tests/acceptance/frontend-service-worker-logout.test.mjs
+  ---
+  duration_ms: 11.824981
+  type: 'test'
+  ...
+# Subtest: R3-FE-1: service-worker API cache is cleared on logout (flock)
+ok 3 - R3-FE-1: service-worker API cache is cleared on logout (flock) # SKIP playwright-core/@sparticuz/chromium unavailable: Cannot find package 'playwright-core' imported from /home/user/full-rerun/tests/acceptance/frontend-service-worker-logout.test.mjs
+  ---
+  duration_ms: 0.42068
+  type: 'test'
+  ...
+# Subtest: R3-FE-1 (source): api-cache cleanup is wired into the real logout path (dairy)
+not ok 4 - R3-FE-1 (source): api-cache cleanup is wired into the real logout path (dairy)
+  ---
+  duration_ms: 16.540363
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/frontend-service-worker-logout.test.mjs:69:1'
+  failureType: 'testCodeFailure'
+  error: 'logout path never deletes the service-worker API cache (dairyfarmapi-v1) in production code'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/frontend-service-worker-logout.test.mjs:78:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 3
+# todo 0
+# duration_ms 394.658866
+
+RUNNER EXIT=1 TIMEOUT=False SECONDS=0.59

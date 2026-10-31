@@ -1,0 +1,92 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "--test", "tests/acceptance/money-validation.test.mjs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+TAP version 13
+# Subtest: G1: negative liability amount_owed is rejected (agri)
+not ok 1 - G1: negative liability amount_owed is rejected (agri)
+  ---
+  duration_ms: 3801.728503
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/money-validation.test.mjs:5:1'
+  failureType: 'testCodeFailure'
+  error: 'negative liability stored (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/money-validation.test.mjs:10:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: G2: negative inventory quantity is rejected on create and update (agri)
+not ok 2 - G2: negative inventory quantity is rejected on create and update (agri)
+  ---
+  duration_ms: 3570.641728
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/money-validation.test.mjs:16:1'
+  failureType: 'testCodeFailure'
+  error: 'negative inventory create accepted (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/money-validation.test.mjs:21:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: G3: absurd field area is rejected (agri)
+not ok 3 - G3: absurd field area is rejected (agri)
+  ---
+  duration_ms: 2960.208575
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/money-validation.test.mjs:32:1'
+  failureType: 'testCodeFailure'
+  error: 'acres=1e12 accepted (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/money-validation.test.mjs:37:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: E5: negative finance amount is rejected (agri)
+not ok 4 - E5: negative finance amount is rejected (agri)
+  ---
+  duration_ms: 3684.884933
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/money-validation.test.mjs:41:1'
+  failureType: 'testCodeFailure'
+  error: 'negative finance amount accepted (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/money-validation.test.mjs:46:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 0
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 14172.304709
+
+RUNNER EXIT=1 TIMEOUT=False SECONDS=14.30

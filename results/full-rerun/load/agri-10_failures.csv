@@ -1,0 +1,4 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET list paged,"ConnectionResetError(104, 'Connection reset by peer')",4,2026-10-31T19:15:38Z,2026-10-31T19:15:38Z
+GET,GET list,"ConnectionResetError(104, 'Connection reset by peer')",1,2026-10-31T19:15:38Z,2026-10-31T19:15:38Z
+GET,GET farms,"ConnectionResetError(104, 'Connection reset by peer')",1,2026-10-31T19:15:38Z,2026-10-31T19:15:38Z

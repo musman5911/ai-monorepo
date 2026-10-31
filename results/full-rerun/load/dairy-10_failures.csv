@@ -1,0 +1,8 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET farms,HTTPError('429 Client Error: Too Many Requests for url: GET farms'),127,2026-10-31T19:14:01Z,2026-10-31T19:14:16Z
+GET,GET farms,HTTPError('401 Client Error: Unauthorized for url: GET farms'),45,2026-10-31T19:13:53Z,2026-10-31T19:14:01Z
+GET,GET list,HTTPError('429 Client Error: Too Many Requests for url: GET list'),315,2026-10-31T19:14:01Z,2026-10-31T19:14:16Z
+GET,GET list paged,HTTPError('401 Client Error: Unauthorized for url: GET list paged'),22,2026-10-31T19:13:52Z,2026-10-31T19:14:01Z
+GET,GET list paged,HTTPError('429 Client Error: Too Many Requests for url: GET list paged'),62,2026-10-31T19:14:01Z,2026-10-31T19:14:16Z
+POST,/api/auth/login,HTTPError('429 Client Error: Too Many Requests for url: /api/auth/login'),5,2026-10-31T19:13:52Z,2026-10-31T19:13:52Z
+GET,GET list,HTTPError('401 Client Error: Unauthorized for url: GET list'),82,2026-10-31T19:13:52Z,2026-10-31T19:14:01Z

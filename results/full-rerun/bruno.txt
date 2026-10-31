@@ -1,0 +1,26 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND node tests/full-rerun/bruno-smoke.mjs
+dairy-login (200 OK) - 370 ms
+dairy-cows-list (200 OK) - 23 ms
+agri-login (200 OK) - 1817 ms
+flock-batches-list (200 OK) - 7 ms
+
+📊 Execution Summary
+┌───────────────┬──────────────┐
+│ Metric        │    Result    │
+├───────────────┼──────────────┤
+│ Status        │    ✓ PASS    │
+├───────────────┼──────────────┤
+│ Requests      │ 4 (4 Passed) │
+├───────────────┼──────────────┤
+│ Tests         │     0/0      │
+├───────────────┼──────────────┤
+│ Assertions    │     0/0      │
+├───────────────┼──────────────┤
+│ Duration (ms) │     2459     │
+└───────────────┴──────────────┘
+Wrote json results to /home/user/full-rerun/results/full-rerun/bruno.json
+
+
+BRUNO_EXIT 0
+EXIT=0

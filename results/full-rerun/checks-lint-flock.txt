@@ -1,0 +1,10 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "--prefix", "flock_farm/client", "run", "lint"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> flock-farm-client@1.0.0 lint
+> tsc --noEmit
+
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=64.50

@@ -1,0 +1,185 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND schemathesis run tests/toolchain/spec-flock.yaml --url http://127.0.0.1:22515/api -n 2 --workers 2 -H Authorization:Bearer <local-test-token>
+SETUP token acquired=true; specs identical to tests/round3/specs/spec-flock.yaml
+Schemathesis v4.32.7
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from tests/toolchain/spec-flock.yaml (in 0.37s)
+
+     Base URL:         http://127.0.0.1:22515/api
+     Specification:    Open API 3.0.3
+     Operations:       4 selected / 4 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ⏭   Examples (in 0.04s)
+
+     ⏭  4 skipped
+
+ ❌  Coverage (in 0.16s)
+
+     ❌ 4 failed
+
+ ❌  Fuzzing (in 0.16s)
+
+     ✅ 1 passed  ❌ 3 failed
+
+=================================== FAILURES ===================================
+_____________________________ DELETE /batches/{id} _____________________________
+1. Test Case ID: S4ZGuT
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Authentication required"}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:22515/api/batches/4676b05a0f5659c9b4baf3d5
+
+    st replay S4ZGuT
+
+2. Test Case ID: mEm9bm
+
+- ST103 Undocumented status code
+
+    Received: 404
+    Documented: 200
+
+[404] Not Found:
+
+    `{"error":"Batch not found"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:22515/api/batches/4676b05a0f5659c9b4baf3d5
+
+    st replay mEm9bm
+
+_________________________________ GET /batches _________________________________
+1. Test Case ID: 8OtNZA
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Authentication required"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:22515/api/batches
+
+    st replay 8OtNZA
+
+______________________________ GET /batches/{id} _______________________________
+1. Test Case ID: xJXdPi
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Authentication required"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:22515/api/batches/4676b05a0f5659c9b4baf3d5
+
+    st replay xJXdPi
+
+2. Test Case ID: 7zulrc
+
+- ST103 Undocumented status code
+
+    Received: 404
+    Documented: 200
+
+[404] Not Found:
+
+    `{"error":"Batch not found"}`
+
+Reproduce with:
+
+    curl -X GET -H 'Authorization: [Filtered]' http://127.0.0.1:22515/api/batches/4676b05a0f5659c9b4baf3d5
+
+    st replay 7zulrc
+
+________________________________ POST /batches _________________________________
+1. Test Case ID: g2jxhA
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"error":"Authentication required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "type": "", "start_date": "", "intake_count": 0, "cost_per_bird": 0}' http://127.0.0.1:22515/api/batches
+
+    st replay g2jxhA
+
+2. Test Case ID: BDuzAY
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 201
+
+[400] Bad Request:
+
+    `{"error":"Batch name is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:22515/api/batches
+
+    st replay BDuzAY
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 4/4
+  Tested: 4
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ ST202 Schema-valid request rejected: 1
+  ❌ ST103 Undocumented status code: 7
+
+For more information, run `st explain <code>` for ST103, ST202.
+
+Test cases:
+  10 generated, 7 found 8 unique failures, 2 skipped
+
+Seed: 171176758643490078270738796322062323222
+
+============================= 8 failures in 0.48s ==============================
+
+
+EXIT=1 ERROR=

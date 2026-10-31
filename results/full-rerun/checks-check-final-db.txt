@@ -1,0 +1,20 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-final-db"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-final-db
+> vitest run tests/final-db-preflight.test.ts
+
+
+ RUN  v3.2.7 /home/user/full-rerun
+
+ ✓ tests/final-db-preflight.test.ts (16 tests) 126ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  19:07:23
+   Duration  1.33s (transform 304ms, setup 0ms, collect 354ms, tests 126ms, environment 0ms, prepare 322ms)
+
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=3.54

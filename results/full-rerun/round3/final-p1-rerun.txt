@@ -1,0 +1,17 @@
+git rev-parse HEAD: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+date: 2026-10-31T19:16:06.182Z
+FINAL P1 RERUN on newest tip (memory mode, NODE_ENV=test, direct server)
+
+### FLOCK http://127.0.0.1:19601
+[B1-B3 rerun] anon GET /api/cards/customer/1 -> 503; contains phone 0301-1234567: false; contains name Khan: false
+[A1 rerun] POST /api/auth/logout -> 200
+[A1 rerun] reuse old token GET /api/data/customers -> 200 (200 = STILL FAILING non-revocation)
+
+### DAIRY http://127.0.0.1:19602
+[A1 rerun] POST /api/auth/logout -> 404
+[A1 rerun] reuse old token GET /api/cows -> 200 (200 = STILL FAILING)
+
+### AGRI http://127.0.0.1:19603
+[A1 rerun] POST /api/auth/logout -> 200
+[A1 rerun] reuse old token GET /api/fields -> 200 (200 = STILL FAILING)
+[neg-liability rerun] POST /api/liabilities amount=-5000 -> 201 body={"creditor":"RERUN","amount_owed":-5000,"farmId":"2eda972deeedfb0146158689","_id":"75b79d061114172f284c48b1"}

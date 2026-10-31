@@ -1,0 +1,7 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+git rev-parse HEAD of muf-monorepo source at initial fetch: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+git log -1 --format=%H origin/muf-monorepo at initial and final fetch: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+Difference: none. Application is a byte-verified Git source export; no separate Git HEAD exists in that export.
+Local date: 2026-11-01 Asia/Karachi; raw timestamps use UTC 2026-10-31.
+All raw outputs under results/full-rerun, results/round3 and results/load in the evidence bundle are this execution, except schema-initial which is explicitly an incomplete first attempt from this same execution.
+Historical READMEs and tests/verification/contested-probes-output.txt are references, not new run evidence.

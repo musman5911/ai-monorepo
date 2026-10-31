@@ -1,0 +1,5 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET farms,HTTPError('429 Client Error: Too Many Requests for url: GET farms'),916,2026-10-31T19:14:18Z,2026-10-31T19:14:42Z
+GET,GET list,HTTPError('429 Client Error: Too Many Requests for url: GET list'),2309,2026-10-31T19:14:18Z,2026-10-31T19:14:42Z
+GET,GET list paged,HTTPError('429 Client Error: Too Many Requests for url: GET list paged'),437,2026-10-31T19:14:18Z,2026-10-31T19:14:42Z
+POST,/api/auth/login,HTTPError('429 Client Error: Too Many Requests for url: /api/auth/login'),50,2026-10-31T19:14:18Z,2026-10-31T19:14:20Z

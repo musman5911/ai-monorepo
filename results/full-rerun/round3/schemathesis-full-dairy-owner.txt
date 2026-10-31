@@ -1,0 +1,2095 @@
+git rev-parse HEAD: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+app=dairy role=owner environment=direct local server NODE_ENV=test MEMORY_MODE=1 no proxy
+command: schemathesis run tests/round3/specs-full/spec-dairy-full.yaml --url http://127.0.0.1:18301/api -n 2 -H Authorization: Bearer <redacted>
+setup: ready=true tokenAcquired=true
+Schemathesis v4.32.7
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from tests/round3/specs-full/spec-dairy-full.yaml (in
+ 0.37s)
+
+     Base URL:         http://127.0.0.1:18301/api
+     Specification:    Open API 3.0.3
+     Operations:       123 selected / 123 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ⏭   Examples (in 0.07s)
+
+     ⏭  123 skipped
+
+ ❌  Coverage (in 1.68s)
+
+     ✅  19 passed  ❌ 104 failed
+
+ ✅  Fuzzing (in 2.56s)
+
+     ✅ 123 passed
+
+=================================== FAILURES ===================================
+___________________________ DELETE /auth/users/{id} ____________________________
+1. Test Case ID: uQvLTp
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/auth/users/0
+
+    st replay uQvLTp
+
+_________________________ DELETE /breeding/events/{id} _________________________
+1. Test Case ID: Y4lpuB
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/breeding/events/0
+
+    st replay Y4lpuB
+
+_____________________________ DELETE /buyers/{id} ______________________________
+1. Test Case ID: 9X366T
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/buyers/0
+
+    st replay 9X366T
+
+___________________ DELETE /buyers/{id}/payments/{paymentId} ___________________
+1. Test Case ID: 0JRuWb
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/buyers/0/payments/0
+
+    st replay 0JRuWb
+
+______________________________ DELETE /cows/{id} _______________________________
+1. Test Case ID: ebVv80
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/cows/0
+
+    st replay ebVv80
+
+____________________________ DELETE /expenses/{id} _____________________________
+1. Test Case ID: mYaI2j
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/expenses/0
+
+    st replay mYaI2j
+
+_____________________________ DELETE /health/{id} ______________________________
+1. Test Case ID: bbwYj7
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/health/0
+
+    st replay bbwYj7
+
+_________________________ DELETE /labor/advances/{id} __________________________
+1. Test Case ID: lQOBpA
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/labor/advances/0
+
+    st replay lQOBpA
+
+________________________ DELETE /labor/attendance/{id} _________________________
+1. Test Case ID: 64kBRm
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/labor/attendance/0
+
+    st replay 64kBRm
+
+__________________________ DELETE /labor/workers/{id} __________________________
+1. Test Case ID: ltp4vO
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/labor/workers/0
+
+    st replay ltp4vO
+
+______________________________ DELETE /milk/{id} _______________________________
+1. Test Case ID: PCMcdE
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/milk/0
+
+    st replay PCMcdE
+
+_____________________________ DELETE /photos/{id} ______________________________
+1. Test Case ID: SPFoVq
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/photos/0
+
+    st replay SPFoVq
+
+____________________________ DELETE /products/{id} _____________________________
+1. Test Case ID: hdZCEV
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/products/0
+
+    st replay hdZCEV
+
+______________________________ DELETE /sales/{id} ______________________________
+1. Test Case ID: 5cpYgY
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/sales/0
+
+    st replay 5cpYgY
+
+____________________________ DELETE /suppliers/{id} ____________________________
+1. Test Case ID: c2309T
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/suppliers/0
+
+    st replay c2309T
+
+_________________ DELETE /suppliers/{id}/payments/{paymentId} __________________
+1. Test Case ID: 2z6HaL
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/suppliers/0/payments/0
+
+    st replay 2z6HaL
+
+_______________________ DELETE /telegram/links/{chatId} ________________________
+1. Test Case ID: XDtv6P
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18301/api/telegram/links/0
+
+    st replay XDtv6P
+
+_______________________________ GET /auth/check ________________________________
+1. Test Case ID: l71eD9
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /auth/check`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"setupDone":true}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/auth/check
+
+    st replay l71eD9
+
+____________________________ GET /auth/mail-status _____________________________
+1. Test Case ID: bf3oYt
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /auth/mail-status`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"configured":false}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/auth/mail-status
+
+    st replay bf3oYt
+
+__________________________________ GET /cows ___________________________________
+1. Test Case ID: RwAmrD
+
+- ST401 Unexpected response to a request without authentication
+
+    Expected 401 or 403, got `429 Too Many Requests` for `GET /cows`
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/cows
+
+    st replay RwAmrD
+
+______________________________ GET /cows/batches _______________________________
+1. Test Case ID: 3FrAbq
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/cows/batches
+
+    st replay 3FrAbq
+
+______________________________ GET /cows/mothers _______________________________
+1. Test Case ID: SI2n2o
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/cows/mothers
+
+    st replay SI2n2o
+
+___________________________ GET /cows/profitability ____________________________
+1. Test Case ID: aYCKWZ
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/cows/profitability
+
+    st replay aYCKWZ
+
+_______________________________ GET /cows/stats ________________________________
+1. Test Case ID: jzgpRP
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/cows/stats
+
+    st replay jzgpRP
+
+________________________________ GET /cows/{id} ________________________________
+1. Test Case ID: PQ61gm
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/cows/0
+
+    st replay PQ61gm
+
+___________________________ GET /cows/{id}/offspring ___________________________
+1. Test Case ID: fNUYvE
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/cows/0/offspring
+
+    st replay fNUYvE
+
+____________________________ GET /cows/{id}/summary ____________________________
+1. Test Case ID: ZbpNyn
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/cows/0/summary
+
+    st replay ZbpNyn
+
+____________________________ GET /dailylog/entries _____________________________
+1. Test Case ID: X0I0jY
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/dailylog/entries
+
+    st replay X0I0jY
+
+_____________________________ GET /dailylog/{date} _____________________________
+1. Test Case ID: orbQe0
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/dailylog/0
+
+    st replay orbQe0
+
+______________________________ GET /email/status _______________________________
+1. Test Case ID: slDNVm
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/email/status
+
+    st replay slDNVm
+
+________________________________ GET /expenses _________________________________
+1. Test Case ID: tZDHlr
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/expenses
+
+    st replay tZDHlr
+
+______________________________ GET /farm-summary _______________________________
+1. Test Case ID: f1YutG
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/farm-summary
+
+    st replay f1YutG
+
+___________________________ GET /feedstock/settings ____________________________
+1. Test Case ID: 1BiJzA
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/feedstock/settings
+
+    st replay 1BiJzA
+
+_________________________________ GET /health __________________________________
+1. Test Case ID: ccKR8G
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/health
+
+    st replay ccKR8G
+
+_____________________________ GET /health/upcoming _____________________________
+1. Test Case ID: KF1swu
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/health/upcoming
+
+    st replay KF1swu
+
+_____________________________ GET /labor/advances ______________________________
+1. Test Case ID: E5EhTR
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/labor/advances
+
+    st replay E5EhTR
+
+____________________________ GET /labor/attendance _____________________________
+1. Test Case ID: MtVd6e
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/labor/attendance
+
+    st replay MtVd6e
+
+______________________________ GET /labor/workers ______________________________
+1. Test Case ID: Gc6mwh
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/labor/workers
+
+    st replay Gc6mwh
+
+__________________________________ GET /milk ___________________________________
+1. Test Case ID: nP1mhX
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/milk
+
+    st replay nP1mhX
+
+______________________________ GET /milk/summary _______________________________
+1. Test Case ID: 0fsTTU
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/milk/summary
+
+    st replay 0fsTTU
+
+_____________________________ GET /photos/orphans ______________________________
+1. Test Case ID: PHHkOr
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/photos/orphans
+
+    st replay PHHkOr
+
+_______________________________ GET /photos/{id} _______________________________
+1. Test Case ID: sPZ3x7
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/photos/0
+
+    st replay sPZ3x7
+
+________________________________ GET /products _________________________________
+1. Test Case ID: z0GDHu
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/products
+
+    st replay z0GDHu
+
+_____________________________ GET /products/public _____________________________
+1. Test Case ID: 0bQEQm
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/products/public
+
+    st replay 0bQEQm
+
+__________________________________ GET /rates __________________________________
+1. Test Case ID: YEUH8A
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/rates
+
+    st replay YEUH8A
+
+_________________________________ GET /rates/1 _________________________________
+1. Test Case ID: 59P8Me
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/rates/1
+
+    st replay 59P8Me
+
+______________________________ GET /rates/history ______________________________
+1. Test Case ID: QLIzDb
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/rates/history
+
+    st replay QLIzDb
+
+__________________________________ GET /sales __________________________________
+1. Test Case ID: VHlM55
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/sales
+
+    st replay VHlM55
+
+____________________________ GET /settings/location ____________________________
+1. Test Case ID: SVeuwq
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/settings/location
+
+    st replay SVeuwq
+
+________________________ GET /super-admin/farm-summary _________________________
+1. Test Case ID: WC5gYL
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/super-admin/farm-summary
+
+    st replay WC5gYL
+
+________________________________ GET /suppliers ________________________________
+1. Test Case ID: y7ofOp
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/suppliers
+
+    st replay y7ofOp
+
+_________________________ GET /suppliers/payments/all __________________________
+1. Test Case ID: cgWU5C
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/suppliers/payments/all
+
+    st replay cgWU5C
+
+_________________________ GET /suppliers/{id}/payments _________________________
+1. Test Case ID: U4rhzk
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/suppliers/0/payments
+
+    st replay U4rhzk
+
+_____________________________ GET /telegram/alerts _____________________________
+1. Test Case ID: dXx4nT
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/telegram/alerts
+
+    st replay dXx4nT
+
+______________________________ GET /telegram/cron ______________________________
+1. Test Case ID: XJAdG7
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/telegram/cron
+
+    st replay XJAdG7
+
+____________________________ GET /telegram/settings ____________________________
+1. Test Case ID: 4tmuGE
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/telegram/settings
+
+    st replay 4tmuGE
+
+_____________________________ GET /telegram/status _____________________________
+1. Test Case ID: vVERm3
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `{"error":"Too many API requests. Please try again later."}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18301/api/telegram/status
+
+    st replay vVERm3
+
+________________________________ PATCH /auth/me ________________________________
+1. Test Case ID: ltKFyM
+
+- ST201 Schema-violating request accepted
+
+    Invalid data should have been rejected
+    Expected: 400, 401, 403, 404, 405, 406, 409, 415, 422, 428, 429, 5xx
+    Invalid component: in body - incorrect type
+
+[200] OK:
+
+    `{"user":{"_id":"ce37c552f9acbad4b36376a9","username":"admin","role":"admin","farmRole":"owner","farmIds":[],"displayName":"Malik Usman","email":"admin@example.com","avatarBase64":"https://images.unsplash.com/photo-1673538064388-21d1aaaf6594?w=800&q=70&fm=jpg","active":true,"farmName":"Usman Dairy Farm","lastLoginAt":"2026-10-31T19:13:55.039Z","createdAt":"2026-10-31T19:13:54.498Z","updatedAt":"2026-10-31T19:13:57.236Z"}}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '[null, null]' http://127.0.0.1:18301/api/auth/me
+
+    st replay ltKFyM
+
+____________________________ PATCH /auth/users/{id} ____________________________
+1. Test Case ID: vGLPOb
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Administrator current password is required for confirmation"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18301/api/auth/users/0
+
+    st replay vGLPOb
+
+__________________________ POST /auth/forgot-password __________________________
+1. Test Case ID: bSiiLY
+
+- ST101 Server error
+
+- ST203 Missing required header accepted
+
+    Got 503 when missing required 'Authorization' header, expected 401
+
+[503] Service Unavailable:
+
+    `{"error":"Email is not configured on this server"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/auth/forgot-password
+
+    st replay bSiiLY
+
+__________________________ POST /auth/reset-password ___________________________
+1. Test Case ID: pWKJqy
+
+- ST203 Missing required header accepted
+
+    Got 400 when missing required 'Authorization' header, expected 401
+
+[400] Bad Request:
+
+    `{"error":"email, code, and newPassword are required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/auth/reset-password
+
+    st replay pWKJqy
+
+_______________________________ POST /auth/setup _______________________________
+1. Test Case ID: vpQJkY
+
+- ST203 Missing required header accepted
+
+    Got 400 when missing required 'Authorization' header, expected 401
+
+[400] Bad Request:
+
+    `{"error":"Setup already done"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/auth/setup
+
+    st replay vpQJkY
+
+__________________________ POST /buyers/{id}/payments __________________________
+1. Test Case ID: Ryn0pF
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"date is required; amount is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18301/api/buyers/0/payments
+
+    st replay Ryn0pF
+
+________________________ POST /suppliers/{id}/payments _________________________
+1. Test Case ID: 0kFfgB
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"date is required; amount is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18301/api/suppliers/0/payments
+
+    st replay 0kFfgB
+
+_______________________ POST /telegram/webhook/{secret} ________________________
+1. Test Case ID: zU9Ek5
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `POST /telegram/webhook/{secret}`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"ok":true}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/telegram/webhook/0
+
+    st replay zU9Ek5
+
+_____________________________ PUT /dailylog/{date} _____________________________
+1. Test Case ID: DBHi8U
+
+- ST201 Schema-violating request accepted
+
+    Invalid data should have been rejected
+    Expected: 400, 401, 403, 404, 405, 406, 409, 415, 422, 428, 429, 5xx
+    Invalid component: in body - incorrect type
+
+[200] OK:
+
+    `{"_id":"0375af5b1003e5f44525a5d4:0","date":"0","farmId":"0375af5b1003e5f44525a5d4","checklist":[],"notes":"","voiceNotes":[],"photos":[],"diaryEntries":[],"createdAt":"2026-10-31T19:13:56.469Z","updatedAt":"2026-10-31T19:13:56.532Z"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '[null, null]' http://127.0.0.1:18301/api/dailylog/0
+
+    st replay DBHi8U
+
+___________________________ PUT /labor/workers/{id} ____________________________
+1. Test Case ID: 4nMIIj
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"name is required; name is required"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18301/api/labor/workers/0
+
+    st replay 4nMIIj
+
+______________________________ PUT /products/{id} ______________________________
+1. Test Case ID: AzHCl0
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"No supported fields supplied."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18301/api/products/0
+
+    st replay AzHCl0
+
+_________________________ TRACE /auth/change-password __________________________
+1. Test Case ID: E115fA
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /auth/change-password"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/auth/change-password
+
+    st replay E115fA
+
+______________________________ TRACE /auth/login _______________________________
+1. Test Case ID: B6bYMf
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /auth/login"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/auth/login
+
+    st replay B6bYMf
+
+________________________________ TRACE /auth/me ________________________________
+1. Test Case ID: Mcyblh
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /auth/me"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18301/api/auth/me
+
+    st replay Mcyblh
+
+_______________________ TRACE /auth/request-profile-code _______________________
+1. Test Case ID: x62OPW
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /auth/request-profile-code"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/auth/request-profile-code
+
+    st replay x62OPW
+
+______________________________ TRACE /auth/users _______________________________
+1. Test Case ID: bbhHRT
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /auth/users"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/auth/users
+
+    st replay bbhHRT
+
+________________________________ TRACE /backup _________________________________
+1. Test Case ID: VEIlWJ
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18301/api/backup
+
+    st replay VEIlWJ
+
+______________________________ TRACE /backup/auto ______________________________
+1. Test Case ID: AO8xaI
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup/auto"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18301/api/backup/auto
+
+    st replay AO8xaI
+
+____________________________ TRACE /backup/auto/run ____________________________
+1. Test Case ID: 4GgH3h
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup/auto/run"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/backup/auto/run
+
+    st replay 4GgH3h
+
+____________________________ TRACE /backup/restore _____________________________
+1. Test Case ID: IPfFre
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup/restore"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/backup/restore
+
+    st replay IPfFre
+
+__________________________ TRACE /backup/restore-auto __________________________
+1. Test Case ID: tymoPw
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup/restore-auto"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/backup/restore-auto
+
+    st replay tymoPw
+
+_______________________________ TRACE /breeding ________________________________
+1. Test Case ID: YAAaJL
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /breeding"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18301/api/breeding
+
+    st replay YAAaJL
+
+____________________________ TRACE /breeding/events ____________________________
+1. Test Case ID: oKtjps
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /breeding/events"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/breeding/events
+
+    st replay oKtjps
+
+________________________________ TRACE /buyers _________________________________
+1. Test Case ID: P3jVXZ
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /buyers"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/buyers
+
+    st replay P3jVXZ
+
+_________________________________ TRACE /cows __________________________________
+1. Test Case ID: fbr83O
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /cows"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/cows
+
+    st replay fbr83O
+
+______________________________ TRACE /email/cron _______________________________
+1. Test Case ID: CDB6Vk
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /email/cron"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/email/cron
+
+    st replay CDB6Vk
+
+____________________________ TRACE /email/send-now _____________________________
+1. Test Case ID: D8oXEw
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /email/send-now"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/email/send-now
+
+    st replay D8oXEw
+
+_______________________________ TRACE /expenses ________________________________
+1. Test Case ID: TKUIgU
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /expenses"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/expenses
+
+    st replay TKUIgU
+
+__________________________ TRACE /feedstock/settings ___________________________
+1. Test Case ID: 6LaDfR
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /feedstock/settings"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/feedstock/settings
+
+    st replay 6LaDfR
+
+________________________________ TRACE /health _________________________________
+1. Test Case ID: edENdM
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /health"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/health
+
+    st replay edENdM
+
+______________________________ TRACE /health/bulk ______________________________
+1. Test Case ID: XNADIF
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /health/bulk"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/health/bulk
+
+    st replay XNADIF
+
+____________________________ TRACE /labor/advances _____________________________
+1. Test Case ID: XnfLFo
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /labor/advances"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/labor/advances
+
+    st replay XnfLFo
+
+___________________________ TRACE /labor/attendance ____________________________
+1. Test Case ID: 8JnayP
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /labor/attendance"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/labor/attendance
+
+    st replay 8JnayP
+
+___________________________ TRACE /labor/post-wages ____________________________
+1. Test Case ID: soWjZ3
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /labor/post-wages"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/labor/post-wages
+
+    st replay soWjZ3
+
+_____________________________ TRACE /labor/workers _____________________________
+1. Test Case ID: x1Gsog
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /labor/workers"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/labor/workers
+
+    st replay x1Gsog
+
+_________________________________ TRACE /milk __________________________________
+1. Test Case ID: Q5eP6k
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /milk"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/milk
+
+    st replay Q5eP6k
+
+_______________________________ TRACE /milk/bulk _______________________________
+1. Test Case ID: ExOapu
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /milk/bulk"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/milk/bulk
+
+    st replay ExOapu
+
+________________________________ TRACE /photos _________________________________
+1. Test Case ID: nMezGX
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /photos"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/photos
+
+    st replay nMezGX
+
+________________________ TRACE /photos/cleanup-orphans _________________________
+1. Test Case ID: OKQYIa
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /photos/cleanup-orphans"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/photos/cleanup-orphans
+
+    st replay OKQYIa
+
+_______________________________ TRACE /products ________________________________
+1. Test Case ID: iA5aIe
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /products"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/products
+
+    st replay iA5aIe
+
+________________________________ TRACE /rates/1 ________________________________
+1. Test Case ID: nY5DyI
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /rates/1"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/rates/1
+
+    st replay nY5DyI
+
+_________________________________ TRACE /sales _________________________________
+1. Test Case ID: ezO5i3
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /sales"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/sales
+
+    st replay ezO5i3
+
+___________________________ TRACE /settings/location ___________________________
+1. Test Case ID: FVkq22
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /settings/location"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/settings/location
+
+    st replay FVkq22
+
+_______________________________ TRACE /suppliers _______________________________
+1. Test Case ID: hGcjRH
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /suppliers"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/suppliers
+
+    st replay hGcjRH
+
+__________________________ TRACE /telegram/link-code ___________________________
+1. Test Case ID: YuOvUv
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /telegram/link-code"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/telegram/link-code
+
+    st replay YuOvUv
+
+_________________________ TRACE /telegram/send-summary _________________________
+1. Test Case ID: Bfw7Fn
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /telegram/send-summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/telegram/send-summary
+
+    st replay Bfw7Fn
+
+___________________________ TRACE /telegram/settings ___________________________
+1. Test Case ID: 8yHJts
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /telegram/settings"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18301/api/telegram/settings
+
+    st replay 8yHJts
+
+=================================== WARNINGS ===================================
+
+Authentication failed: 36 operations returned only 401/403 responses
+
+401 Unauthorized (36 operations):
+  - GET /auth/me
+  - GET /backup
+  - GET /backup/auto
+  - GET /breeding
+  - POST /auth/change-password
+  - POST /auth/login
+  - POST /auth/request-profile-code
+  - POST /auth/users
+  - POST /backup/auto/run
+  - POST /backup/restore
+  - POST /backup/restore-auto
+  - POST /breeding/events
+  - POST /buyers
+  - POST /cows
+  - POST /email/cron
+  - POST /email/send-now
+  - POST /expenses
+  - POST /health
+  - POST /health/bulk
+  - POST /labor/advances
+  - POST /labor/attendance
+  - POST /labor/post-wages
+  - POST /labor/workers
+  - POST /milk
+  - POST /milk/bulk
+  - POST /photos
+  - POST /photos/cleanup-orphans
+  - POST /products
+  - POST /sales
+  - POST /suppliers
+  - POST /telegram/link-code
+  - POST /telegram/send-summary
+  - PUT /feedstock/settings
+  - PUT /rates/1
+  - PUT /settings/location
+  - PUT /telegram/settings
+
+💡 Ensure valid authentication credentials are set via `--auth` or `-H`
+
+Rate limited: 97 operations mostly returned 429 Too Many Requests, leaving the logic behind them untested
+
+  - DELETE /auth/users/{id}
+  - DELETE /breeding/events/{id}
+  - DELETE /buyers/{id}
+  - DELETE /buyers/{id}/payments/{paymentId}
+  - DELETE /cows/{id}
+  - DELETE /expenses/{id}
+  - DELETE /health/{id}
+  - DELETE /labor/advances/{id}
+  - DELETE /labor/attendance/{id}
+  - DELETE /labor/workers/{id}
+  - DELETE /milk/{id}
+  - DELETE /photos/{id}
+  - DELETE /products/{id}
+  - DELETE /sales/{id}
+  - DELETE /suppliers/{id}
+  - DELETE /suppliers/{id}/payments/{paymentId}
+  - DELETE /telegram/links/{chatId}
+  - GET /auth/check
+  - GET /auth/mail-status
+  - GET /auth/me
+  - GET /auth/users
+  - GET /backup
+  - GET /backup/auto
+  - GET /breeding
+  - GET /breeding/events
+  - GET /buyers
+  - GET /buyers/{id}/payments
+  - GET /cards/buyer/{id}
+  - GET /cards/supplier/{id}
+  - GET /cards/worker/{id}
+  - GET /cows
+  - GET /cows/batches
+  - GET /cows/mothers
+  - GET /cows/profitability
+  - GET /cows/stats
+  - GET /cows/{id}
+  - GET /cows/{id}/offspring
+  - GET /cows/{id}/summary
+  - GET /dailylog/entries
+  - GET /dailylog/{date}
+  - GET /email/status
+  - GET /expenses
+  - GET /farm-summary
+  - GET /feedstock/settings
+  - GET /health
+  - GET /health/upcoming
+  - GET /labor/advances
+  - GET /labor/attendance
+  - GET /labor/workers
+  - GET /milk
+  - GET /milk/summary
+  - GET /photos/orphans
+  - GET /photos/{id}
+  - GET /products
+  - GET /products/public
+  - GET /rates
+  - GET /rates/1
+  - GET /rates/history
+  - GET /sales
+  - GET /settings/location
+  - GET /super-admin/farm-summary
+  - GET /suppliers
+  - GET /suppliers/payments/all
+  - GET /suppliers/{id}/payments
+  - GET /telegram/alerts
+  - GET /telegram/cron
+  - GET /telegram/settings
+  - GET /telegram/status
+  - PATCH /auth/users/{id}
+  - POST /auth/forgot-password
+  - POST /breeding/events
+  - POST /buyers
+  - POST /email/send-now
+  - POST /expenses
+  - POST /health
+  - POST /labor/advances
+  - POST /labor/attendance
+  - POST /labor/post-wages
+  - POST /labor/workers
+  - POST /milk
+  - POST /milk/bulk
+  - POST /telegram/link-code
+  - POST /telegram/send-summary
+  - POST /telegram/webhook/{secret}
+  - PUT /breeding/events/{id}
+  - PUT /buyers/{id}
+  - PUT /buyers/{id}/payments/{paymentId}
+  - PUT /cows/{id}
+  - PUT /dailylog/{date}
+  - PUT /expenses/{id}
+  - PUT /health/{id}
+  - PUT /labor/advances/{id}
+  - PUT /milk/{id}
+  - PUT /products/{id}
+  - PUT /rates/1
+  - PUT /sales/{id}
+  - PUT /suppliers/{id}/payments/{paymentId}
+
+💡 Send requests no faster than the API allows with `--rate-limit`, e.g. `--rate-limit=100/m`
+
+Missing test data: 13 operations repeatedly returned 404 Not Found, preventing tests from reaching your API's core logic
+
+  - GET /cards/buyer/{id}
+  - PUT /breeding/events/{id}
+  - PUT /buyers/{id}
+  - PUT /buyers/{id}/payments/{paymentId}
+  - PUT /cows/{id}
+  - PUT /expenses/{id}
+  - PUT /health/{id}
+  - PUT /labor/advances/{id}
+  - PUT /labor/attendance/{id}
+  - PUT /milk/{id}
+  - PUT /sales/{id}
+  - PUT /suppliers/{id}
+  - PUT /suppliers/{id}/payments/{paymentId}
+
+💡 Schemathesis found no operation that creates this data - create it outside the test run and supply the identifiers in your config file
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 123/123
+  Tested: 123
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ✅ Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ ST401 API accepts requests without authentication: 3
+  ❌ ST101 Server error: 1
+  ❌ ST401 Unexpected response to a request without authentication: 1
+  ❌ ST203 Missing required header accepted: 60
+  ❌ ST202 Schema-valid request rejected: 5
+  ❌ ST201 Schema-violating request accepted: 2
+  ❌ ST204 Wrong response to undeclared method: 36
+
+For more information, run `st explain <code>` for ST101, ST201, ST202, ST203, ST204, ST401.
+
+Warnings:
+  ⚠️ Authentication failed: 36 operations returned only 401/403 responses
+  ⚠️ Rate limited: 97 operations mostly returned 429 responses
+  ⚠️ Missing test data: 13 operations repeatedly returned 404 responses
+
+Test cases:
+  637 generated, 104 found 108 unique failures, 12 skipped
+
+Seed: 252112793103769717080009491810826425784
+
+====================== 108 failures, 3 warnings in 4.46s =======================
+
+SCHemathesis exit=1

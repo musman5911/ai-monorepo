@@ -1,0 +1,56 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-ui"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-ui
+> node tools/check-ui-safety.js
+
+
+MUF UI safety checks
+  ✓ muf/core/muf-modal.tsx matches across all three apps
+  ✓ muf/core/muf-confirm.tsx matches across all three apps
+  ✓ muf-style.css matches across all three apps
+  ✓ muf/ui/muf-diary.tsx matches across all three apps
+  ✓ muf/ui/muf-login.tsx matches across all three apps
+  ✓ dairy: no native browser dialog calls in app source
+  ✓ dairy: popup has dialog semantics
+  ✓ dairy: active modal stack and Escape handling present
+  ✓ dairy: notifications queue without native alert fallback
+  ✓ dairy: QR receipt uses MUF notification
+  ✓ dairy: responsive and reduced-motion styles present
+  ✓ dairy: Finance dropdown uses an accessible body portal
+  ✓ dairy: MUF dropdown tokens and popup field safeguards present
+  ✓ dairy: MUF login shell and inset mobile dialog sizing present
+  ✓ dairy: auth UI uses shared MUF login components
+  ✓ dairy: header and primary navbar share a sticky MUF wrapper
+  ✓ dairy: app root clips horizontal overflow without disabling sticky chrome
+  ✓ flock: no native browser dialog calls in app source
+  ✓ flock: popup has dialog semantics
+  ✓ flock: active modal stack and Escape handling present
+  ✓ flock: notifications queue without native alert fallback
+  ✓ flock: QR receipt uses MUF notification
+  ✓ flock: responsive and reduced-motion styles present
+  ✓ flock: Home Birds navigation is scoped to the approved sections
+  ✓ flock: MUF dropdown tokens and popup field safeguards present
+  ✓ flock: MUF login shell and inset mobile dialog sizing present
+  ✓ flock: auth UI uses shared MUF login components
+  ✓ flock: header and primary navbar share a sticky MUF wrapper
+  ✓ agri: no native browser dialog calls in app source
+  ✓ agri: popup has dialog semantics
+  ✓ agri: active modal stack and Escape handling present
+  ✓ agri: notifications queue without native alert fallback
+  ✓ agri: QR receipt uses MUF notification
+  ✓ agri: responsive and reduced-motion styles present
+  ✓ agri: Finance dropdown uses an accessible body portal
+  ✓ agri: MUF dropdown tokens and popup field safeguards present
+  ✓ agri: MUF login shell and inset mobile dialog sizing present
+  ✓ agri: auth UI uses shared MUF login components
+  ✓ agri: header and primary navbar share a sticky MUF wrapper
+  ✓ dairy: popup content uses muf-pc-* classes for the shared patterns
+  ✓ flock: popup content uses muf-pc-* classes for the shared patterns
+  ✓ agri: popup content uses muf-pc-* classes for the shared patterns
+
+All MUF UI safety checks passed.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=0.32

@@ -1,0 +1,916 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "--prefix", "agri_farm/frontend", "run", "lint"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> frontend@0.0.0 lint
+> oxlint
+
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+     ,-[src/muf/ui/muf-diary-media.tsx:110:23]
+ 109 | /** Shrinks a photo to about 90 KB (side and quality are lowered together). */
+ 110 | export async function compressDiaryPhoto(file: File): Promise<{ data: string; bytes: number }> {
+     :                       ^^^^^^^^^^^^^^^^^^
+ 111 |   const img = await loadImage(file);
+     `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/muf/ui/muf-charts.tsx:17:17]
+ 16 | /** Short number: 1500 → 1.5k, 2,400,000 → 2.4M */
+ 17 | export function mufCompact(n: number): string {
+    :                 ^^^^^^^^^^
+ 18 |   const abs = Math.abs(n);
+    `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/muf/ui/muf-charts.tsx:25:17]
+ 24 | /** Round a max value up to a "nice" ceiling for the y axis. */
+ 25 | export function mufNiceMax(max: number): number {
+    :                 ^^^^^^^^^^
+ 26 |   if (max <= 0) return 1;
+    `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/muf/ui/muf-charts.tsx:34:17]
+ 33 | /** Catmull-Rom → cubic bezier smooth path through the points. */
+ 34 | export function mufSmoothPath(pts: { x: number; y: number }[]): string {
+    :                 ^^^^^^^^^^^^^
+ 35 |   if (pts.length === 0) return '';
+    `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/muf/ui/muf-avatar.tsx:15:23]
+ 14 | 
+ 15 | export async function compressToAvatar(file: File, maxSide = 256, quality = 0.82): Promise<string> {
+    :                       ^^^^^^^^^^^^^^^^
+ 16 |   const dataUrl: string = await new Promise((resolve, reject) => {
+    `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/muf/core/muf-confirm.tsx:23:17]
+ 22 | 
+ 23 | export function useConfirm() {
+    :                 ^^^^^^^^^^
+ 24 |   const ctx = useContext(ConfirmContext);
+    `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/muf/core/muf-confirm.tsx:49:17]
+ 48 | /** Styled replacement for window.prompt() — same muf dialog in all 3 farm apps. */
+ 49 | export function usePromptInput() {
+    :                 ^^^^^^^^^^^^^^
+ 50 |   const ctx = useContext(PromptContext);
+    `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/muf/core/muf-confirm.tsx:68:17]
+ 67 |  *  Plain function (no hook) so it works anywhere, including non-component code. */
+ 68 | export function notify(message: unknown, tone: NoticeTone = 'info', title?: string, action?: { label: string; fn: () => void }) {
+    :                 ^^^^^^
+ 69 |   const msg = typeof message === 'string' ? message : String(message ?? '');
+    `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/muf/core/muf-applike.tsx:14:17]
+ 13 | /* ── splash ─────────────────────────────────────────────────── */
+ 14 | export function hideMufSplash() {
+    :                 ^^^^^^^^^^^^^
+ 15 |   const el = document.getElementById('muf-splash');
+    `----
+
+  ! react(only-export-components): Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components.
+    ,-[src/muf/core/muf-applike.tsx:22:17]
+ 21 | /* ── pull-to-refresh (touch devices, page scrolled to top) ──── */
+ 22 | export function initMufPullToRefresh(): () => void {
+    :                 ^^^^^^^^^^^^^^^^^^^^
+ 23 |   if (typeof window === 'undefined' || !('ontouchstart' in window)) return () => {};
+    `----
+
+  ! eslint(no-useless-escape): Unnecessary escape character '-'
+     ,-[src/muf/core/muf-applike.tsx:120:31]
+ 119 |     const m = String(text).match(/-?[\d,]+(?:\.\d+)?/);
+ 120 |     if (!m || m[0].replace(/[,\-]/g, '') === '') { setShown(text); doneRef.current = text; return; }
+     :                               ^^
+ 121 |     const raw = m[0];
+     `----
+  help: Replace `\-` with `-`.
+
+  ! react(only-export-components): Fast refresh only works when a file has exports. Move your component(s) to a separate file.
+   ,-[src/main.tsx:7:7]
+ 6 | 
+ 7 | const App = lazy(() => import('./App'));
+   :       ^^^
+ 8 | const ConfirmProvider = lazy(() => import('./muf/core/muf-confirm'));
+   `----
+
+  ! react(only-export-components): Fast refresh only works when a file has exports. Move your component(s) to a separate file.
+   ,-[src/main.tsx:8:7]
+ 7 | const App = lazy(() => import('./App'));
+ 8 | const ConfirmProvider = lazy(() => import('./muf/core/muf-confirm'));
+   :       ^^^^^^^^^^^^^^^
+ 9 | const MufShop = lazy(() => import('./muf-shop/MufShop'));
+   `----
+
+  ! react(only-export-components): Fast refresh only works when a file has exports. Move your component(s) to a separate file.
+    ,-[src/main.tsx:9:7]
+  8 | const ConfirmProvider = lazy(() => import('./muf/core/muf-confirm'));
+  9 | const MufShop = lazy(() => import('./muf-shop/MufShop'));
+    :       ^^^^^^^
+ 10 | const isMufShopRoute = /^\/shop\/?$/.test(window.location.pathname);
+    `----
+
+  ! eslint(no-unused-vars): Identifier 'mufMonth' is imported but never used.
+    ,-[src/components/app/agriHelpers.ts:9:20]
+  8 | 
+  9 | import { mufToday, mufMonth } from '../../muf/data/muf-date';
+    :                    ^^^^|^^^
+    :                        `-- 'mufMonth' is imported here
+ 10 | import { sumMonth, pctChange, sameMonthLastYearKey } from '../../muf/data/muf-compare';
+    `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/components/SupplierKhata.tsx:62:7]
+ 61 |       showAlert(L('Supplier added!'));
+ 62 |       onChanged && onChanged();
+    :       ^^^^^^^^^^^^^^^^^^^^^^^^^
+ 63 |     } catch (err) { showAlert(err?.response?.data?.detail || 'Failed to add supplier.', true); }
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/components/SupplierKhata.tsx:73:44]
+ 72 |     if (!ok) return;
+ 73 |     try { await api.deleteSupplier(s._id); onChanged && onChanged(); }
+    :                                            ^^^^^^^^^^^^^^^^^^^^^^^^^
+ 74 |     catch (err) { showAlert(err?.response?.data?.detail || 'Failed.', true); }
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+    ,-[src/components/SupplierKhata.tsx:87:7]
+ 86 |       showAlert(L('Payment saved!'));
+ 87 |       onChanged && onChanged();
+    :       ^^^^^^^^^^^^^^^^^^^^^^^^^
+ 88 |     } catch (err) { showAlert(err?.response?.data?.detail || 'Failed to save payment.', true); }
+    `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[src/components/SupplierKhata.tsx:108:7]
+ 107 |       showAlert(L('Payment updated!'));
+ 108 |       onChanged && onChanged();
+     :       ^^^^^^^^^^^^^^^^^^^^^^^^^
+ 109 |     } catch (err) { showAlert(err?.response?.data?.detail || 'Failed to update payment.', true); }
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[src/components/SupplierKhata.tsx:119:7]
+ 118 |       await api.deleteSupplierPayment(khataOf._id, paymentId);
+ 119 |       onChanged && onChanged();
+     :       ^^^^^^^^^^^^^^^^^^^^^^^^^
+ 120 |       notify(L('Payment deleted'), 'success', undefined, {
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-expressions): Expected expression to be used
+     ,-[src/components/SupplierKhata.tsx:124:27]
+ 123 |           api.addSupplierPayment(khataOf._id, { date: payment.date, amount: payment.amount, note: payment.note || undefined })
+ 124 |             .then(() => { onChanged && onChanged(); })
+     :                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+ 125 |             .catch(() => notify(L('Undo failed — add the payment again'), 'error'));
+     `----
+  help: Consider using this expression or removing it
+
+  ! eslint(no-unused-vars): Parameter 'compressAndConvertToBase64' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/LedgerBookForm.tsx:36:3]
+ 35 |   formatCurrency,
+ 36 |   compressAndConvertToBase64,
+    :   ^^^^^^^^^^^^^|^^^^^^^^^^^^
+    :                `-- 'compressAndConvertToBase64' is declared here
+ 37 |   showAlert,
+    `----
+  help: Consider removing this parameter.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'loadLabor'
+    ,-[src/components/LaborBoard.tsx:75:6]
+ 73 |   useEffect(() => {
+ 74 |     loadLabor(month);
+    :     ^^^^|^^^^
+    :         `-- useEffect uses `loadLabor` here
+ 75 |   }, [month]);
+    :      ^^^^^^^
+ 76 | 
+    `----
+  help: Either include it or remove the dependency array.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+    ,-[src/components/ImageUploader.tsx:61:14]
+ 60 |       if (onDone) onDone(res.base64, res);
+ 61 |     } catch (err) {
+    :              ^|^
+    :               `-- 'err' is declared here
+ 62 |       setError('Could not process this image. Try a different file.');
+    `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Parameter 'compressAndConvertToBase64' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/CropOpsPanel.tsx:14:3]
+ 13 |   userRole,
+ 14 |   compressAndConvertToBase64,
+    :   ^^^^^^^^^^^^^|^^^^^^^^^^^^
+    :                `-- 'compressAndConvertToBase64' is declared here
+ 15 |   refreshData,
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'refreshData' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/CropOpsPanel.tsx:15:3]
+ 14 |   compressAndConvertToBase64,
+ 15 |   refreshData,
+    :   ^^^^^|^^^^^
+    :        `-- 'refreshData' is declared here
+ 16 |   showAlert,
+    `----
+  help: Consider removing this parameter.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'loadPhotos'
+    ,-[src/components/CropOpsPanel.tsx:36:6]
+ 34 |   useEffect(() => {
+ 35 |     loadPhotos();
+    :     ^^^^^|^^^^
+    :          `-- useEffect uses `loadPhotos` here
+ 36 |   }, [crop?._id]);
+    :      ^^^^^^^^^^^
+ 37 | 
+    `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'pendingCount'
+    ,-[src/muf/core/muf-offline-banner.tsx:33:7]
+ 25 | 
+ 26 |   useEffect(() => watchOffline(pendingCount, (next) => {
+    :                                ^^^^^^|^^^^^
+    :                                      `-- useEffect uses `pendingCount` here
+ 27 |     if (!next.offline && next.pending === 0 && (prev.current.offline || prev.current.pending > 0)) {
+ 28 |       setJustSynced(true);
+ 29 |       setTimeout(() => setJustSynced(false), 4000);
+ 30 |     }
+ 31 |     prev.current = next;
+ 32 |     setState(next);
+ 33 |   }), []); // pendingCount must be a stable reference (module scope or useCallback)
+    :       ^^
+ 34 | 
+    `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'loadFields'
+    ,-[src/components/AgriFieldsPanel.tsx:34:53]
+ 33 | 
+ 34 |   useEffect(() => { if (open) void loadFields(); }, [open]);
+    :                                    ^^^^^|^^^^       ^^^^^^
+    :                                         `-- useEffect uses `loadFields` here
+ 35 | 
+    `----
+  help: Either include it or remove the dependency array.
+
+  ! eslint(no-unused-vars): Parameter 'isDark' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/AdminMenu.tsx:45:3]
+ 44 |   onUpdateAvatar,
+ 45 |   isDark,
+    :   ^^^|^^
+    :      `-- 'isDark' is declared here
+ 46 |   onToggleDark,
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'onToggleDark' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/AdminMenu.tsx:46:3]
+ 45 |   isDark,
+ 46 |   onToggleDark,
+    :   ^^^^^^|^^^^^
+    :         `-- 'onToggleDark' is declared here
+ 47 |   users,
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Parameter 'tasks' is declared but never used. Unused parameters should start with a '_'.
+    ,-[src/components/AdminMenu.tsx:50:3]
+ 49 |   finance = [],
+ 50 |   tasks = [],
+    :   ^^|^^
+    :     `-- 'tasks' is declared here
+ 51 |   refreshData,
+    `----
+  help: Consider removing this parameter.
+
+  ! eslint(no-unused-vars): Variable 'actionId' is declared but never used. Unused variables should start with a '_'.
+    ,-[src/components/AdminMenu.tsx:67:10]
+ 66 |   const [submitting, setSubmitting] = useState(false);
+ 67 |   const [actionId, setActionId] = useState(null);
+    :          ^^^^|^^^
+    :              `-- 'actionId' is declared here
+ 68 | 
+    `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'emailCodeSent' is declared but never used. Unused variables should start with a '_'.
+    ,-[src/components/AdminMenu.tsx:73:10]
+ 72 |   const [emailCode, setEmailCode] = useState('');
+ 73 |   const [emailCodeSent, setEmailCodeSent] = useState(false);
+    :          ^^^^^^|^^^^^^
+    :                `-- 'emailCodeSent' is declared here
+ 74 | 
+    `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'pwCodeSent' is declared but never used. Unused variables should start with a '_'.
+    ,-[src/components/AdminMenu.tsx:80:10]
+ 79 |   const [pwCode, setPwCode] = useState('');
+ 80 |   const [pwCodeSent, setPwCodeSent] = useState(false);
+    :          ^^^^^|^^^^
+    :               `-- 'pwCodeSent' is declared here
+ 81 |   const [pwVerifyMethod, setPwVerifyMethod] = useState('password'); // 'password' or 'email'
+    `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'resetWorkerId' is declared but never used. Unused variables should start with a '_'.
+    ,-[src/components/AdminMenu.tsx:88:10]
+ 87 |   const [workerForm, setWorkerForm] = useState({ username: '', email: '', password: '', role: 'worker' });
+ 88 |   const [resetWorkerId, setResetWorkerId] = useState(null);
+    :          ^^^^^^|^^^^^^
+    :                `-- 'resetWorkerId' is declared here
+ 89 |   const [workerNewPw, setWorkerNewPw] = useState('');
+    `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'loadingAuto' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/components/AdminMenu.tsx:102:10]
+ 101 |   });
+ 102 |   const [loadingAuto, setLoadingAuto] = useState(false);
+     :          ^^^^^|^^^^^
+     :               `-- 'loadingAuto' is declared here
+ 103 |   const [autoMsg, setAutoMsg] = useState(null);
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'farmLocLoading' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/components/AdminMenu.tsx:119:10]
+ 118 |   const [farmLocMsg, setFarmLocMsg] = useState(null);
+ 119 |   const [farmLocLoading, setFarmLocLoading] = useState(false);
+     :          ^^^^^^^|^^^^^^
+     :                 `-- 'farmLocLoading' is declared here
+ 120 |   const [autoBackup, setAutoBackup] = useState(null);
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'handleRequestPwCode' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/components/AdminMenu.tsx:252:9]
+ 251 |   // --- Password Change ---
+ 252 |   const handleRequestPwCode = async () => {
+     :         ^^^^^^^^^|^^^^^^^^^
+     :                  `-- 'handleRequestPwCode' is declared here
+ 253 |     setPwMsg(null);
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'handleRequestEmailCode' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/components/AdminMenu.tsx:302:9]
+ 301 |   // --- Email Change ---
+ 302 |   const handleRequestEmailCode = async () => {
+     :         ^^^^^^^^^^^|^^^^^^^^^^
+     :                    `-- 'handleRequestEmailCode' is declared here
+ 303 |     setEmailMsg(null);
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'handleTriggerImmediateDigest' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/components/AdminMenu.tsx:356:9]
+ 355 | 
+ 356 |   const handleTriggerImmediateDigest = async () => {
+     :         ^^^^^^^^^^^^^^|^^^^^^^^^^^^^
+     :                       `-- 'handleTriggerImmediateDigest' is declared here
+ 357 |     setSubmitting(true);
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+     ,-[src/components/AdminMenu.tsx:590:14]
+ 589 |       showAlert("JSON Database Backup exported successfully!");
+ 590 |     } catch (err) {
+     :              ^|^
+     :               `-- 'err' is declared here
+ 591 |       showAlert("Backup export failed.", true);
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+     ,-[src/components/AdminMenu.tsx:602:14]
+ 601 |       else if (result === 'fallback') showAlert('Backup downloaded — attach the file in WhatsApp.');
+ 602 |     } catch (err) {
+     :              ^|^
+     :               `-- 'err' is declared here
+ 603 |       showAlert('Backup share failed.', true);
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+     ,-[src/components/AdminMenu.tsx:678:34]
+ 677 |                           showAlert("Avatar photo updated successfully!");
+ 678 |                         } catch (err) {
+     :                                  ^|^
+     :                                   `-- 'err' is declared here
+ 679 |                           showAlert("Failed to update avatar photo.", true);
+     `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+     ,-[src/components/AdminMenu.tsx:690:34]
+ 689 |                           showAlert("Avatar photo removed.");
+ 690 |                         } catch (err) {
+     :                                  ^|^
+     :                                   `-- 'err' is declared here
+ 691 |                           showAlert("Failed to remove avatar photo.", true);
+     `----
+  help: Consider handling this error.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'showAlert'
+     ,-[src/components/AdminMenu.tsx:169:6]
+ 163 |             backupToastShown.current = true;
+ 164 |             showAlert(`Backup sent to ${res.data.emailed_to} on ${String(res.data.emailed_at || '').slice(0, 10)}`);
+     :             ^^^^|^^^^
+     :                 `-- useEffect uses `showAlert` here
+ 165 |           }
+ 166 |         })
+ 167 |         .catch(() => setAutoBackup(null));
+ 168 |     }
+ 169 |   }, [open, activeTab, userRole]);
+     :      ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 170 | 
+     `----
+  help: Either include it or remove the dependency array.
+
+  ! eslint(no-unused-vars): Identifier 'sumMonth' is imported but never used.
+    ,-[src/App.tsx:30:76]
+ 29 | import { mufStoryNet, mufVerdictText, mufDaysBetween } from './muf/data/muf-story';
+ 30 | import { thisMonthKey, lastMonthKey, monthKeyLabel, pctChange, trendArrow, sumMonth, sameMonthLastYearKey } from './muf/data/muf-compare';
+    :                                                                            ^^^^|^^^
+    :                                                                                `-- 'sumMonth' is imported here
+ 31 | import FormOverlay from './muf/core/muf-form-overlay';
+    `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Identifier 'cropImageMap' is imported but never used.
+    ,-[src/App.tsx:44:19]
+ 43 |   getEmptyCropForm, getEmptyFinForm, getEmptyTaskForm,
+ 44 |   formatCurrency, cropImageMap, getCropImage, getCropProgress,
+    :                   ^^^^^^|^^^^^
+    :                         `-- 'cropImageMap' is imported here
+ 45 |   buildAgriProfileData, buildAgriComparison,
+    `----
+  help: Consider removing this import.
+
+  ! eslint(no-unused-vars): Variable 'setupDone' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/App.tsx:378:10]
+ 377 |   // Authentication & Password Recovery States
+ 378 |   const [setupDone, setSetupDone] = useState(true);
+     :          ^^^^|^^^^
+     :              `-- 'setupDone' is declared here
+ 379 |   const [authMode, setAuthMode] = useState('login'); // 'login', 'register', 'forgot_send', 'forgot_reset'
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'actionId' is declared but never used. Unused variables should start with a '_'.
+     ,-[src/App.tsx:429:10]
+ 428 |   const [loading, setLoading] = useState(false);
+ 429 |   const [actionId, setActionId] = useState(null); 
+     :          ^^^^|^^^
+     :              `-- 'actionId' is declared here
+ 430 |   
+     `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:1453:14]
+ 1452 |       if (!isOfflineSave(cropSaveRes)) void refreshData();
+ 1453 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 1454 |       showAlert("Failed to save crop entry.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:1497:14]
+ 1496 |       // Keep the confirmed local removal; an immediate refetch can return a stale cached list.
+ 1497 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 1498 |       showAlert("Failed to remove crop.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Variable 'tubewell' is declared but never used. Unused variables should start with a '_'.
+      ,-[src/App.tsx:1660:9]
+ 1659 |       const {
+ 1660 |         tubewell,
+      :         ^^^^|^^^
+      :             `-- 'tubewell' is declared here
+ 1661 |         hours,
+      `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'hours' is declared but never used. Unused variables should start with a '_'.
+      ,-[src/App.tsx:1661:9]
+ 1660 |         tubewell,
+ 1661 |         hours,
+      :         ^^|^^
+      :           `-- 'hours' is declared here
+ 1662 |         chemical,
+      `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'chemical' is declared but never used. Unused variables should start with a '_'.
+      ,-[src/App.tsx:1662:9]
+ 1661 |         hours,
+ 1662 |         chemical,
+      :         ^^^^|^^^
+      :             `-- 'chemical' is declared here
+ 1663 |         dose,
+      `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'dose' is declared but never used. Unused variables should start with a '_'.
+      ,-[src/App.tsx:1663:9]
+ 1662 |         chemical,
+ 1663 |         dose,
+      :         ^^|^
+      :           `-- 'dose' is declared here
+ 1664 |         spray_image,
+      `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'spray_image' is declared but never used. Unused variables should start with a '_'.
+      ,-[src/App.tsx:1664:9]
+ 1663 |         dose,
+ 1664 |         spray_image,
+      :         ^^^^^|^^^^^
+      :              `-- 'spray_image' is declared here
+ 1665 |         inventory_item_id,
+      `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'inventory_item_id' is declared but never used. Unused variables should start with a '_'.
+      ,-[src/App.tsx:1665:9]
+ 1664 |         spray_image,
+ 1665 |         inventory_item_id,
+      :         ^^^^^^^^|^^^^^^^^
+      :                 `-- 'inventory_item_id' is declared here
+ 1666 |         inventory_qty_consumed,
+      `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Variable 'inventory_qty_consumed' is declared but never used. Unused variables should start with a '_'.
+      ,-[src/App.tsx:1666:9]
+ 1665 |         inventory_item_id,
+ 1666 |         inventory_qty_consumed,
+      :         ^^^^^^^^^^^|^^^^^^^^^^
+      :                    `-- 'inventory_qty_consumed' is declared here
+ 1667 |         ...ledgerFields
+      `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:1717:14]
+ 1716 |       if (!isOfflineSave(saveRes)) void refreshData();
+ 1717 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 1718 |       showAlert("Failed to save ledger entry.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:1828:14]
+ 1827 |       return true;
+ 1828 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 1829 |       showAlert("Failed to delete transaction.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:1870:14]
+ 1869 |       }
+ 1870 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 1871 |       showAlert("Failed to save liability.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:1907:14]
+ 1906 |       refreshData();
+ 1907 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 1908 |       showAlert("Failed to settle debt.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:1929:14]
+ 1928 |       await refreshData();
+ 1929 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 1930 |       showAlert("Failed to remove liability.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:1971:14]
+ 1970 |       }
+ 1971 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 1972 |       showAlert("Failed to save inventory item.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:1991:14]
+ 1990 |       await refreshData();
+ 1991 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 1992 |       showAlert("Failed to delete stock item.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:2031:14]
+ 2030 |       }
+ 2031 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 2032 |       showAlert("Failed to save assignment.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:2060:14]
+ 2059 |       refreshData();
+ 2060 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 2061 |       showAlert("Failed to update task status.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:2073:14]
+ 2072 |       refreshData();
+ 2073 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 2074 |       showAlert("Failed to revert task status.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Catch parameter 'err' is caught but never used.
+      ,-[src/App.tsx:2093:14]
+ 2092 |       await refreshData();
+ 2093 |     } catch (err) {
+      :              ^|^
+      :               `-- 'err' is declared here
+ 2094 |       showAlert("Failed to delete task.", true);
+      `----
+  help: Consider handling this error.
+
+  ! eslint(no-unused-vars): Variable 'netProfit' is declared but never used. Unused variables should start with a '_'.
+      ,-[src/App.tsx:2109:9]
+ 2108 |   const totalExpense = Number(serverFinanceSummary?.totals?.expense ?? localExpense);
+ 2109 |   const netProfit = totalIncome - totalExpense;
+      :         ^^^^|^^^^
+      :             `-- 'netProfit' is declared here
+ 2110 |   const dbIncome = Number((dashboardCropFilter === 'all'
+      `----
+  help: Consider removing this declaration.
+
+  ! eslint(no-unused-vars): Parameter 'key' is declared but never used. Unused parameters should start with a '_'.
+      ,-[src/App.tsx:3592:87]
+ 3591 |                     for (const row of rows) {
+ 3592 |                       const payload = Object.fromEntries(Object.entries(row).filter(([key, value]) => value !== ''));
+      :                                                                                       ^|^
+      :                                                                                        `-- 'key' is declared here
+ 3593 |                       try {
+      `----
+  help: Consider removing this parameter.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'syncOfflineQueue'
+     ,-[src/App.tsx:620:6]
+ 614 |     window.addEventListener('offline-request-queued', handleQueued);
+ 615 |     window.addEventListener('online', syncOfflineQueue);
+     :                                       ^^^^^^^^|^^^^^^^
+     :                                               `-- useEffect uses `syncOfflineQueue` here
+ 616 |     return () => {
+ 617 |       window.removeEventListener('offline-request-queued', handleQueued);
+ 618 |       window.removeEventListener('online', syncOfflineQueue);
+ 619 |     };
+ 620 |   }, []);
+     :      ^^
+ 621 | 
+     `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has missing dependencies: 'selectedCrop.variety', and 'selectedCrop.name'
+     ,-[src/App.tsx:918:6]
+ 898 |             crop_id: cropId,
+ 899 |             crop_search: [selectedCrop?.name, selectedCrop?.variety].filter(Boolean).join('|'),
+     :                           ^^^^^^^^^^^^        ^^^^^^^^^^^^
+ 900 |           })),
+ 901 |           userRole === 'admin'
+ 902 |             ? fetchAllRows((skip, limit) => api.getFinance(skip, limit, { crop_id: cropId }))
+ 903 |             : Promise.resolve([]),
+ 904 |         ]);
+ 905 |         if (cancelled) return;
+ 906 |         setSelectedCropTaskRows(taskRows);
+ 907 |         setSelectedCropFinanceRows(financeRows);
+ 908 |       } catch (error) {
+ 909 |         if (!cancelled) {
+ 910 |           setSelectedCropDetailError(error?.response?.data?.error || error?.message || 'Could not load complete crop history.');
+ 911 |         }
+ 912 |       } finally {
+ 913 |         if (!cancelled) setSelectedCropDetailLoading(false);
+ 914 |       }
+ 915 |     };
+ 916 |     void loadDetails();
+ 917 |     return () => { cancelled = true; };
+ 918 |   }, [token, selectedCrop?._id, listRefreshKey, userRole]);
+     :      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 919 | 
+     `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'refreshData'
+     ,-[src/App.tsx:924:6]
+ 922 |     setLoading(true);
+ 923 |     refreshData(false).finally(() => setLoading(false));
+     :     ^^^^^|^^^^^
+     :          `-- useEffect uses `refreshData` here
+ 924 |   }, [token]);
+     :      ^^^^^^^
+ 925 | 
+     `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'refreshData'
+     ,-[src/App.tsx:929:6]
+ 927 |     if (!token || !needsFullDetails) return;
+ 928 |     void refreshData(true);
+     :          ^^^^^|^^^^^
+     :               `-- useEffect uses `refreshData` here
+ 929 |   }, [token, needsFullDetails]);
+     :      ^^^^^^^^^^^^^^^^^^^^^^^^^
+ 930 | 
+     `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'selectedLedgerGroup'
+      ,-[src/App.tsx:1173:6]
+ 1162 |   useEffect(() => {
+ 1163 |     if (!selectedLedgerGroup) {
+      :          ^^^^^^^^^|^^^^^^^^^
+      :                   `-- useEffect uses `selectedLedgerGroup` here
+ 1164 |       ledgerPageRequestRef.current += 1;
+ 1165 |       setLedgerPageRows([]);
+ 1166 |       setLedgerPageNextSkip(0);
+ 1167 |       setLedgerPageTotal(0);
+ 1168 |       setLedgerPageError('');
+ 1169 |       return undefined;
+ 1170 |     }
+ 1171 |     void fetchLedgerPage(selectedLedgerGroup, 0, true, financeFilter);
+ 1172 |     return () => { ledgerPageRequestRef.current += 1; };
+ 1173 |   }, [selectedLedgerGroup?.id, financeFilter, listRefreshKey]);
+      :      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 1174 | 
+      `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useMemo has a missing dependency: 'finance'
+      ,-[src/App.tsx:2214:6]
+ 2151 |     const activityToday = analyticsSummary?.activityToday ?? (
+ 2152 |       finance.some(f => String(f.date || '').slice(0, 10) === todayIso) ||
+      :       ^^^|^^^
+      :          `-- useMemo uses `finance` here
+ 2153 |       tasks.some(t => String(t.completed_at || t.date || '').slice(0, 10) === todayIso)
+ 2154 |     );
+ 2155 |     if (!activityToday && new Date().getHours() >= 8) {
+ 2156 |       list.push({
+ 2157 |         id: 'no-activity-today',
+ 2158 |         type: 'warning',
+ 2159 |         title: '📔 Nothing logged today',
+ 2160 |         desc: 'No ledger entries or completed tasks recorded today yet.',
+ 2161 |         time: 'Daily reminder'
+ 2162 |       });
+ 2163 |     }
+ 2164 | 
+ 2165 |     // 1. Rain alert
+ 2166 |     if (rainForecast24h > 5) {
+ 2167 |       list.push({
+ 2168 |         id: 'rain-alert',
+ 2169 |         type: 'danger',
+ 2170 |         title: '🌧️ Heavy Rain Warning',
+ 2171 |         desc: `Our weather station reports ${rainForecast24h.toFixed(1)}mm of rain in the next 24h. Pause sprinkler irrigation plans immediately!`,
+ 2172 |         time: 'Real-time alert'
+ 2173 |       });
+ 2174 |     }
+ 2175 | 
+ 2176 |     // 2. Low stock alert
+ 2177 |     inventory.forEach(item => {
+ 2178 |       if (item.current_stock <= item.low_stock_threshold) {
+ 2179 |         list.push({
+ 2180 |           id: `low-stock-${item._id}`,
+ 2181 |           type: 'warning',
+ 2182 |           title: `⚠️ Low Stock: ${item.name}`,
+ 2183 |           desc: `Current stock of ${item.current_stock} ${item.unit} is below the safety threshold of ${item.low_stock_threshold} ${item.unit}. Please restock.`,
+ 2184 |           time: 'Inventory health'
+ 2185 |         });
+ 2186 |       }
+ 2187 |     });
+ 2188 | 
+ 2189 |     // 3. Pending tasks alert
+ 2190 |     const pendingTasksCount = Number(analyticsSummary?.taskSummary?.byStatus?.Pending ?? tasks.filter(t => t.status === 'Pending').length);
+ 2191 |     if (pendingTasksCount > 0) {
+ 2192 |       list.push({
+ 2193 |         id: 'pending-tasks',
+ 2194 |         type: 'info',
+ 2195 |         title: '📝 Pending Care Duties',
+ 2196 |         desc: `There are currently ${pendingTasksCount} farm assignments marked as Pending on the Care Roster board.`,
+ 2197 |         time: 'Care Portal'
+ 2198 |       });
+ 2199 |     }
+ 2200 | 
+ 2201 |     // 4. Unpaid liabilities
+ 2202 |     const pendingLia = liabilities.filter(l => l.status === 'Pending');
+ 2203 |     if (pendingLia.length > 0) {
+ 2204 |       list.push({
+ 2205 |         id: 'pending-liabilities',
+ 2206 |         type: 'warning',
+ 2207 |         title: '💰 Outstanding Liabilities',
+ 2208 |         desc: `You have ${pendingLia.length} unpaid credit debts logged. These are committed crop costs that will be logged as expenses when you settle them.`,
+ 2209 |         time: 'Financial'
+ 2210 |       });
+ 2211 |     }
+ 2212 | 
+ 2213 |     return list;
+ 2214 |   }, [rainForecast24h, inventory, tasks, crops, liabilities, analyticsSummary]);
+      :      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 2215 | 
+      `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useMemo has unnecessary dependency: crops
+      ,-[src/App.tsx:2214:6]
+ 2213 |     return list;
+ 2214 |   }, [rainForecast24h, inventory, tasks, crops, liabilities, analyticsSummary]);
+      :      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 2215 | 
+      `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'cropListFilters'
+      ,-[src/App.tsx:2391:6]
+ 2388 |     if (!token || activeTab !== 'crops') return undefined;
+ 2389 |     void fetchCropPage(0, cropListFilters, true);
+      :                           ^^^^^^^|^^^^^^^
+      :                                  `-- useEffect uses `cropListFilters` here
+ 2390 |     return () => { cropPageRequestRef.current += 1; };
+ 2391 |   }, [token, activeTab, cropFilter, cropSeasonFilter, cropYearFilter, cropFieldFilter, cropIdFilter, cropSearch, listRefreshKey]);
+      :      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 2392 |   useEffect(() => {
+      `----
+  help: Either include it or remove the dependency array.
+
+  ! react-hooks(exhaustive-deps): React Hook useEffect has a missing dependency: 'taskListFilters'
+      ,-[src/App.tsx:2396:6]
+ 2393 |     if (!token || activeTab !== 'tasks') return undefined;
+ 2394 |     void fetchTaskPage(0, taskListFilters, true);
+      :                           ^^^^^^^|^^^^^^^
+      :                                  `-- useEffect uses `taskListFilters` here
+ 2395 |     return () => { taskPageRequestRef.current += 1; };
+ 2396 |   }, [token, activeTab, taskFilter, taskCropFilter, selectedTaskCrop?.name, selectedTaskCrop?.variety, listRefreshKey]);
+      :      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ 2397 | 
+      `----
+  help: Either include it or remove the dependency array.
+
+Found 81 warnings and 0 errors.
+Finished in 271ms on 87 files with 92 rules using 2 threads.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=0.78

@@ -1,0 +1,64 @@
+git rev-parse HEAD: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+command: node tests/round3/phase1c-protocol-chaos-load.mjs
+environment: direct + local appending proxy, NODE_ENV=test, MEMORY_MODE=1
+dairy setup owner=ok
+agri setup owner=ok
+flock setup owner=ok
+
+=== JWT attacks (custom + jwt_tool) ===
+dairy real token payload keys=id,role,username,iat,exp exp=1794078456 iat=1793473656 ttlSec=604800
+dairy alg=none token -> GET /farms HTTP 401
+dairy weak-secret dictionary (secret,password,123456,jwt-secret,change-me): none accepted (only failures logged above)
+dairy expired-but-valid-signature token -> HTTP 401
+dairy kid-traversal header (signed with test secret) -> HTTP 200 (proves kid ignored, not a vuln alone)
+agri real token payload keys=sub,role,username,iat,exp exp=1793560063 iat=1793473663 ttlSec=86400
+agri alg=none token -> GET /farms HTTP 401
+agri weak-secret dictionary (secret,password,123456,jwt-secret,change-me): none accepted (only failures logged above)
+agri expired-but-valid-signature token -> HTTP 401
+agri kid-traversal header (signed with test secret) -> HTTP 200 (proves kid ignored, not a vuln alone)
+flock real token payload keys=sub,username,role,displayName,iat,exp exp=1794078467 iat=1793473667 ttlSec=604800
+flock alg=none token -> GET /farms HTTP 401
+flock weak-secret dictionary (secret,password,123456,jwt-secret,change-me): none accepted (only failures logged above)
+flock expired-but-valid-signature token -> HTTP 401
+flock kid-traversal header (signed with test secret) -> HTTP 200 (proves kid ignored, not a vuln alone)
+jwt_tool decode failed: Command failed: python3 tools-round3/src/jwt_tool/jwt_tool.py eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhmZjkzMmM3MmUwZmE2ZGQ4Y2MzNjZmNyIsInJvbGUiOiJvd25lciIsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE3OTM0NzM2NTYsImV4cCI6MTc5NDA3ODQ1Nn0.59iBkALc_ngO2v2Barw_9iRbVR0Za36hd5UwsKbgr04
+python3: can't open file '/home/user/full-rerun/tools-round3/src/jwt_tool/jwt_tool.py': [Errno 2] No such file or directory
+
+
+=== NoSQL injection (custom; NoSQLMap is Python2-only, see phase1-jwt-nosql-tools.txt) ===
+dairy NoSQL JSON {"username":{"$ne":null},"password":{"$ne":null}} -> HTTP 401 token=no
+dairy NoSQL JSON {"username":{"$regex":"^admin"},"password":{"$ne":null}} -> HTTP 401 token=no
+dairy NoSQL JSON {"username":"admin","password":{"$gt":""}} -> HTTP 401 token=no
+dairy NoSQL JSON {"$where":"1==1"} -> HTTP 401 token=no
+flock NoSQL JSON {"username":{"$ne":null},"password":{"$ne":null}} -> HTTP 401 token=no
+flock NoSQL JSON {"username":{"$regex":"^admin"},"password":{"$ne":null}} -> HTTP 401 token=no
+flock NoSQL JSON {"username":"admin","password":{"$gt":""}} -> HTTP 401 token=no
+flock NoSQL JSON {"$where":"1==1"} -> HTTP 400 token=no
+agri NoSQL urlencoded {"username[$ne]":"x","password[$ne]":"x"} -> HTTP 401 token=no body={"detail":"Invalid email/username or password"}
+agri NoSQL urlencoded {"username":"admin","password[$ne]":"x"} -> HTTP 401 token=no body={"detail":"Invalid email/username or password"}
+agri NoSQL urlencoded {"username[$regex]":"^admin","password[$gt]":""} -> HTTP 401 token=no body={"detail":"Invalid email/username or password"}
+agri NoSQL operator in create field -> HTTP 201 body={"name":"R3 nosql crop","status":{},"farmId":"225e320e2c059c7542e45c21","_id":"00502b5dfaf9ad1ffe055403"}
+
+=== Protocol abuse ===
+dairy malformed JSON -> HTTP 400 body={"error":"Request body contains invalid JSON."}
+dairy duplicate JSON keys -> HTTP 201 body={"name":"dupB","breed":"Jersey","gender":"female","status":"active","_id":"5790e8b5-eb31-45bc-bd0a-57643fcb802b","farmId":"b83b67883cdd0c22fdc33d88","earTag":"","fatherId":"","fath
+dairy JSON as text/plain -> HTTP 400 body={"error":"name is required; breed is required"}
+dairy method override header -> HTTP 201 body={"name":"overridecow","breed":"Jersey","_id":"b91ccc63-7b32-4660-a22b-eb4c6f4703e7","farmId":"b83b67883cdd0c22fdc33d88","gender":"female","earTag":"","fatherId":"","fatherType":"fa
+dairy 12MB JSON body -> HTTP 413 body={"error":"Request body is too large."}
+dairy TRACE /api/farms -> HTTP 404 allow=
+dairy OPTIONS /api/farms -> HTTP 204 allow=
+dairy path /api//farms -> HTTP 404 body={"error":"API route not found: GET /farms"}
+dairy path /api/farms%2f..%2fhealth -> HTTP 404 body={"error":"API route not found: GET /farms%2f..%2fhealth"}
+dairy path /api/cows/%00 -> HTTP 404 body={"error":"Not found"}
+dairy path /api/cows/..;foo -> HTTP 404 body={"error":"Not found"}
+
+=== Load through appending proxy (autocannon) ===
+dairy autocannon -c 10 -d 5 GET http://127.0.0.1:18801/api/farms (through proxy): │ Latency │ 10 ms │ 27 ms │ 71 ms │ 85 ms │ 30.89 ms │ 15.3 ms │ 111 ms │ | │ Req/Sec   │ 235    │ 235    │ 314    │ 437    │ 318.61 │ 77.21   │ 235    │ | │ Bytes/Sec │ 209 kB │ 209 kB │ 273 kB │ 349 kB │ 275 kB │ 46.6 kB │ 209 kB │ | 300 2xx responses, 1293 non 2xx responses | 2k requests in 5.04s, 1.38 MB read
+agri autocannon -c 10 -d 5 GET http://127.0.0.1:18802/api/farms (through proxy): │ Latency │ 20 ms │ 43 ms │ 81 ms │ 93 ms │ 45.24 ms │ 17.38 ms │ 223 ms │ | │ Req/Sec   │ 191    │ 191    │ 215    │ 269    │ 218.4  │ 27.87 │ 191    │ | │ Bytes/Sec │ 226 kB │ 226 kB │ 255 kB │ 319 kB │ 259 kB │ 33 kB │ 226 kB │ | 1k requests in 5.06s, 1.29 MB read
+flock autocannon -c 10 -d 5 GET http://127.0.0.1:18803/api/farms (through proxy): │ Latency │ 12 ms │ 29 ms │ 102 ms │ 111 ms │ 37.98 ms │ 28.24 ms │ 426 ms │ | │ Req/Sec   │ 131    │ 131    │ 321    │ 355    │ 260.4  │ 101.95  │ 131    │ | │ Bytes/Sec │ 203 kB │ 203 kB │ 389 kB │ 419 kB │ 330 kB │ 97.3 kB │ 203 kB │ | 300 2xx responses, 1002 non 2xx responses | 1k requests in 5.07s, 1.65 MB read
+
+=== Chaos: SIGKILL + restart (memory mode data loss is EXPECTED, labelled) ===
+dairy create before kill HTTP 201
+dairy after SIGKILL GET /api/farms -> CONNECTION FAILED (ECONNREFUSED)
+dairy after restart ready=true GET /api/cows HTTP 200 (memory mode: pre-kill records gone by design; production Mongo persistence UNVERIFIED)
+dairy post-restart malformed body -> HTTP 400

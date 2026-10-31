@@ -1,0 +1,1264 @@
+git rev-parse HEAD: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+app=flock role=owner environment=direct local server NODE_ENV=test MEMORY_MODE=1 no proxy
+command: schemathesis run tests/round3/specs-full/spec-flock-full.yaml --url http://127.0.0.1:18303/api -n 2 -H Authorization: Bearer <redacted>
+setup: ready=true tokenAcquired=true
+Schemathesis v4.32.7
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from tests/round3/specs-full/spec-flock-full.yaml (in
+ 1.35s)
+
+     Base URL:         http://127.0.0.1:18303/api
+     Specification:    Open API 3.0.3
+     Operations:       74 selected / 74 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ⏭   Examples (in 0.16s)
+
+     ⏭  74 skipped
+
+ ❌  Coverage (in 3.61s)
+
+     ✅ 21 passed  ❌ 53 failed
+
+ 🚫  Fuzzing (in 3.24s)
+
+     ✅ 73 passed  🚫  1 error
+
+==================================== ERRORS ====================================
+__________________________ POST /auth/forgot-password __________________________
+Runtime Error
+
+AST constructor recursion depth mismatch (before=156, after=42)
+
+    Traceback (most recent call last):
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/lambda_sources.py", line 353, in _lambda_description
+        all_lambdas = AST_LAMBDAS_CACHE[source_lines]
+                      ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/cache.py", line 374, in __getitem__
+        val = self.cache[key]
+              ~~~~~~~~~~^^^^^
+    KeyError: ('from __future__ import annotations\n', '\n', 'import base64\n', 'import json\n', 'import math\n', 'import re\n', 'import sys\n', 'from dataclasses import dataclass, replace\n', 'from fractions import Fraction\n', 'from functools import lru_cache, partial\n', 'from typing import TYPE_CHECKING, NamedTuple, TypedDict, TypeGuard, TypeVar, cast\n', '\n', 'import jsonschema_rs\n', 'from hypothesis import strategies as st\n', 'from hypothesis.errors import InvalidArgument\n', 'from hypothesis.strategies._internal.deferred import DeferredStrategy\n', 'from jsonschema_rs import canonical\n', '\n', 'from schemathesis.config import OutputConfig\n', 'from schemathesis.core import INTERNAL_BUFFER_SIZE, MAX_DRAWN_ARRAY_ITEMS, MAX_STRING_LENGTH\n', 'from schemathesis.core.errors import (\n', '    InvalidSchema,\n', '    UnsupportedRegexPattern,\n', '    UnsupportedSchema,\n', ')\n', 'from schemathesis.core.jsonschema import (\n', '    CANONICALIZE_DRAFT_BY_VALIDATOR,\n', '    FANCY_REGEX_OPTIONS,\n', '    VALIDATED_FORMATS_BY_DRAFT,\n', '    build_validator_for,\n', '    make_validator,\n', '    make_validator_for,\n', '    matches_pattern,\n', '    pattern_matcher,\n', ')\n', 'from schemathesis.core.jsonschema.patterns import (\n', '    anchor_end_of_string,\n', '    compile_ecma_pattern,\n', '    normalize_regex,\n', '    pattern_length_bounds,\n', '    update_quantifier,\n', ')\n', 'from schemathesis.core.output import truncate_json\n', 'from schemathesis.core.transforms import deepclone\n', 'from schemathesis.core.validation import has_surrounding_whitespace\n', 'from schemathesis.generation.jsonschema.context import Alphabet, StrategyContext\n', 'from schemathesis.transport.serialization import Binary, contains_binary\n', '\n', 'if TYPE_CHECKING:\n', '    from collections.abc import Callable, Sequence\n', '    from decimal import Decimal\n', '\n', '    from hypothesis.internal.conjecture.data import ConjectureData\n', '    from hypothesis.strategies import SearchStrategy\n', '\n', '    from schemathesis.core.jsonschema.types import JsonSchema, JsonValue\n', '\n', '    # A bound arrives as `Decimal` when no float spells it back.\n', '    Numeric = int | float | Decimal\n', '\n', '    # Values a position or demand can draw from, and how many distinct ones it needs. `None` where\n', '    # they cannot be counted, and so can never run out.\n', '    Need = tuple[frozenset[object] | None, int]\n', '\n', '\n', '# Any JSON value, kept as the narrower type a caller passes in.\n', 'JsonT = TypeVar("JsonT", bound="JsonValue")\n', '\n', '# Upper bound on properties drawn beyond the ones the schema names.\n', '_EXTRA_KEYS = 5\n', '\n', '\n', 'class _SizeBounds(TypedDict, total=False):\n', '    min_size: int\n', '    max_size: int\n', '\n', '\n', '_VALIDATOR_BY_CANONICALIZE_DRAFT = {draft: cls for cls, draft in CANONICALIZE_DRAFT_BY_VALIDATOR.items()}\n', '\n', '\n', 'def _compiled_pattern(pattern: str) -> re.Pattern[str] | None:\n', '    """The pattern as Python reads it, translating property escapes the validator alone understands."""\n', '    compiled = compile_ecma_pattern(pattern)\n', '    if compiled is not None:\n', '        return compiled\n', '    translated = normalize_regex(pattern)\n', '    if translated is None:\n', '        return None\n', '    # No `re.ASCII`: the translation spells properties out as ranges, and the flag would refuse every\n', '    # non-ASCII one of them. The translation only comes back once it has compiled, so this cannot fail.\n', '    return re.compile(anchor_end_of_string(translated))\n', '\n', '\n', 'def _countable(bound: int | None) -> int | None:\n', '    """A size bound Hypothesis can be handed, or `None` when it runs past what a size can count."""\n', '    # Sizes are averaged as floats, so a bound past this range fails the conversion before any check.\n', '    return bound if bound is None or bound <= sys.maxsize else None\n', '\n', '\n', 'def _floor(bound: int | None) -> int | None:\n', '    """A size floor a draw can reach, or `None` past the buffer one draw fits in."""\n', '    return bound if bound is None or bound <= INTERNAL_BUFFER_SIZE else None\n', '\n', '\n', '# What a builder raises when it cannot draw for a node, and a caller may route around it.\n', 'DECLINED = (UnsupportedSchema, UnsupportedRegexPattern)\n', '\n', '\n', 'class _Unrepresentable:\n', '    """A grid point with no JSON number to carry it; the caller filters it out."""\n', '\n', '\n', '# Not `None`: that is a JSON value in its own right, so a leak would read as a valid `null`.\n', '_UNREPRESENTABLE = _Unrepresentable()\n', '\n', '\n', 'class _PatternProperty(NamedTuple):\n', '    """One `patternProperties` entry: the names it claims, and the values it admits."""\n', '\n', '    claims: Callable[[str], bool]\n', '    values: SearchStrategy[JsonValue]\n', '    schema: jsonschema_rs.CanonicalSchema\n', '\n', '\n', 'class _Node(DeferredStrategy):\n', '    """One schema, named rather than spelled out."""\n', '\n', '    # A schema reached from many places, or from itself, would otherwise spell out the same subtree at\n', '    # every mention, growing what Hypothesis prints - a rejected filter, a failed draw - past any use.\n', '\n', '    def __init__(self, strategy: SearchStrategy[JsonValue], kind: canonical.CanonicalKind) -> None:\n', '        super().__init__(lambda: strategy)\n', '        self.kind = kind\n', '\n', '    def __repr__(self) -> str:\n', '        return f"schema({self.kind.value})"\n', '\n', '\n', 'def from_schema(schema: jsonschema_rs.CanonicalSchema, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    cached = ctx.cache.get(schema)\n', '    if cached is None:\n', '        cached = _Node(_build(schema, ctx), schema.kind)\n', '        ctx.cache[schema] = cached\n', '    return cached\n', '\n', '\n', 'def _simplest_first(value: JsonValue) -> tuple[int, float, str]:\n', '    """Sort key putting the value a shrunk failure should report first: scalars, then short before long."""\n', '    if value is None:\n', '        return (0, 0, "")\n', '    if isinstance(value, bool):\n', '        return (1, int(value), "")\n', '    if isinstance(value, (int, float)):\n', '        return (2 if int(value) == value else 3, abs(value), "" if value >= 0 else "-")\n', '    if isinstance(value, str):\n', '        return (4, len(value), value)\n', '    return (5 if isinstance(value, list) else 6, len(value), jsonschema_rs.canonical.json.to_string(value))\n', '\n', '\n', 'def _build(schema: jsonschema_rs.CanonicalSchema, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    view = schema.view()\n', '    if isinstance(view, canonical.TrueView):\n', '        return _anything(ctx)\n', '    if isinstance(view, canonical.FalseView):\n', '        return st.nothing()\n', '    if isinstance(view, canonical.ConstView):\n', '        return st.just(cast("JsonValue", view.value))\n', '    if isinstance(view, canonical.EnumView):\n', '        return st.sampled_from(sorted(cast("list[JsonValue]", view.values), key=_simplest_first))\n', '    if isinstance(view, canonical.MultiTypeView):\n', '        return st.one_of([_bare_type(name, ctx) for name in view.types])\n', '    if isinstance(view, canonical.TypedGroupView):\n', '        # The node means "type is `type_name` *and* body"; canonicalization folds the type in first,\n', '        # so this is a net, not the filter doing the work.\n', '        return from_schema(view.body, ctx).filter(_TYPE_CHECKS[view.type_name])\n', '    if isinstance(view, canonical.AnyOfView):\n', '        return _any_of(view, ctx)\n', '    if isinstance(view, canonical.IntegerView):\n', '        return _integer(view, ctx)\n', '    if isinstance(view, canonical.NumberView):\n', '        return _number(view)\n', '    if isinstance(view, canonical.StringView):\n', '        return _string(view, ctx)\n', '    if isinstance(view, canonical.ObjectView):\n', '        return _object(view, ctx)\n', '    if isinstance(view, canonical.ArrayView):\n', '        return _array(schema, view, ctx)\n', '    if isinstance(view, canonical.ReferenceView):\n', '        return _reference(schema, view, ctx)\n', '    if isinstance(view, canonical.NotView):\n', '        return _not(schema, view, ctx)\n', '    if isinstance(view, canonical.AllOfView):\n', '        return _all_of(view, ctx)\n', '    if isinstance(view, canonical.OneOfView):\n', '        return _one_of(schema, view, ctx)\n', '    raise UnsupportedSchema.from_reason(f"this part of it:\\n\\n{_displayed(schema)}")\n', '\n', '\n', 'def _displayed(schema: jsonschema_rs.CanonicalSchema) -> str:\n', '    """The node as the user wrote it, short enough to read in an error."""\n', '    raw = schema.to_json_schema()\n', '    if isinstance(raw, dict):\n', '        # Bundle scaffolding the user never wrote.\n', '        raw = {key: value for key, value in raw.items() if key not in ("$schema", "$defs", "definitions")}\n', '    return truncate_json(raw, config=OutputConfig())\n', '\n', '\n', 'def _any_of(view: jsonschema_rs.canonical.AnyOfView, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    """Values any of the branches admits."""\n', '    strategies = []\n', '    declined: Exception | None = None\n', '    for branch in view.branches:\n', '        try:\n', '            strategies.append(from_schema(branch, ctx))\n', '        except DECLINED as exc:\n', '            # A branch nothing can be drawn from is one alternative short, not a schema to give up on.\n', '            declined = exc\n', '    if not strategies:\n', '        # Every alternative declined, so the last reason is the one worth reporting.\n', '        assert declined is not None\n', '        raise declined\n', '    return st.one_of(strategies)\n', '\n', '\n', 'def _target(schema: jsonschema_rs.CanonicalSchema, uri: str, ctx: StrategyContext) -> jsonschema_rs.CanonicalSchema:\n', '    """The schema a pointer names."""\n', '    # `#` is the one pointer with no definition behind it: it names the document itself.\n', '    if uri == "#":\n', '        return ctx.root\n', '    target = schema.definition(uri)\n', '    # Canonicalization refuses a pointer it cannot resolve, so the target is here.\n', '    assert target is not None\n', '    return target\n', '\n', '\n', 'def _reference(\n', '    schema: jsonschema_rs.CanonicalSchema, view: jsonschema_rs.canonical.ReferenceView, ctx: StrategyContext\n', ') -> SearchStrategy[JsonValue]:\n', '    """Values admitted by the schema the pointer names."""\n', '    target = _target(schema, view.uri, ctx)\n', '    pending = ctx.pending.get(view.uri)\n', '    if pending is not None:\n', '        # A pointer back into what is still being built. Spelling the rest of the value lazily lets\n', '        # a draw stop descending, where unrolling it here never would, and every pointer to this\n', '        # target gets that same strategy - so a cycle in the schema becomes one Hypothesis can see.\n', '        ctx.cyclic = True\n', '        return pending\n', '    ctx.pending[view.uri] = st.deferred(lambda: from_schema(target, ctx))\n', '    try:\n', '        return from_schema(target, ctx)\n', '    finally:\n', '        del ctx.pending[view.uri]\n', '\n', '\n', 'def _not(\n', '    schema: jsonschema_rs.CanonicalSchema, view: jsonschema_rs.canonical.NotView, ctx: StrategyContext\n', ') -> SearchStrategy[JsonValue]:\n', '    """Values the barred schema rejects."""\n', '    # A bar is left standing where what it bars is a pointer; following it gives something to complement.\n', '    barred = view.schema\n', '    barred_view = barred.view()\n', '    if isinstance(barred_view, canonical.ReferenceView):\n', '        barred = _target(barred, barred_view.uri, ctx)\n', '    complement = _negated(barred)\n', '    if complement is None or _bars_its_input(complement, barred):\n', '        # Nothing to draw from where no complement is spelled, or where negation hands the bar back\n', '        # unchanged, so the bar judges the draw itself. Only the document can be judged that way:\n', '        # below it, a pointer to `#` names something else.\n', '        if schema != ctx.root:\n', '            raise UnsupportedSchema.from_reason("a `not` whose complement is not spelled out, below the document root")\n', '        return _anything(ctx).filter(_validator(schema))\n', '    spelled = complement.to_json_schema()\n', '    if _points_on(spelled):\n', '        # A pointer naming a carried definition reads against the complement; one naming the document\n', '        # still means where the bar appeared, which the complement is not.\n', '        if _names_document(spelled):\n', '            raise UnsupportedSchema.from_reason("a `not` whose complement names the whole document")\n', '        # A bar reached back through its own complement names a value no finite draw settles on.\n', '        if barred in ctx.complementing:\n', '            raise UnsupportedSchema.from_reason("a `not` reaching back into its own complement")\n', '        nested = StrategyContext(\n', '            root=complement,\n', '            alphabet=ctx.alphabet,\n', '            formats=ctx.formats,\n', '            format_lengths=ctx.format_lengths,\n', '            complementing=ctx.complementing,\n', '            whole_floats=ctx.whole_floats,\n', '        )\n', '        ctx.complementing.add(barred)\n', '        try:\n', '            strategy = from_schema(complement, nested)\n', '        finally:\n', '            ctx.complementing.discard(barred)\n', '        ctx.cyclic = ctx.cyclic or nested.cyclic\n', '        return strategy\n', '    return from_schema(complement, ctx)\n', '\n', '\n', 'def _bars_its_input(complement: jsonschema_rs.CanonicalSchema, barred: jsonschema_rs.CanonicalSchema) -> bool:\n', '    """Whether negation declined, handing back a bar over the very schema it was asked to complement."""\n', '    view = complement.view()\n', '    return isinstance(view, canonical.NotView) and view.schema == barred\n', '\n', '\n', 'def _points_on(schema: object) -> bool:\n', '    """Whether the schema names a pointer outside the definitions it carries."""\n', '    if isinstance(schema, dict):\n', '        return "$ref" in schema or any(\n', '            _points_on(value) for key, value in schema.items() if key not in ("$defs", "definitions")\n', '        )\n', '    return isinstance(schema, list) and any(_points_on(item) for item in schema)\n', '\n', '\n', 'def _names_document(schema: object) -> bool:\n', '    """Whether the schema names the document itself, rather than a definition it carries."""\n', '    if isinstance(schema, dict):\n', '        return schema.get("$ref") == "#" or any(_names_document(value) for value in schema.values())\n', '    return isinstance(schema, list) and any(_names_document(item) for item in schema)\n', '\n', '\n', 'def _all_of(view: jsonschema_rs.canonical.AllOfView, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    """Values every branch admits.\n', '\n', '    What reaches here is an `allOf` canonicalization left standing, which happens where a branch is\n', '    a pointer: folding one would mean unrolling whatever it names. Following the pointers gives the\n', '    intersection back, one branch at a time, until only pointers leading back into the value remain.\n', '    """\n', '    followed = []\n', '    opened = []\n', '    for branch in view.branches:\n', '        branch_view = branch.view()\n', '        if isinstance(branch_view, canonical.ReferenceView) and branch_view.uri not in ctx.following:\n', '            ctx.following.add(branch_view.uri)\n', '            opened.append(branch_view.uri)\n', '            followed.append(_target(branch, branch_view.uri, ctx))\n', '        else:\n', '            followed.append(branch)\n', '    try:\n', '        if opened:\n', '            # Still an `allOf` where a followed branch pointed on; the next round follows those.\n', '            return from_schema(_intersection(followed), ctx)\n', '        for index, branch in enumerate(followed):\n', '            branch_view = branch.view()\n', '            if isinstance(branch_view, canonical.OneOfView):\n', '                # `allOf[X, oneOf[A, B]]` admits what `oneOf[allOf[X, A], allOf[X, B]]` admits, and\n', '                # carrying the rest into every branch lets each one draw what it needs - where the\n', '                # loose half driving alone would have to land inside a branch by chance.\n', '                rest = followed[:index] + followed[index + 1 :]\n', '                return _exclusive(\n', '                    branch,\n', '                    [from_schema(_intersection([*rest, sub]), ctx) for sub in branch_view.branches],\n', '                )\n', '        # Every branch is a pointer back into the value being built, so the value comes from what they\n', '        # name together. Meeting the same intersection again is the cycle, and a placeholder ends it.\n', '        resolved = []\n', '        for branch in followed:\n', '            branch_view = branch.view()\n', '            if isinstance(branch_view, canonical.ReferenceView):\n', '                resolved.append(_target(branch, branch_view.uri, ctx))\n', '            else:\n', '                resolved.append(branch)\n', '        merged = _intersection(resolved)\n', '        if not isinstance(merged.view(), canonical.AllOfView):\n', '            placeholder = ctx.folding.get(merged)\n', '            if placeholder is not None:\n', '                ctx.cyclic = True\n', '                return placeholder\n', '            ctx.folding[merged] = st.deferred(lambda: from_schema(merged, ctx))\n', '            try:\n', '                return from_schema(merged, ctx)\n', '            finally:\n', '                del ctx.folding[merged]\n', '        # Nothing folded, so what the pointers name is only spelled by the draw one branch drives and\n', '        # the rest judge.\n', '        driver, *rest = followed\n', '        strategy = from_schema(driver, ctx)\n', '        for other in rest:\n', '            strategy = strategy.filter(_validator(other))\n', '        return strategy\n', '    finally:\n', '        ctx.following.difference_update(opened)\n', '\n', '\n', 'def _one_of(\n', '    schema: jsonschema_rs.CanonicalSchema, view: jsonschema_rs.canonical.OneOfView, ctx: StrategyContext\n', ') -> SearchStrategy[JsonValue]:\n', '    """Values exactly one branch admits."""\n', '    return _exclusive(schema, [from_schema(branch, ctx) for branch in view.branches])\n', '\n', '\n', 'def _exclusive(\n', '    node: jsonschema_rs.CanonicalSchema, strategies: list[SearchStrategy[JsonValue]]\n', ') -> SearchStrategy[JsonValue]:\n', '    """Values from each strategy that no branch other than its own admits."""\n', '    # A value its own branch drew already clears that branch, so "no other branch admits it" and\n', '    # "exactly one branch admits it" are the same test - one validator for the node, not one per branch.\n', '    exactly_one = _validator(node)\n', '    return st.one_of([strategy.filter(exactly_one) for strategy in strategies])\n', '\n', '\n', 'def _intersection(branches: list[jsonschema_rs.CanonicalSchema]) -> jsonschema_rs.CanonicalSchema:\n', '    """One schema admitting what every branch admits."""\n', '    result = branches[0]\n', '    for branch in branches[1:]:\n', '        result = result.intersect(branch)\n', '    return result\n', '\n', '\n', '@dataclass(frozen=True, slots=True)\n', 'class _Demand:\n', '    """One `contains` demand, together with what an array can draw to meet it."""\n', '\n', '    schema: jsonschema_rs.CanonicalSchema\n', '    minimum: int\n', '    ceiling: int | None\n', '    # Values meeting both the demand and `items`, or `None` when nothing appended can meet it.\n', '    element: SearchStrategy[JsonValue] | None = None\n', '    # The distinct values it can draw from, when they can be counted.\n', '    supply: frozenset[object] | None = None\n', '    # Whether the element provably stays off every other bounded demand.\n', '    counted: bool = True\n', '\n', '\n', '@dataclass(slots=True)\n', 'class _Placement:\n', '    """How one demand\'s matches are spread over an array\'s positions."""\n', '\n', '    demand: _Demand\n', '    # Opening positions narrowed to meet the demand.\n', '    carried: int = 0\n', '    # Positions appended past the opening ones to meet the rest of it.\n', '    placed: int = 0\n', '    # Further appended positions it may take on where nothing else can fill them.\n', '    slack: int = 0\n', '\n', '\n', '@dataclass(slots=True)\n', 'class _Layout:\n', '    """One assignment of every demand\'s matches to an array\'s positions."""\n', '\n', '    # The opening positions, each narrowed towards or away from the demands.\n', '    entries: list[jsonschema_rs.CanonicalSchema]\n', '    placements: list[_Placement]\n', "    # Whether every position's match count is one this steered rather than guessed.\n", '    counted: bool\n', '    # Whether the opening positions are the whole array, with nothing able to follow them.\n', '    closed: bool\n', '\n', '\n', 'def _array(\n', '    schema: jsonschema_rs.CanonicalSchema, view: jsonschema_rs.canonical.ArrayView, ctx: StrategyContext\n', ') -> SearchStrategy[JsonValue]:\n', '    if view.min_items is not None and _floor(view.min_items) is None:\n', '        # No array can be that long.\n', '        return st.nothing()\n', '    if view.prefix_items or view.contains:\n', '        return _with_fixed_elements(schema, view, ctx)\n', '    all_distinct = view.distinctness is canonical.Distinctness.ALL_DISTINCT\n', '    try:\n', '        element = _element(view.items, ctx)\n', '    except DECLINED:\n', '        # Nothing fills a position, but an array that needs none of them is still a value.\n', '        if view.min_items:\n', '            raise\n', '        return st.builds(list)\n', '    kwargs: _SizeBounds = {}\n', '    if view.min_items is not None:\n', '        kwargs["min_size"] = view.min_items\n', '    max_items = _countable(view.max_items)\n', '    if max_items is not None:\n', '        kwargs["max_size"] = max_items\n', '    # `st.lists` refuses either bound over an element strategy drawing nothing, so the bounds are\n', '    # answered here instead. Skipped while a pointer target is still being built, where `is_empty`\n', '    # would force a strategy that is not there yet.\n', '    if kwargs and not ctx.building_cycle and element.is_empty:\n', '        # No position can be filled, so the empty array is the only value the bounds may allow.\n', '        return st.nothing() if kwargs.get("min_size") else st.builds(list)\n', '    if all_distinct:\n', '        return st.lists(element, unique_by=json_identity, **kwargs)\n', '    if view.distinctness is canonical.Distinctness.SOME_REPEATED:\n', '        drawn = st.lists(element, **kwargs).map(_repeat_one)\n', '    else:\n', '        drawn = st.lists(element, **kwargs)\n', '    floor = view.min_items or 0\n', '    if floor > MAX_DRAWN_ARRAY_ITEMS and (max_items is None or max_items >= floor):\n', '        # Every element spends several choices, so a long floor can outgrow one draw; one element repeated never does.\n', '        return st.one_of(element.map(lambda item: _tiled(item, floor)), drawn)\n', '    return drawn\n', '\n', '\n', 'def _with_fixed_elements(\n', '    schema: jsonschema_rs.CanonicalSchema, view: jsonschema_rs.canonical.ArrayView, ctx: StrategyContext\n', ') -> SearchStrategy[JsonValue]:\n', '    """An array whose opening positions the schema names or demands, followed by free ones."""\n', '    all_distinct = view.distinctness is canonical.Distinctness.ALL_DISTINCT\n', '    max_items = _countable(view.max_items)\n', '    # A schema past the length ceiling pins a position no array can have.\n', '    entries = list(view.prefix_items if max_items is None else view.prefix_items[:max_items])\n', '    demands = [_Demand(item.schema, _minimum_contains(item), item.max_contains) for item in view.contains]\n', '    if all_distinct:\n', '        # One element can meet several demands at once; folding those spares a unique array a repeat.\n', '        demands = _merged(demands, view.items)\n', '    # Placing the demanded elements beats filtering: `items` on its own may match rarely, or never.\n', '    bounded = [demand.schema for demand in demands if demand.ceiling is not None]\n', '    resolved = []\n', '    for demand in demands:\n', '        avoid = [other for other in bounded if other is not demand.schema]\n', '        element, counted = _matching(view.items, demand.schema, avoid, ctx)\n', '        supply = _supply(view.items, demand.schema) if all_distinct else None\n', '        resolved.append(replace(demand, element=element, supply=supply, counted=counted))\n', '    demands = resolved\n', '\n', '    closed = False\n', '    if all_distinct:\n', '        # One element can count for several demands, and matches can always be appended, so a demand\n', '        # only needs its own domain to hold enough distinct values.\n', '        if any(demand.supply is not None and len(demand.supply) < demand.minimum for demand in demands):\n', '            return st.nothing()\n', '        limit = _distinct_limit(entries, demands)\n', '        if limit < len(entries):\n', '            # The prefix runs out of distinct values there, and the next position could take none.\n', '            entries = entries[:limit]\n', '            closed = True\n', '\n', '    # Carrying a demand reaches the shortest array; appending keeps positions free to draw what they\n', '    # admit. Neither dominates; `one_of` shrinks toward the first.\n', '    candidates = [_laid_out(entries, demands, closed=closed, carry=True)]\n', '    if entries:\n', '        candidates.append(_laid_out(entries, demands, closed=closed, carry=False))\n', '    layouts = [layout for layout in candidates if layout is not None]\n', '    if len(layouts) == 2 and _carried(layouts[0]) == _carried(layouts[1]):\n', '        # Nothing was carried that would otherwise have been appended, so the two coincide.\n', '        layouts.pop()\n', '    # Arrays shorter than the prefix are instances too, whenever the truncation still carries every\n', '    # demand — and when a position admits nothing, the only ones.\n', '    shorter = [\n', '        layout\n', '        for length in range(view.min_items or 0, len(entries))\n', '        if (layout := _laid_out(entries[:length], demands, closed=True, carry=True)) is not None\n', '    ]\n', '    layouts = [*shorter, *layouts]\n', '    return st.one_of([_from_layout(schema, view, layout, ctx) for layout in layouts])\n', '\n', '\n', 'def _laid_out(\n', '    entries: list[jsonschema_rs.CanonicalSchema], demands: list[_Demand], *, closed: bool, carry: bool\n', ') -> _Layout | None:\n', '    """Assign each demand\'s matches to positions, or `None` when no array clears the schema this way."""\n', '    entries = list(entries)\n', '    placements = []\n', '    counted = all(demand.counted for demand in demands)\n', '    for demand in demands:\n', '        placement = _Placement(demand)\n', '        appendable = demand.element is not None and not closed\n', '        for index, entry in enumerate(entries):\n', '            if _covers(demand.schema, entry):\n', '                # Every value this position admits meets the demand, so it carries one.\n', '                entries[index] = _narrowed(entry, demand.schema) or entry\n', '                placement.carried += 1\n', '                continue\n', '            if placement.carried < demand.minimum and (carry or not appendable):\n', '                # The only way to meet it when nothing can be appended, the shortest array otherwise.\n', '                narrowed = _narrowed(entry, demand.schema)\n', '                if narrowed is not None:\n', '                    entries[index] = narrowed\n', '                    placement.carried += 1\n', '                    continue\n', '            if demand.ceiling is not None:\n', '                # A position matching by chance would push the count past the ceiling.\n', '                without = _narrowed(entry, demand.schema, negate=True)\n', '                if without is None:\n', '                    counted = False\n', '                else:\n', '                    entries[index] = without\n', '        placement.placed = max(0, demand.minimum - placement.carried)\n', '        if demand.ceiling is not None and placement.carried + placement.placed > demand.ceiling:\n', '            # More positions meet the demand than it admits: no array clears this schema.\n', '            return None\n', '        if placement.placed and not appendable:\n', '            return None\n', '        placements.append(placement)\n', '    return _Layout(entries, placements, counted=counted, closed=closed)\n', '\n', '\n', 'def _from_layout(\n', '    schema: jsonschema_rs.CanonicalSchema,\n', '    view: jsonschema_rs.canonical.ArrayView,\n', '    layout: _Layout,\n', '    ctx: StrategyContext,\n', ') -> SearchStrategy[JsonValue]:\n', '    """The arrays one layout admits, drawn as its parts laid end to end."""\n', '    all_distinct = view.distinctness is canonical.Distinctness.ALL_DISTINCT\n', '    minimum = view.min_items or 0\n', '    max_items = _countable(view.max_items)\n', '    fixed = _spelled_out(layout)\n', '    if max_items is not None and max_items < fixed:\n', '        # The spelled-out elements alone overflow the length ceiling.\n', '        return st.nothing()\n', '    if layout.closed or max_items == fixed:\n', '        free: SearchStrategy[JsonValue] = st.nothing()\n', '        free_values = None\n', '    else:\n', '        free, free_values = _free(view, layout.placements, ctx)\n', '    if layout.closed:\n', '        # The opening positions are the whole array, so the lower size bound has to fall within them.\n', '        if minimum > fixed:\n', '            return st.nothing()\n', '    elif free.is_empty:\n', '        # The demanded elements carry the length: the shortfall first, then slack under the ceilings.\n', '        if not _carry(layout.placements, minimum - fixed, unique=all_distinct):\n', '            return st.nothing()\n', '        fixed = _spelled_out(layout)\n', '        headroom = None if max_items is None else max_items - fixed\n', '        for placement in layout.placements:\n', '            room = _room(placement, unique=all_distinct)\n', '            if placement.demand.element is None or not room:\n', '                continue\n', '            placement.slack = room if headroom is None else min(room, headroom)\n', '            if headroom is not None:\n', '                headroom -= placement.slack\n', '    elif all_distinct and free_values is not None and minimum - fixed > len(free_values):\n', '        # The tail holds fewer distinct values than the floor asks; the demanded elements carry the rest.\n', '        if not _carry(layout.placements, minimum - fixed - len(free_values), unique=all_distinct):\n', '            return st.nothing()\n', '        fixed = _spelled_out(layout)\n', '\n', '    # No part for absent opening positions: an empty `st.tuples` still costs a draw.\n', '    parts: list[SearchStrategy[Sequence[JsonValue]]] = []\n', '    if layout.entries:\n', '        parts.append(st.tuples(*[from_schema(entry, ctx) for entry in layout.entries]))\n', '    parts.extend(\n', '        _repeated(placement, ctx, unique=all_distinct)\n', '        for placement in layout.placements\n', '        if placement.placed or placement.slack\n', '    )\n', '    if free.is_empty:\n', '        # No tail part: `st.lists` refuses a positive ceiling over an element strategy drawing nothing.\n', '        return _joined(parts, unique=all_distinct, checked=layout.counted, schema=schema)\n', '    kwargs: _SizeBounds = {"min_size": max(0, minimum - fixed)}\n', '    if max_items is not None:\n', '        kwargs["max_size"] = max_items - fixed\n', '    # `unique_by` settles the free positions; collisions across parts are left to the joined filter.\n', '    parts.append(st.lists(free, unique_by=json_identity if all_distinct else None, **kwargs))\n', '    return _joined(parts, unique=all_distinct, checked=layout.counted, schema=schema)\n', '\n', '\n', 'def _spelled_out(layout: _Layout) -> int:\n', '    """How many positions the layout names outright, before any free ones follow."""\n', '    return len(layout.entries) + sum(placement.placed for placement in layout.placements)\n', '\n', '\n', 'def _carried(layout: _Layout) -> list[int]:\n', '    """How many opening positions each demand took on, in demand order."""\n', '    return [placement.carried for placement in layout.placements]\n', '\n', '\n', 'def _joined(\n', '    parts: list[SearchStrategy[Sequence[JsonValue]]],\n', '    *,\n', '    unique: bool,\n', '    checked: bool,\n', '    schema: jsonschema_rs.CanonicalSchema,\n', ') -> SearchStrategy[JsonValue]:\n', '    """The parts of an array, drawn together and laid end to end."""\n', '    drawn: SearchStrategy = st.tuples(*parts)\n', '    if unique:\n', '        drawn = drawn.filter(_parts_unique)\n', '    strategy: SearchStrategy[JsonValue] = drawn.map(_concat)\n', '    if not checked:\n', '        # A position could not be steered clear of a bounded demand, so its final match count is\n', '        # confirmed against the schema itself; the draw is built to clear it, so this rejects rarely.\n', '        strategy = strategy.filter(_validator(schema))\n', '    return strategy\n', '\n', '\n', 'def _merged(demands: list[_Demand], items: jsonschema_rs.CanonicalSchema | None) -> list[_Demand]:\n', '    """Demands that one element could meet together, folded into one."""\n', '    merged: list[_Demand] = []\n', '    for demand in demands:\n', '        for position, other in enumerate(merged):\n', '            # A ceiling counts matches of the original demand, which the fold would stop tracking.\n', '            if demand.minimum == other.minimum == 1 and demand.ceiling is None and other.ceiling is None:\n', '                joint = _narrowed(other.schema, demand.schema)\n', '                # Within `items` the two may share nothing even when the joint stands on its own.\n', '                if joint is not None and (items is None or _narrowed(items, joint) is not None):\n', '                    merged[position] = replace(other, schema=joint)\n', '                    break\n', "            # A wider demand with no ceiling and no greater floor is met by the stricter one's elements.\n", '            if demand.ceiling is None and demand.minimum <= other.minimum and _covers(demand.schema, other.schema):\n', '                break\n', '            if other.ceiling is None and other.minimum <= demand.minimum and _covers(other.schema, demand.schema):\n', '                merged[position] = demand\n', '                break\n', '        else:\n', '            merged.append(demand)\n', '    return merged\n', '\n', '\n', 'def _distinct_limit(entries: list[jsonschema_rs.CanonicalSchema], demands: list[_Demand]) -> int:\n', '    """How many opening positions can hold values distinct from one another."""\n', '    limit = len(entries)\n', '    values = [_finite_values(entry) for entry in entries]\n', '    while limit and not _feasible([(entry, 1) for entry in values[:limit]] + _appended_needs(values[:limit], demands)):\n', '        limit -= 1\n', '    return limit\n', '\n', '\n', 'def _appended_needs(values: list[frozenset[object] | None], demands: list[_Demand]) -> list[Need]:\n', '    """What each demand needs of its own, past the opening positions already meeting it."""\n', '    needs: list[Need] = []\n', '    for demand in demands:\n', '        if demand.supply is None:\n', '            needs.append((None, demand.minimum))\n', '            continue\n', '        # A position admitting nothing outside the demand meets it without a value of its own.\n', '        # Sufficient, not complete: undercounting only shortens the array.\n', '        carried = sum(1 for entry in values if entry is not None and entry <= demand.supply)\n', '        needs.append((demand.supply, max(0, demand.minimum - carried)))\n', '    return needs\n', '\n', '\n', 'def _feasible(needs: list[Need]) -> bool:\n', '    """Whether every position can be handed a value of its own."""\n', '    # Only a finite value set can force a repeat. Exact bipartite matching: counting the union misses\n', '    # shapes like `{1} {1} {2,3}`, where the whole set fits but a subset of it does not.\n', '    units = [values for values, count in needs if values is not None for _ in range(count)]\n', '    universe = {value for values in units for value in values}\n', '    if len(units) > 16 or len(universe) > 64:\n', '        # Too wide to force a repeat cheaply; the draws settle it.\n', '        return True\n', '    owner: dict[object, int] = {}\n', '\n', '    def claim(unit: int, seen: set[object]) -> bool:\n', '        for value in sorted(units[unit] - seen, key=repr):\n', '            seen.add(value)\n', '            if value not in owner or claim(owner[value], seen):\n', '                owner[value] = unit\n', '                return True\n', '        return False\n', '\n', '    return all(claim(unit, set()) for unit in range(len(units)))\n', '\n', '\n', 'def _carry(placements: list[_Placement], shortfall: int, *, unique: bool) -> bool:\n', '    """Place more demanded elements to reach the lower size bound, as far as the ceilings allow."""\n', '    for placement in placements:\n', '        if shortfall <= 0:\n', '            break\n', '        # A demand nothing appended can meet still leaves the rest to absorb the shortfall.\n', '        if placement.demand.element is None:\n', '            continue\n', '        room = _room(placement, unique=unique)\n', '        take = shortfall if room is None else min(shortfall, room)\n', '        placement.placed += take\n', '        shortfall -= take\n', '    return shortfall <= 0\n', '\n', '\n', 'def _room(placement: _Placement, *, unique: bool) -> int | None:\n', '    """How many more of this demand\'s elements fit, or `None` when nothing bounds them."""\n', '    demand = placement.demand\n', '    taken = placement.carried + placement.placed\n', '    room = None if demand.ceiling is None else demand.ceiling - taken\n', '    if unique and demand.supply is not None:\n', '        # Distinct values also run out where the domain does, whatever the ceiling says.\n', '        left = len(demand.supply) - taken\n', '        room = left if room is None else min(room, left)\n', '    return room\n', '\n', '\n', 'def _matching(\n', '    items: jsonschema_rs.CanonicalSchema | None,\n', '    demand: jsonschema_rs.CanonicalSchema,\n', '    avoid: list[jsonschema_rs.CanonicalSchema],\n', '    ctx: StrategyContext,\n', ') -> tuple[SearchStrategy[JsonValue] | None, bool]:\n', '    """Values clearing the element schema and the demand, and whether they provably stay off `avoid`."""\n', '    schema = _intersected(items, demand)\n', '    if schema.satisfiability() is canonical.Satisfiability.NO:\n', '        return None, True\n', '    steered: jsonschema_rs.CanonicalSchema | None = schema\n', '    for other in avoid:\n', '        steered = None if steered is None else _narrowed(steered, other, negate=True)\n', '    declined: UnsupportedRegexPattern | None = None\n', '    if steered is not None:\n', '        try:\n', '            return from_schema(steered, ctx), True\n', '        except UnsupportedRegexPattern as exc:\n', '            declined = exc\n', '        except DECLINED:\n', '            pass\n', '    counted = not avoid\n', '    try:\n', '        return from_schema(schema, ctx), counted\n', '    except UnsupportedRegexPattern as exc:\n', '        declined = exc\n', '    except DECLINED:\n', '        pass\n', '    if declined is not None:\n', '        # The demand names no value a draw can produce, so a filter against it could never pass.\n', '        raise declined\n', '    # The intersection is not one this builds from, so the demand narrows the elements by filter.\n', '    return _element(items, ctx).filter(_validator(demand)), counted\n', '\n', '\n', 'def _free(\n', '    view: jsonschema_rs.canonical.ArrayView, placements: list[_Placement], ctx: StrategyContext\n', ') -> tuple[SearchStrategy[JsonValue], frozenset[object] | None]:\n', '    """What `items` admits minus every bounded demand, with its distinct values when countable."""\n', '    bounded = [placement.demand.schema for placement in placements if placement.demand.ceiling is not None]\n', '    if not bounded:\n', '        values = None if view.items is None else _finite_values(view.items)\n', '        return _element(view.items, ctx), values\n', '    # Filler that cannot match holds the ceiling without a counting filter.\n', '    remaining = view.items\n', '    for demand in bounded:\n', '        subtracted = _subtracted(remaining, demand)\n', '        if subtracted is None:\n', '            break\n', '        remaining = subtracted\n', '    else:\n', '        # At least one demand is bounded, so the loop left a schema behind.\n', '        assert remaining is not None\n', '        return from_schema(remaining, ctx), _finite_values(remaining)\n', '    if any(_covers(demand, view.items) for demand in bounded):\n', '        # A demand admits everything `items` does; the matches carry the array on their own.\n', '        return st.nothing(), None\n', '    # What is left of `items` is not one this builds from, so the demands become a filter.\n', '    checks = [_validator(demand) for demand in bounded]\n', '    return _element(view.items, ctx).filter(lambda value: not any(check(value) for check in checks)), None\n', '\n', '\n', '# Bounded, small: the layouts revisit few pairs; equality carries the definition maps, so a hit is exact.\n', '@lru_cache(maxsize=512)\n', 'def _covers(demand: jsonschema_rs.CanonicalSchema, items: jsonschema_rs.CanonicalSchema | None) -> bool:\n', '    """Whether the demand admits every value the element schema does."""\n', '    if items is None:\n', '        return isinstance(demand.view(), canonical.TrueView)\n', '    # Undecided reads as "not covered", the same conservative answer the layouts already expect.\n', '    return demand.covers(items) is canonical.Containment.YES\n', '\n', '\n', '@lru_cache(maxsize=512)\n', 'def _narrowed(\n', '    left: jsonschema_rs.CanonicalSchema, right: jsonschema_rs.CanonicalSchema, *, negate: bool = False\n', ') -> jsonschema_rs.CanonicalSchema | None:\n', '    """`left` narrowed to — or away from — `right`, or `None` when nothing usable is left of it."""\n', '    schema = _subtracted(left, right) if negate else _intersected(left, right)\n', '    if schema is None or schema.satisfiability() is canonical.Satisfiability.NO:\n', '        return None\n', '    return schema\n', '\n', '\n', 'def _repeated(placement: _Placement, ctx: StrategyContext, *, unique: bool) -> SearchStrategy[list[JsonValue]]:\n', '    """One demand\'s matches, drawn together rather than as a strategy per position."""\n', '    element = placement.demand.element\n', '    # A placement only ever takes positions the demand can fill; `_laid_out` gives up otherwise.\n', '    assert element is not None\n', '    count = placement.placed\n', '    # Skipped while a pointer target is still being built, where `is_empty` would force a strategy that is not there yet.\n', '    if not ctx.building_cycle and element.is_empty:\n', '        # A contradiction canonicalization could not see: nothing meets the demand, so no array clears\n', "        # the schema this way. Other layouts, and the schema's other branches, may still.\n", '        return st.nothing()\n', '    repeated = st.lists(\n', '        element, min_size=count, max_size=count + placement.slack, unique_by=json_identity if unique else None\n', '    )\n', '    try:\n', '        repeated.validate()\n', '    except InvalidArgument as exc:\n', '        # No looser strategy to filter here: the demand is for more elements than Hypothesis draws\n', '        # in one value, and an array shorter than `minContains` would not clear the schema.\n', '        raise InvalidSchema(f"Cannot generate an array with {count} demanded elements") from exc\n', '    return repeated\n', '\n', '\n', 'def _element(items: jsonschema_rs.CanonicalSchema | None, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    return _anything(ctx) if items is None else from_schema(items, ctx)\n', '\n', '\n', '# The shared factory applies the project-wide kwargs — format assertions and the fancy-regex\n', '# engine — so the filter judges a value exactly the way conformance checks do.\n', '@lru_cache(maxsize=4096)\n', 'def _validator(schema: jsonschema_rs.CanonicalSchema) -> Callable[[JsonValue], bool]:\n', '    return build_validator_for(cast("JsonSchema", schema.to_json_schema())).is_valid\n', '\n', '\n', 'def _supply(\n', '    items: jsonschema_rs.CanonicalSchema | None, demand: jsonschema_rs.CanonicalSchema\n', ') -> frozenset[object] | None:\n', '    """The distinct values an element meeting the demand can take, when they can be counted."""\n', '    view = demand.view()\n', '    if isinstance(view, canonical.ConstView):\n', '        raw = [cast("JsonValue", view.value)]\n', '    elif isinstance(view, canonical.EnumView):\n', '        raw = cast("list[JsonValue]", list(view.values))\n', '    else:\n', '        return None\n', '    if items is not None:\n', '        # An element also answers to `items`; a demanded value it rejects is not drawable.\n', '        admits = _validator(items)\n', '        raw = [value for value in raw if admits(value)]\n', '    return frozenset(json_identity(value) for value in raw)\n', '\n', '\n', '@lru_cache(maxsize=512)\n', 'def _finite_values(schema: jsonschema_rs.CanonicalSchema) -> frozenset[object] | None:\n', '    """The values this schema admits, as uniqueness keys, or `None` when they are not enumerable."""\n', '    view = schema.view()\n', '    if isinstance(view, canonical.ConstView):\n', '        return frozenset({json_identity(cast("JsonValue", view.value))})\n', '    if isinstance(view, canonical.EnumView):\n', '        return frozenset(json_identity(value) for value in cast("list[JsonValue]", view.values))\n', '    return None\n', '\n', '\n', 'def _minimum_contains(demand: jsonschema_rs.canonical.ContainsView) -> int:\n', '    return 1 if demand.min_contains is None else demand.min_contains\n', '\n', '\n', 'def _intersected(\n', '    left: jsonschema_rs.CanonicalSchema | None, right: jsonschema_rs.CanonicalSchema\n', ') -> jsonschema_rs.CanonicalSchema:\n', '    """Both sides as one schema."""\n', '    return right if left is None else left.intersect(right)\n', '\n', '\n', 'def _negated(schema: jsonschema_rs.CanonicalSchema) -> jsonschema_rs.CanonicalSchema | None:\n', '    """Every value the schema rejects, or `None` when that cannot be expressed as a schema."""\n', '    try:\n', '        return schema.negate()\n', '    except canonical.CanonicalizationError:\n', '        return None\n', '\n', '\n', 'def _subtracted(\n', '    left: jsonschema_rs.CanonicalSchema | None, right: jsonschema_rs.CanonicalSchema\n', ') -> jsonschema_rs.CanonicalSchema | None:\n', '    """`left` without what `right` admits, or `None` where the complement cannot be spelled."""\n', '    negated = _negated(right)\n', '    if negated is None:\n', '        return None\n', '    return _intersected(left, negated)\n', '\n', '\n', 'def _concat(parts: tuple[Sequence[JsonValue], ...]) -> JsonValue:\n', '    return [value for part in parts for value in part]\n', '\n', '\n', 'def _parts_unique(parts: tuple[Sequence[JsonValue], ...]) -> bool:\n', '    # `unique_by` settled each part on its own; only collisions across them are left to catch.\n', '    seen: set[object] = set()\n', '    for part in parts:\n', '        keys = {json_identity(value) for value in part}\n', '        if len(keys) != len(part) or keys & seen:\n', '            return False\n', '        seen |= keys\n', '    return True\n', '\n', '\n', 'def _tiled(item: JsonValue, length: int) -> list[JsonValue]:\n', '    # A shared container would let an edit at one index show up at every other.\n', '    if isinstance(item, (dict, list)):\n', '        return [deepclone(item) for _ in range(length)]\n', '    return [item] * length\n', '\n', '\n', 'def _repeat_one(value: list[JsonValue]) -> list[JsonValue]:\n', '    """One drawn array, with an element repeated where every one of them differs."""\n', '    # A repeat needs two positions to sit in, and the demand carries that floor with it.\n', '    assert len(value) >= 2\n', '    seen = {json_identity(item) for item in value}\n', '    if len(seen) < len(value):\n', '        return value\n', '    return [value[0], *value[:-1]]\n', '\n', '\n', 'def json_identity(value: JsonValue) -> object:\n', '    """What `uniqueItems` counts as the same value."""\n', '    # `True == 1` in Python, but `true` and `1` are different JSON values.\n', '    if isinstance(value, bool):\n', '        return ("boolean", value)\n', '    # Numbers compare by value, so `1` and `1.0` are one element. Exact rationals, since rounding\n', '    # to a float would merge distinct numbers that happen to share one.\n', '    if isinstance(value, (int, float)):\n', '        return ("number", _spelled(value))\n', '    return ("json", canonical.json.to_string(value))\n', '\n', '\n', 'def _object(view: jsonschema_rs.canonical.ObjectView, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    if view.min_properties is not None and _countable(view.min_properties) is None:\n', '        # No object can carry that many properties.\n', '        return st.nothing()\n', '    entries = {key: from_schema(entry, ctx) for key, entry in view.properties.items()}\n', '    # Whatever `properties` does not name answers to `additionalProperties`, and is otherwise free.\n', '    unnamed = _anything(ctx) if view.additional_properties is None else from_schema(view.additional_properties, ctx)\n', '    value_for = _value_source(view, unnamed, ctx)\n', '    # A key can be required without `properties` saying anything about its value.\n', '    required = {key: entries[key] if key in entries else value_for(key) for key in view.required}\n', '    # A property no value satisfies can only be absent, so it is never picked.\n', '    optional = {\n', '        key: entry\n', '        for key, entry in entries.items()\n', '        if key not in view.required and view.properties[key].kind is not canonical.CanonicalKind.FALSE\n', '    }\n', '    known = set(view.properties) | set(view.required)\n', '    names = None if view.property_names is None else _closed_names(view.property_names)\n', '    if names is not None:\n', '        # A closed name set admits nothing else, so its names are the only optional keys.\n', '        # Sorted: set iteration order is not stable across processes, and draw order decides replays.\n', '        optional.update({name: value_for(name) for name in sorted(names - set(required) - set(entries))})\n', '        extra = None\n', '    else:\n', '        free_names = _free_names(view, ctx).filter(lambda key: key not in known)\n', '        if view.pattern_properties:\n', '            # Which schemas a key answers to is decided by its own name, so name and value are one draw.\n', '            extra = free_names.flatmap(lambda name: st.tuples(st.just(name), value_for(name)))\n', '        else:\n', '            extra = st.tuples(free_names, unnamed)\n', '    max_properties = _countable(view.max_properties)\n', '    minimum = view.min_properties or 0\n', '    if view.violations:\n', '        # Injected violation entries land on top of the base draw, each with a key of its own, so the\n', "        # base answers to the leaf's own bounds with that many keys already spoken for.\n", '        minimum = max(0, minimum - len(view.violations))\n', '        if max_properties is not None:\n', '            max_properties -= len(view.violations)\n', '            if max_properties < len(required):\n', '                # A fresh violation key can never coincide with a required one, so the ceiling has to fit\n', '                # both. The canonicalizer does not yet fold that need into `maxProperties` satisfiability\n', '                # the way `contains` demands are folded into a length floor, so this combo can still\n', '                # reach here despite satisfiability saying otherwise.\n', '                return st.nothing()\n', '    # Sorted: set iteration order is not stable across processes, and draw order decides replays.\n', '    keys = sorted(optional)\n', '    # Documented keys fill the floor first; names drawn out of nowhere only cover what they cannot.\n', '    low = min(len(keys), max(0, minimum - len(required)))\n', '    high = len(keys) if max_properties is None else min(len(keys), max_properties - len(required))\n', '    if high < low:\n', '        # The required keys alone overrun the ceiling.\n', '        return st.nothing()\n', '    # A coin per optional key lands on half of them, which compounds at every nesting level. Built\n', '    # here rather than per draw, where it would be one strategy per generated value.\n', '    picker = st.sets(st.sampled_from(keys), min_size=low, max_size=high) if keys else None\n', '    if extra is not None and minimum == 0 and max_properties is None:\n', '        # Nothing here moves with the drawn key count, so the free keys are one strategy built once\n', '        # instead of a lookup and a fresh draw on every value. This is the common shape by far.\n', '        base = st.tuples(_named_object(required, optional, picker), _collect(extra, 0, _EXTRA_KEYS)).map(\n', '            lambda parts: {**parts[1], **parts[0]}\n', '        )\n', '    else:\n', '        # Past a floor or under a ceiling the bounds do move with it, so the draws are memoized per\n', '        # object rather than rebuilt every value. Bound to this strategy, so nothing outlives it.\n', '        collect = None if extra is None else lru_cache(maxsize=8)(partial(_collect, extra))\n', '        base = _drawn_object(required, optional, picker, collect, minimum, max_properties)\n', '    if not view.violations:\n', '        return base\n', '    entries_to_inject = [_violation_entry(violation, view, value_for, known, ctx) for violation in view.violations]\n', '    return _with_violations(base, entries_to_inject)\n', '\n', '\n', '@lru_cache\n', 'def _string_domain(draft: int, pattern: str | None = None) -> jsonschema_rs.CanonicalSchema:\n', '    """The canonical string schema for one draft, narrowed to a pattern where one is given."""\n', '    # Matches the kwargs `builder.py` canonicalizes the document with - `intersect` refuses operands\n', '    # that disagree on whether `format` asserts.\n', '    schema = {"type": "string"} if pattern is None else {"type": "string", "pattern": pattern}\n', '    return jsonschema_rs.canonicalize(schema, draft=draft, pattern_options=FANCY_REGEX_OPTIONS, validate_formats=True)\n', '\n', '\n', 'def _violation_entry(\n', '    violation: canonical.NameFailsView | canonical.UndeclaredValueFailsView | canonical.PatternValueFailsView,\n', '    view: jsonschema_rs.canonical.ObjectView,\n', '    value_for: Callable[[str], SearchStrategy[JsonValue]],\n', '    known: set[str],\n', '    ctx: StrategyContext,\n', ') -> SearchStrategy[tuple[str, JsonValue]]:\n', '    """One demand from `ObjectView.violations`, as a key/value pair the object injects last."""\n', '    if isinstance(violation, canonical.NameFailsView):\n', '        complement = _negated(violation.schema)\n', '        if complement is not None:\n', '            key_schema = complement.intersect(_string_domain(ctx.root.draft))\n', '            # The key still lands in this object, so the names it admits bound the barred one too.\n', '            if view.property_names is not None:\n', '                key_schema = key_schema.intersect(view.property_names)\n', '            key = from_schema(key_schema, ctx).map(_key)\n', '        else:\n', '            admitted_key = (\n', '                _text(ctx) if view.property_names is None else from_schema(view.property_names, ctx).map(_key)\n', '            )\n', '            key = _rejected_by(admitted_key, violation.schema)\n', "        # A name equal to a declared property would need that property's schema intersected in too;\n", '        # a fresh key sidesteps that at the cost of never reusing a declared name for the injected key.\n', '        key = key.filter(lambda candidate: candidate not in known)\n', "        # The leaf's own per-key schema (`patternProperties`/`additionalProperties`) still applies to\n", '        # whatever key lands here, so key and value are one draw.\n', '        return key.flatmap(lambda name: st.tuples(st.just(name), value_for(name)))\n', '    if isinstance(violation, canonical.PatternValueFailsView):\n', '        key_schema = _string_domain(ctx.root.draft, violation.pattern)\n', '        # The key still lands in this object, so `propertyNames` bounds it too.\n', '        if view.property_names is not None:\n', '            key_schema = key_schema.intersect(view.property_names)\n', '        key = from_schema(key_schema, ctx).map(_key).filter(lambda candidate: candidate not in known)\n', '        # Whatever else this object says about the key still holds, so the value comes from there,\n', '        # with the negated schema filtered out.\n', '        return key.flatmap(lambda name: st.tuples(st.just(name), _rejected_by(value_for(name), violation.schema)))\n', '    names = frozenset(violation.names)\n', '    # The exact per-key validator judges pattern membership, like `_PatternProperty.claims` - no\n', "    # Python-re/ECMA divergence, since nothing here drives generation from the pattern's source.\n", '    claims = [_facet_check("pattern", pattern) for pattern in (*violation.patterns, *view.pattern_properties)]\n', '    # The key still lands in this object, so the names it admits bound the undeclared one too.\n', '    drawn = _text(ctx) if view.property_names is None else from_schema(view.property_names, ctx).map(_key)\n', '    key = drawn.filter(\n', '        lambda candidate: (\n', '            candidate not in names and candidate not in known and not any(claim(candidate) for claim in claims)\n', '        )\n', '    )\n', '    complement = _negated(violation.additional)\n', '    if complement is None:\n', '        admitted = (\n', '            _anything(ctx) if view.additional_properties is None else from_schema(view.additional_properties, ctx)\n', '        )\n', '        return st.tuples(key, _rejected_by(admitted, violation.additional))\n', '    if view.additional_properties is not None:\n', '        complement = complement.intersect(view.additional_properties)\n', '    return st.tuples(key, st.deferred(lambda: from_schema(complement, ctx)))\n', '\n', '\n', 'def _rejected_by(admitted: SearchStrategy[JsonT], schema: jsonschema_rs.CanonicalSchema) -> SearchStrategy[JsonT]:\n', '    """A demand met by filtering, for a schema whose complement the canonical form cannot spell."""\n', '    # `to_json_schema` carries the draft the node was canonicalized under, so the facets that only\n', '    # assert on some drafts - `contentEncoding` and friends - are judged the same way here.\n', '    admits = _validator(schema)\n', '    return admitted.filter(lambda value: not admits(value))\n', '\n', '\n', '@st.composite\n', 'def _with_violations(\n', '    draw: st.DrawFn, base: SearchStrategy[JsonValue], entries: list[SearchStrategy[tuple[str, JsonValue]]]\n', ') -> JsonValue:\n', '    """The base object plus one entry per violation demand, each injected last so it always lands."""\n', '    drawn = draw(base)\n', '    assert isinstance(drawn, dict), drawn\n', '    result = dict(drawn)\n', '    for entry in entries:\n', '        # A key of its own per violation, which is what the size bounds were computed against.\n', '        key, value = draw(entry.filter(lambda pair: pair[0] not in result))\n', '        result[key] = value\n', '    return result\n', '\n', '\n', 'class _Collected(st.SearchStrategy):\n', '    """Free keys and their values, between `low` and `high` of them."""\n', '\n', '    # A self-referential schema reaches these entries from inside them. Emptiness is answered with\n', '    # the rest of the cycle rather than forced while building, which would enter the cycle again.\n', '\n', '    def __init__(self, entries: SearchStrategy[tuple[str, JsonValue]], low: int, high: int) -> None:\n', '        super().__init__()\n', '        self.entries = entries\n', '        self.low = low\n', '        self.collected = st.lists(entries, unique_by=lambda entry: entry[0], min_size=low, max_size=high).map(dict)\n', '\n', '    def calc_is_empty(self, recur: Callable[[SearchStrategy], bool]) -> bool:\n', '        # No key can be spelled; the floor decides whether that is fatal or only means no extras.\n', '        return bool(self.low) and recur(self.entries)\n', '\n', '    def do_draw(self, data: ConjectureData) -> dict[str, JsonValue]:\n', '        if self.entries.is_empty:\n', '            return {}\n', '        return data.draw(self.collected)\n', '\n', '\n', 'def _collect(\n', '    entries: SearchStrategy[tuple[str, JsonValue]], low: int, high: int\n', ') -> SearchStrategy[dict[str, JsonValue]]:\n', '    if _floor(low) is None:\n', '        # No object can be that wide.\n', '        return st.nothing()\n', '    return _Collected(entries, low, high)\n', '\n', '\n', 'def _free_names(view: jsonschema_rs.canonical.ObjectView, ctx: StrategyContext) -> SearchStrategy[str]:\n', '    """Names for keys the schema does not spell out."""\n', '    minimum = ctx.alphabet.min_name_length\n', '    if view.property_names is not None:\n', "        # Python `re` and the validator's engine disagree on several constructs — `\\d` is Unicode here\n", '        # and ASCII there — so a drawn name is checked before it becomes a key.\n', '        is_valid = _validator(view.property_names)\n', '        named = from_schema(view.property_names, ctx).map(_key).filter(is_valid)\n', '        return named if not minimum else named.filter(lambda name: len(name) >= minimum)\n', '    # Arbitrary text practically never matches a `patternProperties` regex, so the patterns name keys too.\n', '    sources = [_text(ctx, characters=ctx.alphabet.names_as_strategy(), min_size=minimum)]\n', '    for pattern in view.pattern_properties:\n', '        compiled = _compiled_pattern(pattern)\n', '        if compiled is not None:\n', '            drawn = _from_pattern(compiled, ctx).filter(matches_pattern(pattern))\n', '            sources.append(drawn if not minimum else drawn.filter(lambda name: len(name) >= minimum))\n', '    return st.one_of(sources)\n', '\n', '\n', 'def _value_source(\n', '    view: jsonschema_rs.canonical.ObjectView, unnamed: SearchStrategy[JsonValue], ctx: StrategyContext\n', ') -> Callable[[str], SearchStrategy[JsonValue]]:\n', '    """The value strategy a property name answers to under `patternProperties`."""\n', "    # The validator's regex engine decides what a pattern claims — Python `re` would hand the key\n", '    # the wrong schema. Values are built eagerly so a declined schema is refused while the caller\n', '    # can still fall back.\n', '    patterns = [\n', '        _PatternProperty(\n', '            claims=make_validator_for({"type": "string", "pattern": pattern}).is_valid,\n', '            values=from_schema(schema, ctx),\n', '            schema=schema,\n', '        )\n', '        for pattern, schema in view.pattern_properties.items()\n', '    ]\n', '    cache: dict[tuple[int, ...], SearchStrategy[JsonValue]] = {}\n', '\n', '    def value_for(name: str) -> SearchStrategy[JsonValue]:\n', '        matched = tuple(index for index, pattern in enumerate(patterns) if pattern.claims(name))\n', '        strategy = cache.get(matched)\n', '        if strategy is None:\n', '            strategy = cache[matched] = _pattern_values(matched, patterns, unnamed, ctx)\n', '        return strategy\n', '\n', '    return value_for\n', '\n', '\n', 'def _pattern_values(\n', '    matched: tuple[int, ...],\n', '    patterns: list[_PatternProperty],\n', '    unnamed: SearchStrategy[JsonValue],\n', '    ctx: StrategyContext,\n', ') -> SearchStrategy[JsonValue]:\n', '    # `additionalProperties` only reaches names no pattern claims.\n', '    if not matched:\n', '        return unnamed\n', '    if len(matched) == 1:\n', '        return patterns[matched[0]].values\n', '    # A name several patterns claim answers to all of them at once.\n', '    schemas = [patterns[index].schema for index in matched]\n', '    try:\n', '        return from_schema(_intersection(schemas), ctx)\n', '    except jsonschema_rs.canonical.UnsupportedResult:\n', '        # Inexpressible intersection: draw for one pattern, keep what the others accept.\n', '        others = [_validator(schema) for schema in schemas[1:]]\n', '        return patterns[matched[0]].values.filter(lambda value: all(is_valid(value) for is_valid in others))\n', '\n', '\n', '@st.composite\n', 'def _named_object(\n', '    draw: st.DrawFn,\n', '    required: dict[str, SearchStrategy[JsonValue]],\n', '    optional: dict[str, SearchStrategy[JsonValue]],\n', '    picker: SearchStrategy[set[str]] | None,\n', ') -> dict[str, JsonValue]:\n', '    """Every required key, plus a size-biased pick of the optional ones."""\n', '    chosen = draw(picker) if picker is not None else ()\n', '    return draw(st.fixed_dictionaries({**required, **{key: optional[key] for key in sorted(chosen)}}))\n', '\n', '\n', '@st.composite\n', 'def _drawn_object(\n', '    draw: st.DrawFn,\n', '    required: dict[str, SearchStrategy[JsonValue]],\n', '    optional: dict[str, SearchStrategy[JsonValue]],\n', '    picker: SearchStrategy[set[str]] | None,\n', '    collect: Callable[[int, int], SearchStrategy[dict[str, JsonValue]]] | None,\n', '    minimum: int,\n', '    maximum: int | None,\n', ') -> dict[str, JsonValue]:\n', '    """Every required key, a pick of the optional ones, and free keys where the floor asks for more."""\n', '    chosen = draw(picker) if picker is not None else ()\n', '    result = draw(st.fixed_dictionaries({**required, **{key: optional[key] for key in sorted(chosen)}}))\n', '    if collect is None:\n', '        return result\n', '    # The cap bounds the distance past the floor, not the total — capping the total would pin\n', '    # every object with a floor at or above it to exactly that floor.\n', '    extra_low = max(0, minimum - len(result))\n', '    extra_high = extra_low + _EXTRA_KEYS if maximum is None else min(extra_low + _EXTRA_KEYS, maximum - len(result))\n', '    extra = draw(collect(extra_low, extra_high))\n', '    return {**extra, **result}\n', '\n', '\n', 'def _key(name: JsonValue) -> str:\n', '    """A drawn property name, checked rather than cast."""\n', '    # `property_names` constrains keys, so canonicalization keeps only what a key could spell.\n', '    assert isinstance(name, str), name\n', '    return name\n', '\n', '\n', 'def _closed_names(schema: jsonschema_rs.CanonicalSchema) -> set[str] | None:\n', '    """The finite set of admitted property names, or `None` when names are not enumerable."""\n', '    view = schema.view()\n', '    if isinstance(view, canonical.ConstView):\n', '        names = {view.value}\n', '    elif isinstance(view, canonical.EnumView):\n', '        names = set(view.values)\n', '    else:\n', '        return None\n', '    # Canonicalization drops admitted values no property name could equal.\n', '    assert all(isinstance(name, str) for name in names)\n', '    return cast("set[str]", names)\n', '\n', '\n', 'def _integer(view: jsonschema_rs.canonical.IntegerView, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    multiple_of = _combined_multiple_of(view.multiple_of)\n', '    barred = _barred_divisors(view.not_multiple_of)\n', '    if _every_step_is_barred(multiple_of or Fraction(1), barred):\n', '        return st.nothing()\n', '    if multiple_of is None:\n', '        strategy: SearchStrategy[JsonValue] = st.integers(min_value=view.minimum, max_value=view.maximum)\n', '    else:\n', '        # On a `p/q` grid only multiples of `p` are whole, `q` being coprime to it.\n', '        stride = multiple_of.numerator\n', '        low = None if view.minimum is None else -(-view.minimum // stride)\n', '        high = None if view.maximum is None else view.maximum // stride\n', '        strategy = _steps(low, high).map(lambda step: step * stride)\n', '    strategy = _outside_divisors(strategy, barred)\n', '    if ctx.whole_floats:\n', '        # `2.0` is the same integer as `2`, and a reader that takes only the second rejects a value\n', '        # its own schema admits. The plain spelling comes first so a failure shrinks back to it.\n', '        return st.one_of(strategy, strategy.map(_as_whole_float))\n', '    return strategy\n', '\n', '\n', '# Past this magnitude no float spells the integer back, and the shifted value could leave the bounds.\n', '_EXACTLY_SPELLED = 2**53\n', '\n', '\n', 'def _as_whole_float(value: JsonValue) -> JsonValue:\n', '    assert isinstance(value, int)\n', '    return float(value) if -_EXACTLY_SPELLED <= value <= _EXACTLY_SPELLED else value\n', '\n', '\n', 'def _barred_divisors(values: list[Numeric]) -> list[Fraction]:\n', '    # Exact rationals, for the reason `_combined_multiple_of` needs them.\n', '    return [Fraction(str(value)) for value in values]\n', '\n', '\n', 'def _every_step_is_barred(step: Fraction, barred: list[Fraction]) -> bool:\n', '    """Whether the grid the schema admits lands on a barred divisor at every point."""\n', '    return any(step % divisor == 0 for divisor in barred)\n', '\n', '\n', 'def _outside_divisors(strategy: SearchStrategy[JsonValue], barred: list[Fraction]) -> SearchStrategy[JsonValue]:\n', '    if not barred:\n', '        return strategy\n', '\n', '    def is_admitted(value: JsonValue) -> bool:\n', '        spelled = Fraction(str(value))\n', '        return all(spelled % divisor != 0 for divisor in barred)\n', '\n', '    return strategy.filter(is_admitted)\n', '\n', '\n', 'def _number(view: jsonschema_rs.canonical.NumberView) -> SearchStrategy[JsonValue]:\n', '    barred = _barred_divisors(view.not_multiple_of)\n', '    if view.excludes_integers:\n', '        # Draft 4 spells "not an integer" on the leaf; a barred divisor of one says the same thing.\n', '        barred = [*barred, Fraction(1)]\n', '    multiple_of = _combined_multiple_of(view.multiple_of)\n', '    if multiple_of is not None:\n', '        if _every_step_is_barred(multiple_of, barred):\n', '            return st.nothing()\n', '        steps = _steps(\n', '            _lower_step(view.minimum, view.exclusive_minimum, multiple_of),\n', '            _upper_step(view.maximum, view.exclusive_maximum, multiple_of),\n', '        )\n', '        # Grid points that no float represents round to a neighbour off the grid or outside the bounds.\n', '        is_valid = _grid_check(view, multiple_of)\n', '        strategy = steps.map(lambda step: _fraction_to_json_number(step * multiple_of)).filter(is_valid)\n', '        return _outside_divisors(strategy, barred)\n', '\n', '    bounds = _representable_float_bounds(view)\n', '    if bounds is not None:\n', '        float_low, float_high = bounds\n', '        floats = st.floats(min_value=float_low, max_value=float_high, allow_nan=False, allow_infinity=False).map(\n', '            lambda value: value or 0.0\n', '        )\n', '        return _outside_divisors(floats, barred)\n', '    # No float lies within the bounds, leaving the integers that do.\n', '    if _every_step_is_barred(Fraction(1), barred):\n', '        return st.nothing()\n', '    return _steps(\n', '        _lower_step(view.minimum, view.exclusive_minimum, Fraction(1)),\n', '        _upper_step(view.maximum, view.exclusive_maximum, Fraction(1)),\n', '    )\n', '\n', '\n', 'def _grid_check(\n', '    view: jsonschema_rs.canonical.NumberView, multiple_of: Fraction\n', ') -> Callable[[int | float | _Unrepresentable], TypeGuard[int | float]]:\n', '    """Accept only what every reading of the emitted number clears."""\n', '    minimum = None if view.minimum is None else _spelled(view.minimum)\n', '    maximum = None if view.maximum is None else _spelled(view.maximum)\n', '    exclusive_minimum = view.exclusive_minimum\n', '    exclusive_maximum = view.exclusive_maximum\n', '\n', '    def is_valid(value: int | float | _Unrepresentable) -> TypeGuard[int | float]:\n', '        if value is _UNREPRESENTABLE:\n', '            return False\n', '        number = cast("int | float", value)\n', '        spelled = _spelled(number)\n', '        if spelled % multiple_of != 0:\n', '            return False\n', '        for reading in _readings(number, spelled):\n', '            if minimum is not None and (reading <= minimum if exclusive_minimum else reading < minimum):\n', '                return False\n', '            if maximum is not None and (reading >= maximum if exclusive_maximum else reading > maximum):\n', '                return False\n', '        return True\n', '\n', '    return is_valid\n', '\n', '\n', 'def _readings(value: int | float, spelled: Fraction) -> tuple[Fraction, ...]:\n', '    # A reader either keeps the decimal spelled here or parses it into an `f64`, and `jsonschema-rs`\n', '    # itself does both: the `f64` for a bound fitting an `i64`, the decimal for anything wider.\n', '    return (spelled,) if isinstance(value, int) else (spelled, Fraction(value))\n', '\n', '\n', 'def _steps(low: int | None, high: int | None) -> SearchStrategy[int]:\n', '    if low is not None and high is not None and low > high:\n', '        # Canonical bounds come from binary float arithmetic; exact rationals can find the range empty.\n', '        return st.nothing()\n', '    return st.integers(min_value=low, max_value=high)\n', '\n', '\n', 'def _lower_step(bound: Numeric | None, exclusive: bool, step_size: Fraction) -> int | None:\n', '    if bound is None:\n', '        return None\n', '    quotient = _quotient(bound, step_size)\n', '    return math.floor(quotient) + 1 if exclusive else math.ceil(quotient)\n', '\n', '\n', 'def _upper_step(bound: Numeric | None, exclusive: bool, step_size: Fraction) -> int | None:\n', '    if bound is None:\n', '        return None\n', '    quotient = _quotient(bound, step_size)\n', '    return math.ceil(quotient) - 1 if exclusive else math.floor(quotient)\n', '\n', '\n', 'def _quotient(bound: Numeric, step_size: Fraction) -> Fraction:\n', '    return _spelled(bound) / step_size\n', '\n', '\n', 'def _spelled(value: Numeric) -> Fraction:\n', '    # `str` first: a JSON number means the decimal it spells, not the binary float storing it.\n', '    return Fraction(str(value))\n', '\n', '\n', 'def _fraction_to_json_number(value: Fraction) -> int | float | _Unrepresentable:\n', '    if value.denominator == 1:\n', '        return value.numerator\n', '    try:\n', '        return float(value)\n', '    except OverflowError:\n', '        # Whole grid points ride out as exact integers, fractional ones need a float to land in.\n', '        return _UNREPRESENTABLE\n', '\n', '\n', 'def _representable_float_bounds(\n', '    view: jsonschema_rs.canonical.NumberView,\n', ') -> tuple[float | None, float | None] | None:\n', '    low = None\n', '    if view.minimum is not None:\n', '        if view.minimum > sys.float_info.max:\n', '            return None\n', '        if view.minimum >= -sys.float_info.max:\n', '            low = float(view.minimum)\n', '            # An exclusive bound rules out its own rounding; an inclusive one only rules out a float\n', '            # landing under it.\n', '            minimum = _spelled(view.minimum)\n', '            if view.exclusive_minimum or any(reading < minimum for reading in _readings(low, _spelled(low))):\n', '                low = math.nextafter(low, math.inf)\n', '\n', '    high = None\n', '    if view.maximum is not None:\n', '        if view.maximum < -sys.float_info.max:\n', '            return None\n', '        if view.maximum <= sys.float_info.max:\n', '            high = float(view.maximum)\n', '            maximum = _spelled(view.maximum)\n', '            if view.exclusive_maximum or any(reading > maximum for reading in _readings(high, _spelled(high))):\n', '                high = math.nextafter(high, -math.inf)\n', '\n', '    if low is not None and high is not None and low > high:\n', '        return None\n', '    if (low is not None and math.isinf(low)) or (high is not None and math.isinf(high)):\n', '        # Stepping off the last float leaves the range; only integers clear the bound.\n', '        return None\n', '    return low, high\n', '\n', '\n', 'def _combined_multiple_of(values: list[Numeric]) -> Fraction | None:\n', '    # Exact rationals: `step * 0.1` in binary floats lands off the grid two times out of five. Several\n', '    # divisors admit exactly the multiples of their least common multiple.\n', '    combined = None\n', '    for value in values:\n', '        candidate = Fraction(str(value))\n', '        if combined is None:\n', '            combined = candidate\n', '        else:\n', '            combined = Fraction(\n', '                math.lcm(combined.numerator, candidate.numerator),\n', '                math.gcd(combined.denominator, candidate.denominator),\n', '            )\n', '    return combined\n', '\n', '\n', 'def _string(view: jsonschema_rs.canonical.StringView, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    strategy = _admitted_strings(view, ctx)\n', '    if view.excluded:\n', '        barred = frozenset(view.excluded)\n', '        strategy = strategy.filter(lambda value: value not in barred)\n', '    # One `anyOf` covers both runs: a string is barred as soon as it satisfies any of them.\n', '    barred_by = [\n', '        {"type": "string", keyword: value}\n', '        for keyword, values in (("format", view.excluded_formats), ("pattern", view.excluded_patterns))\n', '        for value in values or ()\n', '    ]\n', '    if barred_by:\n', '        matches_barred = make_validator({"anyOf": barred_by}, _VALIDATOR_BY_CANONICALIZE_DRAFT[ctx.root.draft]).is_valid\n', '        strategy = strategy.filter(lambda value: not matches_barred(value))\n', '    return strategy\n', '\n', '\n', '# A pattern that is one character class and nothing else, so the characters it bars are the ones it names.\n', '_BARE_CHARACTER_CLASS = re.compile(r"\\[\\^?(?:[^\\\\\\]]|\\\\.)+\\]")\n', '\n', '\n', '# Characters spanning the categories a class is usually written against. A flip naming none of them\n', '# is empty or too exotic to drive a draw, and the filter on the node still has the last word.\n', '_CLASS_PROBE = "a0 _\\n#\\xe9中"\n', '\n', '\n', 'def _outside_class(pattern: str) -> str | None:\n', '    """A class naming what a bare character class does not, or `None` when the pattern is not one."""\n', '    if _BARE_CHARACTER_CLASS.fullmatch(pattern) is None:\n', '        return None\n', '    flipped = f"[{pattern[2:]}" if pattern.startswith("[^") else f"[^{pattern[1:]}"\n', '    try:\n', '        compiled = re.compile(flipped)\n', '    except re.error:\n', '        return None\n', '    return flipped if any(compiled.fullmatch(character) for character in _CLASS_PROBE) else None\n', '\n', '\n', 'def _characters_outside(view: jsonschema_rs.canonical.StringView, ctx: StrategyContext) -> SearchStrategy[str]:\n', '    """Characters no barred pattern names, so drawing does not lean on the filter to choose."""\n', '    characters = ctx.alphabet.as_strategy()\n', '    for pattern in view.excluded_patterns:\n', '        admitted = _outside_class(pattern)\n', '        if admitted is not None:\n', '            # One class can drive the alphabet; anything else the barred run names still filters above.\n', '            narrowed = st.from_regex(admitted, fullmatch=True, alphabet=characters)\n', '            try:\n', '                narrowed.validate()\n', '            except InvalidArgument:\n', '                # Nothing this class admits is in the alphabet; the filter above still has the say.\n', '                continue\n', '            return narrowed\n', '    return characters\n', '\n', '\n', 'def _admitted_strings(view: jsonschema_rs.canonical.StringView, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    if view.min_length is not None and view.min_length > MAX_STRING_LENGTH:\n', '        # No string can be that long.\n', '        return st.nothing()\n', '    if view.content_media_types or view.content_encodings:\n', '        return _content_string(view, ctx)\n', '    # A name with no generator behind it is an annotation and leaves the strings unconstrained.\n', '    known = [name for name in view.formats if name in ctx.formats]\n', '    if known:\n', '        drivers = [pattern for pattern in view.patterns if _compiled_pattern(pattern) is not None]\n', '        sources = [source for name in known if (source := _format_source(name, view, ctx)) is not None]\n', '        # A pattern stricter than the format admits few generator values, so it drives when they miss; only a\n', '        # format the facet check asserts can vouch for what the pattern draws.\n', '        if drivers and sources and all(name in _CHECKED_FORMATS for name in known):\n', '            return _format_or_pattern(\n', '                st.one_of(sources),\n', '                _string_check(known, view),\n', '                st.one_of([_pattern_formatted(pattern, known, view, ctx) for pattern in drivers]),\n', '            )\n', '        # One generator drives, the rest filter; which pair flows depends on the value, so every\n', '        # driver gets a branch and the dead ones reject their draws.\n', '        return st.one_of([_formatted(name, [other for other in known if other != name], view, ctx) for name in known])\n', '    if not view.patterns:\n', '        # Nothing here spells out what the characters have to be, so a value this long can be padded.\n', '        max_length = _countable(view.max_length)\n', '        characters = _characters_outside(view, ctx)\n', '        if view.min_length is not None and view.min_length >= _PADDED_TEXT_THRESHOLD:\n', '            return _padded_text(ctx, view.min_length, max_length, characters)\n', '        kwargs: dict[str, int] = {}\n', '        if view.min_length is not None:\n', '            kwargs["min_size"] = view.min_length\n', '        if max_length is not None:\n', '            kwargs["max_size"] = max_length\n', '        return _text(ctx, characters=characters, **kwargs)\n', '    if view.max_length is not None and any(\n', '        pattern_length_bounds(pattern)[0] > view.max_length for pattern in view.patterns\n', '    ):\n', '        # Every value has to carry a match of each pattern, and one of them cannot fit under the\n', '        # ceiling. Saying so up front spares the caller a filter that never passes.\n', '        return st.nothing()\n', '    drivers = [pattern for pattern in view.patterns if _compiled_pattern(pattern) is not None]\n', '    if not drivers:\n', '        # Every pattern here names something with no spelling in codepoints - a script this build\n', '        # carries no ranges for. Naming the pattern is what the caller can act on.\n', '        raise UnsupportedRegexPattern.from_pattern(view.patterns[0])\n', '    strategies = [\n', '        _pattern_driven(pattern, [other for other in view.patterns if other != pattern], view, ctx)\n', '        for pattern in drivers\n', '    ]\n', '    if len(drivers) > 1:\n', '        strategies.append(_pattern_joined(drivers, view, ctx))\n', '    return st.one_of(strategies)\n', '\n', '\n', '# Hypothesis indexes every drawn value, and for a string that index is a number with a digit per\n', '# character - work that outgrows the draw itself once a length floor runs into the thousands.\n', '_PADDED_TEXT_THRESHOLD = 256\n', '_PADDED_TEXT_HEAD = 16\n', '# How far past the floor a padded value may run; the floor is the interesting length.\n', '_PADDED_TEXT_SLACK = 8\n', '\n', '\n', 'def _padded_text(\n', '    ctx: StrategyContext, min_length: int, max_length: int | None, characters: SearchStrategy[str]\n', ') -> SearchStrategy[str]:\n', '    """A short head followed by one repeated character, cut to the drawn length."""\n', '    ceiling = min_length + _PADDED_TEXT_SLACK\n', '    if max_length is not None:\n', '        ceiling = min(ceiling, max_length)\n', '    strategy = st.tuples(\n', '        st.integers(min_length, ceiling), _text(ctx, characters=characters, max_size=_PADDED_TEXT_HEAD), characters\n', '    ).map(lambda parts: (parts[1] + parts[2] * parts[0])[: parts[0]])\n', '    # The padding character closes the value, and opens it after an empty head.\n', '    return _surrounding_whitespace_check(strategy, ctx.alphabet)\n', '\n', '\n', 'def _content_string(view: jsonschema_rs.canonical.StringView, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    """A decoded value first, with each encoding mapped over it."""\n', '    if "application/json" in view.content_media_types:\n', '        strategy = _anything(ctx).map(json.dumps)\n', '    else:\n', '        strategy = _text(ctx)\n', '    for media_type in view.content_media_types:\n', '        if media_type != "application/json":\n', '            # No builder for this media type; the draft-aware check mirrors what the validator\n', '            # asserts, and passes everything for a type the validator does not know either.\n', '            strategy = strategy.filter(_content_check(ctx, "contentMediaType", media_type))\n', '    for encoding in view.content_encodings:\n', '        if encoding == "base64":\n', '            strategy = strategy.map(_base64_text)\n', '        else:\n', '            strategy = strategy.filter(_content_check(ctx, "contentEncoding", encoding))\n', '    for pattern in view.patterns:\n', '        strategy = strategy.filter(_facet_check("pattern", pattern))\n', '    return _within_length(strategy, view)\n', '\n', '\n', 'def _base64_text(value: str) -> str:\n', '    return base64.b64encode(value.encode("utf-8")).decode("ascii")\n', '\n', '\n', 'def _content_check(ctx: StrategyContext, keyword: str, value: str) -> Callable[[JsonValue], bool]:\n', '    # Content facets assert only in the drafts where the validator says so; the check has to be\n', "    # built for the document's own draft to agree with it.\n", '    return make_validator({"type": "string", keyword: value}, _VALIDATOR_BY_CANONICALIZE_DRAFT[ctx.root.draft]).is_valid\n', '\n', '\n', 'def _from_pattern(compiled: re.Pattern[str], ctx: StrategyContext) -> SearchStrategy[str]:\n', '    """Values a pattern matches, drawn from as much of the alphabet as the pattern leaves."""\n', '    characters = ctx.alphabet.as_strategy()\n', '    # A pattern is a search, so the value may carry anything around the match; full matches only\n', '    # would leave `^x` spelling a single string, starving `propertyNames` of distinct keys.\n', '    strategy = st.from_regex(compiled, alphabet=characters)\n', '    try:\n', '        strategy.validate()\n', '        return strategy\n', '    except InvalidArgument:\n', '        pass\n', "    # ASCII is the validator's reading, but it leaves characters spelled above that range\n", '    # unreachable; the wider reading of the same source draws those, the narrow one still decides.\n', '    wider = re.compile(compiled.pattern)\n', '    strategy = st.from_regex(wider, alphabet=characters)\n', '    try:\n', '        strategy.validate()\n', '        return strategy.filter(compiled.search)\n', '    except InvalidArgument:\n', '        pass\n', '    # The alphabet bars every character a class in the pattern names. The schema outranks the\n', '    # alphabet, so the value is drawn without it, and whoever cannot carry it says so downstream.\n', '    return st.from_regex(wider).filter(compiled.search)\n', '\n', '\n', 'def _pattern_driven(\n', '    pattern: str, others: list[str], view: jsonschema_rs.canonical.StringView, ctx: StrategyContext\n', ') -> SearchStrategy[JsonValue]:\n', '    """Values drawn from one pattern and filtered by the remaining ones."""\n', '    compiled = _compiled_pattern(pattern)\n', '    assert compiled is not None\n', '    # A length floor left to the filter rejects the short matches drawn, which are most matches inside an array;\n', '    # spelled into the pattern, it is drawn to.\n', '    folded = update_quantifier(compiled.pattern, view.min_length, view.max_length)\n', '    if folded != compiled.pattern:\n', '        compiled = _compiled_pattern(folded)\n', '        assert compiled is not None\n', '    # Python `re` reads the pattern differently from the validator, so the validator decides what the draw is worth.\n', '    strategy = _from_pattern(compiled, ctx).filter(_facet_check("pattern", pattern))\n', '    for other in others:\n', '        strategy = strategy.filter(_facet_check("pattern", other))\n', '    # Length is normally folded into the pattern upstream; this filter is the soundness net.\n', '    return _within_length(strategy, view)\n', '\n', '\n', 'def _pattern_joined(\n', '    drivers: list[str], view: jsonschema_rs.canonical.StringView, ctx: StrategyContext\n', ') -> SearchStrategy[JsonValue]:\n', '    """One match of every pattern, joined in any order, so a value carries them all at once."""\n', '    # A pattern anchored to the start and one anchored to the end meet in no value either draws on\n', "    # its own, and waiting for the other one's filter to land spends the whole draw budget.\n", '    parts = []\n', '    for pattern in drivers:\n', '        compiled = _compiled_pattern(pattern)\n', '        assert compiled is not None\n', '        parts.append(_from_pattern(compiled, ctx))\n', '    strategy = st.tuples(*parts).flatmap(st.permutations).map("".join)\n', '    for pattern in view.patterns:\n', '        strategy = strategy.filter(_facet_check("pattern", pattern))\n', '    return _within_length(strategy, view)\n', '\n', '\n', '_CHECKED_FORMATS = VALIDATED_FORMATS_BY_DRAFT[jsonschema_rs.Draft202012Validator]\n', '# As many tries as a filtered format value gets before its draw is rejected.\n', '_FORMAT_ATTEMPTS = 3\n', '\n', '\n', '@st.composite\n', 'def _format_or_pattern(\n', '    draw: st.DrawFn,\n', '    formatted: SearchStrategy[JsonValue],\n', '    admits: Callable[[JsonValue], bool],\n', '    pattern_driven: SearchStrategy[JsonValue],\n', ') -> JsonValue:\n', '    """A format value when one meets every facet within a few tries, a pattern-driven one otherwise."""\n', '    # A loose pattern admits most format values, a strict one nearly none; falling back rather than\n', '    # splitting draws between the two keeps the dead side from rejecting its share of them.\n', '    for _ in range(_FORMAT_ATTEMPTS):\n', '        value = draw(formatted)\n', '        if admits(value):\n', '            return value\n', '    return draw(pattern_driven)\n', '\n', '\n', 'def _string_check(formats: list[str], view: jsonschema_rs.canonical.StringView) -> Callable[[JsonValue], bool]:\n', '    checks = [_facet_check("format", name) for name in formats]\n', '    checks.extend(_facet_check("pattern", pattern) for pattern in view.patterns)\n', '    within = _length_check(view)\n', '    if within is not None:\n', '        checks.append(within)\n', '    return lambda value: all(check(value) for check in checks)\n', '\n', '\n', 'def _pattern_formatted(\n', '    pattern: str, formats: list[str], view: jsonschema_rs.canonical.StringView, ctx: StrategyContext\n', ') -> SearchStrategy[JsonValue]:\n', '    """Values drawn from one pattern and filtered by the remaining patterns and every format."""\n', '    strategy = _pattern_driven(pattern, [other for other in view.patterns if other != pattern], view, ctx)\n', '    for name in formats:\n', '        strategy = strategy.filter(_facet_check("format", name))\n', '    return strategy\n', '\n', '\n', 'def _formatted(\n', '    name: str, others: list[str], view: jsonschema_rs.canonical.StringView, ctx: StrategyContext\n', ') -> SearchStrategy[JsonValue]:\n', '    """Values from the generator registered for `name`, narrowed to the facets around it."""\n', '    strategy = _format_source(name, view, ctx)\n', '    if strategy is None:\n', '        return st.nothing()\n', '    for other in others:\n', '        strategy = strategy.filter(_facet_check("format", other))\n', '    for pattern in view.patterns:\n', '        # A format generator cannot be steered, so the pattern can only be filtered for.\n', '        strategy = strategy.filter(_facet_check("pattern", pattern))\n', '    return _within_length(strategy, view)\n', '\n', '\n', 'def _format_source(\n', '    name: str, view: jsonschema_rs.canonical.StringView, ctx: StrategyContext\n', ') -> SearchStrategy[str] | None:\n', '    """The generator to draw `name` from, pointed at the length window where it can be; `None` admits nothing."""\n', '    lengths = ctx.format_lengths.get(name)\n', '    if lengths is None or (view.min_length is None and view.max_length is None):\n', '        return ctx.formats[name]\n', '    low = view.min_length or 0\n', '    high = math.inf if view.max_length is None else view.max_length\n', '    # Every value it reaches already lands inside, so the window has nothing left to say.\n', '    if low <= lengths.shortest and lengths.longest <= high:\n', '        return ctx.formats[name]\n', '    # Pointing it somewhere is what settles the window, including whether anything fits at all.\n', '    if lengths.within is not None:\n', '        narrowed = lengths.within(low, high)\n', '        if narrowed is None or low == high:\n', '            return narrowed\n', '        # More than one length is admitted, so the lengths it reaches on its own are worth drawing too.\n', '        if low <= lengths.longest and high >= lengths.shortest:\n', '            return st.one_of([ctx.formats[name], narrowed])\n', '        return narrowed\n', '    if low > lengths.longest or high < lengths.shortest:\n', '        return None\n', '    return ctx.formats[name]\n', '\n', '\n', "# The validator's own engine judges the facet, so `\\p{L}` patterns and format assertions filter\n", '# exactly; a name without a checker behind it passes everything, like the validator itself.\n', '@lru_cache(maxsize=512)\n', 'def _facet_check(keyword: str, value: str) -> Callable[[JsonValue], bool]:\n', '    matcher = pattern_matcher(value) if keyword == "pattern" else None\n', '    is_valid: Callable[[JsonValue], bool]\n', '    if matcher is not None:\n', '        # Shares the compiled pattern with every other check of it instead of compiling another validator.\n', '        def matches(drawn: JsonValue) -> bool:\n', '            return isinstance(drawn, str) and matcher(drawn)\n', '\n', '        is_valid = matches\n', '    else:\n', '        is_valid = make_validator_for({"type": "string", keyword: value}).is_valid\n', '\n', '    def check(drawn: JsonValue) -> bool:\n', '        # A binary payload carries bytes rather than a JSON string, so the facet has no say over it.\n', '        return contains_binary(drawn) or is_valid(drawn)\n', '\n', '    return check\n', '\n', '\n', 'def _within_length(\n', '    strategy: SearchStrategy[JsonValue], view: jsonschema_rs.canonical.StringView\n', ') -> SearchStrategy[JsonValue]:\n', '    check = _length_check(view)\n', '    if check is None:\n', '        return strategy\n', '    return strategy.filter(check)\n', '\n', '\n', 'def _length_check(view: jsonschema_rs.canonical.StringView) -> Callable[[JsonValue], bool] | None:\n', '    if view.min_length is None and view.max_length is None:\n', '        return None\n', '    low = view.min_length or 0\n', '    high = math.inf if view.max_length is None else view.max_length\n', '\n', '    def check(value: JsonValue) -> bool:\n', '        # A binary payload spells its bytes outside the string, so its byte count is the length.\n', '        if isinstance(value, Binary):\n', '            return low <= len(value.data) <= high\n', '        return contains_binary(value) or low <= len(cast("str", value)) <= high\n', '\n', '    return check\n', '\n', '\n', 'def _anything(ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    return _anything_for(ctx.alphabet)\n', '\n', '\n', '@lru_cache\n', 'def _anything_for(alphabet: Alphabet) -> SearchStrategy[JsonValue]:\n', '    # Arbitrary JSON value; containers bounded to keep draws cheap. Assembling the recursive strategy\n', '    # costs far more than every other lifter combined, and it depends only on the alphabet.\n', '    text = _surrounding_whitespace_check(st.text(alphabet=alphabet.as_strategy()), alphabet)\n', '    return st.recursive(\n', '        st.none()\n', '        | st.booleans()\n', '        | st.integers()\n', '        | st.floats(allow_nan=False, allow_infinity=False).map(lambda x: x or 0.0)\n', '        | text,\n', '        lambda children: st.lists(children, max_size=3) | st.dictionaries(text, children, max_size=3),\n', '        max_leaves=5,\n', '    )\n', '\n', '\n', 'def _text(ctx: StrategyContext, *, characters: SearchStrategy[str] | None = None, **kwargs: int) -> SearchStrategy[str]:\n', '    strategy = st.text(alphabet=characters if characters is not None else ctx.alphabet.as_strategy(), **kwargs)\n', '    return _surrounding_whitespace_check(strategy, ctx.alphabet)\n', '\n', '\n', 'def _surrounding_whitespace_check(strategy: SearchStrategy[str], alphabet: Alphabet) -> SearchStrategy[str]:\n', '    """Reject an opening or closing whitespace character, close to the draw that produced it."""\n', '    if alphabet.allow_surrounding_whitespace:\n', '        return strategy\n', '    return strategy.filter(lambda value: not has_surrounding_whitespace(value))\n', '\n', '\n', '# What each JSON type name admits. `True == 1` in Python, but `true` is not a JSON number, and a\n', '# `TypedGroupView` over `integer` comes from Draft 4, where a fractional spelling is not one either.\n', '_TYPE_CHECKS: dict[str, Callable[[JsonValue], bool]] = {\n', '    "null": lambda value: value is None,\n', '    "boolean": lambda value: isinstance(value, bool),\n', '    "integer": lambda value: isinstance(value, int) and not isinstance(value, bool),\n', '    "number": lambda value: isinstance(value, (int, float)) and not isinstance(value, bool),\n', '    "string": lambda value: isinstance(value, str),\n', '    "array": lambda value: isinstance(value, list),\n', '    "object": lambda value: isinstance(value, dict),\n', '}\n', '\n', '\n', 'def _bare_type(name: str, ctx: StrategyContext) -> SearchStrategy[JsonValue]:\n', '    match name:\n', '        case "null":\n', '            return st.none()\n', '        case "boolean":\n', '            return st.booleans()\n', '        case "integer":\n', '            return st.integers()\n', '        case "number":\n', '            return st.floats(allow_nan=False, allow_infinity=False).map(lambda x: x or 0.0)\n', '        case "string":\n', '            return _text(ctx)\n', '        case "array":\n', '            return st.lists(_anything(ctx))\n', '        case _:\n', '            return st.dictionaries(_text(ctx), _anything(ctx))\n')
+    During handling of the above exception, another exception occurred:
+    Traceback (most recent call last):
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/schemathesis/engine/run/unit/_hypothesis_executor.py", line 49, in run_test
+        test_function(ctx=ctx, scenario=scenario, errors=errors, pending_events=pending_events)
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/schemathesis/generation/hypothesis/builder.py", line 270, in run_one_case
+        def test_wrapper(*args: Any, **kwargs: Any) -> Any:
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/core.py", line 2330, in wrapped_test
+        raise the_error_hypothesis_found
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/schemathesis/specs/openapi/_hypothesis.py", line 209, in openapi_cases
+        body_, media_type = _generate_body(
+                            ^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/schemathesis/specs/openapi/_hypothesis.py", line 332, in _generate_body
+        generated = _draw(draw, strategy, operation)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/schemathesis/specs/openapi/_hypothesis.py", line 118, in _draw
+        return draw(strategy)
+               ^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/conjecture/data.py", line 1357, in draw
+        v = unwrapped.do_draw(self)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/strategies.py", line 1426, in do_draw
+        result = self.do_filtered_draw(data)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/strategies.py", line 1441, in do_filtered_draw
+        value = data.draw(self.filtered_strategy)
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/conjecture/data.py", line 1357, in draw
+        v = unwrapped.do_draw(self)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/strategies.py", line 1194, in do_draw
+        x = data.draw(self.mapped_strategy)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/conjecture/data.py", line 1357, in draw
+        v = unwrapped.do_draw(self)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/strategies.py", line 1194, in do_draw
+        x = data.draw(self.mapped_strategy)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/conjecture/data.py", line 1357, in draw
+        v = unwrapped.do_draw(self)
+            ^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/collections.py", line 380, in do_draw
+        value = (value, *data.draw(self.tuple_suffixes))
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/conjecture/data.py", line 1311, in draw
+        strategy.validate()
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/strategies.py", line 560, in validate
+        self.do_validate()
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/collections.py", line 62, in do_validate
+        s.validate()
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/strategies.py", line 560, in validate
+        self.do_validate()
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/recursive.py", line 129, in do_validate
+        check_strategy(extended, f"extend({self.limited_base!r})")
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/recursive.py", line 63, in __repr__
+        return f"LimitedStrategy({self.base_strategy!r})"
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/strategies.py", line 1025, in __repr__
+        return "one_of({})".format(", ".join(map(repr, self.original_strategies)))
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/lazy.py", line 189, in __repr__
+        ) + "".join(
+            ^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/strategies/_internal/lazy.py", line 190, in <genexpr>
+        f".{method}({get_pretty_function_description(fn)})"
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/reflection.py", line 291, in get_pretty_function_description
+        return lambda_sources.lambda_description(f)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/lambda_sources.py", line 439, in lambda_description
+        description = _lambda_description(f)
+                      ^^^^^^^^^^^^^^^^^^^^^^
+      File "/home/user/rerun-tools/lib/python3.11/site-packages/hypothesis/internal/lambda_sources.py", line 378, in _lambda_description
+        tree = ast.parse("".join(source_lines))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      File "/usr/lib/python3.11/ast.py", line 50, in parse
+        return compile(source, filename, mode, flags,
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    SystemError: AST constructor recursion depth mismatch (before=156, after=42)
+
+Need more help?
+    Join our Discord server: https://discord.gg/R9ASRAmHnA
+
+=================================== FAILURES ===================================
+___________________________ DELETE /auth/users/{id} ____________________________
+1. Test Case ID: 5ZxftN
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `Too many requests, please try again later.`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18303/api/auth/users/3e0c4318db3ad516a224faea
+
+    st replay 5ZxftN
+
+_____________________ DELETE /batches/logs/{kind}/{logId} ______________________
+1. Test Case ID: COxGTG
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `Too many requests, please try again later.`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18303/api/batches/logs/0/0
+
+    st replay COxGTG
+
+___________________________ DELETE /batches/wipe-all ___________________________
+1. Test Case ID: VUeFDB
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `Too many requests, please try again later.`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18303/api/batches/wipe-all
+
+    st replay VUeFDB
+
+__________________________ DELETE /batches/{batchId} ___________________________
+1. Test Case ID: TpgbOl
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `Too many requests, please try again later.`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18303/api/batches/0
+
+    st replay TpgbOl
+
+______________________ DELETE /batches/{batchId}/gallery _______________________
+1. Test Case ID: yAfkWo
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `Too many requests, please try again later.`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18303/api/batches/0/gallery
+
+    st replay yAfkWo
+
+_____________________________ DELETE /images/{id} ______________________________
+1. Test Case ID: A33FDq
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `Too many requests, please try again later.`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18303/api/images/3e0c4318db3ad516a224faea
+
+    st replay A33FDq
+
+____________________________ DELETE /products/{id} _____________________________
+1. Test Case ID: 2pEuOQ
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `Too many requests, please try again later.`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18303/api/products/3e0c4318db3ad516a224faea
+
+    st replay 2pEuOQ
+
+_______________________ DELETE /telegram/links/{chatId} ________________________
+1. Test Case ID: Sg2Pby
+
+- ST203 Missing required header accepted
+
+    Got 429 when missing required 'Authorization' header, expected 401
+
+[429] Too Many Requests:
+
+    `Too many requests, please try again later.`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:18303/api/telegram/links/0
+
+    st replay Sg2Pby
+
+_____________________________ GET /auth/can-signup _____________________________
+1. Test Case ID: vMr8zM
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /auth/can-signup`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"allowed":false,"mailConfigured":false,"localCodeDelivery":false}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18303/api/auth/can-signup
+
+    st replay vMr8zM
+
+____________________________ GET /auth/mail-status _____________________________
+1. Test Case ID: BMnGOP
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /auth/mail-status`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"configured":false}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18303/api/auth/mail-status
+
+    st replay BMnGOP
+
+_______________________________ GET /data/{key} ________________________________
+1. Test Case ID: nW1NvM
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Unknown data key: 0"}`
+
+Reproduce with:
+
+    curl -X GET -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/data/0
+
+    st replay nW1NvM
+
+______________________________ GET /farm-summary _______________________________
+1. Test Case ID: f3HMQB
+
+- ST203 Missing required header accepted
+
+    Got 404 when missing required 'Authorization' header, expected 401
+
+[404] Not Found:
+
+    `{"error":"Not enabled"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18303/api/farm-summary
+
+    st replay f3HMQB
+
+_________________________________ GET /health __________________________________
+1. Test Case ID: BnRDBY
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /health`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"status":"ok"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18303/api/health
+
+    st replay BnRDBY
+
+_____________________________ GET /products/public _____________________________
+1. Test Case ID: Z1w0P1
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /products/public`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"products":[]}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18303/api/products/public
+
+    st replay Z1w0P1
+
+____________________________ GET /telegram/settings ____________________________
+1. Test Case ID: U1dLEC
+
+- ST401 Unexpected response to a request without authentication
+
+    Expected 401 or 403, got `429 Too Many Requests` for `GET /telegram/settings`
+
+[429] Too Many Requests:
+
+    `Too many requests, please try again later.`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18303/api/telegram/settings
+
+    st replay U1dLEC
+
+________________________________ PATCH /auth/me ________________________________
+1. Test Case ID: VuoUuM
+
+- ST201 Schema-violating request accepted
+
+    Invalid data should have been rejected
+    Expected: 400, 401, 403, 404, 405, 406, 409, 415, 422, 428, 429, 5xx
+    Invalid component: in body - incorrect type
+
+[200] OK:
+
+    `{"user":{"username":"admin","role":"admin","displayName":"Malik Usman","active":true,"avatarBase64":"https://images.unsplash.com/photo-1673538064388-21d1aaaf6594?w=800&q=70&fm=jpg","_id":"3e0c4318db3ad516a224faea","email":null,"farmIds":[],"lastLoginAt":"2026-10-31T19:15:30.746Z","createdAt":"2026-10-31T19:15:28.881Z","updatedAt":"2026-10-31T19:15:36.685Z","farmRole":"owner"}}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '[null, null]' http://127.0.0.1:18303/api/auth/me
+
+    st replay VuoUuM
+
+____________________________ PATCH /auth/users/{id} ____________________________
+1. Test Case ID: DDqylK
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Administrator current password is required for confirmation"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18303/api/auth/users/3e0c4318db3ad516a224faea
+
+    st replay DDqylK
+
+__________________________ POST /auth/forgot-password __________________________
+1. Test Case ID: MabBtL
+
+- ST101 Server error
+
+- ST203 Missing required header accepted
+
+    Got 503 when missing required 'Authorization' header, expected 401
+
+[503] Service Unavailable:
+
+    `{"error":"Email is not configured on this server"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/auth/forgot-password
+
+    st replay MabBtL
+
+_______________________________ POST /auth/login _______________________________
+1. Test Case ID: D9uS6Q
+
+- ST203 Missing required header accepted
+
+    Got 400 when missing required 'Authorization' header, expected 401
+
+[400] Bad Request:
+
+    `{"error":"Username and password are required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/auth/login
+
+    st replay D9uS6Q
+
+______________________________ POST /auth/logout _______________________________
+1. Test Case ID: VRm910
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `POST /auth/logout`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"ok":true}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/auth/logout
+
+    st replay VRm910
+
+__________________________ POST /auth/reset-password ___________________________
+1. Test Case ID: WHegpk
+
+- ST203 Missing required header accepted
+
+    Got 400 when missing required 'Authorization' header, expected 401
+
+[400] Bad Request:
+
+    `{"error":"email, code, and newPassword are required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/auth/reset-password
+
+    st replay WHegpk
+
+________________________ POST /auth/signup/request-code ________________________
+1. Test Case ID: 1tskaP
+
+- ST203 Missing required header accepted
+
+    Got 403 when missing required 'Authorization' header, expected 401
+
+[403] Forbidden:
+
+    `{"error":"Signup is closed — an active administrator already exists."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/auth/signup/request-code
+
+    st replay 1tskaP
+
+___________________________ POST /auth/signup/verify ___________________________
+1. Test Case ID: OfFx1p
+
+- ST203 Missing required header accepted
+
+    Got 403 when missing required 'Authorization' header, expected 401
+
+[403] Forbidden:
+
+    `{"error":"Signup is closed — an active administrator already exists."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/auth/signup/verify
+
+    st replay OfFx1p
+
+____________________ POST /batches/{batchId}/egg-logs/bulk _____________________
+1. Test Case ID: f18quD
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"entries must be a non-empty array"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18303/api/batches/0/egg-logs/bulk
+
+    st replay f18quD
+
+_________________ POST /batches/{batchId}/logs/{logType}/bulk __________________
+1. Test Case ID: D0iusw
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"entries must be a non-empty array"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18303/api/batches/0/logs/0/bulk
+
+    st replay D0iusw
+
+_______________________ POST /telegram/webhook/{secret} ________________________
+1. Test Case ID: mzQHU9
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `POST /telegram/webhook/{secret}`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"ok":true}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/telegram/webhook/0
+
+    st replay mzQHU9
+
+_______________________________ PUT /data/{key} ________________________________
+1. Test Case ID: Epq7kF
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Unknown data key: 0"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18303/api/data/0
+
+    st replay Epq7kF
+
+______________________________ PUT /products/{id} ______________________________
+1. Test Case ID: LJXRcL
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"No supported fields supplied."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18303/api/products/3e0c4318db3ad516a224faea
+
+    st replay LJXRcL
+
+_________________________ TRACE /auth/change-password __________________________
+1. Test Case ID: Fwdv1Q
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /auth/change-password"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/auth/change-password
+
+    st replay Fwdv1Q
+
+________________________________ TRACE /auth/me ________________________________
+1. Test Case ID: lfNAzc
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /auth/me"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/auth/me
+
+    st replay lfNAzc
+
+_______________________ TRACE /auth/request-profile-code _______________________
+1. Test Case ID: 9wxYYy
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /auth/request-profile-code"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/auth/request-profile-code
+
+    st replay 9wxYYy
+
+______________________________ TRACE /auth/users _______________________________
+1. Test Case ID: X1FoWg
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /auth/users"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/auth/users
+
+    st replay X1FoWg
+
+________________________________ TRACE /backup _________________________________
+1. Test Case ID: QWu3QA
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/backup
+
+    st replay QWu3QA
+
+______________________________ TRACE /backup/auto ______________________________
+1. Test Case ID: 719avM
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup/auto"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/backup/auto
+
+    st replay 719avM
+
+____________________________ TRACE /backup/auto/run ____________________________
+1. Test Case ID: rKSvl3
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup/auto/run"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/backup/auto/run
+
+    st replay rKSvl3
+
+____________________________ TRACE /backup/restore _____________________________
+1. Test Case ID: RZBlfa
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup/restore"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/backup/restore
+
+    st replay RZBlfa
+
+__________________________ TRACE /backup/restore-auto __________________________
+1. Test Case ID: xQj6Px
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /backup/restore-auto"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/backup/restore-auto
+
+    st replay xQj6Px
+
+________________________________ TRACE /batches ________________________________
+1. Test Case ID: VbHL0l
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /batches"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/batches
+
+    st replay VbHL0l
+
+__________________________ TRACE /batches/export-all ___________________________
+1. Test Case ID: GnbqXP
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /batches/export-all"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/batches/export-all
+
+    st replay GnbqXP
+
+__________________________ TRACE /batches/import-all ___________________________
+1. Test Case ID: kQbVjK
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /batches/import-all"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/batches/import-all
+
+    st replay kQbVjK
+
+__________________________ TRACE /cron/daily-summary ___________________________
+1. Test Case ID: 6qeMhN
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /cron/daily-summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/cron/daily-summary
+
+    st replay 6qeMhN
+
+_______________________________ TRACE /products ________________________________
+1. Test Case ID: TJqVMf
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /products"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/products
+
+    st replay TJqVMf
+
+___________________________ TRACE /settings/location ___________________________
+1. Test Case ID: mbFpFq
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /settings/location"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/settings/location
+
+    st replay mbFpFq
+
+___________________________ TRACE /summary/send-now ____________________________
+1. Test Case ID: 1k2iri
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /summary/send-now"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/summary/send-now
+
+    st replay 1k2iri
+
+_____________________________ TRACE /summary/today _____________________________
+1. Test Case ID: Sk4cpB
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /summary/today"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/summary/today
+
+    st replay Sk4cpB
+
+_______________________ TRACE /super-admin/farm-summary ________________________
+1. Test Case ID: gzdPk7
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /super-admin/farm-summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/super-admin/farm-summary
+
+    st replay gzdPk7
+
+____________________________ TRACE /telegram/alerts ____________________________
+1. Test Case ID: R52iU6
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /telegram/alerts"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/telegram/alerts
+
+    st replay R52iU6
+
+_____________________________ TRACE /telegram/cron _____________________________
+1. Test Case ID: kAd4iz
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /telegram/cron"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18303/api/telegram/cron
+
+    st replay kAd4iz
+
+__________________________ TRACE /telegram/link-code ___________________________
+1. Test Case ID: i3FWm9
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /telegram/link-code"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/telegram/link-code
+
+    st replay i3FWm9
+
+_________________________ TRACE /telegram/send-summary _________________________
+1. Test Case ID: fw8gPT
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /telegram/send-summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/telegram/send-summary
+
+    st replay fw8gPT
+
+___________________________ TRACE /telegram/settings ___________________________
+1. Test Case ID: UdKUk4
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /telegram/settings"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/telegram/settings
+
+    st replay UdKUk4
+
+__________________________ TRACE /uploads/diary-image __________________________
+1. Test Case ID: YverPo
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /uploads/diary-image"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/uploads/diary-image
+
+    st replay YverPo
+
+_____________________________ TRACE /uploads/image _____________________________
+1. Test Case ID: fxRtSt
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"error":"API route not found: TRACE /uploads/image"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18303/api/uploads/image
+
+    st replay fxRtSt
+
+=================================== WARNINGS ===================================
+
+Authentication failed: 25 operations returned only 401/403 responses
+
+401 Unauthorized (25 operations):
+  - GET /auth/me
+  - GET /backup
+  - GET /backup/auto
+  - GET /batches/export-all
+  - GET /cron/daily-summary
+  - GET /summary/today
+  - GET /super-admin/farm-summary
+  - GET /telegram/alerts
+  - GET /telegram/cron
+  - POST /auth/change-password
+  - POST /auth/request-profile-code
+  - POST /auth/users
+  - POST /backup/auto/run
+  - POST /backup/restore
+  - POST /backup/restore-auto
+  - POST /batches
+  - POST /batches/import-all
+  - POST /products
+  - POST /summary/send-now
+  - POST /telegram/link-code
+  - POST /telegram/send-summary
+  - POST /uploads/diary-image
+  - POST /uploads/image
+  - PUT /settings/location
+  - PUT /telegram/settings
+
+💡 Ensure valid authentication credentials are set via `--auth` or `-H`
+
+Rate limited: 50 operations mostly returned 429 Too Many Requests, leaving the logic behind them untested
+
+  - DELETE /auth/users/{id}
+  - DELETE /batches/logs/{kind}/{logId}
+  - DELETE /batches/wipe-all
+  - DELETE /batches/{batchId}
+  - DELETE /batches/{batchId}/gallery
+  - DELETE /images/{id}
+  - DELETE /products/{id}
+  - DELETE /telegram/links/{chatId}
+  - GET /auth/can-signup
+  - GET /auth/mail-status
+  - GET /auth/me
+  - GET /auth/users
+  - GET /backup
+  - GET /backup/auto
+  - GET /batches
+  - GET /batches/export-all
+  - GET /batches/{batchId}
+  - GET /cards/customer/{id}
+  - GET /cards/supplier/{id}
+  - GET /cards/worker/{id}
+  - GET /cron/daily-summary
+  - GET /data/{key}
+  - GET /farm-summary
+  - GET /health
+  - GET /images/{id}
+  - GET /products
+  - GET /products/public
+  - GET /settings/location
+  - GET /summary/today
+  - GET /super-admin/farm-summary
+  - GET /telegram/alerts
+  - GET /telegram/cron
+  - GET /telegram/settings
+  - GET /telegram/status
+  - PATCH /auth/users/{id}
+  - POST /auth/forgot-password
+  - POST /auth/users
+  - POST /batches/{batchId}/egg-logs/bulk
+  - POST /batches/{batchId}/feed-logs
+  - POST /batches/{batchId}/gallery
+  - POST /batches/{batchId}/intake
+  - POST /batches/{batchId}/mortality-logs
+  - POST /batches/{batchId}/vaccination-logs
+  - POST /products
+  - POST /telegram/link-code
+  - POST /telegram/send-summary
+  - POST /telegram/webhook/{secret}
+  - POST /uploads/diary-image
+  - POST /uploads/image
+  - PUT /settings/location
+
+💡 Send requests no faster than the API allows with `--rate-limit`, e.g. `--rate-limit=100/m`
+
+Missing test data: 16 operations repeatedly returned 404 Not Found, preventing tests from reaching your API's core logic
+
+  - GET /batches/{batchId}
+  - GET /cards/customer/{id}
+  - GET /cards/supplier/{id}
+  - GET /cards/worker/{id}
+  - GET /images/{id}
+  - PATCH /batches/{batchId}
+  - PATCH /batches/{batchId}/close
+  - POST /batches/{batchId}/egg-logs
+  - POST /batches/{batchId}/expense-logs
+  - POST /batches/{batchId}/feed-logs
+  - POST /batches/{batchId}/gallery
+  - POST /batches/{batchId}/intake
+  - POST /batches/{batchId}/mortality-logs
+  - POST /batches/{batchId}/sales-logs
+  - POST /batches/{batchId}/vaccination-logs
+  - POST /batches/{batchId}/weight-logs
+
+💡 Schemathesis found no operation that creates this data - create it outside the test run and supply the identifiers in your config file
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 74/74
+  Tested: 74
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  🚫 Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ ST401 API accepts requests without authentication: 6
+  ❌ ST101 Server error: 1
+  ❌ ST401 Unexpected response to a request without authentication: 1
+  ❌ ST203 Missing required header accepted: 20
+  ❌ ST202 Schema-valid request rejected: 6
+  ❌ ST201 Schema-violating request accepted: 1
+  ❌ ST204 Wrong response to undeclared method: 25
+
+For more information, run `st explain <code>` for ST101, ST201, ST202, ST203, ST204, ST401.
+
+Errors:
+  🚫 Runtime Error: 1
+
+Warnings:
+  ⚠️ Authentication failed: 25 operations returned only 401/403 responses
+  ⚠️ Rate limited: 50 operations mostly returned 429 responses
+  ⚠️ Missing test data: 16 operations repeatedly returned 404 responses
+
+Test cases:
+  504 generated, 53 found 60 unique failures, 10 skipped
+
+Seed: 320598563014705939534785001334019512239
+
+================== 60 failures, 1 error, 3 warnings in 7.49s ===================
+
+SCHemathesis exit=1

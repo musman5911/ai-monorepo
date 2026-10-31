@@ -1,0 +1,189 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "--test", "tests/acceptance/sessions-auth.test.mjs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+TAP version 13
+# Subtest: A1: token is rejected after logout (dairy)
+not ok 1 - A1: token is rejected after logout (dairy)
+  ---
+  duration_ms: 6068.003484
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: 'logout must exist and succeed, got 404'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:18:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: A1: token is rejected after logout (agri)
+not ok 2 - A1: token is rejected after logout (agri)
+  ---
+  duration_ms: 18455.16476
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    old token still works after logout (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:20:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A1: token is rejected after logout (flock)
+not ok 3 - A1: token is rejected after logout (flock)
+  ---
+  duration_ms: 7214.535384
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    old token still works after logout (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:20:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A3: token lifetime is at most 24h (dairy)
+not ok 4 - A3: token lifetime is at most 24h (dairy)
+  ---
+  duration_ms: 7464.842558
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:27:3'
+  failureType: 'testCodeFailure'
+  error: 'TTL is 168h'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:32:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A3: token lifetime is at most 24h (flock)
+not ok 5 - A3: token lifetime is at most 24h (flock)
+  ---
+  duration_ms: 6790.977617
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:27:3'
+  failureType: 'testCodeFailure'
+  error: 'TTL is 168h'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:32:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# FINDING CHECK A2: token issued BEFORE password change returns HTTP 200 on /api/auth/me AFTER the change
+# Subtest: A2: old token is rejected after password change (dairy)
+not ok 6 - A2: old token is rejected after password change (dairy)
+  ---
+  duration_ms: 9651.696862
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:45:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    A2 BUG: token issued before the password change still works after it (HTTP 200, expected 401)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:66:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: BC-1: login rejects password differing only after byte 72 (dairy)
+not ok 7 - BC-1: login rejects password differing only after byte 72 (dairy)
+  ---
+  duration_ms: 5601.411274
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:73:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    truncated-variant password logged in (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:86:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: BC-1: login rejects password differing only after byte 72 (flock)
+not ok 8 - BC-1: login rejects password differing only after byte 72 (flock)
+  ---
+  duration_ms: 5262.830204
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:73:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    truncated-variant password logged in (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/sessions-auth.test.mjs:86:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 0
+# fail 8
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 67010.136535
+
+RUNNER EXIT=1 TIMEOUT=False SECONDS=67.31

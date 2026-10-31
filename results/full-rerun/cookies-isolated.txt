@@ -1,0 +1,14 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND vitest run -t "session cookie" tests/api-deep/timing-reset-auto-deep.test.ts
+
+ RUN  v3.2.7 /home/user/full-rerun
+
+ ✓ tests/api-deep/timing-reset-auto-deep.test.ts (8 tests | 5 skipped) 6659ms
+   ✓ ROUND 7: timing, reset, auto-backup, cookies > agri: session cookie (if issued) is HttpOnly + SameSite  316ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed | 5 skipped (8)
+   Start at  19:20:17
+   Duration  7.06s (transform 109ms, setup 0ms, collect 104ms, tests 6.66s, environment 0ms, prepare 114ms)
+
+EXIT=0

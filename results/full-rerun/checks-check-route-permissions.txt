@@ -1,0 +1,11 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-route-permissions"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-route-permissions
+> node tools/check-route-permissions.js
+
+Route permission inventory passed: 49 route modules are documented; all route modules are documented, imported by their server, and visibly mounted.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=0.42

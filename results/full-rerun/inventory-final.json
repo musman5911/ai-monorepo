@@ -1,0 +1,1534 @@
+{
+  "revision": "2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0",
+  "items": [
+    {
+      "path": "tests/acceptance/README.md",
+      "sha256": "c4d379f3c7078ae43de445df791176edab56607f17430c5efecf0a39a22435de",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/acceptance/_harness.mjs",
+      "sha256": "9cb2d7a3ef820ffa3d5193b817a82894a4d13322de78b1b94665ddecace9a4f3",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/acceptance/backups.test.mjs",
+      "sha256": "0d3ed04664f3a2e47a3805fff3c4045897022b57694d8590773161bd60522464",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance/flock-cards-farm-scope.test.mjs",
+      "sha256": "a2b6549453264986be7ebd2ce9ce5458b875a3986038e0ffe6f9d6e1f0f1c2d3",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance/frontend-service-worker-logout.test.mjs",
+      "sha256": "9bf095f850bb9c2d4a0b72d00729ef0aee656c4d9f5196ab57d601a1011f229e",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance/headers-csp.test.mjs",
+      "sha256": "3b6e58bb1790999d31b6d4602ae8c7ff7a6f8a6fc85be516ad7e7a06030ea114",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance/input-bounds.test.mjs",
+      "sha256": "4fd8eb764b9daf5123e613c7708da06914d8eabeb7a755066d3921306872baf9",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance/money-validation.test.mjs",
+      "sha256": "196ea98a52db66af44988c57302e7a4a06549cb5892c77b2074a2415ecb087de",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance/photos.test.mjs",
+      "sha256": "85aadb3d4d034ce4cfcf4e41343e2573aa2218b9c2f31d4bb92436b5b164cfb8",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance/sessions-auth.test.mjs",
+      "sha256": "2e53f0a3eebb152d6fb65148832ed57bd5011eae82785a14bde7670c8f75035f",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance/telegram.test.mjs",
+      "sha256": "03d884871dc99a09616789433be2b57357a60b89f65ad5f28525a248374a6bcf",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance-business/README.md",
+      "sha256": "c37e24e21cffb9e399d5e5f92c25dd527150922065cee96d63a4758a9b66b8c4",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/acceptance-business/agri-business.test.mjs",
+      "sha256": "f2ca690f39621f6fc8d556949d530b85ce7ff5333dc734fc7f93f4febf179a4b",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance-business/dairy-business.test.mjs",
+      "sha256": "580da91085cf0c5171b0fbd8a92f308d03b9cec2c28a57f22bf48f2417af2246",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance-business/dates-tz.test.mjs",
+      "sha256": "2231dce92ff3ca21e0629d191d1756ac21f172acbcfd6302d3f7236f7d6a13ac",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance-business/flock-business.test.mjs",
+      "sha256": "7ecd87c7c79dc37e62dbe4c70b86e4a93606ab36820cc5f998d1a29487e5f526",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "acceptance-final.txt"
+      ]
+    },
+    {
+      "path": "tests/acceptance-business/freeze-date.mjs",
+      "sha256": "0c3285338deea846d4fccdff2e13f1739351a2d9217e8147235b90c84baf9bf6",
+      "provenance": "historical-recovered",
+      "disposition": "SUPERSEDED_BROKEN_PRELOAD_NOT_RUN",
+      "evidence": []
+    },
+    {
+      "path": "tests/acceptance-business/frozen-server.mjs",
+      "sha256": "f8aa936ce61ca71c6faa62221a18508e6e94ce397c4a20aa7406485841d0e931",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/agri-bulk-api.test.ts",
+      "sha256": "86df80f95423d6623c7e006f7a68cc7503b538576a578045a7851bdaae648dfb",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/agri-bulk-import.test.ts",
+      "sha256": "1777d5ef29bab905ae8cd9340c6b33ab9aac1633d946b523b27934595d4dc4d4",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/agri-fields-cycles.test.ts",
+      "sha256": "37015f8136554ff6e8b2046e3327aa7b9c063de359df27465905026becc62b3a",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/agri-fields-screens.test.ts",
+      "sha256": "7bec548386c7840a1b2678c8c410199731f3009144219735ddb31650ffea509a",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/agri-photo-storage.test.ts",
+      "sha256": "278f041727e74f84b3c33f7b830f44286df193852486ee1fb408b2902c35a74b",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/agri-runtime-api.integration.test.ts",
+      "sha256": "125d79177fa4c07784193b98cb5268393c8f8e84a427a83393cbfb2641e016e1",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/agri-analytics-deep.test.ts",
+      "sha256": "130cebabd1341d2e740b8251ff5971f00c8d9f232386ed026386a981e55b5921",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/agri-filters-deep.test.ts",
+      "sha256": "3d03aff254a51790748990ed06284973e0dbc94903f83f83119fe68f1cd17d65",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/agri-liabilities-deep.test.ts",
+      "sha256": "0c7911596343a42c44afc5ed5360cd2949f30e4d6b98e060bca978928e00d0eb",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/allfarms-deletion-analytics-deep.test.ts",
+      "sha256": "1472bffa82917f0acf2f7e3b13fff21541d4bf48c3467ab409c44141c0d25c26",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/auth-isolation-deep.test.ts",
+      "sha256": "cefb2b9806087f776886048f51fbc9bab57694665913e19131d95d278c86cac4",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/backup-media-deep.test.ts",
+      "sha256": "2032ae7f0862105f10d58c13dcfd4610ed8034281f3b168925df0feef1e60a5c",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/concurrency-invariants.test.ts",
+      "sha256": "4759d3c82daf2f5462e0f4eb059cc7d9769e20563f1fa5218b7e4eb644dea8d7",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/coverage-sweep-deep.test.ts",
+      "sha256": "751887ef5082b56a17a4c3a0ec77e5ec7a536f4d11baf490190866f2dc5ab4d8",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/coverage-sweep2-deep.test.ts",
+      "sha256": "572527b7f7b5a8edf4ee5fd41fd1e2878cff042d35c16366df617800634d6d18",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/cross-realm-deep.test.ts",
+      "sha256": "2f44a43c467c94fc7fac7ab0f4affb8b64bc34608035f9061d859c1ad6b6be7b",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/farm-delete-data-deep.test.ts",
+      "sha256": "4c55220c1e8426078ba3ac4149bf9739968a5856b1087166239da9f5767ed2de",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/farm-transfer-deep.test.ts",
+      "sha256": "e5b92980187f865c20d82c6cdaa608b9b224a2eed7bd6c4e61b702b7b4b33035",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/fidelity-precision-deep.test.ts",
+      "sha256": "d9fda843a891dd6874391c900545b9546e4469477103cde032449111b365a687",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/flock-destructive-deep.test.ts",
+      "sha256": "d1af69db09f38774eca459e05c9b7ec58b317c12f14c6afcee4d9a4ecc1ea4c1",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/frontend-contract-deep.test.ts",
+      "sha256": "3a98deefae093295ab11a6b30a47a64a195fecb1811b6a64bc874d3f319a0d4a",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/fuzz-robustness.test.ts",
+      "sha256": "bef78883e66d65610867935b17e8310e466c9ce7edcf6720ab9b3c16438249f8",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/ids-unicode-uploads-deep.test.ts",
+      "sha256": "c34864ff414461dbf85b4e9666a925faac2f5c2b3b2b05b818d695a8b0d8bd6d",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/last-surface-deep.test.ts",
+      "sha256": "726138b641f38c281d0a50d9bc7635b84e4fee394184972d6e3918106723f766",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/load-lifetime-smuggling-deep.test.ts",
+      "sha256": "51a074c4dfdf83dc1d5a40e03e3dbf765ce3abbf1534c2fa18aee059e761dcb1",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/pagination-dates-backup-abuse.test.ts",
+      "sha256": "e48cf5a260bcc0b9d5735f7b7744408f3aa93e0b935c32f721ee0c85f3f58cba",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/protocol-exotic-deep.test.ts",
+      "sha256": "6d47266a774587304cbf449ea05f56b3c0c03627be2d62b21836c21e58567505",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/public-surface-deep.test.ts",
+      "sha256": "fcbfb6db61124fd2bd1d9c50a4cd12be748c399763e7f6ba24e60fc9324f3667",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/q1-delete-pinpoint-deep.test.ts",
+      "sha256": "3e53f69b25befed1c19d114e68bb6a5361138eb9ef98b8dfc494d127f47ba776",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round1-breeding-events.test.ts",
+      "sha256": "2aaf4c10ba34bf0f96d8c3149712061d77d3cc6f6e9d96d6530cf92cba186d95",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round10-flock-import-images.test.ts",
+      "sha256": "5421ae42754e600e36f07c6ff2b44f94d69fa6fe7070e472d31888b2bab8752b",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round11-role-agri.test.ts",
+      "sha256": "4c8ae885834e97bfff7fd9efe3cc7a6493fbe8743a914a4b8725b8a93fe6eca2",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round11-role-flock.test.ts",
+      "sha256": "36b250063368aceb508beee664ef8289b605d77d46728f7d6ca9661696434370",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round11-role-system.test.ts",
+      "sha256": "875013bea5a80f493a84ea27397493aafdb00066cfd30cc3438ec58844873401",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round12-photos-cloudinary.test.ts",
+      "sha256": "ccce812f0a6460935e3a9a53721f69b5a7b804ca82ccfa18ebc23394d359ddfa",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round12-photos-flock.test.ts",
+      "sha256": "f7ba4aee80c0ee59e58566b68b1b9654e17fdbc60c294bcf117e5a9bdc276ac1",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round13-sessions.test.ts",
+      "sha256": "1151f6e05da22e54d93cf771c88a0626c7a68affec742d34a2be3a25738d64c7",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round14-fuzz.test.ts",
+      "sha256": "f6705b66c358a231853dbb301d587d204527f8d21757facda2af3ce5a521766d",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round15-concurrency.test.ts",
+      "sha256": "6eaa27b6f54f34ca96e261306e333cc2a130f27bc80fcc5acd5ae9635d473a68",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round2-agri-fields.test.ts",
+      "sha256": "16a8f6abc28d92a3e954551c33184fc1f9f3572047695a9afa191e4df48dbb07",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round3-super-admin.test.ts",
+      "sha256": "9e59b1c8e93167446924aa5f91c2b6f762cb0fd31553048a3b683f7a2945bfff",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round4-backup-newmodels.test.ts",
+      "sha256": "d97a1a9d8dbc473f45fa7a88f42d3b098d18159427934a6a1c4a52fa6f935706",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round6-breeding-deep.test.ts",
+      "sha256": "d42d522c5cbae7f9b3a4cdc98ed9d576c666183d1f3fecc83277945a1cb031f1",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round7-agri-fields-deep.test.ts",
+      "sha256": "e33d74f4c8d118da5642972aedbcf3c7d25cd966ebee7d6dca57ecb98d34d332",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round8-summary-accuracy.test.ts",
+      "sha256": "d5490ac08bea6bed2154023d0021ef6f6e56f6ae1ce13befb79c9833652036f7",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/round9-backup-integrity.test.ts",
+      "sha256": "732b29d97434c2e3bbc138074aaa7de219f259dec5db2cc682c1deaaabd6e492",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/session-escalation-deep.test.ts",
+      "sha256": "730bb7eb2e3c3cf0794537915a271efff934e62ca99005b5bb765d82b2fbed93",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/telegram-bot-deep.test.ts",
+      "sha256": "dc5be66df507833ed0d6c594d9e1d0d3191453dbc7debde31d357aaad12426e1",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-deep/timing-reset-auto-deep.test.ts",
+      "sha256": "fc6ba12682d4d9733ea06baf16bd844c8752e9da6cfe0f8aa5411e5a696ffbf2",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-matrix/agri.api-matrix.test.ts",
+      "sha256": "1dae5fbb4b63c08477a3ec0cd6edb6b55e7a09f6891c2a6302c8e36adeae1869",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-matrix/backup-import-export.test.ts",
+      "sha256": "25d259e63953699477896d2c900cc38346c87f5c6873ce57168b93c55bdb8891",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "sha256": "03a97c311230b719e2e73bf17c08b849bbaa7999a38f07e11cb4683099ad66c2",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-matrix/flock.api-matrix.test.ts",
+      "sha256": "890e34cc6caa935a461844e602ff3d923792c1bb8fabdb9c3513f5551a95229f",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/api-matrix/harness.ts",
+      "sha256": "988553be0135ce62a0c996cc36c0957fca7863410764034f6c2ff0b778f686fe",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/archive-screens.test.ts",
+      "sha256": "4f146f0791275aa3ef46539e3b0ead43b0bf8add0ef04c1cfe8974e875d5ab54",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/archive.test.ts",
+      "sha256": "b949fb0a4f41c7b8e82fa1685bd43f9c930cfbf2cb965590e11cc7b96ed78bb1",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/auth-production-config.test.ts",
+      "sha256": "8a7a4cb8f4362856591dd28b11f46bc1641695fbe212cdf5fa5f9ab465bb526f",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/check-bundle-size.test.ts",
+      "sha256": "befb9bc2b363f1394cc520597d5ceed567bffc34d77690ca10b47c10efacfa57",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/cloudinary-store.test.ts",
+      "sha256": "17719d14ffb0314aec8b6d1231517d7d57ebd8b711265fcca2e475a1f101c797",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/dairy-breeding-events.test.ts",
+      "sha256": "6967532359d8bc1cc1141f2a1c52db262f820486d029a36d7c65678cfb0c2e65",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/dairy-breeding-screens.test.ts",
+      "sha256": "e2cbddfc917e8b75b0296c093ded28ee0724e215493b6bf40983682ca15bffde",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/dairy-calving-creates-calf.test.ts",
+      "sha256": "6461ff832b889384bb9b48d9d2db41f3407c2b5a22ac9ea35940a870da106a62",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/dairy-photo-runtime.integration.test.ts",
+      "sha256": "d6fa7ad0a7822ab3d3b671939b6e5633e5dcd844ccc41ce2c6bbb753101ebaca",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/final-db-preflight.test.ts",
+      "sha256": "3a9660bb2ce022457b777d42a0ffcad6fba2af876ccbac2ad177add8a9511b24",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-batch-history-guards.test.ts",
+      "sha256": "7d904eaeec60b059ab84c557ac7f9a41923818f15065aab41b9b11227d807687",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-batch-labor.test.ts",
+      "sha256": "5565bc015ae176d3e3403dfb0cc1ed8e47b728b367c8a7fdc5d05d6ec1003f85",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-batch-math.test.ts",
+      "sha256": "f0e126f622a0d4f47cf4f7a3a975633ca7fbd8823d80cff8a4bc40cf85486d0d",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-dark-login-background.test.ts",
+      "sha256": "6628dcc5b2fda51e5859f9056c400b103aa392ea4394007c407a69ece6e36f31",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-data-route-allocation.test.ts",
+      "sha256": "e687d6a1f1e318a11032aeab3366dfcef612b42dea2da13edd8aecbe1f7fd06d",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-egg-inventory-coordination.test.ts",
+      "sha256": "ee3a03d3af2251b88f9d54cb79d5f3556caf7eaea314698c09dbb70114510b32",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-egg-inventory-lock.test.ts",
+      "sha256": "7eada7811f559e5f93c01390f5d0ed3a2f6ded03bba9749081d803316b721a74",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-first-owner-setup.test.ts",
+      "sha256": "5d926a075ad3393f441b28eda46cabed14de5205bc7f7133f96a9af21191e823",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-image-backup.test.ts",
+      "sha256": "27b304c9ef89b76e064ae34386c83f972ac90112b370e7152746ce9b8c9b0754",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-image-references.test.ts",
+      "sha256": "f7b4916b216bded2093935361ca349992ca3049ed10154dc8cd437a72fb707c8",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/flock-incubation-allocation.test.ts",
+      "sha256": "89e9beb807046b6f35fd0513b2e9e6f23a7d04b36b17f23f7ebfef8e68e30a0a",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/full-rerun/bruno-smoke.mjs",
+      "sha256": "b222f8c40c5f041d1929f9fc8614383e560bdcca02725da31bdf7fe86164e2f5",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/full-rerun/business-probes.test.mjs",
+      "sha256": "080cf8734a8a0154312ae36b3769573a01fa1cfa94f619069d86ccc0c89d9815",
+      "provenance": "new-or-reconstructed",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "business-probes.txt"
+      ]
+    },
+    {
+      "path": "tests/full-rerun/eslint.config.mjs",
+      "sha256": "4ec28162fc64891d0310be1c126ce224ffbdc66884afb09e5c7fe9d0b9d4f847",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/full-rerun/latest-surface.test.mjs",
+      "sha256": "701d2bffc734d406878533071785ccdfaa572284fc7319f41267519417d4b630",
+      "provenance": "new-or-reconstructed",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "new-shop.txt"
+      ]
+    },
+    {
+      "path": "tests/full-rerun/scale-server.mjs",
+      "sha256": "0883f2c15f98bae59d45cea21ad49812b9028a69151f00c88e3098a32863a2ae",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/full-rerun/scale.test.mjs",
+      "sha256": "7e454cd56e6bcd8710ef44c764acb2fb3a622eb83132d79edeba029a5aa39fff",
+      "provenance": "new-or-reconstructed",
+      "disposition": "EXECUTED",
+      "evidence": [
+        "scale-final.txt"
+      ]
+    },
+    {
+      "path": "tests/full-rerun/seed-schema-load.mjs",
+      "sha256": "5675663a77f77b070ab73915d36ffae1038713ed68ccf8bd03cff551e6e80da6",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/full-rerun/stryker-farms.config.json",
+      "sha256": "75227cb5428ae83dfae8ef4b9654c1a0ed15014a4071a99671896345420e0720",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/full-rerun/stryker.config.json",
+      "sha256": "4f484e1dd926e59f6c2aa1c8f4e3719a768aa79a3ddb5e1f6d290975af590a17",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/full-rerun/vitest-farm-mutation.config.mjs",
+      "sha256": "776454ac352f21cc4f3ae5376ad125832a1e72329600c75466954b50f4a20a6c",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/full-rerun/vitest-mutation.config.mjs",
+      "sha256": "524aff812cf20f9b151f5684a2777166d3f7c5afa9a8e1b67ef964f7e966a354",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/muf-charts.test.ts",
+      "sha256": "d957cd511b37bafffc87c892e7cd57f84cd1606a0a41fdb547d2ae78bfe03f51",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/muf-compare.test.ts",
+      "sha256": "72bb806fab329aaa1d1bcc77d2a5f0d819e8aefeaf2bf846f42aa6fffb3a189d",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/muf-env-rate-limit.test.ts",
+      "sha256": "eb08f60db30dec6e13d2f016812d327a381bf17f04391f1fdaa828ae5851dce8",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/muf-farms-agri.test.ts",
+      "sha256": "d73656eeec9ae17348a5ac447eb94206f6f053d708b3ad6dd48be3db100011c0",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/muf-farms.test.ts",
+      "sha256": "35b5b2c1ca33f172e0d6a36a552577eeba19c2c4648970139d8da05144bd882b",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/muf-storage.test.ts",
+      "sha256": "d20ddc398ce681137e87f8e97acfd2a774a2710692dc5bc782da2511276f201b",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/muf-urdu-fallback-coverage.test.ts",
+      "sha256": "1aa8b57ccee2aa2fc996323f6c53ccea416924fe4b66259afc0805497ac45807",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/muf-zakat.test.ts",
+      "sha256": "3c56ddafa2838eaf2c374f4d2b4a422e69ffdd3a6005f515153993e3f6abe23b",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/phase-1-super-admin.test.ts",
+      "sha256": "cdd927402cff9119e98bbd0c5f0982b524e941e802da00b34cc15fbb181d18c2",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/phase1-backup-farm-context.test.ts",
+      "sha256": "0e94863300ae3509e070c56566006b6dc0541e7e2caef11fc6192b1ad543ee7f",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/phase3-farm-isolation.test.ts",
+      "sha256": "be19576407608c2ecf8d3920f3c076c4848c210e8120299f472cc42642a8f0e8",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/phase3-pagination.test.ts",
+      "sha256": "9c5f99d064c330ba0c04d505825067326c71b48e686ff7099a3938424fd05179",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/phase4-breeding-lineage.test.ts",
+      "sha256": "9809cb16d9476ecb08f8ea5acbed4ffdb4a42105aec7c40594ea4b9b7b7e3bdf",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/photo-client-migration.test.ts",
+      "sha256": "597cb719b6b7245879378a8a1ff81d9116336ae5bed9a3d043387ea1c5609890",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/photo-phase8-regression.test.ts",
+      "sha256": "a2024a09979d8ce072d89051b73d643e39969beeade934b2d5a5f82731d902fa",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/public-products.test.ts",
+      "sha256": "62db94e401ff5f01efe2a20b33f77ff4417524523051ca1ba61e333cb2cba536",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/public-route-security.test.ts",
+      "sha256": "a06e52d94b0a5841be0cdf5111549fd92895beff2b3ce4e93f748a29d43ce4be",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/build-full-specs.mjs",
+      "sha256": "f76d1ad31fd3800c2a42cfd01984321361e8fcc498b3d46742b86f9282ab4dae",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/fastcheck-commands.mjs",
+      "sha256": "e9e8480170f4c2cb35b8c3217b078a410f4a465a4f704203af2dd0d355ec4f73",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/final-p1-rerun.mjs",
+      "sha256": "582a9d8a9ac693e1edd11ba4b3a9ea8305f162d8d40373d8f9f6a66e386ea235",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/hypothesis_agri.py",
+      "sha256": "c2916649ebfd6752177f4496f49bb2344b536b09222150376a12694a88eed133",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/idor-authz-matrix.mjs",
+      "sha256": "14dea60c6a2aee3fe05d400bbbc5392ba25c7fdc1ab1fe2af2fda0fa16cc3d0c",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/patch-crypto.mjs",
+      "sha256": "e51c930b92a140080fc3daa2f770bb1e472791c504ce6c73a93485f349e40315",
+      "provenance": "historical-recovered",
+      "disposition": "OPTIONAL_INSTRUMENTATION_NOT_NEEDED",
+      "evidence": []
+    },
+    {
+      "path": "tests/round3/phase0-probe.sh",
+      "sha256": "234d6f6191eb4337973cc39b949207373f38e52cc00b3e5d6c510fc80b12f5b1",
+      "provenance": "historical-recovered",
+      "disposition": "SUPERSEDED_SETUP",
+      "evidence": [
+        "install.txt",
+        "environment.txt",
+        "specialist-install.txt",
+        "extra-tools-install.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/phase1-dynamic.mjs",
+      "sha256": "82237e92ee5d1f98a0d300c5b5910e158272470497677f2b7b271edb97e22934",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/phase1b-prod-proxy-cards.mjs",
+      "sha256": "0ff51515e509d10f851991f6fb7f094c1a7cab9f441c535b15089d79269582a4",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/phase1c-protocol-chaos-load.mjs",
+      "sha256": "d26d4cb610d5ed6a637c3e4a8627f3096731f4186442a3dadb5b1afc5ff7020b",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/phase1d-followups.mjs",
+      "sha256": "0ccdb1580ea60b36d231b3dd9f159ab2c5d9b0ce83065167f642221698755537",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/phase3-browser.mjs",
+      "sha256": "7a0c7c6daad50ce83a6d20ba67d3fd33243f2d352d7d5d9e485e7b4ed45b2537",
+      "provenance": "historical-recovered",
+      "disposition": "DEFERRED_OWNER_BROWSER",
+      "evidence": []
+    },
+    {
+      "path": "tests/round3/phase3-flock-cards-reverse.mjs",
+      "sha256": "c687688f38243bfd30ff822d6841b043ed725161edac1860afea9c5de5fc2479",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/phase3b-state.mjs",
+      "sha256": "ab74aba8212ddba327c01939194f83b8de50be90b788c9dcf4ff38fbe7c5aec9",
+      "provenance": "historical-recovered",
+      "disposition": "DEFERRED_OWNER_BROWSER",
+      "evidence": []
+    },
+    {
+      "path": "tests/round3/run-schemathesis-full.mjs",
+      "sha256": "4df29d6643924c5d980d0f509e1a2122fe8865f92056e9ddc9c32ca1848c9765",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "round3-status.json",
+        "schema-corrected.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/semgrep-custom.yaml",
+      "sha256": "3565656612bc1204cf88a0c3799f52fa98fd31fe8e0bc9cffa393b3c8f405393",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/round3/specs/spec-agri.yaml",
+      "sha256": "f1386ccfee3d20d3d05eb94b1436e207a9d26c21015bcdf88a4e1e6529e490b8",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCHEMA_OR_IDENTICAL_ALIAS",
+      "evidence": [
+        "schema-corrected.txt",
+        "schema-seed-agri.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/specs/spec-dairy.yaml",
+      "sha256": "30e162977005831fab94dea3a4acad70efb88a7479fad04cf6042e208d831091",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCHEMA_OR_IDENTICAL_ALIAS",
+      "evidence": [
+        "schema-corrected.txt",
+        "schema-seed-dairy.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/specs/spec-flock.yaml",
+      "sha256": "85c9b8681920a278f3af1f67ec6a9758c97049ca704ecfb20c4e5874649acfdb",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCHEMA_OR_IDENTICAL_ALIAS",
+      "evidence": [
+        "schema-corrected.txt",
+        "schema-seed-flock.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/specs-full/spec-agri-full.yaml",
+      "sha256": "b8b0b57b1bdf6ff1b7b3883f3fb722d3abc1f6c68188ec352cbfb57c36eb8857",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCHEMA_OR_IDENTICAL_ALIAS",
+      "evidence": [
+        "schema-corrected.txt",
+        "schema-seed-agri-full.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/specs-full/spec-dairy-full.yaml",
+      "sha256": "b4dd6e8464099ef6d68ece4b41ced1073dacd2f81ad9cbe116683fe53a3ee52f",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCHEMA_OR_IDENTICAL_ALIAS",
+      "evidence": [
+        "schema-corrected.txt",
+        "schema-seed-dairy-full.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/specs-full/spec-flock-full.yaml",
+      "sha256": "919a32c09a389a24f4f9265015a2f5c9fd95ddd41e683b6a85c20dd1274afb8f",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCHEMA_OR_IDENTICAL_ALIAS",
+      "evidence": [
+        "schema-corrected.txt",
+        "schema-seed-flock-full.txt"
+      ]
+    },
+    {
+      "path": "tests/round3/stryker.config.json",
+      "sha256": "795d51bb3ca7269fbe1d1072d04d342fb10557762e923a42e99f7946822daff5",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/route-matrix-policy.test.ts",
+      "sha256": "488f32d21baae62ec7ad472c1a212bfcde708b6cc09fbeab753540d5ae36a290",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/shop-isolation.test.ts",
+      "sha256": "8a1ecf3e5df78be06611c539f655912506bbe5b9d62fe5d33704b8473808d6c3",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/smoke.test.ts",
+      "sha256": "88823e846aebe789ea7071ea2fc22dd74c72ade79e3b7d93ae0cd738f21305dd",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/telegram-farm-scope.test.ts",
+      "sha256": "eb2db4c17efeb296de904fecbf91bb774d509905ba4be475c93a85d67c0a56a4",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/agri-login.bru",
+      "sha256": "9f9e881214bc0ccff0907c336354e68425c06ca127b8cf4bb83e6e1f7faffb17",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_REQUEST_SMOKE_NO_ASSERTIONS",
+      "evidence": [
+        "bruno.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/bruno.json",
+      "sha256": "0eac49c26350cfeecc065bd5763332c632c283b1c5ef09377fe56d3636c5478b",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/dairy-cows-list.bru",
+      "sha256": "93c67ccd4cab389cb620f52c8fd73e3105b8563ff5f1a16b735250f627255341",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_REQUEST_SMOKE_NO_ASSERTIONS",
+      "evidence": [
+        "bruno.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/dairy-login.bru",
+      "sha256": "7351b481222c2b02a48c36a8ff92668b15fc51e70fa1e1e0c44e8480254a498d",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_REQUEST_SMOKE_NO_ASSERTIONS",
+      "evidence": [
+        "bruno.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/flock-batches-list.bru",
+      "sha256": "a68833d1e288229f1709e6913dc71dd8aad8a107c21149229fcd8665c613dfcb",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_REQUEST_SMOKE_NO_ASSERTIONS",
+      "evidence": [
+        "bruno.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/fastcheck-invariants.test.ts",
+      "sha256": "8a91f9205832af31c8f67227042abbec9197e8e20e71e94cced6131c91b1f56a",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/security-scan.test.ts",
+      "sha256": "e88769c7087133a0757543a892d8f6f6470085b5e8983360f967805a8ee376f6",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/spawn.mjs",
+      "sha256": "45630bb73dc63784f174f8d856f88e0f6feacd1de37a9ab8da9d63a93926517b",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/toolchain/spec-agri.yaml",
+      "sha256": "f1386ccfee3d20d3d05eb94b1436e207a9d26c21015bcdf88a4e1e6529e490b8",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCHEMA_OR_IDENTICAL_ALIAS",
+      "evidence": [
+        "schema-corrected.txt",
+        "schema-seed-agri.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/spec-dairy.yaml",
+      "sha256": "30e162977005831fab94dea3a4acad70efb88a7479fad04cf6042e208d831091",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCHEMA_OR_IDENTICAL_ALIAS",
+      "evidence": [
+        "schema-corrected.txt",
+        "schema-seed-dairy.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/spec-flock.yaml",
+      "sha256": "85c9b8681920a278f3af1f67ec6a9758c97049ca704ecfb20c4e5874649acfdb",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCHEMA_OR_IDENTICAL_ALIAS",
+      "evidence": [
+        "schema-corrected.txt",
+        "schema-seed-flock.txt"
+      ]
+    },
+    {
+      "path": "tests/toolchain/stryker.config.json",
+      "sha256": "5e201d0931e92f8008e8f04c0ccaafb93afb0391ba660c9271299ca749b05d72",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/verification/RUN-REAL-MONGO.md",
+      "sha256": "5ed09fb67c110987ef8af932d3b00ce413b4265f12d134a10e575e788dcf581b",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/verification/__pycache__/load-locust.cpython-311.pyc",
+      "sha256": "c6c87fec04566893cc02cc71b8b57ea5d7f0af51d6600f0437843605c58b4e9e",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/verification/__pycache__/locust-agri.cpython-311.pyc",
+      "sha256": "25634b442668a8ad5a9549042c2258a10f9f175ed1d9313cb591acd94f17b508",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/verification/authz-matrix.mjs",
+      "sha256": "14dea60c6a2aee3fe05d400bbbc5392ba25c7fdc1ab1fe2af2fda0fa16cc3d0c",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "verification-status.json",
+        "locust-agri-original.txt"
+      ]
+    },
+    {
+      "path": "tests/verification/contested-probes-output.txt",
+      "sha256": "8e776f5572f012c9cd3727c2470fc7f0ed9a1817f5796a78f4c4bddeccee8a3a",
+      "provenance": "historical-recovered",
+      "disposition": "OLD_REFERENCE_OUTPUT_NOT_NEW_EVIDENCE",
+      "evidence": []
+    },
+    {
+      "path": "tests/verification/contested-probes.sh",
+      "sha256": "5a88b0eea3449b1023472441a29911ebb3e423b99b1ae1ee00107e72b67eb41e",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "verification-status.json",
+        "locust-agri-original.txt"
+      ]
+    },
+    {
+      "path": "tests/verification/load-locust.py",
+      "sha256": "836cfcbd888022d0ba32ce5060ff6ebce8ea5148a4861f3d23ce00280c6ecb30",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "verification-status.json",
+        "locust-agri-original.txt"
+      ]
+    },
+    {
+      "path": "tests/verification/locust-agri.py",
+      "sha256": "fdbfe81c05a84bfcec968b67300eedd7f514dd1aa611ac074a134a5c0e9af05b",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "verification-status.json",
+        "locust-agri-original.txt"
+      ]
+    },
+    {
+      "path": "tests/verification/run-load.sh",
+      "sha256": "2973e6bd40c75a543be156cf321efaf141f7c527e866bdcc2d59e810b592ab20",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_SCRIPT",
+      "evidence": [
+        "verification-status.json",
+        "locust-agri-original.txt"
+      ]
+    },
+    {
+      "path": "tests/verification/semgrep-rules.yml",
+      "sha256": "8ccfe5ec33073c44ad72b418ec63f6f9f9810be2b8fbeb124ed52b5009fc4d5e",
+      "provenance": "historical-recovered",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    },
+    {
+      "path": "tests/verification/unit-farm-guards.test.ts",
+      "sha256": "543bba1881775ddf0ee3df53973fd1b9e25929a1db8797ca2c063e8d8302ae04",
+      "provenance": "historical-recovered",
+      "disposition": "EXECUTED_HISTORICAL",
+      "evidence": [
+        "historical-legacy-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/workflow-contract.test.ts",
+      "sha256": "cd724a2dc6959248c78a73ef527317666fbc5db972056487fd2c0145bf161f20",
+      "provenance": "latest-upstream",
+      "disposition": "EXECUTED_UPSTREAM",
+      "evidence": [
+        "upstream-vitest.txt"
+      ]
+    },
+    {
+      "path": "tests/full-rerun/README.md",
+      "sha256": "15397e7c273306c70695494e0fc8e28d306b1fcac7e221c02c169df27df7de73",
+      "provenance": "new-or-reconstructed",
+      "disposition": "SUPPORT_FILE",
+      "evidence": []
+    }
+  ]
+}

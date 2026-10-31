@@ -1,0 +1,10 @@
+git rev-parse HEAD: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+command: node tests/round3/fastcheck-commands.mjs
+environment: Agri direct local server, NODE_ENV=test, MEMORY_MODE=1
+setup token=ok
+fast-check commands: FAIL -> Property failed after 2 tests
+{ seed: 1249659084, path: "1:1:1:0:0:0", endOnFailure: true }
+Counterexample: [Create(-1) /*replayPath="H:B"*/]
+Shrunk 5 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run

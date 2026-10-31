@@ -1,0 +1,21 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["/home/user/rerun-extra-tools/node_modules/.bin/knip", "--no-progress"]
+file:///home/user/rerun-extra-tools/node_modules/oxc-parser/src-js/raw-transfer/common.js:294
+  const arrayBuffer = new ArrayBuffer(ARRAY_BUFFER_SIZE);
+                      ^
+
+RangeError: Array buffer allocation failed
+    at new ArrayBuffer (<anonymous>)
+    at createBuffer (file:///home/user/rerun-extra-tools/node_modules/oxc-parser/src-js/raw-transfer/common.js:294:23)
+    at prepareRaw (file:///home/user/rerun-extra-tools/node_modules/oxc-parser/src-js/raw-transfer/common.js:208:55)
+    at parseSyncRawImpl (file:///home/user/rerun-extra-tools/node_modules/oxc-parser/src-js/raw-transfer/common.js:42:53)
+    at parseSyncRaw (file:///home/user/rerun-extra-tools/node_modules/oxc-parser/src-js/raw-transfer/eager.js:16:10)
+    at parseSync (file:///home/user/rerun-extra-tools/node_modules/oxc-parser/src-js/index.js:60:12)
+    at parseFile (file:///home/user/rerun-extra-tools/node_modules/knip/dist/typescript/ast-nodes.js:13:12)
+    at runPlugin (file:///home/user/rerun-extra-tools/node_modules/knip/dist/WorkspaceWorker.js:358:47)
+    at async WorkspaceWorker.runPlugins (file:///home/user/rerun-extra-tools/node_modules/knip/dist/WorkspaceWorker.js:446:33)
+    at async build (file:///home/user/rerun-extra-tools/node_modules/knip/dist/graph/build.js:186:35)
+
+Node.js v22.22.3
+
+EXIT=1 TIMEOUT=False

@@ -1,0 +1,187 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "--test", "tests/acceptance/headers-csp.test.mjs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+TAP version 13
+# Subtest: C1: production responses include Content-Security-Policy (dairy)
+not ok 1 - C1: production responses include Content-Security-Policy (dairy)
+  ---
+  duration_ms: 2131.044032
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: 'no CSP header in production (HTTP 200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ~
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:25:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: C1: production responses include Content-Security-Policy (agri)
+not ok 2 - C1: production responses include Content-Security-Policy (agri)
+  ---
+  duration_ms: 2487.15445
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: 'no CSP header in production (HTTP 200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: ~
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:25:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C3: authenticated responses send Cache-Control no-store (dairy)
+not ok 3 - C3: authenticated responses send Cache-Control no-store (dairy)
+  ---
+  duration_ms: 3372.62072
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:32:3'
+  failureType: 'testCodeFailure'
+  error: 'Cache-Control is "(absent)"'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:38:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C3: authenticated responses send Cache-Control no-store (agri)
+not ok 4 - C3: authenticated responses send Cache-Control no-store (agri)
+  ---
+  duration_ms: 6982.062643
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:32:3'
+  failureType: 'testCodeFailure'
+  error: 'Cache-Control is "(absent)"'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:38:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C3: authenticated responses send Cache-Control no-store (flock)
+not ok 5 - C3: authenticated responses send Cache-Control no-store (flock)
+  ---
+  duration_ms: 3483.912946
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:32:3'
+  failureType: 'testCodeFailure'
+  error: 'Cache-Control is "(absent)"'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:38:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: SG-2: production boot refuses MEMORY_MODE=1 (dairy)
+ok 6 - SG-2: production boot refuses MEMORY_MODE=1 (dairy)
+  ---
+  duration_ms: 1625.133513
+  type: 'test'
+  ...
+# Subtest: SG-2: production boot refuses MEMORY_MODE=1 (agri)
+ok 7 - SG-2: production boot refuses MEMORY_MODE=1 (agri)
+  ---
+  duration_ms: 1619.86653
+  type: 'test'
+  ...
+# Subtest: SG-2: production boot refuses MEMORY_MODE=1 (flock)
+ok 8 - SG-2: production boot refuses MEMORY_MODE=1 (flock)
+  ---
+  duration_ms: 1217.395371
+  type: 'test'
+  ...
+# Subtest: SG-1: production boot refuses weak JWT_SECRET "secret" (dairy)
+ok 9 - SG-1: production boot refuses weak JWT_SECRET "secret" (dairy)
+  ---
+  duration_ms: 10087.596488
+  type: 'test'
+  ...
+# Subtest: SG-1: production boot refuses weak JWT_SECRET "secret" (agri)
+ok 10 - SG-1: production boot refuses weak JWT_SECRET "secret" (agri)
+  ---
+  duration_ms: 6054.048355
+  type: 'test'
+  ...
+# Subtest: SG-1: production boot refuses weak JWT_SECRET "secret" (flock)
+not ok 11 - SG-1: production boot refuses weak JWT_SECRET "secret" (flock)
+  ---
+  duration_ms: 1246.611486
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:65:3'
+  failureType: 'testCodeFailure'
+  error: 'production server booted with JWT_SECRET=secret'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:78:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# FINDING CHECK RL-1/proxy: wrong-login statuses via appending proxy: 401,401,401,401,401,429
+# Subtest: RL-1 (behind appending proxy): rotating fake XFF still gets rate-limited 429 (dairy)
+ok 12 - RL-1 (behind appending proxy): rotating fake XFF still gets rate-limited 429 (dairy)
+  ---
+  duration_ms: 1868.161948
+  type: 'test'
+  ...
+# FINDING CHECK RL-1/direct: wrong-login statuses with rotating XFF, direct: 401,401,401,401,401,401,401,401,401,401,401,401,401,401
+# Subtest: RL-1 (direct exposure, P2): rotating X-Forwarded-For must not defeat the login limiter (dairy)
+not ok 13 - RL-1 (direct exposure, P2): rotating X-Forwarded-For must not defeat the login limiter (dairy)
+  ---
+  duration_ms: 3115.887116
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:134:1'
+  failureType: 'testCodeFailure'
+  error: 'RL-1 BUG (direct exposure, P2): 14 wrong logins with rotating X-Forwarded-For never got a 429 (got 401,401,401,401,401,401,401,401,401,401,401,401,401,401) — the limiter trusts a spoofable header'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/headers-csp.test.mjs:139:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 6
+# fail 7
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 45725.314166
+
+RUNNER EXIT=1 TIMEOUT=False SECONDS=45.95

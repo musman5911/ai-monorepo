@@ -1,0 +1,225 @@
+{
+  "revision": "2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0",
+  "jobs": [
+    {
+      "name": "check-sync",
+      "args": [
+        "npm",
+        "run",
+        "check-sync"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.94,
+      "log": "results/full-rerun/checks-check-sync.txt"
+    },
+    {
+      "name": "check-ui",
+      "args": [
+        "npm",
+        "run",
+        "check-ui"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.32,
+      "log": "results/full-rerun/checks-check-ui.txt"
+    },
+    {
+      "name": "check-workbench",
+      "args": [
+        "npm",
+        "run",
+        "check-workbench"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.22,
+      "log": "results/full-rerun/checks-check-workbench.txt"
+    },
+    {
+      "name": "check-workbench-runtime",
+      "args": [
+        "npm",
+        "run",
+        "check-workbench-runtime"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 2.48,
+      "log": "results/full-rerun/checks-check-workbench-runtime.txt"
+    },
+    {
+      "name": "check-farms",
+      "args": [
+        "npm",
+        "run",
+        "check-farms"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 11.22,
+      "log": "results/full-rerun/checks-check-farms.txt"
+    },
+    {
+      "name": "check-breeding-events",
+      "args": [
+        "npm",
+        "run",
+        "check-breeding-events"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 2.07,
+      "log": "results/full-rerun/checks-check-breeding-events.txt"
+    },
+    {
+      "name": "check-super-admin",
+      "args": [
+        "npm",
+        "run",
+        "check-super-admin"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 10.74,
+      "log": "results/full-rerun/checks-check-super-admin.txt"
+    },
+    {
+      "name": "check-docs",
+      "args": [
+        "npm",
+        "run",
+        "check-docs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.68,
+      "log": "results/full-rerun/checks-check-docs.txt"
+    },
+    {
+      "name": "check-bundle-size",
+      "args": [
+        "npm",
+        "run",
+        "check-bundle-size"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.47,
+      "log": "results/full-rerun/checks-check-bundle-size.txt"
+    },
+    {
+      "name": "check-archive",
+      "args": [
+        "npm",
+        "run",
+        "check-archive"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 15.13,
+      "log": "results/full-rerun/checks-check-archive.txt"
+    },
+    {
+      "name": "check-audit",
+      "args": [
+        "npm",
+        "run",
+        "check-audit"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 8.53,
+      "log": "results/full-rerun/checks-check-audit.txt"
+    },
+    {
+      "name": "check-secrets",
+      "args": [
+        "npm",
+        "run",
+        "check-secrets"
+      ],
+      "exit": 2,
+      "timeout": false,
+      "seconds": 0.44,
+      "log": "results/full-rerun/checks-check-secrets.txt"
+    },
+    {
+      "name": "check-route-permissions",
+      "args": [
+        "npm",
+        "run",
+        "check-route-permissions"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.42,
+      "log": "results/full-rerun/checks-check-route-permissions.txt"
+    },
+    {
+      "name": "check-route-matrix",
+      "args": [
+        "npm",
+        "run",
+        "check-route-matrix"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 31.43,
+      "log": "results/full-rerun/checks-check-route-matrix.txt"
+    },
+    {
+      "name": "check-shop",
+      "args": [
+        "npm",
+        "run",
+        "check-shop"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 3.39,
+      "log": "results/full-rerun/checks-check-shop.txt"
+    },
+    {
+      "name": "check-final-db",
+      "args": [
+        "npm",
+        "run",
+        "check-final-db"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 3.54,
+      "log": "results/full-rerun/checks-check-final-db.txt"
+    },
+    {
+      "name": "lint-agri",
+      "args": [
+        "npm",
+        "--prefix",
+        "agri_farm/frontend",
+        "run",
+        "lint"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.78,
+      "log": "results/full-rerun/checks-lint-agri.txt"
+    },
+    {
+      "name": "lint-flock",
+      "args": [
+        "npm",
+        "--prefix",
+        "flock_farm/client",
+        "run",
+        "lint"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 64.5,
+      "log": "results/full-rerun/checks-lint-flock.txt"
+    }
+  ]
+}

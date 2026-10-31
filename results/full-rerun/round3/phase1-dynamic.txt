@@ -1,0 +1,207 @@
+git rev-parse HEAD: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+environment: direct local servers, NODE_ENV=test, MEMORY_MODE=1, no proxy, no real MongoDB
+command: node tests/round3/phase1-dynamic.mjs
+[dairy stdout] [startup] PORT env=18101 -> listening on 18101
+[dairy stdout] 🧠 In-memory store active (MEMORY_MODE=1) — no MongoDB connection.
+[dairy stderr] (node:6505) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `node --trace-warnings ...` to show where the warning 
+[dairy stderr] (node:6505) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[dairy stdout] Server running on port 18101
+[dairy stdout] 🌱 Demo data seeded (1 year): 16 animals, 3187 milk entries, 257 expenses, health, buyers, rates, sales, diary.
+[dairy stdout] 🌱 Logins → admin / admin123   |   worker / worker123
+[dairy stdout] [farms] tagged 16 Cow record(s)
+[dairy stdout] [farms] tagged 4 BreedingEvent record(s)
+[dairy stdout] [farms] tagged 3187 Milk record(s)
+[dairy stdout] [farms] tagged 268 Expense record(s)
+[dairy stdout] [farms] tagged 3 Laborer record(s)
+[dairy stdout] [farms] tagged 782 LaborAttendance record(s)
+[dairy stdout] [farms] tagged 2 LaborAdvance record(s)
+[dairy stdout] [farms] tagged 1 Rate record(s)
+[dairy stdout] [farms] tagged 15 Health record(s)
+[dairy stdout] [farms] tagged 3 Buyer record(s)
+[dairy stdout] [farms] tagged 72 BuyerPayment record(s)
+[dairy stdout] [farms] tagged 2 Supplier record(s)
+[dairy stdout] [farms] tagged 24 SupplierPayment record(s)
+[dairy stdout] [farms] tagged 8 RateHistory record(s)
+[dairy stdout] [farms] tagged 30 DailyLog record(s)
+[dairy stdout] [farms] tagged 1 Sale record(s)
+[dairy stdout] [farms] converted 1 admin account(s) to owner
+[dairy stdout] [farms] assigned 1 account(s) to the default farm
+[dairy stdout] 💾 [Auto Backup] Saved auto-2026-10
+dairy login admin: HTTP 200 token=present
+dairy login worker: HTTP 200 token=present
+[agri stdout] [startup] PORT env=18102 -> listening on 18102
+[agri stdout] 🧠 [Database] MEMORY_MODE=1 — using in-memory demo database (data is lost on restart).
+[agri stdout] 🌱 [Demo] Seeding in-memory database with realistic demo farm data...
+[agri stdout] 🌱 [Demo] Demo data seeded successfully.
+🌱 [Demo] Login -> admin / admin123  (or)  worker / worker123
+[agri stdout] [farms] tagged 6 Crop record(s)
+[agri stdout] [farms] tagged 56 Finance record(s)
+[agri stdout] [farms] tagged 5 Task record(s)
+[agri stdout] [farms] tagged 4 Inventory record(s)
+[agri stdout] [farms] tagged 2 Liability record(s)
+[agri stdout] [farms] tagged 15 Irrigation record(s)
+[agri stdout] [farms] tagged 2 CropPhoto record(s)
+[agri stdout] [farms] tagged 6 Spray record(s)
+[agri stdout] [farms] tagged 2 Laborer record(s)
+[agri stdout] [farms] tagged 574 Attendance record(s)
+[agri stdout] [farms] tagged 2 LaborAdvance record(s)
+[farms] tagged 2 Supplier record(s)
+[agri stdout] [farms] tagged 24 SupplierPayment record(s)
+[agri stdout] [farms] converted 1 admin account(s) to owner
+[farms] assigned 1 account(s) to the default farm
+[agri stdout] 👑 [Status] Administrator account verified.
+[agri stdout] 💾 [Auto Backup] Saved auto-2026-10
+[agri stdout] ⏰ [Cron Engine] Internal scheduler disabled (DISABLE_INTERNAL_SCHEDULER=1). Use an external cron to ping /cron/dispatch-report.
+[agri stderr] (node:6640) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `node --trace-warnings ...` to show where the warning 
+[agri stderr] (node:6640) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[agri stdout] Server running on port 18102
+agri login admin: HTTP 200 token=present
+agri login worker: HTTP 200 token=present
+[flock stderr] ⚠️  MEMORY_DB mode: using in-process data store — all data is lost on restart. NEVER use in production.
+[flock stdout] ◇ injected env (0) from .env // tip: ⌘ override existing { override: true }
+[flock stdout] [startup] PORT env=18103 -> listening on 18103
+[flock stdout] 🧠 In-memory store active (MEMORY_MODE=1) — no MongoDB connection.
+[flock stderr] (node:6828) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `node --trace-warnings ...` to show where the warning 
+[flock stderr] (node:6828) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[flock stdout] 🐔 Flock Farm server running on port 18103
+[flock stdout] 🌱 Demo data seeded (1 year): birds, feed, eggs, sales, batches, health, diary.
+[flock stdout] 🌱 Logins → admin / admin123   |   worker / worker123
+[flock stdout] [farms] tagged 16 DataStore record(s)
+[flock stdout] [farms] tagged 2 Batch record(s)
+[flock stdout] [farms] tagged 26 BatchFeedLog record(s)
+[flock stdout] [farms] tagged 5 BatchMortalityLog record(s)
+[flock stdout] [farms] tagged 5 BatchExpenseLog record(s)
+[flock stdout] [farms] tagged 2 BatchSaleLog record(s)
+[flock stdout] [farms] tagged 12 BatchWeightLog record(s)
+[flock stdout] [farms] converted 1 admin account(s) to owner
+[flock stdout] [farms] assigned 1 account(s) to the default farm
+[flock stdout] 💾 [Auto Backup] Saved auto-2026-10
+flock login admin: HTTP 200 token=present
+flock login worker: HTTP 200 token=present
+
+=== dairy Phase1A/J headers/auth/public ===
+dairy anon GET /farms: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Not authorized"} 
+dairy owner GET /farms: HTTP 200 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"farms":[{"id":"e54005eb013c7c03dd71df3c","_id":"e54005eb013c7c03dd71df3c","name":"Farm 1","location":"Local demo farm","archived":false,"createdAt":"2020-01-01T00:00:00.000Z"},{"id":"22f0ee435eb5644804afb370","_id":"22f0ee435eb5644804afb370","name":"Farm 2 - Access Test","location":"Isolated role-testing farm","archived":false,"createdAt":"2020-01-02T00:00:00.000Z"}],"activeFarmId":"e54005eb013c7c03dd71df3c","mode":"single"} 
+dairy worker GET /farms: HTTP 200 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"farms":[{"id":"e54005eb013c7c03dd71df3c","_id":"e54005eb013c7c03dd71df3c","name":"Farm 1","location":"Local demo farm","archived":false,"createdAt":"2020-01-01T00:00:00.000Z"}],"activeFarmId":"e54005eb013c7c03dd71df3c","mode":"single"} 
+dairy anon GET /farms/public: HTTP 404 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"API route not found: GET /farms/public"} 
+dairy CORS evil origin: HTTP 200 ACAO=https://evil.example.com ACAC=null
+dairy tampered JWT GET /farms: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Token invalid"} 
+dairy garbage JWT GET /farms: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Token invalid"} 
+dairy NoSQL login object probe: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Invalid credentials"} 
+dairy proto pollution query GET /farms: HTTP 200 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"farms":[{"id":"e54005eb013c7c03dd71df3c","_id":"e54005eb013c7c03dd71df3c","name":"Farm 1","location":"Local demo farm","archived":false,"createdAt":"2020-01-01T00:00:00.000Z"},{"id":"22f0ee435eb5644804afb370","_id":"22f0ee435eb5644804afb370","name":"Farm 2 - Access Test","location":"Isolated role-testing farm","archived":false,"createdAt":"2020-01-02T00:00:00.000Z"}],"activeFarmId":"e54005eb013c7c03dd71df3c","mode":"single"} 
+dairy Object.prototype.polluted after probe: undefined
+dairy A1 logout+reuse: logout HTTP 404; reuse GET /farms HTTP 200 => TOKEN STILL WORKS
+
+=== agri Phase1A/J headers/auth/public ===
+agri anon GET /farms: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"detail":"Invalid or expired authentication credentials"} 
+agri owner GET /farms: HTTP 200 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"farms":[{"id":"cf8472be1a88041c09462671","_id":"cf8472be1a88041c09462671","name":"Farm 1","location":"Local demo farm","archived":false,"createdAt":"2020-01-01T00:00:00.000Z"},{"id":"b2c9d24530c100325e31ecae","_id":"b2c9d24530c100325e31ecae","name":"Farm 2 - Access Test","location":"Isolated role-testing farm","archived":false,"createdAt":"2020-01-02T00:00:00.000Z"}],"activeFarmId":"cf8472be1a88041c09462671","mode":"single"} 
+agri worker GET /farms: HTTP 200 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"farms":[{"id":"cf8472be1a88041c09462671","_id":"cf8472be1a88041c09462671","name":"Farm 1","location":"Local demo farm","archived":false,"createdAt":"2020-01-01T00:00:00.000Z"}],"activeFarmId":"cf8472be1a88041c09462671","mode":"single"} 
+agri anon GET /farms/public: HTTP 404 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"detail":"API route not found: GET /farms/public"} 
+agri CORS evil origin: HTTP 200 ACAO=https://evil.example.com ACAC=true
+agri tampered JWT GET /farms: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"detail":"Invalid or expired authentication credentials"} 
+agri garbage JWT GET /farms: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"detail":"Invalid or expired authentication credentials"} 
+agri NoSQL login object probe: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"detail":"Invalid email/username or password"} 
+agri proto pollution query GET /farms: HTTP 200 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"farms":[{"id":"cf8472be1a88041c09462671","_id":"cf8472be1a88041c09462671","name":"Farm 1","location":"Local demo farm","archived":false,"createdAt":"2020-01-01T00:00:00.000Z"},{"id":"b2c9d24530c100325e31ecae","_id":"b2c9d24530c100325e31ecae","name":"Farm 2 - Access Test","location":"Isolated role-testing farm","archived":false,"createdAt":"2020-01-02T00:00:00.000Z"}],"activeFarmId":"cf8472be1a88041c09462671","mode":"single"} 
+agri Object.prototype.polluted after probe: undefined
+agri A1 logout+reuse: logout HTTP 200; reuse GET /farms HTTP 200 => TOKEN STILL WORKS
+
+=== flock Phase1A/J headers/auth/public ===
+flock anon GET /farms: HTTP 401 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Authentication required"} 
+flock owner GET /farms: HTTP 200 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"farms":[{"id":"ba8b3a3071bbd712e49109dc","_id":"ba8b3a3071bbd712e49109dc","name":"Farm 1","location":"Local demo farm","archived":false,"createdAt":"2020-01-01T00:00:00.000Z"},{"id":"bc09ca5ee04386e1a2a2d48e","_id":"bc09ca5ee04386e1a2a2d48e","name":"Farm 2 - Access Test","location":"Isolated role-testing farm","archived":false,"createdAt":"2020-01-02T00:00:00.000Z"}],"activeFarmId":"ba8b3a3071bbd712e49109dc","mode":"single"} 
+flock worker GET /farms: HTTP 200 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"farms":[{"id":"ba8b3a3071bbd712e49109dc","_id":"ba8b3a3071bbd712e49109dc","name":"Farm 1","location":"Local demo farm","archived":false,"createdAt":"2020-01-01T00:00:00.000Z"}],"activeFarmId":"ba8b3a3071bbd712e49109dc","mode":"single"} 
+flock anon GET /farms/public: HTTP 404 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"API route not found: GET /farms/public"} 
+flock CORS evil origin: HTTP 200 ACAO=https://evil.example.com ACAC=true
+flock tampered JWT GET /farms: HTTP 401 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Invalid or expired token"} 
+flock garbage JWT GET /farms: HTTP 401 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Invalid or expired token"} 
+flock NoSQL login object probe: HTTP 401 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Invalid username or password"} 
+flock proto pollution query GET /farms: HTTP 200 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"farms":[{"id":"ba8b3a3071bbd712e49109dc","_id":"ba8b3a3071bbd712e49109dc","name":"Farm 1","location":"Local demo farm","archived":false,"createdAt":"2020-01-01T00:00:00.000Z"},{"id":"bc09ca5ee04386e1a2a2d48e","_id":"bc09ca5ee04386e1a2a2d48e","name":"Farm 2 - Access Test","location":"Isolated role-testing farm","archived":false,"createdAt":"2020-01-02T00:00:00.000Z"}],"activeFarmId":"ba8b3a3071bbd712e49109dc","mode":"single"} 
+flock Object.prototype.polluted after probe: undefined
+flock A1 logout+reuse: logout HTTP 200; reuse GET /farms HTTP 200 => TOKEN STILL WORKS
+
+=== cross-app JWT ===
+dairy owner token -> agri /farms: HTTP 401
+dairy owner token -> flock /farms: HTTP 401
+agri owner token -> dairy /farms: HTTP 401
+agri owner token -> flock /farms: HTTP 401
+flock owner token -> dairy /farms: HTTP 401
+flock owner token -> agri /farms: HTTP 401
+
+=== Phase14 public cards ===
+dairy list /buyers: HTTP 200 rows=3 firstId=b2
+dairy ANON card /cards/buyer/b2: HTTP 200 cache-control=no-store, no-cache, must-revalidate, private csp=absent xcto=nosniff xfo=SAMEORIGIN robots=noindex, nofollow, noarchive referrer=no-referrer body=<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Buyer Card — Usman Dairy Farm</title>
+<link rel="icon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet"> phonePattern=true bytes=12905
+dairy list /suppliers: HTTP 200 rows=2 firstId=sup1
+dairy ANON card /cards/supplier/sup1: HTTP 200 cache-control=no-store, no-cache, must-revalidate, private csp=absent xcto=nosniff xfo=SAMEORIGIN robots=noindex, nofollow, noarchive referrer=no-referrer body=<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supplier Card — Usman Dairy Farm</title>
+<link rel="icon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="styleshee phonePattern=true bytes=11473
+dairy list /labor/workers: HTTP 200 rows=3 firstId=lw-demo-1
+dairy ANON card /cards/worker/lw-demo-1: HTTP 200 cache-control=no-store, no-cache, must-revalidate, private csp=absent xcto=nosniff xfo=SAMEORIGIN robots=noindex, nofollow, noarchive referrer=no-referrer body=<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Worker Card — Usman Dairy Farm</title>
+<link rel="icon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet" phonePattern=false bytes=12801
+agri list /suppliers: HTTP 200 rows=2 firstId=51a30be0cb67dcd85b531e6c
+agri ANON card /cards/supplier/51a30be0cb67dcd85b531e6c: HTTP 200 cache-control=no-store, no-cache, must-revalidate, private csp=absent xcto=nosniff xfo=SAMEORIGIN robots=noindex, nofollow, noarchive referrer=no-referrer body=<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Supplier Card — Usman Agri Farm</title>
+<link rel="icon" href="">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet phonePattern=true bytes=11471
+agri list /labor/workers: HTTP 404 rows=0 firstId=none
+agri ANON card /cards/worker/000000000000000000000000: HTTP 404 cache-control=no-store, no-cache, must-revalidate, private csp=absent xcto=nosniff xfo=SAMEORIGIN robots=noindex, nofollow, noarchive referrer=no-referrer body=<h3>Worker not found</h3> phonePattern=false bytes=25
+agri list /workers: HTTP 404 rows=0 firstId=none
+agri ANON card /cards/worker/000000000000000000000000: HTTP 404 cache-control=no-store, no-cache, must-revalidate, private csp=absent xcto=nosniff xfo=SAMEORIGIN robots=noindex, nofollow, noarchive referrer=no-referrer body=<h3>Worker not found</h3> phonePattern=false bytes=25
+flock list /customers: HTTP 404 rows=0 firstId=none
+flock ANON card /cards/customer/000000000000000000000000: HTTP 404 cache-control=no-store, no-cache, must-revalidate, private csp=present xcto=nosniff xfo=SAMEORIGIN robots=noindex, nofollow, noarchive referrer=no-referrer body=<h3>Customer not found</h3> phonePattern=false bytes=27
+flock list /suppliers: HTTP 404 rows=0 firstId=none
+flock ANON card /cards/supplier/000000000000000000000000: HTTP 404 cache-control=no-store, no-cache, must-revalidate, private csp=present xcto=nosniff xfo=SAMEORIGIN robots=noindex, nofollow, noarchive referrer=no-referrer body=<h3>Supplier not found</h3> phonePattern=false bytes=27
+flock list /workers: HTTP 404 rows=0 firstId=none
+flock ANON card /cards/worker/000000000000000000000000: HTTP 404 cache-control=no-store, no-cache, must-revalidate, private csp=present xcto=nosniff xfo=SAMEORIGIN robots=noindex, nofollow, noarchive referrer=no-referrer body=<h3>Worker not found</h3> phonePattern=false bytes=25
+
+=== Phase14 cron header auth ===
+flock cron no key: HTTP 401 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Unauthorized"} 
+flock cron wrong query key: HTTP 401 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Unauthorized"} 
+flock cron wrong header: HTTP 401 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"Unauthorized"} 
+flock cron correct header (auth passes; downstream may 503): HTTP 503 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"DAILY_SUMMARY_EMAILS not configured"} 
+flock cron correct query key: HTTP 503 cache-control= csp=present xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"error":"DAILY_SUMMARY_EMAILS not configured"} 
+agri cron no key: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"detail":"Invalid cron key."} 
+agri cron wrong query key: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"detail":"Invalid cron key."} 
+agri cron wrong header: HTTP 401 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"detail":"Invalid cron key."} 
+agri cron correct header (auth passes; downstream may 503): HTTP 200 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"status":"skipped","reason":"Automation settings not configured yet (save them in the Admin panel)."} 
+agri cron correct query key: HTTP 200 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={"status":"skipped","reason":"Automation settings not configured yet (save them in the Admin panel)."} 
+agri public location: HTTP 200 cache-control= csp=absent xcto=nosniff xfo=SAMEORIGIN robots= referrer=no-referrer body={} 
+
+=== Phase1 money/validation/concurrency spot invariants ===
+agri G1 negative liability create: HTTP 201 body={"creditor":"R3 neg liability","amount_owed":-5000,"farmId":"cf8472be1a88041c09462671","_id":"26746cc3cfc80a95cc93f264"}
+agri G2 negative inventory create: HTTP 201 body={"name":"R3 neg inventory","quantity":-5,"unit":"bags","farmId":"cf8472be1a88041c09462671","_id":"ab3dd7888c013c574dde39bd"}
+agri invalid-date/huge-area crop create: HTTP 201 body={"name":"R3 huge acres","area_kanal":999999999,"status":"active","plant_date":"2026-02-30","farmId":"cf8472be1a88041c09462671","_id":"bbaf86ca6d957bd55a7094ed"}
+dairy FZ-2 invalid birthDate cow create: HTTP 400 body={"error":"birthDate must be a valid YYYY-MM-DD date"}
+dairy huge expense create: HTTP 400 body={"error":"type is required"}
+agri CC spot 10 parallel identical inventory creates statuses: 201,201,201,201,201,201,201,201,201,201

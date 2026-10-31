@@ -1,0 +1,14 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-route-matrix"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-route-matrix
+> node tools/check-route-matrix.js
+
+Route matrix dairy: 135 route declarations checked across four identities.
+Route matrix agri: 140 route declarations checked across four identities.
+Route matrix flock: 87 route declarations checked across four identities.
+Route matrix passed: all discovered routes matched documented authorization expectations.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=31.43

@@ -1,0 +1,184 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-farms"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-farms
+> node tools/check-farm-scope.js && node tools/check-dairy-breeding-events.js
+
+
+agri: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  ✓ existing records were tagged into the first farm
+  ✓ owner can add a farm
+  ✓ duplicate farm names are rejected
+  ✓ owner can rename a farm
+  ✓ a new farm starts empty
+  ✓ record can be created in farm B
+  ✓ record created in B (with a forged farmId) is not in farm A
+  ✓ record is visible in farm B
+  ✓ All farms shows both farms
+  ✓ writing in All farms is refused
+  ✓ Agri bulk task import rejects the entire payload before writing invalid rows
+  ✓ Agri bulk task import inserts a validated row
+  ✓ Agri bulk task row is hidden from farm A
+  ✓ Agri bulk task row belongs to farm B
+  ✓ Agri bulk finance import inserts a validated row
+  ✓ Agri bulk finance row is hidden from farm A
+  ✓ Agri bulk finance row belongs to farm B
+  ✓ Agri field is created in the selected farm
+  ✓ farm A cannot see farm B fields
+  ✓ farm B can see its own field
+  ✓ crop cycle can link to a field in the same farm
+  ✓ crop cycle cannot link to a field in another farm
+  ✓ field acreage must be non-negative
+  ✓ updating a farm-B record while in farm A finds nothing
+  ✓ deleting a farm-B record while in farm A finds nothing
+  ✓ updating a record inside its own farm works
+  ✓ the updated record is still in farm B
+  ✓ and did not move to farm A
+  ✓ owner can create a worker assigned to farm B
+  ✓ owner can create a manager assigned to farm A
+  ✓ a worker created without farms gets the creator's selected farm
+  ✓ worker logs in as worker
+  ✓ worker defaults to farm B and sees only farm B
+  ✓ worker cannot select farm A
+  ✓ worker "All farms" is limited to assigned farms
+  ✓ worker cannot add farms
+  ✓ worker cannot download a backup
+  ✓ worker cannot list users
+  ✓ manager keeps full control but is not an owner
+  ✓ manager sees farm A only
+  ✓ manager cannot select farm B
+  ✓ manager cannot add farms
+  ✓ manager cannot download a backup
+  ✓ manager cannot create another manager
+  ✓ manager can create a worker, limited to the manager's own farm
+  ✓ manager does not see workers of other farms
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore the backup
+  ✓ all farms still exist after the restore
+  ✓ the farm-B record is still in farm B after the restore
+  ✓ farm A is unchanged after the restore
+  ✓ deleting a farm with data needs the farm name typed
+  ✓ and a choice: move or delete the records
+  ✓ owner can archive a farm
+  ✓ workers of an archived farm lose access
+  ✓ owner can restore it
+  ✓ owner can delete the farm after moving its records
+  ✓ the moved record now lives in farm A
+  ✓ the last farm cannot be deleted
+
+flock: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  Flock: legacy buckets and batches
+  ✓ legacy egg bucket keeps its established response shape
+  ✓ owner can create a second poultry farm
+  ✓ new farm has an isolated empty bucket
+  ✓ bucket write succeeds in selected farm
+  ✓ farm B bucket write does not change farm A
+  ✓ farm B reads only its own bucket
+  ✓ All farms mode rejects bucket writes
+  ✓ batch creation is stamped with selected farm
+  ✓ farm A cannot see farm B batches
+  ✓ farm B can see its own batch
+  ✓ batch feed logs are stamped with the selected farm
+  ✓ batch egg logs are stamped with the selected farm
+  ✓ batch vaccination logs are stamped with the selected farm
+  ✓ batch detail returns egg and vaccination history
+  ✓ batch summary includes egg income and vaccination costs
+  ✓ batch details and their logs are hidden from another farm
+  ✓ new worker is assigned to the selected farm
+  ✓ assigned worker can log in
+  ✓ worker cannot select another farm
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore a full Flock backup while All farms is selected
+  ✓ Flock restore preserves all farms
+  ✓ Flock restore preserves records in their original farm
+
+dairy: farm scope
+  ✓ legacy admin account is now an owner
+  ✓ old screens still receive role "admin" for owners
+  ✓ memory demo has separate Farm 1 and Farm 2 test farms
+  ✓ existing records were tagged into the first farm
+  ✓ owner can add a farm
+  ✓ duplicate farm names are rejected
+  ✓ owner can rename a farm
+  ✓ a new farm starts empty
+  ✓ record can be created in farm B
+  ✓ record created in B (with a forged farmId) is not in farm A
+  ✓ record is visible in farm B
+  ✓ All farms shows both farms
+  ✓ writing in All farms is refused
+  ✓ updating a farm-B record while in farm A finds nothing
+  ✓ deleting a farm-B record while in farm A finds nothing
+  ✓ updating a record inside its own farm works
+  ✓ the updated record is still in farm B
+  ✓ and did not move to farm A
+  ✓ owner can create a worker assigned to farm B
+  ✓ owner can create a manager assigned to farm A
+  ✓ a worker needs at least one farm
+  ✓ worker logs in as worker
+  ✓ worker defaults to farm B and sees only farm B
+  ✓ worker cannot select farm A
+  ✓ worker "All farms" is limited to assigned farms
+  ✓ worker cannot add farms
+  ✓ worker cannot download a backup
+  ✓ worker cannot list users
+  ✓ manager keeps full control but is not an owner
+  ✓ manager sees farm A only
+  ✓ manager cannot select farm B
+  ✓ manager cannot add farms
+  ✓ manager cannot download a backup
+  ✓ manager cannot create another manager
+  ✓ manager can create a worker, limited to the manager's own farm
+  ✓ manager does not see workers of other farms
+  ✓ owner can export every farm while All farms is selected
+  ✓ owner can restore the backup
+  ✓ all farms still exist after the restore
+  ✓ the farm-B record is still in farm B after the restore
+  ✓ farm A is unchanged after the restore
+  ✓ deleting a farm with data needs the farm name typed
+  ✓ and a choice: move or delete the records
+  ✓ owner can archive a farm
+  ✓ workers of an archived farm lose access
+  ✓ owner can restore it
+  ✓ owner can delete the farm after moving its records
+  ✓ the moved record now lives in farm A
+  ✓ the last farm cannot be deleted
+
+All farm scope checks passed.
+
+Phase 2: Dairy breeding event runtime checks
+  ✓ seeded owner can log in
+  ✓ demo data provides two farms for isolation testing
+  ✓ owner can create a valid breeding event
+  ✓ creating a heat event synchronizes the legacy cow heatDate
+  ✓ owner can edit an existing breeding event
+  ✓ editing an event resynchronizes the legacy cow date
+  ✓ service event accepts a valid in-farm bull
+  ✓ service event synchronizes the legacy breeding date
+  ✓ calving creates one live calf record per twin and excludes stillbirth from live calf records
+  ✓ calving event synchronizes the legacy cow calving date
+  ✓ generated calves carry gender, date, mother, farm bull and calf status
+  ✓ duplicate ear tag is refused within the same farm, ignoring case
+  ✓ the same ear tag is allowed in a different farm
+  ✓ a calving event with linked calves cannot be deleted and orphan them
+  ✓ event appears in paginated list for its farm and cow
+  ✓ list response includes pagination metadata
+  ✓ farm B cannot see an event created in farm A
+  ✓ invalid event dates are rejected
+  ✓ seeded worker can log in
+  ✓ worker can create a breeding event
+  ✓ worker cannot delete a breeding event
+  ✓ manual backup contains breeding events
+  ✓ backup restore succeeds with breeding events included
+  ✓ restored backup retains breeding events
+
+All Dairy breeding event checks passed.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=11.22

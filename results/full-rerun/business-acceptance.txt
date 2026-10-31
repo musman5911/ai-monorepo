@@ -1,0 +1,133 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND node --test --test-concurrency=1 tests/acceptance-business/agri-business.test.mjs tests/acceptance-business/dairy-business.test.mjs tests/acceptance-business/dates-tz.test.mjs tests/acceptance-business/flock-business.test.mjs
+CWD /home/user/full-rerun
+TAP version 13
+# FINDING CHECK BL-2: posting 2027-03 wages settled 2 unrelated seeded advances (expected 0)
+# Subtest: BL-2: post-wages settles only the posted month's advances (agri)
+not ok 1 - BL-2: post-wages settles only the posted month's advances (agri)
+  ---
+  duration_ms: 2451.541991
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance-business/agri-business.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    BL-2 BUG: posting wages for 2027-03 settled 2 advances of other workers/months
+    
+    2 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 2
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance-business/agri-business.test.mjs:25:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: BL-guard: liability pay books exactly one finance expense, second pay is a no-op (agri)
+ok 2 - BL-guard: liability pay books exactly one finance expense, second pay is a no-op (agri)
+  ---
+  duration_ms: 2386.95032
+  type: 'test'
+  ...
+# Subtest: BL-guard: analytics finance totals equal the sum of the finance records (agri)
+ok 3 - BL-guard: analytics finance totals equal the sum of the finance records (agri)
+  ---
+  duration_ms: 2374.847194
+  type: 'test'
+  ...
+# FINDING CHECK BL-1: posting 2027-03 wages settled 2 unrelated seeded advances (expected 0)
+# Subtest: BL-1: post-wages settles only the posted month's advances (dairy)
+not ok 4 - BL-1: post-wages settles only the posted month's advances (dairy)
+  ---
+  duration_ms: 44621.851334
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance-business/dairy-business.test.mjs:7:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    BL-1 BUG: posting wages for 2027-03 settled 2 advances belonging to other workers/months — their advance balances now wrongly show as settled
+    
+    2 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 2
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance-business/dairy-business.test.mjs:25:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: BL-guard: milk summary saleable/revenue matches hand calculation (dairy)
+ok 5 - BL-guard: milk summary saleable/revenue matches hand calculation (dairy)
+  ---
+  duration_ms: 44500.629805
+  type: 'test'
+  ...
+# FINDING CHECK BL-4: at 01:30 PKT on 2026-10-28, farm-summary Today's milk = "142.5 L"; records dated 2026-10-28 total 11 L
+# Subtest: BL-4: farm-summary "Today's milk" uses the Pakistan farm day, not UTC (dairy)
+not ok 6 - BL-4: farm-summary "Today's milk" uses the Pakistan farm day, not UTC (dairy)
+  ---
+  duration_ms: 21366.34126
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance-business/dates-tz.test.mjs:16:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    BL-4 BUG: farm-summary "Today's milk" = "142.5 L" at 01:30 Pakistan time, but the records dated today (2026-10-28 PKT) total 11 L — the summary is using the UTC day (2026-10-27)
+    
+    '142.5 L' !== '11 L'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '11 L'
+  actual: '142.5 L'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance-business/dates-tz.test.mjs:45:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# FINDING CHECK BL-3: sell 50 eggs from 80 in stock -> HTTP 400 {"error":"Sold, home-use and broken eggs cannot exceed collected eggs"}
+# Subtest: BL-3: eggs collected Monday can be sold Tuesday from stock (flock)
+not ok 7 - BL-3: eggs collected Monday can be sold Tuesday from stock (flock)
+  ---
+  duration_ms: 989.831013
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance-business/flock-business.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    BL-3 BUG: selling 50 of 80 stocked eggs was rejected (HTTP 400) because validation only looks at same-day collection
+    
+    400 !== 201
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 201
+  actual: 400
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance-business/flock-business.test.mjs:19:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: BL-guard: batch summary matches hand calculation, incl. all-dead batch (flock)
+ok 8 - BL-guard: batch summary matches hand calculation, incl. all-dead batch (flock)
+  ---
+  duration_ms: 966.831712
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 4
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 119906.172022

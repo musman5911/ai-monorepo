@@ -1,0 +1,94 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "--test", "tests/acceptance/telegram.test.mjs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+TAP version 13
+# FINDING CHECK K1/dairy: after one bot message "kharcha 999999999", marker found=true, amount 999999999 found=true
+# Subtest: K1: telegram bot rejects a 999,999,999 single-message expense (dairy)
+not ok 1 - K1: telegram bot rejects a 999,999,999 single-message expense (dairy)
+  ---
+  duration_ms: 7222.337959
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/telegram.test.mjs:18:3'
+  failureType: 'testCodeFailure'
+  error: 'K1 BUG (dairy): one Telegram message booked a Rs 999,999,999 expense (marker=true, amount=true)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/telegram.test.mjs:41:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# FINDING CHECK K1/agri: after one bot message "kharcha 999999999", marker found=false, amount 999999999 found=true
+# Subtest: K1: telegram bot rejects a 999,999,999 single-message expense (agri)
+not ok 2 - K1: telegram bot rejects a 999,999,999 single-message expense (agri)
+  ---
+  duration_ms: 14236.403303
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/telegram.test.mjs:18:3'
+  failureType: 'testCodeFailure'
+  error: 'K1 BUG (agri): one Telegram message booked a Rs 999,999,999 expense (marker=false, amount=true)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/telegram.test.mjs:41:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# FINDING CHECK K1/flock: after one bot message "kharcha 999999999", marker found=true, amount 999999999 found=true
+# Subtest: K1: telegram bot rejects a 999,999,999 single-message expense (flock)
+not ok 3 - K1: telegram bot rejects a 999,999,999 single-message expense (flock)
+  ---
+  duration_ms: 7265.547763
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/telegram.test.mjs:18:3'
+  failureType: 'testCodeFailure'
+  error: 'K1 BUG (flock): one Telegram message booked a Rs 999,999,999 expense (marker=true, amount=true)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/telegram.test.mjs:41:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: CRON-LOG-1: cron secret is not printed to server logs (agri)
+not ok 4 - CRON-LOG-1: cron secret is not printed to server logs (agri)
+  ---
+  duration_ms: 15791.909289
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/telegram.test.mjs:48:1'
+  failureType: 'testCodeFailure'
+  error: 'cron ?key= secret appeared verbatim in server logs'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/telegram.test.mjs:54:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 0
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 44844.514763
+
+RUNNER EXIT=1 TIMEOUT=False SECONDS=45.11

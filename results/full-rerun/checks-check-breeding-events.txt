@@ -1,0 +1,38 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-breeding-events"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-breeding-events
+> node tools/check-dairy-breeding-events.js
+
+
+Phase 2: Dairy breeding event runtime checks
+  ✓ seeded owner can log in
+  ✓ demo data provides two farms for isolation testing
+  ✓ owner can create a valid breeding event
+  ✓ creating a heat event synchronizes the legacy cow heatDate
+  ✓ owner can edit an existing breeding event
+  ✓ editing an event resynchronizes the legacy cow date
+  ✓ service event accepts a valid in-farm bull
+  ✓ service event synchronizes the legacy breeding date
+  ✓ calving creates one live calf record per twin and excludes stillbirth from live calf records
+  ✓ calving event synchronizes the legacy cow calving date
+  ✓ generated calves carry gender, date, mother, farm bull and calf status
+  ✓ duplicate ear tag is refused within the same farm, ignoring case
+  ✓ the same ear tag is allowed in a different farm
+  ✓ a calving event with linked calves cannot be deleted and orphan them
+  ✓ event appears in paginated list for its farm and cow
+  ✓ list response includes pagination metadata
+  ✓ farm B cannot see an event created in farm A
+  ✓ invalid event dates are rejected
+  ✓ seeded worker can log in
+  ✓ worker can create a breeding event
+  ✓ worker cannot delete a breeding event
+  ✓ manual backup contains breeding events
+  ✓ backup restore succeeds with breeding events included
+  ✓ restored backup retains breeding events
+
+All Dairy breeding event checks passed.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=2.07

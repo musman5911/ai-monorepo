@@ -1,0 +1,2016 @@
+{
+  "errors": [
+    {
+      "code": 2,
+      "level": "warn",
+      "message": "Timeout when running regex_dos on agri_farm/backend/demo-data.js:\n ",
+      "path": "agri_farm/backend/demo-data.js",
+      "rule_id": "regex_dos",
+      "type": "Timeout"
+    },
+    {
+      "code": 2,
+      "level": "warn",
+      "message": "Timeout when running node_ssrf on agri_farm/backend/routes/analytics.js:\n ",
+      "path": "agri_farm/backend/routes/analytics.js",
+      "rule_id": "node_ssrf",
+      "type": "Timeout"
+    },
+    {
+      "code": 2,
+      "level": "warn",
+      "message": "Timeout when running regex_dos on agri_farm/backend/routes/analytics.js:\n ",
+      "path": "agri_farm/backend/routes/analytics.js",
+      "rule_id": "regex_dos",
+      "type": "Timeout"
+    },
+    {
+      "code": 2,
+      "level": "warn",
+      "message": "Timeout when running regex_injection_dos on agri_farm/backend/routes/analytics.js:\n ",
+      "path": "agri_farm/backend/routes/analytics.js",
+      "rule_id": "regex_injection_dos",
+      "type": "Timeout"
+    },
+    {
+      "code": 2,
+      "level": "warn",
+      "message": "Timeout when running regex_dos on dairy_farm/backend/demo-data.js:\n ",
+      "path": "dairy_farm/backend/demo-data.js",
+      "rule_id": "regex_dos",
+      "type": "Timeout"
+    },
+    {
+      "code": 2,
+      "level": "warn",
+      "message": "Timeout when running node_ssrf on dairy_farm/backend/routes/auth.js:\n ",
+      "path": "dairy_farm/backend/routes/auth.js",
+      "rule_id": "node_ssrf",
+      "type": "Timeout"
+    },
+    {
+      "code": 2,
+      "level": "warn",
+      "message": "Timeout when running regex_dos on dairy_farm/backend/routes/auth.js:\n ",
+      "path": "dairy_farm/backend/routes/auth.js",
+      "rule_id": "regex_dos",
+      "type": "Timeout"
+    },
+    {
+      "code": 2,
+      "level": "warn",
+      "message": "Timeout when running node_ssrf on flock_farm/backend/routes/batches.js:\n ",
+      "path": "flock_farm/backend/routes/batches.js",
+      "rule_id": "node_ssrf",
+      "type": "Timeout"
+    }
+  ],
+  "njsscan_version": "0.4.2",
+  "nodejs": {
+    "express_xss": {
+      "files": [
+        {
+          "file_path": "flock_farm/backend/routes/uploads.js",
+          "match_lines": [
+            172,
+            192
+          ],
+          "match_position": [
+            5,
+            24
+          ],
+          "match_string": "    const img = await Image.findOne({ _id: id, farmId: String(req.farmContext?.farmId || '') });\n    if (!img) return res.status(404).json({ error: 'Image not found' });\n    if (img.provider === 'cloudinary') {\n      let remoteUrl;\n      try { remoteUrl = new URL(img.secureUrl); } catch { return res.status(502).json({ error: 'Stored Cloudinary URL is invalid' }); }\n      if (remoteUrl.protocol !== 'https:' || remoteUrl.hostname !== 'res.cloudinary.com') {\n        return res.status(502).json({ error: 'Stored Cloudinary URL is not trusted' });\n      }\n      const remote = await fetch(remoteUrl);\n      if (!remote.ok) return res.status(502).json({ error: 'Cloudinary photo retrieval failed' });\n      const bytes = Buffer.from(await remote.arrayBuffer());\n      res.setHeader('Content-Type', img.contentType || remote.headers.get('content-type') || 'image/jpeg');\n      res.setHeader('Cache-Control', 'private, no-store');\n      return res.send(bytes);\n    }\n\n    res.setHeader('Content-Type', img.contentType || 'image/jpeg');\n    // The response is farm-authorized. Never permit shared caches to reuse it\n    // across users or farm contexts, even though each upload has its own ID.\n    res.setHeader('Cache-Control', 'private, no-store');\n    res.send(img.data);"
+        }
+      ],
+      "metadata": {
+        "cwe": "CWE-79: Improper Neutralization of Input During Web Page Generation ('Cross-site Scripting')",
+        "description": "Untrusted User Input in Response will result in Reflected Cross Site Scripting Vulnerability.",
+        "owasp-web": "A1: Injection",
+        "severity": "ERROR"
+      }
+    },
+    "helmet_feature_disabled": {
+      "files": [
+        {
+          "file_path": "agri_farm/backend/server.js",
+          "match_lines": [
+            49,
+            52
+          ],
+          "match_position": [
+            9,
+            3
+          ],
+          "match_string": "app.use(helmet({\n  contentSecurityPolicy: false,\n  crossOriginEmbedderPolicy: false,\n}));"
+        },
+        {
+          "file_path": "dairy_farm/backend/server.js",
+          "match_lines": [
+            48,
+            51
+          ],
+          "match_position": [
+            9,
+            3
+          ],
+          "match_string": "app.use(helmet({\n  contentSecurityPolicy: false,\n  crossOriginEmbedderPolicy: false,\n}));"
+        }
+      ],
+      "metadata": {
+        "cwe": "CWE-693: Protection Mechanism Failure",
+        "description": "One or more Security Response header is explicitly disabled in Helmet.",
+        "owasp-web": "A6: Security Misconfiguration",
+        "severity": "WARNING"
+      }
+    },
+    "node_insecure_random_generator": {
+      "files": [
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            281,
+            281
+          ],
+          "match_position": [
+            43,
+            56
+          ],
+          "match_string": "  const code = String(Math.floor(100000 + Math.random() * 900000));"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            451,
+            451
+          ],
+          "match_position": [
+            43,
+            56
+          ],
+          "match_string": "  const code = String(Math.floor(100000 + Math.random() * 900000));"
+        },
+        {
+          "file_path": "dairy_farm/backend/db.js",
+          "match_lines": [
+            316,
+            316
+          ],
+          "match_position": [
+            43,
+            56
+          ],
+          "match_string": "  const code = String(Math.floor(100000 + Math.random() * 900000));"
+        },
+        {
+          "file_path": "dairy_farm/backend/demo-data.js",
+          "match_lines": [
+            36,
+            36
+          ],
+          "match_position": [
+            51,
+            64
+          ],
+          "match_string": "function rnd(min, max) { return Math.round((min + Math.random() * (max - min)) * 10) / 10; }"
+        },
+        {
+          "file_path": "dairy_farm/backend/demo-data.js",
+          "match_lines": [
+            164,
+            164
+          ],
+          "match_position": [
+            11,
+            24
+          ],
+          "match_string": "      if (Math.random() < 0.03) continue; // occasional missed entry"
+        },
+        {
+          "file_path": "dairy_farm/backend/demo-data.js",
+          "match_lines": [
+            349,
+            349
+          ],
+          "match_position": [
+            58,
+            71
+          ],
+          "match_string": "      checklist: checklist.map(item => ({ ...item, done: Math.random() > 0.08 })),"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/rates.js",
+          "match_lines": [
+            12,
+            12
+          ],
+          "match_position": [
+            66,
+            79
+          ],
+          "match_string": "    rate = await Rate.create({ _id: 'rate-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8), value: 130, date: todayStr() });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/rates.js",
+          "match_lines": [
+            50,
+            50
+          ],
+          "match_position": [
+            63,
+            76
+          ],
+          "match_string": "      : await Rate.create({ _id: 'rate-' + Date.now() + '-' + Math.random().toString(36).slice(2, 8), value, date: now });"
+        },
+        {
+          "file_path": "flock_farm/backend/demo-data.js",
+          "match_lines": [
+            18,
+            18
+          ],
+          "match_position": [
+            50,
+            63
+          ],
+          "match_string": "function rnd(min, max) { return Math.round(min + Math.random() * (max - min)); }"
+        },
+        {
+          "file_path": "flock_farm/backend/demo-data.js",
+          "match_lines": [
+            19,
+            19
+          ],
+          "match_position": [
+            52,
+            65
+          ],
+          "match_string": "function rnd1(min, max) { return Math.round((min + Math.random() * (max - min)) * 10) / 10; }"
+        },
+        {
+          "file_path": "flock_farm/backend/demo-data.js",
+          "match_lines": [
+            195,
+            195
+          ],
+          "match_position": [
+            20,
+            33
+          ],
+          "match_string": "    const broken = Math.random() < 0.15 ? 1 : 0;"
+        },
+        {
+          "file_path": "flock_farm/backend/demo-data.js",
+          "match_lines": [
+            196,
+            196
+          ],
+          "match_position": [
+            21,
+            34
+          ],
+          "match_string": "    const homeUse = Math.random() < 0.5 ? rnd(1, 2) : 0;"
+        },
+        {
+          "file_path": "flock_farm/backend/demo-data.js",
+          "match_lines": [
+            225,
+            225
+          ],
+          "match_position": [
+            19,
+            32
+          ],
+          "match_string": "      amountPaid: Math.random() < 0.85 ? amount : Math.round(amount * 0.6),"
+        },
+        {
+          "file_path": "flock_farm/backend/demo-data.js",
+          "match_lines": [
+            351,
+            351
+          ],
+          "match_position": [
+            48,
+            61
+          ],
+          "match_string": "      completed: checklistTaskIds.filter(() => Math.random() > 0.1),"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/backup.js",
+          "match_lines": [
+            253,
+            253
+          ],
+          "match_position": [
+            89,
+            102
+          ],
+          "match_string": "  const imageSnapshotId = new Date().toISOString().replace(/[^0-9A-Za-z]/g, '') + '_' + Math.random().toString(36).slice(2, 10);"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/batches.js",
+          "match_lines": [
+            56,
+            56
+          ],
+          "match_position": [
+            27,
+            40
+          ],
+          "match_string": "  const rand = Math.floor(Math.random() * 1000).toString().padStart(3, '0');"
+        }
+      ],
+      "metadata": {
+        "cwe": "CWE-327: Use of a Broken or Risky Cryptographic Algorithm",
+        "description": "crypto.pseudoRandomBytes()/Math.random() is a cryptographically weak random number generator.",
+        "owasp-web": "A9: Using Components with Known Vulnerabilities",
+        "severity": "WARNING"
+      }
+    },
+    "node_nosqli_injection": {
+      "files": [
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            133,
+            142
+          ],
+          "match_position": [
+            3,
+            5
+          ],
+          "match_string": "  const cleanEmail = String(body.email || '').toLowerCase().trim();\n  const cleanUsername = String(body.username || '').toLowerCase().trim();\n  validateNewPassword(body.password);\n\n  const existing = await User.findOne({\n    $or: [\n      cleanEmail ? { email: cleanEmail } : { email: 'NON_EXISTENT_DUMMY_VALUE_99' },\n      { username: cleanUsername },\n    ],\n  });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            134,
+            142
+          ],
+          "match_position": [
+            3,
+            5
+          ],
+          "match_string": "  const cleanUsername = String(body.username || '').toLowerCase().trim();\n  validateNewPassword(body.password);\n\n  const existing = await User.findOne({\n    $or: [\n      cleanEmail ? { email: cleanEmail } : { email: 'NON_EXISTENT_DUMMY_VALUE_99' },\n      { username: cleanUsername },\n    ],\n  });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            183,
+            185
+          ],
+          "match_position": [
+            3,
+            94
+          ],
+          "match_string": "  const identifier = String(req.body?.username || '').toLowerCase().trim();\n  const password = String(req.body?.password || '');\n  const user = await User.findOne({ $or: [{ email: identifier }, { username: identifier }] });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            238,
+            256
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const code = String(req.body?.code || '').trim();\n\n  if (!newPassword) return badRequest(res, 'New password is required.');\n  validateNewPassword(newPassword);\n\n  if (code) {\n    const currentEmail = current.email || '';\n    const resetRecord = await Reset.findOne({ email: currentEmail, code });\n    if (!resetRecord || (resetRecord.expiry || 0) < nowSeconds()) {\n      return badRequest(res, 'Invalid or expired verification code.');\n    }\n    await Reset.deleteMany({ email: currentEmail });\n  } else if (currentPassword) {\n    if (!verifyPassword(currentPassword, current.password)) {\n      return unauthorized(res, 'Current password is incorrect.');\n    }\n  } else {\n    return badRequest(res, 'Either current password or verification code is required.');\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            244,
+            245
+          ],
+          "match_position": [
+            5,
+            75
+          ],
+          "match_string": "    const currentEmail = current.email || '';\n    const resetRecord = await Reset.findOne({ email: currentEmail, code });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            302,
+            332
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  let email = body.email;\n  const code = String(body.code || '').trim();\n  const avatarBase64 = body.avatar_base64;\n\n  const updateFields = {};\n  if (email !== undefined) {\n    email = String(email).toLowerCase().trim();\n    if (email) {\n      if (!isValidEmail(email)) {\n        return badRequest(res, 'The provided email address is not a valid format.');\n      }\n      const existing = await User.findOne({ email, _id: { $ne: req.user._id } });\n      if (existing) {\n        return badRequest(res, 'This email address is already in use by another account.');\n      }\n    }\n    if (email !== (req.user.email || '')) {\n      const currentEmail = req.user.email || '';\n      if (currentEmail) {\n        if (!code) {\n          return badRequest(res, 'Verification code is required to update the account email.');\n        }\n        const resetRecord = await Reset.findOne({ email: currentEmail, code });\n        if (!resetRecord || (resetRecord.expiry || 0) < nowSeconds()) {\n          return badRequest(res, 'Invalid or expired verification code.');\n        }\n        await Reset.deleteMany({ email: currentEmail });\n      }\n    }\n    updateFields.email = email;\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            303,
+            332
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const code = String(body.code || '').trim();\n  const avatarBase64 = body.avatar_base64;\n\n  const updateFields = {};\n  if (email !== undefined) {\n    email = String(email).toLowerCase().trim();\n    if (email) {\n      if (!isValidEmail(email)) {\n        return badRequest(res, 'The provided email address is not a valid format.');\n      }\n      const existing = await User.findOne({ email, _id: { $ne: req.user._id } });\n      if (existing) {\n        return badRequest(res, 'This email address is already in use by another account.');\n      }\n    }\n    if (email !== (req.user.email || '')) {\n      const currentEmail = req.user.email || '';\n      if (currentEmail) {\n        if (!code) {\n          return badRequest(res, 'Verification code is required to update the account email.');\n        }\n        const resetRecord = await Reset.findOne({ email: currentEmail, code });\n        if (!resetRecord || (resetRecord.expiry || 0) < nowSeconds()) {\n          return badRequest(res, 'Invalid or expired verification code.');\n        }\n        await Reset.deleteMany({ email: currentEmail });\n      }\n    }\n    updateFields.email = email;\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            308,
+            317
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    email = String(email).toLowerCase().trim();\n    if (email) {\n      if (!isValidEmail(email)) {\n        return badRequest(res, 'The provided email address is not a valid format.');\n      }\n      const existing = await User.findOne({ email, _id: { $ne: req.user._id } });\n      if (existing) {\n        return badRequest(res, 'This email address is already in use by another account.');\n      }\n    }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            313,
+            313
+          ],
+          "match_position": [
+            30,
+            81
+          ],
+          "match_string": "      const existing = await User.findOne({ email, _id: { $ne: req.user._id } });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            319,
+            329
+          ],
+          "match_position": [
+            7,
+            8
+          ],
+          "match_string": "      const currentEmail = req.user.email || '';\n      if (currentEmail) {\n        if (!code) {\n          return badRequest(res, 'Verification code is required to update the account email.');\n        }\n        const resetRecord = await Reset.findOne({ email: currentEmail, code });\n        if (!resetRecord || (resetRecord.expiry || 0) < nowSeconds()) {\n          return badRequest(res, 'Invalid or expired verification code.');\n        }\n        await Reset.deleteMany({ email: currentEmail });\n      }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            370,
+            372
+          ],
+          "match_position": [
+            3,
+            50
+          ],
+          "match_string": "  const oid = parseOid(req.params.userId, 'user ID');\n\n  const target = await User.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            370,
+            411
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const oid = parseOid(req.params.userId, 'user ID');\n\n  const target = await User.findOne({ _id: oid });\n  if (!target) return notFound(res, 'User not found');\n  const isSelf = String(target._id) === String(req.user._id);\n  if (!isSelf && !managerCanHandle(req, target)) {\n    return forbidden(res, 'You can only manage workers in your own farms.');\n  }\n\n  const updates = {};\n  if (req.body?.role !== undefined) {\n    if (isSelf) return badRequest(res, 'You cannot change your own role');\n    if (!mufIsOwner(req.user.role)) return forbidden(res, 'Only an owner can change roles.');\n    const nextRole = mufNormalizeRole(req.body.role);\n    if (nextRole !== 'worker' && !String(target.email || '').trim()) {\n      return badRequest(res, 'Email address is mandatory for owner and manager accounts.');\n    }\n    if (target.active !== false && mufIsOwner(target.role) && nextRole !== 'owner' && (await ownerCountExcluding(target._id)) === 0) {\n      return badRequest(res, 'At least one active owner must remain.');\n    }\n    updates.role = nextRole;\n  }\n  if (req.body?.farmIds !== undefined) {\n    let farmIds = await validFarmIds(req.body.farmIds);\n    if (!mufIsOwner(req.user.role)) {\n      const mine = new Set((req.user.farmIds || []).map(String));\n      // A manager may change a worker's assignments only within farms the\n      // manager controls. Preserve the worker's assignments on other farms.\n      const outsideMyFarms = (target.farmIds || []).map(String).filter((id) => !mine.has(id));\n      farmIds = [...new Set([...outsideMyFarms, ...farmIds.filter((id) => mine.has(id))])];\n    }\n    if (mufNormalizeRole(updates.role ?? target.role) !== 'owner' && farmIds.length === 0) {\n      return badRequest(res, 'Assign at least one farm to this account.');\n    }\n    updates.farmIds = farmIds;\n  }\n  if (newUsername) {\n    const clean = String(newUsername).toLowerCase().trim();\n    const existing = await User.findOne({ username: clean, _id: { $ne: oid } });\n    if (existing) return badRequest(res, 'Username is already taken');\n    updates.username = clean;\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            407,
+            408
+          ],
+          "match_position": [
+            5,
+            80
+          ],
+          "match_string": "    const clean = String(newUsername).toLowerCase().trim();\n    const existing = await User.findOne({ username: clean, _id: { $ne: oid } });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            425,
+            430
+          ],
+          "match_position": [
+            3,
+            50
+          ],
+          "match_string": "  const oid = parseOid(userId, 'user ID');\n\n  if (String(req.user._id) === userId) {\n    return badRequest(res, 'You cannot delete your own account');\n  }\n  const target = await User.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            445,
+            448
+          ],
+          "match_position": [
+            3,
+            83
+          ],
+          "match_string": "  const email = String(req.body?.email || '').toLowerCase().trim();\n  if (!email) return badRequest(res, 'Admin email is required');\n\n  const admin = await User.findOne({ email, role: { $in: MUF_FULL_ROLE_VALUES } });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            448,
+            448
+          ],
+          "match_position": [
+            23,
+            83
+          ],
+          "match_string": "  const admin = await User.findOne({ email, role: { $in: MUF_FULL_ROLE_VALUES } });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/auth.js",
+          "match_lines": [
+            467,
+            476
+          ],
+          "match_position": [
+            3,
+            53
+          ],
+          "match_string": "  const email = String(req.body?.email || '').toLowerCase().trim();\n  const code = String(req.body?.code || '').trim();\n  const newPassword = req.body?.newPassword;\n\n  if (!email || !code || !newPassword) {\n    return badRequest(res, 'Email, code, and new password are required.');\n  }\n  validateNewPassword(newPassword);\n\n  const resetRecord = await Reset.findOne({ email });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/backup.js",
+          "match_lines": [
+            159,
+            159
+          ],
+          "match_position": [
+            27,
+            109
+          ],
+          "match_string": "      const admin = await User.findOne({ role: { $in: MUF_FULL_ROLE_VALUES }, email: { $nin: [null, ''] } });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/crop-logs.js",
+          "match_lines": [
+            15,
+            16
+          ],
+          "match_position": [
+            3,
+            53
+          ],
+          "match_string": "  const oid = parseOid(String(itemId), 'inventory item ID');\n  const item = await Inventory.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/crop-logs.js",
+          "match_lines": [
+            47,
+            47
+          ],
+          "match_position": [
+            22,
+            82
+          ],
+          "match_string": "  const crop = await Crop.findOne({ _id: parseOid(req.body.crop_id, 'crop ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/crop-logs.js",
+          "match_lines": [
+            85,
+            86
+          ],
+          "match_position": [
+            3,
+            53
+          ],
+          "match_string": "  const oid = parseOid(req.params.logId, 'irrigation ID');\n  const log = await Irrigation.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/crop-logs.js",
+          "match_lines": [
+            109,
+            109
+          ],
+          "match_position": [
+            22,
+            73
+          ],
+          "match_string": "  const crop = await Crop.findOne({ _id: parseOid(crop_id, 'crop ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/crop-logs.js",
+          "match_lines": [
+            136,
+            140
+          ],
+          "match_position": [
+            3,
+            78
+          ],
+          "match_string": "  const body = req.body || {};\n  if (!body.crop_id || !String(body.chemical || '').trim()) {\n    return badRequest(res, 'Crop and chemical name are required.');\n  }\n  const crop = await Crop.findOne({ _id: parseOid(body.crop_id, 'crop ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/crop-logs.js",
+          "match_lines": [
+            140,
+            140
+          ],
+          "match_position": [
+            22,
+            78
+          ],
+          "match_string": "  const crop = await Crop.findOne({ _id: parseOid(body.crop_id, 'crop ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/crop-logs.js",
+          "match_lines": [
+            158,
+            159
+          ],
+          "match_position": [
+            3,
+            48
+          ],
+          "match_string": "  const oid = parseOid(req.params.logId, 'spray ID');\n  const log = await Spray.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/crops.js",
+          "match_lines": [
+            80,
+            83
+          ],
+          "match_position": [
+            3,
+            54
+          ],
+          "match_string": "  const fieldId = String(body?.fieldId || '').trim();\n  if (!fieldId) return { ok: true, fieldId: '' };\n  if (!/^[0-9a-fA-F]{24}$/.test(fieldId)) return { ok: false, message: 'fieldId must be a valid field ID' };\n  const field = await Field.findOne({ _id: fieldId });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/crops.js",
+          "match_lines": [
+            99,
+            108
+          ],
+          "match_position": [
+            3,
+            33
+          ],
+          "match_string": "  const oid = parseOid(req.params.cropId, 'crop ID');\n  const link = await validateFieldLink(req.body || {});\n  if (!link.ok) return badRequest(res, link.message);\n  const payload = { ...(req.body || {}) };\n  if (link.fieldId) payload.fieldId = link.fieldId;\n  else if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'fieldId')) {\n    const existing = await Crop.findOne({ _id: oid });\n    if (existing?.fieldId) payload.fieldId = String(existing.fieldId);\n    else delete payload.fieldId;\n  } else delete payload.fieldId;"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/diary-media.js",
+          "match_lines": [
+            58,
+            60
+          ],
+          "match_position": [
+            3,
+            52
+          ],
+          "match_string": "  const date = String(req.params.date || '');\n  if (!validDate(date)) return res.status(400).json({ error: 'Invalid diary date' });\n  const record = await DiaryMedia.findOne({ date });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/diary-media.js",
+          "match_lines": [
+            65,
+            83
+          ],
+          "match_position": [
+            3,
+            51
+          ],
+          "match_string": "  const date = String(req.params.date || '');\n  if (!validDate(date)) return res.status(400).json({ error: 'Invalid diary date' });\n  const update = { date };\n  if (req.body?.photos !== undefined) {\n    const photos = req.body.photos;\n    if (!Array.isArray(photos) || photos.length > 10) return res.status(400).json({ error: 'Photos must be an array with at most 10 items' });\n    const safePhotos = photos.map((p) => safePhoto(p, date));\n    if (safePhotos.some((p) => !p.id || !(p.data.startsWith('data:image/jpeg;base64,') || (p.data.startsWith('/api/images/') || /^\\/api\\/photos\\/[a-f0-9]{24}$/i.test(p.data)) || /^https?:\\/\\//i.test(p.data)) || p.data.length > 230000)) {\n      return res.status(400).json({ error: 'Each diary photo must be a compressed image under 160 KB' });\n    }\n    update.photos = safePhotos;\n  }\n  if (req.body?.entries !== undefined) {\n    const entries = safeEntries(req.body.entries, date);\n    if (!entries) return res.status(400).json({ error: 'Diary entries or attachments are invalid or too large' });\n    update.entries = entries;\n  }\n  await DiaryMedia.updateOne({ date }, { $set: update }, { upsert: true });\n  const saved = await DiaryMedia.findOne({ date });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/fields.js",
+          "match_lines": [
+            23,
+            25
+          ],
+          "match_position": [
+            3,
+            73
+          ],
+          "match_string": "  const normalized = normalizeField(req.body || {});\n  if (normalized.error) return badRequest(res, normalized.error);\n  const duplicate = await Field.findOne({ name: normalized.value.name });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/fields.js",
+          "match_lines": [
+            25,
+            25
+          ],
+          "match_position": [
+            27,
+            73
+          ],
+          "match_string": "  const duplicate = await Field.findOne({ name: normalized.value.name });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/fields.js",
+          "match_lines": [
+            32,
+            35
+          ],
+          "match_position": [
+            3,
+            91
+          ],
+          "match_string": "  const id = parseOid(req.params.fieldId, 'field ID');\n  const normalized = normalizeField(req.body || {});\n  if (normalized.error) return badRequest(res, normalized.error);\n  const duplicate = await Field.findOne({ name: normalized.value.name, _id: { $ne: id } });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/fields.js",
+          "match_lines": [
+            33,
+            35
+          ],
+          "match_position": [
+            3,
+            91
+          ],
+          "match_string": "  const normalized = normalizeField(req.body || {});\n  if (normalized.error) return badRequest(res, normalized.error);\n  const duplicate = await Field.findOne({ name: normalized.value.name, _id: { $ne: id } });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/fields.js",
+          "match_lines": [
+            35,
+            35
+          ],
+          "match_position": [
+            27,
+            91
+          ],
+          "match_string": "  const duplicate = await Field.findOne({ name: normalized.value.name, _id: { $ne: id } });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/fields.js",
+          "match_lines": [
+            43,
+            44
+          ],
+          "match_position": [
+            3,
+            49
+          ],
+          "match_string": "  const id = parseOid(req.params.fieldId, 'field ID');\n  const field = await Field.findOne({ _id: id });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/finance.js",
+          "match_lines": [
+            87,
+            87
+          ],
+          "match_position": [
+            75,
+            109
+          ],
+          "match_string": "    if (row.crop_id && (!/^[0-9a-fA-F]{24}$/.test(row.crop_id) || !(await Crop.findOne({ _id: row.crop_id })))) {"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/finance.js",
+          "match_lines": [
+            90,
+            90
+          ],
+          "match_position": [
+            75,
+            110
+          ],
+          "match_string": "    if (row.fieldId && (!/^[0-9a-fA-F]{24}$/.test(row.fieldId) || !(await Field.findOne({ _id: row.fieldId })))) {"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/finance.js",
+          "match_lines": [
+            93,
+            93
+          ],
+          "match_position": [
+            83,
+            121
+          ],
+          "match_string": "    if (row.cropCycleId && (!/^[0-9a-fA-F]{24}$/.test(row.cropCycleId) || !(await Crop.findOne({ _id: row.cropCycleId })))) {"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/finance.js",
+          "match_lines": [
+            128,
+            130
+          ],
+          "match_position": [
+            3,
+            55
+          ],
+          "match_string": "  const oid = parseOid(req.params.financeId, 'finance ID');\n  const entry = { ...(req.body || {}) };\n  const existing = await Finance.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            60,
+            62
+          ],
+          "match_position": [
+            3,
+            90
+          ],
+          "match_string": "  const body = req.body || {};\n  if (!body.laborer_id) return badRequest(res, 'Field worker is required.');\n  const laborer = await Laborer.findOne({ _id: parseOid(body.laborer_id, 'laborer ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            62,
+            62
+          ],
+          "match_position": [
+            25,
+            90
+          ],
+          "match_string": "  const laborer = await Laborer.findOne({ _id: parseOid(body.laborer_id, 'laborer ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            66,
+            73
+          ],
+          "match_position": [
+            3,
+            100
+          ],
+          "match_string": "  payload.date = payload.date || todayStr();\n  payload.crop_id = payload.crop_id || null;\n  const cropError = await validateCropLink(payload.crop_id);\n  if (cropError) return badRequest(res, cropError);\n  payload.posted = false;\n  payload.day_units = payload.day_type === 'full' ? 1.0 : 0.5;\n\n  const existing = await Attendance.findOne({ laborer_id: payload.laborer_id, date: payload.date });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            73,
+            73
+          ],
+          "match_position": [
+            26,
+            100
+          ],
+          "match_string": "  const existing = await Attendance.findOne({ laborer_id: payload.laborer_id, date: payload.date });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            86,
+            87
+          ],
+          "match_position": [
+            3,
+            53
+          ],
+          "match_string": "  const oid = parseOid(req.params.attId, 'attendance ID');\n  const row = await Attendance.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            86,
+            102
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const oid = parseOid(req.params.attId, 'attendance ID');\n  const row = await Attendance.findOne({ _id: oid });\n  if (!row) return notFound(res, 'Attendance row not found');\n  if (row.posted) return badRequest(res, 'Posted attendance cannot be edited. Remove the Labor ledger entry first if needed.');\n  const body = req.body || {};\n  const payload = {};\n  if (body.day_type !== undefined) {\n    if (!['full', 'half'].includes(body.day_type)) return badRequest(res, 'day_type must be full or half');\n    payload.day_type = body.day_type;\n    payload.day_units = body.day_type === 'full' ? 1.0 : 0.5;\n  }\n  if (body.date !== undefined) {\n    if (!/\\d{4}-\\d{2}-\\d{2}/.test(String(body.date))) return badRequest(res, 'Invalid date');\n    const clash = await Attendance.findOne({ laborer_id: row.laborer_id, date: String(body.date), _id: { $ne: oid } });\n    if (clash) return badRequest(res, 'This worker already has attendance on that date.');\n    payload.date = String(body.date);\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            87,
+            102
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const row = await Attendance.findOne({ _id: oid });\n  if (!row) return notFound(res, 'Attendance row not found');\n  if (row.posted) return badRequest(res, 'Posted attendance cannot be edited. Remove the Labor ledger entry first if needed.');\n  const body = req.body || {};\n  const payload = {};\n  if (body.day_type !== undefined) {\n    if (!['full', 'half'].includes(body.day_type)) return badRequest(res, 'day_type must be full or half');\n    payload.day_type = body.day_type;\n    payload.day_units = body.day_type === 'full' ? 1.0 : 0.5;\n  }\n  if (body.date !== undefined) {\n    if (!/\\d{4}-\\d{2}-\\d{2}/.test(String(body.date))) return badRequest(res, 'Invalid date');\n    const clash = await Attendance.findOne({ laborer_id: row.laborer_id, date: String(body.date), _id: { $ne: oid } });\n    if (clash) return badRequest(res, 'This worker already has attendance on that date.');\n    payload.date = String(body.date);\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            90,
+            102
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const body = req.body || {};\n  const payload = {};\n  if (body.day_type !== undefined) {\n    if (!['full', 'half'].includes(body.day_type)) return badRequest(res, 'day_type must be full or half');\n    payload.day_type = body.day_type;\n    payload.day_units = body.day_type === 'full' ? 1.0 : 0.5;\n  }\n  if (body.date !== undefined) {\n    if (!/\\d{4}-\\d{2}-\\d{2}/.test(String(body.date))) return badRequest(res, 'Invalid date');\n    const clash = await Attendance.findOne({ laborer_id: row.laborer_id, date: String(body.date), _id: { $ne: oid } });\n    if (clash) return badRequest(res, 'This worker already has attendance on that date.');\n    payload.date = String(body.date);\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            99,
+            99
+          ],
+          "match_position": [
+            25,
+            119
+          ],
+          "match_string": "    const clash = await Attendance.findOne({ laborer_id: row.laborer_id, date: String(body.date), _id: { $ne: oid } });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            115,
+            116
+          ],
+          "match_position": [
+            3,
+            53
+          ],
+          "match_string": "  const oid = parseOid(req.params.attId, 'attendance ID');\n  const row = await Attendance.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            132,
+            134
+          ],
+          "match_position": [
+            3,
+            90
+          ],
+          "match_string": "  const body = req.body || {};\n  if (!body.laborer_id) return badRequest(res, 'Field worker is required.');\n  const laborer = await Laborer.findOne({ _id: parseOid(body.laborer_id, 'laborer ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            134,
+            134
+          ],
+          "match_position": [
+            25,
+            90
+          ],
+          "match_string": "  const laborer = await Laborer.findOne({ _id: parseOid(body.laborer_id, 'laborer ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            145,
+            146
+          ],
+          "match_position": [
+            3,
+            55
+          ],
+          "match_string": "  const oid = parseOid(req.params.advId, 'advance ID');\n  const row = await LaborAdvance.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/labor.js",
+          "match_lines": [
+            166,
+            167
+          ],
+          "match_position": [
+            3,
+            55
+          ],
+          "match_string": "  const oid = parseOid(req.params.advId, 'advance ID');\n  const row = await LaborAdvance.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/liabilities.js",
+          "match_lines": [
+            37,
+            38
+          ],
+          "match_position": [
+            3,
+            87
+          ],
+          "match_string": "  const itemId = req.params.itemId;\n  const liability = await Liability.findOne({ _id: parseOid(itemId, 'liability ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/liabilities.js",
+          "match_lines": [
+            38,
+            53
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const liability = await Liability.findOne({ _id: parseOid(itemId, 'liability ID') });\n  if (!liability) return notFound(res, 'Liability not found');\n\n  if (liability.status === 'Paid') {\n    return res.json({ status: 'already_paid' });\n  }\n\n  await Liability.updateOne({ _id: itemId }, { $set: { status: 'Paid' } });\n\n  let cropName = '';\n  if (liability.crop_id) {\n    try {\n      const crop = await Crop.findOne({ _id: String(liability.crop_id) });\n      if (crop) cropName = ` - ${crop.name}`;\n    } catch { /* ignore */ }\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/liabilities.js",
+          "match_lines": [
+            38,
+            38
+          ],
+          "match_position": [
+            27,
+            87
+          ],
+          "match_string": "  const liability = await Liability.findOne({ _id: parseOid(itemId, 'liability ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/liabilities.js",
+          "match_lines": [
+            50,
+            50
+          ],
+          "match_position": [
+            26,
+            74
+          ],
+          "match_string": "      const crop = await Crop.findOne({ _id: String(liability.crop_id) });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/suppliers.js",
+          "match_lines": [
+            42,
+            45
+          ],
+          "match_position": [
+            3,
+            83
+          ],
+          "match_string": "  const supplierId = req.params.supplierId;\n  const amount = Number(req.body?.amount || 0);\n  if (amount <= 0) return badRequest(res, 'Amount must be more than 0');\n  const sup = await Supplier.findOne({ _id: parseOid(supplierId, 'supplier ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/suppliers.js",
+          "match_lines": [
+            45,
+            45
+          ],
+          "match_position": [
+            21,
+            83
+          ],
+          "match_string": "  const sup = await Supplier.findOne({ _id: parseOid(supplierId, 'supplier ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/suppliers.js",
+          "match_lines": [
+            53,
+            54
+          ],
+          "match_position": [
+            3,
+            64
+          ],
+          "match_string": "  const paymentId = parseOid(req.params.paymentId, 'payment ID');\n  const row = await SupplierPayment.findOne({ _id: paymentId });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/tasks.js",
+          "match_lines": [
+            96,
+            96
+          ],
+          "match_position": [
+            61,
+            95
+          ],
+          "match_string": "      if (!/^[0-9a-fA-F]{24}$/.test(row.crop_id) || !(await Crop.findOne({ _id: row.crop_id }))) {"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/tasks.js",
+          "match_lines": [
+            101,
+            101
+          ],
+          "match_position": [
+            71,
+            120
+          ],
+          "match_string": "      if (!/^[0-9a-fA-F]{24}$/.test(row.inventory_item_id) || !(await Inventory.findOne({ _id: row.inventory_item_id }))) {"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/tasks.js",
+          "match_lines": [
+            170,
+            171
+          ],
+          "match_position": [
+            3,
+            48
+          ],
+          "match_string": "  const oid = parseOid(req.params.taskId, 'task ID');\n  const task = await Task.findOne({ _id: oid });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/tasks.js",
+          "match_lines": [
+            209,
+            222
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const invItemId = task.inventory_item_id;\n  const qtyConsumed = Number(task.inventory_qty_consumed || 0);\n  if (invItemId && qtyConsumed > 0) {\n    try {\n      const invItem = await Inventory.findOne({ _id: String(invItemId) });\n      if (invItem && (Number(invItem.current_stock) || 0) >= qtyConsumed) {\n        await Inventory.updateOne({ _id: String(invItemId) }, { $inc: { current_stock: -qtyConsumed } });\n      } else {\n        console.log(`\u26a0\ufe0f Skipped inventory deduction: insufficient stock or item not found for ${invItemId}`);\n      }\n    } catch (invErr) {\n      console.log('Failed to auto-deduct inventory stock:', invErr.message);\n    }\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/tasks.js",
+          "match_lines": [
+            230,
+            251
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    const attDate = todayStr();\n    for (const lid of crewIds) {\n      try {\n        const laborer = await Laborer.findOne({ _id: lid });\n        if (!laborer) continue;\n        const existing = await Attendance.findOne({ laborer_id: lid, date: attDate });\n        if (existing) continue; // already marked today (manually or by another task)\n        await Attendance.insertMany([{\n          laborer_id: lid,\n          date: attDate,\n          day_type: 'full',\n          day_units: 1.0,\n          crop_id: task.crop_id || null,\n          field: '',\n          notes: `Auto: task '${task.title}' completed`,\n          posted: false,\n        }]);\n        crewMarked += 1;\n      } catch (attErr) {\n        console.log('Failed to auto-mark crew attendance:', attErr.message);\n      }\n    }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/telegram.js",
+          "match_lines": [
+            68,
+            82
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const userId = String(body.userId || '');\n  const laborerId = String(body.laborerId || '');\n  const farmId = mufGetFarmContext()?.farmId;\n  if (!farmId) return res.status(400).json({ detail: 'Select one farm before creating a Telegram link code' });\n  let username = '';\n  let laborerName = '';\n  if (userId) {\n    const u = await User.findOne({ _id: parseOid(userId, 'user ID') });\n    if (!u) return res.status(404).json({ detail: 'User not found' });\n    const assignedFarmIds = (u.farmIds || []).map(String);\n    if (!mufIsOwner(u.role) && !assignedFarmIds.includes(String(farmId))) {\n      return res.status(404).json({ detail: 'User not found in the selected farm' });\n    }\n    username = u.username || '';\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/telegram.js",
+          "match_lines": [
+            69,
+            87
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const laborerId = String(body.laborerId || '');\n  const farmId = mufGetFarmContext()?.farmId;\n  if (!farmId) return res.status(400).json({ detail: 'Select one farm before creating a Telegram link code' });\n  let username = '';\n  let laborerName = '';\n  if (userId) {\n    const u = await User.findOne({ _id: parseOid(userId, 'user ID') });\n    if (!u) return res.status(404).json({ detail: 'User not found' });\n    const assignedFarmIds = (u.farmIds || []).map(String);\n    if (!mufIsOwner(u.role) && !assignedFarmIds.includes(String(farmId))) {\n      return res.status(404).json({ detail: 'User not found in the selected farm' });\n    }\n    username = u.username || '';\n  }\n  if (laborerId) {\n    const lw = await Laborer.findOne({ _id: parseOid(laborerId, 'worker ID') });\n    if (!lw) return res.status(404).json({ detail: 'Worker not found' });\n    laborerName = lw.name || '';\n  }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/telegram.js",
+          "match_lines": [
+            75,
+            75
+          ],
+          "match_position": [
+            21,
+            71
+          ],
+          "match_string": "    const u = await User.findOne({ _id: parseOid(userId, 'user ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/telegram.js",
+          "match_lines": [
+            84,
+            84
+          ],
+          "match_position": [
+            22,
+            80
+          ],
+          "match_string": "    const lw = await Laborer.findOne({ _id: parseOid(laborerId, 'worker ID') });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/telegram.js",
+          "match_lines": [
+            176,
+            224
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    const date = todayStr();\n    if (['help', 'unknown', 'milk', 'eggs'].includes(cmd.kind)) {\n      await send(cmd.kind === 'unknown' ? m.TG.unknown : AGRI_TG_HELP);\n      return res.json({ ok: true });\n    }\n\n    if (cmd.kind === 'expense') {\n      const qty = toFloat(cmd.qty);\n      if (qty <= 0) {\n        await send(m.TG.noQty);\n        return res.json({ ok: true });\n      }\n      const category = String(cmd.name || 'Other').split(' ').map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(' ').slice(0, 40);\n      const who = link.laborerName || link.username || chatId;\n      await Finance.insertMany([{\n        category,\n        amount: qty,\n        type: 'expense',\n        date,\n        crop_id: null,\n        notes: `via Telegram (${who})`,\n      }]);\n      await send(m.TG.saved(`\u062e\u0631\u0686\u06c1 Rs ${Math.trunc(qty).toLocaleString()} (${category}) \u2014 ${date}`));\n      return res.json({ ok: true });\n    }\n\n    if (cmd.kind === 'attendance') {\n      if (!link.laborerId) {\n        await send('\u0622\u067e \u06a9\u06d2 \u06a9\u06be\u0627\u062a\u06d2 \u06a9\u06d2 \u0633\u0627\u062a\u06be \u0645\u0632\u062f\u0648\u0631 \u067e\u0631\u0648\u0641\u0627\u0626\u0644 \u0645\u0646\u0633\u0644\u06a9 \u0646\u06c1\u06cc\u06ba \u2014 \u0627\u06cc\u0688\u0645\u0646 \u0633\u06d2 \u06a9\u06c1\u06cc\u06ba \u06a9\u06c1 \u0644\u0646\u06a9 \u06a9\u0648\u0688 \u0628\u0646\u0627\u062a\u06d2 \u0648\u0642\u062a \u0648\u0631\u06a9\u0631 \u0628\u06be\u06cc \u0686\u0646\u06d2\u06d4');\n        return res.json({ ok: true });\n      }\n      const existing = await Attendance.findOne({ laborer_id: link.laborerId, date });\n      if (existing) {\n        await send(`\u0622\u062c \u06a9\u06cc \u062d\u0627\u0636\u0631\u06cc \u067e\u06c1\u0644\u06d2 \u0633\u06d2 \u0644\u06af\u06cc \u06c1\u06d2 (${date})\u06d4`);\n        return res.json({ ok: true });\n      }\n      await Attendance.insertMany([{\n        laborer_id: link.laborerId,\n        date,\n        day_type: 'full',\n        day_units: 1.0,\n        crop_id: null,\n        field: '',\n        notes: 'via Telegram',\n        posted: false,\n      }]);\n      await send(m.TG.saved(`\u062d\u0627\u0636\u0631\u06cc (\u067e\u0648\u0631\u0627 \u062f\u0646) \u2014 ${date}`));\n      return res.json({ ok: true });\n    }"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/telegram.js",
+          "match_lines": [
+            207,
+            207
+          ],
+          "match_position": [
+            30,
+            86
+          ],
+          "match_string": "      const existing = await Attendance.findOne({ laborer_id: link.laborerId, date });"
+        },
+        {
+          "file_path": "agri_farm/backend/routes/telegram.js",
+          "match_lines": [
+            295,
+            295
+          ],
+          "match_position": [
+            23,
+            78
+          ],
+          "match_string": "      try { u = await User.findOne({ _id: parseOid(link.userId, 'user ID') }); } catch { u = null; }"
+        },
+        {
+          "file_path": "agri_farm/backend/server.js",
+          "match_lines": [
+            275,
+            275
+          ],
+          "match_position": [
+            29,
+            108
+          ],
+          "match_string": "    const adminUser = await (await import('./db.js')).User.findOne({ role: { $in: MUF_FULL_ROLE_VALUES } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            135,
+            155
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const cleanEmail = String(email || '').trim().toLowerCase();\n  if (cleanEmail && !validateEmail(cleanEmail)) {\n    const err = new Error('Invalid email format');\n    err.status = 400;\n    throw err;\n  }\n\n  const existingUsername = await User.findOne({ username: cleanUsername });\n  if (existingUsername) {\n    const err = new Error('A user with that username already exists');\n    err.status = 409;\n    throw err;\n  }\n  if (cleanEmail) {\n    const existingEmail = await User.findOne({ email: cleanEmail });\n    if (existingEmail) {\n      const err = new Error('Email already in use');\n      err.status = 409;\n      throw err;\n    }\n  }"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            199,
+            202
+          ],
+          "match_position": [
+            5,
+            53
+          ],
+          "match_string": "    const identifier = normalizeUsername(req.body?.username);\n    const user = identifier.includes('@')\n      ? await User.findOne({ email: identifier })\n      : await User.findOne({ username: identifier });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            232,
+            274
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    const user = await User.findById(req.user.id);\n    if (!user || user.active === false) return res.status(401).json({ error: 'User is not active' });\n\n    if (req.body?.displayName !== undefined) user.displayName = String(req.body.displayName || '').trim();\n\n    // Avatar: compressed base64 data-URL stored in-place on the user doc.\n    // Overwriting replaces the previous image (no orphaned data), and\n    // 'REMOVE_AVATAR' clears it \u2014 freeing the space entirely.\n    if (req.body?.avatarBase64 !== undefined) {\n      const avatar = String(req.body.avatarBase64 || '');\n      if (avatar === 'REMOVE_AVATAR') {\n        user.avatarBase64 = '';\n      } else {\n        if (avatar && !avatar.startsWith('data:image/')) {\n          return res.status(400).json({ error: 'Avatar must be an image data URL' });\n        }\n        if (avatar.length > 400000) {\n          return res.status(400).json({ error: 'Avatar image is too large \u2014 please use a smaller photo' });\n        }\n        user.avatarBase64 = avatar;\n      }\n    }\n\n    if (req.body?.email !== undefined) {\n      const cleanEmail = String(req.body.email || '').trim().toLowerCase();\n      if (cleanEmail && !validateEmail(cleanEmail)) return res.status(400).json({ error: 'Invalid email format' });\n      if (cleanEmail) {\n        const duplicate = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });\n        if (duplicate) return res.status(409).json({ error: 'Email already in use' });\n      }\n      // An account with a registered email must\n      // confirm an email change with an emailed verification code.\n      const currentEmail = String(user.email || '').trim().toLowerCase();\n      if (cleanEmail !== currentEmail && currentEmail) {\n        const code = String(req.body?.code || '').trim();\n        if (!code) {\n          return res.status(400).json({ error: 'Verification code is required to update the account email.' });\n        }\n        const valid = await consumeProfileCode(user._id, code);\n        if (!valid) return res.status(400).json({ error: 'Invalid or expired verification code' });\n      }\n      user.email = cleanEmail;\n    }"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            256,
+            261
+          ],
+          "match_position": [
+            7,
+            8
+          ],
+          "match_string": "      const cleanEmail = String(req.body.email || '').trim().toLowerCase();\n      if (cleanEmail && !validateEmail(cleanEmail)) return res.status(400).json({ error: 'Invalid email format' });\n      if (cleanEmail) {\n        const duplicate = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });\n        if (duplicate) return res.status(409).json({ error: 'Email already in use' });\n      }"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            259,
+            259
+          ],
+          "match_position": [
+            33,
+            92
+          ],
+          "match_string": "        const duplicate = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            333,
+            345
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    const user = await User.findById(req.params.id);\n    if (!user) return res.status(404).json({ error: 'User not found' });\n\n    const isSelf = String(user._id) === String(req.user.id);\n    if (!isSelf && !managerCanHandle(req, user)) return res.status(403).json({ error: 'You can only manage workers in your own farms' });\n\n    if (req.body?.username !== undefined) {\n      const cleanUsername = normalizeUsername(req.body.username);\n      if (cleanUsername.length < 3) return res.status(400).json({ error: 'Username must be at least 3 characters' });\n      const duplicate = await User.findOne({ username: cleanUsername, _id: { $ne: user._id } });\n      if (duplicate) return res.status(409).json({ error: 'Username is already taken' });\n      user.username = cleanUsername;\n    }"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            333,
+            401
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    const user = await User.findById(req.params.id);\n    if (!user) return res.status(404).json({ error: 'User not found' });\n\n    const isSelf = String(user._id) === String(req.user.id);\n    if (!isSelf && !managerCanHandle(req, user)) return res.status(403).json({ error: 'You can only manage workers in your own farms' });\n\n    if (req.body?.username !== undefined) {\n      const cleanUsername = normalizeUsername(req.body.username);\n      if (cleanUsername.length < 3) return res.status(400).json({ error: 'Username must be at least 3 characters' });\n      const duplicate = await User.findOne({ username: cleanUsername, _id: { $ne: user._id } });\n      if (duplicate) return res.status(409).json({ error: 'Username is already taken' });\n      user.username = cleanUsername;\n    }\n\n    if (req.body?.password !== undefined) {\n      if (String(req.body.password).length < MIN_PASSWORD_LENGTH) {\n        return res.status(400).json({ error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` });\n      }\n      user.password = await bcrypt.hash(String(req.body.password), 10);\n    }\n\n    if (req.body?.role !== undefined) {\n      if (isSelf) return res.status(400).json({ error: \"You can't change your own role\" });\n      if (!mufIsOwner(req.user.role)) return res.status(403).json({ error: 'Only an owner can change roles' });\n      user.role = normalizeRole(req.body.role);\n    }\n\n    if (req.body?.farmIds !== undefined) {\n      let farmIds = await validFarmIds(req.body.farmIds);\n      if (!mufIsOwner(req.user.role)) {\n        const mine = new Set((req.user.farmIds || []).map(String));\n        // A manager may change a worker's assignments only within farms the\n        // manager controls. Preserve the worker's assignments on other farms.\n        const outsideMyFarms = (user.farmIds || []).map(String).filter((id) => !mine.has(id));\n        farmIds = [...new Set([...outsideMyFarms, ...farmIds.filter((id) => mine.has(id))])];\n      }\n      if (normalizeRole(user.role) !== 'owner' && farmIds.length === 0) {\n        return res.status(400).json({ error: 'Assign at least one farm to this account' });\n      }\n      user.farmIds = farmIds;\n    }\n\n    if (req.body?.displayName !== undefined) user.displayName = String(req.body.displayName || '').trim();\n\n    if (req.body?.active !== undefined) {\n      if (isSelf) return res.status(400).json({ error: \"You can't deactivate yourself\" });\n      user.active = Boolean(req.body.active);\n    }\n\n    if (req.body?.email !== undefined) {\n      const cleanEmail = String(req.body.email || '').trim().toLowerCase();\n      if (cleanEmail && !validateEmail(cleanEmail)) return res.status(400).json({ error: 'Invalid email format' });\n      if (cleanEmail) {\n        const duplicate = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });\n        if (duplicate) return res.status(409).json({ error: 'Email already in use' });\n      }\n      // An account with a registered email must\n      // confirm an email change with an emailed verification code.\n      const currentEmail = String(user.email || '').trim().toLowerCase();\n      if (cleanEmail !== currentEmail && currentEmail) {\n        const code = String(req.body?.code || '').trim();\n        if (!code) {\n          return res.status(400).json({ error: 'Verification code is required to update the account email.' });\n        }\n        const valid = await consumeProfileCode(user._id, code);\n        if (!valid) return res.status(400).json({ error: 'Invalid or expired verification code' });\n      }\n      user.email = cleanEmail;\n    }"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            340,
+            342
+          ],
+          "match_position": [
+            7,
+            96
+          ],
+          "match_string": "      const cleanUsername = normalizeUsername(req.body.username);\n      if (cleanUsername.length < 3) return res.status(400).json({ error: 'Username must be at least 3 characters' });\n      const duplicate = await User.findOne({ username: cleanUsername, _id: { $ne: user._id } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            342,
+            342
+          ],
+          "match_position": [
+            31,
+            96
+          ],
+          "match_string": "      const duplicate = await User.findOne({ username: cleanUsername, _id: { $ne: user._id } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            383,
+            388
+          ],
+          "match_position": [
+            7,
+            8
+          ],
+          "match_string": "      const cleanEmail = String(req.body.email || '').trim().toLowerCase();\n      if (cleanEmail && !validateEmail(cleanEmail)) return res.status(400).json({ error: 'Invalid email format' });\n      if (cleanEmail) {\n        const duplicate = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });\n        if (duplicate) return res.status(409).json({ error: 'Email already in use' });\n      }"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            386,
+            386
+          ],
+          "match_position": [
+            33,
+            92
+          ],
+          "match_string": "        const duplicate = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            531,
+            536
+          ],
+          "match_position": [
+            5,
+            108
+          ],
+          "match_string": "    const email = String(req.body?.email || '').trim().toLowerCase();\n    if (!email || !validateEmail(email)) {\n      return res.status(400).json({ error: 'A valid email is required' });\n    }\n\n    const user = await User.findOne({ email, role: { $in: MUF_FULL_ROLE_VALUES }, active: { $ne: false } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            536,
+            536
+          ],
+          "match_position": [
+            24,
+            108
+          ],
+          "match_string": "    const user = await User.findOne({ email, role: { $in: MUF_FULL_ROLE_VALUES }, active: { $ne: false } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            557,
+            569
+          ],
+          "match_position": [
+            5,
+            108
+          ],
+          "match_string": "    const email = String(req.body?.email || '').trim().toLowerCase();\n    const code = String(req.body?.code || '').trim();\n    const newPassword = String(req.body?.newPassword || '');\n\n    if (!email || !code || !newPassword) {\n      return res.status(400).json({ error: 'email, code, and newPassword are required' });\n    }\n    if (!validateEmail(email)) return res.status(400).json({ error: 'A valid email is required' });\n    if (newPassword.length < MIN_PASSWORD_LENGTH) {\n      return res.status(400).json({ error: `New password must be at least ${MIN_PASSWORD_LENGTH} characters` });\n    }\n\n    const user = await User.findOne({ email, role: { $in: MUF_FULL_ROLE_VALUES }, active: { $ne: false } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            569,
+            577
+          ],
+          "match_position": [
+            5,
+            31
+          ],
+          "match_string": "    const user = await User.findOne({ email, role: { $in: MUF_FULL_ROLE_VALUES }, active: { $ne: false } });\n    if (!user) return res.status(400).json({ error: 'Invalid or expired code' });\n\n    const reset = await PasswordReset.findOne({\n      purpose: 'reset_password',\n      userId: user._id,\n      usedAt: null,\n      expiresAt: { $gt: new Date() },\n    }).sort({ createdAt: -1 });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            569,
+            569
+          ],
+          "match_position": [
+            24,
+            108
+          ],
+          "match_string": "    const user = await User.findOne({ email, role: { $in: MUF_FULL_ROLE_VALUES }, active: { $ne: false } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/auth.js",
+          "match_lines": [
+            572,
+            577
+          ],
+          "match_position": [
+            25,
+            7
+          ],
+          "match_string": "    const reset = await PasswordReset.findOne({\n      purpose: 'reset_password',\n      userId: user._id,\n      usedAt: null,\n      expiresAt: { $gt: new Date() },\n    }).sort({ createdAt: -1 });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/backup.js",
+          "match_lines": [
+            233,
+            233
+          ],
+          "match_position": [
+            27,
+            109
+          ],
+          "match_string": "      const admin = await User.findOne({ role: { $in: MUF_FULL_ROLE_VALUES }, email: { $nin: [null, ''] } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/cows.js",
+          "match_lines": [
+            304,
+            304
+          ],
+          "match_position": [
+            7,
+            45
+          ],
+          "match_string": "      Sale.findOne({ cowId: req.params.id }),"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/cows.js",
+          "match_lines": [
+            413,
+            413
+          ],
+          "match_position": [
+            31,
+            81
+          ],
+          "match_string": "    const existingExp = await Expense.findOne({ _purchaseCowId: req.params.id });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/dailylog.js",
+          "match_lines": [
+            35,
+            35
+          ],
+          "match_position": [
+            23,
+            66
+          ],
+          "match_string": "    const log = await DailyLog.findOne({ date: req.params.date });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/dailylog.js",
+          "match_lines": [
+            104,
+            104
+          ],
+          "match_position": [
+            28,
+            71
+          ],
+          "match_string": "    const existing = await DailyLog.findOne({ date: req.params.date });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/health.js",
+          "match_lines": [
+            163,
+            163
+          ],
+          "match_position": [
+            31,
+            76
+          ],
+          "match_string": "    const existingExp = await Expense.findOne({ _healthId: req.params.id });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/milk.js",
+          "match_lines": [
+            187,
+            187
+          ],
+          "match_position": [
+            32,
+            90
+          ],
+          "match_string": "        const existing = await Milk.findOne({ cowId: payload.cowId, date: payload.date });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/milk.js",
+          "match_lines": [
+            222,
+            222
+          ],
+          "match_position": [
+            28,
+            86
+          ],
+          "match_string": "    const existing = await Milk.findOne({ cowId: payload.cowId, date: payload.date });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/milk.js",
+          "match_lines": [
+            242,
+            242
+          ],
+          "match_position": [
+            38,
+            96
+          ],
+          "match_string": "          const existingRace = await Milk.findOne({ cowId: payload.cowId, date: payload.date });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/milk.js",
+          "match_lines": [
+            269,
+            271
+          ],
+          "match_position": [
+            7,
+            104
+          ],
+          "match_string": "      const nextCow = payload.cowId ?? current.cowId;\n      const nextDate = payload.date ?? current.date;\n      const clash = await Milk.findOne({ cowId: nextCow, date: nextDate, _id: { $ne: req.params.id } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/milk.js",
+          "match_lines": [
+            270,
+            271
+          ],
+          "match_position": [
+            7,
+            104
+          ],
+          "match_string": "      const nextDate = payload.date ?? current.date;\n      const clash = await Milk.findOne({ cowId: nextCow, date: nextDate, _id: { $ne: req.params.id } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/milk.js",
+          "match_lines": [
+            271,
+            271
+          ],
+          "match_position": [
+            27,
+            104
+          ],
+          "match_string": "      const clash = await Milk.findOne({ cowId: nextCow, date: nextDate, _id: { $ne: req.params.id } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/sales.js",
+          "match_lines": [
+            55,
+            55
+          ],
+          "match_position": [
+            32,
+            70
+          ],
+          "match_string": "    const existingSale = await Sale.findOne({ cowId: payload.cowId });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/sales.js",
+          "match_lines": [
+            75,
+            99
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    const sale = await Sale.findById(req.params.id);\n    if (!sale) return res.status(404).json({ error: 'Not found' });\n\n    // If cowId is changing, restore old cow and mark new cow as sold\n    if (payload.cowId && payload.cowId !== sale.cowId) {\n      const newCow = await Cow.findById(payload.cowId);\n      if (!newCow) return res.status(404).json({ error: 'Cow not found' });\n      if (newCow.status === 'sold') {\n        return res.status(400).json({ error: `${newCow.name} is already marked as sold` });\n      }\n      const otherSale = await Sale.findOne({ cowId: payload.cowId, _id: { $ne: sale._id } });\n      if (otherSale) {\n        return res.status(400).json({ error: `${newCow.name} already has a sale record` });\n      }\n\n      const oldCow = await Cow.findById(sale.cowId);\n      if (oldCow && oldCow.status === 'sold') {\n        oldCow.status = sale.previousStatus || 'active';\n        await oldCow.save();\n      }\n\n      payload.previousStatus = newCow.status;\n      newCow.status = 'sold';\n      await newCow.save();\n    }"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/sales.js",
+          "match_lines": [
+            85,
+            85
+          ],
+          "match_position": [
+            31,
+            93
+          ],
+          "match_string": "      const otherSale = await Sale.findOne({ cowId: payload.cowId, _id: { $ne: sale._id } });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/telegram.js",
+          "match_lines": [
+            145,
+            171
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    const date = todayStr();\n    if (cmd.kind === 'help' || cmd.kind === 'unknown') {\n      return send(cmd.kind === 'unknown' ? m.TG.unknown : HELP_TEXT);\n    }\n\n    if (cmd.kind === 'milk') {\n      if (!cmd.qty || cmd.qty <= 0) return send(m.TG.noQty);\n      const cows = await Cow.find();\n      const name = (cmd.name || '').toLowerCase();\n      const alive = cows.filter((c) => c.status !== 'sold');\n      const matches = name ? alive.filter((c) => String(c.name || '').toLowerCase().includes(name)) : [];\n      if (matches.length === 0) {\n        return send(`\u06af\u0627\u0626\u06d2 \u06a9\u0627 \u0646\u0627\u0645 \u0633\u0645\u062c\u06be \u0646\u06c1\u06cc\u06ba \u0622\u06cc\u0627\u06d4 \u0627\u06cc\u0633\u06d2 \u0644\u06a9\u06be\u06cc\u06ba: \"doodh bella 12\"\\n\u0622\u067e \u06a9\u06d2 \u062c\u0627\u0646\u0648\u0631: ${alive.slice(0, 10).map((c) => c.name).join('\u060c ')}`);\n      }\n      if (matches.length > 1) {\n        return send(`\u0627\u06cc\u06a9 \u0633\u06d2 \u0632\u06cc\u0627\u062f\u06c1 \u062c\u0627\u0646\u0648\u0631 \u0645\u0644\u06d2: ${matches.map((c) => c.name).join('\u060c ')} \u2014 \u067e\u0648\u0631\u0627 \u0646\u0627\u0645 \u0644\u06a9\u06be\u06cc\u06ba\u06d4`);\n      }\n      const cow = matches[0];\n      const shift = farmHour() < 14 ? 'morning' : 'evening';\n      const existing = await Milk.findOne({ cowId: cow._id, date });\n      if (existing) {\n        await Milk.findByIdAndUpdate(existing._id, { $set: { [shift]: cmd.qty } }, { new: true });\n      } else {\n        await Milk.create({ _id: randomUUID(), cowId: cow._id, date, morning: shift === 'morning' ? cmd.qty : 0, evening: shift === 'evening' ? cmd.qty : 0 });\n      }\n      return send(m.TG.saved(`${cow.name}: ${cmd.qty} \u0644\u06cc\u0679\u0631 (${shift === 'morning' ? '\u0635\u0628\u062d' : '\u0634\u0627\u0645'}) \u2014 ${date}`));\n    }"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/telegram.js",
+          "match_lines": [
+            145,
+            186
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    const date = todayStr();\n    if (cmd.kind === 'help' || cmd.kind === 'unknown') {\n      return send(cmd.kind === 'unknown' ? m.TG.unknown : HELP_TEXT);\n    }\n\n    if (cmd.kind === 'milk') {\n      if (!cmd.qty || cmd.qty <= 0) return send(m.TG.noQty);\n      const cows = await Cow.find();\n      const name = (cmd.name || '').toLowerCase();\n      const alive = cows.filter((c) => c.status !== 'sold');\n      const matches = name ? alive.filter((c) => String(c.name || '').toLowerCase().includes(name)) : [];\n      if (matches.length === 0) {\n        return send(`\u06af\u0627\u0626\u06d2 \u06a9\u0627 \u0646\u0627\u0645 \u0633\u0645\u062c\u06be \u0646\u06c1\u06cc\u06ba \u0622\u06cc\u0627\u06d4 \u0627\u06cc\u0633\u06d2 \u0644\u06a9\u06be\u06cc\u06ba: \"doodh bella 12\"\\n\u0622\u067e \u06a9\u06d2 \u062c\u0627\u0646\u0648\u0631: ${alive.slice(0, 10).map((c) => c.name).join('\u060c ')}`);\n      }\n      if (matches.length > 1) {\n        return send(`\u0627\u06cc\u06a9 \u0633\u06d2 \u0632\u06cc\u0627\u062f\u06c1 \u062c\u0627\u0646\u0648\u0631 \u0645\u0644\u06d2: ${matches.map((c) => c.name).join('\u060c ')} \u2014 \u067e\u0648\u0631\u0627 \u0646\u0627\u0645 \u0644\u06a9\u06be\u06cc\u06ba\u06d4`);\n      }\n      const cow = matches[0];\n      const shift = farmHour() < 14 ? 'morning' : 'evening';\n      const existing = await Milk.findOne({ cowId: cow._id, date });\n      if (existing) {\n        await Milk.findByIdAndUpdate(existing._id, { $set: { [shift]: cmd.qty } }, { new: true });\n      } else {\n        await Milk.create({ _id: randomUUID(), cowId: cow._id, date, morning: shift === 'morning' ? cmd.qty : 0, evening: shift === 'evening' ? cmd.qty : 0 });\n      }\n      return send(m.TG.saved(`${cow.name}: ${cmd.qty} \u0644\u06cc\u0679\u0631 (${shift === 'morning' ? '\u0635\u0628\u062d' : '\u0634\u0627\u0645'}) \u2014 ${date}`));\n    }\n\n    if (cmd.kind === 'expense') {\n      if (!cmd.qty || cmd.qty <= 0) return send(m.TG.noQty);\n      const type = m.expenseHint(cmd.words);\n      await Expense.create({ _id: randomUUID(), cowId: null, date, type, amount: cmd.qty, note: `${cmd.name || type} (Telegram: ${link.laborerName || link.username || chatId})`.trim() });\n      return send(m.TG.saved(`\u062e\u0631\u0686\u06c1 Rs ${cmd.qty.toLocaleString()} (${type}) \u2014 ${date}`));\n    }\n\n    if (cmd.kind === 'attendance') {\n      if (!link.laborerId) return send('\u0622\u067e \u06a9\u06d2 \u06a9\u06be\u0627\u062a\u06d2 \u06a9\u06d2 \u0633\u0627\u062a\u06be \u0645\u0632\u062f\u0648\u0631 \u067e\u0631\u0648\u0641\u0627\u0626\u0644 \u0645\u0646\u0633\u0644\u06a9 \u0646\u06c1\u06cc\u06ba \u2014 \u0627\u06cc\u0688\u0645\u0646 \u0633\u06d2 \u06a9\u06c1\u06cc\u06ba \u06a9\u06c1 \u0644\u0646\u06a9 \u06a9\u0648\u0688 \u0628\u0646\u0627\u062a\u06d2 \u0648\u0642\u062a \u0648\u0631\u06a9\u0631 \u0628\u06be\u06cc \u0686\u0646\u06d2\u06d4');\n      const already = await LaborAttendance.findOne({ workerId: link.laborerId, date });\n      if (already) return send(`\u0622\u062c \u06a9\u06cc \u062d\u0627\u0636\u0631\u06cc \u067e\u06c1\u0644\u06d2 \u0633\u06d2 \u0644\u06af\u06cc \u06c1\u06d2 (${date})\u06d4`);\n      await LaborAttendance.create({ _id: randomUUID(), workerId: link.laborerId, date, dayType: 'full', posted: false, notes: 'via Telegram' });\n      return send(m.TG.saved(`\u062d\u0627\u0636\u0631\u06cc (\u067e\u0648\u0631\u0627 \u062f\u0646) \u2014 ${date}`));\n    }"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/telegram.js",
+          "match_lines": [
+            164,
+            164
+          ],
+          "match_position": [
+            30,
+            68
+          ],
+          "match_string": "      const existing = await Milk.findOne({ cowId: cow._id, date });"
+        },
+        {
+          "file_path": "dairy_farm/backend/routes/telegram.js",
+          "match_lines": [
+            182,
+            182
+          ],
+          "match_position": [
+            29,
+            88
+          ],
+          "match_string": "      const already = await LaborAttendance.findOne({ workerId: link.laborerId, date });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            109,
+            113
+          ],
+          "match_position": [
+            3,
+            4
+          ],
+          "match_string": "  const clean = String(identifier || '').trim().toLowerCase();\n  if (!clean) return null;\n  if (clean.includes('@')) {\n    return User.findOne({ email: clean });\n  }"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            109,
+            114
+          ],
+          "match_position": [
+            3,
+            44
+          ],
+          "match_string": "  const clean = String(identifier || '').trim().toLowerCase();\n  if (!clean) return null;\n  if (clean.includes('@')) {\n    return User.findOne({ email: clean });\n  }\n  return User.findOne({ username: clean });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            162,
+            207
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    const user = await User.findById(req.user._id);\n    if (!user) return res.status(404).json({ error: 'User not found' });\n\n    if (displayName !== undefined) user.displayName = String(displayName || '').trim();\n\n    // Avatar: compressed base64 data-URL stored in-place on the user doc.\n    // Overwriting replaces the previous image (no orphaned data), and\n    // 'REMOVE_AVATAR' clears it \u2014 freeing the space entirely.\n    if (avatarBase64 !== undefined) {\n      const avatar = String(avatarBase64 || '');\n      if (avatar === 'REMOVE_AVATAR') {\n        user.avatarBase64 = '';\n      } else {\n        if (avatar && !avatar.startsWith('data:image/')) {\n          return res.status(400).json({ error: 'Avatar must be an image data URL' });\n        }\n        if (avatar.length > 400000) {\n          return res.status(400).json({ error: 'Avatar image is too large \u2014 please use a smaller photo' });\n        }\n        user.avatarBase64 = avatar;\n      }\n    }\n    if (email !== undefined) {\n      const clean = String(email || '').trim().toLowerCase();\n      if (!clean) {\n        user.email = null;\n      } else if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(clean)) {\n        return res.status(400).json({ error: 'Invalid email format' });\n      } else {\n        // ensure unique\n        const dup = await User.findOne({ email: clean, _id: { $ne: user._id } });\n        if (dup) return res.status(409).json({ error: 'Email already in use' });\n        // An account with a registered email must\n        // confirm an email change with an emailed verification code.\n        const currentEmail = String(user.email || '').trim().toLowerCase();\n        if (clean !== currentEmail && currentEmail) {\n          const code = String(req.body?.code || '').trim();\n          if (!code) {\n            return res.status(400).json({ error: 'Verification code is required to update the account email.' });\n          }\n          const valid = await consumeProfileCode(user._id, code);\n          if (!valid) return res.status(400).json({ error: 'Invalid or expired verification code' });\n        }\n        user.email = clean;\n      }\n    }"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            185,
+            206
+          ],
+          "match_position": [
+            7,
+            8
+          ],
+          "match_string": "      const clean = String(email || '').trim().toLowerCase();\n      if (!clean) {\n        user.email = null;\n      } else if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(clean)) {\n        return res.status(400).json({ error: 'Invalid email format' });\n      } else {\n        // ensure unique\n        const dup = await User.findOne({ email: clean, _id: { $ne: user._id } });\n        if (dup) return res.status(409).json({ error: 'Email already in use' });\n        // An account with a registered email must\n        // confirm an email change with an emailed verification code.\n        const currentEmail = String(user.email || '').trim().toLowerCase();\n        if (clean !== currentEmail && currentEmail) {\n          const code = String(req.body?.code || '').trim();\n          if (!code) {\n            return res.status(400).json({ error: 'Verification code is required to update the account email.' });\n          }\n          const valid = await consumeProfileCode(user._id, code);\n          if (!valid) return res.status(400).json({ error: 'Invalid or expired verification code' });\n        }\n        user.email = clean;\n      }"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            192,
+            192
+          ],
+          "match_position": [
+            27,
+            81
+          ],
+          "match_string": "        const dup = await User.findOne({ email: clean, _id: { $ne: user._id } });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            243,
+            244
+          ],
+          "match_position": [
+            5,
+            64
+          ],
+          "match_string": "    const normalized = String(username).toLowerCase().trim();\n    const exists = await User.findOne({ username: normalized });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            256,
+            260
+          ],
+          "match_position": [
+            7,
+            60
+          ],
+          "match_string": "      cleanEmail = String(email).trim().toLowerCase();\n      if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(cleanEmail)) {\n        return res.status(400).json({ error: 'Invalid email format' });\n      }\n      const dup = await User.findOne({ email: cleanEmail });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            302,
+            306
+          ],
+          "match_position": [
+            7,
+            99
+          ],
+          "match_string": "      const cleanUsername = String(username || '').trim().toLowerCase();\n      if (cleanUsername.length < 3) {\n        return res.status(400).json({ error: 'Username must be at least 3 characters' });\n      }\n      const dupName = await User.findOne({ username: cleanUsername, _id: { $ne: req.params.id } });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            306,
+            306
+          ],
+          "match_position": [
+            29,
+            99
+          ],
+          "match_string": "      const dupName = await User.findOne({ username: cleanUsername, _id: { $ne: req.params.id } });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            339,
+            347
+          ],
+          "match_position": [
+            7,
+            8
+          ],
+          "match_string": "      const clean = String(email || '').trim().toLowerCase();\n      if (!clean) updates.email = null;\n      else if (!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(clean)) {\n        return res.status(400).json({ error: 'Invalid email format' });\n      } else {\n        const dup = await User.findOne({ email: clean, _id: { $ne: req.params.id } });\n        if (dup) return res.status(409).json({ error: 'Email already in use' });\n        updates.email = clean;\n      }"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            344,
+            344
+          ],
+          "match_position": [
+            27,
+            86
+          ],
+          "match_string": "        const dup = await User.findOne({ email: clean, _id: { $ne: req.params.id } });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            487,
+            492
+          ],
+          "match_position": [
+            5,
+            96
+          ],
+          "match_string": "    const email = String(req.body?.email || '').trim().toLowerCase();\n    if (!email || !/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/.test(email)) {\n      return res.status(400).json({ error: 'A valid email is required' });\n    }\n    // Only admins may reset via email\n    const user = await User.findOne({ email, role: { $in: ['owner', 'admin'] }, active: true });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            513,
+            522
+          ],
+          "match_position": [
+            5,
+            96
+          ],
+          "match_string": "    const email = String(req.body?.email || '').trim().toLowerCase();\n    const code = String(req.body?.code || '').trim();\n    const newPassword = String(req.body?.newPassword || '');\n    if (!email || !code || !newPassword) {\n      return res.status(400).json({ error: 'email, code, and newPassword are required' });\n    }\n    if (passwordTooShort(newPassword)) {\n      return res.status(400).json({ error: `New password must be at least ${MIN_PASSWORD_LENGTH} characters` });\n    }\n    const user = await User.findOne({ email, role: { $in: ['owner', 'admin'] }, active: true });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            522,
+            530
+          ],
+          "match_position": [
+            5,
+            31
+          ],
+          "match_string": "    const user = await User.findOne({ email, role: { $in: ['owner', 'admin'] }, active: true });\n    if (!user) return res.status(400).json({ error: 'Invalid or expired code' });\n\n    const reset = await PasswordReset.findOne({\n      purpose: 'reset_password',\n      userId: user._id,\n      usedAt: null,\n      expiresAt: { $gt: new Date() },\n    }).sort({ createdAt: -1 });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            525,
+            530
+          ],
+          "match_position": [
+            25,
+            7
+          ],
+          "match_string": "    const reset = await PasswordReset.findOne({\n      purpose: 'reset_password',\n      userId: user._id,\n      usedAt: null,\n      expiresAt: { $gt: new Date() },\n    }).sort({ createdAt: -1 });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/backup.js",
+          "match_lines": [
+            133,
+            135
+          ],
+          "match_position": [
+            7,
+            93
+          ],
+          "match_string": "      const name = String(farm.name || '').trim();\n      if (!name) continue;\n      const existing = farm.id ? await Farm.findById(farm.id) : await Farm.findOne({ name });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/backup.js",
+          "match_lines": [
+            149,
+            149
+          ],
+          "match_position": [
+            31,
+            85
+          ],
+          "match_string": "        const current = await DataStore.findOne({ key, farmId: String(row.farmId) });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/backup.js",
+          "match_lines": [
+            154,
+            156
+          ],
+          "match_position": [
+            7,
+            63
+          ],
+          "match_string": "      const farmId = mufGetDefaultFarmId();\n      if (!farmId) continue;\n      const current = await DataStore.findOne({ key, farmId });"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/batches.js",
+          "match_lines": [
+            28,
+            33
+          ],
+          "match_position": [
+            5,
+            51
+          ],
+          "match_string": "    const m = String(imagePath || '').match(/^\\/api\\/images\\/([a-f0-9]{24})$/i);\n    const scopedFarmId = String(farmId || '');\n    if (!scopedFarmId || !m || !mongoose.isValidObjectId(m[1])) return;\n    // Image has no automatic farm-scope plugin: enforce ownership in every query.\n    const imageFilter = { _id: m[1], farmId: scopedFarmId, kind: 'batch' };\n    const image = await Image.findOne(imageFilter);"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/batches.js",
+          "match_lines": [
+            351,
+            355
+          ],
+          "match_position": [
+            7,
+            15
+          ],
+          "match_string": "      const imageId = image_path.match(/^\\/api\\/images\\/([a-f0-9]{24})$/i)?.[1];\n      const farmId = String(req.farmContext?.farmId || '');\n      const image = imageId && farmId\n        ? await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean()\n        : null;"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/batches.js",
+          "match_lines": [
+            352,
+            355
+          ],
+          "match_position": [
+            7,
+            15
+          ],
+          "match_string": "      const farmId = String(req.farmContext?.farmId || '');\n      const image = imageId && farmId\n        ? await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean()\n        : null;"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/batches.js",
+          "match_lines": [
+            421,
+            425
+          ],
+          "match_position": [
+            9,
+            17
+          ],
+          "match_string": "        const imageId = patch.image_path.match(/^\\/api\\/images\\/([a-f0-9]{24})$/i)?.[1];\n        const farmId = String(req.farmContext?.farmId || '');\n        const image = imageId && farmId\n          ? await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean()\n          : null;"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/batches.js",
+          "match_lines": [
+            422,
+            425
+          ],
+          "match_position": [
+            9,
+            17
+          ],
+          "match_string": "        const farmId = String(req.farmContext?.farmId || '');\n        const image = imageId && farmId\n          ? await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean()\n          : null;"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/batches.js",
+          "match_lines": [
+            893,
+            898
+          ],
+          "match_position": [
+            5,
+            100
+          ],
+          "match_string": "    const imageId = imagePath.match(/^\\/api\\/images\\/([a-f0-9]{24})$/i)?.[1];\n    const farmId = String(req.farmContext?.farmId || '');\n    if (!imageId || !farmId) {\n      return res.status(400).json({ error: 'image_path must be an uploaded /api/images/<id> path in the selected farm' });\n    }\n    const image = await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean();"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/batches.js",
+          "match_lines": [
+            894,
+            898
+          ],
+          "match_position": [
+            5,
+            100
+          ],
+          "match_string": "    const farmId = String(req.farmContext?.farmId || '');\n    if (!imageId || !farmId) {\n      return res.status(400).json({ error: 'image_path must be an uploaded /api/images/<id> path in the selected farm' });\n    }\n    const image = await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean();"
+        },
+        {
+          "file_path": "flock_farm/backend/routes/uploads.js",
+          "match_lines": [
+            172,
+            172
+          ],
+          "match_position": [
+            23,
+            96
+          ],
+          "match_string": "    const img = await Image.findOne({ _id: id, farmId: String(req.farmContext?.farmId || '') });"
+        }
+      ],
+      "metadata": {
+        "cwe": "CWE-943: Improper Neutralization of Special Elements in Data Query Logic",
+        "description": "Untrusted user input in findOne() function can result in NoSQL Injection.",
+        "owasp-web": "A1: Injection",
+        "severity": "ERROR"
+      }
+    },
+    "node_timing_attack": {
+      "files": [
+        {
+          "file_path": "flock_farm/backend/routes/auth.js",
+          "match_lines": [
+            320,
+            325
+          ],
+          "match_position": [
+            5,
+            6
+          ],
+          "match_string": "    if (password !== undefined) {\n      if (passwordTooShort(password)) {\n        return res.status(400).json({ error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` });\n      }\n      updates.passwordHash = await User.hashPassword(String(password));\n    }"
+        }
+      ],
+      "metadata": {
+        "cwe": "CWE-208: Observable Timing Discrepancy",
+        "description": "String comparisons using '===', '!==', '!=' and '==' is vulnerable to timing attacks. A timing attack allows the attacker to learn potentially sensitive information by, for example, measuring how long it takes for the application to respond to a request.  More info: https://nodejs.org/en/learn/getting-started/security-best-practices#information-exposure-through-timing-attacks-cwe-208",
+        "owasp-web": "A9: Using Components with Known Vulnerabilities",
+        "severity": "WARNING"
+      }
+    },
+    "regex_dos": {
+      "files": [
+        {
+          "file_path": "dairy_farm/backend/routes/expenses.js",
+          "match_lines": [
+            40,
+            40
+          ],
+          "match_position": [
+            91,
+            148
+          ],
+          "match_string": "    else if (body.receiptBase64 === '' || body.receiptBase64.startsWith('data:image/') || /^\\/api\\/photos\\/[a-f0-9]{24}$/i.test(body.receiptBase64)) payload.receiptBase64 = body.receiptBase64;"
+        },
+        {
+          "file_path": "flock_farm/backend/server.js",
+          "match_lines": [
+            239,
+            239
+          ],
+          "match_position": [
+            7,
+            71
+          ],
+          "match_string": "  if (/\\.(png|jpg|jpeg|gif|webp|svg|ico|webmanifest)$/i.test(req.path)) {"
+        }
+      ],
+      "metadata": {
+        "cwe": "CWE-185: Incorrect Regular Expression",
+        "description": "Ensure that the regex used to compare with user supplied input is safe from regular expression denial of service.",
+        "owasp-web": "A6: Security Misconfiguration",
+        "severity": "WARNING"
+      }
+    }
+  },
+  "templates": {}
+}

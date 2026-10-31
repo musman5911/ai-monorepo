@@ -1,0 +1,60 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+TAP version 13
+# {"app":"dairy","route":"/farms","method":"POST","status":201}
+# {"app":"dairy","route":"/farms","method":"POST","status":201}
+# {"app":"dairy","route":"/products","method":"POST","status":201}
+# {"app":"dairy","route":"/products/public","method":"GET","status":200}
+# {"app":"dairy","route":"/products/b728add183205ac1b9a661b9","method":"PUT","status":200}
+# {"app":"dairy","route":"/products/public","method":"GET","status":200}
+# {"app":"dairy","route":"/products/b728add183205ac1b9a661b9","method":"PUT","status":404}
+# {"app":"dairy","route":"/products","method":"POST","status":403}
+# {"app":"dairy","route":"/products/b728add183205ac1b9a661b9","method":"PUT","status":200}
+# {"app":"dairy","route":"/products/public","method":"GET","status":200}
+# Subtest: NEW-SHOP-dairy: public projection, publication toggle, farm isolation and worker write denial
+ok 1 - NEW-SHOP-dairy: public projection, publication toggle, farm isolation and worker write denial
+  ---
+  duration_ms: 5164.477237
+  type: 'test'
+  ...
+# {"app":"agri","route":"/farms","method":"POST","status":201}
+# {"app":"agri","route":"/farms","method":"POST","status":201}
+# {"app":"agri","route":"/products","method":"POST","status":201}
+# {"app":"agri","route":"/products/public","method":"GET","status":200}
+# {"app":"agri","route":"/products/85ae14534fd42b7b5578fe21","method":"PUT","status":200}
+# {"app":"agri","route":"/products/public","method":"GET","status":200}
+# {"app":"agri","route":"/products/85ae14534fd42b7b5578fe21","method":"PUT","status":404}
+# {"app":"agri","route":"/products","method":"POST","status":403}
+# {"app":"agri","route":"/products/85ae14534fd42b7b5578fe21","method":"PUT","status":200}
+# {"app":"agri","route":"/products/public","method":"GET","status":200}
+# Subtest: NEW-SHOP-agri: public projection, publication toggle, farm isolation and worker write denial
+ok 2 - NEW-SHOP-agri: public projection, publication toggle, farm isolation and worker write denial
+  ---
+  duration_ms: 10517.492671
+  type: 'test'
+  ...
+# {"app":"flock","route":"/farms","method":"POST","status":201}
+# {"app":"flock","route":"/farms","method":"POST","status":201}
+# {"app":"flock","route":"/products","method":"POST","status":201}
+# {"app":"flock","route":"/products/public","method":"GET","status":200}
+# {"app":"flock","route":"/products/5ed918071c020d5b51beb453","method":"PUT","status":200}
+# {"app":"flock","route":"/products/public","method":"GET","status":200}
+# {"app":"flock","route":"/products/5ed918071c020d5b51beb453","method":"PUT","status":404}
+# {"app":"flock","route":"/products","method":"POST","status":403}
+# {"app":"flock","route":"/products/5ed918071c020d5b51beb453","method":"PUT","status":200}
+# {"app":"flock","route":"/products/public","method":"GET","status":200}
+# Subtest: NEW-SHOP-flock: public projection, publication toggle, farm isolation and worker write denial
+ok 3 - NEW-SHOP-flock: public projection, publication toggle, farm isolation and worker write denial
+  ---
+  duration_ms: 4486.591001
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 20603.338407
+EXIT=0

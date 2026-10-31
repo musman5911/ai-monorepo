@@ -1,0 +1,52 @@
+[
+  {
+    "name": "eslint-security",
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "name": "knip",
+    "exit": 1,
+    "timeout": false
+  },
+  {
+    "name": "madge-dairy_farm",
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "name": "depcheck-dairy_farm",
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "name": "madge-agri_farm",
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "name": "depcheck-agri_farm",
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "name": "madge-flock_farm",
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "name": "depcheck-flock_farm",
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "name": "semgrep-bounded",
+    "exit": 0,
+    "timeout": false
+  },
+  {
+    "name": "detect-secrets-source",
+    "exit": 0,
+    "timeout": false
+  }
+]

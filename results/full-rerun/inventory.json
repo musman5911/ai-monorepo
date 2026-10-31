@@ -1,0 +1,965 @@
+{
+  "tested_revision": "2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0",
+  "files": [
+    {
+      "path": "tests/acceptance/README.md",
+      "provenance": "historical-recovered",
+      "sha256": "c4d379f3c7078ae43de445df791176edab56607f17430c5efecf0a39a22435de",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/_harness.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "f1ddfdcee2a10c540c131d3cbfd2bf48646d6ba5c56c089d27eb4c0a8a2c7441",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/backups.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "0d3ed04664f3a2e47a3805fff3c4045897022b57694d8590773161bd60522464",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/flock-cards-farm-scope.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "a2b6549453264986be7ebd2ce9ce5458b875a3986038e0ffe6f9d6e1f0f1c2d3",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/frontend-service-worker-logout.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "9bf095f850bb9c2d4a0b72d00729ef0aee656c4d9f5196ab57d601a1011f229e",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/headers-csp.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "3b6e58bb1790999d31b6d4602ae8c7ff7a6f8a6fc85be516ad7e7a06030ea114",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/input-bounds.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "4fd8eb764b9daf5123e613c7708da06914d8eabeb7a755066d3921306872baf9",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/money-validation.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "196ea98a52db66af44988c57302e7a4a06549cb5892c77b2074a2415ecb087de",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/photos.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "a0c64cea669be1f43a910f3a3f48216e2a053b6dfbce5eb3e9ba873e14b51d65",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/sessions-auth.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "2e53f0a3eebb152d6fb65148832ed57bd5011eae82785a14bde7670c8f75035f",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance/telegram.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "03d884871dc99a09616789433be2b57357a60b89f65ad5f28525a248374a6bcf",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance-business/README.md",
+      "provenance": "historical-recovered",
+      "sha256": "c37e24e21cffb9e399d5e5f92c25dd527150922065cee96d63a4758a9b66b8c4",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance-business/agri-business.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "f2ca690f39621f6fc8d556949d530b85ce7ff5333dc734fc7f93f4febf179a4b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance-business/dairy-business.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "580da91085cf0c5171b0fbd8a92f308d03b9cec2c28a57f22bf48f2417af2246",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance-business/dates-tz.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "2231dce92ff3ca21e0629d191d1756ac21f172acbcfd6302d3f7236f7d6a13ac",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance-business/flock-business.test.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "7ecd87c7c79dc37e62dbe4c70b86e4a93606ab36820cc5f998d1a29487e5f526",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance-business/freeze-date.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "0c3285338deea846d4fccdff2e13f1739351a2d9217e8147235b90c84baf9bf6",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/acceptance-business/frozen-server.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "f8aa936ce61ca71c6faa62221a18508e6e94ce397c4a20aa7406485841d0e931",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/agri-bulk-api.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "86df80f95423d6623c7e006f7a68cc7503b538576a578045a7851bdaae648dfb",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/agri-bulk-import.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "1777d5ef29bab905ae8cd9340c6b33ab9aac1633d946b523b27934595d4dc4d4",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/agri-fields-cycles.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "37015f8136554ff6e8b2046e3327aa7b9c063de359df27465905026becc62b3a",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/agri-fields-screens.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "7bec548386c7840a1b2678c8c410199731f3009144219735ddb31650ffea509a",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/agri-photo-storage.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "278f041727e74f84b3c33f7b830f44286df193852486ee1fb408b2902c35a74b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/agri-runtime-api.integration.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "125d79177fa4c07784193b98cb5268393c8f8e84a427a83393cbfb2641e016e1",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/agri-analytics-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "130cebabd1341d2e740b8251ff5971f00c8d9f232386ed026386a981e55b5921",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/agri-filters-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "3d03aff254a51790748990ed06284973e0dbc94903f83f83119fe68f1cd17d65",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/agri-liabilities-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "0c7911596343a42c44afc5ed5360cd2949f30e4d6b98e060bca978928e00d0eb",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/allfarms-deletion-analytics-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "1472bffa82917f0acf2f7e3b13fff21541d4bf48c3467ab409c44141c0d25c26",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/auth-isolation-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "cefb2b9806087f776886048f51fbc9bab57694665913e19131d95d278c86cac4",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/backup-media-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "2032ae7f0862105f10d58c13dcfd4610ed8034281f3b168925df0feef1e60a5c",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/concurrency-invariants.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "4759d3c82daf2f5462e0f4eb059cc7d9769e20563f1fa5218b7e4eb644dea8d7",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/coverage-sweep-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "751887ef5082b56a17a4c3a0ec77e5ec7a536f4d11baf490190866f2dc5ab4d8",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/coverage-sweep2-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "572527b7f7b5a8edf4ee5fd41fd1e2878cff042d35c16366df617800634d6d18",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/cross-realm-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "2f44a43c467c94fc7fac7ab0f4affb8b64bc34608035f9061d859c1ad6b6be7b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/farm-delete-data-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "4c55220c1e8426078ba3ac4149bf9739968a5856b1087166239da9f5767ed2de",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/farm-transfer-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "e5b92980187f865c20d82c6cdaa608b9b224a2eed7bd6c4e61b702b7b4b33035",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/fidelity-precision-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "d9fda843a891dd6874391c900545b9546e4469477103cde032449111b365a687",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/flock-destructive-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "d1af69db09f38774eca459e05c9b7ec58b317c12f14c6afcee4d9a4ecc1ea4c1",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/frontend-contract-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "8ecabeeb6487b11e9eefe891a058f9912ced3a0b83b58d3187e4c44ffa97e10a",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/fuzz-robustness.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "bef78883e66d65610867935b17e8310e466c9ce7edcf6720ab9b3c16438249f8",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/ids-unicode-uploads-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "c34864ff414461dbf85b4e9666a925faac2f5c2b3b2b05b818d695a8b0d8bd6d",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/last-surface-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "726138b641f38c281d0a50d9bc7635b84e4fee394184972d6e3918106723f766",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/load-lifetime-smuggling-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "51a074c4dfdf83dc1d5a40e03e3dbf765ce3abbf1534c2fa18aee059e761dcb1",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/pagination-dates-backup-abuse.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "e48cf5a260bcc0b9d5735f7b7744408f3aa93e0b935c32f721ee0c85f3f58cba",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/protocol-exotic-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "6d47266a774587304cbf449ea05f56b3c0c03627be2d62b21836c21e58567505",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/public-surface-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "fcbfb6db61124fd2bd1d9c50a4cd12be748c399763e7f6ba24e60fc9324f3667",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/q1-delete-pinpoint-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "3e53f69b25befed1c19d114e68bb6a5361138eb9ef98b8dfc494d127f47ba776",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round1-breeding-events.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "2aaf4c10ba34bf0f96d8c3149712061d77d3cc6f6e9d96d6530cf92cba186d95",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round10-flock-import-images.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "5421ae42754e600e36f07c6ff2b44f94d69fa6fe7070e472d31888b2bab8752b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round11-role-agri.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "4c8ae885834e97bfff7fd9efe3cc7a6493fbe8743a914a4b8725b8a93fe6eca2",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round11-role-flock.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "36b250063368aceb508beee664ef8289b605d77d46728f7d6ca9661696434370",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round11-role-system.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "875013bea5a80f493a84ea27397493aafdb00066cfd30cc3438ec58844873401",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round12-photos-cloudinary.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "ccce812f0a6460935e3a9a53721f69b5a7b804ca82ccfa18ebc23394d359ddfa",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round12-photos-flock.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "f7ba4aee80c0ee59e58566b68b1b9654e17fdbc60c294bcf117e5a9bdc276ac1",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round13-sessions.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "1151f6e05da22e54d93cf771c88a0626c7a68affec742d34a2be3a25738d64c7",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round14-fuzz.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "f6705b66c358a231853dbb301d587d204527f8d21757facda2af3ce5a521766d",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round15-concurrency.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "6eaa27b6f54f34ca96e261306e333cc2a130f27bc80fcc5acd5ae9635d473a68",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round2-agri-fields.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "16a8f6abc28d92a3e954551c33184fc1f9f3572047695a9afa191e4df48dbb07",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round3-super-admin.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "9e59b1c8e93167446924aa5f91c2b6f762cb0fd31553048a3b683f7a2945bfff",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round4-backup-newmodels.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "d97a1a9d8dbc473f45fa7a88f42d3b098d18159427934a6a1c4a52fa6f935706",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round6-breeding-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "d42d522c5cbae7f9b3a4cdc98ed9d576c666183d1f3fecc83277945a1cb031f1",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round7-agri-fields-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "e33d74f4c8d118da5642972aedbcf3c7d25cd966ebee7d6dca57ecb98d34d332",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round8-summary-accuracy.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "d5490ac08bea6bed2154023d0021ef6f6e56f6ae1ce13befb79c9833652036f7",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/round9-backup-integrity.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "732b29d97434c2e3bbc138074aaa7de219f259dec5db2cc682c1deaaabd6e492",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/session-escalation-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "730bb7eb2e3c3cf0794537915a271efff934e62ca99005b5bb765d82b2fbed93",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/telegram-bot-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "dc5be66df507833ed0d6c594d9e1d0d3191453dbc7debde31d357aaad12426e1",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-deep/timing-reset-auto-deep.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "fc6ba12682d4d9733ea06baf16bd844c8752e9da6cfe0f8aa5411e5a696ffbf2",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-matrix/agri.api-matrix.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "1dae5fbb4b63c08477a3ec0cd6edb6b55e7a09f6891c2a6302c8e36adeae1869",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-matrix/backup-import-export.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "b477a8d8d48b08a30d5053b6a5c1c0f6a9ad8adb9de3134670f50e58bd69c51a",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "03a97c311230b719e2e73bf17c08b849bbaa7999a38f07e11cb4683099ad66c2",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-matrix/flock.api-matrix.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "890e34cc6caa935a461844e602ff3d923792c1bb8fabdb9c3513f5551a95229f",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/api-matrix/harness.ts",
+      "provenance": "historical-recovered",
+      "sha256": "988553be0135ce62a0c996cc36c0957fca7863410764034f6c2ff0b778f686fe",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/archive-screens.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "4f146f0791275aa3ef46539e3b0ead43b0bf8add0ef04c1cfe8974e875d5ab54",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/archive.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "b949fb0a4f41c7b8e82fa1685bd43f9c930cfbf2cb965590e11cc7b96ed78bb1",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/auth-production-config.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "8a7a4cb8f4362856591dd28b11f46bc1641695fbe212cdf5fa5f9ab465bb526f",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/check-bundle-size.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "befb9bc2b363f1394cc520597d5ceed567bffc34d77690ca10b47c10efacfa57",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/cloudinary-store.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "17719d14ffb0314aec8b6d1231517d7d57ebd8b711265fcca2e475a1f101c797",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/dairy-breeding-events.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "6967532359d8bc1cc1141f2a1c52db262f820486d029a36d7c65678cfb0c2e65",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/dairy-breeding-screens.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "e2cbddfc917e8b75b0296c093ded28ee0724e215493b6bf40983682ca15bffde",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/dairy-calving-creates-calf.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "6461ff832b889384bb9b48d9d2db41f3407c2b5a22ac9ea35940a870da106a62",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/dairy-photo-runtime.integration.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "d6fa7ad0a7822ab3d3b671939b6e5633e5dcd844ccc41ce2c6bbb753101ebaca",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/final-db-preflight.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "3a9660bb2ce022457b777d42a0ffcad6fba2af876ccbac2ad177add8a9511b24",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-batch-history-guards.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "7d904eaeec60b059ab84c557ac7f9a41923818f15065aab41b9b11227d807687",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-batch-labor.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "5565bc015ae176d3e3403dfb0cc1ed8e47b728b367c8a7fdc5d05d6ec1003f85",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-batch-math.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "f0e126f622a0d4f47cf4f7a3a975633ca7fbd8823d80cff8a4bc40cf85486d0d",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-dark-login-background.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "6628dcc5b2fda51e5859f9056c400b103aa392ea4394007c407a69ece6e36f31",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-data-route-allocation.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "e687d6a1f1e318a11032aeab3366dfcef612b42dea2da13edd8aecbe1f7fd06d",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-egg-inventory-coordination.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "ee3a03d3af2251b88f9d54cb79d5f3556caf7eaea314698c09dbb70114510b32",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-egg-inventory-lock.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "7eada7811f559e5f93c01390f5d0ed3a2f6ded03bba9749081d803316b721a74",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-first-owner-setup.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "5d926a075ad3393f441b28eda46cabed14de5205bc7f7133f96a9af21191e823",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-image-backup.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "27b304c9ef89b76e064ae34386c83f972ac90112b370e7152746ce9b8c9b0754",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-image-references.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "f7b4916b216bded2093935361ca349992ca3049ed10154dc8cd437a72fb707c8",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/flock-incubation-allocation.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "89e9beb807046b6f35fd0513b2e9e6f23a7d04b36b17f23f7ebfef8e68e30a0a",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/muf-charts.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "d957cd511b37bafffc87c892e7cd57f84cd1606a0a41fdb547d2ae78bfe03f51",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/muf-compare.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "72bb806fab329aaa1d1bcc77d2a5f0d819e8aefeaf2bf846f42aa6fffb3a189d",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/muf-env-rate-limit.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "eb08f60db30dec6e13d2f016812d327a381bf17f04391f1fdaa828ae5851dce8",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/muf-farms-agri.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "d73656eeec9ae17348a5ac447eb94206f6f053d708b3ad6dd48be3db100011c0",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/muf-farms.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "35b5b2c1ca33f172e0d6a36a552577eeba19c2c4648970139d8da05144bd882b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/muf-storage.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "d20ddc398ce681137e87f8e97acfd2a774a2710692dc5bc782da2511276f201b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/muf-urdu-fallback-coverage.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "1aa8b57ccee2aa2fc996323f6c53ccea416924fe4b66259afc0805497ac45807",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/muf-zakat.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "3c56ddafa2838eaf2c374f4d2b4a422e69ffdd3a6005f515153993e3f6abe23b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/phase-1-super-admin.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "cdd927402cff9119e98bbd0c5f0982b524e941e802da00b34cc15fbb181d18c2",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/phase1-backup-farm-context.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "0e94863300ae3509e070c56566006b6dc0541e7e2caef11fc6192b1ad543ee7f",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/phase3-farm-isolation.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "be19576407608c2ecf8d3920f3c076c4848c210e8120299f472cc42642a8f0e8",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/phase3-pagination.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "9c5f99d064c330ba0c04d505825067326c71b48e686ff7099a3938424fd05179",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/phase4-breeding-lineage.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "9809cb16d9476ecb08f8ea5acbed4ffdb4a42105aec7c40594ea4b9b7b7e3bdf",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/photo-client-migration.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "597cb719b6b7245879378a8a1ff81d9116336ae5bed9a3d043387ea1c5609890",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/photo-phase8-regression.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "a2024a09979d8ce072d89051b73d643e39969beeade934b2d5a5f82731d902fa",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/public-products.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "62db94e401ff5f01efe2a20b33f77ff4417524523051ca1ba61e333cb2cba536",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/public-route-security.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "a06e52d94b0a5841be0cdf5111549fd92895beff2b3ce4e93f748a29d43ce4be",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/build-full-specs.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "1200f2c704f30440e6dc6cfa569a6dfb750caa0018a9e17e99526c4faf89a87a",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/fastcheck-commands.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "545636feff029d36d27b6a21a687336c1b45eb5bbe5b0c334550e92014e43b32",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/final-p1-rerun.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "e6db3e40cbf1fd044e2a20fe639831ee8f42c1de8f19c27e8a3e4878f7db3c70",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/hypothesis_agri.py",
+      "provenance": "historical-recovered",
+      "sha256": "247528332b99ef3afbdbdfbd323c35e8fe5a52d6e878de14038ff42a1d33fd77",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/idor-authz-matrix.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "14dea60c6a2aee3fe05d400bbbc5392ba25c7fdc1ab1fe2af2fda0fa16cc3d0c",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/patch-crypto.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "e51c930b92a140080fc3daa2f770bb1e472791c504ce6c73a93485f349e40315",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/phase0-probe.sh",
+      "provenance": "historical-recovered",
+      "sha256": "234d6f6191eb4337973cc39b949207373f38e52cc00b3e5d6c510fc80b12f5b1",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/phase1-dynamic.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "ec69a0d042fe635192c5443ca6030a04d2f934eec241bbd13e46c174ba6558b9",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/phase1b-prod-proxy-cards.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "0cf282a3cc41690f2a7da49dee4aacdbbf8246b7d1948129c607281b77959e7e",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/phase1c-protocol-chaos-load.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "8d46bc0a05d98c6f15fdb445ebf5b094148154ca4f25edaba2d45e0e4b68b4d2",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/phase1d-followups.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "96a9bd1d21bf2cd17a62065d702dbb0275d6a7406aa81299d3748d39a08b1854",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/phase3-browser.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "7a0c7c6daad50ce83a6d20ba67d3fd33243f2d352d7d5d9e485e7b4ed45b2537",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/phase3-flock-cards-reverse.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "4b1d270592e1d602d6b81959d94374e6dc5a8f8374bfe775d5771c134d907677",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/phase3b-state.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "ab74aba8212ddba327c01939194f83b8de50be90b788c9dcf4ff38fbe7c5aec9",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/run-schemathesis-full.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "106850c9e4578d85c7616197a7af7b40c5930d512c13f940ef4ff092c85a7db9",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/semgrep-custom.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "3565656612bc1204cf88a0c3799f52fa98fd31fe8e0bc9cffa393b3c8f405393",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/specs/spec-agri.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "f1386ccfee3d20d3d05eb94b1436e207a9d26c21015bcdf88a4e1e6529e490b8",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/specs/spec-dairy.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "30e162977005831fab94dea3a4acad70efb88a7479fad04cf6042e208d831091",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/specs/spec-flock.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "85c9b8681920a278f3af1f67ec6a9758c97049ca704ecfb20c4e5874649acfdb",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/specs-full/spec-agri-full.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "6a0a86633b14a6fae3ffa0382bda04072dae1bdcf994a7aa60cfa904e130da9a",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/specs-full/spec-dairy-full.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "9be8307ead976ec0eaa898638608b9e09f1c4f1ee63cc89aac7281319c560e79",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/specs-full/spec-flock-full.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "095955984297cb9fb6be8c07b5ed2b16800fa320d9b85f284aeb4c136d007082",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/round3/stryker.config.json",
+      "provenance": "historical-recovered",
+      "sha256": "795d51bb3ca7269fbe1d1072d04d342fb10557762e923a42e99f7946822daff5",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/route-matrix-policy.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "488f32d21baae62ec7ad472c1a212bfcde708b6cc09fbeab753540d5ae36a290",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/shop-isolation.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "8a1ecf3e5df78be06611c539f655912506bbe5b9d62fe5d33704b8473808d6c3",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/smoke.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "88823e846aebe789ea7071ea2fc22dd74c72ade79e3b7d93ae0cd738f21305dd",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/telegram-farm-scope.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "eb2db4c17efeb296de904fecbf91bb774d509905ba4be475c93a85d67c0a56a4",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/agri-login.bru",
+      "provenance": "historical-recovered",
+      "sha256": "9f9e881214bc0ccff0907c336354e68425c06ca127b8cf4bb83e6e1f7faffb17",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/bruno.json",
+      "provenance": "historical-recovered",
+      "sha256": "0eac49c26350cfeecc065bd5763332c632c283b1c5ef09377fe56d3636c5478b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/dairy-cows-list.bru",
+      "provenance": "historical-recovered",
+      "sha256": "93c67ccd4cab389cb620f52c8fd73e3105b8563ff5f1a16b735250f627255341",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/dairy-login.bru",
+      "provenance": "historical-recovered",
+      "sha256": "7351b481222c2b02a48c36a8ff92668b15fc51e70fa1e1e0c44e8480254a498d",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/flock-batches-list.bru",
+      "provenance": "historical-recovered",
+      "sha256": "a68833d1e288229f1709e6913dc71dd8aad8a107c21149229fcd8665c613dfcb",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/fastcheck-invariants.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "8a91f9205832af31c8f67227042abbec9197e8e20e71e94cced6131c91b1f56a",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/security-scan.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "e88769c7087133a0757543a892d8f6f6470085b5e8983360f967805a8ee376f6",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/spawn.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "45630bb73dc63784f174f8d856f88e0f6feacd1de37a9ab8da9d63a93926517b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/spec-agri.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "f1386ccfee3d20d3d05eb94b1436e207a9d26c21015bcdf88a4e1e6529e490b8",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/spec-dairy.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "30e162977005831fab94dea3a4acad70efb88a7479fad04cf6042e208d831091",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/spec-flock.yaml",
+      "provenance": "historical-recovered",
+      "sha256": "85c9b8681920a278f3af1f67ec6a9758c97049ca704ecfb20c4e5874649acfdb",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/stryker-report/index.html",
+      "provenance": "historical-recovered",
+      "sha256": "8a4d07864cf68fb0b44845f8a5b26135507698045ec6867e6c59f563ad08b432",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/toolchain/stryker.config.json",
+      "provenance": "historical-recovered",
+      "sha256": "5e201d0931e92f8008e8f04c0ccaafb93afb0391ba660c9271299ca749b05d72",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/verification/RUN-REAL-MONGO.md",
+      "provenance": "historical-recovered",
+      "sha256": "5ed09fb67c110987ef8af932d3b00ce413b4265f12d134a10e575e788dcf581b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/verification/authz-matrix.mjs",
+      "provenance": "historical-recovered",
+      "sha256": "14dea60c6a2aee3fe05d400bbbc5392ba25c7fdc1ab1fe2af2fda0fa16cc3d0c",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/verification/contested-probes-output.txt",
+      "provenance": "historical-recovered",
+      "sha256": "8e776f5572f012c9cd3727c2470fc7f0ed9a1817f5796a78f4c4bddeccee8a3a",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/verification/contested-probes.sh",
+      "provenance": "historical-recovered",
+      "sha256": "5a88b0eea3449b1023472441a29911ebb3e423b99b1ae1ee00107e72b67eb41e",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/verification/load-locust.py",
+      "provenance": "historical-recovered",
+      "sha256": "836cfcbd888022d0ba32ce5060ff6ebce8ea5148a4861f3d23ce00280c6ecb30",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/verification/locust-agri.py",
+      "provenance": "historical-recovered",
+      "sha256": "fdbfe81c05a84bfcec968b67300eedd7f514dd1aa611ac074a134a5c0e9af05b",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/verification/run-load.sh",
+      "provenance": "historical-recovered",
+      "sha256": "2973e6bd40c75a543be156cf321efaf141f7c527e866bdcc2d59e810b592ab20",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/verification/semgrep-rules.yml",
+      "provenance": "historical-recovered",
+      "sha256": "8ccfe5ec33073c44ad72b418ec63f6f9f9810be2b8fbeb124ed52b5009fc4d5e",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/verification/unit-farm-guards.test.ts",
+      "provenance": "historical-recovered",
+      "sha256": "543bba1881775ddf0ee3df53973fd1b9e25929a1db8797ca2c063e8d8302ae04",
+      "status": "NOT_RUN"
+    },
+    {
+      "path": "tests/workflow-contract.test.ts",
+      "provenance": "latest-upstream",
+      "sha256": "cd724a2dc6959248c78a73ef527317666fbc5db972056487fd2c0145bf161f20",
+      "status": "NOT_RUN"
+    }
+  ]
+}

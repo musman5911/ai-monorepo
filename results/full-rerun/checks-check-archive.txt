@@ -1,0 +1,75 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-archive"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-archive
+> node tools/check-dairy-archive.js && node tools/check-flock-archive.js && node tools/check-agri-archive.js
+
+(node:6751) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/full-rerun/tools/check-dairy-archive.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/full-rerun/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓ memory-mode owner login
+  ✓ default farm exists
+  ✓ second farm created
+  ✓ old milk snapshot created for selected farm
+  ✓ snapshot records can be read before removal
+  ✓ another farm cannot read this archive job
+  ✓ rejects missing/invalid retention period
+  ✓ refuses delete before export
+  ✓ download returns durable snapshot
+  ✓ rejects wrong typed confirmation
+  ✓ archives after export and confirmation
+  ✓ archived row leaves active list
+  ✓ Archive farm A does not remove farm B records
+  ✓ restore succeeds
+  ✓ restores the original milk record unchanged
+  ✓ expense fixtures created in both farms
+  ✓ expense snapshot created
+  ✓ old expense is in active list before archive
+  ✓ active expense total includes only the selected farm fixture
+  ✓ expense export preserves original row
+  ✓ expense archive executes after export and confirmation
+  ✓ archived expense leaves active list
+  ✓ active expense total excludes archived amount
+  ✓ other farm expense list and total remain unchanged
+  ✓ expense restore succeeds
+  ✓ expense list and total return after restore
+(node:6838) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/full-rerun/tools/check-flock-archive.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/full-rerun/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓ Flock memory-mode owner login
+  ✓ Flock default farm exists
+  ✓ Flock second farm created
+  ✓ Flock feed-log fixtures created in two farms
+  ✓ Flock active batch detail and feed-cost total include old log
+  ✓ Flock feed-log snapshot created
+  ✓ Flock export preserves feed-log record
+  ✓ Flock feed-log archive executes after export and confirmation
+  ✓ Flock archived feed log leaves active batch list
+  ✓ Flock batch feed-cost total excludes archived log
+  ✓ Flock archive preserves other farm list and totals
+  ✓ Flock feed-log restoration succeeds
+  ✓ Flock list and feed-cost total return after restore
+(node:6882) [MODULE_TYPELESS_PACKAGE_JSON] Warning: Module type of file:///home/user/full-rerun/tools/check-agri-archive.js is not specified and it doesn't parse as CommonJS.
+Reparsing as ES module because module syntax was detected. This incurs a performance overhead.
+To eliminate this warning, add "type": "module" to /home/user/full-rerun/package.json.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✓ Agri memory-mode owner login
+  ✓ Agri default farm exists
+  ✓ two isolated Agri archive test farms created
+  ✓ Agri finance fixtures created in two farms
+  ✓ Agri analytics totals include active finance record
+  ✓ Agri finance snapshot created
+  ✓ Agri archive refuses removal before export
+  ✓ Agri export preserves original finance row
+  ✓ Agri archive executes after export and confirmation
+  ✓ Agri archived finance row leaves active list
+  ✓ Agri archive preserves other farm finance
+  ✓ Agri analytics totals exclude archived finance
+  ✓ Agri finance restoration succeeds
+  ✓ Agri finance totals return to original values after restore
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=15.13

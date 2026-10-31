@@ -1,0 +1,113 @@
+{
+  "revision": "2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0",
+  "jobs": [
+    {
+      "name": "backups.test",
+      "args": [
+        "node",
+        "--test",
+        "tests/acceptance/backups.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 113.83,
+      "log": "results/full-rerun/acceptance-backups.test.txt"
+    },
+    {
+      "name": "flock-cards-farm-scope.test",
+      "args": [
+        "node",
+        "--test",
+        "tests/acceptance/flock-cards-farm-scope.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 17.45,
+      "log": "results/full-rerun/acceptance-flock-cards-farm-scope.test.txt"
+    },
+    {
+      "name": "frontend-service-worker-logout.test",
+      "args": [
+        "node",
+        "--test",
+        "tests/acceptance/frontend-service-worker-logout.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 0.59,
+      "log": "results/full-rerun/acceptance-frontend-service-worker-logout.test.txt"
+    },
+    {
+      "name": "headers-csp.test",
+      "args": [
+        "node",
+        "--test",
+        "tests/acceptance/headers-csp.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 45.95,
+      "log": "results/full-rerun/acceptance-headers-csp.test.txt"
+    },
+    {
+      "name": "input-bounds.test",
+      "args": [
+        "node",
+        "--test",
+        "tests/acceptance/input-bounds.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 20.23,
+      "log": "results/full-rerun/acceptance-input-bounds.test.txt"
+    },
+    {
+      "name": "money-validation.test",
+      "args": [
+        "node",
+        "--test",
+        "tests/acceptance/money-validation.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 14.3,
+      "log": "results/full-rerun/acceptance-money-validation.test.txt"
+    },
+    {
+      "name": "photos.test",
+      "args": [
+        "node",
+        "--test",
+        "tests/acceptance/photos.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 44.02,
+      "log": "results/full-rerun/acceptance-photos.test.txt"
+    },
+    {
+      "name": "sessions-auth.test",
+      "args": [
+        "node",
+        "--test",
+        "tests/acceptance/sessions-auth.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 67.31,
+      "log": "results/full-rerun/acceptance-sessions-auth.test.txt"
+    },
+    {
+      "name": "telegram.test",
+      "args": [
+        "node",
+        "--test",
+        "tests/acceptance/telegram.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 45.11,
+      "log": "results/full-rerun/acceptance-telegram.test.txt"
+    }
+  ]
+}

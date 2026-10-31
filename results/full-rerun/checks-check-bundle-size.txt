@@ -1,0 +1,16 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-bundle-size"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-bundle-size
+> node tools/check-bundle-size.js
+
+
+MUF production JavaScript bundle budgets
+  ✓ Dairy: largest 505.5 KiB / 700.0 KiB per file
+  ✓ Agri: largest 420.2 KiB / 600.0 KiB per file
+  ✓ Flock: largest 412.6 KiB / 850.0 KiB per file
+All production JavaScript assets are within budget.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=0.47

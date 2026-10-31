@@ -1,0 +1,326 @@
+{
+  "revision": "2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0",
+  "counts": {
+    "REPRODUCED_ASSERTION": 43,
+    "PASS": 13,
+    "SKIPPED_BROWSER": 3,
+    "INFORMATIONAL": 4
+  },
+  "tests": [
+    {
+      "test": "BL-2: post-wages settles only the posted month's advances (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "BL-guard: liability pay books exactly one finance expense, second pay is a no-op (agri)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "BL-guard: analytics finance totals equal the sum of the finance records (agri)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "BL-1: post-wages settles only the posted month's advances (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "BL-guard: milk summary saleable/revenue matches hand calculation (dairy)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "BL-4: farm-summary \"Today's milk\" uses the Pakistan farm day, not UTC (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "BL-3: eggs collected Monday can be sold Tuesday from stock (flock)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "BL-guard: batch summary matches hand calculation, incl. all-dead batch (flock)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "I1: tampered backup is rejected on restore (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'tampered backup restored (200)'"
+    },
+    {
+      "test": "I2: another app's backup is rejected, not partially imported (dairy restores agri backup)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'cross-app backup accepted (200: {\"success\":true,\"message\":\"Data restored successfully (sequential)\"})'"
+    },
+    {
+      "test": "I3: junk backup payload is rejected cleanly (flock)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "PH-3: agri backup includes uploaded PhotoAsset photos so restore cannot silently lose them",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'backup JSON contains no PhotoAsset collection \u2014 uploaded photos would be lost on restore'"
+    },
+    {
+      "test": "B1-B3 (flock forward): anonymous card for sequential id 1 does not expose phone/balance",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'anonymous card 200 exposes a phone number'"
+    },
+    {
+      "test": "B1-B3 (flock reverse): Farm B customer link shows Farm B data, not Farm A",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'Farm B link (id 1) served Farm A private data'"
+    },
+    {
+      "test": "ROLE-F1: creating a user with farmIds assigns exactly those farms (flock)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "J1: importing Farm A batch export into Farm B succeeds (flock)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'import into Farm B failed (500: {\"error\":\"Failed to import batch data\"})'"
+    },
+    {
+      "test": "R3-FE-1: service-worker API cache is cleared on logout (dairy)",
+      "status": "SKIPPED_BROWSER",
+      "error": null
+    },
+    {
+      "test": "R3-FE-1: service-worker API cache is cleared on logout (agri)",
+      "status": "SKIPPED_BROWSER",
+      "error": null
+    },
+    {
+      "test": "R3-FE-1: service-worker API cache is cleared on logout (flock)",
+      "status": "SKIPPED_BROWSER",
+      "error": null
+    },
+    {
+      "test": "R3-FE-1 (source): api-cache cleanup is wired into the real logout path (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'logout path never deletes the service-worker API cache (dairyfarmapi-v1) in production code'"
+    },
+    {
+      "test": "C1: production responses include Content-Security-Policy (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'no CSP header in production (HTTP 200)'"
+    },
+    {
+      "test": "C1: production responses include Content-Security-Policy (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'no CSP header in production (HTTP 200)'"
+    },
+    {
+      "test": "C3: authenticated responses send Cache-Control no-store (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'Cache-Control is \"(absent)\"'"
+    },
+    {
+      "test": "C3: authenticated responses send Cache-Control no-store (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'Cache-Control is \"(absent)\"'"
+    },
+    {
+      "test": "C3: authenticated responses send Cache-Control no-store (flock)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'Cache-Control is \"(absent)\"'"
+    },
+    {
+      "test": "SG-2: production boot refuses MEMORY_MODE=1 (dairy)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "SG-2: production boot refuses MEMORY_MODE=1 (agri)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "SG-2: production boot refuses MEMORY_MODE=1 (flock)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "SG-1: production boot refuses weak JWT_SECRET \"secret\" (dairy)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "SG-1: production boot refuses weak JWT_SECRET \"secret\" (agri)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "SG-1: production boot refuses weak JWT_SECRET \"secret\" (flock)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'production server booted with JWT_SECRET=secret'"
+    },
+    {
+      "test": "RL-1 (behind appending proxy): rotating fake XFF still gets rate-limited 429 (dairy)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "RL-1 (direct exposure, P2): rotating X-Forwarded-For must not defeat the login limiter (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'RL-1 BUG (direct exposure, P2): 14 wrong logins with rotating X-Forwarded-For never got a 429 (got 401,401,401,401,401,401,401,401,401,401,401,401,401,401) \u2014 the limiter trusts a spoofable header'"
+    },
+    {
+      "test": "E1: empty crop create is rejected (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'empty crop stored (201)'"
+    },
+    {
+      "test": "FZ-3: operator objects in crop string fields are rejected, not stored as {} (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'operator object stored (201: {\"name\":{},\"status\":{},\"farmId\":\"f87f3809e15d7ab9a7096a92\",\"_id\":\"544ca1d42ce01f6f3b436ec7\"})'"
+    },
+    {
+      "test": "FZ-1: a 5 MB single text field is rejected (dairy cow notes)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'5MB field stored (201)'"
+    },
+    {
+      "test": "D1: absurd numeric cow weight is rejected (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'weight=1e15 accepted (201)'"
+    },
+    {
+      "test": "FZ-2: impossible calendar date 2026-02-30 is rejected (dairy daily log)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'2026-02-30 accepted (404: {\"error\":\"API route not found: POST /dailylog\"})'"
+    },
+    {
+      "test": "F1: batch with negative initial count is rejected (flock)",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "A6: create cannot forge role/farm ownership fields (agri crop create)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'client-forged _id was stored'"
+    },
+    {
+      "test": "A5: stale writer does not silently overwrite a newer update (dairy cow)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "G1: negative liability amount_owed is rejected (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'negative liability stored (201)'"
+    },
+    {
+      "test": "G2: negative inventory quantity is rejected on create and update (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'negative inventory create accepted (201)'"
+    },
+    {
+      "test": "G3: absurd field area is rejected (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'acres=1e12 accepted (201)'"
+    },
+    {
+      "test": "E5: negative finance amount is rejected (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'negative finance amount accepted (201)'"
+    },
+    {
+      "test": "PH-1 (INFO, needs design decision): uploaded photo is served without EXIF/GPS bytes (dairy)",
+      "status": "INFORMATIONAL",
+      "error": "'GPS/EXIF marker served back byte-identical'"
+    },
+    {
+      "test": "PH-2 (INFO, needs design decision): worker cannot delete photos (dairy)",
+      "status": "INFORMATIONAL",
+      "error": "'worker deleted a photo (200)'"
+    },
+    {
+      "test": "PH-1 (INFO, needs design decision): uploaded photo is served without EXIF/GPS bytes (agri)",
+      "status": "INFORMATIONAL",
+      "error": "'GPS/EXIF marker served back byte-identical'"
+    },
+    {
+      "test": "PH-2 (INFO, needs design decision): worker cannot delete photos (agri)",
+      "status": "INFORMATIONAL",
+      "error": "'worker deleted a photo (200)'"
+    },
+    {
+      "test": "PH-F2: flock images are not served with public immutable year-long caching",
+      "status": "PASS",
+      "error": null
+    },
+    {
+      "test": "P8-1: flock diary photo paths resolve on the backend (no /api/photos 404)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "A1: token is rejected after logout (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'logout must exist and succeed, got 404'"
+    },
+    {
+      "test": "A1: token is rejected after logout (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "A1: token is rejected after logout (flock)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "A3: token lifetime is at most 24h (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'TTL is 168h'"
+    },
+    {
+      "test": "A3: token lifetime is at most 24h (flock)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'TTL is 168h'"
+    },
+    {
+      "test": "A2: old token is rejected after password change (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "BC-1: login rejects password differing only after byte 72 (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "BC-1: login rejects password differing only after byte 72 (flock)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "|-"
+    },
+    {
+      "test": "K1: telegram bot rejects a 999,999,999 single-message expense (dairy)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'K1 BUG (dairy): one Telegram message booked a Rs 999,999,999 expense (marker=true, amount=true)'"
+    },
+    {
+      "test": "K1: telegram bot rejects a 999,999,999 single-message expense (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'K1 BUG (agri): one Telegram message booked a Rs 999,999,999 expense (marker=false, amount=true)'"
+    },
+    {
+      "test": "K1: telegram bot rejects a 999,999,999 single-message expense (flock)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'K1 BUG (flock): one Telegram message booked a Rs 999,999,999 expense (marker=true, amount=true)'"
+    },
+    {
+      "test": "CRON-LOG-1: cron secret is not printed to server logs (agri)",
+      "status": "REPRODUCED_ASSERTION",
+      "error": "'cron ?key= secret appeared verbatim in server logs'"
+    }
+  ]
+}

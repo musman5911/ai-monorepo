@@ -1,0 +1,1188 @@
+[
+  {
+    "iterationIndex": 0,
+    "results": [
+      {
+        "test": {
+          "filename": "dairy-login.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://127.0.0.1:3000/api/auth/login",
+          "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "User-Agent": "bruno-runtime/4.3.0",
+            "Content-Length": "47",
+            "Accept-Encoding": "gzip, compress, deflate, br",
+            "Host": "127.0.0.1:3000",
+            "Connection": "keep-alive",
+            "content-type": "application/json"
+          },
+          "data": "{ \"username\": \"admin\", \"password\": \"admin123\" }"
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "headers": {
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "no-referrer",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "SAMEORIGIN",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "0",
+            "vary": "Origin",
+            "ratelimit-policy": "5;w=900",
+            "ratelimit-limit": "5",
+            "ratelimit-remaining": "3",
+            "ratelimit-reset": "879",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "704",
+            "etag": "W/\"2c0-gXYOJD+4r/8Ft6vXFA8IS4w4gU0\"",
+            "date": "Sat, 31 Oct 2026 19:15:36 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          },
+          "data": {
+            "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjIwMjllOTM0ODFjOTAxNDEzMzk3MTM1YiIsInJvbGUiOiJvd25lciIsInVzZXJuYW1lIjoiYWRtaW4iLCJpYXQiOjE3OTM0NzQxMzYsImV4cCI6MTc5NDA3ODkzNn0.ax01r-LLxYfr5oku7HIdt8bHa1mVTmrFNjo8xciFOFE",
+            "role": "admin",
+            "farmRole": "owner",
+            "username": "admin",
+            "user": {
+              "_id": "2029e93481c901413397135b",
+              "username": "admin",
+              "role": "admin",
+              "farmRole": "owner",
+              "farmIds": [],
+              "displayName": "Malik Usman",
+              "email": "admin@example.com",
+              "avatarBase64": "https://images.unsplash.com/photo-1673538064388-21d1aaaf6594?w=800&q=70&fm=jpg",
+              "active": true,
+              "farmName": "Usman Dairy Farm",
+              "lastLoginAt": "2026-10-31T19:15:36.692Z",
+              "createdAt": "2026-10-31T19:15:13.785Z",
+              "updatedAt": "2026-10-31T19:15:36.692Z"
+            }
+          },
+          "url": "http://127.0.0.1/api/auth/login",
+          "responseTime": 370,
+          "duration": 370,
+          "size": 704
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.585126198,
+        "name": "Dairy login",
+        "suitename": "/home/user/full-rerun/tests/toolchain/bruno/farm-apis/dairy-login",
+        "path": "dairy-login",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "dairy-cows-list.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://127.0.0.1:3000/api/cows",
+          "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "User-Agent": "bruno-runtime/4.3.0",
+            "Accept-Encoding": "gzip, compress, deflate, br",
+            "Host": "127.0.0.1:3000",
+            "Connection": "keep-alive",
+            "Authorization": "Bearer ********",
+            "content-type": null
+          }
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "headers": {
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "no-referrer",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "SAMEORIGIN",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "0",
+            "vary": "Origin",
+            "ratelimit-policy": "300;w=900",
+            "ratelimit-limit": "300",
+            "ratelimit-remaining": "296",
+            "ratelimit-reset": "879",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "13641",
+            "etag": "W/\"3549-ZfZjotrPdO2/mWVRRLOc73Of35w\"",
+            "date": "Sat, 31 Oct 2026 19:15:36 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          },
+          "data": [
+            {
+              "_id": "cow16",
+              "name": "Bahadur",
+              "breed": "Red Sindhi",
+              "gender": "male",
+              "status": "active",
+              "birthDate": "2024-01-20",
+              "weight": 520,
+              "lactationNumber": 0,
+              "batch": "Spring Batch",
+              "purchasePrice": 180000,
+              "image": "https://images.unsplash.com/photo-1763095818819-e2eb01e69ce8?w=800&q=70&fm=jpg",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.802Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow11",
+              "name": "Basanti",
+              "breed": "Sahiwal",
+              "status": "active",
+              "birthDate": "2023-01-10",
+              "weight": 340,
+              "lactationNumber": 1,
+              "calvingDate": "2026-09-16",
+              "batch": "Spring Batch",
+              "purchasePrice": 155000,
+              "image": "https://images.unsplash.com/photo-1673229266917-89abfa3ebc58?w=800&q=70&fm=jpg",
+              "weightHistory": [
+                {
+                  "id": "w-cow11-11",
+                  "date": "2025-12-06",
+                  "weightKg": 300,
+                  "note": "First weighing"
+                },
+                {
+                  "id": "w-cow11-10",
+                  "date": "2025-12-06",
+                  "weightKg": 303,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-9",
+                  "date": "2026-01-06",
+                  "weightKg": 306,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-8",
+                  "date": "2026-03-06",
+                  "weightKg": 309,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-7",
+                  "date": "2026-03-06",
+                  "weightKg": 312,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-6",
+                  "date": "2026-05-06",
+                  "weightKg": 315,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-5",
+                  "date": "2026-05-06",
+                  "weightKg": 318,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-4",
+                  "date": "2026-07-06",
+                  "weightKg": 321,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-3",
+                  "date": "2026-07-06",
+                  "weightKg": 324,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-2",
+                  "date": "2026-08-06",
+                  "weightKg": 327,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-1",
+                  "date": "2026-10-06",
+                  "weightKg": 330,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow11-0",
+                  "date": "2026-10-06",
+                  "weightKg": 333,
+                  "note": ""
+                }
+              ],
+              "expectedPrice": 180000,
+              "marketNotes": [
+                {
+                  "id": "mn3",
+                  "date": "2026-10-26",
+                  "buyer": "Malik Riaz (Hassanabdal)",
+                  "phone": "0333-4455667",
+                  "offer": 165000,
+                  "note": "Low offer — asked to revisit"
+                }
+              ],
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "gallery": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.802Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow5",
+              "name": "Chameli",
+              "breed": "Cholistani",
+              "status": "pregnant",
+              "birthDate": "2022-05-18",
+              "weight": 370,
+              "lactationNumber": 2,
+              "calvingDate": "2026-06-23",
+              "pregnancyDate": "2026-09-21",
+              "batch": "Winter Batch",
+              "purchasePrice": 130000,
+              "image": "https://images.unsplash.com/photo-1708965799324-41fb097e3f4d?w=800&q=70&fm=jpg",
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.801Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow13",
+              "name": "Chhoti",
+              "breed": "Sahiwal",
+              "gender": "female",
+              "status": "calf",
+              "birthDate": "2026-04-24",
+              "weight": 65,
+              "lactationNumber": 0,
+              "motherId": "cow1",
+              "isCalf": true,
+              "nursingUntil": "2026-07-08",
+              "batch": "Born on Farm",
+              "purchasePrice": 0,
+              "image": "https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?w=800&q=70&fm=jpg",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.802Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow14",
+              "name": "Golu",
+              "breed": "Holstein Friesian",
+              "gender": "male",
+              "status": "calf",
+              "birthDate": "2026-03-20",
+              "weight": 80,
+              "lactationNumber": 0,
+              "motherId": "cow2",
+              "isCalf": true,
+              "nursingUntil": "2026-06-03",
+              "batch": "Born on Farm",
+              "purchasePrice": 0,
+              "image": "https://images.unsplash.com/photo-1527153857715-3908f2bae5e8?w=800&q=70&fm=jpg",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.802Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow6",
+              "name": "Guddi",
+              "breed": "Sahiwal",
+              "status": "dry",
+              "birthDate": "2018-09-30",
+              "weight": 400,
+              "lactationNumber": 6,
+              "calvingDate": "2025-09-06",
+              "pregnancyDate": "2026-02-13",
+              "dryDate": "2026-08-17",
+              "batch": "Original Herd",
+              "purchasePrice": 120000,
+              "image": "https://images.unsplash.com/photo-1673229266917-89abfa3ebc58?w=800&q=70&fm=jpg",
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.801Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow8",
+              "name": "Jasmine",
+              "breed": "Jersey",
+              "status": "active",
+              "birthDate": "2021-08-14",
+              "weight": 350,
+              "lactationNumber": 3,
+              "calvingDate": "2026-08-12",
+              "heatDate": "2026-10-28",
+              "batch": "Spring Batch",
+              "purchasePrice": 200000,
+              "image": "https://images.unsplash.com/photo-1658010225107-97c9bec88fd3?w=800&q=70&fm=jpg",
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.801Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow9",
+              "name": "Kiran",
+              "breed": "Red Sindhi",
+              "status": "active",
+              "birthDate": "2022-02-28",
+              "weight": 380,
+              "lactationNumber": 2,
+              "calvingDate": "2026-05-19",
+              "batch": "Original Herd",
+              "purchasePrice": 145000,
+              "image": "https://images.unsplash.com/photo-1598715685267-0f45367d8071?w=800&q=70&fm=jpg",
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.801Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow1",
+              "name": "Laila",
+              "breed": "Sahiwal",
+              "status": "active",
+              "birthDate": "2020-03-15",
+              "weight": 420,
+              "lactationNumber": 4,
+              "calvingDate": "2026-04-24",
+              "batch": "Original Herd",
+              "purchasePrice": 150000,
+              "calvingHistory": [
+                {
+                  "date": "2026-04-24",
+                  "calfId": "cow13"
+                }
+              ],
+              "image": "https://images.unsplash.com/photo-1673229266917-89abfa3ebc58?w=800&q=70&fm=jpg",
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "createdAt": "2026-10-31T19:15:14.801Z",
+              "updatedAt": "2026-10-31T19:15:14.911Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow2",
+              "name": "Moti",
+              "breed": "Holstein Friesian",
+              "status": "pregnant",
+              "birthDate": "2019-07-22",
+              "weight": 510,
+              "lactationNumber": 5,
+              "calvingDate": "2026-03-20",
+              "pregnancyDate": "2026-03-25",
+              "batch": "Original Herd",
+              "purchasePrice": 250000,
+              "calvingHistory": [
+                {
+                  "date": "2026-03-20",
+                  "calfId": "cow14"
+                }
+              ],
+              "image": "https://images.unsplash.com/photo-1567513068697-fca8c2af4528?w=800&q=70&fm=jpg",
+              "weightHistory": [
+                {
+                  "id": "w-cow2-11",
+                  "date": "2025-12-06",
+                  "weightKg": 470,
+                  "note": "First weighing"
+                },
+                {
+                  "id": "w-cow2-10",
+                  "date": "2025-12-06",
+                  "weightKg": 474,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-9",
+                  "date": "2026-01-06",
+                  "weightKg": 478,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-8",
+                  "date": "2026-03-06",
+                  "weightKg": 482,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-7",
+                  "date": "2026-03-06",
+                  "weightKg": 486,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-6",
+                  "date": "2026-05-06",
+                  "weightKg": 490,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-5",
+                  "date": "2026-05-06",
+                  "weightKg": 494,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-4",
+                  "date": "2026-07-06",
+                  "weightKg": 498,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-3",
+                  "date": "2026-07-06",
+                  "weightKg": 502,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-2",
+                  "date": "2026-08-06",
+                  "weightKg": 506,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-1",
+                  "date": "2026-10-06",
+                  "weightKg": 510,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow2-0",
+                  "date": "2026-10-06",
+                  "weightKg": 514,
+                  "note": ""
+                }
+              ],
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "marketNotes": [],
+              "createdAt": "2026-10-31T19:15:14.801Z",
+              "updatedAt": "2026-10-31T19:15:14.911Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow10",
+              "name": "Noor",
+              "breed": "Cholistani",
+              "status": "sold",
+              "birthDate": "2017-04-20",
+              "weight": 360,
+              "lactationNumber": 7,
+              "batch": "Original Herd",
+              "purchasePrice": 100000,
+              "image": "https://images.unsplash.com/photo-1708965799324-41fb097e3f4d?w=800&q=70&fm=jpg",
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.802Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow3",
+              "name": "Rani",
+              "breed": "Sahiwal",
+              "status": "active",
+              "birthDate": "2021-11-01",
+              "weight": 390,
+              "lactationNumber": 3,
+              "calvingDate": "2026-06-03",
+              "batch": "Original Herd",
+              "purchasePrice": 140000,
+              "image": "https://images.unsplash.com/photo-1673229266917-89abfa3ebc58?w=800&q=70&fm=jpg",
+              "weightHistory": [
+                {
+                  "id": "w-cow3-11",
+                  "date": "2025-12-06",
+                  "weightKg": 350,
+                  "note": "First weighing"
+                },
+                {
+                  "id": "w-cow3-10",
+                  "date": "2025-12-06",
+                  "weightKg": 353.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-9",
+                  "date": "2026-01-06",
+                  "weightKg": 357,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-8",
+                  "date": "2026-03-06",
+                  "weightKg": 360.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-7",
+                  "date": "2026-03-06",
+                  "weightKg": 364,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-6",
+                  "date": "2026-05-06",
+                  "weightKg": 367.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-5",
+                  "date": "2026-05-06",
+                  "weightKg": 371,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-4",
+                  "date": "2026-07-06",
+                  "weightKg": 374.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-3",
+                  "date": "2026-07-06",
+                  "weightKg": 378,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-2",
+                  "date": "2026-08-06",
+                  "weightKg": 381.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-1",
+                  "date": "2026-10-06",
+                  "weightKg": 385,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow3-0",
+                  "date": "2026-10-06",
+                  "weightKg": 388.5,
+                  "note": ""
+                }
+              ],
+              "expectedPrice": 320000,
+              "marketNotes": [
+                {
+                  "id": "mn1",
+                  "date": "2026-10-22",
+                  "buyer": "Haji Sharif (Taxila)",
+                  "phone": "0300-1112223",
+                  "offer": 290000,
+                  "note": "Wants to see her milking first"
+                },
+                {
+                  "id": "mn2",
+                  "date": "2026-10-28",
+                  "buyer": "Cattle broker Nadeem",
+                  "phone": "0345-8887766",
+                  "offer": 305000,
+                  "note": "Will confirm after Eid"
+                }
+              ],
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "gallery": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.801Z",
+              "updatedAt": "2026-10-31T19:15:14.911Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow7",
+              "name": "Shehzadi",
+              "breed": "Holstein Friesian",
+              "status": "active",
+              "birthDate": "2020-12-05",
+              "weight": 530,
+              "lactationNumber": 4,
+              "calvingDate": "2026-08-02",
+              "batch": "Winter Batch",
+              "purchasePrice": 280000,
+              "image": "https://images.unsplash.com/photo-1567513068697-fca8c2af4528?w=800&q=70&fm=jpg",
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.801Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow15",
+              "name": "Shera",
+              "breed": "Sahiwal",
+              "gender": "male",
+              "status": "active",
+              "birthDate": "2023-06-15",
+              "weight": 580,
+              "lactationNumber": 0,
+              "batch": "Winter Batch",
+              "purchasePrice": 200000,
+              "image": "https://images.unsplash.com/photo-1763095818819-e2eb01e69ce8?w=800&q=70&fm=jpg",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.802Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow12",
+              "name": "Sufi",
+              "breed": "Holstein Friesian",
+              "status": "active",
+              "birthDate": "2020-06-25",
+              "weight": 500,
+              "lactationNumber": 4,
+              "calvingDate": "2026-07-03",
+              "batch": "Original Herd",
+              "purchasePrice": 260000,
+              "image": "https://images.unsplash.com/photo-1567513068697-fca8c2af4528?w=800&q=70&fm=jpg",
+              "weightHistory": [
+                {
+                  "id": "w-cow12-11",
+                  "date": "2025-12-06",
+                  "weightKg": 480,
+                  "note": "First weighing"
+                },
+                {
+                  "id": "w-cow12-10",
+                  "date": "2025-12-06",
+                  "weightKg": 484.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-9",
+                  "date": "2026-01-06",
+                  "weightKg": 489,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-8",
+                  "date": "2026-03-06",
+                  "weightKg": 493.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-7",
+                  "date": "2026-03-06",
+                  "weightKg": 498,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-6",
+                  "date": "2026-05-06",
+                  "weightKg": 502.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-5",
+                  "date": "2026-05-06",
+                  "weightKg": 507,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-4",
+                  "date": "2026-07-06",
+                  "weightKg": 511.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-3",
+                  "date": "2026-07-06",
+                  "weightKg": 516,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-2",
+                  "date": "2026-08-06",
+                  "weightKg": 520.5,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-1",
+                  "date": "2026-10-06",
+                  "weightKg": 525,
+                  "note": ""
+                },
+                {
+                  "id": "w-cow12-0",
+                  "date": "2026-10-06",
+                  "weightKg": 529.5,
+                  "note": ""
+                }
+              ],
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.802Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            },
+            {
+              "_id": "cow4",
+              "name": "Sundar",
+              "breed": "Red Sindhi",
+              "status": "pregnant",
+              "birthDate": "2019-01-10",
+              "weight": 440,
+              "lactationNumber": 5,
+              "calvingDate": "2026-02-13",
+              "pregnancyDate": "2026-07-03",
+              "batch": "Original Herd",
+              "purchasePrice": 160000,
+              "image": "https://images.unsplash.com/photo-1598715685267-0f45367d8071?w=800&q=70&fm=jpg",
+              "gender": "female",
+              "earTag": "",
+              "fatherId": "",
+              "fatherType": "farm",
+              "fatherName": "",
+              "motherId": "",
+              "isCalf": false,
+              "calvingEventId": "",
+              "expectedPrice": 0,
+              "gallery": [],
+              "weightHistory": [],
+              "marketNotes": [],
+              "calvingHistory": [],
+              "createdAt": "2026-10-31T19:15:14.801Z",
+              "updatedAt": "2026-10-31T19:15:14.912Z",
+              "farmId": "52842debdeb6e83b69007172"
+            }
+          ],
+          "url": "http://127.0.0.1/api/cows",
+          "responseTime": 23,
+          "duration": 23,
+          "size": 13641
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.035834788,
+        "name": "Dairy cows list",
+        "suitename": "/home/user/full-rerun/tests/toolchain/bruno/farm-apis/dairy-cows-list",
+        "path": "dairy-cows-list",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "agri-login.bru"
+        },
+        "request": {
+          "method": "POST",
+          "url": "http://127.0.0.1:8000/api/login",
+          "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "User-Agent": "bruno-runtime/4.3.0",
+            "Content-Length": "47",
+            "Accept-Encoding": "gzip, compress, deflate, br",
+            "Host": "127.0.0.1:8000",
+            "Connection": "keep-alive",
+            "content-type": "application/json"
+          },
+          "data": "{ \"username\": \"admin\", \"password\": \"admin123\" }"
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "headers": {
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "no-referrer",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "SAMEORIGIN",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "0",
+            "vary": "Origin",
+            "access-control-allow-credentials": "true",
+            "ratelimit-policy": "10;w=300",
+            "ratelimit-limit": "10",
+            "ratelimit-remaining": "8",
+            "ratelimit-reset": "288",
+            "set-cookie": [
+              "access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4YTIxYTQyYjc1ZTllMGMzZjBjMWY5ZjUiLCJyb2xlIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzkzNDc0MTM4LCJleHAiOjE3OTM1NjA1Mzh9.EKyyORarpxEoW_VEcW2StVT4vR-aQ-DmNiIbQo2PgVI; Max-Age=86400; Path=/; Expires=Sun, 01 Nov 2026 19:15:38 GMT; HttpOnly; SameSite=Lax"
+            ],
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "324",
+            "etag": "W/\"144-p9A6m1pT2w8/adJYzEXXmTejj7o\"",
+            "date": "Sat, 31 Oct 2026 19:15:38 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          },
+          "data": {
+            "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI4YTIxYTQyYjc1ZTllMGMzZjBjMWY5ZjUiLCJyb2xlIjoiYWRtaW4iLCJ1c2VybmFtZSI6ImFkbWluIiwiaWF0IjoxNzkzNDc0MTM4LCJleHAiOjE3OTM1NjA1Mzh9.EKyyORarpxEoW_VEcW2StVT4vR-aQ-DmNiIbQo2PgVI",
+            "token_type": "bearer",
+            "role": "admin",
+            "farmRole": "owner",
+            "farmIds": [],
+            "username": "admin"
+          },
+          "url": "http://127.0.0.1/api/login",
+          "responseTime": 1817,
+          "duration": 1817,
+          "size": 324
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 1.827371466,
+        "name": "Agri login",
+        "suitename": "/home/user/full-rerun/tests/toolchain/bruno/farm-apis/agri-login",
+        "path": "agri-login",
+        "iterationIndex": 0
+      },
+      {
+        "test": {
+          "filename": "flock-batches-list.bru"
+        },
+        "request": {
+          "method": "GET",
+          "url": "http://127.0.0.1:3001/api/batches",
+          "headers": {
+            "Accept": "application/json, text/plain, */*",
+            "User-Agent": "bruno-runtime/4.3.0",
+            "Accept-Encoding": "gzip, compress, deflate, br",
+            "Host": "127.0.0.1:3001",
+            "Connection": "keep-alive",
+            "Authorization": "Bearer ********",
+            "content-type": null,
+            "Cookie": "********"
+          }
+        },
+        "response": {
+          "status": 200,
+          "statusText": "OK",
+          "headers": {
+            "content-security-policy": "default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https://images.unsplash.com;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;connect-src 'self' https: http: ws: wss:",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "origin-agent-cluster": "?1",
+            "referrer-policy": "no-referrer",
+            "strict-transport-security": "max-age=31536000; includeSubDomains",
+            "x-content-type-options": "nosniff",
+            "x-dns-prefetch-control": "off",
+            "x-download-options": "noopen",
+            "x-frame-options": "SAMEORIGIN",
+            "x-permitted-cross-domain-policies": "none",
+            "x-xss-protection": "0",
+            "vary": "Origin",
+            "access-control-allow-credentials": "true",
+            "ratelimit-policy": "300;w=60",
+            "ratelimit-limit": "300",
+            "ratelimit-remaining": "297",
+            "ratelimit-reset": "52",
+            "content-type": "application/json; charset=utf-8",
+            "content-length": "1839",
+            "etag": "W/\"72f-1c+IlHB+krhp7nT0Qo9t0XbxhLI\"",
+            "date": "Sat, 31 Oct 2026 19:15:38 GMT",
+            "connection": "keep-alive",
+            "keep-alive": "timeout=5"
+          },
+          "data": {
+            "batches": [
+              {
+                "batch_id": "batch-demo-2",
+                "name": "Golden Layers 2.0",
+                "type": "Layer",
+                "start_date": "2026-08-17",
+                "expected_end_date": null,
+                "intake_count": 60,
+                "source": "Sadiq chicks dealer",
+                "cost_per_bird": 120,
+                "status": "Active",
+                "_id": "53f39e7d60d11877465523c3",
+                "image_path": "https://images.unsplash.com/photo-1598016717029-026340d417d4?w=800&q=70&fm=jpg",
+                "gallery": [
+                  "https://images.unsplash.com/photo-1598016717029-026340d417d4?w=800&q=70&fm=jpg"
+                ],
+                "createdAt": "2026-10-31T19:15:29.499Z",
+                "updatedAt": "2026-10-31T19:15:29.499Z",
+                "farmId": "735cee7ccaf01f687ec8688a",
+                "summary": {
+                  "intake_cost": 7200,
+                  "total_feed_cost": 35710,
+                  "total_expense_cost": 5800,
+                  "total_vaccination_cost": 0,
+                  "total_eggs_collected": 0,
+                  "total_eggs_sold": 0,
+                  "total_eggs_available": 0,
+                  "total_egg_income": 0,
+                  "total_mortality_count": 3,
+                  "total_sold_count": 0,
+                  "total_revenue": 0,
+                  "total_cost": 48710,
+                  "live_count": 57,
+                  "profit_loss": -48710,
+                  "mortality_pct": 5,
+                  "cost_per_bird": 854.561403508772
+                }
+              },
+              {
+                "batch_id": "batch-demo-1",
+                "name": "Broiler Cycle — Spring",
+                "type": "Broiler",
+                "start_date": "2026-05-24",
+                "expected_end_date": "2026-07-08",
+                "intake_count": 100,
+                "source": "Big Bird hatchery",
+                "cost_per_bird": 95,
+                "status": "Closed",
+                "_id": "dfeeaa53668383c0c83b3339",
+                "image_path": "https://images.unsplash.com/photo-1546272989-40c92939c6c2?w=800&q=70&fm=jpg",
+                "gallery": [
+                  "https://images.unsplash.com/photo-1546272989-40c92939c6c2?w=800&q=70&fm=jpg"
+                ],
+                "createdAt": "2026-10-31T19:15:29.498Z",
+                "updatedAt": "2026-10-31T19:15:29.498Z",
+                "farmId": "735cee7ccaf01f687ec8688a",
+                "summary": {
+                  "intake_cost": 9500,
+                  "total_feed_cost": 54700,
+                  "total_expense_cost": 10300,
+                  "total_vaccination_cost": 0,
+                  "total_eggs_collected": 0,
+                  "total_eggs_sold": 0,
+                  "total_eggs_available": 0,
+                  "total_egg_income": 0,
+                  "total_mortality_count": 6,
+                  "total_sold_count": 94,
+                  "total_revenue": 91500,
+                  "total_cost": 74500,
+                  "live_count": 0,
+                  "profit_loss": 17000,
+                  "mortality_pct": 6,
+                  "cost_per_bird": 745
+                }
+              }
+            ]
+          },
+          "url": "http://127.0.0.1/api/batches",
+          "responseTime": 7,
+          "duration": 7,
+          "size": 1839
+        },
+        "error": null,
+        "status": "pass",
+        "assertionResults": [],
+        "testResults": [],
+        "preRequestTestResults": [],
+        "postResponseTestResults": [],
+        "shouldStopRunnerExecution": false,
+        "runDuration": 0.010504559,
+        "name": "Flock batches list",
+        "suitename": "/home/user/full-rerun/tests/toolchain/bruno/farm-apis/flock-batches-list",
+        "path": "flock-batches-list",
+        "iterationIndex": 0
+      }
+    ],
+    "summary": {
+      "totalRequests": 4,
+      "passedRequests": 4,
+      "failedRequests": 0,
+      "errorRequests": 0,
+      "skippedRequests": 0,
+      "skippedByBail": 0,
+      "totalAssertions": 0,
+      "passedAssertions": 0,
+      "failedAssertions": 0,
+      "totalTests": 0,
+      "passedTests": 0,
+      "failedTests": 0,
+      "totalPreRequestTests": 0,
+      "passedPreRequestTests": 0,
+      "failedPreRequestTests": 0,
+      "totalPostResponseTests": 0,
+      "passedPostResponseTests": 0,
+      "failedPostResponseTests": 0
+    }
+  }
+]

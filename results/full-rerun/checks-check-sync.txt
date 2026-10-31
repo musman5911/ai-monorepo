@@ -1,0 +1,261 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-sync"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-sync
+> node tools/check-muf-sync.js
+
+
+━━ Twin files (dairy ↔ flock, must be identical after normalizing farm identity) ━━
+  ✅ muf-telegram-farms.mjs (all 3) identical
+  ✅ muf-style.css (all 3)          identical
+  ✅ muf-login.tsx (all 3)          identical
+  ✅ components/MyFarmsPanel.tsx    identical
+  ✅ muf-print.ts                   identical
+  ✅ utils/share.ts                 identical
+  ✅ muf-labor.ts                   identical
+  ✅ muf-zakat.ts                   identical
+  ✅ muf-pdf.ts                     identical
+  ✅ muf-feedstock.ts               identical
+  ✅ muf-khata.ts                   identical
+  ✅ muf-farmbook.ts                identical
+  ✅ muf-image.ts                   identical
+  ✅ muf-voice.ts                   identical
+  ✅ muf-urdu.ts                    identical
+  ✅ muf-urdu-terms-1.ts            identical
+  ✅ muf-urdu-terms-2.ts            identical
+  ✅ muf-urdu-terms-3.ts            identical
+  ✅ muf-urdu-terms-4.ts            identical
+  ✅ muf-urdu-terms-5.ts            identical
+  ✅ muf-urdu-terms-6.ts            identical
+  ✅ muf-search.ts                  identical
+  ✅ muf-offline.ts                 identical
+  ✅ muf-charts.tsx                 identical
+  ✅ muf-profile.ts                 identical
+  ✅ muf-applike.tsx                identical
+  ✅ muf-date.ts                    identical
+  ✅ muf-story.ts                   identical
+  ✅ muf-telegram.mjs               identical
+  ✅ muf-supplier.ts                identical
+  ✅ muf-motion.ts                  identical
+  ✅ muf-modal.tsx                  identical
+  ✅ muf-confirm.tsx                identical
+  ✅ muf-portal.tsx                 identical
+  ✅ muf-offline-banner.tsx         identical
+  ✅ muf-avatar.tsx                 identical
+  ✅ muf-farm-profile.tsx           identical
+  ✅ muf-header-search.tsx          identical
+  ✅ muf-telegram-panel.tsx         identical
+  ✅ muf-form-overlay.tsx           identical
+  ✅ muf-scroll-lock.ts             identical
+  ✅ muf-card-qr.tsx                identical
+  ✅ muf-entity-grid.tsx            identical
+  ✅ muf-diary-media.tsx            identical
+  ✅ muf-login-lang.tsx             identical
+  ✅ muf-login.tsx                  identical
+  ✅ muf-a11y.ts                    identical
+  ✅ muf-worker-panel.tsx           identical
+
+━━ Shared farm switcher (all three apps, byte-identical) ━━
+  ✅ Product manager component identical in all three apps
+
+━━ MU Farms public shop (all three apps, byte-identical) ━━
+  ✅ MufShop.tsx              identical in all three apps
+  ✅ muf-shop.css             identical in all three apps
+  ✅ README.md                identical in all three apps
+  ✅ Shared farm switcher identical in all three apps
+
+━━ Backend muf twins (byte-identical in all 3 backends) ━━
+  ✅ muf-telegram.mjs     byte-identical
+  ✅ muf-email.mjs        byte-identical
+  ✅ muf-date.mjs         byte-identical
+  ✅ muf-query.mjs        byte-identical
+  ✅ muf-env.mjs          byte-identical
+  ✅ muf-card.mjs         byte-identical
+  ✅ muf-farms.mjs        byte-identical
+  ✅ muf-products.mjs     byte-identical
+  ✅ backend: telegram parser helper    parseCommand
+  ✅ backend: email factory helper      createMufMailer
+  ✅ backend: farm-local today helper   mufToday
+  ✅ backend: query matcher helper      mufMatches
+  ✅ backend: env resolver (MUF_ENV)    MUF_ENV
+  ✅ backend: card page renderer        renderMufCard
+
+━━ Unified env system (same names in all 3 backends) ━━
+  ✅ env: MONGO_URI                     in all 3 .env.example
+  ✅ env: JWT_SECRET                    in all 3 .env.example
+  ✅ env: APP_URL                       in all 3 .env.example
+  ✅ env: FRONTEND_URL                  in all 3 .env.example
+  ✅ env: SMTP_HOST                     in all 3 .env.example
+  ✅ env: SMTP_PORT                     in all 3 .env.example
+  ✅ env: SMTP_SECURE                   in all 3 .env.example
+  ✅ env: SMTP_USER                     in all 3 .env.example
+  ✅ env: SMTP_PASS                     in all 3 .env.example
+  ✅ env: SMTP_FROM                     in all 3 .env.example
+  ✅ env: TELEGRAM_BOT_TOKEN            in all 3 .env.example
+  ✅ env: TELEGRAM_WEBHOOK_SECRET       in all 3 .env.example
+  ✅ env: CRON_SECRET                   in all 3 .env.example
+  ✅ env: MEMORY_MODE                   in all 3 .env.example
+  ✅ env: CROSS_FARM_KEY                in all 3 .env.example
+  ✅ env: TZ_OFFSET_HOURS               in all 3 .env.example
+  ✅ env: LOG_REQUESTS                  in all 3 .env.example
+  ✅ env: CLOUDINARY_CLOUD_NAME         in all 3 .env.example
+  ✅ env: CLOUDINARY_API_KEY            in all 3 .env.example
+  ✅ env: CLOUDINARY_API_SECRET         in all 3 .env.example
+  ✅ env: PORT                          in all 3 .env.example
+  ✅ env: dairy no legacy reads         all through muf-env
+  ✅ env: flock no legacy reads         all through muf-env
+  ✅ env: agri no legacy reads          all through muf-env
+
+━━ muf invariants (same value required in all three apps) ━━
+  ✅ popup width small (MUF token)  muf-pup-width-sm
+  ✅ popup width big (MUF token)    muf-pup-width-lg
+  ✅ popup max height (MUF card)    muf-pup-card
+  ✅ popup mobile height token      70dvh
+  ✅ form overlay mobile height cap max-height: var(--muf-popup-mobile-max-height) !important
+  ✅ primary action uses canonical  var(--muf-color-primary)
+  ✅ active navigation uses canonic var(--muf-color-primary-hover)
+  ✅ detail action uses canonical t var(--muf-color-primary)
+  ✅ focus ring uses semantic succe var(--muf-color-success)
+  ✅ popup focus outline uses share var(--muf-ui-focus)
+  ✅ mobile popup stage padding tok 10px
+  ✅ mobile popup typography scale  (matched)
+  ✅ mobile popup fields use shared (matched)
+  ✅ popup form gap uses shared tok 1rem
+  ✅ popup field height uses shared 38px
+  ✅ mobile popup field size uses s var(--muf-ui-popup-field-font-size-mobile)
+  ✅ primary action height token    47px
+  ✅ primary action consumes height var(--muf-core-action-primary-height,47px)
+  ✅ compact action consumes sizing var(--muf-core-action-compact-height,31px)
+  ✅ KPI spacing consumes token     var(--muf-core-kpi-gap,12px)
+  ✅ KPI padding consumes token     var(--muf-core-kpi-padding,17px 15px)
+  ✅ panel radius consumes token    var(--muf-core-panel-radius,20px)
+  ✅ entity card radius consumes to var(--muf-core-entity-radius,17px)
+  ✅ record action color consumes t var(--muf-core-action-record-bg,#f0f3f1)
+  ✅ popup content: label primitive font-weight: 600
+  ✅ popup content: muted text prim font-size: 0.75rem
+  ✅ popup content: form grid primi gap: 0.75rem
+  ✅ popup content: actions primiti justify-content: flex-end
+  ✅ popup content: mobile scale ho var(--muf-popup-mobile-text-xs, 10.5px)
+  ✅ popup content: dark popup hook #e5edf7
+  ✅ brand token: WhatsApp green    #25D366
+  ✅ brand token: WhatsApp hover    #1ebe5b
+  ✅ dark popups: white panels repa #172337
+  ✅ dark popups: dark slate text r #e5edf7
+  ✅ photo viewer z-index token     1450
+  ✅ Notes MUF root class           muf-notes
+  ✅ scale: shared popup title 0.87 0.875rem
+  ✅ popup body padding             --pup-body-pad
+  ✅ popup rounding                 rounded-2xl sm:rounded-3xl
+  ✅ popup backdrop                 bg-black/50
+  ✅ admin popup width (MUF token)  muf-admin-shell-card
+  ✅ admin popup height (MUF token) muf-admin-shell-card
+  ✅ admin popup rounding (MUF)     muf-admin-shell-card
+  ✅ admin stage spacing (MUF)      muf-popup-stage
+  ✅ toast z-index                  z-[var(--muf-z-toast)]
+  ✅ type scale: desktop zoom       0.8
+  ✅ print: brand title 26px        26px
+  ✅ print: green rule              #16a34a
+  ✅ print: logo size 56px          56px
+  ✅ print: dark green brand        #14532d
+  ✅ compare: pctChange helper      pctChange
+  ✅ compare: trendArrow helper     trendArrow
+  ✅ share: backup share helper     shareBackupFile
+  ✅ share: WhatsApp fallback URL   https://web.whatsapp.com
+  ✅ labor: half-day units 0.5      0.5
+  ✅ labor: wage sheet helper       buildWageSheet
+  ✅ labor: post date (28th)        -28
+  ✅ zakat: default 2.5%            2.5
+  ✅ zakat: ushr rates 10/5         10
+  ✅ zakat: statement helper        zakatStatementBody
+  ✅ zakat: download helper         downloadZakatPdf
+  ✅ pdf: header helper             mufPdfHeader
+  ✅ pdf: logo 17mm at 14,8         14, 8, 17, 17
+  ✅ pdf: dark green brand rgb      20, 83, 45
+  ✅ pdf: green rule rgb            22, 163, 74
+  ✅ labor: advance helper          payoutAfterAdvances
+  ✅ farmbook: download helper      downloadFarmBookPdf
+  ✅ urdu: dictionary helper        mufUr
+  ✅ urdu: Dashboard term           ڈیش بورڈ
+  ✅ search: ranking helper         mufSearch
+  ✅ offline: watch helper          watchOffline
+  ✅ charts: area chart component   MufAreaChart
+  ✅ dark: shared palette vars      --muf-dark-bg
+  ✅ profile: buyers pdf            downloadFarmProfilePdf
+  ✅ applike: pull to refresh       initMufPullToRefresh
+  ✅ applike: splash styles         #muf-splash
+  ✅ date: local today helper       mufToday
+  ✅ story: lifetime verdict        mufVerdictText
+  ✅ compare: same month last year  sameMonthLastYearKey
+  ✅ telegram: doodh keyword        doodh
+  ✅ telegram: urdu hazri keyword   حاضری
+  ✅ telegram: drop check           mufDropCheck
+  ✅ telegram: drop alert text      tgDropAlert
+  ✅ supplier: balance math         supplierBalances
+  ✅ supplier: urdu hisab text      کھاتے کی تفصیل
+  ✅ motion: single re-export       'motion/react'
+  ✅ motion: modal spring 480/30    480
+  ✅ motion: reduced-motion gate    prefersReducedMotion
+  ✅ modal: muf-overlay class       muf-overlay
+  ✅ modal: ESC top-most close      (matched)
+  ✅ modal: body scroll lock        (matched)
+  ✅ confirm: prompt support        usePromptInput
+  ✅ confirm: toast support         notify
+  ✅ portal: modal root id          (matched)
+  ✅ form overlay uses muf modal    ./muf-modal
+  ✅ scroll lock: stack counter     0
+
+━━ muf email shell (backend mailers) ━━
+  ✅ email: brand green header      #16a34a
+  ✅ email: farm name color         #14532d
+  ✅ email: code box bg             #f0fdf4
+  ✅ email: logo 56px               56
+
+━━ Scan rules (must stay clean in all three apps) ━━
+  ✅ motion imported only via muf-motion          clean in all 3 apps
+
+━━ muf-urdu shared helpers (all 3 apps) ━━
+  ✅ urdu: mufUr helper                  (all 3)
+  ✅ urdu: mufFill helper                (all 3)
+  ✅ urdu: mufL helper                   (all 3)
+  ✅ Urdu only in muf-urdu + message builders     clean in all 3 apps
+  ✅ toLocaleDateString only in muf-date (+ legac clean in all 3 apps
+  ✅ popup size only small|big                   clean in all 3 apps
+
+━━ backend invariants (mongoSanitize + JSON body limit, all 3 apps) ━━
+  ✅ mongoSanitize imported             (matched)
+  ✅ mongoSanitize mounted              (matched)
+  ✅ JSON body limit 10mb               10mb
+
+━━ muf-pdf: typed finalY helper present in all 3 apps ━━
+  ✅ mufLastAutoTableY exported         mufLastAutoTableY
+  ✅ mufPdfTable delegates to helper    mufLastAutoTableY
+  ✅ lastAutoTable only via mufLastAutoTableY hel clean in all 3 apps
+
+━━ muf-image twin present in all 3 apps ━━
+  ✅ muf-image: compressGalleryImage ex compressGalleryImage
+  ✅ muf-image: GALLERY_MAX_PHOTOS = 10 10
+
+━━ muf-voice twin present in all 3 apps ━━
+  ✅ muf-voice: isVoiceSupported export isVoiceSupported
+  ✅ muf-voice: startVoiceRecording exp startVoiceRecording
+  ✅ muf-voice: MAX_VOICE_SECONDS = 60  60
+
+━━ muf-storage backend twin parity ━━
+  ✅ muf-storage.mjs byte-identical in all 3 backends
+  ✅ save API with server validation
+  ✅ read-link API
+  ✅ delete API
+  ✅ orphan cleanup API
+  ✅ 100 KB default limit
+
+━━ muf-cloudinary backend twin parity ━━
+  ✅ muf-cloudinary.mjs byte-identical in all 3 backends
+  ✅ Cloudinary signing client
+  ✅ optional-credential detector
+
+🎉 All muf checks passed — the three apps are in sync.
+
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=0.94

@@ -1,0 +1,103 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "--test", "tests/acceptance/flock-cards-farm-scope.test.mjs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+TAP version 13
+# Subtest: B1-B3 (flock forward): anonymous card for sequential id 1 does not expose phone/balance
+not ok 1 - B1-B3 (flock forward): anonymous card for sequential id 1 does not expose phone/balance
+  ---
+  duration_ms: 3723.368224
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/flock-cards-farm-scope.test.mjs:12:1'
+  failureType: 'testCodeFailure'
+  error: 'anonymous card 200 exposes a phone number'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/flock-cards-farm-scope.test.mjs:18:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: B1-B3 (flock reverse): Farm B customer link shows Farm B data, not Farm A
+not ok 2 - B1-B3 (flock reverse): Farm B customer link shows Farm B data, not Farm A
+  ---
+  duration_ms: 4070.454023
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/flock-cards-farm-scope.test.mjs:23:1'
+  failureType: 'testCodeFailure'
+  error: 'Farm B link (id 1) served Farm A private data'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/flock-cards-farm-scope.test.mjs:38:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# FINDING CHECK ROLE-F1: requested farmIds=[2095e4175760de1bca5ad109] (Farm B), server assigned [d35d1bdbefc2c45a3a88b210]
+# Subtest: ROLE-F1: creating a user with farmIds assigns exactly those farms (flock)
+not ok 3 - ROLE-F1: creating a user with farmIds assigns exactly those farms (flock)
+  ---
+  duration_ms: 4628.236259
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/flock-cards-farm-scope.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    ROLE-F1 BUG: owner asked for Farm B [2095e4175760de1bca5ad109] but the new manager was assigned [d35d1bdbefc2c45a3a88b210] instead (Farm A is d35d1bdbefc2c45a3a88b210)
+    + actual - expected
+    
+      [
+    +   'd35d1bdbefc2c45a3a88b210'
+    -   '2095e4175760de1bca5ad109'
+      ]
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: '2095e4175760de1bca5ad109'
+  actual:
+    0: 'd35d1bdbefc2c45a3a88b210'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/flock-cards-farm-scope.test.mjs:65:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: J1: importing Farm A batch export into Farm B succeeds (flock)
+not ok 4 - J1: importing Farm A batch export into Farm B succeeds (flock)
+  ---
+  duration_ms: 4615.730498
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/flock-cards-farm-scope.test.mjs:70:1'
+  failureType: 'testCodeFailure'
+  error: 'import into Farm B failed (500: {"error":"Failed to import batch data"})'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/flock-cards-farm-scope.test.mjs:82:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 0
+# fail 4
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 17285.292439
+
+RUNNER EXIT=1 TIMEOUT=False SECONDS=17.45

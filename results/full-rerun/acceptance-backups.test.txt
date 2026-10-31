@@ -1,0 +1,79 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "--test", "tests/acceptance/backups.test.mjs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+TAP version 13
+# Subtest: I1: tampered backup is rejected on restore (dairy)
+not ok 1 - I1: tampered backup is rejected on restore (dairy)
+  ---
+  duration_ms: 45198.427007
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/backups.test.mjs:5:1'
+  failureType: 'testCodeFailure'
+  error: 'tampered backup restored (200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/backups.test.mjs:16:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: I2: another app's backup is rejected, not partially imported (dairy restores agri backup)
+not ok 2 - I2: another app's backup is rejected, not partially imported (dairy restores agri backup)
+  ---
+  duration_ms: 53280.806516
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/backups.test.mjs:20:1'
+  failureType: 'testCodeFailure'
+  error: 'cross-app backup accepted (200: {"success":true,"message":"Data restored successfully (sequential)"})'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/backups.test.mjs:28:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: I3: junk backup payload is rejected cleanly (flock)
+ok 3 - I3: junk backup payload is rejected cleanly (flock)
+  ---
+  duration_ms: 7116.517112
+  type: 'test'
+  ...
+# Subtest: PH-3: agri backup includes uploaded PhotoAsset photos so restore cannot silently lose them
+not ok 4 - PH-3: agri backup includes uploaded PhotoAsset photos so restore cannot silently lose them
+  ---
+  duration_ms: 8037.313361
+  type: 'test'
+  location: '/home/user/full-rerun/tests/acceptance/backups.test.mjs:41:1'
+  failureType: 'testCodeFailure'
+  error: 'backup JSON contains no PhotoAsset collection — uploaded photos would be lost on restore'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/full-rerun/tests/acceptance/backups.test.mjs:53:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..4
+# tests 4
+# suites 0
+# pass 1
+# fail 3
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 113767.587476
+
+RUNNER EXIT=1 TIMEOUT=False SECONDS=113.83

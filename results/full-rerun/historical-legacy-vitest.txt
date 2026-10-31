@@ -1,0 +1,3214 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node_modules/.bin/vitest", "run", "--maxWorkers=2", "tests/api-deep/agri-analytics-deep.test.ts", "tests/api-deep/agri-filters-deep.test.ts", "tests/api-deep/agri-liabilities-deep.test.ts", "tests/api-deep/allfarms-deletion-analytics-deep.test.ts", "tests/api-deep/auth-isolation-deep.test.ts", "tests/api-deep/backup-media-deep.test.ts", "tests/api-deep/concurrency-invariants.test.ts", "tests/api-deep/coverage-sweep-deep.test.ts", "tests/api-deep/coverage-sweep2-deep.test.ts", "tests/api-deep/cross-realm-deep.test.ts", "tests/api-deep/farm-delete-data-deep.test.ts", "tests/api-deep/farm-transfer-deep.test.ts", "tests/api-deep/fidelity-precision-deep.test.ts", "tests/api-deep/flock-destructive-deep.test.ts", "tests/api-deep/frontend-contract-deep.test.ts", "tests/api-deep/fuzz-robustness.test.ts", "tests/api-deep/ids-unicode-uploads-deep.test.ts", "tests/api-deep/last-surface-deep.test.ts", "tests/api-deep/load-lifetime-smuggling-deep.test.ts", "tests/api-deep/pagination-dates-backup-abuse.test.ts", "tests/api-deep/protocol-exotic-deep.test.ts", "tests/api-deep/public-surface-deep.test.ts", "tests/api-deep/q1-delete-pinpoint-deep.test.ts", "tests/api-deep/round1-breeding-events.test.ts", "tests/api-deep/round10-flock-import-images.test.ts", "tests/api-deep/round11-role-agri.test.ts", "tests/api-deep/round11-role-flock.test.ts", "tests/api-deep/round11-role-system.test.ts", "tests/api-deep/round12-photos-cloudinary.test.ts", "tests/api-deep/round12-photos-flock.test.ts", "tests/api-deep/round13-sessions.test.ts", "tests/api-deep/round14-fuzz.test.ts", "tests/api-deep/round15-concurrency.test.ts", "tests/api-deep/round2-agri-fields.test.ts", "tests/api-deep/round3-super-admin.test.ts", "tests/api-deep/round4-backup-newmodels.test.ts", "tests/api-deep/round6-breeding-deep.test.ts", "tests/api-deep/round7-agri-fields-deep.test.ts", "tests/api-deep/round8-summary-accuracy.test.ts", "tests/api-deep/round9-backup-integrity.test.ts", "tests/api-deep/session-escalation-deep.test.ts", "tests/api-deep/telegram-bot-deep.test.ts", "tests/api-deep/timing-reset-auto-deep.test.ts", "tests/api-matrix/agri.api-matrix.test.ts", "tests/api-matrix/backup-import-export.test.ts", "tests/api-matrix/dairy.api-matrix.test.ts", "tests/api-matrix/flock.api-matrix.test.ts", "tests/toolchain/fastcheck-invariants.test.ts", "tests/toolchain/security-scan.test.ts", "tests/verification/unit-farm-guards.test.ts"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+ RUN  v3.2.7 /home/user/full-rerun
+
+ ❯ tests/api-matrix/flock.api-matrix.test.ts (21 tests | 8 failed) 4143ms
+   ✓ Flock API field matrix > batches > full CRUD: create → read → update → delete → 404 54ms
+   × Flock API field matrix > batches > rejects empty/missing/bad-enum/negative/huge/oversized input 70ms
+     → bad date: expected 201 to be 400 // Object.is equality
+   ✓ Flock API field matrix > batches > does not store script payloads verbatim; auth policy 30ms
+   × Flock API field matrix > batches > update validation: PATCH rejects bad enum / negative numbers 17ms
+     → expected 200 to be 400 // Object.is equality
+   ✓ Flock API field matrix > batch logs (all kinds) > feed: create → invalid rejected → delete → gone 31ms
+   ✓ Flock API field matrix > batch logs (all kinds) > mortality: create → invalid rejected → delete → gone 31ms
+   ✓ Flock API field matrix > batch logs (all kinds) > expense: create → invalid rejected → delete → gone 18ms
+   ✓ Flock API field matrix > batch logs (all kinds) > sale: create → invalid rejected → delete → gone 18ms
+   ✓ Flock API field matrix > batch logs (all kinds) > egg: create → invalid rejected → delete → gone 24ms
+   ✓ Flock API field matrix > batch logs (all kinds) > weight: create → invalid rejected → delete → gone 17ms
+   × Flock API field matrix > batch logs (all kinds) > vaccination: create → invalid rejected → delete → gone 7ms
+     → vaccination negative value: expected 201 to be 400 // Object.is equality
+   ✓ Flock API field matrix > batch logs (all kinds) > logs on a nonexistent batch are rejected 10ms
+   ✓ Flock API field matrix > batch logs (all kinds) > intake adds birds; closed batch rejects new logs 54ms
+   × Flock API field matrix > /data buckets > birds: round-trip works; wrong-type value rejected 19ms
+     → birds accepts plain-string value: expected 200 to be 400 // Object.is equality
+   × Flock API field matrix > /data buckets > eggs: round-trip works; wrong-type value rejected 35ms
+     → eggs accepts plain-string value: expected 200 to be 400 // Object.is equality
+   × Flock API field matrix > /data buckets > feed: round-trip works; wrong-type value rejected 31ms
+     → feed accepts plain-string value: expected 200 to be 400 // Object.is equality
+   × Flock API field matrix > /data buckets > settings: round-trip works; wrong-type value rejected 25ms
+     → settings accepts plain-string value: expected 200 to be 400 // Object.is equality
+   × Flock API field matrix > /data buckets > diary: round-trip works; wrong-type value rejected 36ms
+     → diary accepts plain-string value: expected 200 to be 400 // Object.is equality
+   ✓ Flock API field matrix > /data buckets > unknown bucket keys are rejected; worker cannot write settings 9ms
+   ✓ Flock API field matrix > /data buckets > stale-version writes conflict (409) 14ms
+   ✓ Flock API field matrix > batch counts in list reflect create/delete 20ms
+ ❯ tests/api-matrix/agri.api-matrix.test.ts (46 tests | 31 failed) 7403ms
+   ✓ Agri API field matrix > crops > full CRUD: create → update → delete → gone 66ms
+   × Agri API field matrix > crops > rejects empty body and missing required fields 20ms
+     → crops empty body: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > crops > rejects negative / string / huge numbers 5ms
+     → crops.area_acres negative: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > crops > rejects oversized strings; does not store script verbatim 13ms
+     → crops.name 10k chars: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > crops > update rejects invalid values too 15ms
+     → crops update area_acres negative: expected 200 to be 400 // Object.is equality
+   ✓ Agri API field matrix > crops > rejects unauthenticated writes; worker create → 403 19ms
+   ✓ Agri API field matrix > tasks > full CRUD: create → update → delete → gone 32ms
+   × Agri API field matrix > tasks > rejects empty body and missing required fields 3ms
+     → tasks empty body: expected 201 to be 400 // Object.is equality
+   ✓ Agri API field matrix > tasks > rejects negative / string / huge numbers 0ms
+   × Agri API field matrix > tasks > rejects oversized strings; does not store script verbatim 3ms
+     → tasks.title 10k chars: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > tasks > update rejects invalid values too 20ms
+     → tasks empty update: expected 200 to be 400 // Object.is equality
+   ✓ Agri API field matrix > tasks > rejects unauthenticated writes; worker create → 403 4ms
+   ✓ Agri API field matrix > finance > full CRUD: create → update → delete → gone 66ms
+   × Agri API field matrix > finance > rejects empty body and missing required fields 20ms
+     → finance empty body: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > finance > rejects negative / string / huge numbers 4ms
+     → finance.amount negative: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > finance > rejects oversized strings; does not store script verbatim 4ms
+     → finance.date 10k chars: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > finance > update rejects invalid values too 37ms
+     → finance update amount negative: expected 200 to be 400 // Object.is equality
+   ✓ Agri API field matrix > finance > rejects unauthenticated writes; worker create → 403 14ms
+   × Agri API field matrix > inventory > full CRUD: create → update → delete → gone 33ms
+     → double-delete inventory: expected 200 to be 404 // Object.is equality
+   × Agri API field matrix > inventory > rejects empty body and missing required fields 4ms
+     → inventory empty body: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > inventory > rejects negative / string / huge numbers 13ms
+     → inventory.quantity negative: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > inventory > rejects oversized strings; does not store script verbatim 8ms
+     → inventory.name 10k chars: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > inventory > update rejects invalid values too 12ms
+     → inventory update quantity negative: expected 200 to be 400 // Object.is equality
+   ✓ Agri API field matrix > inventory > rejects unauthenticated writes; worker create → 403 13ms
+   × Agri API field matrix > suppliers > full CRUD: create → update → delete → gone 34ms
+     → double-delete suppliers: expected 200 to be 404 // Object.is equality
+   × Agri API field matrix > suppliers > rejects empty body and missing required fields 9ms
+     → suppliers empty body: expected 201 to be 400 // Object.is equality
+   ✓ Agri API field matrix > suppliers > rejects negative / string / huge numbers 0ms
+   × Agri API field matrix > suppliers > rejects oversized strings; does not store script verbatim 7ms
+     → suppliers.name 10k chars: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > suppliers > update rejects invalid values too 17ms
+     → suppliers empty update: expected 200 to be 400 // Object.is equality
+   ✓ Agri API field matrix > suppliers > rejects unauthenticated writes; worker create → 403 5ms
+   × Agri API field matrix > liabilities > full CRUD: create → update → delete → gone 26ms
+     → double-delete liabilities: expected 200 to be 404 // Object.is equality
+   × Agri API field matrix > liabilities > rejects empty body and missing required fields 3ms
+     → liabilities empty body: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > liabilities > rejects negative / string / huge numbers 6ms
+     → liabilities.amount_owed negative: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > liabilities > rejects oversized strings; does not store script verbatim 4ms
+     → liabilities.creditor 10k chars: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > liabilities > update rejects invalid values too 14ms
+     → liabilities update amount_owed negative: expected 200 to be 400 // Object.is equality
+   ✓ Agri API field matrix > liabilities > rejects unauthenticated writes; worker create → 403 18ms
+   ✓ Agri API field matrix > laborers > full CRUD: create → update → delete → gone 29ms
+   ✓ Agri API field matrix > laborers > rejects empty body and missing required fields 8ms
+   × Agri API field matrix > laborers > rejects negative / string / huge numbers 6ms
+     → laborers.daily_wage negative: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > laborers > rejects oversized strings; does not store script verbatim 3ms
+     → laborers.name 10k chars: expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > laborers > update rejects invalid values too 14ms
+     → laborers update daily_wage negative: expected 200 to be 400 // Object.is equality
+   ✓ Agri API field matrix > laborers > rejects unauthenticated writes; worker create → 403 6ms
+   × Agri API field matrix > crops: rejects bad status enum and bad plant_date on create and update 14ms
+     → expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > tasks: rejects bad priority enum 3ms
+     → expected 201 to be 400 // Object.is equality
+   × Agri API field matrix > crop logs: irrigation/spray validation + ghost crop 59ms
+     → spray negative quantity: expected 201 to be 400 // Object.is equality
+   ✓ Agri API field matrix > bulk twins validate (contrast with single-record creates) 9ms
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts (45 tests | 15 failed) 4852ms
+   ✓ Dairy API field matrix > cows > full CRUD: create → read → update → delete → 404 135ms
+   ✓ Dairy API field matrix > cows > rejects empty body and missing required fields 17ms
+   ✓ Dairy API field matrix > cows > rejects negative and non-numeric numbers 33ms
+   × Dairy API field matrix > cows > rejects huge numbers and oversized strings 22ms
+     → cows.ageYears huge: expected 201 to be 400 // Object.is equality
+   × Dairy API field matrix > cows > does not store script payloads verbatim 14ms
+     → cows.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'
+   ✓ Dairy API field matrix > cows > rejects unauthenticated writes; worker create policy 12ms
+   × Dairy API field matrix > milk > full CRUD: create → read → update → delete → 404 118ms
+     → double-delete milk: expected 200 to be 404 // Object.is equality
+   ✓ Dairy API field matrix > milk > rejects empty body and missing required fields 17ms
+   ✓ Dairy API field matrix > milk > rejects negative and non-numeric numbers 19ms
+   × Dairy API field matrix > milk > rejects huge numbers and oversized strings 6ms
+     → milk.morning huge: expected 201 to be 400 // Object.is equality
+   ✓ Dairy API field matrix > milk > does not store script payloads verbatim 3ms
+   ✓ Dairy API field matrix > milk > rejects unauthenticated writes; worker create policy 19ms
+   ✓ Dairy API field matrix > expenses > full CRUD: create → read → update → delete → 404 50ms
+   ✓ Dairy API field matrix > expenses > rejects empty body and missing required fields 17ms
+   ✓ Dairy API field matrix > expenses > rejects negative and non-numeric numbers 7ms
+   × Dairy API field matrix > expenses > rejects huge numbers and oversized strings 3ms
+     → expenses.amount huge: expected 201 to be 400 // Object.is equality
+   ✓ Dairy API field matrix > expenses > does not store script payloads verbatim 0ms
+   ✓ Dairy API field matrix > expenses > rejects unauthenticated writes; worker create policy 14ms
+   × Dairy API field matrix > health > full CRUD: create → read → update → delete → 404 47ms
+     → double-delete health: expected 200 to be 404 // Object.is equality
+   ✓ Dairy API field matrix > health > rejects empty body and missing required fields 13ms
+   ✓ Dairy API field matrix > health > rejects negative and non-numeric numbers 13ms
+   × Dairy API field matrix > health > rejects huge numbers and oversized strings 6ms
+     → health.cost huge: expected 201 to be 400 // Object.is equality
+   ✓ Dairy API field matrix > health > does not store script payloads verbatim 3ms
+   ✓ Dairy API field matrix > health > rejects unauthenticated writes; worker create policy 29ms
+   × Dairy API field matrix > buyers > full CRUD: create → read → update → delete → 404 91ms
+     → double-delete buyers: expected 200 to be 404 // Object.is equality
+   ✓ Dairy API field matrix > buyers > rejects empty body and missing required fields 16ms
+   ✓ Dairy API field matrix > buyers > rejects negative and non-numeric numbers 0ms
+   × Dairy API field matrix > buyers > rejects huge numbers and oversized strings 22ms
+     → buyers.name 10k chars: expected 201 to be 400 // Object.is equality
+   × Dairy API field matrix > buyers > does not store script payloads verbatim 15ms
+     → buyers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'
+   ✓ Dairy API field matrix > buyers > rejects unauthenticated writes; worker create policy 8ms
+   × Dairy API field matrix > suppliers > full CRUD: create → read → update → delete → 404 97ms
+     → double-delete suppliers: expected 200 to be 404 // Object.is equality
+   ✓ Dairy API field matrix > suppliers > rejects empty body and missing required fields 10ms
+   ✓ Dairy API field matrix > suppliers > rejects negative and non-numeric numbers 0ms
+   × Dairy API field matrix > suppliers > rejects huge numbers and oversized strings 11ms
+     → suppliers.name 10k chars: expected 201 to be 400 // Object.is equality
+   × Dairy API field matrix > suppliers > does not store script payloads verbatim 9ms
+     → suppliers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'
+   ✓ Dairy API field matrix > suppliers > rejects unauthenticated writes; worker create policy 9ms
+   ✓ Dairy API field matrix > labor workers > full CRUD: create → read → update → delete → 404 59ms
+   ✓ Dairy API field matrix > labor workers > rejects empty body and missing required fields 19ms
+   ✓ Dairy API field matrix > labor workers > rejects negative and non-numeric numbers 15ms
+   × Dairy API field matrix > labor workers > rejects huge numbers and oversized strings 3ms
+     → labor workers.dailyWage huge: expected 201 to be 400 // Object.is equality
+   × Dairy API field matrix > labor workers > does not store script payloads verbatim 7ms
+     → labor workers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'
+   ✓ Dairy API field matrix > labor workers > rejects unauthenticated writes; worker create policy 5ms
+   ✓ Dairy API field matrix > cows: rejects bad enums and bad dates on create AND update 77ms
+   ✓ Dairy API field matrix > ghost foreign keys are rejected (milk/health for nonexistent cow) 14ms
+   ✓ Dairy API field matrix > bulk milk import: valid rows land; invalid rows rejected atomically 123ms
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (dairy) > deactivation kills the OLD token and fresh login (where the feature exists)
+dairy deactivate edit -> 200 {"user":{"_id":"8e53c7aa29185a941eb0d1c5","username":"r13damxmvwrvbrb","role":"admin","farmRole":"manager","farmIds":["0
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (dairy) > bcrypt 72-byte: password differing only after byte 72 must NOT authenticate
+dairy create 73-byte-password user -> 201
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (dairy) > 1MB password does not hang or 500 the login/signup
+dairy 1MB-password login -> 429 in 21ms
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (dairy) > login rate limiter cannot be reset by spoofing X-Forwarded-For
+dairy limiter plain: 429,429,429,429,429,429,429,429,429,429,429,429,429,429,429
+dairy limiter xff-spoofed: 401,401,401,401,401,401,401,401,401,401,401,401,401,401,401
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (dairy) > forgot-password does not enumerate registered emails
+dairy forgot existing -> 503 {"error":"Email is not configured on this server"} | nonexistent -> 503 {"error":"Email is not configured on this server"}
+
+ ✓ tests/api-deep/fidelity-precision-deep.test.ts (7 tests) 14894ms
+   ✓ ROUND 10: fidelity + precision > dairy backup fidelity: one of EVERY resource survives export → delete → restore  416ms
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (agri) > deactivation kills the OLD token and fresh login (where the feature exists)
+agri deactivate edit -> 400 {"detail":"No updates provided"}
+agri: deactivation NOT supported via edit (status 400) — recording as feature-absent
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (agri) > bcrypt 72-byte: password differing only after byte 72 must NOT authenticate
+agri create 73-byte-password user -> 400
+
+ ❯ tests/api-deep/round12-photos-cloudinary.test.ts (19 tests | 7 failed) 16947ms
+   ✓ ROUND 12: photos (dairy, fallback mode) > unauthenticated photo read gets no bytes and no cloud URL leak 6ms
+   ✓ ROUND 12: photos (dairy, fallback mode) > farm isolation: manager of A cannot read or delete farm B photo (403/404) 34ms
+   ✓ ROUND 12: photos (dairy, fallback mode) > cache headers: photo responses are private, never public 3ms
+   ✓ ROUND 12: photos (dairy, fallback mode) > upload validation: SVG, HTML-as-PNG, empty, wrong field all rejected 4xx 35ms
+   × ROUND 12: photos (dairy, fallback mode) > EXIF/GPS: uploaded JPEG bytes are served back — is EXIF stripped? 18ms
+     → EXIF GPS marker still present in served bytes (not stripped): expected true to be false // Object.is equality
+   × ROUND 12: photos (dairy, fallback mode) > role checks: worker upload/delete behaviour is explicit 32ms
+     → worker delete photo → 200: expected [ 403, 404 ] to include 200
+   ✓ ROUND 12: photos (dairy, fallback mode) > delete integrity: referenced photo blocked (409); orphan cleanup removes only orphans 21ms
+   ✓ ROUND 12: photos (dairy, fallback mode) > photos survive backup? dairy/agri backup must contain the photo or its bytes 110ms
+   × ROUND 12: photos (dairy, fallback mode) > id guessing: random/malformed photo ids → 404, never bytes 28ms
+     → GET /photos/../../etc/passwd → 200: expected [ 400, 404 ] to include 200
+   ✓ ROUND 12: photos (agri, fallback mode) > unauthenticated photo read gets no bytes and no cloud URL leak 5ms
+   ✓ ROUND 12: photos (agri, fallback mode) > farm isolation: manager of A cannot read or delete farm B photo (403/404) 31ms
+   ✓ ROUND 12: photos (agri, fallback mode) > cache headers: photo responses are private, never public 3ms
+   ✓ ROUND 12: photos (agri, fallback mode) > upload validation: SVG, HTML-as-PNG, empty, wrong field all rejected 4xx 17ms
+   × ROUND 12: photos (agri, fallback mode) > EXIF/GPS: uploaded JPEG bytes are served back — is EXIF stripped? 13ms
+     → EXIF GPS marker still present in served bytes (not stripped): expected true to be false // Object.is equality
+   × ROUND 12: photos (agri, fallback mode) > role checks: worker upload/delete behaviour is explicit 5ms
+     → worker delete photo → 200: expected [ 403, 404 ] to include 200
+   ✓ ROUND 12: photos (agri, fallback mode) > delete integrity: referenced photo blocked (409); orphan cleanup removes only orphans 12ms
+   × ROUND 12: photos (agri, fallback mode) > photos survive backup? dairy/agri backup must contain the photo or its bytes 24ms
+     → photo id absent from backup (photos lost on restore): expected false to be true // Object.is equality
+   × ROUND 12: photos (agri, fallback mode) > id guessing: random/malformed photo ids → 404, never bytes 39ms
+     → GET /photos/../../etc/passwd → 200: expected [ 400, 404 ] to include 200
+   ✓ ROUND 12: photos with FAKE Cloudinary config (configured-mode error paths) > dairy: upload with unreachable Cloudinary fails cleanly and leaks no secret  2006ms
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (agri) > 1MB password does not hang or 500 the login/signup
+agri 1MB-password login -> 401 in 916ms
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (agri) > login rate limiter cannot be reset by spoofing X-Forwarded-For
+agri limiter plain: 429,429,429,429,429,429,429,429,429,429,429,429,429,429,429
+agri limiter xff-spoofed: 401,401,401,401,401,401,401,401,401,401,401,401,401,401,401
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (agri) > forgot-password does not enumerate registered emails
+agri forgot existing -> 429 {"detail":"Too many request attempts. Please wait a few minutes before trying again."} | nonexistent -> 429 {"detail":"Too many request attempts. Please wait a few minutes before trying again."}
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (flock) > deactivation kills the OLD token and fresh login (where the feature exists)
+flock deactivate edit -> 200 {"user":{"username":"r13damxmvwrvbrb","role":"admin","farmIds":["a63cda85354976540c322abe"],"displayName":"","email":"r1
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (flock) > bcrypt 72-byte: password differing only after byte 72 must NOT authenticate
+flock create 73-byte-password user -> 201
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (flock) > 1MB password does not hang or 500 the login/signup
+flock 1MB-password login -> 401 in 235ms
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (flock) > login rate limiter cannot be reset by spoofing X-Forwarded-For
+flock limiter plain: 401,429,429,429,429,429,429,429,429,429,429,429,429,429,429
+flock limiter xff-spoofed: 401,401,401,401,401,401,401,401,401,401,401,401,401,401,401
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (flock) > forgot-password does not enumerate registered emails
+flock forgot existing -> 503 {"error":"Email is not configured on this server"} | nonexistent -> 503 {"error":"Email is not configured on this server"}
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 cross-app tokens (same JWT_SECRET, different user DBs) > owner tokens from one app are rejected by the other two
+dairy-token -> agri: GET /farms -> 401
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 cross-app tokens (same JWT_SECRET, different user DBs) > owner tokens from one app are rejected by the other two
+dairy-token -> flock: GET /farms -> 401
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 cross-app tokens (same JWT_SECRET, different user DBs) > owner tokens from one app are rejected by the other two
+agri-token -> dairy: GET /farms -> 401
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 cross-app tokens (same JWT_SECRET, different user DBs) > owner tokens from one app are rejected by the other two
+agri-token -> flock: GET /farms -> 401
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 cross-app tokens (same JWT_SECRET, different user DBs) > owner tokens from one app are rejected by the other two
+flock-token -> dairy: GET /farms -> 401
+
+stdout | tests/api-deep/round13-sessions.test.ts > ROUND 13 cross-app tokens (same JWT_SECRET, different user DBs) > owner tokens from one app are rejected by the other two
+flock-token -> agri: GET /farms -> 401
+
+ ❯ tests/api-deep/session-escalation-deep.test.ts (15 tests | 5 failed) 21158ms
+   × DEEPEST: sessions, escalation, leakage, throttling > dairy: token is revoked after logout 330ms
+     → pre-logout token still works after logout: expected 200 to be 401 // Object.is equality
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > dairy: token of a DELETED user stops working  522ms
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > dairy: backup export contains no password hashes or secrets 196ms
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > dairy: mass assignment on create cannot forge id/role/farm ownership 55ms
+   × DEEPEST: sessions, escalation, leakage, throttling > flock: token is revoked after logout 484ms
+     → pre-logout token still works after logout: expected 200 to be 401 // Object.is equality
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > flock: token of a DELETED user stops working  570ms
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > flock: backup export contains no password hashes or secrets 27ms
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > flock: mass assignment on create cannot forge id/role/farm ownership 15ms
+   × DEEPEST: sessions, escalation, leakage, throttling > agri: token is revoked after logout 1012ms
+     → pre-logout token still works after logout: expected 200 to be 401 // Object.is equality
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > agri: token of a DELETED user stops working  2440ms
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > agri: backup export contains no password hashes or secrets 17ms
+   × DEEPEST: sessions, escalation, leakage, throttling > agri: mass assignment on create cannot forge id/role/farm ownership 7ms
+     → server honored client-supplied _id: expected 'forged-mxmvwrvuk7' not to be 'forged-mxmvwrvuk7' // Object.is equality
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > agri: unauthenticated signup cannot mint an owner account 6ms
+   × DEEPEST: sessions, escalation, leakage, throttling > dairy: changing password revokes previously issued tokens 1095ms
+     → pre-password-change token still works: expected 200 to be 401 // Object.is equality
+   ✓ DEEPEST: sessions, escalation, leakage, throttling > login throttling: 60 rapid failed logins trigger rate limiting (429) 65ms
+ ❯ tests/api-deep/round13-sessions.test.ts (22 tests | 5 failed) 45933ms
+   ✓ ROUND 13 sessions (dairy) > role demotion manager->worker revokes manager powers on the OLD token  768ms
+   ✓ ROUND 13 sessions (dairy) > removing farmIds revokes the OLD token farm access (keeps new farm)  767ms
+   ✓ ROUND 13 sessions (dairy) > deactivation kills the OLD token and fresh login (where the feature exists)  565ms
+   × ROUND 13 sessions (dairy) > bcrypt 72-byte: password differing only after byte 72 must NOT authenticate 153ms
+     → correct 73-byte login (got 429): expected 429 to be 200 // Object.is equality
+   ✓ ROUND 13 sessions (dairy) > 1MB password does not hang or 500 the login/signup 21ms
+   × ROUND 13 sessions (dairy) > login rate limiter cannot be reset by spoofing X-Forwarded-For 67ms
+     → limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality
+   ✓ ROUND 13 sessions (dairy) > forgot-password does not enumerate registered emails 101ms
+   ✓ ROUND 13 sessions (agri) > role demotion manager->worker revokes manager powers on the OLD token  2589ms
+   ✓ ROUND 13 sessions (agri) > removing farmIds revokes the OLD token farm access (keeps new farm)  2902ms
+   ✓ ROUND 13 sessions (agri) > deactivation kills the OLD token and fresh login (where the feature exists)  2641ms
+   ✓ ROUND 13 sessions (agri) > bcrypt 72-byte: password differing only after byte 72 must NOT authenticate 20ms
+   ✓ ROUND 13 sessions (agri) > 1MB password does not hang or 500 the login/signup  917ms
+   × ROUND 13 sessions (agri) > login rate limiter cannot be reset by spoofing X-Forwarded-For 128ms
+     → limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality
+   ✓ ROUND 13 sessions (agri) > forgot-password does not enumerate registered emails 7ms
+   ✓ ROUND 13 sessions (flock) > role demotion manager->worker revokes manager powers on the OLD token  704ms
+   ✓ ROUND 13 sessions (flock) > removing farmIds revokes the OLD token farm access (keeps new farm)  836ms
+   ✓ ROUND 13 sessions (flock) > deactivation kills the OLD token and fresh login (where the feature exists)  734ms
+   × ROUND 13 sessions (flock) > bcrypt 72-byte: password differing only after byte 72 must NOT authenticate 668ms
+     → byte-73-differing login (want 401, got 200 — 200 means bcrypt 72-byte truncation): expected 200 to be 401 // Object.is equality
+   ✓ ROUND 13 sessions (flock) > 1MB password does not hang or 500 the login/signup 236ms
+   × ROUND 13 sessions (flock) > login rate limiter cannot be reset by spoofing X-Forwarded-For 134ms
+     → limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality
+   ✓ ROUND 13 sessions (flock) > forgot-password does not enumerate registered emails 232ms
+   ✓ ROUND 13 cross-app tokens (same JWT_SECRET, different user DBs) > owner tokens from one app are rejected by the other two 23ms
+ ❯ tests/api-deep/round11-role-flock.test.ts (9 tests | 1 failed) 5809ms
+   ✓ ROUND 11C: role system (flock) > owner: all-mode, any farm, summary, backup, user creation all work 125ms
+   × ROUND 11C: role system (flock) > ROLE-F1: user creation honors the requested farmIds (not the creator current farm) 405ms
+     → requested farmIds [B] but user got ["a0ea023870f7a908af95f1cd"]: expected [ 'a0ea023870f7a908af95f1cd' ] to deeply equal [ '24811b14ec04faef7dabcf29' ]
+   ✓ ROUND 11C: role system (flock) > manager: farm list = assigned only; other-farm header 403; B batches invisible in all-mode 54ms
+   ✓ ROUND 11C: role system (flock) > manager: write in all-mode blocked; body farmId smuggle stays in assigned farm 30ms
+   ✓ ROUND 11C: role system (flock) > manager cannot administer: farm create/archive/delete, manager creation, summary, user PATCH/DELETE (owner-only in flock) 32ms
+   ✓ ROUND 11C: role system (flock) > manager: backup/import must not expose or overwrite other farms 6ms
+   ✓ ROUND 11C: role system (flock) > escalation: manager cannot widen own role/farms via /auth/me PATCH or user routes 21ms
+   ✓ ROUND 11C: role system (flock) > worker: no user/farm admin, no summary/backup, scoped reads only 28ms
+   ✓ ROUND 11C: role system (flock) > telegram scope: manager cannot read/push telegram for farm B 10ms
+ ✓ tests/api-deep/round11-role-system.test.ts (8 tests) 7136ms
+   ✓ ROUND 11: role system (dairy deep) > owner can do everything: farms, users of any role, all-farm mode, summary, backup  363ms
+   ✓ ROUND 11: role system (dairy deep) > manager manages workers of own farm only: create worker in A ok; B-only worker impossible  365ms
+   ✓ ROUND 11: role system (dairy deep) > escalation: manager cannot raise own role or widen own farmIds (PATCH self)  582ms
+ ✓ tests/api-deep/auth-isolation-deep.test.ts (9 tests) 19310ms
+ ✓ tests/api-deep/allfarms-deletion-analytics-deep.test.ts (5 tests) 19223ms
+ ✓ tests/api-deep/agri-filters-deep.test.ts (7 tests) 9844ms
+ ✓ tests/api-deep/round11-role-agri.test.ts (8 tests) 15467ms
+ ❯ tests/api-deep/round6-breeding-deep.test.ts (5 tests | 1 failed) 5586ms
+   ✓ ROUND R6: breeding deep lifecycle > full lifecycle: heat→service→check→calving creates exactly the live calf with full lineage 84ms
+   × ROUND R6: breeding deep lifecycle > calving with generated calves is edit-locked (409) and delete-locked (409) 149ms
+     → delete calving after calf removed → 409: expected 409 to be less than 300
+   ✓ ROUND R6: breeding deep lifecycle > legacy date sync follows edits and deletion fallback (service) 60ms
+   ✓ ROUND R6: breeding deep lifecycle > validation depth: pagination abuse, bad types/dates, events on missing-type payloads 58ms
+   ✓ ROUND R6: breeding deep lifecycle > race: two parallel calvings with the same ear tag produce exactly one calf with that tag 43ms
+ ✓ tests/api-deep/concurrency-invariants.test.ts (7 tests) 18652ms
+ ❯ tests/api-deep/cross-realm-deep.test.ts (7 tests | 2 failed) 17320ms
+   ✓ ROUND 4: cross-realm + smuggling > cross-app token replay: a token from one app is rejected by the other two 25ms
+   ✓ ROUND 4: cross-realm + smuggling > dairy: worker assigned to Farm A cannot reach Farm B via X-Farm-Id 72ms
+   × ROUND 4: cross-realm + smuggling > lost update: stale writer cannot silently overwrite (dairy) 39ms
+     → dairy silent lost-update (no version/conflict check): expected 200 to be 409 // Object.is equality
+   × ROUND 4: cross-realm + smuggling > lost update: stale writer cannot silently overwrite (agri) 24ms
+     → agri silent lost-update (no version/conflict check): expected 200 to be 409 // Object.is equality
+   ✓ ROUND 4: cross-realm + smuggling > method smuggling: override headers/verbs cannot turn a POST into a DELETE 28ms
+   ✓ ROUND 4: cross-realm + smuggling > header smuggling: bogus X-Farm-Id does not unlock a merged all-farms view 17ms
+   ✓ ROUND 4: cross-realm + smuggling > content-type confusion: JSON body sent as text/plain is not processed as a create 18ms
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (dairy) > write-route hostile battery produces no 5xx
+dairy empty-body -> 400
+dairy name-number -> 201
+dairy name-null -> 400
+dairy name-object-nosql -> 201
+dairy name-array -> 201
+dairy name-bool -> 201
+dairy num-string-abc -> 400
+dairy num-string-money -> 201
+dairy num-1e308 -> 201
+dairy num-negative -> 400
+dairy num-object-gt -> 400
+dairy name-nul -> 201
+dairy name-100k -> 201
+dairy extra-proto-field -> 201
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (dairy) > list pagination/search abuse: no 5xx, search stays fast
+dairy search-bomb -> 200 in 3ms
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (dairy) > list pagination/search abuse: no 5xx, search stays fast
+dairy nosql-query status[$ne] -> 200
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (dairy) > body-size limits: 5MB field and 12MB body are not accepted as normal creates
+dairy 5MB-name create -> 201
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (dairy) > 20x parallel identical creates: no 5xx (duplicate count recorded)
+dairy 20x parallel create codes: 201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201 | records with marker: 20
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (dairy) > 10x parallel DELETE of the same record: exactly one success, no 5xx
+dairy 10x parallel DELETE codes: 200,404,404,404,404,404,404,404,404,404 | successes=1
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (dairy) > 3x concurrent restores of the same backup: no 5xx, farm count stable
+dairy concurrent restore codes: 200,200,200 | farms 2 -> 2
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (dairy) > restore with an extra unknown collection + missing collections: no 5xx, farms intact
+dairy tampered restore -> 200 | farms 2 -> 2
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (dairy) > restore body over the 100MB restore limit is 413, not a crash
+dairy 101MB restore -> 413
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (agri) > write-route hostile battery produces no 5xx
+agri empty-body -> 201
+agri name-number -> 201
+agri name-null -> 201
+agri name-object-nosql -> 201
+agri name-array -> 201
+agri name-bool -> 201
+agri num-string-abc -> 201
+agri num-string-money -> 201
+agri num-1e308 -> 201
+agri num-negative -> 201
+agri num-object-gt -> 201
+agri name-nul -> 201
+agri name-100k -> 201
+agri extra-proto-field -> 201
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (agri) > list pagination/search abuse: no 5xx, search stays fast
+agri search-bomb -> 200 in 7ms
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (agri) > list pagination/search abuse: no 5xx, search stays fast
+agri nosql-query status[$ne] -> 200
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (agri) > body-size limits: 5MB field and 12MB body are not accepted as normal creates
+agri 5MB-name create -> 201
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (agri) > 20x parallel identical creates: no 5xx (duplicate count recorded)
+agri 20x parallel create codes: 201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201 | records with marker: 20
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (agri) > 10x parallel DELETE of the same record: exactly one success, no 5xx
+agri 10x parallel DELETE codes: 200,404,404,404,404,404,404,404,404,404 | successes=1
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (agri) > 3x concurrent restores of the same backup: no 5xx, farm count stable
+agri concurrent restore codes: 200,200,200 | farms 2 -> 2
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (agri) > restore with an extra unknown collection + missing collections: no 5xx, farms intact
+agri tampered restore -> 200 | farms 2 -> 2
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (agri) > restore body over the 100MB restore limit is 413, not a crash
+agri 101MB restore -> 413
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (flock) > write-route hostile battery produces no 5xx
+flock empty-body -> 400
+flock name-number -> 201
+flock name-null -> 400
+flock name-object-nosql -> 201
+flock name-array -> 201
+flock name-bool -> 201
+flock num-string-abc -> 400
+flock num-string-money -> 201
+flock num-1e308 -> 201
+flock num-negative -> 400
+flock num-object-gt -> 400
+flock name-nul -> 201
+flock name-100k -> 201
+flock extra-proto-field -> 201
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (flock) > list pagination/search abuse: no 5xx, search stays fast
+flock search-bomb -> 200 in 15ms
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (flock) > list pagination/search abuse: no 5xx, search stays fast
+flock nosql-query status[$ne] -> 200
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (flock) > body-size limits: 5MB field and 12MB body are not accepted as normal creates
+flock 5MB-name create -> 201
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (flock) > 20x parallel identical creates: no 5xx (duplicate count recorded)
+flock 20x parallel create codes: 201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201,201 | records with marker: 20
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (flock) > 10x parallel DELETE of the same record: exactly one success, no 5xx
+flock 10x parallel DELETE codes: 200,404,404,404,404,404,404,404,404,404 | successes=1
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (flock) > 3x concurrent restores of the same backup: no 5xx, farm count stable
+flock concurrent restore codes: 200,200,200 | farms 2 -> 2
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (flock) > restore with an extra unknown collection + missing collections: no 5xx, farms intact
+flock tampered restore -> 200 | farms 2 -> 2
+
+stdout | tests/api-deep/round14-fuzz.test.ts > ROUND 14 dairy date edges (dailylog) > invalid calendar dates are rejected, not stored or 500
+dailylog PUT 2026-02-30 -> 200
+
+ ❯ tests/api-deep/round14-fuzz.test.ts (13 tests | 4 failed) 16007ms
+   ✓ ROUND 14 fuzz (dairy) > write-route hostile battery produces no 5xx 108ms
+   ✓ ROUND 14 fuzz (dairy) > __proto__ payload is not stored/reflected (no prototype pollution echo) 11ms
+   ✓ ROUND 14 fuzz (dairy) > list pagination/search abuse: no 5xx, search stays fast 68ms
+   × ROUND 14 fuzz (dairy) > body-size limits: 5MB field and 12MB body are not accepted as normal creates 261ms
+     → 5MB name must not be a normal 201 create: expected 201 not to be 201 // Object.is equality
+   ✓ ROUND 14 fuzz (agri) > write-route hostile battery produces no 5xx 45ms
+   ✓ ROUND 14 fuzz (agri) > __proto__ payload is not stored/reflected (no prototype pollution echo) 7ms
+   ✓ ROUND 14 fuzz (agri) > list pagination/search abuse: no 5xx, search stays fast 41ms
+   × ROUND 14 fuzz (agri) > body-size limits: 5MB field and 12MB body are not accepted as normal creates 126ms
+     → 5MB name must not be a normal 201 create: expected 201 not to be 201 // Object.is equality
+   ✓ ROUND 14 fuzz (flock) > write-route hostile battery produces no 5xx 108ms
+   ✓ ROUND 14 fuzz (flock) > __proto__ payload is not stored/reflected (no prototype pollution echo) 21ms
+   ✓ ROUND 14 fuzz (flock) > list pagination/search abuse: no 5xx, search stays fast 120ms
+   × ROUND 14 fuzz (flock) > body-size limits: 5MB field and 12MB body are not accepted as normal creates 157ms
+     → 5MB name must not be a normal 201 create: expected 201 not to be 201 // Object.is equality
+   × ROUND 14 dairy date edges (dailylog) > invalid calendar dates are rejected, not stored or 500 6ms
+     → 2026-02-30 should be 4xx, got 200: expected 200 to be greater than or equal to 400
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 concurrency (flock) > restore body over the 100MB restore limit is 413, not a crash
+flock 101MB restore -> 413
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 flock export/import round-trip (J1 recheck) > export -> import -> import again: batch count never duplicates
+flock export-all -> 200 bytes=14907
+
+stdout | tests/api-deep/round15-concurrency.test.ts > ROUND 15 flock export/import round-trip (J1 recheck) > export -> import -> import again: batch count never duplicates
+flock import#1 -> 200, import#2 -> 200 | marker count 1 -> 1 -> 1
+
+ ✓ tests/api-deep/round15-concurrency.test.ts (16 tests) 17657ms
+   ✓ ROUND 15 concurrency (dairy) > 3x concurrent restores of the same backup: no 5xx, farm count stable  474ms
+   ✓ ROUND 15 concurrency (dairy) > restore body over the 100MB restore limit is 413, not a crash  1165ms
+   ✓ ROUND 15 concurrency (agri) > restore body over the 100MB restore limit is 413, not a crash  610ms
+   ✓ ROUND 15 concurrency (flock) > restore body over the 100MB restore limit is 413, not a crash  991ms
+ ❯ tests/api-deep/round7-agri-fields-deep.test.ts (5 tests | 1 failed) 4262ms
+   × ROUND R7: agri fields deep > validation: negative/garbage acres rejected, duplicate name per farm 409, same name across farms OK 21ms
+     → absurd acres 1e12 → 201: expected [ 400, 422 ] to include 201
+   ✓ ROUND R7: agri fields deep > cross-farm field access: farm B context cannot read/update/delete farm A field by id 12ms
+   ✓ ROUND R7: agri fields deep > rename collision → 409; rename to free name works and crop link follows the id (not the name) 13ms
+   ✓ ROUND R7: agri fields deep > deleting a field with linked finance: no dangling fieldId survives in finance rows or byField analytics 7ms
+   ✓ ROUND R7: agri fields deep > field reuse across seasons: completed cycle then a new cycle on the same field is allowed 7ms
+ ✓ tests/api-deep/fuzz-robustness.test.ts (15 tests) 7547ms
+   ✓ DEEP: hostile-body fuzzing (no 500s, no pollution) > oversized body (11MB) is rejected as 4xx JSON, not a stack page  470ms
+ ❯ tests/api-deep/coverage-sweep-deep.test.ts (7 tests | 2 failed) 7443ms
+   × ROUND 11: coverage sweep > dairy farm GPS location is not public (flock requires auth for the same data) 44ms
+     → farm location served without login: expected 200 to be 401 // Object.is equality
+   ✓ ROUND 11: coverage sweep > dairy uncovered GET endpoints: owner 200, anonymous 401, no 500s 83ms
+   ✓ ROUND 11: coverage sweep > dairy sales lifecycle: sale marks cow sold, duplicate blocked, delete restores status 67ms
+   ✓ ROUND 11: coverage sweep > dairy rates: worker cannot change the milk rate; owner change is recorded in history 34ms
+   × ROUND 11: coverage sweep > dairy dailylog: write/read round-trip; garbage dates are 4xx not 500 11ms
+     → dailylog PUT not-a-date must reject: expected 200 to be greater than or equal to 400
+   ✓ ROUND 11: coverage sweep > dairy feedstock: worker read-only; negative use is clamped/rejected 21ms
+   ✓ ROUND 11: coverage sweep > dairy email cron refuses unauthenticated triggers 10ms
+ ❯ tests/api-deep/load-lifetime-smuggling-deep.test.ts (7 tests | 2 failed) 10994ms
+   × ROUND 8: load, lifetime, smuggling, deps > dairy: token lifetime is at most 24 hours 10ms
+     → dairy access-token lifetime is 168h: expected 168 to be less than or equal to 24
+   × ROUND 8: load, lifetime, smuggling, deps > flock: token lifetime is at most 24 hours 1ms
+     → flock access-token lifetime is 168h: expected 168 to be less than or equal to 24
+   ✓ ROUND 8: load, lifetime, smuggling, deps > agri: token lifetime is at most 24 hours 0ms
+   ✓ ROUND 8: load, lifetime, smuggling, deps > dairy soak: 150 parallel reads + 30 parallel writes, zero 5xx, counts exact, memory sane  1035ms
+   ✓ ROUND 8: load, lifetime, smuggling, deps > flock + agri soak: 100 parallel reads each, zero 5xx  893ms
+   ✓ ROUND 8: load, lifetime, smuggling, deps > raw-socket smuggling probes: server never hangs and stays healthy (dairy) 9ms
+   ✓ ROUND 8: load, lifetime, smuggling, deps > DOMPurify: no frontend imports a known-vulnerable DOMPurify (≤3.4.16) 69ms
+ ❯ tests/api-deep/ids-unicode-uploads-deep.test.ts (5 tests | 1 failed) 9277ms
+   ✓ ROUND 6: ids, unicode, uploads > id traversal fuzz: weird ids are clean 404s, never 500 or cross-resource data  308ms
+   ✓ ROUND 6: ids, unicode, uploads > sort/filter query injection never 500s and never leaks credential fields 48ms
+   ✓ ROUND 6: ids, unicode, uploads > unicode integrity: emoji + Urdu + combining chars round-trip byte-identical 37ms
+   × ROUND 6: ids, unicode, uploads > flock upload: script-bearing SVG cannot be stored and served back as active content 22ms
+     → svg upload rejected with 500: expected [ 400, 415 ] to include 500
+   ✓ ROUND 6: ids, unicode, uploads > flock upload: non-image, empty and worker uploads are rejected 20ms
+ ✓ tests/api-deep/round1-breeding-events.test.ts (4 tests) 3459ms
+ ❯ tests/api-deep/public-surface-deep.test.ts (12 tests | 8 failed) 10195ms
+   × ROUND 5: public surface + headers > dairy public buyer card does not expose phone number to unauthenticated visitors 116ms
+     → public card leaks buyer phone number: expected '<!DOCTYPE html>\n<html lang="en" dir=…' not to contain '0300-7654321'
+   ✓ ROUND 5: public surface + headers > telegram webhooks never 500 on wrong secrets; cron endpoints reject missing keys (all apps) 31ms
+   ✓ ROUND 5: public surface + headers > no account enumeration via login errors or forgot-password (all apps)  829ms
+   × ROUND 5: public surface + headers > dairy: API responses carry CSP + nosniff + frame protection 6ms
+     → dairy missing Content-Security-Policy: expected null to be truthy
+   ✓ ROUND 5: public surface + headers > dairy: CORS does not reflect arbitrary origins with credentials 3ms
+   × ROUND 5: public surface + headers > dairy: authenticated responses are marked non-cacheable 3ms
+     → dairy sensitive API response cacheable: "": expected '' to match /no-store|no-cache|private/
+   ✓ ROUND 5: public surface + headers > flock: API responses carry CSP + nosniff + frame protection 5ms
+   × ROUND 5: public surface + headers > flock: CORS does not reflect arbitrary origins with credentials 3ms
+     → flock preflight reflects evil origin WITH credentials: expected false to be true // Object.is equality
+   × ROUND 5: public surface + headers > flock: authenticated responses are marked non-cacheable 8ms
+     → flock sensitive API response cacheable: "": expected '' to match /no-store|no-cache|private/
+   × ROUND 5: public surface + headers > agri: API responses carry CSP + nosniff + frame protection 7ms
+     → agri missing Content-Security-Policy: expected null to be truthy
+   × ROUND 5: public surface + headers > agri: CORS does not reflect arbitrary origins with credentials 3ms
+     → agri preflight reflects evil origin WITH credentials: expected false to be true // Object.is equality
+   × ROUND 5: public surface + headers > agri: authenticated responses are marked non-cacheable 3ms
+     → agri sensitive API response cacheable: "": expected '' to match /no-store|no-cache|private/
+ ❯ tests/api-deep/timing-reset-auto-deep.test.ts (8 tests | 3 failed) 11535ms
+   ✓ ROUND 7: timing, reset, auto-backup, cookies > dairy: login timing does not reveal whether the username exists  365ms
+   × ROUND 7: timing, reset, auto-backup, cookies > dairy: session cookie (if issued) is HttpOnly + SameSite 26ms
+     → expected 429 to be 200 // Object.is equality
+   ✓ ROUND 7: timing, reset, auto-backup, cookies > flock: login timing does not reveal whether the username exists  649ms
+   × ROUND 7: timing, reset, auto-backup, cookies > flock: session cookie (if issued) is HttpOnly + SameSite 2ms
+     → expected 429 to be 200 // Object.is equality
+   ✓ ROUND 7: timing, reset, auto-backup, cookies > agri: login timing does not reveal whether the username exists  1971ms
+   × ROUND 7: timing, reset, auto-backup, cookies > agri: session cookie (if issued) is HttpOnly + SameSite 3ms
+     → expected 429 to be 200 // Object.is equality
+   ✓ ROUND 7: timing, reset, auto-backup, cookies > reset-code guessing is throttled (429) within 30 attempts — dairy + flock + agri 64ms
+   ✓ ROUND 7: timing, reset, auto-backup, cookies > restore-auto never reports fake success; workers are blocked 154ms
+ ❯ tests/api-deep/pagination-dates-backup-abuse.test.ts (6 tests | 1 failed) 9616ms
+   ✓ DEEP: pagination, dates, backup abuse > dairy pagination: limit/offset never duplicate or skip rows across pages 295ms
+   ✓ DEEP: pagination, dates, backup abuse > pagination abuse: negative/huge/float limits never 500 36ms
+   ✓ DEEP: pagination, dates, backup abuse > date edges: month summaries survive Feb-29, month 13 and boundary days 85ms
+   ✓ DEEP: pagination, dates, backup abuse > backup abuse: restoring the SAME backup twice must not duplicate data 275ms
+   × DEEP: pagination, dates, backup abuse > backup abuse: cross-app restore is rejected (no silent mis-import) 129ms
+     → dairy backup → agri restore: expected 200 to be greater than or equal to 400
+   ✓ DEEP: pagination, dates, backup abuse > backup abuse: wrong-shape payloads never 500 (truncated, array, nested junk) 52ms
+ ❯ tests/api-deep/q1-delete-pinpoint-deep.test.ts (6 tests | 1 failed) 4450ms
+   ✓ ROUND 23: Q1 DELETE pinpoint + flock import scoping > dairy DELETE /health/:id works in memory mode (no 500) 25ms
+   ✓ ROUND 23: Q1 DELETE pinpoint + flock import scoping > dairy DELETE /buyers/:id works in memory mode (no 500) 10ms
+   ✓ ROUND 23: Q1 DELETE pinpoint + flock import scoping > dairy DELETE /suppliers/:id works in memory mode (no 500) 6ms
+   ✓ ROUND 23: Q1 DELETE pinpoint + flock import scoping > dairy DELETE /labor/:id works in memory mode (no 500) 11ms
+   ✓ ROUND 23: Q1 DELETE pinpoint + flock import scoping > dairy DELETE /milk/:id works in memory mode (no 500) 38ms
+   × ROUND 23: Q1 DELETE pinpoint + flock import scoping > flock import-all into farm B does not leak into farm A 34ms
+     → import into B → 500: expected 500 to be less than 300
+ ❯ tests/api-deep/round12-photos-flock.test.ts (6 tests | 2 failed) 2830ms
+   ✓ ROUND 12B: photos (flock) > unauthenticated image read: 401, no bytes, no cloudinary redirect 3ms
+   ✓ ROUND 12B: photos (flock) > farm isolation: manager of A cannot read/delete farm B image 4ms
+   ✓ ROUND 12B: photos (flock) > roles: worker cannot use admin upload; diary upload + delete fencing 15ms
+   × ROUND 12B: photos (flock) > validation: SVG rejected on both upload routes; wrong field name rejected 20ms
+     → expected 500 to be less than 500
+   ✓ ROUND 12B: photos (flock) > cache headers on image read are private 7ms
+   × ROUND 12B: photos (flock) > P8-1: flock /api/photos/:id (what the diary UI requests) exists 27ms
+     → GET /api/photos/:id → 404 (diary UI builds these URLs): expected 404 to be 200 // Object.is equality
+ ✓ tests/api-deep/round2-agri-fields.test.ts (4 tests) 5000ms
+ ❯ tests/toolchain/fastcheck-invariants.test.ts (5 tests | 2 failed) 21192ms
+   × TOOLCHAIN fast-check invariants > P1: agri inventory quantity is never negative after any PUT quantity 602ms
+     → Property failed after 2 tests
+{ seed: -1478825653, path: "1:1:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0", endOnFailure: true }
+Counterexample: [-1]
+Shrunk 16 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+   × TOOLCHAIN fast-check invariants > P2: agri liability amount_owed is never negative after any create amount 173ms
+     → Property failed after 1 tests
+{ seed: -251847124, path: "0:1:0", endOnFailure: true }
+Counterexample: [-1]
+Shrunk 2 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+   ✓ TOOLCHAIN fast-check invariants > P3: flock live_count never goes negative under random mortality/sales sequences  388ms
+   ✓ TOOLCHAIN fast-check invariants > P4: malformed agri crop payloads never produce 500  432ms
+   ✓ TOOLCHAIN fast-check invariants > P5: dairy milk daily total equals morning + evening for the cow-day record 129ms
+ ❯ tests/api-matrix/backup-import-export.test.ts (11 tests | 4 failed) 32983ms
+   ✓ Backup / import / export (all apps) > dairy > owner downloads a structured backup; worker is forbidden 237ms
+   ✓ Backup / import / export (all apps) > dairy > junk restore is rejected and data survives 234ms
+   × Backup / import / export (all apps) > dairy > export → restore into a fresh instance round-trips the marker record 5017ms
+     → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+   ✓ Backup / import / export (all apps) > flock > owner downloads a structured backup; worker is forbidden 79ms
+   × Backup / import / export (all apps) > flock > junk restore is rejected and data survives 20ms
+     → flock junk restore {}: expected 404 to be 400 // Object.is equality
+   × Backup / import / export (all apps) > flock > export → restore into a fresh instance round-trips the marker record 5004ms
+     → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+   ✓ Backup / import / export (all apps) > agri > owner downloads a structured backup; worker is forbidden 89ms
+   ✓ Backup / import / export (all apps) > agri > junk restore is rejected and data survives 174ms
+   × Backup / import / export (all apps) > agri > export → restore into a fresh instance round-trips the marker record 5001ms
+     → Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+   ✓ Backup / import / export (all apps) > flock: batch export-all endpoint responds with export data 9ms
+   ✓ Backup / import / export (all apps) > cross-app farm-summary gate rejects wrong keys everywhere 26ms
+ ❯ tests/api-deep/coverage-sweep2-deep.test.ts (6 tests | 3 failed) 32283ms
+   × ROUND 12: agri coverage + unknown routes > agri farm GPS location is not public 67ms
+     → agri farm location served without login: expected 200 to be 401 // Object.is equality
+   × ROUND 12: agri coverage + unknown routes > agri automations are admin-only and validate their payload 115ms
+     → automations accepted garbage config → 200: expected 200 to be greater than or equal to 400
+   × ROUND 12: agri coverage + unknown routes > agri diary-media: round-trip works, garbage dates and mega-payloads are safe 99ms
+     → diary-media PUT 2026-02-30 must reject: expected 200 to be greater than or equal to 400
+   ✓ ROUND 12: agri coverage + unknown routes > agri cron dispatch + telegram settings refuse unauthorized callers 35ms
+   ✓ ROUND 12: agri coverage + unknown routes > unknown API routes return JSON 404s (never HTML, never 500) in all apps 202ms
+   ✓ ROUND 12: agri coverage + unknown routes > root and health endpoints do not disclose stack or env details 140ms
+ ✓ tests/verification/unit-farm-guards.test.ts (14 tests) 22ms
+ ❯ tests/api-deep/round9-backup-integrity.test.ts (4 tests | 2 failed) 38903ms
+   × ROUND R9: backup integrity > tampered backup: editing an amount inside the backup changes restored data (integrity check?) 1054ms
+     → tampered amount silently restored (no integrity/signature check): expected { _id: 'e1', date: '2025-11-01', …(9) } to be falsy
+   × ROUND R9: backup integrity > cross-app restore: agri backup into dairy (and flock backup into agri) is rejected, data untouched 558ms
+     → agri backup → dairy restore → 200: expected [ 400, 409, 422 ] to include 200
+   ✓ ROUND R9: backup integrity > malformed restores never 500 and never wipe existing data (all apps)  1089ms
+   ✓ ROUND R9: backup integrity > restore with another owner's farm ids inside does not adopt foreign farms  684ms
+ ✓ tests/api-deep/farm-delete-data-deep.test.ts (3 tests) 32048ms
+   ✓ ROUND 18: deleteData farm wipe + restore > dairy: backup → delete farm+data → restore brings the farm and its cow back  660ms
+ ✓ tests/api-deep/protocol-exotic-deep.test.ts (11 tests) 54349ms
+   ✓ ROUND 9: protocol exotics > dairy: TRACE method is refused  2504ms
+   ✓ ROUND 9: protocol exotics > dairy: WebSocket upgrade is not silently accepted on the API port  2501ms
+   ✓ ROUND 9: protocol exotics > flock: TRACE method is refused  2502ms
+   ✓ ROUND 9: protocol exotics > flock: WebSocket upgrade is not silently accepted on the API port  2501ms
+   ✓ ROUND 9: protocol exotics > agri: TRACE method is refused  2501ms
+   ✓ ROUND 9: protocol exotics > agri: WebSocket upgrade is not silently accepted on the API port  2502ms
+   ✓ ROUND 9: protocol exotics > slow-drip: a stalled partial request does not block or crash the dairy server  1810ms
+ ❯ tests/api-deep/frontend-contract-deep.test.ts (3 tests | 3 failed) 520ms
+   × ROUND 13: frontend↔backend contract > dairy: every API path the frontend calls exists in the backend 244ms
+     → dairy dead: ["/archive/jobs","/archive/jobs/:p/execute","/archive/jobs/:p/restore","/archive/jobs/:p/records"]: expected [ '/archive/jobs', …(3) ] to deeply equal []
+   × ROUND 13: frontend↔backend contract > flock: every API path the frontend calls exists in the backend 84ms
+     → flock dead: ["/archive/jobs","/archive/jobs/:p/execute","/archive/jobs/:p/restore","/archive/jobs/:p/records"]: expected [ '/archive/jobs', …(3) ] to deeply equal []
+   × ROUND 13: frontend↔backend contract > agri: every API path the frontend calls exists in the backend 168ms
+     → agri dead: ["/archive/jobs","/archive/jobs/:p/execute","/archive/jobs/:p/restore","/archive/jobs/:p/records"]: expected [ '/archive/jobs', …(3) ] to deeply equal []
+ ❯ tests/api-deep/round10-flock-import-images.test.ts (4 tests | 1 failed) 7544ms
+   ✓ ROUND R10: flock import + images > export-all → wipe → import-all restores the same batch codes and counts 82ms
+   ✓ ROUND R10: flock import + images > import-all with a duplicate batch code updates rather than duplicates (idempotent re-import) 66ms
+   × ROUND R10: flock import + images > import-all into farm B does not leak batches into farm A 35ms
+     → import into B → 500: expected 500 to be less than 300
+   ✓ ROUND R10: flock import + images > image backup round trip: uploaded image bytes survive export → restore byte-identically 184ms
+ ✓ tests/api-deep/round8-summary-accuracy.test.ts (4 tests) 29015ms
+ ❯ tests/api-deep/telegram-bot-deep.test.ts (7 tests | 1 failed) 11081ms
+   ✓ ROUND 15: telegram bot write-path > bot is live: owner can mint a link code for a laborer 70ms
+   ✓ ROUND 15: telegram bot write-path > unlinked chat cannot write data, even with the correct webhook secret  375ms
+   ✓ ROUND 15: telegram bot write-path > fabricated link code does not link a chat  747ms
+   ✓ ROUND 15: telegram bot write-path > properly linked chat CAN log an expense and milk via the bot  1076ms
+   ✓ ROUND 15: telegram bot write-path > a consumed link code cannot be reused by a second chat  712ms
+   × ROUND 15: telegram bot write-path > bot expense amounts are bounded (no crore-scale single message) 380ms
+     → bot accepted a 999,999,999 expense from one chat message: expected 1 to be +0 // Object.is equality
+   ✓ ROUND 15: telegram bot write-path > wrong webhook secret performs no writes  387ms
+ ✓ tests/api-deep/flock-destructive-deep.test.ts (4 tests) 6396ms
+ ❯ tests/api-deep/agri-liabilities-deep.test.ts (3 tests | 2 failed) 17273ms
+   ✓ ROUND 22: agri liabilities + inventory > pay settles in full exactly once (no duplicate finance expense on double-pay) 230ms
+   × ROUND 22: agri liabilities + inventory > negative amount_owed cannot be created or set via update 34ms
+     → negative liability persisted on create: expected -777 to be greater than or equal to 0
+   × ROUND 22: agri liabilities + inventory > inventory: negative quantity via update is rejected; worker blocked everywhere 36ms
+     → negative inventory quantity persisted: expected -50 to be greater than or equal to 0
+ ✓ tests/api-deep/agri-analytics-deep.test.ts (4 tests) 14912ms
+ ✓ tests/api-deep/round4-backup-newmodels.test.ts (2 tests) 8169ms
+ ✓ tests/api-deep/backup-media-deep.test.ts (3 tests) 14058ms
+ ✓ tests/api-deep/farm-transfer-deep.test.ts (4 tests) 12396ms
+ ❯ tests/api-deep/last-surface-deep.test.ts (4 tests | 1 failed) 15862ms
+   ✓ ROUND 14: last surfaces > farm-summary refuses callers without the cross-farm key (all apps) 37ms
+   ✓ ROUND 14: last surfaces > first-run setup cannot be re-entered after seeding (dairy) 27ms
+   ✓ ROUND 14: last surfaces > tokens in the URL query string are never accepted as auth (all apps) 77ms
+   × ROUND 14: last surfaces > agri public worker card does not expose wages/advances to unauthenticated visitors 159ms
+     → public worker card leaks daily wage: expected '<!DOCTYPE html>\n<html lang="en" dir=…' not to contain '1,777'
+ ❯ tests/api-deep/round3-super-admin.test.ts (10 tests | 1 failed) 12811ms
+   ✓ ROUND R3: super-admin owner-only > dairy: farm-summary is owner-only (anonymous + worker rejected) 90ms
+   ✓ ROUND R3: super-admin owner-only > dairy: owner summary covers all of the owner's farms, separated per farm 57ms
+   ✓ ROUND R3: super-admin owner-only > dairy: summary requires session auth, not the shared cross-app key alone 8ms
+   ✓ ROUND R3: super-admin owner-only > flock: farm-summary is owner-only (anonymous + worker rejected) 53ms
+   ✓ ROUND R3: super-admin owner-only > flock: owner summary covers all of the owner's farms, separated per farm 19ms
+   ✓ ROUND R3: super-admin owner-only > flock: summary requires session auth, not the shared cross-app key alone 2ms
+   ✓ ROUND R3: super-admin owner-only > agri: farm-summary is owner-only (anonymous + worker rejected) 57ms
+   ✓ ROUND R3: super-admin owner-only > agri: owner summary covers all of the owner's farms, separated per farm 31ms
+   ✓ ROUND R3: super-admin owner-only > agri: summary requires session auth, not the shared cross-app key alone 8ms
+   × ROUND R3: super-admin owner-only > dairy: farm role is preserved at login and cleared at logout 44ms
+     → expected 404 to be less than 300
+ ❯ tests/toolchain/security-scan.test.ts (14 tests | 7 failed) 13562ms
+   × TOOLCHAIN security scan > dairy: API responses carry CSP + nosniff + frame protection 24ms
+     → missing CSP: expected null to be truthy
+   × TOOLCHAIN security scan > dairy: authenticated responses are non-cacheable 7ms
+     → auth response cacheable: expected '' to match /no-store|private/i
+   ✓ TOOLCHAIN security scan > dairy: CORS does not reflect arbitrary origins with credentials 18ms
+   ✓ TOOLCHAIN security scan > dairy: no framework banner (X-Powered-By / Server version) 5ms
+   ✓ TOOLCHAIN security scan > flock: API responses carry CSP + nosniff + frame protection 10ms
+   × TOOLCHAIN security scan > flock: authenticated responses are non-cacheable 13ms
+     → auth response cacheable: expected '' to match /no-store|private/i
+   × TOOLCHAIN security scan > flock: CORS does not reflect arbitrary origins with credentials 9ms
+     → CORS reflects evil origin with credentials (acao=https://evil.example.com acac=true): expected true to be false // Object.is equality
+   ✓ TOOLCHAIN security scan > flock: no framework banner (X-Powered-By / Server version) 8ms
+   × TOOLCHAIN security scan > agri: API responses carry CSP + nosniff + frame protection 12ms
+     → missing CSP: expected null to be truthy
+   × TOOLCHAIN security scan > agri: authenticated responses are non-cacheable 10ms
+     → auth response cacheable: expected '' to match /no-store|private/i
+   × TOOLCHAIN security scan > agri: CORS does not reflect arbitrary origins with credentials 5ms
+     → CORS reflects evil origin with credentials (acao=https://evil.example.com acac=true): expected true to be false // Object.is equality
+   ✓ TOOLCHAIN security scan > agri: no framework banner (X-Powered-By / Server version) 9ms
+   ✓ TOOLCHAIN security scan > dairy: public surfaces do not expose GPS coordinates or buyer phone numbers 12ms
+   ✓ TOOLCHAIN security scan > flock: image bytes are not served to anonymous callers 10ms
+
+⎯⎯⎯⎯⎯⎯ Failed Tests 127 ⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/api-deep/agri-liabilities-deep.test.ts > ROUND 22: agri liabilities + inventory > negative amount_owed cannot be created or set via update
+AssertionError: negative liability persisted on create: expected -777 to be greater than or equal to 0
+ ❯ tests/api-deep/agri-liabilities-deep.test.ts:41:101
+     39|       const id = idOf(c.data);
+     40|       const list = await raw(ctx, '/liabilities', { token: ctx.owner }…
+     41|       expect(Number(findRow(list.data, id)?.amount_owed), 'negative li…
+       |                                                                                                     ^
+     42|     } else {
+     43|       expect([400, 422]).toContain(c.response.status);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/127]⎯
+
+ FAIL  tests/api-deep/agri-liabilities-deep.test.ts > ROUND 22: agri liabilities + inventory > inventory: negative quantity via update is rejected; worker blocked everywhere
+AssertionError: negative inventory quantity persisted: expected -50 to be greater than or equal to 0
+ ❯ tests/api-deep/agri-liabilities-deep.test.ts:60:100
+     58|     expect([200, 400, 422], `negative update → ${neg.response.status}`…
+     59|     const after = await raw(ctx, '/inventory', { token: ctx.owner });
+     60|     expect(Number(findRow(after.data, itemId)?.quantity), 'negative in…
+       |                                                                                                    ^
+     61|     const w = await raw(ctx, '/inventory', { method: 'POST', token: ct…
+     62|     expect([401, 403], `worker inventory create → ${w.response.status}…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/127]⎯
+
+ FAIL  tests/api-deep/coverage-sweep-deep.test.ts > ROUND 11: coverage sweep > dairy farm GPS location is not public (flock requires auth for the same data)
+AssertionError: farm location served without login: expected 200 to be 401 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 401[39m
+[31m+ 200[39m
+
+ ❯ tests/api-deep/coverage-sweep-deep.test.ts:25:62
+     23|     expect([200, 201]).toContain(put.response.status);
+     24|     const pub = await fetch(`${ctx.base}/api/settings/location`);
+     25|     expect(pub.status, 'farm location served without login').toBe(401);
+       |                                                              ^
+     26|     const fPub = await fetch(`${apps.flock.base}/api/settings/location…
+     27|     expect(fPub.status).toBe(401);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/127]⎯
+
+ FAIL  tests/api-deep/coverage-sweep-deep.test.ts > ROUND 11: coverage sweep > dairy dailylog: write/read round-trip; garbage dates are 4xx not 500
+AssertionError: dailylog PUT not-a-date must reject: expected 200 to be greater than or equal to 400
+ ❯ tests/api-deep/coverage-sweep-deep.test.ts:89:68
+     87|       expect(r.response.status, `dailylog GET ${bad}`).toBeLessThan(50…
+     88|       const w = await raw(ctx, `/dailylog/${bad}`, { method: 'PUT', to…
+     89|       expect(w.response.status, `dailylog PUT ${bad} must reject`).toB…
+       |                                                                    ^
+     90|       expect(w.response.status).toBeLessThan(500);
+     91|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/127]⎯
+
+ FAIL  tests/api-deep/coverage-sweep2-deep.test.ts > ROUND 12: agri coverage + unknown routes > agri farm GPS location is not public
+AssertionError: agri farm location served without login: expected 200 to be 401 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 401[39m
+[31m+ 200[39m
+
+ ❯ tests/api-deep/coverage-sweep2-deep.test.ts:24:67
+     22|     expect([200, 201]).toContain(put.response.status);
+     23|     const pub = await fetch(`${ctx.base}/api/settings/location`);
+     24|     expect(pub.status, 'agri farm location served without login').toBe…
+       |                                                                   ^
+     25|     if (pub.status === 200) {
+     26|       const body = await pub.text();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/127]⎯
+
+ FAIL  tests/api-deep/coverage-sweep2-deep.test.ts > ROUND 12: agri coverage + unknown routes > agri automations are admin-only and validate their payload
+AssertionError: automations accepted garbage config → 200: expected 200 to be greater than or equal to 400
+ ❯ tests/api-deep/coverage-sweep2-deep.test.ts:40:105
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/127]⎯
+
+ FAIL  tests/api-deep/coverage-sweep2-deep.test.ts > ROUND 12: agri coverage + unknown routes > agri diary-media: round-trip works, garbage dates and mega-payloads are safe
+AssertionError: diary-media PUT 2026-02-30 must reject: expected 200 to be greater than or equal to 400
+ ❯ tests/api-deep/coverage-sweep2-deep.test.ts:51:71
+     49|     for (const bad of ['not-a-date', '2026-02-30', '2026-13-01']) {
+     50|       const w = await raw(ctx, `/diary-media/${bad}`, { method: 'PUT',…
+     51|       expect(w.response.status, `diary-media PUT ${bad} must reject`).…
+       |                                                                       ^
+     52|       expect(w.response.status).toBeLessThan(500);
+     53|     }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[7/127]⎯
+
+ FAIL  tests/api-deep/cross-realm-deep.test.ts > ROUND 4: cross-realm + smuggling > lost update: stale writer cannot silently overwrite (dairy)
+AssertionError: dairy silent lost-update (no version/conflict check): expected 200 to be 409 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 409[39m
+[31m+ 200[39m
+
+ ❯ tests/api-deep/cross-realm-deep.test.ts:78:91
+     76|     await raw(dctx, `/cows/${cowId}`, { method: 'PUT', token: dctx.own…
+     77|     const stale = await raw(dctx, `/cows/${cowId}`, { method: 'PUT', t…
+     78|     expect(stale.response.status, 'dairy silent lost-update (no versio…
+       |                                                                                           ^
+     79|     await raw(dctx, `/cows/${cowId}`, { method: 'DELETE', token: dctx.…
+     80|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[8/127]⎯
+
+ FAIL  tests/api-deep/cross-realm-deep.test.ts > ROUND 4: cross-realm + smuggling > lost update: stale writer cannot silently overwrite (agri)
+AssertionError: agri silent lost-update (no version/conflict check): expected 200 to be 409 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 409[39m
+[31m+ 200[39m
+
+ ❯ tests/api-deep/cross-realm-deep.test.ts:88:91
+     86|     await raw(actx, `/crops/${cropId}`, { method: 'PUT', token: actx.o…
+     87|     const stale2 = await raw(actx, `/crops/${cropId}`, { method: 'PUT'…
+     88|     expect(stale2.response.status, 'agri silent lost-update (no versio…
+       |                                                                                           ^
+     89|     await raw(actx, `/crops/${cropId}`, { method: 'DELETE', token: act…
+     90|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[9/127]⎯
+
+ FAIL  tests/api-deep/frontend-contract-deep.test.ts > ROUND 13: frontend↔backend contract > dairy: every API path the frontend calls exists in the backend
+AssertionError: dairy dead: ["/archive/jobs","/archive/jobs/:p/execute","/archive/jobs/:p/restore","/archive/jobs/:p/records"]: expected [ '/archive/jobs', …(3) ] to deeply equal []
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- [][39m
+[31m+ [[39m
+[31m+   "/archive/jobs",[39m
+[31m+   "/archive/jobs/:p/execute",[39m
+[31m+   "/archive/jobs/:p/restore",[39m
+[31m+   "/archive/jobs/:p/records",[39m
+[31m+ ][39m
+
+ ❯ tests/api-deep/frontend-contract-deep.test.ts:97:61
+     95|         .filter((p) => !PAGE_ROUTES.has(p) && p.length > 1);
+     96|       const dead = paths.filter((p) => !routes.some((r) => matches(p, …
+     97|       expect(dead, `${name} dead: ${JSON.stringify(dead)}`).toEqual([]…
+       |                                                             ^
+     98|     });
+     99|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[10/127]⎯
+
+ FAIL  tests/api-deep/frontend-contract-deep.test.ts > ROUND 13: frontend↔backend contract > flock: every API path the frontend calls exists in the backend
+AssertionError: flock dead: ["/archive/jobs","/archive/jobs/:p/execute","/archive/jobs/:p/restore","/archive/jobs/:p/records"]: expected [ '/archive/jobs', …(3) ] to deeply equal []
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- [][39m
+[31m+ [[39m
+[31m+   "/archive/jobs",[39m
+[31m+   "/archive/jobs/:p/execute",[39m
+[31m+   "/archive/jobs/:p/restore",[39m
+[31m+   "/archive/jobs/:p/records",[39m
+[31m+ ][39m
+
+ ❯ tests/api-deep/frontend-contract-deep.test.ts:97:61
+     95|         .filter((p) => !PAGE_ROUTES.has(p) && p.length > 1);
+     96|       const dead = paths.filter((p) => !routes.some((r) => matches(p, …
+     97|       expect(dead, `${name} dead: ${JSON.stringify(dead)}`).toEqual([]…
+       |                                                             ^
+     98|     });
+     99|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[11/127]⎯
+
+ FAIL  tests/api-deep/frontend-contract-deep.test.ts > ROUND 13: frontend↔backend contract > agri: every API path the frontend calls exists in the backend
+AssertionError: agri dead: ["/archive/jobs","/archive/jobs/:p/execute","/archive/jobs/:p/restore","/archive/jobs/:p/records"]: expected [ '/archive/jobs', …(3) ] to deeply equal []
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- [][39m
+[31m+ [[39m
+[31m+   "/archive/jobs",[39m
+[31m+   "/archive/jobs/:p/execute",[39m
+[31m+   "/archive/jobs/:p/restore",[39m
+[31m+   "/archive/jobs/:p/records",[39m
+[31m+ ][39m
+
+ ❯ tests/api-deep/frontend-contract-deep.test.ts:97:61
+     95|         .filter((p) => !PAGE_ROUTES.has(p) && p.length > 1);
+     96|       const dead = paths.filter((p) => !routes.some((r) => matches(p, …
+     97|       expect(dead, `${name} dead: ${JSON.stringify(dead)}`).toEqual([]…
+       |                                                             ^
+     98|     });
+     99|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[12/127]⎯
+
+ FAIL  tests/api-deep/ids-unicode-uploads-deep.test.ts > ROUND 6: ids, unicode, uploads > flock upload: script-bearing SVG cannot be stored and served back as active content
+AssertionError: svg upload rejected with 500: expected [ 400, 415 ] to include 500
+ ❯ tests/api-deep/ids-unicode-uploads-deep.test.ts:83:67
+     81|       expect(ct.includes('svg') || cd.includes('attachment'), 'svg ser…
+     82|     } else {
+     83|       expect([400, 415], `svg upload rejected with ${up.status}`).toCo…
+       |                                                                   ^
+     84|     }
+     85|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[13/127]⎯
+
+ FAIL  tests/api-deep/last-surface-deep.test.ts > ROUND 14: last surfaces > agri public worker card does not expose wages/advances to unauthenticated visitors
+AssertionError: public worker card leaks daily wage: expected '<!DOCTYPE html>\n<html lang="en" dir=…' not to contain '1,777'
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 1,777[39m
+[31m+ <!DOCTYPE html>[39m
+[31m+ <html lang="en" dir="ltr">[39m
+[31m+ <head>[39m
+[31m+ <meta charset="utf-8">[39m
+[31m+ <meta name="viewport" content="width=device-width, initial-scale=1">[39m
+[31m+ <title>Worker Card — Usman Agri Farm</title>[39m
+[31m+ <link rel="icon" href="">[39m
+[31m+ <link rel="preconnect" href="https://fonts.googleapis.com">[39m
+[31m+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>[39m
+[31m+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">[39m
+[31m+ <style>[39m
+[31m+   * { margin: 0; padding: 0; box-sizing: border-box; }[39m
+[31m+   body {[39m
+[31m+     font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;[39m
+[31m+     background: #edf0ea; color: #0f172a;[39m
+[31m+     min-height: 100vh; display: flex; justify-content: center;[39m
+[31m+     padding: 22px 14px 44px;[39m
+[31m+   }[39m
+[31m+   .wrap { width: 100%; max-width: 430px; }[39m
+[31m+[39m
+[31m+   .card {[39m
+[31m+     position: relative; background: #fff; border-radius: 26px; overflow: hidden;[39m
+[31m+     box-shadow: 0 18px 44px rgba(20, 35, 25, .14);[39m
+[31m+   }[39m
+[31m+   /* dot texture + green corner accents */[39m
+[31m+   .card::before {[39m
+[31m+     content: ""; position: absolute; top: 0; left: 0; width: 150px; height: 150px;[39m
+[31m+     background-image: radial-gradient(rgba(22, 163, 74, .16) 1.2px, transparent 1.3px);[39m
+[31m+     background-size: 9px 9px; border-radius: 26px 0 100% 0; pointer-events: none;[39m
+[31m+   }[39m
+[31m+   .card::after {[39m
+[31m+     content: ""; position: absolute; top: 0; right: 0; width: 130px; height: 130px;[39m
+[31m+     background: linear-gradient(225deg, rgba(22, 163, 74, .10) 0%, transparent 58%);[39m
+[31m+     border-radius: 0 26px 0 100%; pointer-events: none;[39m
+[31m+   }[39m
+[31m+[39m
+[31m+   .head { padding: 22px 22px 14px; position: relative; }[39m
+[31m+   .brand { display: flex; align-items: center; gap: 13px; }[39m
+[31m+   .brand img { width: 62px; height: 62px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; box-shadow: 0 4px 12px rgba(20, 83, 45, .18); border: 3px solid #f0fdf4; }[39m
+[31m+   .brand .txt { min-width: 0; flex: 1; }[39m
+[31m+   .farm { font-size: 24px; font-weight: 900; color: #14532d; letter-spacing: .2px; line-height: 1.12; text-transform: uppercase; }[39m
+[31m+   .sub {[39m
+[31m+     font-size: 9.5px; font-weight: 700; color: #15803d; letter-spacing: .12em;[39m
+[31m+     margin-top: 5px; display: flex; align-items: center; gap: 8px; white-space: nowrap;[39m
+[31m+   }[39m
+[31m+   .sub::before, .sub::after { content: ""; height: 1.5px; background: #15803d55; flex: 1; min-width: 14px; border-radius: 2px; }[39m
+[31m+[39m
+[31m+   .titlebar {[39m
+[31m+     display: flex; align-items: stretch; justify-content: space-between; gap: 10px;[39m
+[31m+     padding: 4px 22px 14px;[39m
+[31m+   }[39m
+[31m+   .badge {[39m
+[31m+     display: inline-flex; align-items: center; gap: 6px;[39m
+[31m+     background: linear-gradient(135deg, #14532d, #166534);[39m
+[31m+     color: #fff; border-radius: 12px; padding: 9px 14px;[39m
+[31m+     font-size: 13px; font-weight: 800; letter-spacing: .02em;[39m
+[31m+     box-shadow: 0 6px 14px rgba(20, 83, 45, .22);[39m
+[31m+   }[39m
+[31m+   .badge .month { color: #fde047; font-weight: 800; }[39m
+[31m+   .ur-box {[39m
+[31m+     display: flex; align-items: center;[39m
+[31m+     border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 8px 12px;[39m
+[31m+     font-family: 'Noto Nastaliq Urdu', serif; font-size: 13px; font-weight: 600; color: #334155;[39m
+[31m+     background: #fbfdfb; max-width: 46%;[39m
+[31m+   }[39m
+[31m+[39m
+[31m+   .body { padding: 2px 22px 16px; }[39m
+[31m+   .row { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f1f5f9; }[39m
+[31m+   .row:last-child { border-bottom: none; }[39m
+[31m+   .tile {[39m
+[31m+     width: 40px; height: 40px; border-radius: 12px; flex: 0 0 auto;[39m
+[31m+     background: #14532d; color: #fff; display: grid; place-items: center;[39m
+[31m+     box-shadow: 0 5px 12px rgba(20, 83, 45, .22);[39m
+[31m+   }[39m
+[31m+   .row-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }[39m
+[31m+   .lbl { display: flex; flex-direction: column; min-width: 0; }[39m
+[31m+   .lbl-en { font-size: 13.5px; font-weight: 700; color: #1e293b; }[39m
+[31m+   .lbl-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 12.5px; color: #64748b; line-height: 1.9; margin-top: -2px; }[39m
+[31m+   .vals { display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; min-width: 0; }[39m
+[31m+   .vals .val { font-weight: 800; text-align: right; }[39m
+[31m+   .vals .val[dir="rtl"] { font-family: 'Noto Nastaliq Urdu', serif; line-height: 1.9; margin-top: -3px; font-weight: 600; }[39m
+[31m+[39m
+[31m+   .row-big { border-bottom: none; }[39m
+[31m+   .row-big .row-main {[39m
+[31m+     flex-direction: row; align-items: center; gap: 12px;[39m
+[31m+     border: 1.5px solid #bbf7d0; border-radius: 16px;[39m
+[31m+     background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 90%);[39m
+[31m+     padding: 14px 16px; margin-top: 2px;[39m
+[31m+   }[39m
+[31m+   .row-big .lbl { flex: 1; }[39m
+[31m+   .row-big .lbl-en { font-size: 13px; font-weight: 800; color: #14532d; letter-spacing: .03em; text-transform: uppercase; }[39m
+[31m+   .row-big .lbl-ur { font-size: 12.5px; color: #3f6212; }[39m
+[31m+   .row-big .vals .val { font-size: 26px; font-weight: 900; }[39m
+[31m+   .moneybag {[39m
+[31m+     width: 48px; height: 48px; border-radius: 50%; flex: 0 0 auto;[39m
+[31m+     background: #dcfce7; color: #15803d; display: grid; place-items: center;[39m
+[31m+     border: 1.5px solid #bbf7d0;[39m
+[31m+   }[39m
+[31m+[39m
+[31m+   .foot { margin: 0 22px 18px; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 11px; background: #fbfdfb; }[39m
+[31m+   .foot-icon { width: 34px; height: 34px; border-radius: 50%; background: #14532d; color: #fff; display: grid; place-items: center; flex: 0 0 auto; }[39m
+[31m+   .foot-en { font-size: 10.5px; color: #475569; line-height: 1.55; flex: 1; }[39m
+[31m+   .foot-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 11.5px; color: #475569; line-height: 2; text-align: right; flex: 1; }[39m
+[31m+[39m
+[31m+   .thanks {[39m
+[31m+     margin: -14px auto 0; position: relative; width: max-content;[39m
+[31m+     display: flex; align-items: center; gap: 8px;[39m
+[31m+     background: #fff; border: 1px solid #e2e8f0; border-radius: 999px;[39m
+[31m+     padding: 7px 16px 7px 9px; box-shadow: 0 10px 22px rgba(20, 35, 25, .14);[39m
+[31m+   }[39m
+[31m+   .thanks img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }[39m
+[31m+   .thanks .t-en { font-size: 9px; font-weight: 900; letter-spacing: .08em; color: #14532d; }[39m
+[31m+   .thanks .t-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 11px; color: #334155; line-height: 1.6; }[39m
+[31m+[39m
+[31m+   .meta { padding: 10px 20px 0; }[39m
+[31m+   .meta p { font-size: 10px; color: #94a3b8; text-align: center; }[39m
+[31m+   .meta .ur { font-family: 'Noto Nastaliq Urdu', serif; line-height: 1.9; }[39m
+[31m+[39m
+[31m+   @media print {[39m
+[31m+     body { background: #fff; padding: 0; }[39m
+[31m+     .card { box-shadow: none; border-radius: 0; }[39m
+[31m+     .thanks { box-shadow: none; }[39m
+[31m+   }[39m
+[31m+ </style>[39m
+[31m+ </head>[39m
+[31m+ <body>[39m
+[31m+ <div class="wrap">[39m
+[31m+   <div class="card">[39m
+[31m+     <div class="head">[39m
+[31m+       <div class="brand">[39m
+[31m+         [39m
+[31m+         <div class="txt">[39m
+[31m+           <div class="farm">Usman Agri Farm</div>[39m
+[31m+           <div class="sub">CROP &amp; AGRICULTURE MANAGEMENT SYSTEM</div>[39m
+[31m+         </div>[39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+     <div class="titlebar">[39m
+[31m+       <span class="badge">Worker Card <span class="month">— November 2026</span></span>[39m
+[31m+       <span class="ur-box" dir="rtl">ورکر کارڈ — نومبر 2026</span>[39m
+[31m+     </div>[39m
+[31m+     <div class="body">[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Name</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">نام</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">Card Worker mxmvws2oj1</span>[39m
+[31m+           [39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><circle cx="8" cy="10" r="2"/><path d="M5.5 16c.6-1.6 1.6-2.2 2.5-2.2S10 14.4 10.5 16M14 9.5h4M14 13.5h4"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Worker ID</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">ورکر آئی ڈی</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">f9e376b632203f15f1f1dd78</span>[39m
+[31m+           [39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Daily wage</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">روزانہ مزدوری</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">Rs 1,777</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#0f172a;font-size:13px">روپے 1,777</span>[39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Attendance (2026-11)</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">اس ماہ کی حاضری</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">No attendance yet</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#0f172a;font-size:13px">ابھی حاضری نہیں</span>[39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M21 11h-6a2 2 0 0 0 0 4h6z"/><circle cx="16" cy="13" r=".5"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Wages for this month</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">اس ماہ کی مزدوری</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">Rs 0</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#0f172a;font-size:13px">روپے 0</span>[39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.5"/><path d="M6 12h.01M18 12h.01"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Advance (udhaar) due</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">باقی اُدھار</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#64748b;font-size:15px">None</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#64748b;font-size:13px">نہیں</span>[39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row row-big">[39m
+[31m+       [39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Net payable this month</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">اس ماہ کی خالص رقم</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#15803d;font-size:26px">Rs 0</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#15803d;font-size:19px">روپے 0</span>[39m
+[31m+         </div>[39m
+[31m+         <span class="moneybag"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 7h5l2.8 3.8c1.4 2.2 2.2 4 2.2 5.7A4.5 4.5 0 0 1 15 21h-6a4.5 4.5 0 0 1-4.5-4.5c0-1.7.8-3.5 2.2-5.7z"/><path d="M9.5 7c0-2 1.3-3.5 2.5-3.5s2.5 1.5 2.5 3.5"/><path d="M10.5 12.5h3M12 12.5v5"/></svg></span>[39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+     </div>[39m
+[31m+     <div class="foot"><span class="foot-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3.5V11c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5.5z"/><path d="M8.5 11.5l2.5 2.5 4.5-4.5"/></svg></span><div class="foot-en">Usman Agri Farm — for your reference. Keep this card safe; anyone with the link can see it.</div><div class="foot-ur" dir="rtl">Usman Agri Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔</div></div>[39m
+[31m+   </div>[39m
+[31m+   <div class="thanks">[39m
+[31m+     [39m
+[31m+     <span class="t-en">THANK YOU!</span>[39m
+[31m+     <span class="t-ur" dir="rtl">شکریہ!</span>[39m
+[31m+   </div>[39m
+[31m+   <div class="meta"><p>Generated 2026-11-01</p></div>[39m
+[31m+ </div>[39m
+[31m+ </body>[39m
+[31m+ </html>[39m
+
+ ❯ tests/api-deep/last-surface-deep.test.ts:65:61
+     63|     expect(res.status).toBe(200);
+     64|     const html = await res.text();
+     65|     expect(html, 'public worker card leaks daily wage').not.toContain(…
+       |                                                             ^
+     66|     expect(html, 'public worker card leaks phone').not.toContain('0321…
+     67|     await raw(ctx, `/laborers/${id}`, { method: 'DELETE', token: ctx.o…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[14/127]⎯
+
+ FAIL  tests/api-deep/load-lifetime-smuggling-deep.test.ts > ROUND 8: load, lifetime, smuggling, deps > dairy: token lifetime is at most 24 hours
+AssertionError: dairy access-token lifetime is 168h: expected 168 to be less than or equal to 24
+ ❯ tests/api-deep/load-lifetime-smuggling-deep.test.ts:52:65
+     50|       const claims = JSON.parse(Buffer.from(apps[name].owner.split('.'…
+     51|       const ttlH = (claims.exp - claims.iat) / 3600;
+     52|       expect(ttlH, `${name} access-token lifetime is ${ttlH}h`).toBeLe…
+       |                                                                 ^
+     53|     });
+     54|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[15/127]⎯
+
+ FAIL  tests/api-deep/load-lifetime-smuggling-deep.test.ts > ROUND 8: load, lifetime, smuggling, deps > flock: token lifetime is at most 24 hours
+AssertionError: flock access-token lifetime is 168h: expected 168 to be less than or equal to 24
+ ❯ tests/api-deep/load-lifetime-smuggling-deep.test.ts:52:65
+     50|       const claims = JSON.parse(Buffer.from(apps[name].owner.split('.'…
+     51|       const ttlH = (claims.exp - claims.iat) / 3600;
+     52|       expect(ttlH, `${name} access-token lifetime is ${ttlH}h`).toBeLe…
+       |                                                                 ^
+     53|     });
+     54|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[16/127]⎯
+
+ FAIL  tests/api-deep/pagination-dates-backup-abuse.test.ts > DEEP: pagination, dates, backup abuse > backup abuse: cross-app restore is rejected (no silent mis-import)
+AssertionError: dairy backup → agri restore: expected 200 to be greater than or equal to 400
+ ❯ tests/api-deep/pagination-dates-backup-abuse.test.ts:91:63
+     89|     const dairyBackup = (await raw(apps.dairy, '/backup', { token: app…
+     90|     const r1 = await raw(apps.agri, '/restore', { method: 'POST', toke…
+     91|     expect(r1.response.status, 'dairy backup → agri restore').toBeGrea…
+       |                                                               ^
+     92|     const agriBackup = (await raw(apps.agri, '/backup', { token: apps.…
+     93|     const r2 = await raw(apps.dairy, '/backup/restore', { method: 'POS…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[17/127]⎯
+
+ FAIL  tests/api-deep/public-surface-deep.test.ts > ROUND 5: public surface + headers > dairy public buyer card does not expose phone number to unauthenticated visitors
+AssertionError: public card leaks buyer phone number: expected '<!DOCTYPE html>\n<html lang="en" dir=…' not to contain '0300-7654321'
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 0300-7654321[39m
+[31m+ <!DOCTYPE html>[39m
+[31m+ <html lang="en" dir="ltr">[39m
+[31m+ <head>[39m
+[31m+ <meta charset="utf-8">[39m
+[31m+ <meta name="viewport" content="width=device-width, initial-scale=1">[39m
+[31m+ <title>Buyer Card — Usman Dairy Farm</title>[39m
+[31m+ <link rel="icon" href="">[39m
+[31m+ <link rel="preconnect" href="https://fonts.googleapis.com">[39m
+[31m+ <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>[39m
+[31m+ <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=Noto+Nastaliq+Urdu:wght@400;600;700&display=swap" rel="stylesheet">[39m
+[31m+ <style>[39m
+[31m+   * { margin: 0; padding: 0; box-sizing: border-box; }[39m
+[31m+   body {[39m
+[31m+     font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif;[39m
+[31m+     background: #edf0ea; color: #0f172a;[39m
+[31m+     min-height: 100vh; display: flex; justify-content: center;[39m
+[31m+     padding: 22px 14px 44px;[39m
+[31m+   }[39m
+[31m+   .wrap { width: 100%; max-width: 430px; }[39m
+[31m+[39m
+[31m+   .card {[39m
+[31m+     position: relative; background: #fff; border-radius: 26px; overflow: hidden;[39m
+[31m+     box-shadow: 0 18px 44px rgba(20, 35, 25, .14);[39m
+[31m+   }[39m
+[31m+   /* dot texture + green corner accents */[39m
+[31m+   .card::before {[39m
+[31m+     content: ""; position: absolute; top: 0; left: 0; width: 150px; height: 150px;[39m
+[31m+     background-image: radial-gradient(rgba(22, 163, 74, .16) 1.2px, transparent 1.3px);[39m
+[31m+     background-size: 9px 9px; border-radius: 26px 0 100% 0; pointer-events: none;[39m
+[31m+   }[39m
+[31m+   .card::after {[39m
+[31m+     content: ""; position: absolute; top: 0; right: 0; width: 130px; height: 130px;[39m
+[31m+     background: linear-gradient(225deg, rgba(22, 163, 74, .10) 0%, transparent 58%);[39m
+[31m+     border-radius: 0 26px 0 100%; pointer-events: none;[39m
+[31m+   }[39m
+[31m+[39m
+[31m+   .head { padding: 22px 22px 14px; position: relative; }[39m
+[31m+   .brand { display: flex; align-items: center; gap: 13px; }[39m
+[31m+   .brand img { width: 62px; height: 62px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; box-shadow: 0 4px 12px rgba(20, 83, 45, .18); border: 3px solid #f0fdf4; }[39m
+[31m+   .brand .txt { min-width: 0; flex: 1; }[39m
+[31m+   .farm { font-size: 24px; font-weight: 900; color: #14532d; letter-spacing: .2px; line-height: 1.12; text-transform: uppercase; }[39m
+[31m+   .sub {[39m
+[31m+     font-size: 9.5px; font-weight: 700; color: #15803d; letter-spacing: .12em;[39m
+[31m+     margin-top: 5px; display: flex; align-items: center; gap: 8px; white-space: nowrap;[39m
+[31m+   }[39m
+[31m+   .sub::before, .sub::after { content: ""; height: 1.5px; background: #15803d55; flex: 1; min-width: 14px; border-radius: 2px; }[39m
+[31m+[39m
+[31m+   .titlebar {[39m
+[31m+     display: flex; align-items: stretch; justify-content: space-between; gap: 10px;[39m
+[31m+     padding: 4px 22px 14px;[39m
+[31m+   }[39m
+[31m+   .badge {[39m
+[31m+     display: inline-flex; align-items: center; gap: 6px;[39m
+[31m+     background: linear-gradient(135deg, #14532d, #166534);[39m
+[31m+     color: #fff; border-radius: 12px; padding: 9px 14px;[39m
+[31m+     font-size: 13px; font-weight: 800; letter-spacing: .02em;[39m
+[31m+     box-shadow: 0 6px 14px rgba(20, 83, 45, .22);[39m
+[31m+   }[39m
+[31m+   .badge .month { color: #fde047; font-weight: 800; }[39m
+[31m+   .ur-box {[39m
+[31m+     display: flex; align-items: center;[39m
+[31m+     border: 1.5px solid #e2e8f0; border-radius: 12px; padding: 8px 12px;[39m
+[31m+     font-family: 'Noto Nastaliq Urdu', serif; font-size: 13px; font-weight: 600; color: #334155;[39m
+[31m+     background: #fbfdfb; max-width: 46%;[39m
+[31m+   }[39m
+[31m+[39m
+[31m+   .body { padding: 2px 22px 16px; }[39m
+[31m+   .row { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid #f1f5f9; }[39m
+[31m+   .row:last-child { border-bottom: none; }[39m
+[31m+   .tile {[39m
+[31m+     width: 40px; height: 40px; border-radius: 12px; flex: 0 0 auto;[39m
+[31m+     background: #14532d; color: #fff; display: grid; place-items: center;[39m
+[31m+     box-shadow: 0 5px 12px rgba(20, 83, 45, .22);[39m
+[31m+   }[39m
+[31m+   .row-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; }[39m
+[31m+   .lbl { display: flex; flex-direction: column; min-width: 0; }[39m
+[31m+   .lbl-en { font-size: 13.5px; font-weight: 700; color: #1e293b; }[39m
+[31m+   .lbl-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 12.5px; color: #64748b; line-height: 1.9; margin-top: -2px; }[39m
+[31m+   .vals { display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; min-width: 0; }[39m
+[31m+   .vals .val { font-weight: 800; text-align: right; }[39m
+[31m+   .vals .val[dir="rtl"] { font-family: 'Noto Nastaliq Urdu', serif; line-height: 1.9; margin-top: -3px; font-weight: 600; }[39m
+[31m+[39m
+[31m+   .row-big { border-bottom: none; }[39m
+[31m+   .row-big .row-main {[39m
+[31m+     flex-direction: row; align-items: center; gap: 12px;[39m
+[31m+     border: 1.5px solid #bbf7d0; border-radius: 16px;[39m
+[31m+     background: linear-gradient(135deg, #f0fdf4 0%, #ffffff 90%);[39m
+[31m+     padding: 14px 16px; margin-top: 2px;[39m
+[31m+   }[39m
+[31m+   .row-big .lbl { flex: 1; }[39m
+[31m+   .row-big .lbl-en { font-size: 13px; font-weight: 800; color: #14532d; letter-spacing: .03em; text-transform: uppercase; }[39m
+[31m+   .row-big .lbl-ur { font-size: 12.5px; color: #3f6212; }[39m
+[31m+   .row-big .vals .val { font-size: 26px; font-weight: 900; }[39m
+[31m+   .moneybag {[39m
+[31m+     width: 48px; height: 48px; border-radius: 50%; flex: 0 0 auto;[39m
+[31m+     background: #dcfce7; color: #15803d; display: grid; place-items: center;[39m
+[31m+     border: 1.5px solid #bbf7d0;[39m
+[31m+   }[39m
+[31m+[39m
+[31m+   .foot { margin: 0 22px 18px; border: 1.5px solid #e2e8f0; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 11px; background: #fbfdfb; }[39m
+[31m+   .foot-icon { width: 34px; height: 34px; border-radius: 50%; background: #14532d; color: #fff; display: grid; place-items: center; flex: 0 0 auto; }[39m
+[31m+   .foot-en { font-size: 10.5px; color: #475569; line-height: 1.55; flex: 1; }[39m
+[31m+   .foot-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 11.5px; color: #475569; line-height: 2; text-align: right; flex: 1; }[39m
+[31m+[39m
+[31m+   .thanks {[39m
+[31m+     margin: -14px auto 0; position: relative; width: max-content;[39m
+[31m+     display: flex; align-items: center; gap: 8px;[39m
+[31m+     background: #fff; border: 1px solid #e2e8f0; border-radius: 999px;[39m
+[31m+     padding: 7px 16px 7px 9px; box-shadow: 0 10px 22px rgba(20, 35, 25, .14);[39m
+[31m+   }[39m
+[31m+   .thanks img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; }[39m
+[31m+   .thanks .t-en { font-size: 9px; font-weight: 900; letter-spacing: .08em; color: #14532d; }[39m
+[31m+   .thanks .t-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 11px; color: #334155; line-height: 1.6; }[39m
+[31m+[39m
+[31m+   .meta { padding: 10px 20px 0; }[39m
+[31m+   .meta p { font-size: 10px; color: #94a3b8; text-align: center; }[39m
+[31m+   .meta .ur { font-family: 'Noto Nastaliq Urdu', serif; line-height: 1.9; }[39m
+[31m+[39m
+[31m+   @media print {[39m
+[31m+     body { background: #fff; padding: 0; }[39m
+[31m+     .card { box-shadow: none; border-radius: 0; }[39m
+[31m+     .thanks { box-shadow: none; }[39m
+[31m+   }[39m
+[31m+ </style>[39m
+[31m+ </head>[39m
+[31m+ <body>[39m
+[31m+ <div class="wrap">[39m
+[31m+   <div class="card">[39m
+[31m+     <div class="head">[39m
+[31m+       <div class="brand">[39m
+[31m+         [39m
+[31m+         <div class="txt">[39m
+[31m+           <div class="farm">Usman Dairy Farm</div>[39m
+[31m+           <div class="sub">DAIRY &amp; LIVESTOCK MANAGEMENT SYSTEM</div>[39m
+[31m+         </div>[39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+     <div class="titlebar">[39m
+[31m+       <span class="badge">Buyer Card <span class="month">— November 2026</span></span>[39m
+[31m+       <span class="ur-box" dir="rtl">خریدار کارڈ — نومبر 2026</span>[39m
+[31m+     </div>[39m
+[31m+     <div class="body">[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Name</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">نام</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">Card Buyer mxmvwryi21</span>[39m
+[31m+           [39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 2 .7 2.9a2 2 0 0 1-.5 2.1L8 10a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.5c.9.3 1.9.6 2.9.7a2 2 0 0 1 1.7 2z"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Phone</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">فون نمبر</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">0300-7654321</span>[39m
+[31m+           [39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6.5 7 6.5 11.3a6.5 6.5 0 0 1-13 0C5.5 9.7 12 2.7 12 2.7z"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Total milk value</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">کل دودھ کی قیمت</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">Rs 0</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#0f172a;font-size:13px">روپے 0</span>[39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M21 11h-6a2 2 0 0 0 0 4h6z"/><circle cx="16" cy="13" r=".5"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Total collected</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">کل وصول ہوئے</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">Rs 0</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#0f172a;font-size:13px">روپے 0</span>[39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.7s6.5 7 6.5 11.3a6.5 6.5 0 0 1-13 0C5.5 9.7 12 2.7 12 2.7z"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Milk this month (2026-11)</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">اس ماہ کا دودھ</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">Rs 0</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#0f172a;font-size:13px">روپے 0</span>[39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row">[39m
+[31m+       <span class="tile"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-4"/><path d="M21 11h-6a2 2 0 0 0 0 4h6z"/><circle cx="16" cy="13" r=".5"/></svg></span>[39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Collected this month</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">اس ماہ کی وصولی</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#0f172a;font-size:15px">Rs 0</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#0f172a;font-size:13px">روپے 0</span>[39m
+[31m+         </div>[39m
+[31m+         [39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+ <div class="row row-big">[39m
+[31m+       [39m
+[31m+       <div class="row-main">[39m
+[31m+         <div class="lbl">[39m
+[31m+           <span class="lbl-en">Balance (in your favor)</span>[39m
+[31m+           <span class="lbl-ur" dir="rtl">بقایا (آپ کے حق میں)</span>[39m
+[31m+         </div>[39m
+[31m+         <div class="vals">[39m
+[31m+           <span class="val" style="color:#15803d;font-size:26px">Rs 0</span>[39m
+[31m+           <span class="val" dir="rtl" style="color:#15803d;font-size:19px">روپے 0</span>[39m
+[31m+         </div>[39m
+[31m+         <span class="moneybag"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 7h5l2.8 3.8c1.4 2.2 2.2 4 2.2 5.7A4.5 4.5 0 0 1 15 21h-6a4.5 4.5 0 0 1-4.5-4.5c0-1.7.8-3.5 2.2-5.7z"/><path d="M9.5 7c0-2 1.3-3.5 2.5-3.5s2.5 1.5 2.5 3.5"/><path d="M10.5 12.5h3M12 12.5v5"/></svg></span>[39m
+[31m+       </div>[39m
+[31m+     </div>[39m
+[31m+     </div>[39m
+[31m+     <div class="foot"><span class="foot-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 3.5V11c0 5-3.5 9-8 11-4.5-2-8-6-8-11V5.5z"/><path d="M8.5 11.5l2.5 2.5 4.5-4.5"/></svg></span><div class="foot-en">Usman Dairy Farm — for your reference. Keep this card safe; anyone with the link can see it.</div><div class="foot-ur" dir="rtl">Usman Dairy Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔</div></div>[39m
+[31m+   </div>[39m
+[31m+   <div class="thanks">[39m
+[31m+     [39m
+[31m+     <span class="t-en">THANK YOU!</span>[39m
+[31m+     <span class="t-ur" dir="rtl">شکریہ!</span>[39m
+[31m+   </div>[39m
+[31m+   <div class="meta"><p>Generated 2026-11-01</p></div>[39m
+[31m+ </div>[39m
+[31m+ </body>[39m
+[31m+ </html>[39m
+
+ ❯ tests/api-deep/public-surface-deep.test.ts:29:62
+     27|     expect(res.status).toBe(200);
+     28|     const html = await res.text();
+     29|     expect(html, 'public card leaks buyer phone number').not.toContain…
+       |                                                              ^
+     30|     for (const guess of ['1', '000000000000000000000001', 'admin']) {
+     31|       const g = await fetch(`${ctx.base}/api/cards/buyer/${guess}`);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[18/127]⎯
+
+ FAIL  tests/api-deep/public-surface-deep.test.ts > ROUND 5: public surface + headers > dairy: API responses carry CSP + nosniff + frame protection
+AssertionError: dairy missing Content-Security-Policy: expected null to be truthy
+
+[32m- Expected:[39m 
+true
+
+[31m+ Received:[39m 
+null
+
+ ❯ tests/api-deep/public-surface-deep.test.ts:79:91
+     77|       expect(res.status).toBe(200);
+     78|       const h = res.headers;
+     79|       expect(h.get('content-security-policy'), `${name} missing Conten…
+       |                                                                                           ^
+     80|       expect((h.get('x-content-type-options') || '').toLowerCase(), `$…
+     81|       const frame = h.get('x-frame-options') || h.get('content-securit…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[19/127]⎯
+
+ FAIL  tests/api-deep/public-surface-deep.test.ts > ROUND 5: public surface + headers > dairy: authenticated responses are marked non-cacheable
+AssertionError: dairy sensitive API response cacheable: "": expected '' to match /no-store|no-cache|private/
+
+[32m- Expected:[39m 
+/no-store|no-cache|private/
+
+[31m+ Received:[39m 
+""
+
+ ❯ tests/api-deep/public-surface-deep.test.ts:104:71
+    102|       const res = await fetch(`${ctx.base}/api${LIST[name]}`, { header…
+    103|       const cc = (res.headers.get('cache-control') || '').toLowerCase(…
+    104|       expect(cc, `${name} sensitive API response cacheable: "${cc}"`).…
+       |                                                                       ^
+    105|     });
+    106|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[20/127]⎯
+
+ FAIL  tests/api-deep/public-surface-deep.test.ts > ROUND 5: public surface + headers > flock: CORS does not reflect arbitrary origins with credentials
+AssertionError: flock preflight reflects evil origin WITH credentials: expected false to be true // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+ ❯ tests/api-deep/public-surface-deep.test.ts:93:127
+     91|       const acao = res.headers.get('access-control-allow-origin');
+     92|       const acc = res.headers.get('access-control-allow-credentials');
+     93|       expect(!(acao === 'https://evil.example' && acc === 'true'), `${…
+       |                                                                                                                               ^
+     94|       const get = await fetch(`${ctx.base}/api${LIST[name]}`, { header…
+     95|       const gAcao = get.headers.get('access-control-allow-origin');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[21/127]⎯
+
+ FAIL  tests/api-deep/public-surface-deep.test.ts > ROUND 5: public surface + headers > flock: authenticated responses are marked non-cacheable
+AssertionError: flock sensitive API response cacheable: "": expected '' to match /no-store|no-cache|private/
+
+[32m- Expected:[39m 
+/no-store|no-cache|private/
+
+[31m+ Received:[39m 
+""
+
+ ❯ tests/api-deep/public-surface-deep.test.ts:104:71
+    102|       const res = await fetch(`${ctx.base}/api${LIST[name]}`, { header…
+    103|       const cc = (res.headers.get('cache-control') || '').toLowerCase(…
+    104|       expect(cc, `${name} sensitive API response cacheable: "${cc}"`).…
+       |                                                                       ^
+    105|     });
+    106|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[22/127]⎯
+
+ FAIL  tests/api-deep/public-surface-deep.test.ts > ROUND 5: public surface + headers > agri: API responses carry CSP + nosniff + frame protection
+AssertionError: agri missing Content-Security-Policy: expected null to be truthy
+
+[32m- Expected:[39m 
+true
+
+[31m+ Received:[39m 
+null
+
+ ❯ tests/api-deep/public-surface-deep.test.ts:79:91
+     77|       expect(res.status).toBe(200);
+     78|       const h = res.headers;
+     79|       expect(h.get('content-security-policy'), `${name} missing Conten…
+       |                                                                                           ^
+     80|       expect((h.get('x-content-type-options') || '').toLowerCase(), `$…
+     81|       const frame = h.get('x-frame-options') || h.get('content-securit…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[23/127]⎯
+
+ FAIL  tests/api-deep/public-surface-deep.test.ts > ROUND 5: public surface + headers > agri: CORS does not reflect arbitrary origins with credentials
+AssertionError: agri preflight reflects evil origin WITH credentials: expected false to be true // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+ ❯ tests/api-deep/public-surface-deep.test.ts:93:127
+     91|       const acao = res.headers.get('access-control-allow-origin');
+     92|       const acc = res.headers.get('access-control-allow-credentials');
+     93|       expect(!(acao === 'https://evil.example' && acc === 'true'), `${…
+       |                                                                                                                               ^
+     94|       const get = await fetch(`${ctx.base}/api${LIST[name]}`, { header…
+     95|       const gAcao = get.headers.get('access-control-allow-origin');
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[24/127]⎯
+
+ FAIL  tests/api-deep/public-surface-deep.test.ts > ROUND 5: public surface + headers > agri: authenticated responses are marked non-cacheable
+AssertionError: agri sensitive API response cacheable: "": expected '' to match /no-store|no-cache|private/
+
+[32m- Expected:[39m 
+/no-store|no-cache|private/
+
+[31m+ Received:[39m 
+""
+
+ ❯ tests/api-deep/public-surface-deep.test.ts:104:71
+    102|       const res = await fetch(`${ctx.base}/api${LIST[name]}`, { header…
+    103|       const cc = (res.headers.get('cache-control') || '').toLowerCase(…
+    104|       expect(cc, `${name} sensitive API response cacheable: "${cc}"`).…
+       |                                                                       ^
+    105|     });
+    106|   }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[25/127]⎯
+
+ FAIL  tests/api-deep/q1-delete-pinpoint-deep.test.ts > ROUND 23: Q1 DELETE pinpoint + flock import scoping > flock import-all into farm B does not leak into farm A
+AssertionError: import into B → 500: expected 500 to be less than 300
+ ❯ tests/api-deep/q1-delete-pinpoint-deep.test.ts:75:77
+     73|     expect(bOwn.response.status, `farm B own batch → ${bOwn.response.s…
+     74|     const impB = await raw(flock, '/batches/import-all', { method: 'PO…
+     75|     expect(impB.response.status, `import into B → ${impB.response.stat…
+       |                                                                             ^
+     76|     const listB0 = await raw(flock, '/batches', { token: flock.owner, …
+     77|     expect(JSON.stringify(listB0.data), 'farm B own batch was destroye…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[26/127]⎯
+
+ FAIL  tests/api-deep/round10-flock-import-images.test.ts > ROUND R10: flock import + images > import-all into farm B does not leak batches into farm A
+AssertionError: import into B → 500: expected 500 to be less than 300
+ ❯ tests/api-deep/round10-flock-import-images.test.ts:47:77
+     45|     const expA = await raw(ctx, '/batches/export-all', { token: ctx.ow…
+     46|     const impB = await raw(ctx, '/batches/import-all', { method: 'POST…
+     47|     expect(impB.response.status, `import into B → ${impB.response.stat…
+       |                                                                             ^
+     48|     const inB = await listBatches(farmB);
+     49|     expect(inB.length, 'nothing imported into farm B').toBeGreaterThan…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[27/127]⎯
+
+ FAIL  tests/api-deep/round11-role-flock.test.ts > ROUND 11C: role system (flock) > ROLE-F1: user creation honors the requested farmIds (not the creator current farm)
+AssertionError: requested farmIds [B] but user got ["a0ea023870f7a908af95f1cd"]: expected [ 'a0ea023870f7a908af95f1cd' ] to deeply equal [ '24811b14ec04faef7dabcf29' ]
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[2m  [[22m
+[32m-   "24811b14ec04faef7dabcf29",[39m
+[31m+   "a0ea023870f7a908af95f1cd",[39m
+[2m  ][22m
+
+ ❯ tests/api-deep/round11-role-flock.test.ts:52:78
+     50|     expect([200, 201]).toContain(r.response.status);
+     51|     const got = ((r.data as any)?.user?.farmIds || []).map(String);
+     52|     expect(got, `requested farmIds [B] but user got ${JSON.stringify(g…
+       |                                                                              ^
+     53|   });
+     54| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[28/127]⎯
+
+ FAIL  tests/api-deep/round12-photos-cloudinary.test.ts > ROUND 12: photos (dairy, fallback mode) > EXIF/GPS: uploaded JPEG bytes are served back — is EXIF stripped?
+ FAIL  tests/api-deep/round12-photos-cloudinary.test.ts > ROUND 12: photos (agri, fallback mode) > EXIF/GPS: uploaded JPEG bytes are served back — is EXIF stripped?
+AssertionError: EXIF GPS marker still present in served bytes (not stripped): expected true to be false // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- false[39m
+[31m+ true[39m
+
+ ❯ tests/api-deep/round12-photos-cloudinary.test.ts:94:105
+     92|       const res = await fetch(`${ctx.base}/api/photos/${id}`, { header…
+     93|       const buf = Buffer.from(await res.arrayBuffer());
+     94|       expect(buf.includes('GPSMARKER'), 'EXIF GPS marker still present…
+       |                                                                                                         ^
+     95|     });
+     96| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[29/127]⎯
+
+ FAIL  tests/api-deep/round12-photos-cloudinary.test.ts > ROUND 12: photos (dairy, fallback mode) > role checks: worker upload/delete behaviour is explicit
+ FAIL  tests/api-deep/round12-photos-cloudinary.test.ts > ROUND 12: photos (agri, fallback mode) > role checks: worker upload/delete behaviour is explicit
+AssertionError: worker delete photo → 200: expected [ 403, 404 ] to include 200
+ ❯ tests/api-deep/round12-photos-cloudinary.test.ts:102:74
+    100|       const wid = String((up.data as any)?.id || photoA);
+    101|       const del = await raw(ctx, `/photos/${wid}`, { method: 'DELETE',…
+    102|       expect([403, 404], `worker delete photo → ${del.response.status}…
+       |                                                                          ^
+    103|       void up;
+    104|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[30/127]⎯
+
+ FAIL  tests/api-deep/round12-photos-cloudinary.test.ts > ROUND 12: photos (dairy, fallback mode) > id guessing: random/malformed photo ids → 404, never bytes
+ FAIL  tests/api-deep/round12-photos-cloudinary.test.ts > ROUND 12: photos (agri, fallback mode) > id guessing: random/malformed photo ids → 404, never bytes
+AssertionError: GET /photos/../../etc/passwd → 200: expected [ 400, 404 ] to include 200
+ ❯ tests/api-deep/round12-photos-cloudinary.test.ts:130:73
+    128|       for (const bad of ['000000000000000000000000', 'not-an-id', '../…
+    129|         const r = await raw(ctx, `/photos/${bad}`, { token: ctx.owner,…
+    130|         expect([400, 404], `GET /photos/${bad} → ${r.response.status}`…
+       |                                                                         ^
+    131|       }
+    132|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[31/127]⎯
+
+ FAIL  tests/api-deep/round12-photos-cloudinary.test.ts > ROUND 12: photos (agri, fallback mode) > photos survive backup? dairy/agri backup must contain the photo or its bytes
+AssertionError: photo id absent from backup (photos lost on restore): expected false to be true // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+ ❯ tests/api-deep/round12-photos-cloudinary.test.ts:124:93
+    122|       expect(bak.response.status).toBe(200);
+    123|       const text = JSON.stringify(bak.data);
+    124|       expect(text.includes(photoA), 'photo id absent from backup (phot…
+       |                                                                                             ^
+    125|     });
+    126| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[32/127]⎯
+
+ FAIL  tests/api-deep/round12-photos-flock.test.ts > ROUND 12B: photos (flock) > validation: SVG rejected on both upload routes; wrong field name rejected
+AssertionError: expected 500 to be less than 500
+ ❯ tests/api-deep/round12-photos-flock.test.ts:69:24
+     67|     const res = await fetch(`${ctx.base}/api/uploads/image?kind=bird`,…
+     68|     expect(res.status, `wrong field name → ${res.status}`).toBeGreater…
+     69|     expect(res.status).toBeLessThan(500);
+       |                        ^
+     70|   });
+     71| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[33/127]⎯
+
+ FAIL  tests/api-deep/round12-photos-flock.test.ts > ROUND 12B: photos (flock) > P8-1: flock /api/photos/:id (what the diary UI requests) exists
+AssertionError: GET /api/photos/:id → 404 (diary UI builds these URLs): expected 404 to be 200 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 200[39m
+[31m+ 404[39m
+
+ ❯ tests/api-deep/round12-photos-flock.test.ts:81:92
+     79|   it('P8-1: flock /api/photos/:id (what the diary UI requests) exists'…
+     80|     const res = await fetch(`${ctx.base}/api/photos/${imgB}`, { header…
+     81|     expect(res.status, `GET /api/photos/:id → ${res.status} (diary UI …
+       |                                                                                            ^
+     82|   });
+     83| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[34/127]⎯
+
+ FAIL  tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (dairy) > bcrypt 72-byte: password differing only after byte 72 must NOT authenticate
+AssertionError: correct 73-byte login (got 429): expected 429 to be 200 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 200[39m
+[31m+ 429[39m
+
+ ❯ tests/api-deep/round13-sessions.test.ts:97:73
+     95|       if (m.status >= 400) { expect(m.status, 'create rejected (policy…
+     96|       const good = await loginAs(m.u, p72);
+     97|       expect(good.status, `correct 73-byte login (got ${good.status})`…
+       |                                                                         ^
+     98|       const trunc = await loginAs(m.u, `${'A'.repeat(72)}Y`);
+     99|       expect(trunc.status, `byte-73-differing login (want 401, got ${t…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[35/127]⎯
+
+ FAIL  tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (dairy) > login rate limiter cannot be reset by spoofing X-Forwarded-For
+ FAIL  tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (agri) > login rate limiter cannot be reset by spoofing X-Forwarded-For
+ FAIL  tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (flock) > login rate limiter cannot be reset by spoofing X-Forwarded-For
+AssertionError: limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+ ❯ tests/api-deep/round13-sessions.test.ts:130:118
+    128|       const spoofLimited = spoofed.includes(429);
+    129|       expect(plainLimited, 'limiter should engage on 15 rapid failures…
+    130|       expect(spoofLimited, 'limiter must still engage when XFF is spoo…
+       |                                                                                                                      ^
+    131|     }, 120_000);
+    132| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[36/127]⎯
+
+ FAIL  tests/api-deep/round13-sessions.test.ts > ROUND 13 sessions (flock) > bcrypt 72-byte: password differing only after byte 72 must NOT authenticate
+AssertionError: byte-73-differing login (want 401, got 200 — 200 means bcrypt 72-byte truncation): expected 200 to be 401 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 401[39m
+[31m+ 200[39m
+
+ ❯ tests/api-deep/round13-sessions.test.ts:99:125
+     97|       expect(good.status, `correct 73-byte login (got ${good.status})`…
+     98|       const trunc = await loginAs(m.u, `${'A'.repeat(72)}Y`);
+     99|       expect(trunc.status, `byte-73-differing login (want 401, got ${t…
+       |                                                                                                                             ^
+    100|     }, 60_000);
+    101| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[37/127]⎯
+
+ FAIL  tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (dairy) > body-size limits: 5MB field and 12MB body are not accepted as normal creates
+ FAIL  tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (agri) > body-size limits: 5MB field and 12MB body are not accepted as normal creates
+ FAIL  tests/api-deep/round14-fuzz.test.ts > ROUND 14 fuzz (flock) > body-size limits: 5MB field and 12MB body are not accepted as normal creates
+AssertionError: 5MB name must not be a normal 201 create: expected 201 not to be 201 // Object.is equality
+ ❯ tests/api-deep/round14-fuzz.test.ts:86:84
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[38/127]⎯
+
+ FAIL  tests/api-deep/round14-fuzz.test.ts > ROUND 14 dairy date edges (dailylog) > invalid calendar dates are rejected, not stored or 500
+AssertionError: 2026-02-30 should be 4xx, got 200: expected 200 to be greater than or equal to 400
+ ❯ tests/api-deep/round14-fuzz.test.ts:116:83
+    114|       if (r.response.status >= 500) bad.push(`${d} -> ${r.response.sta…
+    115|       if (['2026-02-30', '2026-13-01', '0000-00-00', 'not-a-date'].inc…
+    116|         expect(r.response.status, `${d} should be 4xx, got ${r.respons…
+       |                                                                                   ^
+    117|         expect(r.response.status).toBeLessThan(500);
+    118|       }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39/127]⎯
+
+ FAIL  tests/api-deep/round3-super-admin.test.ts > ROUND R3: super-admin owner-only > dairy: farm role is preserved at login and cleared at logout
+AssertionError: expected 404 to be less than 300
+ ❯ tests/api-deep/round3-super-admin.test.ts:44:33
+     42|     expect(roleText, 'owner session carries no farm role').toMatch(/ow…
+     43|     const out = await raw(apps.dairy, '/auth/logout', { method: 'POST'…
+     44|     expect(out.response.status).toBeLessThan(300);
+       |                                 ^
+     45|     const me2 = await raw(apps.dairy, '/auth/me', { token: apps.dairy.…
+     46|     // Logout may or may not revoke the token (known finding); but if …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[40/127]⎯
+
+ FAIL  tests/api-deep/round6-breeding-deep.test.ts > ROUND R6: breeding deep lifecycle > calving with generated calves is edit-locked (409) and delete-locked (409)
+AssertionError: delete calving after calf removed → 409: expected 409 to be less than 300
+ ❯ tests/api-deep/round6-breeding-deep.test.ts:53:97
+     51|     expect(calfDel.response.status, `delete calf cow → ${calfDel.respo…
+     52|     const del2 = await raw(ctx, `/breeding/events/${calvingId}`, { met…
+     53|     expect(del2.response.status, `delete calving after calf removed → …
+       |                                                                                                 ^
+     54|     const mother = await getCow(cow);
+     55|     // Legacy calvingDate: preserved-by-design when no event remains (…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[41/127]⎯
+
+ FAIL  tests/api-deep/round7-agri-fields-deep.test.ts > ROUND R7: agri fields deep > validation: negative/garbage acres rejected, duplicate name per farm 409, same name across farms OK
+AssertionError: absurd acres 1e12 → 201: expected [ 400, 422 ] to include 201
+ ❯ tests/api-deep/round7-agri-fields-deep.test.ts:24:71
+     22|     expect([400, 422], `garbage acres → ${gar.response.status}`).toCon…
+     23|     const huge = await raw(ctx, '/fields', { method: 'POST', token: ct…
+     24|     expect([400, 422], `absurd acres 1e12 → ${huge.response.status}`).…
+       |                                                                       ^
+     25|     const dup = await raw(ctx, '/fields', { method: 'POST', token: ctx…
+     26|     expect(dup.response.status, `duplicate name same farm → ${dup.resp…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[42/127]⎯
+
+ FAIL  tests/api-deep/round9-backup-integrity.test.ts > ROUND R9: backup integrity > tampered backup: editing an amount inside the backup changes restored data (integrity check?)
+AssertionError: tampered amount silently restored (no integrity/signature check): expected { _id: 'e1', date: '2025-11-01', …(9) } to be falsy
+
+[32m- Expected:[39m 
+false
+
+[31m+ Received:[39m 
+{
+  "_id": "e1",
+  "amount": 987654321,
+  "createdAt": "2026-10-31T19:10:04.778Z",
+  "date": "2025-11-01",
+  "farmId": "affd8661088f9f6d54a5d1d4",
+  "feedKg": 400,
+  "note": "Opening bulk feed stock (wheat bran, cottonseed, silage)",
+  "receiptBase64": "",
+  "supplierId": "",
+  "type": "feed",
+  "updatedAt": "2026-10-31T19:10:04.981Z",
+}
+
+ ❯ tests/api-deep/round9-backup-integrity.test.ts:32:85
+     30|     const hit = rows2.find((r: any) => Number(r.amount) === 987654321);
+     31|     // A backup system with integrity protection would reject or flag …
+     32|     expect(hit, 'tampered amount silently restored (no integrity/signa…
+       |                                                                                     ^
+     33|   });
+     34| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[43/127]⎯
+
+ FAIL  tests/api-deep/round9-backup-integrity.test.ts > ROUND R9: backup integrity > cross-app restore: agri backup into dairy (and flock backup into agri) is rejected, data untouched
+AssertionError: agri backup → dairy restore → 200: expected [ 400, 409, 422 ] to include 200
+ ❯ tests/api-deep/round9-backup-integrity.test.ts:40:84
+     38|     const before = await raw(dairy, '/backup', { token: dairy.owner });
+     39|     const r1 = await raw(dairy, '/backup/restore', { method: 'POST', t…
+     40|     expect([400, 409, 422], `agri backup → dairy restore → ${r1.respon…
+       |                                                                                    ^
+     41|     const after = await raw(dairy, '/backup', { token: dairy.owner });
+     42|     expect(JSON.stringify(after.data).length, 'dairy data changed by c…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[44/127]⎯
+
+ FAIL  tests/api-deep/session-escalation-deep.test.ts > DEEPEST: sessions, escalation, leakage, throttling > dairy: token is revoked after logout
+ FAIL  tests/api-deep/session-escalation-deep.test.ts > DEEPEST: sessions, escalation, leakage, throttling > flock: token is revoked after logout
+ FAIL  tests/api-deep/session-escalation-deep.test.ts > DEEPEST: sessions, escalation, leakage, throttling > agri: token is revoked after logout
+AssertionError: pre-logout token still works after logout: expected 200 to be 401 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 401[39m
+[31m+ 200[39m
+
+ ❯ tests/api-deep/session-escalation-deep.test.ts:60:82
+     58|       await raw(ctx, logoutRoute, { method: 'POST', token });
+     59|       const after = await raw(ctx, LIST[name], { token });
+     60|       expect(after.response.status, 'pre-logout token still works afte…
+       |                                                                                  ^
+     61|     });
+     62| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[45/127]⎯
+
+ FAIL  tests/api-deep/session-escalation-deep.test.ts > DEEPEST: sessions, escalation, leakage, throttling > agri: mass assignment on create cannot forge id/role/farm ownership
+AssertionError: server honored client-supplied _id: expected 'forged-mxmvwrvuk7' not to be 'forged-mxmvwrvuk7' // Object.is equality
+ ❯ tests/api-deep/session-escalation-deep.test.ts:109:72
+    107|         const r = await raw(ctx, '/crops', { method: 'POST', token: ct…
+    108|         expect(r.response.status).toBe(201);
+    109|         expect(idOf(r.data), 'server honored client-supplied _id').not…
+       |                                                                        ^
+    110|         await raw(ctx, `/crops/${idOf(r.data)}`, { method: 'DELETE', t…
+    111|       } else {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[46/127]⎯
+
+ FAIL  tests/api-deep/session-escalation-deep.test.ts > DEEPEST: sessions, escalation, leakage, throttling > dairy: changing password revokes previously issued tokens
+AssertionError: pre-password-change token still works: expected 200 to be 401 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 401[39m
+[31m+ 200[39m
+
+ ❯ tests/api-deep/session-escalation-deep.test.ts:149:76
+    147|     expect([200, 201], `change-password: ${change.response.status} ${J…
+    148|     const after = await raw(ctx, LIST.dairy, { token });
+    149|     expect(after.response.status, 'pre-password-change token still wor…
+       |                                                                            ^
+    150|     const uid = (await findUserId('dairy', ctx, username)) || idOf(cre…
+    151|     if (uid) await deleteUser('dairy', ctx, uid);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[47/127]⎯
+
+ FAIL  tests/api-deep/telegram-bot-deep.test.ts > ROUND 15: telegram bot write-path > bot expense amounts are bounded (no crore-scale single message)
+AssertionError: bot accepted a 999,999,999 expense from one chat message: expected 1 to be +0 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 0[39m
+[31m+ 1[39m
+
+ ❯ tests/api-deep/telegram-bot-deep.test.ts:88:86
+     86|     await hook(900003, 'kharcha 999999999 uniquemarker-huge');
+     87|     const found = await expensesWith('uniquemarker-huge');
+     88|     expect(found.length, 'bot accepted a 999,999,999 expense from one …
+       |                                                                                      ^
+     89|   });
+     90| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[48/127]⎯
+
+ FAIL  tests/api-deep/timing-reset-auto-deep.test.ts > ROUND 7: timing, reset, auto-backup, cookies > dairy: session cookie (if issued) is HttpOnly + SameSite
+ FAIL  tests/api-deep/timing-reset-auto-deep.test.ts > ROUND 7: timing, reset, auto-backup, cookies > flock: session cookie (if issued) is HttpOnly + SameSite
+ FAIL  tests/api-deep/timing-reset-auto-deep.test.ts > ROUND 7: timing, reset, auto-backup, cookies > agri: session cookie (if issued) is HttpOnly + SameSite
+AssertionError: expected 429 to be 200 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 200[39m
+[31m+ 429[39m
+
+ ❯ tests/api-deep/timing-reset-auto-deep.test.ts:46:26
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[49/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > crops > rejects empty body and missing required fields
+AssertionError: crops empty body: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:112:134
+    110| 
+    111|       it('rejects empty body and missing required fields', async () =>…
+    112|         expect((await raw(ctx, res.base, { method: 'POST', token: ctx.…
+       |                                                                                                                                      ^
+    113|         for (const field of res.required) {
+    114|           const body = res.valid();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[50/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > crops > rejects negative / string / huge numbers
+AssertionError: crops.area_acres negative: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:126:72
+    124|           for (const [label, value] of [['negative', -5], ['string', '…
+    125|             const r = await raw(ctx, res.base, { method: 'POST', token…
+    126|             expect(r.response.status, `${res.name}.${field} ${label}`)…
+       |                                                                        ^
+    127|             if (r.response.status === 201) await raw(ctx, `${res.base}…
+    128|           }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[51/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > crops > rejects oversized strings; does not store script verbatim
+AssertionError: crops.name 10k chars: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:136:76
+    134|         if (!textField) return;
+    135|         const long = await raw(ctx, res.base, { method: 'POST', token:…
+    136|         expect(long.response.status, `${res.name}.${textField} 10k cha…
+       |                                                                            ^
+    137|         if (long.response.status === 201) await raw(ctx, `${res.base}/…
+    138| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[52/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > crops > update rejects invalid values too
+AssertionError: crops update area_acres negative: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:153:77
+    151|         for (const field of res.numeric) {
+    152|           const r = await raw(ctx, `${res.base}/${id}`, { method: res.…
+    153|           expect(r.response.status, `${res.name} update ${field} negat…
+       |                                                                             ^
+    154|         }
+    155|         const bad = await raw(ctx, `${res.base}/${id}`, { method: res.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[53/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > tasks > rejects empty body and missing required fields
+AssertionError: tasks empty body: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:112:134
+    110| 
+    111|       it('rejects empty body and missing required fields', async () =>…
+    112|         expect((await raw(ctx, res.base, { method: 'POST', token: ctx.…
+       |                                                                                                                                      ^
+    113|         for (const field of res.required) {
+    114|           const body = res.valid();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[54/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > tasks > rejects oversized strings; does not store script verbatim
+AssertionError: tasks.title 10k chars: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:136:76
+    134|         if (!textField) return;
+    135|         const long = await raw(ctx, res.base, { method: 'POST', token:…
+    136|         expect(long.response.status, `${res.name}.${textField} 10k cha…
+       |                                                                            ^
+    137|         if (long.response.status === 201) await raw(ctx, `${res.base}/…
+    138| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[55/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > tasks > update rejects invalid values too
+AssertionError: tasks empty update: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:156:65
+    154|         }
+    155|         const bad = await raw(ctx, `${res.base}/${id}`, { method: res.…
+    156|         expect(bad.response.status, `${res.name} empty update`).toBe(4…
+       |                                                                 ^
+    157|         await raw(ctx, `${res.base}/${id}`, { method: 'DELETE', token:…
+    158|       });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[56/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > finance > rejects empty body and missing required fields
+AssertionError: finance empty body: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:112:134
+    110| 
+    111|       it('rejects empty body and missing required fields', async () =>…
+    112|         expect((await raw(ctx, res.base, { method: 'POST', token: ctx.…
+       |                                                                                                                                      ^
+    113|         for (const field of res.required) {
+    114|           const body = res.valid();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[57/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > finance > rejects negative / string / huge numbers
+AssertionError: finance.amount negative: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:126:72
+    124|           for (const [label, value] of [['negative', -5], ['string', '…
+    125|             const r = await raw(ctx, res.base, { method: 'POST', token…
+    126|             expect(r.response.status, `${res.name}.${field} ${label}`)…
+       |                                                                        ^
+    127|             if (r.response.status === 201) await raw(ctx, `${res.base}…
+    128|           }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[58/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > finance > rejects oversized strings; does not store script verbatim
+AssertionError: finance.date 10k chars: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:136:76
+    134|         if (!textField) return;
+    135|         const long = await raw(ctx, res.base, { method: 'POST', token:…
+    136|         expect(long.response.status, `${res.name}.${textField} 10k cha…
+       |                                                                            ^
+    137|         if (long.response.status === 201) await raw(ctx, `${res.base}/…
+    138| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[59/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > finance > update rejects invalid values too
+AssertionError: finance update amount negative: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:153:77
+    151|         for (const field of res.numeric) {
+    152|           const r = await raw(ctx, `${res.base}/${id}`, { method: res.…
+    153|           expect(r.response.status, `${res.name} update ${field} negat…
+       |                                                                             ^
+    154|         }
+    155|         const bad = await raw(ctx, `${res.base}/${id}`, { method: res.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[60/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > inventory > full CRUD: create → update → delete → gone
+AssertionError: double-delete inventory: expected 200 to be 404 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 404[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:108:71
+    106|         expect(rowsOf(after.data).some((r: any) => String(r._id || r.i…
+    107|         const delAgain = await raw(ctx, `${res.base}/${id}`, { method:…
+    108|         expect(delAgain.response.status, `double-delete ${res.name}`).…
+       |                                                                       ^
+    109|       });
+    110| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[61/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > inventory > rejects empty body and missing required fields
+AssertionError: inventory empty body: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:112:134
+    110| 
+    111|       it('rejects empty body and missing required fields', async () =>…
+    112|         expect((await raw(ctx, res.base, { method: 'POST', token: ctx.…
+       |                                                                                                                                      ^
+    113|         for (const field of res.required) {
+    114|           const body = res.valid();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[62/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > inventory > rejects negative / string / huge numbers
+AssertionError: inventory.quantity negative: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:126:72
+    124|           for (const [label, value] of [['negative', -5], ['string', '…
+    125|             const r = await raw(ctx, res.base, { method: 'POST', token…
+    126|             expect(r.response.status, `${res.name}.${field} ${label}`)…
+       |                                                                        ^
+    127|             if (r.response.status === 201) await raw(ctx, `${res.base}…
+    128|           }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[63/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > inventory > rejects oversized strings; does not store script verbatim
+AssertionError: inventory.name 10k chars: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:136:76
+    134|         if (!textField) return;
+    135|         const long = await raw(ctx, res.base, { method: 'POST', token:…
+    136|         expect(long.response.status, `${res.name}.${textField} 10k cha…
+       |                                                                            ^
+    137|         if (long.response.status === 201) await raw(ctx, `${res.base}/…
+    138| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[64/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > inventory > update rejects invalid values too
+AssertionError: inventory update quantity negative: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:153:77
+    151|         for (const field of res.numeric) {
+    152|           const r = await raw(ctx, `${res.base}/${id}`, { method: res.…
+    153|           expect(r.response.status, `${res.name} update ${field} negat…
+       |                                                                             ^
+    154|         }
+    155|         const bad = await raw(ctx, `${res.base}/${id}`, { method: res.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[65/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > suppliers > full CRUD: create → update → delete → gone
+AssertionError: double-delete suppliers: expected 200 to be 404 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 404[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:108:71
+    106|         expect(rowsOf(after.data).some((r: any) => String(r._id || r.i…
+    107|         const delAgain = await raw(ctx, `${res.base}/${id}`, { method:…
+    108|         expect(delAgain.response.status, `double-delete ${res.name}`).…
+       |                                                                       ^
+    109|       });
+    110| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[66/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > suppliers > rejects empty body and missing required fields
+AssertionError: suppliers empty body: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:112:134
+    110| 
+    111|       it('rejects empty body and missing required fields', async () =>…
+    112|         expect((await raw(ctx, res.base, { method: 'POST', token: ctx.…
+       |                                                                                                                                      ^
+    113|         for (const field of res.required) {
+    114|           const body = res.valid();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[67/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > suppliers > rejects oversized strings; does not store script verbatim
+AssertionError: suppliers.name 10k chars: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:136:76
+    134|         if (!textField) return;
+    135|         const long = await raw(ctx, res.base, { method: 'POST', token:…
+    136|         expect(long.response.status, `${res.name}.${textField} 10k cha…
+       |                                                                            ^
+    137|         if (long.response.status === 201) await raw(ctx, `${res.base}/…
+    138| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[68/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > suppliers > update rejects invalid values too
+AssertionError: suppliers empty update: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:156:65
+    154|         }
+    155|         const bad = await raw(ctx, `${res.base}/${id}`, { method: res.…
+    156|         expect(bad.response.status, `${res.name} empty update`).toBe(4…
+       |                                                                 ^
+    157|         await raw(ctx, `${res.base}/${id}`, { method: 'DELETE', token:…
+    158|       });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[69/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > liabilities > full CRUD: create → update → delete → gone
+AssertionError: double-delete liabilities: expected 200 to be 404 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 404[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:108:71
+    106|         expect(rowsOf(after.data).some((r: any) => String(r._id || r.i…
+    107|         const delAgain = await raw(ctx, `${res.base}/${id}`, { method:…
+    108|         expect(delAgain.response.status, `double-delete ${res.name}`).…
+       |                                                                       ^
+    109|       });
+    110| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[70/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > liabilities > rejects empty body and missing required fields
+AssertionError: liabilities empty body: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:112:134
+    110| 
+    111|       it('rejects empty body and missing required fields', async () =>…
+    112|         expect((await raw(ctx, res.base, { method: 'POST', token: ctx.…
+       |                                                                                                                                      ^
+    113|         for (const field of res.required) {
+    114|           const body = res.valid();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[71/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > liabilities > rejects negative / string / huge numbers
+AssertionError: liabilities.amount_owed negative: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:126:72
+    124|           for (const [label, value] of [['negative', -5], ['string', '…
+    125|             const r = await raw(ctx, res.base, { method: 'POST', token…
+    126|             expect(r.response.status, `${res.name}.${field} ${label}`)…
+       |                                                                        ^
+    127|             if (r.response.status === 201) await raw(ctx, `${res.base}…
+    128|           }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[72/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > liabilities > rejects oversized strings; does not store script verbatim
+AssertionError: liabilities.creditor 10k chars: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:136:76
+    134|         if (!textField) return;
+    135|         const long = await raw(ctx, res.base, { method: 'POST', token:…
+    136|         expect(long.response.status, `${res.name}.${textField} 10k cha…
+       |                                                                            ^
+    137|         if (long.response.status === 201) await raw(ctx, `${res.base}/…
+    138| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[73/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > liabilities > update rejects invalid values too
+AssertionError: liabilities update amount_owed negative: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:153:77
+    151|         for (const field of res.numeric) {
+    152|           const r = await raw(ctx, `${res.base}/${id}`, { method: res.…
+    153|           expect(r.response.status, `${res.name} update ${field} negat…
+       |                                                                             ^
+    154|         }
+    155|         const bad = await raw(ctx, `${res.base}/${id}`, { method: res.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[74/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > laborers > rejects negative / string / huge numbers
+AssertionError: laborers.daily_wage negative: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:126:72
+    124|           for (const [label, value] of [['negative', -5], ['string', '…
+    125|             const r = await raw(ctx, res.base, { method: 'POST', token…
+    126|             expect(r.response.status, `${res.name}.${field} ${label}`)…
+       |                                                                        ^
+    127|             if (r.response.status === 201) await raw(ctx, `${res.base}…
+    128|           }
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[75/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > laborers > rejects oversized strings; does not store script verbatim
+AssertionError: laborers.name 10k chars: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:136:76
+    134|         if (!textField) return;
+    135|         const long = await raw(ctx, res.base, { method: 'POST', token:…
+    136|         expect(long.response.status, `${res.name}.${textField} 10k cha…
+       |                                                                            ^
+    137|         if (long.response.status === 201) await raw(ctx, `${res.base}/…
+    138| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[76/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > laborers > update rejects invalid values too
+AssertionError: laborers update daily_wage negative: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:153:77
+    151|         for (const field of res.numeric) {
+    152|           const r = await raw(ctx, `${res.base}/${id}`, { method: res.…
+    153|           expect(r.response.status, `${res.name} update ${field} negat…
+       |                                                                             ^
+    154|         }
+    155|         const bad = await raw(ctx, `${res.base}/${id}`, { method: res.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[77/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > crops: rejects bad status enum and bad plant_date on create and update
+AssertionError: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:170:166
+    168| 
+    169|   it('crops: rejects bad status enum and bad plant_date on create and …
+    170|     expect((await raw(ctx, '/crops', { method: 'POST', token: ctx.owne…
+       |                                                                                                                                                                      ^
+    171|     expect((await raw(ctx, '/crops', { method: 'POST', token: ctx.owne…
+    172|     const ok = await raw(ctx, '/crops', { method: 'POST', token: ctx.o…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[78/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > tasks: rejects bad priority enum
+AssertionError: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:179:145
+    177| 
+    178|   it('tasks: rejects bad priority enum', async () => {
+    179|     expect((await raw(ctx, '/tasks', { method: 'POST', token: ctx.owne…
+       |                                                                                                                                                 ^
+    180|   });
+    181| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[79/127]⎯
+
+ FAIL  tests/api-matrix/agri.api-matrix.test.ts > Agri API field matrix > crop logs: irrigation/spray validation + ghost crop
+AssertionError: spray negative quantity: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/agri.api-matrix.test.ts:196:182
+    194|     expect(spray.response.status).toBe(201);
+    195|     const sprayId = idOf(spray.data);
+    196|     expect((await raw(ctx, '/spray', { method: 'POST', token: ctx.owne…
+       |                                                                                                                                                                                      ^
+    197|     expect((await raw(ctx, `/spray/${sprayId}`, { method: 'DELETE', to…
+    198|   });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[80/127]⎯
+
+ FAIL  tests/api-matrix/backup-import-export.test.ts > Backup / import / export (all apps) > dairy > export → restore into a fresh instance round-trips the marker record
+ FAIL  tests/api-matrix/backup-import-export.test.ts > Backup / import / export (all apps) > flock > export → restore into a fresh instance round-trips the marker record
+ FAIL  tests/api-matrix/backup-import-export.test.ts > Backup / import / export (all apps) > agri > export → restore into a fresh instance round-trips the marker record
+Error: Test timed out in 5000ms.
+If this is a long-running test, pass a timeout value as the last argument or configure it globally with "testTimeout".
+ ❯ tests/api-matrix/backup-import-export.test.ts:59:7
+     57|       });
+     58| 
+     59|       it('export → restore into a fresh instance round-trips the marke…
+       |       ^
+     60|         const ctx = apps[name];
+     61|         // Plant a unique marker record through the normal API first.
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[81/127]⎯
+
+ FAIL  tests/api-matrix/backup-import-export.test.ts > Backup / import / export (all apps) > flock > junk restore is rejected and data survives
+AssertionError: flock junk restore {}: expected 404 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 404[39m
+
+ ❯ tests/api-matrix/backup-import-export.test.ts:51:98
+     49|         for (const junk of [{}, { backup: 'nope' }, { version: 999 }, …
+     50|           const r = await raw(ctx, restorePath, { method: 'POST', toke…
+     51|           expect(r.response.status, `${name} junk restore ${JSON.strin…
+       |                                                                                                  ^
+     52|         }
+     53|         const worker = await raw(ctx, restorePath, { method: 'POST', t…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[82/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > cows > rejects huge numbers and oversized strings
+AssertionError: cows.ageYears huge: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:129:69
+    127|         for (const field of res.numeric) {
+    128|           const huge = await raw(ctx, res.base, { method: 'POST', toke…
+    129|           expect(huge.response.status, `${res.name}.${field} huge`).to…
+       |                                                                     ^
+    130|         }
+    131|         const textField = res.required.find((f) => typeof res.valid()[…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[83/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > cows > does not store script payloads verbatim
+AssertionError: cows.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'
+
+Expected: [32m"<script>"[39m
+Received: [31m"<script>[7malert(1)</script>[27m"[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:146:83
+    144|           const one = await raw(ctx, `${res.base}/${id}`, { token: ctx…
+    145|           const stored = String(one.data?.[textField] ?? created.data?…
+    146|           expect(stored, `${res.name}.${textField} stores <script> ver…
+       |                                                                                   ^
+    147|           await raw(ctx, `${res.base}/${id}`, { method: 'DELETE', toke…
+    148|         } else {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[84/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > milk > full CRUD: create → read → update → delete → 404
+AssertionError: double-delete milk: expected 200 to be 404 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 404[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:104:71
+    102|         expect(gone.response.status, `read-after-delete ${res.name}`).…
+    103|         const delAgain = await raw(ctx, `${res.base}/${id}`, { method:…
+    104|         expect(delAgain.response.status, `double-delete ${res.name}`).…
+       |                                                                       ^
+    105|       });
+    106| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[85/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > milk > rejects huge numbers and oversized strings
+AssertionError: milk.morning huge: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:129:69
+    127|         for (const field of res.numeric) {
+    128|           const huge = await raw(ctx, res.base, { method: 'POST', toke…
+    129|           expect(huge.response.status, `${res.name}.${field} huge`).to…
+       |                                                                     ^
+    130|         }
+    131|         const textField = res.required.find((f) => typeof res.valid()[…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[86/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > expenses > rejects huge numbers and oversized strings
+AssertionError: expenses.amount huge: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:129:69
+    127|         for (const field of res.numeric) {
+    128|           const huge = await raw(ctx, res.base, { method: 'POST', toke…
+    129|           expect(huge.response.status, `${res.name}.${field} huge`).to…
+       |                                                                     ^
+    130|         }
+    131|         const textField = res.required.find((f) => typeof res.valid()[…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[87/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > health > full CRUD: create → read → update → delete → 404
+AssertionError: double-delete health: expected 200 to be 404 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 404[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:104:71
+    102|         expect(gone.response.status, `read-after-delete ${res.name}`).…
+    103|         const delAgain = await raw(ctx, `${res.base}/${id}`, { method:…
+    104|         expect(delAgain.response.status, `double-delete ${res.name}`).…
+       |                                                                       ^
+    105|       });
+    106| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[88/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > health > rejects huge numbers and oversized strings
+AssertionError: health.cost huge: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:129:69
+    127|         for (const field of res.numeric) {
+    128|           const huge = await raw(ctx, res.base, { method: 'POST', toke…
+    129|           expect(huge.response.status, `${res.name}.${field} huge`).to…
+       |                                                                     ^
+    130|         }
+    131|         const textField = res.required.find((f) => typeof res.valid()[…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[89/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > buyers > full CRUD: create → read → update → delete → 404
+AssertionError: double-delete buyers: expected 200 to be 404 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 404[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:104:71
+    102|         expect(gone.response.status, `read-after-delete ${res.name}`).…
+    103|         const delAgain = await raw(ctx, `${res.base}/${id}`, { method:…
+    104|         expect(delAgain.response.status, `double-delete ${res.name}`).…
+       |                                                                       ^
+    105|       });
+    106| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[90/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > buyers > rejects huge numbers and oversized strings
+AssertionError: buyers.name 10k chars: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:134:78
+    132|         if (textField) {
+    133|           const long = await raw(ctx, res.base, { method: 'POST', toke…
+    134|           expect(long.response.status, `${res.name}.${textField} 10k c…
+       |                                                                              ^
+    135|         }
+    136|       });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[91/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > buyers > does not store script payloads verbatim
+AssertionError: buyers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'
+
+Expected: [32m"<script>"[39m
+Received: [31m"<script>[7malert(1)</script>[27m"[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:146:83
+    144|           const one = await raw(ctx, `${res.base}/${id}`, { token: ctx…
+    145|           const stored = String(one.data?.[textField] ?? created.data?…
+    146|           expect(stored, `${res.name}.${textField} stores <script> ver…
+       |                                                                                   ^
+    147|           await raw(ctx, `${res.base}/${id}`, { method: 'DELETE', toke…
+    148|         } else {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[92/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > suppliers > full CRUD: create → read → update → delete → 404
+AssertionError: double-delete suppliers: expected 200 to be 404 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 404[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:104:71
+    102|         expect(gone.response.status, `read-after-delete ${res.name}`).…
+    103|         const delAgain = await raw(ctx, `${res.base}/${id}`, { method:…
+    104|         expect(delAgain.response.status, `double-delete ${res.name}`).…
+       |                                                                       ^
+    105|       });
+    106| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[93/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > suppliers > rejects huge numbers and oversized strings
+AssertionError: suppliers.name 10k chars: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:134:78
+    132|         if (textField) {
+    133|           const long = await raw(ctx, res.base, { method: 'POST', toke…
+    134|           expect(long.response.status, `${res.name}.${textField} 10k c…
+       |                                                                              ^
+    135|         }
+    136|       });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[94/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > suppliers > does not store script payloads verbatim
+AssertionError: suppliers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'
+
+Expected: [32m"<script>"[39m
+Received: [31m"<script>[7malert(1)</script>[27m"[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:146:83
+    144|           const one = await raw(ctx, `${res.base}/${id}`, { token: ctx…
+    145|           const stored = String(one.data?.[textField] ?? created.data?…
+    146|           expect(stored, `${res.name}.${textField} stores <script> ver…
+       |                                                                                   ^
+    147|           await raw(ctx, `${res.base}/${id}`, { method: 'DELETE', toke…
+    148|         } else {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[95/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > labor workers > rejects huge numbers and oversized strings
+AssertionError: labor workers.dailyWage huge: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:129:69
+    127|         for (const field of res.numeric) {
+    128|           const huge = await raw(ctx, res.base, { method: 'POST', toke…
+    129|           expect(huge.response.status, `${res.name}.${field} huge`).to…
+       |                                                                     ^
+    130|         }
+    131|         const textField = res.required.find((f) => typeof res.valid()[…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[96/127]⎯
+
+ FAIL  tests/api-matrix/dairy.api-matrix.test.ts > Dairy API field matrix > labor workers > does not store script payloads verbatim
+AssertionError: labor workers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'
+
+Expected: [32m"<script>"[39m
+Received: [31m"<script>[7malert(1)</script>[27m"[39m
+
+ ❯ tests/api-matrix/dairy.api-matrix.test.ts:146:83
+    144|           const one = await raw(ctx, `${res.base}/${id}`, { token: ctx…
+    145|           const stored = String(one.data?.[textField] ?? created.data?…
+    146|           expect(stored, `${res.name}.${textField} stores <script> ver…
+       |                                                                                   ^
+    147|           await raw(ctx, `${res.base}/${id}`, { method: 'DELETE', toke…
+    148|         } else {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[97/127]⎯
+
+ FAIL  tests/api-matrix/flock.api-matrix.test.ts > Flock API field matrix > batches > rejects empty/missing/bad-enum/negative/huge/oversized input
+AssertionError: bad date: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/flock.api-matrix.test.ts:51:158
+     49|       }
+     50|       expect((await raw(ctx, '/batches', { method: 'POST', token: ctx.…
+     51|       expect((await raw(ctx, '/batches', { method: 'POST', token: ctx.…
+       |                                                                                                                                                              ^
+     52|       expect((await raw(ctx, '/batches', { method: 'POST', token: ctx.…
+     53|       expect((await raw(ctx, '/batches', { method: 'POST', token: ctx.…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[98/127]⎯
+
+ FAIL  tests/api-matrix/flock.api-matrix.test.ts > Flock API field matrix > batches > update validation: PATCH rejects bad enum / negative numbers
+AssertionError: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/flock.api-matrix.test.ts:78:133
+     76|       batchId = id;
+     77|       expect((await raw(ctx, `/batches/${id}`, { method: 'PATCH', toke…
+     78|       expect((await raw(ctx, `/batches/${id}`, { method: 'PATCH', toke…
+       |                                                                                                                                     ^
+     79|       expect((await raw(ctx, '/batches/nope', { token: ctx.owner })).r…
+     80|     });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[99/127]⎯
+
+ FAIL  tests/api-matrix/flock.api-matrix.test.ts > Flock API field matrix > batch logs (all kinds) > vaccination: create → invalid rejected → delete → gone
+AssertionError: vaccination negative value: expected 201 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 201[39m
+
+ ❯ tests/api-matrix/flock.api-matrix.test.ts:101:65
+     99|         expect(logId).toBeTruthy();
+    100|         const bad = await raw(ctx, `/batches/${batchId}/${k.path}`, { …
+    101|         expect(bad.response.status, `${k.kind} negative value`).toBe(4…
+       |                                                                 ^
+    102|         const empty = await raw(ctx, `/batches/${batchId}/${k.path}`, …
+    103|         expect(empty.response.status, `${k.kind} empty body`).toBe(400…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[100/127]⎯
+
+ FAIL  tests/api-matrix/flock.api-matrix.test.ts > Flock API field matrix > /data buckets > birds: round-trip works; wrong-type value rejected
+AssertionError: birds accepts plain-string value: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/flock.api-matrix.test.ts:142:76
+    140|         expect(put.response.status, `valid PUT ${key}`).toBe(200);
+    141|         const wrong = await raw(ctx, `/data/${key}`, { method: 'PUT', …
+    142|         expect(wrong.response.status, `${key} accepts plain-string val…
+       |                                                                            ^
+    143|         // restore whatever the wrong-type write may have landed
+    144|         const now = await raw(ctx, `/data/${key}`, { token: ctx.owner …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[101/127]⎯
+
+ FAIL  tests/api-matrix/flock.api-matrix.test.ts > Flock API field matrix > /data buckets > eggs: round-trip works; wrong-type value rejected
+AssertionError: eggs accepts plain-string value: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/flock.api-matrix.test.ts:142:76
+    140|         expect(put.response.status, `valid PUT ${key}`).toBe(200);
+    141|         const wrong = await raw(ctx, `/data/${key}`, { method: 'PUT', …
+    142|         expect(wrong.response.status, `${key} accepts plain-string val…
+       |                                                                            ^
+    143|         // restore whatever the wrong-type write may have landed
+    144|         const now = await raw(ctx, `/data/${key}`, { token: ctx.owner …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[102/127]⎯
+
+ FAIL  tests/api-matrix/flock.api-matrix.test.ts > Flock API field matrix > /data buckets > feed: round-trip works; wrong-type value rejected
+AssertionError: feed accepts plain-string value: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/flock.api-matrix.test.ts:142:76
+    140|         expect(put.response.status, `valid PUT ${key}`).toBe(200);
+    141|         const wrong = await raw(ctx, `/data/${key}`, { method: 'PUT', …
+    142|         expect(wrong.response.status, `${key} accepts plain-string val…
+       |                                                                            ^
+    143|         // restore whatever the wrong-type write may have landed
+    144|         const now = await raw(ctx, `/data/${key}`, { token: ctx.owner …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[103/127]⎯
+
+ FAIL  tests/api-matrix/flock.api-matrix.test.ts > Flock API field matrix > /data buckets > settings: round-trip works; wrong-type value rejected
+AssertionError: settings accepts plain-string value: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/flock.api-matrix.test.ts:142:76
+    140|         expect(put.response.status, `valid PUT ${key}`).toBe(200);
+    141|         const wrong = await raw(ctx, `/data/${key}`, { method: 'PUT', …
+    142|         expect(wrong.response.status, `${key} accepts plain-string val…
+       |                                                                            ^
+    143|         // restore whatever the wrong-type write may have landed
+    144|         const now = await raw(ctx, `/data/${key}`, { token: ctx.owner …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[104/127]⎯
+
+ FAIL  tests/api-matrix/flock.api-matrix.test.ts > Flock API field matrix > /data buckets > diary: round-trip works; wrong-type value rejected
+AssertionError: diary accepts plain-string value: expected 200 to be 400 // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- 400[39m
+[31m+ 200[39m
+
+ ❯ tests/api-matrix/flock.api-matrix.test.ts:142:76
+    140|         expect(put.response.status, `valid PUT ${key}`).toBe(200);
+    141|         const wrong = await raw(ctx, `/data/${key}`, { method: 'PUT', …
+    142|         expect(wrong.response.status, `${key} accepts plain-string val…
+       |                                                                            ^
+    143|         // restore whatever the wrong-type write may have landed
+    144|         const now = await raw(ctx, `/data/${key}`, { token: ctx.owner …
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[105/127]⎯
+
+ FAIL  tests/toolchain/fastcheck-invariants.test.ts > TOOLCHAIN fast-check invariants > P1: agri inventory quantity is never negative after any PUT quantity
+Error: Property failed after 2 tests
+{ seed: -1478825653, path: "1:1:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0", endOnFailure: true }
+Counterexample: [-1]
+Shrunk 16 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ asyncThrowIfFailed node_modules/fast-check/lib/fast-check.js:2481:8
+
+Caused by: AssertionError: quantity became -1 after PUT -1: expected -1 to be greater than or equal to 0
+ ❯ tests/toolchain/fastcheck-invariants.test.ts:28:88
+ ❯ AsyncProperty.run node_modules/fast-check/lib/fast-check.js:1217:19
+ ❯ asyncPropertyExecution node_modules/fast-check/lib/fast-check.js:2564:14
+ ❯ asyncRunIt node_modules/fast-check/lib/fast-check.js:2557:15
+ ❯ tests/toolchain/fastcheck-invariants.test.ts:24:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[106/127]⎯
+
+ FAIL  tests/toolchain/fastcheck-invariants.test.ts > TOOLCHAIN fast-check invariants > P2: agri liability amount_owed is never negative after any create amount
+Error: Property failed after 1 tests
+{ seed: -251847124, path: "0:1:0", endOnFailure: true }
+Counterexample: [-1]
+Shrunk 2 time(s)
+
+Hint: Enable verbose mode in order to have the list of all failing values encountered during the run
+ ❯ buildError node_modules/fast-check/lib/fast-check.js:2469:16
+ ❯ asyncThrowIfFailed node_modules/fast-check/lib/fast-check.js:2481:8
+
+Caused by: AssertionError: negative liability -1 stored: expected -1 to be greater than or equal to 0
+ ❯ tests/toolchain/fastcheck-invariants.test.ts:38:91
+ ❯ AsyncProperty.run node_modules/fast-check/lib/fast-check.js:1217:19
+ ❯ asyncPropertyExecution node_modules/fast-check/lib/fast-check.js:2564:14
+ ❯ asyncRunIt node_modules/fast-check/lib/fast-check.js:2557:15
+ ❯ tests/toolchain/fastcheck-invariants.test.ts:33:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[107/127]⎯
+
+ FAIL  tests/toolchain/security-scan.test.ts > TOOLCHAIN security scan > dairy: API responses carry CSP + nosniff + frame protection
+ FAIL  tests/toolchain/security-scan.test.ts > TOOLCHAIN security scan > agri: API responses carry CSP + nosniff + frame protection
+AssertionError: missing CSP: expected null to be truthy
+
+[32m- Expected:[39m 
+true
+
+[31m+ Received:[39m 
+null
+
+ ❯ tests/toolchain/security-scan.test.ts:23:63
+     21|       const r = await raw(apps[n], '/farms', { token: apps[n].owner });
+     22|       const h = r.response.headers;
+     23|       expect(h.get('content-security-policy'), 'missing CSP').toBeTrut…
+       |                                                               ^
+     24|       expect(h.get('x-content-type-options'), 'missing nosniff').toBe(…
+     25|       const frame = h.get('x-frame-options') || h.get('content-securit…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[108/127]⎯
+
+ FAIL  tests/toolchain/security-scan.test.ts > TOOLCHAIN security scan > dairy: authenticated responses are non-cacheable
+ FAIL  tests/toolchain/security-scan.test.ts > TOOLCHAIN security scan > flock: authenticated responses are non-cacheable
+ FAIL  tests/toolchain/security-scan.test.ts > TOOLCHAIN security scan > agri: authenticated responses are non-cacheable
+AssertionError: auth response cacheable: expected '' to match /no-store|private/i
+
+[32m- Expected:[39m 
+/no-store|private/i
+
+[31m+ Received:[39m 
+""
+
+ ❯ tests/toolchain/security-scan.test.ts:31:88
+     29|     it(`${n}: authenticated responses are non-cacheable`, async () => {
+     30|       const r = await raw(apps[n], '/farms', { token: apps[n].owner });
+     31|       expect(r.response.headers.get('cache-control') || '', 'auth resp…
+       |                                                                                        ^
+     32|     });
+     33| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[109/127]⎯
+
+ FAIL  tests/toolchain/security-scan.test.ts > TOOLCHAIN security scan > flock: CORS does not reflect arbitrary origins with credentials
+ FAIL  tests/toolchain/security-scan.test.ts > TOOLCHAIN security scan > agri: CORS does not reflect arbitrary origins with credentials
+AssertionError: CORS reflects evil origin with credentials (acao=https://evil.example.com acac=true): expected true to be false // Object.is equality
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- false[39m
+[31m+ true[39m
+
+ ❯ tests/toolchain/security-scan.test.ts:38:144
+     36|       const acao = res.headers.get('access-control-allow-origin');
+     37|       const acac = res.headers.get('access-control-allow-credentials');
+     38|       expect(acao === 'https://evil.example.com' && acac === 'true', `…
+       |                                                                                                                                                ^
+     39|     });
+     40| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[110/127]⎯
+
+
+ Test Files  30 failed | 20 passed (50)
+      Tests  127 failed | 347 passed (474)
+   Start at  19:06:16
+   Duration  399.21s (transform 1.42s, setup 0ms, collect 3.61s, tests 729.33s, environment 59ms, prepare 13.44s)
+
+
+RUNNER EXIT=1 TIMEOUT=False SECONDS=400.99

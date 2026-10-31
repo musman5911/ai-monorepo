@@ -1,0 +1,79 @@
+[
+  {
+    "file": "tests/round3/phase1-dynamic.mjs",
+    "reason": "Source export has no Git metadata; use recorded upstream revision; relocate obsolete absolute path",
+    "before_sha256": "ec69a0d042fe635192c5443ca6030a04d2f934eec241bbd13e46c174ba6558b9"
+  },
+  {
+    "file": "tests/round3/build-full-specs.mjs",
+    "reason": "Source export has no Git metadata; use recorded upstream revision; relocate obsolete absolute path",
+    "before_sha256": "1200f2c704f30440e6dc6cfa569a6dfb750caa0018a9e17e99526c4faf89a87a"
+  },
+  {
+    "file": "tests/round3/run-schemathesis-full.mjs",
+    "reason": "Source export has no Git metadata; use recorded upstream revision; relocate obsolete absolute path",
+    "before_sha256": "106850c9e4578d85c7616197a7af7b40c5930d512c13f940ef4ff092c85a7db9"
+  },
+  {
+    "file": "tests/round3/phase1b-prod-proxy-cards.mjs",
+    "reason": "Source export has no Git metadata; use recorded upstream revision; relocate obsolete absolute path",
+    "before_sha256": "0cf282a3cc41690f2a7da49dee4aacdbbf8246b7d1948129c607281b77959e7e"
+  },
+  {
+    "file": "tests/round3/phase1c-protocol-chaos-load.mjs",
+    "reason": "Source export has no Git metadata; use recorded upstream revision; relocate obsolete absolute path",
+    "before_sha256": "8d46bc0a05d98c6f15fdb445ebf5b094148154ca4f25edaba2d45e0e4b68b4d2"
+  },
+  {
+    "file": "tests/round3/fastcheck-commands.mjs",
+    "reason": "Source export has no Git metadata; use recorded upstream revision; relocate obsolete absolute path",
+    "before_sha256": "545636feff029d36d27b6a21a687336c1b45eb5bbe5b0c334550e92014e43b32"
+  },
+  {
+    "file": "tests/round3/phase1d-followups.mjs",
+    "reason": "Source export has no Git metadata; use recorded upstream revision; relocate obsolete absolute path",
+    "before_sha256": "96a9bd1d21bf2cd17a62065d702dbb0275d6a7406aa81299d3748d39a08b1854"
+  },
+  {
+    "file": "tests/round3/phase3-flock-cards-reverse.mjs",
+    "reason": "Source export has no Git metadata; use recorded upstream revision; relocate obsolete absolute path",
+    "before_sha256": "4b1d270592e1d602d6b81959d94374e6dc5a8f8374bfe775d5771c134d907677"
+  },
+  {
+    "file": "tests/round3/final-p1-rerun.mjs",
+    "reason": "Source export has no Git metadata; use recorded upstream revision; relocate obsolete absolute path",
+    "before_sha256": "e6db3e40cbf1fd044e2a20fe639831ee8f42c1de8f19c27e8a3e4878f7db3c70"
+  },
+  {
+    "file": "tests/round3/hypothesis_agri.py",
+    "reason": "Recorded revision in Git-free source export"
+  },
+  {
+    "file": "tests/round3/fastcheck-commands.mjs",
+    "reason": "Resolve fast-check through installed public package entry point"
+  },
+  {
+    "file": "tests/acceptance/_harness.mjs",
+    "reason": "Dairy /api/health is a protected health-record list, not readiness; poll /api/farms (200/401 only after startup gate), preserve login assertions; replace redacted default with split seeded demo password."
+  },
+  {
+    "file": "tests/acceptance/photos.test.mjs",
+    "reason": "Historical flock fixture incorrectly POSTed JSON to /api/images (404); use real multipart /api/uploads/image. P8 intended diary-path assertion must GET /api/photos/id, not /api/images/id. Earlier failing fixture was NOT proof of PH-F2/P8."
+  },
+  {
+    "file": "tests/round3/run-schemathesis-full.mjs",
+    "reason": "Initial owner/worker scans lacked tokens on Dairy/Flock due startup race. Reuse health-ready/retry login; initial runs retained as incomplete evidence."
+  },
+  {
+    "file": "tests/round3/final-p1-rerun.mjs",
+    "reason": "Old final Agri P1 script used Dairy login/logout paths and wrong liability field; correct test copy and rerun. Initial 401 not evidence of a fix."
+  },
+  {
+    "file": "tests/api-matrix/backup-import-export.test.ts",
+    "reason": "Flock restore route is /backup/restore, not Agri /restore. Initial Flock 404s were obsolete route assumptions, not app bugs."
+  },
+  {
+    "file": "tests/api-deep/frontend-contract-deep.test.ts",
+    "reason": "Static extractor ignored shared createYearlyArchiveRouter. Read actual shared router definitions; runtime archive checks already pass."
+  }
+]

@@ -1,0 +1,430 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND schemathesis run tests/toolchain/spec-agri.yaml --url http://127.0.0.1:22514/api -n 2 --workers 2 -H Authorization:Bearer <local-test-token>
+SETUP token acquired=true; specs identical to tests/round3/specs/spec-agri.yaml
+Schemathesis v4.32.7
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from tests/toolchain/spec-agri.yaml (in 0.39s)
+
+     Base URL:         http://127.0.0.1:22514/api
+     Specification:    Open API 3.0.3
+     Operations:       17 selected / 17 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ⏭   Examples (in 0.01s)
+
+     ⏭  17 skipped
+
+ ❌  Coverage (in 0.31s)
+
+     ❌ 17 failed
+
+ ❌  Fuzzing (in 0.69s)
+
+     ✅ 12 passed  ❌  5 failed
+
+=================================== FAILURES ===================================
+______________________________ DELETE /crops/{id} ______________________________
+1. Test Case ID: UhvWT5
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:22514/api/crops/5f2ee001f1bfe3bdb7168537
+
+    st replay UhvWT5
+
+2. Test Case ID: hgHAh8
+
+- ST103 Undocumented status code
+
+    Received: 404
+    Documented: 200
+
+[404] Not Found:
+
+    `{"detail":"Crop not found"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:22514/api/crops/5f2ee001f1bfe3bdb7168537
+
+    st replay hgHAh8
+
+____________________________ DELETE /inventory/{id} ____________________________
+1. Test Case ID: EtfKrz
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:22514/api/inventory/5f2ee001f1bfe3bdb7168537
+
+    st replay EtfKrz
+
+__________________________________ GET /crops __________________________________
+1. Test Case ID: 4UhhY2
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:22514/api/crops
+
+    st replay 4UhhY2
+
+_______________________________ GET /crops/{id} ________________________________
+1. Test Case ID: AGGDRk
+
+- ST103 Undocumented status code
+
+    Received: 404
+    Documented: 200
+
+[404] Not Found:
+
+    `{"detail":"API route not found: GET /crops/5f2ee001f1bfe3bdb7168537"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:22514/api/crops/5f2ee001f1bfe3bdb7168537
+
+    st replay AGGDRk
+
+_________________________________ GET /finance _________________________________
+1. Test Case ID: hTaWPF
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:22514/api/finance
+
+    st replay hTaWPF
+
+________________________________ GET /inventory ________________________________
+1. Test Case ID: 4beDZk
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:22514/api/inventory
+
+    st replay 4beDZk
+
+_______________________________ GET /liabilities _______________________________
+1. Test Case ID: lFU9cD
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:22514/api/liabilities
+
+    st replay lFU9cD
+
+________________________________ GET /suppliers ________________________________
+1. Test Case ID: czInQJ
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:22514/api/suppliers
+
+    st replay czInQJ
+
+__________________________________ GET /tasks __________________________________
+1. Test Case ID: gk8fvt
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:22514/api/tasks
+
+    st replay gk8fvt
+
+_________________________________ POST /crops __________________________________
+1. Test Case ID: puj953
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "status": "", "plant_date": "", "area_kanal": 0, "season": "", "field": ""}' http://127.0.0.1:22514/api/crops
+
+    st replay puj953
+
+________________________________ POST /finance _________________________________
+1. Test Case ID: lltgpE
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"type": "", "amount": 0, "category": "", "date": "", "description": ""}' http://127.0.0.1:22514/api/finance
+
+    st replay lltgpE
+
+_______________________________ POST /inventory ________________________________
+1. Test Case ID: k21akw
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "quantity": 0, "unit": "", "creditor": "", "amount_owed": 0}' http://127.0.0.1:22514/api/inventory
+
+    st replay k21akw
+
+______________________________ POST /liabilities _______________________________
+1. Test Case ID: DY3YS4
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "quantity": 0, "unit": "", "creditor": "", "amount_owed": 0}' http://127.0.0.1:22514/api/liabilities
+
+    st replay DY3YS4
+
+2. Test Case ID: zlsJvk
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 201
+
+[400] Bad Request:
+
+    `{"error":"Request body contains invalid JSON."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d $'\x00' http://127.0.0.1:22514/api/liabilities
+
+    st replay zlsJvk
+
+_______________________________ POST /suppliers ________________________________
+1. Test Case ID: L3l3D5
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "quantity": 0, "unit": "", "creditor": "", "amount_owed": 0}' http://127.0.0.1:22514/api/suppliers
+
+    st replay L3l3D5
+
+_________________________________ POST /tasks __________________________________
+1. Test Case ID: x0pZxQ
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"title": "", "status": "", "priority": "", "due_date": ""}' http://127.0.0.1:22514/api/tasks
+
+    st replay x0pZxQ
+
+_______________________________ PUT /crops/{id} ________________________________
+1. Test Case ID: 3xq1xQ
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Content-Type: application/json' -d '{"name": "", "status": "", "plant_date": "", "area_kanal": 0, "season": "", "field": ""}' http://127.0.0.1:22514/api/crops/5f2ee001f1bfe3bdb7168537
+
+    st replay 3xq1xQ
+
+2. Test Case ID: 2AesmM
+
+- ST103 Undocumented status code
+
+    Received: 404
+    Documented: 200
+
+[404] Not Found:
+
+    `{"detail":"Crop not found"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:22514/api/crops/5f2ee001f1bfe3bdb7168537
+
+    st replay 2AesmM
+
+_____________________________ PUT /inventory/{id} ______________________________
+1. Test Case ID: D1Oi6l
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"detail":"Invalid or expired authentication credentials"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Content-Type: application/json' -d '{"name": "", "quantity": 0, "unit": "", "creditor": "", "amount_owed": 0}' http://127.0.0.1:22514/api/inventory/5f2ee001f1bfe3bdb7168537
+
+    st replay D1Oi6l
+
+2. Test Case ID: 2kGbPG
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 200
+
+[400] Bad Request:
+
+    `{"error":"Request body contains invalid JSON."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d null http://127.0.0.1:22514/api/inventory/5f2ee001f1bfe3bdb7168537
+
+    st replay 2kGbPG
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 17/17
+  Tested: 17
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ ST103 Undocumented status code: 21
+
+For more information, run `st explain ST103`.
+
+Test cases:
+  62 generated, 21 found 21 unique failures, 24 skipped
+
+Seed: 227173366418297418058854763157840158808
+
+============================= 21 failures in 1.21s =============================
+
+
+EXIT=1 ERROR=

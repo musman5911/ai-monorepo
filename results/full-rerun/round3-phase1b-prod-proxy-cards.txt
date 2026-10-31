@@ -1,0 +1,646 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["node", "tests/round3/phase1b-prod-proxy-cards.mjs"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+git rev-parse HEAD: 2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+command: node tests/round3/phase1b-prod-proxy-cards.mjs
+
+=== TEST/MEMORY SERVERS + PROXY (for limiter/card tests) ===
+[dairy test stdout] [startup] PORT env=18401 -> listening on 18401
+[dairy test stdout] 🧠 In-memory store active (MEMORY_MODE=1) — no MongoDB connection.
+[dairy test stderr] (node:6942) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[dairy test stderr] (node:6942) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[dairy test stdout] Server running on port 18401
+dairy proxy listening 18501 -> 18401; proxy APPENDS ', 198.51.100.23' to X-Forwarded-For
+[dairy test stdout] 🌱 Demo data seeded (1 year): 16 animals, 3179 milk entries, 257 expenses, health, buyers, rates, sales, diary.
+🌱 Logins → admin / admin123   |   worker / worker123
+[dairy test stdout] [farms] tagged 16 Cow record(s)
+[dairy test stdout] [farms] tagged 4 BreedingEvent record(s)
+[dairy test stdout] [farms] tagged 3179 Milk record(s)
+[dairy test stdout] [farms] tagged 268 Expense record(s)
+[dairy test stdout] [farms] tagged 3 Laborer record(s)
+[dairy test stdout] [farms] tagged 782 LaborAttendance record(s)
+[dairy test stdout] [farms] tagged 2 LaborAdvance record(s)
+[farms] tagged 1 Rate record(s)
+[dairy test stdout] [farms] tagged 15 Health record(s)
+[dairy test stdout] [farms] tagged 3 Buyer record(s)
+[dairy test stdout] [farms] tagged 72 BuyerPayment record(s)
+[farms] tagged 2 Supplier record(s)
+[dairy test stdout] [farms] tagged 24 SupplierPayment record(s)
+[dairy test stdout] [farms] tagged 8 RateHistory record(s)
+[dairy test stdout] [farms] tagged 30 DailyLog record(s)
+[dairy test stdout] [farms] tagged 1 Sale record(s)
+[dairy test stdout] [farms] converted 1 admin account(s) to owner
+[farms] assigned 1 account(s) to the default farm
+[dairy test stdout] 💾 [Auto Backup] Saved auto-2026-10
+dairy ready=true ownerLogin=200 token=present
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 200 (240ms)
+[agri test stdout] [startup] PORT env=18402 -> listening on 18402
+[agri test stdout] 🧠 [Database] MEMORY_MODE=1 — using in-memory demo database (data is lost on restart).
+[agri test stdout] 🌱 [Demo] Seeding in-memory database with realistic demo farm data...
+[agri test stdout] 🌱 [Demo] Demo data seeded successfully.
+🌱 [Demo] Login -> admin / admin123  (or)  worker / worker123
+[agri test stdout] [farms] tagged 6 Crop record(s)
+[agri test stdout] [farms] tagged 56 Finance record(s)
+[agri test stdout] [farms] tagged 5 Task record(s)
+[agri test stdout] [farms] tagged 4 Inventory record(s)
+[agri test stdout] [farms] tagged 2 Liability record(s)
+[agri test stdout] [farms] tagged 15 Irrigation record(s)
+[agri test stdout] [farms] tagged 2 CropPhoto record(s)
+[agri test stdout] [farms] tagged 6 Spray record(s)
+[agri test stdout] [farms] tagged 2 Laborer record(s)
+[agri test stdout] [farms] tagged 574 Attendance record(s)
+[agri test stdout] [farms] tagged 2 LaborAdvance record(s)
+[farms] tagged 2 Supplier record(s)
+[agri test stdout] [farms] tagged 24 SupplierPayment record(s)
+[agri test stdout] [farms] converted 1 admin account(s) to owner
+[farms] assigned 1 account(s) to the default farm
+[agri test stdout] 👑 [Status] Administrator account verified.
+[agri test stdout] 💾 [Auto Backup] Saved auto-2026-10
+[agri test stdout] ⏰ [Cron Engine] Internal scheduler disabled (DISABLE_INTERNAL_SCHEDULER=1). Use an external cron to ping /cron/dispatch-report.
+[agri test stderr] (node:6955) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[agri test stderr] (node:6955) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[agri test stdout] Server running on port 18402
+agri proxy listening 18502 -> 18402; proxy APPENDS ', 198.51.100.23' to X-Forwarded-For
+[agri test stdout] [REQ] GET /api/farms auth=NO -> 401 (33ms)
+agri ready=true ownerLogin=200 token=present
+[agri test stdout] [REQ] POST /api/login auth=NO -> 200 (1253ms)
+[flock test stderr] ⚠️  MEMORY_DB mode: using in-process data store — all data is lost on restart. NEVER use in production.
+[flock test stdout] ◇ injected env (0) from .env // tip: ⌘ enable debugging { debug: true }
+[flock test stdout] [startup] PORT env=18403 -> listening on 18403
+[flock test stdout] 🧠 In-memory store active (MEMORY_MODE=1) — no MongoDB connection.
+[flock test stderr] (node:7086) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[flock test stderr] (node:7086) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[flock test stdout] 🐔 Flock Farm server running on port 18403
+flock proxy listening 18503 -> 18403; proxy APPENDS ', 198.51.100.23' to X-Forwarded-For
+[flock test stdout] 🌱 Demo data seeded (1 year): birds, feed, eggs, sales, batches, health, diary.
+[flock test stdout] 🌱 Logins → admin / admin123   |   worker / worker123
+[flock test stdout] [farms] tagged 16 DataStore record(s)
+[flock test stdout] [farms] tagged 2 Batch record(s)
+[flock test stdout] [farms] tagged 26 BatchFeedLog record(s)
+[flock test stdout] [farms] tagged 5 BatchMortalityLog record(s)
+[flock test stdout] [farms] tagged 5 BatchExpenseLog record(s)
+[flock test stdout] [farms] tagged 2 BatchSaleLog record(s)
+[flock test stdout] [farms] tagged 12 BatchWeightLog record(s)
+[flock test stdout] [farms] converted 1 admin account(s) to owner
+[flock test stdout] [farms] assigned 1 account(s) to the default farm
+[flock test stdout] 💾 [Auto Backup] Saved auto-2026-10
+flock ready=true ownerLogin=200 token=present
+
+=== LOGIN LIMITER: direct XFF spoof vs through appending proxy ===
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (391ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (353ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (269ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (297ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (289ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (327ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (297ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (280ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (290ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (283ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (167ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (283ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (207ms)
+dairy DIRECT changing-XFF wrong logins x14: 401,401,401,401,401,401,401,401,401,401,401,401,401,401 => NO 429 (spoof creates fresh bucket)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (173ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (201ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (167ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (231ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (193ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 401 (180ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 429 (5ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 429 (10ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 429 (8ms)
+[REQ] POST /api/auth/login auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 429 (0ms)
+dairy THROUGH PROXY changing client-supplied XFF x14 (proxy appends 198.51.100.23): 401,401,401,401,401,429,429,429,429,429,429,429,429,429 => limiter BLOCKS (appended proxy IP is trusted key)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (789ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (721ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (970ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (881ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (1074ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (1061ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (816ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (1026ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (1007ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (927ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (941ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (1062ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (801ms)
+agri DIRECT changing-XFF wrong logins x14: 401,401,401,401,401,401,401,401,401,401,401,401,401,401 => NO 429 (spoof creates fresh bucket)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (986ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (910ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (873ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (947ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (847ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (864ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (1067ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (983ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (1360ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (1123ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 401 (1098ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 429 (0ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 429 (1ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 429 (0ms)
+[agri test stdout] [REQ] POST /api/login auth=NO -> 429 (1ms)
+agri THROUGH PROXY changing client-supplied XFF x14 (proxy appends 198.51.100.23): 401,401,401,401,401,401,401,401,401,401,429,429,429,429 => limiter BLOCKS (appended proxy IP is trusted key)
+flock DIRECT changing-XFF wrong logins x14: 401,401,401,401,401,401,401,401,401,401,401,401,401,401 => NO 429 (spoof creates fresh bucket)
+flock THROUGH PROXY changing client-supplied XFF x14 (proxy appends 198.51.100.23): 401,401,401,401,401,401,401,401,401,401,429,429,429,429 => limiter BLOCKS (appended proxy IP is trusted key)
+
+=== CRON QUERY KEY IN LOGS (LOG_REQUESTS=1 servers above) ===
+agri cron wrong ?key request HTTP 401 body={"detail":"Invalid cron key."}
+[agri test stdout] [REQ] GET /api/cron/dispatch-report?key=CRONLOGSECRET123 auth=NO -> 401 (0ms)
+agri cron correct ?key request HTTP 200 body={"status":"skipped","reason":"Automation settings not configured yet (save them in the Admin panel)."}
+[agri test stdout] [REQ] GET /api/cron/dispatch-report?key=[SECURITY_DATA] auth=NO -> 200 (1ms)
+flock cron wrong ?key request HTTP 401 body={"error":"Unauthorized"}
+flock cron correct ?key request HTTP 503 body={"error":"DAILY_SUMMARY_EMAILS not configured"}
+^^ Search the [REQ] stdout lines above for key=[SECURITY_DATA] / CRONLOGSECRET123: if present verbatim, the query secret is written to server logs. Response bodies above show whether it is echoed (it is not in these bodies).
+
+=== CARDS: data returned, ID guessability, burst limiter direct vs proxy ===
+dairy buyer list /api/buyers HTTP 200 ids=b2,b3,b1
+[dairy test stdout] [REQ] GET /api/buyers auth=YES(len=223) -> 200 (5ms)
+dairy supplier list /api/suppliers HTTP 200 ids=sup1,sup2
+[dairy test stdout] [REQ] GET /api/suppliers auth=YES(len=223) -> 200 (13ms)
+dairy worker list /api/labor/workers HTTP 200 ids=lw-demo-1,lw-demo-2,lw-demo-3
+agri supplier list /api/suppliers HTTP 200 ids=244e737cb7b265d9c8dc4212,401126268a84155b2a59eec3
+[agri test stdout] [REQ] GET /api/suppliers auth=YES(len=224) -> 200 (2ms)
+agri worker list /api/laborers HTTP 200 ids=d1f2f112ae31707555df6aaa,b912308d34c9bd0173b57643
+[agri test stdout] [REQ] GET /api/laborers auth=YES(len=224) -> 200 (1ms)
+flock bucket customers HTTP 200 ids=1,2,3
+[dairy test stdout] [REQ] GET /api/labor/workers auth=YES(len=223) -> 200 (21ms)
+flock bucket suppliers HTTP 200 ids=1,2
+flock bucket laborers HTTP 200 ids=lw-demo-1,lw-demo-2
+dairy buyer ANON card id=b2: HTTP 200 headers cache=no-store, no-cache, must-revalidate, private robots=noindex, nofollow, noarchive referrer=no-referrer
+dairy buyer CARD TEXT: Buyer Card — Usman Dairy Farm | Usman Dairy Farm | DAIRY   LIVESTOCK MANAGEMENT SYSTEM | Buyer Card | — November 2026 | خریدار کارڈ — نومبر 2026 | Name | نام | Ali Baba Dairy | Phone | فون نمبر | 0312-9876543 | Total milk value | کل دودھ کی قیمت | Rs 1,321,241 | روپے 1,321,241 | Total collected | کل وصول ہوئے | Rs 1,250,550 | روپے 1,250,550 | Milk this month (2026-11) | اس ماہ کا دودھ | Rs 0 | روپے 0 | Collected this month | اس ماہ کی وصولی | Rs 0 | روپے 0 | Balance to collect | باقی رقم (لینے کو) | Rs 70,691 | روپے 70,691 | Usman Dairy Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Dairy Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-01
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (102ms)
+dairy supplier ANON card id=sup1: HTTP 200 headers cache=no-store, no-cache, must-revalidate, private robots=noindex, nofollow, noarchive referrer=no-referrer
+dairy supplier CARD TEXT: Supplier Card — Usman Dairy Farm | Usman Dairy Farm | DAIRY   LIVESTOCK MANAGEMENT SYSTEM | Supplier Card | — November 2026 | سپلائیئر کارڈ — نومبر 2026 | Name | نام | Malik Feed   Wanda Store | Phone | فون نمبر | 0300-1112233 | Total purchases (udhaar) | کل خریداری | Rs 1,809,059 | روپے 1,809,059 | Total paid | کل ادا شدہ | Rs 1,406,560 | روپے 1,406,560 | Balance to pay | باقی رقم (ادائیگی کو) | Rs 402,499 | روپے 402,499 | Usman Dairy Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Dairy Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-01
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 200 (9ms)
+dairy worker ANON card id=lw-demo-1: HTTP 200 headers cache=no-store, no-cache, must-revalidate, private robots=noindex, nofollow, noarchive referrer=no-referrer
+dairy worker CARD TEXT: Worker Card — Usman Dairy Farm | Usman Dairy Farm | DAIRY   LIVESTOCK MANAGEMENT SYSTEM | Worker Card | — November 2026 | ورکر کارڈ — نومبر 2026 | Name | نام | Akram | Worker ID | ورکر آئی ڈی | lw-demo-1 | Daily wage | روزانہ مزدوری | Rs 700 | روپے 700 | Attendance (2026-11) | اس ماہ کی حاضری | No attendance yet | ابھی حاضری نہیں | Wages for this month | اس ماہ کی مزدوری | Rs 0 | روپے 0 | Advance (udhaar) due | باقی اُدھار | Rs 5,000 | روپے 5,000 | Net payable this month | اس ماہ کی خالص رقم | Rs -5,000 | روپے -5,000 | Usman Dairy Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Dairy Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-01
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 200 (13ms)
+agri supplier ANON card id=244e737cb7b265d9c8dc4212: HTTP 200 headers cache=no-store, no-cache, must-revalidate, private robots=noindex, nofollow, noarchive referrer=no-referrer
+agri supplier CARD TEXT: Supplier Card — Usman Agri Farm | Usman Agri Farm | CROP   AGRICULTURE MANAGEMENT SYSTEM | Supplier Card | — November 2026 | سپلائیئر کارڈ — نومبر 2026 | Name | نام | Taxila Zarai Markaz (Khad   Beej) | Phone | فون نمبر | 0300-4445566 | Total purchases (udhaar) | کل خریداری | Rs 268,600 | روپے 268,600 | Total paid | کل ادا شدہ | Rs 152,880 | روپے 152,880 | Balance to pay | باقی رقم (ادائیگی کو) | Rs 115,720 | روپے 115,720 | Usman Agri Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Agri Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-01
+[agri test stdout] [REQ] GET /api/cards/supplier/244e737cb7b265d9c8dc4212 auth=NO -> 200 (75ms)
+agri worker ANON card id=d1f2f112ae31707555df6aaa: HTTP 200 headers cache=no-store, no-cache, must-revalidate, private robots=noindex, nofollow, noarchive referrer=no-referrer
+agri worker CARD TEXT: Worker Card — Usman Agri Farm | Usman Agri Farm | CROP   AGRICULTURE MANAGEMENT SYSTEM | Worker Card | — November 2026 | ورکر کارڈ — نومبر 2026 | Name | نام | Ali | Worker ID | ورکر آئی ڈی | d1f2f112ae31707555df6aaa | Daily wage | روزانہ مزدوری | Rs 1,200 | روپے 1,200 | Attendance (2026-11) | اس ماہ کی حاضری | No attendance yet | ابھی حاضری نہیں | Wages for this month | اس ماہ کی مزدوری | Rs 0 | روپے 0 | Advance (udhaar) due | باقی اُدھار | Rs 6,000 | روپے 6,000 | Net payable this month | اس ماہ کی خالص رقم | Rs -6,000 | روپے -6,000 | Usman Agri Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Agri Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-01
+[agri test stdout] [REQ] GET /api/cards/worker/d1f2f112ae31707555df6aaa auth=NO -> 200 (41ms)
+flock customer ANON card id=1: HTTP 200 headers cache=no-store, no-cache, must-revalidate, private robots=noindex, nofollow, noarchive referrer=no-referrer
+flock customer CARD TEXT: Customer Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Customer Card | — November 2026 | کسٹمر کارڈ — نومبر 2026 | Name | نام | Khan General Store | Phone | فون نمبر | 0301-1234567 | Total egg sales | کل اندوں کی فروخت | Rs 14,850 | روپے 14,850 | Total collected | کل وصول ہوئے | Rs 14,270 | روپے 14,270 | Sales this month (2026-11) | اس ماہ کی فروخت | Rs 0 | روپے 0 | Collected this month | اس ماہ کی وصولی | Rs 0 | روپے 0 | Balance to collect | باقی رقم (لینے کو) | Rs 580 | روپے 580 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-01
+flock supplier ANON card id=1: HTTP 200 headers cache=no-store, no-cache, must-revalidate, private robots=noindex, nofollow, noarchive referrer=no-referrer
+flock supplier CARD TEXT: Supplier Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Supplier Card | — November 2026 | سپلائیئر کارڈ — نومبر 2026 | Name | نام | Malik Feed   Wanda Store | Phone | فون نمبر | 0300-1112233 | Total purchases (udhaar) | کل خریداری | Rs 111,444 | روپے 111,444 | Total paid | کل ادا شدہ | Rs 90,600 | روپے 90,600 | Balance to pay | باقی رقم (ادائیگی کو) | Rs 20,844 | روپے 20,844 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-01
+flock worker ANON card id=lw-demo-1: HTTP 200 headers cache=no-store, no-cache, must-revalidate, private robots=noindex, nofollow, noarchive referrer=no-referrer
+flock worker CARD TEXT: Worker Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Worker Card | — November 2026 | ورکر کارڈ — نومبر 2026 | Name | نام | Shakeel | Worker ID | ورکر آئی ڈی | lw-demo-1 | Daily wage | روزانہ مزدوری | Rs 300 | روپے 300 | Attendance (2026-11) | اس ماہ کی حاضری | No attendance yet | ابھی حاضری نہیں | Wages for this month | اس ماہ کی مزدوری | Rs 0 | روپے 0 | Advance (udhaar) due | باقی اُدھار | Rs 1,500 | روپے 1,500 | Net payable this month | اس ماہ کی خالص رقم | Rs -1,500 | روپے -1,500 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-01
+flock customer enumeration ids 1..8 anon: 1:200 2:200 3:200 4:404 5:404 6:404 7:404 8:404 (200 = card exists; sequential numeric ids are enumerable, subject to 60/15m limiter)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (13ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (19ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (21ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (17ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (52ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (7ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (31ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (14ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (13ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (18ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (17ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (18ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (5ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (23ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (20ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (16ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (14ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (18ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (24ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (19ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (5ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (24ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (13ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (20ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (5ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (5ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (5ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (10ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (2ms)
+dairy buyer BURST direct same-IP x65: 200x60 429x5 first429At=61
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (13ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (10ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (9ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (6ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (35ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (5ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (7ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (7ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (14ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (13ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (24ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (10ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (19ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (13ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (13ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (14ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (20ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (7ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (22ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (19ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (12ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (10ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (16ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (11ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (15ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (8ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (10ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (28ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 200 (7ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/buyer/b2 auth=NO -> 429 (0ms)
+dairy buyer BURST through proxy changing spoofed XFF x65: 200x60 429x5 first429At=61 => proxy-appended IP is the bucket; spoof does NOT reset
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+dairy supplier BURST direct same-IP x65: 200x0 429x65 first429At=1
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/supplier/sup1 auth=NO -> 429 (1ms)
+dairy supplier BURST through proxy changing spoofed XFF x65: 200x0 429x65 first429At=1 => proxy-appended IP is the bucket; spoof does NOT reset
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (16ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (2ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (5ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (5ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (2ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (4ms)
+dairy worker BURST direct same-IP x65: 200x0 429x65 first429At=1
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (4ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (3ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (6ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (3ms)
+[REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (1ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+[dairy test stdout] [REQ] GET /api/cards/worker/lw-demo-1 auth=NO -> 429 (0ms)
+dairy worker BURST through proxy changing spoofed XFF x65: 200x0 429x65 first429At=1 => proxy-appended IP is the bucket; spoof does NOT reset
+
+=== PRODUCTION-MODE SERVERS (fake MONGO_URI, no real DB available) ===
+Limitation: production + MEMORY_MODE exits by design, and no real MongoDB is available in this sandbox (Phase 0/4). Production probes below use NODE_ENV=production, FRONTEND_URL=https://good.example, strong JWT_SECRET, MONGO_URI=mongodb://127.0.0.1:27017/muf_prod (unreachable). API may stay at the 503 startup gate; CORS/header behaviour is still observable on those responses. Authenticated production behaviour is UNVERIFIED until a real DB exists.
+[dairy prod stdout] [startup] PORT env=19401 -> listening on 3000, 19401
+[dairy prod stderr] (node:7613) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[dairy prod stderr] (node:7613) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[dairy prod stdout] Server running on port 3000
+[dairy prod stdout] Server running on port 19401
+dairy prod process exitCode=null
+dairy PROD actual GET /api/farms Origin=good: HTTP 503 CSP=ABSENT Cache= XCTO=nosniff XFO=SAMEORIGIN ACAO=https://good.example ACAC= body={"error":"Server is starting, please retry in a few seconds."}
+dairy PROD actual GET /api/farms Origin=evil: HTTP 503 CSP=ABSENT Cache= XCTO=nosniff XFO=SAMEORIGIN ACAO= ACAC= body={"error":"Server is starting, please retry in a few seconds."}
+dairy PROD preflight Origin=https://good.example: HTTP 204 ACAO=https://good.example ACAC=null ACAH=Content-Type,Authorization,X-Cron-Secret,X-Cron-Key,X-Cross-Farm-Key,X-Farm-Id
+dairy PROD preflight Origin=https://evil.example.com: HTTP 204 ACAO=null ACAC=null ACAH=Content-Type,Authorization,X-Cron-Secret,X-Cron-Key,X-Cross-Farm-Key,X-Farm-Id
+dairy PROD error route Origin=evil: HTTP 503 CSP=ABSENT Cache= XCTO=nosniff XFO=SAMEORIGIN ACAO= ACAC= body={"error":"Server is starting, please retry in a few seconds."}
+dairy PROD GET / (HTML): HTTP 200 content-type=text/html; charset=UTF-8 CSP=ABSENT bodyStart=<!DOCTYPE html> <html lang="en">   <head>     <link rel="preconnect" href="https://fonts.googleapis.com">     <link rel=
+dairy PROD GET /assets/index.js (static guess): HTTP 200 content-type=text/html; charset=UTF-8 CSP=ABSENT Cache=public, max-age=0
+[agri prod stdout] [startup] PORT env=19402 -> listening on 8000, 19402
+[agri prod stdout] 🔌 [Database] Connection target resolved: Host '127.0.0.1' | Database 'muf_prod'
+[agri prod stderr] (node:7743) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[agri prod stderr] (node:7743) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[agri prod stdout] Server running on port 8000
+[agri prod stdout] Server running on port 19402
+agri prod process exitCode=null
+agri PROD actual GET /api/farms Origin=good: HTTP 503 CSP=ABSENT Cache= XCTO=nosniff XFO=SAMEORIGIN ACAO=https://good.example ACAC=true body={"error":"Server is starting, please retry in a few seconds."}
+agri PROD actual GET /api/farms Origin=evil: HTTP 503 CSP=ABSENT Cache= XCTO=nosniff XFO=SAMEORIGIN ACAO= ACAC=true body={"error":"Server is starting, please retry in a few seconds."}
+agri PROD preflight Origin=https://good.example: HTTP 204 ACAO=https://good.example ACAC=true ACAH=Content-Type,Authorization,X-Access-Token,X-Cron-Secret,X-Cron-Key,X-Cross-Farm-Key,X-Farm-Id
+agri PROD preflight Origin=https://evil.example.com: HTTP 204 ACAO=null ACAC=true ACAH=Content-Type,Authorization,X-Access-Token,X-Cron-Secret,X-Cron-Key,X-Cross-Farm-Key,X-Farm-Id
+agri PROD error route Origin=evil: HTTP 503 CSP=ABSENT Cache= XCTO=nosniff XFO=SAMEORIGIN ACAO= ACAC=true body={"error":"Server is starting, please retry in a few seconds."}
+agri PROD GET / (HTML): HTTP 200 content-type=text/html; charset=UTF-8 CSP=ABSENT bodyStart=<!doctype html> <html lang="en">   <head>     <script>       // Local Vite testing: remove stale PWA shells before React
+agri PROD GET /assets/index.js (static guess): HTTP 200 content-type=text/html; charset=UTF-8 CSP=ABSENT Cache=public, max-age=0
+[flock prod stdout] ◇ injected env (0) from .env // tip: ⌁ auth for agents [www.vestauth.com]
+[flock prod stdout] [startup] PORT env=19403 -> listening on 3001, 19403
+[flock prod stderr] (node:7782) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[flock prod stderr] (node:7782) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[flock prod stdout] 🐔 Flock Farm server running on port 3001
+[flock prod stdout] 🐔 Flock Farm server running on port 19403
+flock prod process exitCode=null
+flock PROD actual GET /api/farms Origin=good: HTTP 503 CSP=present Cache= XCTO=nosniff XFO=SAMEORIGIN ACAO=https://good.example ACAC=true body={"error":"Server is starting, please retry in a few seconds."}
+flock PROD actual GET /api/farms Origin=evil: HTTP 503 CSP=present Cache= XCTO=nosniff XFO=SAMEORIGIN ACAO= ACAC= body={"error":"Server is starting, please retry in a few seconds."}
+flock PROD preflight Origin=https://good.example: HTTP 204 ACAO=https://good.example ACAC=true ACAH=authorization,content-type
+flock PROD preflight Origin=https://evil.example.com: HTTP 503 ACAO=null ACAC=null ACAH=null
+flock PROD error route Origin=evil: HTTP 503 CSP=present Cache= XCTO=nosniff XFO=SAMEORIGIN ACAO= ACAC= body={"error":"Server is starting, please retry in a few seconds."}
+flock PROD GET / (HTML): HTTP 200 content-type=text/html; charset=UTF-8 CSP=present bodyStart=<!doctype html> <html lang="en">   <head>     <link rel="preconnect" href="https://fonts.googleapis.com">     <link rel=
+flock PROD GET /assets/index.js (static guess): HTTP 200 content-type=text/html; charset=UTF-8 CSP=present Cache=public, max-age=0
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=60.06

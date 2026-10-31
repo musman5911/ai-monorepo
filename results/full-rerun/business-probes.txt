@@ -1,0 +1,58 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND node --test tests/full-rerun/business-probes.test.mjs
+TAP version 13
+# {"method":"GET","path":"/rates/1","status":200}
+# {"method":"POST","path":"/cows","status":201}
+# {"method":"POST","path":"/milk","status":201}
+# {"method":"PUT","path":"/rates/1","status":200}
+# {"method":"POST","path":"/milk","status":201}
+# {"method":"GET","path":"/milk/summary?cowId=e0f2830a-0969-4829-b832-aee8958c9fd6","status":200}
+# {"expectedRevenue":3450,"actual":{"count":2,"totalLiters":20,"saleableLiters":20,"revenue":3450}}
+# Subtest: RERUN-RATE: historical milk uses old rate and exact PKT change-day uses new rate
+ok 1 - RERUN-RATE: historical milk uses old rate and exact PKT change-day uses new rate
+  ---
+  duration_ms: 1290.574045
+  type: 'test'
+  ...
+# {"method":"POST","path":"/cows","status":201}
+# {"method":"POST","path":"/buyers","status":201}
+# {"method":"POST","path":"/milk","status":201}
+# {"method":"POST","path":"/buyers/8dabaca6-7fb0-4e5e-9c2a-857cd5cf3222/payments","status":201}
+# {"method":"GET","path":"/milk/summary?cowId=818cf40f-3725-4dbe-aff8-3a3bbbbfcaee","status":200}
+# {"method":"GET","path":"/cards/buyer/8dabaca6-7fb0-4e5e-9c2a-857cd5cf3222","status":200}
+# CARD TEXT  Buyer Card — Usman Dairy Farm * { margin: 0; padding: 0; box-sizing: border-box; } body { font-family: 'Inter', -apple-system, 'Segoe UI', Roboto, sans-serif; background: \#edf0ea; color: \#0f172a; min-height: 100vh; display: flex; justify-content: center; padding: 22px 14px 44px; } .wrap { width: 100%; max-width: 430px; } .card { position: relative; background: \#fff; border-radius: 26px; overflow: hidden; box-shadow: 0 18px 44px rgba(20, 35, 25, .14); } /* dot texture + green corner accents */ .card::before { content: ""; position: absolute; top: 0; left: 0; width: 150px; height: 150px; background-image: radial-gradient(rgba(22, 163, 74, .16) 1.2px, transparent 1.3px); background-size: 9px 9px; border-radius: 26px 0 100% 0; pointer-events: none; } .card::after { content: ""; position: absolute; top: 0; right: 0; width: 130px; height: 130px; background: linear-gradient(225deg, rgba(22, 163, 74, .10) 0%, transparent 58%); border-radius: 0 26px 0 100%; pointer-events: none; } .head { padding: 22px 22px 14px; position: relative; } .brand { display: flex; align-items: center; gap: 13px; } .brand img { width: 62px; height: 62px; border-radius: 50%; object-fit: cover; flex: 0 0 auto; box-shadow: 0 4px 12px rgba(20, 83, 45, .18); border: 3px solid \#f0fdf4; } .brand .txt { min-width: 0; flex: 1; } .farm { font-size: 24px; font-weight: 900; color: \#14532d; letter-spacing: .2px; line-height: 1.12; text-transform: uppercase; } .sub { font-size: 9.5px; font-weight: 700; color: \#15803d; letter-spacing: .12em; margin-top: 5px; display: flex; align-items: center; gap: 8px; white-space: nowrap; } .sub::before, .sub::after { content: ""; height: 1.5px; background: \#15803d55; flex: 1; min-width: 14px; border-radius: 2px; } .titlebar { display: flex; align-items: stretch; justify-content: space-between; gap: 10px; padding: 4px 22px 14px; } .badge { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(135deg, \#14532d, \#166534); color: \#fff; border-radius: 12px; padding: 9px 14px; font-size: 13px; font-weight: 800; letter-spacing: .02em; box-shadow: 0 6px 14px rgba(20, 83, 45, .22); } .badge .month { color: \#fde047; font-weight: 800; } .ur-box { display: flex; align-items: center; border: 1.5px solid \#e2e8f0; border-radius: 12px; padding: 8px 12px; font-family: 'Noto Nastaliq Urdu', serif; font-size: 13px; font-weight: 600; color: \#334155; background: \#fbfdfb; max-width: 46%; } .body { padding: 2px 22px 16px; } .row { display: flex; align-items: flex-start; gap: 12px; padding: 11px 0; border-bottom: 1px solid \#f1f5f9; } .row:last-child { border-bottom: none; } .tile { width: 40px; height: 40px; border-radius: 12px; flex: 0 0 auto; background: \#14532d; color: \#fff; display: grid; place-items: center; box-shadow: 0 5px 12px rgba(20, 83, 45, .22); } .row-main { display: flex; align-items: center; gap: 10px; flex: 1; min-width: 0; } .lbl { display: flex; flex-direction: column; min-width: 0; } .lbl-en { font-size: 13.5px; font-weight: 700; color: \#1e293b; } .lbl-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 12.5px; color: \#64748b; line-height: 1.9; margin-top: -2px; } .vals { display: flex; flex-direction: column; align-items: flex-end; margin-left: auto; min-width: 0; } .vals .val { font-weight: 800; text-align: right; } .vals .val[dir="rtl"] { font-family: 'Noto Nastaliq Urdu', serif; line-height: 1.9; margin-top: -3px; font-weight: 600; } .row-big { border-bottom: none; } .row-big .row-main { flex-direction: row; align-items: center; gap: 12px; border: 1.5px solid \#bbf7d0; border-radius: 16px; background: linear-gradient(135deg, \#f0fdf4 0%, \#ffffff 90%); padding: 14px 16px; margin-top: 2px; } .row-big .lbl { flex: 1; } .row-big .lbl-en { font-size: 13px; font-weight: 800; color: \#14532d; letter-spacing: .03em; text-transform: uppercase; } .row-big .lbl-ur { font-size: 12.5px; color: \#3f6212; } .row-big .vals .val { font-size: 26px; font-weight: 900; } .moneybag { width: 48px; height: 48px; border-radius: 50%; flex: 0 0 auto; background: \#dcfce7; color: \#15803d; display: grid; place-items: center; border: 1.5px solid \#bbf7d0; } .foot { margin: 0 22px 18px; border: 1.5px solid \#e2e8f0; border-radius: 14px; padding: 12px 14px; display: flex; align-items: center; gap: 11px; background: \#fbfdfb; } .foot-icon { width: 34px; height: 34px; border-radius: 50%; background: \#14532d; color: \#fff; display: grid; place-items: center; flex: 0 0 auto; } .foot-en { font-size: 10.5px; color: \#475569; line-height: 1.55; flex: 1; } .foot-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 11.5px; color: \#475569; line-height: 2; text-align: right; flex: 1; } .thanks { margin: -14px auto 0; position: relative; width: max-content; display: flex; align-items: center; gap: 8px; background: \#fff; border: 1px solid \#e2e8f0; border-radius: 999px; padding: 7px 16px 7px 9px; box-shadow: 0 10px 22px rgba(20, 35, 25, .14); } .thanks img { width: 26px; height: 26px; border-radius: 50%; object-fit: cover; } .thanks .t-en { font-size: 9px; font-weight: 900; letter-spacing: .08em; color: \#14532d; } .thanks .t-ur { font-family: 'Noto Nastaliq Urdu', serif; font-size: 11px; color: \#334155; line-height: 1.6; } .meta { padding: 10px 20px 0; } .meta p { font-size: 10px; color: \#94a3b8; text-align: center; } .meta .ur { font-family: 'Noto Nastaliq Urdu', serif; line-height: 1.9; } @media print { body { background: \#fff; padding: 0; } .card { box-shadow: none; border-radius: 0; } .thanks { box-shadow: none; } } Usman Dairy Farm DAIRY &amp; LIVESTOCK MANAGEMENT SYSTEM Buyer Card — November 2026 خریدار کارڈ — نومبر 2026 Name نام Card fixture Total milk value کل دودھ کی قیمت Rs 1,200 روپے 1,200 Total collected کل وصول ہوئے Rs 1,000 روپے 1,000 Milk this month (2026-11) اس ماہ کا دودھ Rs 1,200 روپے 1,200 Collected this month اس ماہ کی وصولی Rs 1,000 روپے 1,000 Balance to collect باقی رقم (لینے کو) Rs 200 روپے 200 Usman Dairy Farm — for your reference. Keep this card safe; anyone with the link can see it. Usman Dairy Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ THANK YOU! شکریہ! Generated 2026-11-01 
+# Subtest: RERUN-CARD: buyer default rate, payment, and card totals agree (1200/1000/200)
+ok 2 - RERUN-CARD: buyer default rate, payment, and card totals agree (1200/1000/200)
+  ---
+  duration_ms: 1474.146932
+  type: 'test'
+  ...
+# {"method":"POST","path":"/cows","status":201}
+# {"method":"POST","path":"/health","status":201}
+# {"method":"GET","path":"/expenses?limit=1000","status":200}
+# {"method":"PUT","path":"/health/7fdb58b5-6709-4ba7-9268-b95ade04c6a6","status":200}
+# {"method":"GET","path":"/expenses?limit=1000","status":200}
+# {"method":"PUT","path":"/health/7fdb58b5-6709-4ba7-9268-b95ade04c6a6","status":200}
+# {"method":"GET","path":"/expenses?limit=1000","status":200}
+# {"method":"PUT","path":"/health/7fdb58b5-6709-4ba7-9268-b95ade04c6a6","status":200}
+# {"method":"DELETE","path":"/health/7fdb58b5-6709-4ba7-9268-b95ade04c6a6","status":200}
+# {"method":"GET","path":"/expenses?limit=1000","status":200}
+# {"method":"POST","path":"/health/bulk","status":200}
+# {"method":"GET","path":"/health?cowId=822bba16-f446-478a-bdc8-72c8179e1337","status":200}
+# {"method":"GET","path":"/expenses?limit=1000","status":200}
+# Subtest: RERUN-HEALTH: linked expense survives edit once and disappears at zero/delete, including bulk
+ok 3 - RERUN-HEALTH: linked expense survives edit once and disappears at zero/delete, including bulk
+  ---
+  duration_ms: 1491.787832
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 4368.116383
+EXIT=0

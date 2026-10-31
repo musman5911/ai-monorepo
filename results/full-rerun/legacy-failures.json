@@ -1,0 +1,630 @@
+{
+  "revision": "2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0",
+  "failures": [
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/agri-liabilities-deep.test.ts",
+      "title": "ROUND 22: agri liabilities + inventory negative amount_owed cannot be created or set via update",
+      "message": "AssertionError: negative liability persisted on create: expected -777 to be greater than or equal to 0\n    at /home/user/full-rerun/tests/api-deep/agri-liabilities-deep.test.ts:41:101\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/agri-liabilities-deep.test.ts",
+      "title": "ROUND 22: agri liabilities + inventory inventory: negative quantity via update is rejected; worker blocked everywhere",
+      "message": "AssertionError: negative inventory quantity persisted: expected -50 to be greater than or equal to 0\n    at /home/user/full-rerun/tests/api-deep/agri-liabilities-deep.test.ts:60:100\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/coverage-sweep-deep.test.ts",
+      "title": "ROUND 11: coverage sweep dairy farm GPS location is not public (flock requires auth for the same data)",
+      "message": "AssertionError: farm location served without login: expected 200 to be 401 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/coverage-sweep-deep.test.ts:25:62\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/coverage-sweep-deep.test.ts",
+      "title": "ROUND 11: coverage sweep dairy dailylog: write/read round-trip; garbage dates are 4xx not 500",
+      "message": "AssertionError: dailylog PUT not-a-date must reject: expected 200 to be greater than or equal to 400\n    at /home/user/full-rerun/tests/api-deep/coverage-sweep-deep.test.ts:89:68\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/coverage-sweep2-deep.test.ts",
+      "title": "ROUND 12: agri coverage + unknown routes agri farm GPS location is not public",
+      "message": "AssertionError: agri farm location served without login: expected 200 to be 401 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/coverage-sweep2-deep.test.ts:24:67\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/coverage-sweep2-deep.test.ts",
+      "title": "ROUND 12: agri coverage + unknown routes agri automations are admin-only and validate their payload",
+      "message": "AssertionError: automations accepted garbage config \u2192 200: expected 200 to be greater than or equal to 400\n    at /home/user/full-rerun/tests/api-deep/coverage-sweep2-deep.test.ts:40:105\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/coverage-sweep2-deep.test.ts",
+      "title": "ROUND 12: agri coverage + unknown routes agri diary-media: round-trip works, garbage dates and mega-payloads are safe",
+      "message": "AssertionError: diary-media PUT 2026-02-30 must reject: expected 200 to be greater than or equal to 400\n    at /home/user/full-rerun/tests/api-deep/coverage-sweep2-deep.test.ts:51:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/cross-realm-deep.test.ts",
+      "title": "ROUND 4: cross-realm + smuggling lost update: stale writer cannot silently overwrite (dairy)",
+      "message": "AssertionError: dairy silent lost-update (no version/conflict check): expected 200 to be 409 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/cross-realm-deep.test.ts:78:91\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/cross-realm-deep.test.ts",
+      "title": "ROUND 4: cross-realm + smuggling lost update: stale writer cannot silently overwrite (agri)",
+      "message": "AssertionError: agri silent lost-update (no version/conflict check): expected 200 to be 409 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/cross-realm-deep.test.ts:88:91\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/frontend-contract-deep.test.ts",
+      "title": "ROUND 13: frontend\u2194backend contract dairy: every API path the frontend calls exists in the backend",
+      "message": "AssertionError: dairy dead: [\"/archive/jobs\",\"/archive/jobs/:p/execute\",\"/archive/jobs/:p/restore\",\"/archive/jobs/:p/records\"]: expected [ '/archive/jobs', \u2026(3) ] to deeply equal []\n    at /home/user/full-rerun/tests/api-deep/frontend-contract-deep.test.ts:97:61\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/frontend-contract-deep.test.ts",
+      "title": "ROUND 13: frontend\u2194backend contract flock: every API path the frontend calls exists in the backend",
+      "message": "AssertionError: flock dead: [\"/archive/jobs\",\"/archive/jobs/:p/execute\",\"/archive/jobs/:p/restore\",\"/archive/jobs/:p/records\"]: expected [ '/archive/jobs', \u2026(3) ] to deeply equal []\n    at /home/user/full-rerun/tests/api-deep/frontend-contract-deep.test.ts:97:61\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/frontend-contract-deep.test.ts",
+      "title": "ROUND 13: frontend\u2194backend contract agri: every API path the frontend calls exists in the backend",
+      "message": "AssertionError: agri dead: [\"/archive/jobs\",\"/archive/jobs/:p/execute\",\"/archive/jobs/:p/restore\",\"/archive/jobs/:p/records\"]: expected [ '/archive/jobs', \u2026(3) ] to deeply equal []\n    at /home/user/full-rerun/tests/api-deep/frontend-contract-deep.test.ts:97:61\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/ids-unicode-uploads-deep.test.ts",
+      "title": "ROUND 6: ids, unicode, uploads flock upload: script-bearing SVG cannot be stored and served back as active content",
+      "message": "AssertionError: svg upload rejected with 500: expected [ 400, 415 ] to include 500\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/full-rerun/node_modules/chai/index.js:1686:25)\n    at /home/user/full-rerun/tests/api-deep/ids-unicode-uploads-deep.test.ts:83:67\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/last-surface-deep.test.ts",
+      "title": "ROUND 14: last surfaces agri public worker card does not expose wages/advances to unauthenticated visitors",
+      "message": "AssertionError: public worker card leaks daily wage: expected '<!DOCTYPE html>\\n<html lang=\"en\" dir=\u2026' not to contain '1,777'\n    at /home/user/full-rerun/tests/api-deep/last-surface-deep.test.ts:65:61\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/load-lifetime-smuggling-deep.test.ts",
+      "title": "ROUND 8: load, lifetime, smuggling, deps dairy: token lifetime is at most 24 hours",
+      "message": "AssertionError: dairy access-token lifetime is 168h: expected 168 to be less than or equal to 24\n    at /home/user/full-rerun/tests/api-deep/load-lifetime-smuggling-deep.test.ts:52:65\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/load-lifetime-smuggling-deep.test.ts",
+      "title": "ROUND 8: load, lifetime, smuggling, deps flock: token lifetime is at most 24 hours",
+      "message": "AssertionError: flock access-token lifetime is 168h: expected 168 to be less than or equal to 24\n    at /home/user/full-rerun/tests/api-deep/load-lifetime-smuggling-deep.test.ts:52:65\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/pagination-dates-backup-abuse.test.ts",
+      "title": "DEEP: pagination, dates, backup abuse backup abuse: cross-app restore is rejected (no silent mis-import)",
+      "message": "AssertionError: dairy backup \u2192 agri restore: expected 200 to be greater than or equal to 400\n    at /home/user/full-rerun/tests/api-deep/pagination-dates-backup-abuse.test.ts:91:63\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts",
+      "title": "ROUND 5: public surface + headers dairy public buyer card does not expose phone number to unauthenticated visitors",
+      "message": "AssertionError: public card leaks buyer phone number: expected '<!DOCTYPE html>\\n<html lang=\"en\" dir=\u2026' not to contain '0300-7654321'\n    at /home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts:29:62\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts",
+      "title": "ROUND 5: public surface + headers dairy: API responses carry CSP + nosniff + frame protection",
+      "message": "AssertionError: dairy missing Content-Security-Policy: expected null to be truthy\n    at /home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts:79:91\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts",
+      "title": "ROUND 5: public surface + headers dairy: authenticated responses are marked non-cacheable",
+      "message": "AssertionError: dairy sensitive API response cacheable: \"\": expected '' to match /no-store|no-cache|private/\n    at /home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts:104:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts",
+      "title": "ROUND 5: public surface + headers flock: CORS does not reflect arbitrary origins with credentials",
+      "message": "AssertionError: flock preflight reflects evil origin WITH credentials: expected false to be true // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts:93:127\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts",
+      "title": "ROUND 5: public surface + headers flock: authenticated responses are marked non-cacheable",
+      "message": "AssertionError: flock sensitive API response cacheable: \"\": expected '' to match /no-store|no-cache|private/\n    at /home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts:104:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts",
+      "title": "ROUND 5: public surface + headers agri: API responses carry CSP + nosniff + frame protection",
+      "message": "AssertionError: agri missing Content-Security-Policy: expected null to be truthy\n    at /home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts:79:91\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts",
+      "title": "ROUND 5: public surface + headers agri: CORS does not reflect arbitrary origins with credentials",
+      "message": "AssertionError: agri preflight reflects evil origin WITH credentials: expected false to be true // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts:93:127\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts",
+      "title": "ROUND 5: public surface + headers agri: authenticated responses are marked non-cacheable",
+      "message": "AssertionError: agri sensitive API response cacheable: \"\": expected '' to match /no-store|no-cache|private/\n    at /home/user/full-rerun/tests/api-deep/public-surface-deep.test.ts:104:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/q1-delete-pinpoint-deep.test.ts",
+      "title": "ROUND 23: Q1 DELETE pinpoint + flock import scoping flock import-all into farm B does not leak into farm A",
+      "message": "AssertionError: import into B \u2192 500: expected 500 to be less than 300\n    at /home/user/full-rerun/tests/api-deep/q1-delete-pinpoint-deep.test.ts:75:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round10-flock-import-images.test.ts",
+      "title": "ROUND R10: flock import + images import-all into farm B does not leak batches into farm A",
+      "message": "AssertionError: import into B \u2192 500: expected 500 to be less than 300\n    at /home/user/full-rerun/tests/api-deep/round10-flock-import-images.test.ts:47:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round11-role-flock.test.ts",
+      "title": "ROUND 11C: role system (flock) ROLE-F1: user creation honors the requested farmIds (not the creator current farm)",
+      "message": "AssertionError: requested farmIds [B] but user got [\"f154ce466619812e845cc2ec\"]: expected [ 'f154ce466619812e845cc2ec' ] to deeply equal [ '2c2bab111b01832a3cc6e4b8' ]\n    at /home/user/full-rerun/tests/api-deep/round11-role-flock.test.ts:52:78\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts",
+      "title": "ROUND 12: photos (dairy, fallback mode) EXIF/GPS: uploaded JPEG bytes are served back \u2014 is EXIF stripped?",
+      "message": "AssertionError: EXIF GPS marker still present in served bytes (not stripped): expected true to be false // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts:94:105\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts",
+      "title": "ROUND 12: photos (dairy, fallback mode) role checks: worker upload/delete behaviour is explicit",
+      "message": "AssertionError: worker delete photo \u2192 200: expected [ 403, 404 ] to include 200\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/full-rerun/node_modules/chai/index.js:1686:25)\n    at /home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts:102:74\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts",
+      "title": "ROUND 12: photos (dairy, fallback mode) id guessing: random/malformed photo ids \u2192 404, never bytes",
+      "message": "AssertionError: GET /photos/../../etc/passwd \u2192 200: expected [ 400, 404 ] to include 200\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/full-rerun/node_modules/chai/index.js:1686:25)\n    at /home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts:130:73\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts",
+      "title": "ROUND 12: photos (agri, fallback mode) EXIF/GPS: uploaded JPEG bytes are served back \u2014 is EXIF stripped?",
+      "message": "AssertionError: EXIF GPS marker still present in served bytes (not stripped): expected true to be false // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts:94:105\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts",
+      "title": "ROUND 12: photos (agri, fallback mode) role checks: worker upload/delete behaviour is explicit",
+      "message": "AssertionError: worker delete photo \u2192 200: expected [ 403, 404 ] to include 200\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/full-rerun/node_modules/chai/index.js:1686:25)\n    at /home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts:102:74\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts",
+      "title": "ROUND 12: photos (agri, fallback mode) photos survive backup? dairy/agri backup must contain the photo or its bytes",
+      "message": "AssertionError: photo id absent from backup (photos lost on restore): expected false to be true // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts:124:93\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts",
+      "title": "ROUND 12: photos (agri, fallback mode) id guessing: random/malformed photo ids \u2192 404, never bytes",
+      "message": "AssertionError: GET /photos/../../etc/passwd \u2192 200: expected [ 400, 404 ] to include 200\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/full-rerun/node_modules/chai/index.js:1686:25)\n    at /home/user/full-rerun/tests/api-deep/round12-photos-cloudinary.test.ts:130:73\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round12-photos-flock.test.ts",
+      "title": "ROUND 12B: photos (flock) validation: SVG rejected on both upload routes; wrong field name rejected",
+      "message": "AssertionError: expected 500 to be less than 500\n    at /home/user/full-rerun/tests/api-deep/round12-photos-flock.test.ts:69:24\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round12-photos-flock.test.ts",
+      "title": "ROUND 12B: photos (flock) P8-1: flock /api/photos/:id (what the diary UI requests) exists",
+      "message": "AssertionError: GET /api/photos/:id \u2192 404 (diary UI builds these URLs): expected 404 to be 200 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round12-photos-flock.test.ts:81:92\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round13-sessions.test.ts",
+      "title": "ROUND 13 sessions (dairy) bcrypt 72-byte: password differing only after byte 72 must NOT authenticate",
+      "message": "AssertionError: correct 73-byte login (got 429): expected 429 to be 200 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round13-sessions.test.ts:97:73\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round13-sessions.test.ts",
+      "title": "ROUND 13 sessions (dairy) login rate limiter cannot be reset by spoofing X-Forwarded-For",
+      "message": "AssertionError: limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round13-sessions.test.ts:130:118\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round13-sessions.test.ts",
+      "title": "ROUND 13 sessions (agri) login rate limiter cannot be reset by spoofing X-Forwarded-For",
+      "message": "AssertionError: limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round13-sessions.test.ts:130:118\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round13-sessions.test.ts",
+      "title": "ROUND 13 sessions (flock) bcrypt 72-byte: password differing only after byte 72 must NOT authenticate",
+      "message": "AssertionError: byte-73-differing login (want 401, got 200 \u2014 200 means bcrypt 72-byte truncation): expected 200 to be 401 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round13-sessions.test.ts:99:125\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round13-sessions.test.ts",
+      "title": "ROUND 13 sessions (flock) login rate limiter cannot be reset by spoofing X-Forwarded-For",
+      "message": "AssertionError: limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round13-sessions.test.ts:130:118\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round14-fuzz.test.ts",
+      "title": "ROUND 14 fuzz (dairy) body-size limits: 5MB field and 12MB body are not accepted as normal creates",
+      "message": "AssertionError: 5MB name must not be a normal 201 create: expected 201 not to be 201 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round14-fuzz.test.ts:86:84\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round14-fuzz.test.ts",
+      "title": "ROUND 14 fuzz (agri) body-size limits: 5MB field and 12MB body are not accepted as normal creates",
+      "message": "AssertionError: 5MB name must not be a normal 201 create: expected 201 not to be 201 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round14-fuzz.test.ts:86:84\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round14-fuzz.test.ts",
+      "title": "ROUND 14 fuzz (flock) body-size limits: 5MB field and 12MB body are not accepted as normal creates",
+      "message": "AssertionError: 5MB name must not be a normal 201 create: expected 201 not to be 201 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/round14-fuzz.test.ts:86:84\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round14-fuzz.test.ts",
+      "title": "ROUND 14 dairy date edges (dailylog) invalid calendar dates are rejected, not stored or 500",
+      "message": "AssertionError: 2026-02-30 should be 4xx, got 200: expected 200 to be greater than or equal to 400\n    at /home/user/full-rerun/tests/api-deep/round14-fuzz.test.ts:116:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round3-super-admin.test.ts",
+      "title": "ROUND R3: super-admin owner-only dairy: farm role is preserved at login and cleared at logout",
+      "message": "AssertionError: expected 404 to be less than 300\n    at /home/user/full-rerun/tests/api-deep/round3-super-admin.test.ts:44:33\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round6-breeding-deep.test.ts",
+      "title": "ROUND R6: breeding deep lifecycle calving with generated calves is edit-locked (409) and delete-locked (409)",
+      "message": "AssertionError: delete calving after calf removed \u2192 409: expected 409 to be less than 300\n    at /home/user/full-rerun/tests/api-deep/round6-breeding-deep.test.ts:53:97\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round7-agri-fields-deep.test.ts",
+      "title": "ROUND R7: agri fields deep validation: negative/garbage acres rejected, duplicate name per farm 409, same name across farms OK",
+      "message": "AssertionError: absurd acres 1e12 \u2192 201: expected [ 400, 422 ] to include 201\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/full-rerun/node_modules/chai/index.js:1686:25)\n    at /home/user/full-rerun/tests/api-deep/round7-agri-fields-deep.test.ts:24:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round9-backup-integrity.test.ts",
+      "title": "ROUND R9: backup integrity tampered backup: editing an amount inside the backup changes restored data (integrity check?)",
+      "message": "AssertionError: tampered amount silently restored (no integrity/signature check): expected { _id: 'e1', date: '2025-11-01', \u2026(9) } to be falsy\n    at /home/user/full-rerun/tests/api-deep/round9-backup-integrity.test.ts:32:85\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/round9-backup-integrity.test.ts",
+      "title": "ROUND R9: backup integrity cross-app restore: agri backup into dairy (and flock backup into agri) is rejected, data untouched",
+      "message": "AssertionError: agri backup \u2192 dairy restore \u2192 200: expected [ 400, 409, 422 ] to include 200\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/full-rerun/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/full-rerun/node_modules/chai/index.js:1686:25)\n    at /home/user/full-rerun/tests/api-deep/round9-backup-integrity.test.ts:40:84\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts",
+      "title": "DEEPEST: sessions, escalation, leakage, throttling dairy: token is revoked after logout",
+      "message": "AssertionError: pre-logout token still works after logout: expected 200 to be 401 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts:60:82\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts",
+      "title": "DEEPEST: sessions, escalation, leakage, throttling flock: token is revoked after logout",
+      "message": "AssertionError: pre-logout token still works after logout: expected 200 to be 401 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts:60:82\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts",
+      "title": "DEEPEST: sessions, escalation, leakage, throttling agri: token is revoked after logout",
+      "message": "AssertionError: pre-logout token still works after logout: expected 200 to be 401 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts:60:82\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts",
+      "title": "DEEPEST: sessions, escalation, leakage, throttling agri: mass assignment on create cannot forge id/role/farm ownership",
+      "message": "AssertionError: server honored client-supplied _id: expected 'forged-mxmvws8agm' not to be 'forged-mxmvws8agm' // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts:109:72\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts",
+      "title": "DEEPEST: sessions, escalation, leakage, throttling dairy: changing password revokes previously issued tokens",
+      "message": "AssertionError: pre-password-change token still works: expected 200 to be 401 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/session-escalation-deep.test.ts:149:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/telegram-bot-deep.test.ts",
+      "title": "ROUND 15: telegram bot write-path bot expense amounts are bounded (no crore-scale single message)",
+      "message": "AssertionError: bot accepted a 999,999,999 expense from one chat message: expected 1 to be +0 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/telegram-bot-deep.test.ts:88:86\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/timing-reset-auto-deep.test.ts",
+      "title": "ROUND 7: timing, reset, auto-backup, cookies dairy: session cookie (if issued) is HttpOnly + SameSite",
+      "message": "AssertionError: expected 429 to be 200 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/timing-reset-auto-deep.test.ts:46:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/timing-reset-auto-deep.test.ts",
+      "title": "ROUND 7: timing, reset, auto-backup, cookies flock: session cookie (if issued) is HttpOnly + SameSite",
+      "message": "AssertionError: expected 429 to be 200 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/timing-reset-auto-deep.test.ts:46:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-deep/timing-reset-auto-deep.test.ts",
+      "title": "ROUND 7: timing, reset, auto-backup, cookies agri: session cookie (if issued) is HttpOnly + SameSite",
+      "message": "AssertionError: expected 429 to be 200 // Object.is equality\n    at /home/user/full-rerun/tests/api-deep/timing-reset-auto-deep.test.ts:46:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix crops rejects empty body and missing required fields",
+      "message": "AssertionError: crops empty body: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:112:134\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix crops rejects negative / string / huge numbers",
+      "message": "AssertionError: crops.area_acres negative: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:126:72\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix crops rejects oversized strings; does not store script verbatim",
+      "message": "AssertionError: crops.name 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:136:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix crops update rejects invalid values too",
+      "message": "AssertionError: crops update area_acres negative: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:153:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix tasks rejects empty body and missing required fields",
+      "message": "AssertionError: tasks empty body: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:112:134\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix tasks rejects oversized strings; does not store script verbatim",
+      "message": "AssertionError: tasks.title 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:136:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix tasks update rejects invalid values too",
+      "message": "AssertionError: tasks empty update: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:156:65\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix finance rejects empty body and missing required fields",
+      "message": "AssertionError: finance empty body: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:112:134\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix finance rejects negative / string / huge numbers",
+      "message": "AssertionError: finance.amount negative: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:126:72\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix finance rejects oversized strings; does not store script verbatim",
+      "message": "AssertionError: finance.date 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:136:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix finance update rejects invalid values too",
+      "message": "AssertionError: finance update amount negative: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:153:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix inventory full CRUD: create \u2192 update \u2192 delete \u2192 gone",
+      "message": "AssertionError: double-delete inventory: expected 200 to be 404 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:108:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix inventory rejects empty body and missing required fields",
+      "message": "AssertionError: inventory empty body: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:112:134\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix inventory rejects negative / string / huge numbers",
+      "message": "AssertionError: inventory.quantity negative: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:126:72\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix inventory rejects oversized strings; does not store script verbatim",
+      "message": "AssertionError: inventory.name 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:136:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix inventory update rejects invalid values too",
+      "message": "AssertionError: inventory update quantity negative: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:153:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix suppliers full CRUD: create \u2192 update \u2192 delete \u2192 gone",
+      "message": "AssertionError: double-delete suppliers: expected 200 to be 404 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:108:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix suppliers rejects empty body and missing required fields",
+      "message": "AssertionError: suppliers empty body: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:112:134\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix suppliers rejects oversized strings; does not store script verbatim",
+      "message": "AssertionError: suppliers.name 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:136:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix suppliers update rejects invalid values too",
+      "message": "AssertionError: suppliers empty update: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:156:65\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix liabilities full CRUD: create \u2192 update \u2192 delete \u2192 gone",
+      "message": "AssertionError: double-delete liabilities: expected 200 to be 404 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:108:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix liabilities rejects empty body and missing required fields",
+      "message": "AssertionError: liabilities empty body: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:112:134\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix liabilities rejects negative / string / huge numbers",
+      "message": "AssertionError: liabilities.amount_owed negative: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:126:72\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix liabilities rejects oversized strings; does not store script verbatim",
+      "message": "AssertionError: liabilities.creditor 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:136:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix liabilities update rejects invalid values too",
+      "message": "AssertionError: liabilities update amount_owed negative: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:153:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix laborers rejects negative / string / huge numbers",
+      "message": "AssertionError: laborers.daily_wage negative: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:126:72\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix laborers rejects oversized strings; does not store script verbatim",
+      "message": "AssertionError: laborers.name 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:136:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix laborers update rejects invalid values too",
+      "message": "AssertionError: laborers update daily_wage negative: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:153:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix crops: rejects bad status enum and bad plant_date on create and update",
+      "message": "AssertionError: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:170:166\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix tasks: rejects bad priority enum",
+      "message": "AssertionError: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:179:145\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts",
+      "title": "Agri API field matrix crop logs: irrigation/spray validation + ghost crop",
+      "message": "AssertionError: spray negative quantity: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/agri.api-matrix.test.ts:196:182\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/backup-import-export.test.ts",
+      "title": "Backup / import / export (all apps) flock junk restore is rejected and data survives",
+      "message": "AssertionError: flock junk restore {}: expected 404 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/backup-import-export.test.ts:51:98\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/backup-import-export.test.ts",
+      "title": "Backup / import / export (all apps) flock export \u2192 restore into a fresh instance round-trips the marker record",
+      "message": "AssertionError: flock restore into fresh instance: expected 404 to be 200 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/backup-import-export.test.ts:80:81\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix cows rejects huge numbers and oversized strings",
+      "message": "AssertionError: cows.ageYears huge: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix cows does not store script payloads verbatim",
+      "message": "AssertionError: cows.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:146:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix milk full CRUD: create \u2192 read \u2192 update \u2192 delete \u2192 404",
+      "message": "AssertionError: double-delete milk: expected 200 to be 404 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:104:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix milk rejects huge numbers and oversized strings",
+      "message": "AssertionError: milk.morning huge: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix expenses rejects huge numbers and oversized strings",
+      "message": "AssertionError: expenses.amount huge: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix health full CRUD: create \u2192 read \u2192 update \u2192 delete \u2192 404",
+      "message": "AssertionError: double-delete health: expected 200 to be 404 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:104:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix health rejects huge numbers and oversized strings",
+      "message": "AssertionError: health.cost huge: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix buyers full CRUD: create \u2192 read \u2192 update \u2192 delete \u2192 404",
+      "message": "AssertionError: double-delete buyers: expected 200 to be 404 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:104:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix buyers rejects huge numbers and oversized strings",
+      "message": "AssertionError: buyers.name 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:134:78\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix buyers does not store script payloads verbatim",
+      "message": "AssertionError: buyers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:146:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix suppliers full CRUD: create \u2192 read \u2192 update \u2192 delete \u2192 404",
+      "message": "AssertionError: double-delete suppliers: expected 200 to be 404 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:104:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix suppliers rejects huge numbers and oversized strings",
+      "message": "AssertionError: suppliers.name 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:134:78\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix suppliers does not store script payloads verbatim",
+      "message": "AssertionError: suppliers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:146:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix labor workers rejects huge numbers and oversized strings",
+      "message": "AssertionError: labor workers.dailyWage huge: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts",
+      "title": "Dairy API field matrix labor workers does not store script payloads verbatim",
+      "message": "AssertionError: labor workers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/full-rerun/tests/api-matrix/dairy.api-matrix.test.ts:146:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts",
+      "title": "Flock API field matrix batches rejects empty/missing/bad-enum/negative/huge/oversized input",
+      "message": "AssertionError: bad date: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts:51:158\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts",
+      "title": "Flock API field matrix batches update validation: PATCH rejects bad enum / negative numbers",
+      "message": "AssertionError: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts:78:133\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts",
+      "title": "Flock API field matrix batch logs (all kinds) vaccination: create \u2192 invalid rejected \u2192 delete \u2192 gone",
+      "message": "AssertionError: vaccination negative value: expected 201 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts:101:65\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts",
+      "title": "Flock API field matrix /data buckets birds: round-trip works; wrong-type value rejected",
+      "message": "AssertionError: birds accepts plain-string value: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts:142:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts",
+      "title": "Flock API field matrix /data buckets eggs: round-trip works; wrong-type value rejected",
+      "message": "AssertionError: eggs accepts plain-string value: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts:142:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts",
+      "title": "Flock API field matrix /data buckets feed: round-trip works; wrong-type value rejected",
+      "message": "AssertionError: feed accepts plain-string value: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts:142:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts",
+      "title": "Flock API field matrix /data buckets settings: round-trip works; wrong-type value rejected",
+      "message": "AssertionError: settings accepts plain-string value: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts:142:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts",
+      "title": "Flock API field matrix /data buckets diary: round-trip works; wrong-type value rejected",
+      "message": "AssertionError: diary accepts plain-string value: expected 200 to be 400 // Object.is equality\n    at /home/user/full-rerun/tests/api-matrix/flock.api-matrix.test.ts:142:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/toolchain/fastcheck-invariants.test.ts",
+      "title": "TOOLCHAIN fast-check invariants P1: agri inventory quantity is never negative after any PUT quantity",
+      "message": "Error: Property failed after 3 tests\n{ seed: -1831280858, path: \"2:1:0:0:0:0:0:0:0:0:0:0:0:0:0:0:0\", endOnFailure: true }\nCounterexample: [-1]\nShrunk 16 time(s)\n\nHint: Enable verbose mode in order to have the list of all failing values encountered during the run\n    at buildError (file:///home/user/full-rerun/node_modules/fast-check/lib/fast-check.js:2469:16)\n    at asyncThrowIfFailed (file:///home/user/full-rerun/node_modules/fast-check/lib/fast-check.js:2481:8)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/toolchain/fastcheck-invariants.test.ts",
+      "title": "TOOLCHAIN fast-check invariants P2: agri liability amount_owed is never negative after any create amount",
+      "message": "Error: Property failed after 1 tests\n{ seed: -1426335462, path: \"0:1:0:0:0:0:0:0:0:0:0:0:0:0:0\", endOnFailure: true }\nCounterexample: [-1]\nShrunk 14 time(s)\n\nHint: Enable verbose mode in order to have the list of all failing values encountered during the run\n    at buildError (file:///home/user/full-rerun/node_modules/fast-check/lib/fast-check.js:2469:16)\n    at asyncThrowIfFailed (file:///home/user/full-rerun/node_modules/fast-check/lib/fast-check.js:2481:8)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/toolchain/security-scan.test.ts",
+      "title": "TOOLCHAIN security scan dairy: API responses carry CSP + nosniff + frame protection",
+      "message": "AssertionError: missing CSP: expected null to be truthy\n    at /home/user/full-rerun/tests/toolchain/security-scan.test.ts:23:63\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/toolchain/security-scan.test.ts",
+      "title": "TOOLCHAIN security scan dairy: authenticated responses are non-cacheable",
+      "message": "AssertionError: auth response cacheable: expected '' to match /no-store|private/i\n    at /home/user/full-rerun/tests/toolchain/security-scan.test.ts:31:88\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/toolchain/security-scan.test.ts",
+      "title": "TOOLCHAIN security scan flock: authenticated responses are non-cacheable",
+      "message": "AssertionError: auth response cacheable: expected '' to match /no-store|private/i\n    at /home/user/full-rerun/tests/toolchain/security-scan.test.ts:31:88\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/toolchain/security-scan.test.ts",
+      "title": "TOOLCHAIN security scan flock: CORS does not reflect arbitrary origins with credentials",
+      "message": "AssertionError: CORS reflects evil origin with credentials (acao=https://evil.example.com acac=true): expected true to be false // Object.is equality\n    at /home/user/full-rerun/tests/toolchain/security-scan.test.ts:38:144\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/toolchain/security-scan.test.ts",
+      "title": "TOOLCHAIN security scan agri: API responses carry CSP + nosniff + frame protection",
+      "message": "AssertionError: missing CSP: expected null to be truthy\n    at /home/user/full-rerun/tests/toolchain/security-scan.test.ts:23:63\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/toolchain/security-scan.test.ts",
+      "title": "TOOLCHAIN security scan agri: authenticated responses are non-cacheable",
+      "message": "AssertionError: auth response cacheable: expected '' to match /no-store|private/i\n    at /home/user/full-rerun/tests/toolchain/security-scan.test.ts:31:88\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    },
+    {
+      "file": "/home/user/full-rerun/tests/toolchain/security-scan.test.ts",
+      "title": "TOOLCHAIN security scan agri: CORS does not reflect arbitrary origins with credentials",
+      "message": "AssertionError: CORS reflects evil origin with credentials (acao=https://evil.example.com acac=true): expected true to be false // Object.is equality\n    at /home/user/full-rerun/tests/toolchain/security-scan.test.ts:38:144\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/full-rerun/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+    }
+  ]
+}

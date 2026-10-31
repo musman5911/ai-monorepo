@@ -1,0 +1,271 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND stryker run tests/full-rerun/stryker.config.json (pure batch-math tests only; unrelated known-failing legacy suites excluded)
+[32m19:09:34 (9868) INFO ProjectReader[39m Found 1 of 800 file(s) to be mutated.
+[32m19:09:35 (9868) INFO Instrumenter[39m Instrumented 1 source file(s) with 160 mutant(s)
+[32m19:09:46 (9868) INFO ConcurrencyTokenProvider[39m Creating 2 test runner process(es).
+[32m19:09:52 (9868) INFO DryRunExecutor[39m Starting initial test run (vitest test runner with "perTest" coverage analysis). This may take a while.
+[32m19:09:54 (9868) INFO DryRunExecutor[39m Initial test run succeeded. Ran 6 tests in 1 second (net 5.098046000000977 ms, overhead 1625.901953999999 ms).
+
+All tests/flock-batch-math.test.ts
+  ✓ batch egg log validation accepts a valid daily production record [line 6] (killed 10)
+  ✓ batch egg log validation rejects counts that exceed collected eggs [line 13] (killed 15)
+  ✓ batch egg log validation rejects negative values and missing dates [line 19] (killed 13)
+  ✓ batch financial summary includes egg income in revenue and vaccination cost in expenses [line 28] (killed 88)
+  ✓ batch financial summary deducts sales, home use and waste from available eggs [line 54] (killed 4)
+  ✓ batch financial summary returns null for a missing batch [line 65] (killed 1)
+
+[NoCoverage] ConditionalExpression
+flock_farm/backend/batch-math.mjs:51:7
+-       : batch.intake_count > 0
++       : true
+
+[NoCoverage] ConditionalExpression
+flock_farm/backend/batch-math.mjs:51:7
+-       : batch.intake_count > 0
++       : false
+
+[NoCoverage] EqualityOperator
+flock_farm/backend/batch-math.mjs:51:7
+-       : batch.intake_count > 0
++       : batch.intake_count >= 0
+
+[NoCoverage] EqualityOperator
+flock_farm/backend/batch-math.mjs:51:7
+-       : batch.intake_count > 0
++       : batch.intake_count <= 0
+
+[NoCoverage] ArithmeticOperator
+flock_farm/backend/batch-math.mjs:52:9
+-         ? total_cost / batch.intake_count
++         ? total_cost * batch.intake_count
+
+[Survived] MethodExpression
+flock_farm/backend/batch-math.mjs:2:16
+-     const date = String(record.date || '').trim();
++     const date = String(record.date || '');
+Tests ran:
+    batch egg log validation accepts a valid daily production record
+    batch egg log validation rejects counts that exceed collected eggs
+    batch egg log validation rejects negative values and missing dates
+
+
+[Survived] ConditionalExpression
+flock_farm/backend/batch-math.mjs:6:32
+-     const broken_wasted = Number(record.broken_wasted || 0);
++     const broken_wasted = Number(true);
+Tests ran:
+    batch egg log validation accepts a valid daily production record
+    batch egg log validation rejects counts that exceed collected eggs
+    batch egg log validation rejects negative values and missing dates
+
+
+[Survived] ConditionalExpression
+flock_farm/backend/batch-math.mjs:7:32
+-     const price_per_egg = Number(record.price_per_egg || 0);
++     const price_per_egg = Number(true);
+Tests ran:
+    batch egg log validation accepts a valid daily production record
+    batch egg log validation rejects counts that exceed collected eggs
+    batch egg log validation rejects negative values and missing dates
+
+
+[Survived] ConditionalExpression
+flock_farm/backend/batch-math.mjs:7:32
+-     const price_per_egg = Number(record.price_per_egg || 0);
++     const price_per_egg = Number(false);
+Tests ran:
+    batch egg log validation accepts a valid daily production record
+    batch egg log validation rejects counts that exceed collected eggs
+    batch egg log validation rejects negative values and missing dates
+
+
+[Survived] MethodExpression
+flock_farm/backend/batch-math.mjs:11:8
+-     if (!values.every(Number.isFinite) || values.some((value) => value < 0)) {
++     if (!values.some(Number.isFinite) || values.some((value) => value < 0)) {
+Tests ran:
+    batch egg log validation accepts a valid daily production record
+    batch egg log validation rejects counts that exceed collected eggs
+    batch egg log validation rejects negative values and missing dates
+
+
+[Survived] EqualityOperator
+flock_farm/backend/batch-math.mjs:14:7
+-     if (sold + home_use + broken_wasted > collected) {
++     if (sold + home_use + broken_wasted >= collected) {
+Tests ran:
+    batch egg log validation accepts a valid daily production record
+    batch egg log validation rejects counts that exceed collected eggs
+
+
+[Survived] ArrayDeclaration
+flock_farm/backend/batch-math.mjs:22:14
+-     feedLogs = [],
++     feedLogs = ["Stryker was here"],
+Tests ran:
+    batch financial summary deducts sales, home use and waste from available eggs
+    batch financial summary returns null for a missing batch
+
+
+[Survived] ArrayDeclaration
+flock_farm/backend/batch-math.mjs:23:19
+-     mortalityLogs = [],
++     mortalityLogs = ["Stryker was here"],
+Tests ran:
+    batch financial summary deducts sales, home use and waste from available eggs
+    batch financial summary returns null for a missing batch
+
+
+[Survived] ArrayDeclaration
+flock_farm/backend/batch-math.mjs:24:17
+-     expenseLogs = [],
++     expenseLogs = ["Stryker was here"],
+Tests ran:
+    batch financial summary deducts sales, home use and waste from available eggs
+    batch financial summary returns null for a missing batch
+
+
+[Survived] ArrayDeclaration
+flock_farm/backend/batch-math.mjs:25:15
+-     salesLogs = [],
++     salesLogs = ["Stryker was here"],
+Tests ran:
+    batch financial summary deducts sales, home use and waste from available eggs
+    batch financial summary returns null for a missing batch
+
+
+[Survived] ArrayDeclaration
+flock_farm/backend/batch-math.mjs:26:13
+-     eggLogs = [],
++     eggLogs = ["Stryker was here"],
+Tests ran:
+    batch financial summary returns null for a missing batch
+
+
+[Survived] ArrayDeclaration
+flock_farm/backend/batch-math.mjs:27:21
+-     vaccinationLogs = [],
++     vaccinationLogs = ["Stryker was here"],
+Tests ran:
+    batch financial summary deducts sales, home use and waste from available eggs
+    batch financial summary returns null for a missing batch
+
+
+[Survived] ConditionalExpression
+flock_farm/backend/batch-math.mjs:42:75
+-     const total_mortality_count = mortalityLogs.reduce((sum, log) => sum + (log.count || 0), 0);
++     const total_mortality_count = mortalityLogs.reduce((sum, log) => sum + (true), 0);
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+
+
+[Survived] ConditionalExpression
+flock_farm/backend/batch-math.mjs:48:25
+-     const mortality_pct = batch.intake_count > 0 ? (total_mortality_count / batch.intake_count) * 100 : 0;
++     const mortality_pct = true ? (total_mortality_count / batch.intake_count) * 100 : 0;
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] ConditionalExpression
+flock_farm/backend/batch-math.mjs:48:25
+-     const mortality_pct = batch.intake_count > 0 ? (total_mortality_count / batch.intake_count) * 100 : 0;
++     const mortality_pct = false ? (total_mortality_count / batch.intake_count) * 100 : 0;
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] EqualityOperator
+flock_farm/backend/batch-math.mjs:48:25
+-     const mortality_pct = batch.intake_count > 0 ? (total_mortality_count / batch.intake_count) * 100 : 0;
++     const mortality_pct = batch.intake_count >= 0 ? (total_mortality_count / batch.intake_count) * 100 : 0;
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] EqualityOperator
+flock_farm/backend/batch-math.mjs:48:25
+-     const mortality_pct = batch.intake_count > 0 ? (total_mortality_count / batch.intake_count) * 100 : 0;
++     const mortality_pct = batch.intake_count <= 0 ? (total_mortality_count / batch.intake_count) * 100 : 0;
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] ArithmeticOperator
+flock_farm/backend/batch-math.mjs:48:50
+-     const mortality_pct = batch.intake_count > 0 ? (total_mortality_count / batch.intake_count) * 100 : 0;
++     const mortality_pct = batch.intake_count > 0 ? total_mortality_count / batch.intake_count / 100 : 0;
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] ArithmeticOperator
+flock_farm/backend/batch-math.mjs:48:51
+-     const mortality_pct = batch.intake_count > 0 ? (total_mortality_count / batch.intake_count) * 100 : 0;
++     const mortality_pct = batch.intake_count > 0 ? (total_mortality_count * batch.intake_count) * 100 : 0;
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] ConditionalExpression
+flock_farm/backend/batch-math.mjs:49:25
+-     const cost_per_bird = live_count > 0
++     const cost_per_bird = true
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] ConditionalExpression
+flock_farm/backend/batch-math.mjs:49:25
+-     const cost_per_bird = live_count > 0
++     const cost_per_bird = false
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] EqualityOperator
+flock_farm/backend/batch-math.mjs:49:25
+-     const cost_per_bird = live_count > 0
++     const cost_per_bird = live_count >= 0
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] EqualityOperator
+flock_farm/backend/batch-math.mjs:49:25
+-     const cost_per_bird = live_count > 0
++     const cost_per_bird = live_count <= 0
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+[Survived] ArithmeticOperator
+flock_farm/backend/batch-math.mjs:50:7
+-       ? total_cost / live_count
++       ? total_cost * live_count
+Tests ran:
+    batch financial summary includes egg income in revenue and vaccination cost in expenses
+    batch financial summary deducts sales, home use and waste from available eggs
+
+
+Ran 1.37 tests per mutant on average.
+----------------|------------------|----------|-----------|------------|----------|----------|
+                | % Mutation score |          |           |            |          |          |
+File            |  total | covered | # killed | # timeout | # survived | # no cov | # errors |
+----------------|--------|---------|----------|-----------|------------|----------|----------|
+All files       |  81.88 |   84.52 |      131 |         0 |         24 |        5 |        0 |
+ batch-math.mjs |  81.88 |   84.52 |      131 |         0 |         24 |        5 |        0 |
+----------------|--------|---------|----------|-----------|------------|----------|----------|
+[32m19:11:58 (9868) INFO JsonReporter[39m Your report can be found at: file:///home/user/full-rerun/results/full-rerun/mutation.json
+[32m19:11:58 (9868) INFO MutationTestExecutor[39m Done in 2 minutes and 25 seconds.
+EXIT=0

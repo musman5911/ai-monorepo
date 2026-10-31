@@ -1,0 +1,51 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["npm", "run", "check-super-admin"]
+CWD /home/user/full-rerun
+ENV: external tokens blank, internal scheduler disabled; per-test settings also apply.
+
+> check-super-admin
+> node tools/check-super-admin.js
+
+  ✓ Agri navigation gates Super Admin on the owner role
+  ✓ Dairy navigation gates Super Admin on the owner role
+  ✓ Flock navigation gates Super Admin on the owner role
+
+Agri: owner-only Super Admin summary
+  ✓ seeded owner can log in
+  ✓ owner can read the Super Admin farm summary
+  ✓ owner receives a separate entry for each active farm
+  ✓ each farm entry contains its own identity and metrics
+  ✓ owner can create a manager assigned to a farm
+  ✓ owner can create a worker assigned to a farm
+  ✓ manager can log in
+  ✓ worker can log in
+  ✓ manager receives HTTP 403 on owner-only summary data
+  ✓ worker receives HTTP 403 on owner-only summary data
+
+Dairy: owner-only Super Admin summary
+  ✓ seeded owner can log in
+  ✓ owner can read the Super Admin farm summary
+  ✓ owner receives a separate entry for each active farm
+  ✓ each farm entry contains its own identity and metrics
+  ✓ owner can create a manager assigned to a farm
+  ✓ owner can create a worker assigned to a farm
+  ✓ manager can log in
+  ✓ worker can log in
+  ✓ manager receives HTTP 403 on owner-only summary data
+  ✓ worker receives HTTP 403 on owner-only summary data
+
+Flock: owner-only Super Admin summary
+  ✓ seeded owner can log in
+  ✓ owner can read the Super Admin farm summary
+  ✓ owner receives a separate entry for each active farm
+  ✓ each farm entry contains its own identity and metrics
+  ✓ owner can create a manager assigned to a farm
+  ✓ owner can create a worker assigned to a farm
+  ✓ manager can log in
+  ✓ worker can log in
+  ✓ manager receives HTTP 403 on owner-only summary data
+  ✓ worker receives HTTP 403 on owner-only summary data
+
+All Super Admin checks passed.
+
+RUNNER EXIT=0 TIMEOUT=False SECONDS=10.74

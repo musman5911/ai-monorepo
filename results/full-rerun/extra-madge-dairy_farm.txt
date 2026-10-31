@@ -1,0 +1,9 @@
+2ddf5bccd555b779ee7446c038a30fc5bcd1bcb0
+COMMAND ["/home/user/rerun-extra-tools/node_modules/.bin/madge", "--circular", "dairy_farm/backend"]
+- Finding files
+Processed 47 files (1.9s) (1 warning)
+
+✔ No circular dependency found!
+
+
+EXIT=0 TIMEOUT=False
