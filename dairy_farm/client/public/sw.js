@@ -1,5 +1,5 @@
 const CACHE_NAME = 'dairyfarm-v1';
-const API_CACHE_NAME = 'dairyfarmapi-v1'; // offline API cache (stale-while-revalidate)
+const API_CACHE_NAME = 'dairyfarmapi-v2'; // user + farm-scoped offline API cache
 const ASSETS = [
   '/',
   '/index.html',
@@ -44,12 +44,33 @@ self.addEventListener('activate', (e) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys
-          .filter((key) => (key.startsWith('dairyfarm-') || key === API_CACHE_NAME) && key !== CACHE_NAME)
+          .filter((key) => (key.startsWith('dairyfarm-') && key !== CACHE_NAME) || (key.startsWith('dairyfarmapi-') && key !== API_CACHE_NAME))
           .map((key) => caches.delete(key))
       )
     ).then(() => clients.claim())
   );
 });
+
+async function getApiCacheKey(request) {
+  const authorization = request.headers.get('Authorization')
+    || request.headers.get('X-Auth-Token')
+    || request.headers.get('X-Access-Token')
+    || '';
+  const farmId = request.headers.get('X-Farm-Id') || '';
+  if (!authorization && !farmId) return request;
+
+  // Never put the bearer token itself in a cache URL. Hash the user + farm
+  // context so cached records from two farms or two accounts cannot collide.
+  if (!self.crypto || !self.crypto.subtle) return null;
+  const bytes = new TextEncoder().encode(authorization + '\n' + farmId);
+  const digest = await self.crypto.subtle.digest('SHA-256', bytes);
+  const scope = Array.from(new Uint8Array(digest))
+    .map((value) => value.toString(16).padStart(2, '0'))
+    .join('');
+  const keyUrl = new URL(request.url);
+  keyUrl.searchParams.set('__muf_api_scope', scope);
+  return new Request(keyUrl.toString(), { method: 'GET' });
+}
 
 self.addEventListener('fetch', (e) => {
   // API GETs: stale-while-revalidate offline cache — when the phone is
@@ -61,16 +82,61 @@ self.addEventListener('fetch', (e) => {
   if (isApiGet) {
     e.respondWith(
       caches.open(API_CACHE_NAME).then(async (cache) => {
+        const authorization = e.request.headers.get('Authorization')
+          || e.request.headers.get('X-Auth-Token')
+          || e.request.headers.get('X-Access-Token')
+          || '';
+        const farmId = e.request.headers.get('X-Farm-Id') || '';
+        const isPrivateApiRead = Boolean(authorization || farmId);
+
+        if (isPrivateApiRead) {
+          let cacheKey = null;
+          try {
+            cacheKey = await getApiCacheKey(e.request);
+          } catch {
+            // If a safe per-user/per-farm key cannot be created, do not serve
+            // another request's cached data. Use the network without caching.
+            return fetch(e.request).catch(() => new Response(
+              JSON.stringify({ error: 'offline' }),
+              { status: 503, headers: { 'Content-Type': 'application/json' } }
+            ));
+          }
+          if (!cacheKey) {
+            return fetch(e.request).catch(() => new Response(
+              JSON.stringify({ error: 'offline' }),
+              { status: 503, headers: { 'Content-Type': 'application/json' } }
+            ));
+          }
+
+          // Authenticated data is network-first. If the network is unavailable,
+          // fall back only to this same user's and same farm's cached response.
+          try {
+            const fresh = await fetch(e.request);
+            if (fresh && fresh.ok) cache.put(cacheKey, fresh.clone()).catch(() => {});
+            return fresh;
+          } catch {
+            const cached = await cache.match(cacheKey);
+            if (cached) return cached;
+            return new Response(JSON.stringify({ error: 'offline' }), {
+              status: 503,
+              headers: { 'Content-Type': 'application/json' }
+            });
+          }
+        }
+
+        // Public API reads retain stale-while-revalidate behavior.
         const cached = await cache.match(e.request);
         const network = fetch(e.request).then((response) => {
           if (response && response.ok) cache.put(e.request, response.clone());
           return response;
         }).catch(() => null);
-        if (cached) { network.catch(() => {}); return cached; } // offline → last data
+        if (cached) { network.catch(() => {}); return cached; }
         const fresh = await network;
         if (fresh) return fresh;
-        // online but request failed (e.g. server down): fail like a normal API error
-        return new Response(JSON.stringify({ error: 'offline' }), { status: 503, headers: { 'Content-Type': 'application/json' } });
+        return new Response(JSON.stringify({ error: 'offline' }), {
+          status: 503,
+          headers: { 'Content-Type': 'application/json' }
+        });
       })
     );
     return;
