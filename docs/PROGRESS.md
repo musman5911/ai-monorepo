@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-11-03 (Dairy empty-disposable-database and browser checks advanced; Phase 19 remains in progress).
+Last updated: 2026-11-03 (Dairy live checks passed; farm-scoped service-worker cache correction pushed; Phase 19 remains in progress).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -417,3 +417,18 @@ The owner pulled commit `f50d196` and reported the following results on the disp
 The owner also reported that repeated tab navigation no longer triggers the API rate-limit error. The local build output contains the existing non-fatal Mongoose warning that `collection` is a reserved schema pathname. It did not prevent server startup.
 
 These are owner-supplied Windows/browser results, not independently executed in this editing session. The successful empty-database UI tests do not complete the separate restored-backup migration/index/query-plan track in this phase. No database restore, migration apply, archive restore, deletion-safety, or concurrency test is claimed here.
+
+
+## Phase 19 farm-switch cache correction (2026-11-03)
+
+Owner-reported Agri and Flock browser testing had shown that changing farms could require a second refresh before the newly selected farm's records appeared. Source inspection found all three service workers cached authenticated `/api/` GET responses by URL alone, ignoring the `Authorization` and `X-Farm-Id` request headers. Their stale-while-revalidate strategy could therefore return Farm A's cached response immediately after selecting Farm B while the background fetch refreshed the URL-only cache.
+
+Updated Dairy, Agri and Flock service workers to:
+- partition authenticated API cache entries by a SHA-256 scope derived from the authorization header and selected farm ID (the bearer token itself is never put in the cache URL);
+- use network-first reads for private/authenticated API data, falling back only to the same user/farm cache when the network is unavailable;
+- bypass caching if a safe per-user/per-farm key cannot be created;
+- version the API caches and remove old cache versions during activation and local development.
+
+Added `tests/farm-api-cache-isolation.test.ts`. GitHub Actions run [41667733026](https://github.com/musman5911/ai-monorepo/actions/runs/41667733026) passed on commit `139da5e`.
+
+**Owner validation pending:** pull the change, build Agri and Flock, and verify that switching Farm A ↔ Farm B displays each farm's records after a single selection/reload. No local browser proof is claimed yet. The separate Agri crop-form popup close issue remains open and requires its own browser verification/fix.

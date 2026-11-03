@@ -148,3 +148,18 @@ The Dairy general API ceiling is now 1,200 requests per 15 minutes. The stricter
 The non-fatal Mongoose warning about the reserved schema pathname `collection` remains visible at backend startup. The owner did not report a blocking effect from it. The fix raises the general Dairy API allowance and removes duplicate App-shell requests; it does not claim to prove that every possible screen is free of an independent request loop.
 
 Phase 19 remains **In progress**. The empty-disposable-database CRUD and selected backup checks are not a substitute for the remaining restored-backup migration, idempotence, index/query-plan, database-size, archive/photo, and multi-process concurrency scenarios listed above. No restore or migration apply is claimed in this checkpoint.
+
+
+## Phase 19 farm-switch cache correction (2026-11-03)
+
+Owner-reported Agri and Flock browser testing had shown that changing farms could require a second refresh before the newly selected farm's records appeared. Source inspection found all three service workers cached authenticated `/api/` GET responses by URL alone, ignoring the `Authorization` and `X-Farm-Id` request headers. Their stale-while-revalidate strategy could therefore return Farm A's cached response immediately after selecting Farm B while the background fetch refreshed the URL-only cache.
+
+Updated Dairy, Agri and Flock service workers to:
+- partition authenticated API cache entries by a SHA-256 scope derived from the authorization header and selected farm ID (the bearer token itself is never put in the cache URL);
+- use network-first reads for private/authenticated API data, falling back only to the same user/farm cache when the network is unavailable;
+- bypass caching if a safe per-user/per-farm key cannot be created;
+- version the API caches and remove old cache versions during activation and local development.
+
+Added `tests/farm-api-cache-isolation.test.ts`. GitHub Actions run [41667733026](https://github.com/musman5911/ai-monorepo/actions/runs/41667733026) passed on commit `139da5e`.
+
+**Owner validation pending:** pull the change, build Agri and Flock, and verify that switching Farm A ↔ Farm B displays each farm's records after a single selection/reload. No local browser proof is claimed yet. The separate Agri crop-form popup close issue remains open and requires its own browser verification/fix.
