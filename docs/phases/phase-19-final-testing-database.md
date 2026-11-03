@@ -162,4 +162,4 @@ Updated Dairy, Agri and Flock service workers to:
 
 Added `tests/farm-api-cache-isolation.test.ts`. GitHub Actions run [41667733026](https://github.com/musman5911/ai-monorepo/actions/runs/41667733026) passed on commit `139da5e`.
 
-**Owner validation pending:** pull the change, build Agri and Flock, and verify that switching Farm A ↔ Farm B displays each farm's records after a single selection/reload. No local browser proof is claimed yet. The separate Agri crop-form popup close issue remains open and requires its own browser verification/fix.
+**Owner validation (2026-11-03):** after pulling commit `88bf941), the owner reports that Agri and Flock farm switching both pass in the browser: Farm A ↔ Farm B records appear immediately after selection, without pressing F5. The owner also reports that the Agri crop popup closes correctly after the tested close/cancel and save actions, and Dairy farm data isolation passes without a manual refresh. This closes the browser checks that were pending in the previous checkpoint. These are owner-supplied browser results, not independently executed in this editing session.

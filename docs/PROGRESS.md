@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-11-03 (Dairy live checks passed; farm-scoped service-worker cache correction pushed; Phase 19 remains in progress).
+Last updated: 2026-11-03 (Agri, Flock and Dairy browser regression checks passed; Phase 19 remains in progress).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -432,3 +432,19 @@ Updated Dairy, Agri and Flock service workers to:
 Added `tests/farm-api-cache-isolation.test.ts`. GitHub Actions run [41667733026](https://github.com/musman5911/ai-monorepo/actions/runs/41667733026) passed on commit `139da5e`.
 
 **Owner validation pending:** pull the change, build Agri and Flock, and verify that switching Farm A ↔ Farm B displays each farm's records after a single selection/reload. No local browser proof is claimed yet. The separate Agri crop-form popup close issue remains open and requires its own browser verification/fix.
+
+
+## Phase 19 browser regression checkpoint (2026-11-03; owner-supplied results)
+
+After pulling commit `88bf941`, the owner reports that all four final browser checks passed:
+
+| Browser check | Result |
+|---|---|
+| Agri Farm A ↔ Farm B switching | Passed; the selected farm's records appeared immediately without pressing F5 |
+| Flock Farm A ↔ Farm B switching | Passed; the selected farm's records appeared immediately without pressing F5 |
+| Agri crop popup | Passed; the popup closed correctly after the tested close/cancel and save actions |
+| Dairy farm data isolation | Passed; farm records remained separated while moving between the tested farms, without a manual refresh |
+
+This closes the browser validation previously pending for the farm-scoped service-worker cache correction and the Agri crop-popup behavior. The results are owner-supplied browser observations, not independently executed in this editing session.
+
+**Current disposition:** Phase 19 remains **In progress**. The remaining real-MongoDB track still requires a fresh backup restored only to a confirmed disposable copy, guarded migration dry-run/apply/idempotence checks, record-count and farm-ownership comparison, index/query-plan inspection, and the listed backup/restore, archive/photo, deletion-safety and two-process concurrency scenarios. The empty-database CRUD/browser checks do not replace those restored-copy tests. Do not run migrations against production or ordinary app `.env` targets.
