@@ -250,27 +250,28 @@ export default function App() {
   const [sessionNotice, setSessionNotice] = useState<string | null>(null);
   const reduceMotion = prefersReducedMotion();
 
-  // Header bell — real health alerts (due/overdue), same data the Dashboard
-  // banner uses, surfaced in the shared parent-design header.
-  useEffect(() => {
-    if (!token) { setHealthAlerts([]); return; }
-    let cancelled = false;
-    api.getUpcomingHealth()
-      .then((records: HealthRecord[]) => { if (!cancelled) setHealthAlerts(records || []); })
-      .catch(() => { if (!cancelled) setHealthAlerts([]); });
-    return () => { cancelled = true; };
-  }, [token, tab]);
-
+  // Shared header indicators are session-level data. Refreshing them on every
+  // tab change duplicated requests already made by Dashboard and the active tab,
+  // needlessly consuming the app-wide API rate limit.
   const [milkLoggedToday, setMilkLoggedToday] = useState<boolean | null>(null);
   useEffect(() => {
-    if (!token) return;
+    if (!token) {
+      setHealthAlerts([]);
+      setMilkLoggedToday(null);
+      return;
+    }
     let cancelled = false;
     const today = todayStr();
-    api.getMilk({ from: today, to: today })
-      .then((rows: unknown[]) => { if (!cancelled) setMilkLoggedToday(Array.isArray(rows) && rows.length > 0); })
-      .catch(() => { if (!cancelled) setMilkLoggedToday(null); });
+    Promise.all([
+      api.getUpcomingHealth().catch(() => null),
+      api.getMilk({ from: today, to: today }).catch(() => null),
+    ]).then(([alerts, milkRows]) => {
+      if (cancelled) return;
+      if (alerts !== null) setHealthAlerts(alerts || []);
+      if (milkRows !== null) setMilkLoggedToday(Array.isArray(milkRows) && milkRows.length > 0);
+    });
     return () => { cancelled = true; };
-  }, [token, tab]);
+  }, [token]);
 
   const notifications = useMemo(() => {
     const today = todayStr();

@@ -136,3 +136,11 @@ First-owner setup differs by app:
 The Flock first-owner fix is source/test coverage only until the updated branch is pulled and exercised against the local Flock test database. After owner setup, verify farm creation, test-record CRUD, farm isolation, and backup behavior. Keep all production databases untouched.
 
 The existing `tools/final-db-*.mjs` migration workflow remains reserved for the restored-copy/legacy-data track. Do not bypass its backup/restore guards for empty-database setup tests, and do not run migrations against production.
+
+## Dairy API request-limit correction (2026-11-03)
+
+During the owner's live Dairy checks, the same HTTP 429 response appeared on Backup, Dashboard, Breeding and other screens. Source review found that one IP-based limiter capped every API route at 300 requests per 15 minutes, while the dashboard loads several datasets in parallel. The App shell also fetched health alerts and today's milk again on every tab change, duplicating requests made by the Dashboard.
+
+The Dairy general API ceiling is now 1,200 requests per 15 minutes. The stricter route-specific limits for login (5), first-owner setup (3), password reset (5) and user management (20) remain in place. Shared header health/milk indicators now load once per authenticated session instead of on each tab switch. Added a source-contract regression test for both protections.
+
+**Validation pending:** pull this commit into the Windows checkout, run the new test and Dairy build, then repeat Dashboard, Breeding, Backup and tab-navigation checks. Do not mark Phase 19 complete until those live checks pass. This change does not prove that no individual screen has an independent request loop.

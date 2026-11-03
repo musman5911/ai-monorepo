@@ -82,11 +82,15 @@ app.use((req, res, next) => {
 app.use(cookieParser());
 app.use(mongoSanitize());
 
-// Broad API rate limiter: authenticated data routes still need a safety net in case a token leaks or a script loops.
+// General API budget for normal farm-app browsing. A dashboard loads several
+// independent datasets in parallel, and some summary cards load linked records.
+// Keep this high enough for real navigation while retaining a hard ceiling for
+// runaway clients. Login, setup, password-reset and user-management routes have
+// their own stricter route-specific limiters in routes/auth.js.
 const apiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: mufTestRateLimitMax(300),
-  message: { error: 'Too many API requests. Please try again later.' },
+  max: mufTestRateLimitMax(1200),
+  message: { error: 'Too many API requests. Please wait a few minutes before trying again.' },
   standardHeaders: true,
   legacyHeaders: false,
 });
