@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-10-29 (Phases 17 and 18 complete for command-line scope; Phase 19 real-MongoDB testing started).
+Last updated: 2026-11-03 (Dairy empty-disposable-database and browser checks advanced; Phase 19 remains in progress).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -392,3 +392,28 @@ Added `tools/final-db-preflight.mjs`, `tools/final-db-migrate.mjs`, and the read
 
 
 **Phase 19 safety-check hardening (2026-10-29):** added a dedicated `npm run check-final-db` command for the Phase 19 offline safety regression suite and wired it into the push/PR GitHub Actions quick-check workflow. Expanded regression coverage for explicit-URI-only behavior, cross-app database-name rejection, credential-free diagnostics, and refusal to start migrations before restore confirmation. This check is intentionally offline; live MongoDB verification remains blocked until a disposable target and fresh backup are independently confirmed.
+
+
+## Phase 19 Dairy live verification checkpoint (2026-11-03; owner-supplied Windows CMD and browser results)
+
+The owner pulled commit `f50d196` and reported the following results on the disposable Dairy database `muf_phase19_dairy_local`:
+
+| Check | Result |
+|---|---|
+| Direct Node MongoDB driver connection and admin ping | Passed; output identified `muf_phase19_dairy_local` |
+| Dairy backend startup | Passed; MongoDB connected and monthly snapshot `auto-2026-11` was saved during startup |
+| Agri/Flock cross-farm records were not shown in Dairy | Not part of this checkpoint |
+| Farm A animal `PH19-DAIRY-A-EDITED` persisted after backend restart | Passed |
+| Farm B did not show Farm A's test animal | Passed |
+| Farm B animal `PH19-DAIRY-B-COW` created and appeared immediately | Passed |
+| Farm A did not show Farm B's test animal after switching back | Passed |
+| Form closes after creating the Farm B animal | Passed |
+| Dairy broad API 429 across Dashboard, Cows, Milk, Breeding, Health, Finance, Reports and Admin Backup after the fix | Owner reported all listed screens working without the 429 |
+| Manual and automatic backup actions | Owner reported both working after the fix; no restore was performed |
+| `npx vitest run tests/dairy-api-usage.test.ts` | Passed: 1 file / 2 tests |
+| `npm run build` in `dairy_farm/client` | Passed: `tsc --noEmit` and Vite build (3,224 modules) |
+| Dairy backend startup after update | Passed: listening on port 3000 and MongoDB connected |
+
+The owner also reported that repeated tab navigation no longer triggers the API rate-limit error. The local build output contains the existing non-fatal Mongoose warning that `collection` is a reserved schema pathname. It did not prevent server startup.
+
+These are owner-supplied Windows/browser results, not independently executed in this editing session. The successful empty-database UI tests do not complete the separate restored-backup migration/index/query-plan track in this phase. No database restore, migration apply, archive restore, deletion-safety, or concurrency test is claimed here.
