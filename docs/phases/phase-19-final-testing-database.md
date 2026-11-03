@@ -163,3 +163,22 @@ Updated Dairy, Agri and Flock service workers to:
 Added `tests/farm-api-cache-isolation.test.ts`. GitHub Actions run [41667733026](https://github.com/musman5911/ai-monorepo/actions/runs/41667733026) passed on commit `139da5e`.
 
 **Owner validation (2026-11-03):** after pulling commit `88bf941), the owner reports that Agri and Flock farm switching both pass in the browser: Farm A ↔ Farm B records appear immediately after selection, without pressing F5. The owner also reports that the Agri crop popup closes correctly after the tested close/cancel and save actions, and Dairy farm data isolation passes without a manual refresh. This closes the browser checks that were pending in the previous checkpoint. These are owner-supplied browser results, not independently executed in this editing session.
+
+
+## Phase 19 automated regression checkpoint (2026-11-03; owner-supplied Windows CMD results)
+
+After pulling documentation commit `3814116`, the owner reported:
+
+| Command/check | Result |
+|---|---|
+| `npx vitest run tests/farm-api-cache-isolation.test.ts` | Passed: 1 file / 6 tests |
+| `npm run check-final-db` | Passed: 1 file / 16 tests |
+| `npm test` | Passed: 51 files / 441 tests |
+
+The focused cache suite verifies the Dairy, Agri and Flock service-worker cache partitioning by authenticated user and selected farm, plus old-cache version cleanup. The final database suite verifies safety preflight and migration wrapper contracts offline; it does **not** establish a live MongoDB backup restore, migration, index, query-plan or concurrency result. The full test output included one conditional Mongoose-query test skipped because Dairy backend packages were not installed in the root test environment; all 441 executed tests passed.
+
+Together with the immediately preceding browser checkpoint, the owner reports the farm-switch behavior in Agri and Flock passes without pressing F5, the Agri crop popup closes correctly, and Dairy farm data isolation passes. These are owner-supplied local results, not commands independently executed in this editing session.
+
+**Remaining command-line gate:** run `npm run check-sync`, `npm run check-ui`, `npm run check-workbench`, `npm run check-farms`, `npm run check-docs`, and `tools\\build-all.bat`; then record their actual outputs. `npm ci` is also listed in the standard gate if dependencies need a clean install. Do not claim those checks based on the three passing commands above.
+
+**Phase disposition:** still **In progress**. The restored-backup real-MongoDB checklist remains unverified: backup restore to dedicated copies, guarded migration dry-run/apply/re-apply, before/after counts and farm ownership, indexes/query plans, persistent backup/restore scenarios, archive/photo scenarios, 84-case farm-deletion safety, large Flock image restore, two-backend egg-inventory lock, and database-size/cap measurements.

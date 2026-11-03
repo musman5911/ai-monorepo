@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-11-03 (Agri, Flock and Dairy browser regression checks passed; Phase 19 remains in progress).
+Last updated: 2026-11-03 (Phase 19 browser validation and 441-test automated suite passed; real-database restore track remains open).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -448,3 +448,22 @@ After pulling commit `88bf941`, the owner reports that all four final browser ch
 This closes the browser validation previously pending for the farm-scoped service-worker cache correction and the Agri crop-popup behavior. The results are owner-supplied browser observations, not independently executed in this editing session.
 
 **Current disposition:** Phase 19 remains **In progress**. The remaining real-MongoDB track still requires a fresh backup restored only to a confirmed disposable copy, guarded migration dry-run/apply/idempotence checks, record-count and farm-ownership comparison, index/query-plan inspection, and the listed backup/restore, archive/photo, deletion-safety and two-process concurrency scenarios. The empty-database CRUD/browser checks do not replace those restored-copy tests. Do not run migrations against production or ordinary app `.env` targets.
+
+
+## Phase 19 automated and browser validation checkpoint (2026-11-03; owner-supplied Windows CMD results)
+
+The owner pulled commit `3814116` and reported these checks passing:
+
+| Command/check | Result |
+|---|---|
+| Agri Farm A ↔ Farm B browser switching | Passed; correct records appeared immediately without pressing F5 |
+| Flock Farm A ↔ Farm B browser switching | Passed; correct records appeared immediately without pressing F5 |
+| Agri crop popup close/cancel and save behavior | Passed |
+| Dairy farm data isolation in browser | Passed without manual refresh |
+| `npx vitest run tests/farm-api-cache-isolation.test.ts` | Passed: 1 file / 6 tests |
+| `npm run check-final-db` | Passed: 1 file / 16 safety and migration-wrapper tests |
+| `npm test` | Passed: 51 files / 441 tests |
+
+The focused cache test covers all three service workers' user/farm cache partitioning and old-cache cleanup. The final-DB test verifies fail-closed configuration, explicit disposable-target and backup requirements, dry-run-by-default migration behavior, and required index source contracts. It is an offline test and does not connect to MongoDB. The full suite includes one conditional Mongoose-query test skipped because the Dairy backend packages were not installed in this root test environment; Vitest still reports all 441 executed tests passed.
+
+These are owner-supplied Windows CMD and browser results, not independently executed in this editing session. The remaining standard checks and all real-MongoDB restored-copy scenarios are still pending. Do not mark Phase 19 complete or run a migration apply on production or ordinary app `.env` targets.
