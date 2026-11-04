@@ -121,17 +121,17 @@ function buildDairyCollections(farmIds, today) {
     const activeCount = farmNo - 1;
     for (let n = 1; n <= activeCount; n += 1) {
       const cowId = n === 1 ? mother : p + "-cow-" + String(n).padStart(2, "0");
-      c.Cow.push({ _id: cowId, seedId: cowId, farmId, name: (n === 1 ? "Noor " : "Rani ") + farmNo + (n === 1 ? "" : "-" + n), breed: n % 2 ? "Sahiwal" : "Holstein Friesian", gender: "female", earTag: "D-" + farmNo + "-C-" + String(n).padStart(3, "0"), status: "active", birthDate: dateFromSeed(800 + n * 70, today), weight: 390 + n * 22, lactationNumber: 2 + n, batch: "Lactating Group " + farmNo, calvingDate: dateFromSeed(125, today), purchasePrice: 145000 + n * 9000, fatherId: bull, fatherType: "farm", fatherName: "Sher " + farmNo });
+      c.Cow.push({ _id: cowId, seedId: cowId, farmId, name: (n === 1 ? "Noor " : "Rani ") + farmNo + (n === 1 ? "" : "-" + n), breed: n % 2 ? "Sahiwal" : "Holstein Friesian", gender: "female", earTag: "D-" + farmNo + "-C-" + String(n).padStart(3, "0"), status: "active", birthDate: dateFromSeed(800 + n * 70, today), weight: 390 + n * 22, lactationNumber: 2 + n, batch: "Lactating Group " + farmNo, calvingDate: dateFromSeed(61, today), purchasePrice: 145000 + n * 9000, fatherId: bull, fatherType: "farm", fatherName: "Sher " + farmNo });
       for (let day = 0; day < 60; day += 1) c.Milk.push({ _id: p + "-milk-" + n + "-" + (day + 1), seedId: p + "-milk-" + n + "-" + (day + 1), farmId, cowId, date: dateFromSeed(day, today), morning: 7 + ((day + n) % 4), evening: 5 + ((day + 2 * n) % 3), calfMilk: 0.5, fatPercent: 3.8, snfPercent: 8.5 });
     }
     c.Cow.push({ _id: sold, seedId: sold, farmId, name: "Gulabo " + farmNo, breed: "Red Sindhi", gender: "female", earTag: "D-" + farmNo + "-S-001", status: "sold", birthDate: dateFromSeed(1600, today), weight: 360, lactationNumber: 5, batch: "Sold Animals", purchasePrice: 95000, fatherId: bull, fatherType: "farm", fatherName: "Sher " + farmNo });
-    c.Cow.push({ _id: calf, seedId: calf, farmId, name: "Chhoti " + farmNo, breed: "Sahiwal", gender: "female", earTag: "D-" + farmNo + "-K-001", status: "calf", birthDate: dateFromSeed(4, today), weight: 58, lactationNumber: 0, motherId: mother, fatherId: bull, fatherType: "farm", fatherName: "Sher " + farmNo, isCalf: true, batch: "Born on Farm" });
+    c.Cow.push({ _id: calf, seedId: calf, farmId, name: "Chhoti " + farmNo, breed: "Sahiwal", gender: "female", earTag: "D-" + farmNo + "-K-001", status: "calf", birthDate: dateFromSeed(61, today), weight: 58, lactationNumber: 0, motherId: mother, fatherId: bull, fatherType: "farm", fatherName: "Sher " + farmNo, isCalf: true, batch: "Born on Farm" });
     const eventData = [
-      { type: "heat", date: dateFromSeed(90, today), notes: "Observed standing heat." },
-      { type: "service", date: dateFromSeed(88, today), sireSource: "farm_bull", bullId: bull, bullName: "Sher " + farmNo, notes: "Natural service by farm bull." },
-      { type: "service", date: dateFromSeed(86, today), sireSource: "outside_straw", semenCode: "STRAW-" + farmNo + "-A", bullName: "Approved outside sire", technician: "Demo technician" },
-      { type: "pregnancy_check", date: dateFromSeed(50, today), result: "positive", notes: "Routine demo pregnancy check." },
-      { type: "calving", date: dateFromSeed(4, today), calves: [{ gender: "female", earTag: "D-" + farmNo + "-K-001", outcome: "live" }], generatedCalfIds: [calf], notes: "Live calf linked to dam and sire." }
+      { type: "heat", date: dateFromSeed(343, today), notes: "Observed standing heat." },
+      { type: "service", date: dateFromSeed(341, today), sireSource: "farm_bull", bullId: bull, bullName: "Sher " + farmNo, notes: "Natural service by farm bull." },
+      { type: "service", date: dateFromSeed(339, today), sireSource: "outside_straw", semenCode: "STRAW-" + farmNo + "-A", bullName: "Approved outside sire", technician: "Demo technician" },
+      { type: "pregnancy_check", date: dateFromSeed(291, today), result: "positive", notes: "Routine demo pregnancy check." },
+      { type: "calving", date: dateFromSeed(61, today), calves: [{ gender: "female", earTag: "D-" + farmNo + "-K-001", outcome: "live" }], generatedCalfIds: [calf], notes: "Live calf linked to dam and sire." }
     ];
     eventData.forEach((event, index) => c.BreedingEvent.push({ _id: p + "-event-" + (index + 1), seedId: p + "-event-" + (index + 1), farmId, cowId: mother, ...event }));
     c.BreedingEvent.push({ _id: p + "-sold-heat", seedId: p + "-sold-heat", farmId, cowId: sold, type: "heat", date: dateFromSeed(170, today), notes: "Historical event before sale." });
@@ -201,7 +201,7 @@ function buildFlockCollections(farmIds, today) {
       c.BatchExpenseLog.push({ seedId: batchId + "-expense", farmId, batch_id: batchId, date: dateFromSeed(9, today), category: "Medicine", detail: "Routine flock medicine", amount: 1850 + n * 200, notes: "" });
       c.BatchSaleLog.push({ seedId: batchId + "-sale", farmId, batch_id: batchId, date: dateFromSeed(4, today), count: 12, amount: 15600, buyer: "Poultry buyer " + farmNo, notes: "Partial batch sale" });
       c.BatchWeightLog.push({ seedId: batchId + "-weight", farmId, batch_id: batchId, date: dateFromSeed(3, today), avg_weight_g: 1450 + n * 80, sample_size: 12, notes: "Weekly sample" });
-      c.BatchEggLog.push({ seedId: batchId + "-eggs", farmId, batch_id: batchId, date: dateFromSeed(1, today), collected: n === 1 ? 80 : 38 + n * 6, sold: n === 1 ? 20 : 30 + n * 4, home_use: 4, broken_wasted: 2, price_per_egg: 25, notes: "Layer collection" });
+      c.BatchEggLog.push({ seedId: batchId + "-eggs", farmId, batch_id: batchId, date: n === 1 ? dateFromSeed(30, today) : dateFromSeed(1, today), collected: n === 1 ? 80 : 38 + n * 6, sold: n === 1 ? 20 : 30 + n * 4, home_use: 4, broken_wasted: 2, price_per_egg: 25, notes: "Layer collection" });
       c.BatchVaccinationLog.push({ seedId: batchId + "-vaccination", farmId, batch_id: batchId, date: dateFromSeed(7, today), vaccine_name: "Newcastle (ND)", dose: "0.5 ml", bird_count: 70, cost: 950, notes: "Vaccination schedule" });
     }
     const sourceBatch = batches[0];
@@ -226,9 +226,9 @@ function buildFlockCollections(farmIds, today) {
       expenses: [{ id: "seed-" + farmNo + "-expense-1", date: dateFromSeed(9, today), detail: "Routine flock medicine", category: "Other", amount: 1850, notes: "" }],
       incubation: [{
         id: incubationId, sourceBatchId: sourceBatch.batch_id, startDate: dateFromSeed(21, today),
-        eggsSet: 24, hatchDate: dateFromSeed(0, today), hatched: 7, brokenEggs: 1,
+        eggsSet: 24, hatchDate: dateFromSeed(3, today), hatched: 7, brokenEggs: 1,
         spoiledEggs: 2, infertileEggs: 10, deadInShellEggs: 4,
-        flockTransferDate: dateFromSeed(3, today), flockTransferCount: 7,
+        flockTransferDate: dateFromSeed(2, today), flockTransferCount: 7,
         notes: "Allocated from the linked batch egg inventory."
       }],
       checklist: [{ date: dateFromSeed(0, today), completed: ["collect_eggs", "feed_birds", "check_water"] }],
