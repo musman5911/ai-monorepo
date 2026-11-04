@@ -88,7 +88,7 @@ describe('incubation data route inventory lock integration', () => {
 
   it('requires an explicit version so stale clients cannot silently overwrite newer data', async () => {
     const res = makeResponse();
-    await putIncubation(makeRequest([{ id: 2, sourceBatchId: 'BATCH-1', eggsSet: 10 }], 'incubation', undefined), res);
+    await putIncubation(makeRequest([{ id: 2, sourceBatchId: 'BATCH-1', eggsSet: 10 }], 'incubation', null), res);
     expect(res.statusCode).toBe(428);
     expect(res.body.error).toMatch(/baseVersion is required/);
     expect(state.savedValue).toBeNull();
