@@ -200,12 +200,45 @@ function buildFlockCollections(farmIds, today) {
       c.BatchExpenseLog.push({ seedId: batchId + "-expense", farmId, batch_id: batchId, date: dateFromSeed(9, today), category: "Medicine", detail: "Routine flock medicine", amount: 1850 + n * 200, notes: "" });
       c.BatchSaleLog.push({ seedId: batchId + "-sale", farmId, batch_id: batchId, date: dateFromSeed(4, today), count: 12, amount: 15600, buyer: "Poultry buyer " + farmNo, notes: "Partial batch sale" });
       c.BatchWeightLog.push({ seedId: batchId + "-weight", farmId, batch_id: batchId, date: dateFromSeed(3, today), avg_weight_g: 1450 + n * 80, sample_size: 12, notes: "Weekly sample" });
-      c.BatchEggLog.push({ seedId: batchId + "-eggs", farmId, batch_id: batchId, date: dateFromSeed(1, today), collected: 38 + n * 6, sold: 30 + n * 4, home_use: 4, broken_wasted: 2, price_per_egg: 25, notes: "Layer collection" });
+      c.BatchEggLog.push({ seedId: batchId + "-eggs", farmId, batch_id: batchId, date: dateFromSeed(1, today), collected: n === 1 ? 80 : 38 + n * 6, sold: n === 1 ? 20 : 30 + n * 4, home_use: 4, broken_wasted: 2, price_per_egg: 25, notes: "Layer collection" });
       c.BatchVaccinationLog.push({ seedId: batchId + "-vaccination", farmId, batch_id: batchId, date: dateFromSeed(7, today), vaccine_name: "Newcastle (ND)", dose: "0.5 ml", bird_count: 70, cost: 950, notes: "Vaccination schedule" });
     }
     const sourceBatch = batches[0];
-    const birds = Array.from({ length: 8 + farmNo }, (_, index) => ({ id: "seed-" + farmNo + "-bird-" + (index + 1), name: "Home Bird " + farmNo + "-" + (index + 1), gender: index % 3 === 0 ? "Male" : "Female", breed: index % 2 ? "Desi" : "Golden", status: "Active", batchId: sourceBatch.batch_id }));
+    const incubationId = "seed-" + farmNo + "-incubation-1";
+    const birds = Array.from({ length: 8 + farmNo }, (_, index) => ({
+      id: "seed-" + farmNo + "-bird-" + (index + 1),
+      name: "Home Bird " + farmNo + "-" + (index + 1),
+      gender: index % 3 === 0 ? "Male" : "Female",
+      breed: index % 2 ? "Desi" : "Golden",
+      status: "Active",
+      batchId: sourceBatch.batch_id,
+      sourceIncubationId: index < 7 ? incubationId : ""
+    }));
     const buckets = {
+      settings: { defaultPricePerEgg: 25, vaccinationIntervalDays: 30, feedLowStockDays: 14, feedConsumptionKgPerDay: 2 },
+      birds,
+      vaccinations: [{ id: "seed-" + farmNo + "-vaccination-1", birdId: birds[0].id, date: dateFromSeed(7, today), vaccineName: "Newcastle (ND)", dose: "0.5 ml", cost: 950, notes: "Routine vaccination" }],
+      feed: [{ id: "seed-" + farmNo + "-feed-1", date: dateFromSeed(5, today), feedType: "Layer mash", quantityKg: 22, rateRsPerKg: 118, supplierId: 1 }],
+      eggs: [{ id: "seed-" + farmNo + "-eggs-1", date: dateFromSeed(1, today), totalEggsCollected: 42, sold: 34, homeUse: 4, brokenWasted: 2, pricePerEgg: 25 }],
+      customers: [{ id: "seed-" + farmNo + "-customer-1", name: "Egg Customer " + farmNo, phone: "0303-00000" + farmNo }],
+      customerSales: [{ id: "seed-" + farmNo + "-customer-sale-1", customerId: "seed-" + farmNo + "-customer-1", date: dateFromSeed(4, today), eggsQty: 12, pricePerEgg: 25, amountPaid: 200, notes: "Part payment" }],
+      expenses: [{ id: "seed-" + farmNo + "-expense-1", date: dateFromSeed(9, today), detail: "Routine flock medicine", category: "Other", amount: 1850, notes: "" }],
+      incubation: [{
+        id: incubationId, sourceBatchId: sourceBatch.batch_id, startDate: dateFromSeed(21, today),
+        eggsSet: 24, hatchDate: dateFromSeed(0, today), hatched: 7, brokenEggs: 1,
+        spoiledEggs: 2, infertileEggs: 10, deadInShellEggs: 4,
+        flockTransferDate: dateFromSeed(3, today), flockTransferCount: 7,
+        notes: "Allocated from the linked batch egg inventory."
+      }],
+      checklist: [{ date: dateFromSeed(0, today), completed: ["collect_eggs", "feed_birds", "check_water"] }],
+      diary: [{ date: dateFromSeed(0, today), note: "Routine demo farm entry." }],
+      suppliers: [{ id: "seed-" + farmNo + "-supplier-1", name: "Feed Supplier " + farmNo }],
+      supplierPayments: [{ id: "seed-" + farmNo + "-supplier-payment-1", supplierId: "seed-" + farmNo + "-supplier-1", date: dateFromSeed(2, today), amount: 4500, note: "Part payment" }],
+      laborers: [{ id: "seed-" + farmNo + "-laborer-1", name: "Flock Worker " + farmNo, dailyWage: 1000 }],
+      laborAttendance: [{ id: "seed-" + farmNo + "-labor-attendance-1", workerId: "seed-" + farmNo + "-laborer-1", date: dateFromSeed(1, today), dayType: "full", posted: false }],
+      laborAdvances: [{ id: "seed-" + farmNo + "-labor-advance-1", workerId: "seed-" + farmNo + "-laborer-1", date: dateFromSeed(6, today), amount: 1200, settled: false }]
+    };
+    for (const [key, value] of Object.entries(buckets)) c.DataStore.push({ seedId: p + "-bucket-" + key, farmId, key, value, version: 0 });
       birds, homeBirds: birds.slice(0, 8),
       customers: [{ id: "seed-" + farmNo + "-customer-1", name: "Egg Customer " + farmNo, phone: "0303-00000" + farmNo }],
       suppliers: [{ id: "seed-" + farmNo + "-supplier-1", name: "Feed Supplier " + farmNo }],
