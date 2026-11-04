@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const port = Number(process.env.MUF_FLOCK_ARCHIVE_PORT || 5189);
 const base = `http://127.0.0.1:${port}`;
-const child = spawn(process.execPath, ['server.js'], { cwd: path.join(root, 'flock_farm/backend'), env: { ...process.env, MEMORY_MODE: '1', PORT: String(port), JWT_SECRET: 'flock-archive-check-secret', NODE_ENV: 'development', MONGO_URI: '', MONGODB_URI: '' }, stdio: ['ignore','pipe','pipe'] });
+const child = spawn(process.execPath, ['server.js'], { cwd: path.join(root, 'flock_farm/backend'), env: { ...process.env, MEMORY_MODE: '1', MUF_DEMO_PROFILE: 'basic', PORT: String(port), JWT_SECRET: 'flock-archive-check-secret', NODE_ENV: 'development', MONGO_URI: '', MONGODB_URI: '' }, stdio: ['ignore','pipe','pipe'] });
 let logs='', failures=0; child.stdout.on('data',d=>{logs+=d}); child.stderr.on('data',d=>{logs+=d});
 const check=(v,label)=>{console.log(`  ${v?'✓':'✗'} ${label}`);if(!v)failures++}; const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 async function call(method,url,{token,farm,body}={}){const headers={'content-type':'application/json'};if(token)headers.authorization=`Bearer ${token}`;if(farm)headers['x-farm-id']=farm;const res=await fetch(base+url,{method,headers,body:body===undefined?undefined:JSON.stringify(body)});const raw=await res.text();let json;try{json=JSON.parse(raw)}catch{json=raw}return{status:res.status,json,headers:res.headers}}
