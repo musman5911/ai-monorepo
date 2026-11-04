@@ -175,7 +175,25 @@ function buildAgriCollections(farmIds, today) {
     }
     c.Crop.push(...crops);
     crops.forEach((crop, n) => {
-      c.Finance.push({ _id: stableObjectId(p + "-finance-" + n + "-input"), seedId: p + "-finance-" + n + "-input", farmId, category: "Seed and fertilizer", amount: 18500 + n * 3200, type: "expense", date: dateFromSeed(26 + n * 4, today), crop_id: String(crop._id), cycleId: crop.cycleId, fieldId: crop.fieldId, notes: "Field and crop-cycle input cost" }, { _id: stableObjectId(p + "-finance-" + n + "-sale"), seedId: p + "-finance-" + n + "-sale", farmId, category: "Crop sale", amount: 54000 + n * 8000, type: "income", date: dateFromSeed(6 + n, today), crop_id: String(crop._id), cycleId: crop.cycleId, fieldId: crop.fieldId, notes: "Linked demo crop-cycle sale" });
+      const cycle = cycles[n % cycles.length];
+      c.Finance.push({
+        _id: stableObjectId(p + "-finance-" + n + "-input"),
+        seedId: p + "-finance-" + n + "-input",
+        farmId, category: "Seed and fertilizer", amount: 18500 + n * 3200,
+        type: "expense", date: dateFromSeed(cycle.plantOffset - 5, today),
+        crop_id: String(crop._id), cycleId: crop.cycleId, fieldId: crop.fieldId,
+        notes: "Field and crop-cycle input cost"
+      });
+      if (crop.status === "Completed") {
+        c.Finance.push({
+          _id: stableObjectId(p + "-finance-" + n + "-sale"),
+          seedId: p + "-finance-" + n + "-sale",
+          farmId, category: "Crop sale", amount: 54000 + n * 8000,
+          type: "income", date: dateFromSeed(cycle.harvestOffset - 3, today),
+          crop_id: String(crop._id), cycleId: crop.cycleId, fieldId: crop.fieldId,
+          notes: "Linked demo crop-cycle sale"
+        });
+      }
     });
     c.Task.push({ _id: stableObjectId(p + "-task-01"), seedId: p + "-task-01", farmId, title: "Irrigate demo field", description: "Check water rotation and field channels", status: "Pending", date: dateFromSeed(1, today), fieldId: String(fields[0]._id), crop_id: String(crops[0]._id) }, { _id: stableObjectId(p + "-task-02"), seedId: p + "-task-02", farmId, title: "Inspect crop health", description: "Scout for weeds and pests", status: "Completed", date: dateFromSeed(5, today), fieldId: String(fields[fields.length - 1]._id), crop_id: String(crops[crops.length - 1]._id) });
     c.Inventory.push({ _id: stableObjectId(p + "-inventory-01"), seedId: p + "-inventory-01", farmId, name: "DAP fertilizer", quantity: 16 + farmNo, unit: "bags", low_stock_threshold: 5, notes: "Demo fertilizer stock" }, { _id: stableObjectId(p + "-inventory-02"), seedId: p + "-inventory-02", farmId, name: "Wheat seed", quantity: 80 + farmNo * 10, unit: "kg", low_stock_threshold: 20, notes: "Demo seed stock" });
