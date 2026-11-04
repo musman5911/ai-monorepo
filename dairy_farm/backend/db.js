@@ -287,6 +287,7 @@ const SupplierPaymentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 const UserSchema = new mongoose.Schema({
+  seedId: { type: String, index: true },
   username: { type: String, required: true, unique: true, trim: true, lowercase: true },
   password: { type: String, required: true },
   // owner / manager / worker (legacy 'admin' is converted to owner by the farms migration)
