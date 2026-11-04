@@ -126,3 +126,35 @@ describe('Agri finance ledger input allowlist', () => {
     expect(normalizeFinanceInput({ ...base, crop_id: 'not-an-id' }).error).toMatch(/valid ID/);
   });
 });
+
+
+describe('Agri task input allowlist', () => {
+  it('strips status and unknown fields and keeps app task fields', async () => {
+    const { normalizeTaskInput } = await import('../agri_farm/backend/record-validation.mjs');
+    expect(normalizeTaskInput({
+      title: ' Irrigate fields ', due_date: '2026-11-04', assigned_to: 'worker',
+      priority: 'High', notes: 'Check valves', image_base64: '/api/photos/0123456789abcdef01234567',
+      labor_cost: '1500', inventory_item_id: '1123456789abcdef01234567',
+      inventory_qty_consumed: '2', crop_id: '2123456789abcdef01234567',
+      laborer_ids: ['3123456789abcdef01234567', '3123456789abcdef01234567'],
+      status: 'Completed', farmId: 'other', role: 'owner',
+    })).toEqual({ value: {
+      title: 'Irrigate fields', due_date: '2026-11-04', assigned_to: 'worker',
+      priority: 'High', notes: 'Check valves', image_base64: '/api/photos/0123456789abcdef01234567',
+      labor_cost: 1500, inventory_item_id: '1123456789abcdef01234567',
+      inventory_qty_consumed: 2, crop_id: '2123456789abcdef01234567',
+      laborer_ids: ['3123456789abcdef01234567'],
+    } });
+  });
+
+  it('rejects malformed task dates, priorities, image references, amounts and crew lists', async () => {
+    const { normalizeTaskInput } = await import('../agri_farm/backend/record-validation.mjs');
+    const base = { title: 'Irrigate fields', priority: 'Medium' };
+    expect(normalizeTaskInput({ ...base, due_date: '2026-02-31' }).error).toMatch(/valid calendar date/);
+    expect(normalizeTaskInput({ ...base, priority: 'Urgent' }).error).toMatch(/Priority/);
+    expect(normalizeTaskInput({ ...base, labor_cost: 'Infinity' }).error).toMatch(/non-negative/);
+    expect(normalizeTaskInput({ ...base, image_base64: 'javascript:alert(1)' }).error).toMatch(/image/);
+    expect(normalizeTaskInput({ ...base, laborer_ids: ['bad-id'] }).error).toMatch(/valid ID/);
+    expect(normalizeTaskInput({ ...base, inventory_qty_consumed: 2 }).error).toMatch(/inventory item/);
+  });
+});

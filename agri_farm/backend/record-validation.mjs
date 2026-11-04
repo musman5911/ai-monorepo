@@ -250,3 +250,59 @@ export function normalizeFinanceInput(body = {}, { defaultDate = '' } = {}) {
   }
   return { value };
 }
+
+
+export function normalizeTaskInput(body = {}) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { error: 'Task details must be an object.' };
+  const title = cleanText(body.title, 'Task title', 200, { required: true });
+  if (title.error) return title;
+  const dueDate = cleanDate(body.due_date, 'Due date');
+  if (dueDate.error) return dueDate;
+  const assignedTo = cleanText(body.assigned_to, 'Assigned worker', 120);
+  if (assignedTo.error) return assignedTo;
+  const priority = body.priority === undefined ? 'Medium' : body.priority;
+  if (!['Low', 'Medium', 'High'].includes(priority)) return { error: 'Priority must be Low, Medium, or High.' };
+  const notes = cleanText(body.notes, 'Task notes', 2000);
+  if (notes.error) return notes;
+  const image = cleanText(body.image_base64, 'Task image', 400_000);
+  if (image.error) return image;
+  if (image.value && !image.value.startsWith('data:image/') && !/^\/api\/photos\/[a-f0-9]{24}$/i.test(image.value)) {
+    return { error: 'Task image must be an image data URL or a farm photo path.' };
+  }
+  const laborCost = cleanNumber(body.labor_cost, 'Labor cost', { fallback: 0 });
+  if (laborCost.error) return laborCost;
+  const inventoryQty = cleanNumber(body.inventory_qty_consumed, 'Inventory quantity', { fallback: 0 });
+  if (inventoryQty.error) return inventoryQty;
+  const cropId = optionalId(body.crop_id, 'Crop ID');
+  if (cropId.error) return cropId;
+  const inventoryId = optionalId(body.inventory_item_id, 'Inventory item ID');
+  if (inventoryId.error) return inventoryId;
+  if (inventoryQty.value > 0 && !inventoryId.value) {
+    return { error: 'Select an inventory item before recording a consumed quantity.' };
+  }
+  const rawLaborerIds = body.laborer_ids === undefined ? [] : body.laborer_ids;
+  if (!Array.isArray(rawLaborerIds) || rawLaborerIds.length > 30) {
+    return { error: 'laborer_ids must be a list of at most 30 worker IDs.' };
+  }
+  const laborerIds = [];
+  for (const rawId of rawLaborerIds) {
+    if (typeof rawId !== 'string' || !validObjectId(rawId.trim())) {
+      return { error: 'Every assigned laborer must have a valid ID.' };
+    }
+    const id = rawId.trim();
+    if (!laborerIds.includes(id)) laborerIds.push(id);
+  }
+  return { value: {
+    title: title.value,
+    due_date: dueDate.value,
+    assigned_to: assignedTo.value,
+    priority,
+    notes: notes.value,
+    image_base64: image.value,
+    labor_cost: laborCost.value,
+    inventory_item_id: inventoryId.value,
+    inventory_qty_consumed: inventoryQty.value,
+    crop_id: cropId.value,
+    laborer_ids: laborerIds,
+  } };
+}

@@ -7,6 +7,7 @@ import { mufIsFullRole } from '../muf-farms.mjs';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { notFound, forbidden, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
+import { normalizeTaskInput } from '../record-validation.mjs';
 
 const router = express.Router();
 
@@ -61,53 +62,24 @@ router.post('/tasks/bulk', protect, requireAdmin, asyncHandler(async (req, res) 
   if (rows.length > 200) return res.status(400).json({ error: 'A task bulk request is limited to 200 rows' });
 
   const errors = [];
-  const allowedPriorities = new Set(['Low', 'Medium', 'High']);
-  const prepared = rows.map((raw, index) => {
-    const rowNumber = index + 2;
-    const row = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
-    const title = String(row.title || '').trim();
-    const priority = String(row.priority || 'Medium').trim();
-    const dueDate = String(row.due_date || '').trim();
-    const laborCost = row.labor_cost === undefined || row.labor_cost === '' ? 0 : Number(row.labor_cost);
-    if (!title) errors.push({ row: rowNumber, message: 'Task title is required.' });
-    if (!allowedPriorities.has(priority)) errors.push({ row: rowNumber, message: 'Priority must be Low, Medium, or High.' });
-    if (dueDate && Number.isNaN(Date.parse(dueDate))) errors.push({ row: rowNumber, message: 'Due date must be valid.' });
-    if (!Number.isFinite(laborCost) || laborCost < 0) errors.push({ row: rowNumber, message: 'Labor cost must be a non-negative number.' });
-    return {
-      title,
-      due_date: dueDate,
-      assigned_to: String(row.assigned_to || '').trim(),
-      priority,
-      notes: String(row.notes || ''),
-      labor_cost: laborCost,
-      crop_id: String(row.crop_id || '').trim() || null,
-      inventory_item_id: String(row.inventory_item_id || '').trim() || null,
-      inventory_qty_consumed: row.inventory_qty_consumed === undefined || row.inventory_qty_consumed === '' ? 0 : Number(row.inventory_qty_consumed),
-      laborer_ids: Array.isArray(row.laborer_ids) ? row.laborer_ids : [],
-      status: 'Pending',
-    };
-  });
-  for (let index = 0; index < prepared.length; index += 1) {
-    const row = prepared[index];
-    if (!Number.isFinite(row.inventory_qty_consumed) || row.inventory_qty_consumed < 0) {
-      errors.push({ row: index + 2, message: 'Inventory quantity must be a non-negative number.' });
+  const prepared = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    const normalized = normalizeTaskInput(rows[index]);
+    if (normalized.error) {
+      errors.push({ row: index + 2, message: normalized.error });
+      continue;
     }
-    if (row.crop_id) {
-      if (!/^[0-9a-fA-F]{24}$/.test(row.crop_id) || !(await Crop.findOne({ _id: row.crop_id }))) {
-        errors.push({ row: index + 2, message: 'Crop must exist in the selected farm.' });
-      }
+    const row = normalized.value;
+    const linkError = await validateTaskLinks(row);
+    if (linkError) {
+      errors.push({ row: index + 2, message: linkError });
+      continue;
     }
-    if (row.inventory_item_id) {
-      if (!/^[0-9a-fA-F]{24}$/.test(row.inventory_item_id) || !(await Inventory.findOne({ _id: row.inventory_item_id }))) {
-        errors.push({ row: index + 2, message: 'Inventory item must exist in the selected farm.' });
-      }
-    }
+    [row.laborer_ids, row.laborer_names] = await cleanLaborerIds(row.laborer_ids);
+    row.status = 'Pending';
+    prepared.push(row);
   }
   if (errors.length) return res.status(400).json({ error: 'Bulk task validation failed', details: errors });
-
-  for (const task of prepared) {
-    [task.laborer_ids, task.laborer_names] = await cleanLaborerIds(task.laborer_ids);
-  }
   const inserted = await Task.insertMany(prepared);
   return res.status(201).json({ status: 'ok', inserted: inserted.length });
 }));
@@ -147,21 +119,29 @@ async function cleanLaborerIds(rawIds) {
 }
 
 router.post('/tasks', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const task = { ...(req.body || {}), status: 'Pending' };
+  const normalized = normalizeTaskInput(req.body || {});
+  if (normalized.error) return res.status(400).json({ error: normalized.error });
+  const task = normalized.value;
   const linkError = await validateTaskLinks(task);
   if (linkError) return res.status(400).json({ error: linkError });
   [task.laborer_ids, task.laborer_names] = await cleanLaborerIds(task.laborer_ids);
-  await Task.insertMany([task]);
+  await Task.insertMany([{ ...task, status: 'Pending' }]);
   return res.status(201).json({ status: 'ok' });
 }));
 
 router.put('/tasks/:taskId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.taskId, 'task ID');
-  const task = { ...(req.body || {}) };
+  const existing = await Task.findOne({ _id: oid });
+  if (!existing) return notFound(res, 'Task not found');
+  const normalized = normalizeTaskInput(req.body || {});
+  if (normalized.error) return res.status(400).json({ error: normalized.error });
+  const task = normalized.value;
   const linkError = await validateTaskLinks(task);
   if (linkError) return res.status(400).json({ error: linkError });
   [task.laborer_ids, task.laborer_names] = await cleanLaborerIds(task.laborer_ids);
-  const result = await replaceFarmRecord(Task, oid, task);
+  // Editing task details must not mark a task complete; completion is a
+  // separate idempotent endpoint that also performs finance and stock effects.
+  const result = await replaceFarmRecord(Task, oid, { ...task, status: existing.status || 'Pending' });
   if (!result.matchedCount) return notFound(res, 'Task not found');
   return res.json({ status: 'ok' });
 }));

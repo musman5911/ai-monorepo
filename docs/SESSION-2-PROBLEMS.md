@@ -36,7 +36,8 @@ Source review does not replace browser, real-MongoDB or deployed-system verifica
 | ID | Problem | Status | Note |
 |---|---|---|---|
 | D1, D2, D3 | Dairy: huge numbers, oversized strings, ghost cow ids | NOT CHECKED | Dairy uses shared input readers, so some of this may already be handled |
-| E1 to E5, E7 | Agri validation gaps (crops, tasks, crop logs, automations, diary media) | NOT CHECKED | |
+| E1, E2, E4, E7 | Agri validation gaps (crops, crop logs, automations, diary media) | NOT CHECKED | |
+| E5 | Agri task create/update/bulk accepted arbitrary fields and unbounded values; editing could change status without completion side effects | FIXED | Task writes now use an allowlist with finite bounded numbers, valid dates and linked-record IDs. Task updates preserve current status; only the separate completion endpoint performs wage/inventory/attendance side effects. |
 | E14 | Agri finance create/update/bulk routes accepted arbitrary fields and lacked consistent amount/date validation | FIXED | The finance routes now use a strict field allowlist matching the app's ledger form and automatic ledger writers, bound numeric fields, enforce exact calendar dates, and verify crop/field/crop-cycle/supplier references in the selected farm. |
 | E9 to E12 | Supplier, laborer, attendance, advance and supplier-payment write validation | FIXED | New allowlisted validators strip unknown control fields, require finite bounded money values, and enforce exact calendar dates. Supplier-payment updates/deletes are now tied to the selected parent supplier. |
 | E6 | Inventory: no validation, raw update | FIXED | Current route normalizes an allowlist of name/category/current_stock/unit/low_stock_threshold before create/update; regression tests cover rejected values and stripped fields. |
