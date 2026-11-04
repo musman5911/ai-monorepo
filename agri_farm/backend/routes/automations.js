@@ -9,6 +9,7 @@ import { todayStr, localParts, localDateTimeStr } from '../utils/date.js';
 import { badRequest, sendHttpError, asyncHandler } from '../utils/helpers.js';
 import { maybeRunMonthlyAutoBackup } from './backup.js';
 import { MUF_ENV } from '../muf-env.mjs';
+import { escapeHtml, normalizeAutomationSettings, normalizeDigestRequest, normalizeFarmLocation } from '../automation-validation.mjs';
 
 const router = express.Router();
 
@@ -73,9 +74,9 @@ async function buildAndSendCustomDigest({
   if ((includeCrops || allFields) && cropsList.length) {
     const rows = cropsList.map((c) => `
         <div style="background-color: #ffffff; border: 1px solid #ccd9c5; padding: 10px 14px; border-radius: 8px; margin-bottom: 6px; display: block; overflow: hidden;">
-            <div style="font-size: 13px; color: #1c1917; font-weight: bold; float: left;">${c.name} <span style="font-size: 11px; color: #66645e; font-weight: normal;">(${c.variety || 'Standard'})</span></div>
-            <div style="font-size: 10px; font-weight: bold; color: #116b35; background-color: #eaf5e7; padding: 1px 6px; border-radius: 10px; border: 1px solid #ccd9c5; text-transform: uppercase; float: right;">${c.status}</div>
-            <div style="clear: both; font-size: 11px; color: #7a837e; margin-top: 4px;">Sector Plot: <strong>${c.field || 'General'}</strong></div>
+            <div style="font-size: 13px; color: #1c1917; font-weight: bold; float: left;">${escapeHtml(c.name)} <span style="font-size: 11px; color: #66645e; font-weight: normal;">(${escapeHtml(c.variety || 'Standard')})</span></div>
+            <div style="font-size: 10px; font-weight: bold; color: #116b35; background-color: #eaf5e7; padding: 1px 6px; border-radius: 10px; border: 1px solid #ccd9c5; text-transform: uppercase; float: right;">${escapeHtml(c.status)}</div>
+            <div style="clear: both; font-size: 11px; color: #7a837e; margin-top: 4px;">Sector Plot: <strong>${escapeHtml(c.field || 'General')}</strong></div>
         </div>
         `).join('');
     cropsHtml = `
@@ -93,10 +94,10 @@ async function buildAndSendCustomDigest({
       return `
         <div style="background-color: #ffffff; border: 1px solid #ccd9c5; padding: 10px 14px; border-radius: 8px; margin-bottom: 6px;">
             <div style="display: block; overflow: hidden; margin-bottom: 4px;">
-                <div style="font-size: 13px; font-weight: bold; color: #1c1917; float: left;">${t.title}</div>
-                <div style="font-size: 9px; font-weight: bold; color: ${high ? '#ef4444' : '#165b33'}; text-transform: uppercase; background-color: ${high ? '#fef2f2' : '#f4faf5'}; padding: 1px 6px; border-radius: 4px; border: 1px solid ${high ? '#fecaca' : '#ccd9c5'}; float: right;">${t.priority}</div>
+                <div style="font-size: 13px; font-weight: bold; color: #1c1917; float: left;">${escapeHtml(t.title)}</div>
+                <div style="font-size: 9px; font-weight: bold; color: ${high ? '#ef4444' : '#165b33'}; text-transform: uppercase; background-color: ${high ? '#fef2f2' : '#f4faf5'}; padding: 1px 6px; border-radius: 4px; border: 1px solid ${high ? '#fecaca' : '#ccd9c5'}; float: right;">${escapeHtml(t.priority)}</div>
             </div>
-            <div style="font-size: 11px; color: #7a837e; margin-top: 4px;">Due Date: <strong>${t.due_date || 'N/A'}</strong> • Status: <strong>${t.status}</strong></div>
+            <div style="font-size: 11px; color: #7a837e; margin-top: 4px;">Due Date: <strong>${escapeHtml(t.due_date || 'N/A')}</strong> • Status: <strong>${escapeHtml(t.status)}</strong></div>
         </div>
         `;
     }).join('');
@@ -168,7 +169,7 @@ export function startScheduler() {
 
           const now = localParts();
           if (isTimeToRun(schedule, lastRunTs, now)) {
-            console.log(`⏰ [Cron Engine] Executing scheduled report cycle for ${recipient}...`);
+            console.log('⏰ [Cron Engine] Executing scheduled report cycle...');
             const sent = await buildAndSendCustomDigest({
               recipientEmailsStr: recipient,
               allFields: false,
@@ -206,13 +207,18 @@ router.get('/settings/automations', protect, ownerOnly, asyncHandler(async (req,
       recipient: req.user.email || '',
     });
   }
-  const data = settings.value || {};
-  if (!data.recipient) data.recipient = req.user.email || '';
-  return res.json(data);
+  const normalized = normalizeAutomationSettings(settings.value || {});
+  if (normalized.error) return res.status(500).json({ error: 'Stored automation settings are invalid. Save the settings again.' });
+  if (!normalized.value.recipient) normalized.value.recipient = req.user.email || '';
+  return res.json(normalized.value);
 }));
 
 router.put('/settings/automations', protect, ownerOnly, asyncHandler(async (req, res) => {
-  await Setting.updateOne({ key: 'automations' }, { $set: { value: req.body || {} } }, { upsert: true });
+  const existing = await Setting.findOne({ key: 'automations' });
+  const lastRun = Number(existing?.value?.last_run || 0);
+  const normalized = normalizeAutomationSettings(req.body || {}, { lastRun });
+  if (normalized.error) return badRequest(res, normalized.error);
+  await Setting.updateOne({ key: 'automations' }, { $set: { value: normalized.value } }, { upsert: true });
   return res.json({ status: 'ok' });
 }));
 
@@ -231,16 +237,11 @@ router.get('/settings/location', asyncHandler(async (_req, res) => {
 }));
 
 router.put('/settings/location', protect, ownerOnly, asyncHandler(async (req, res) => {
-  const rawDms = String(req.body?.raw_dms || '').trim();
-  const lat = req.body?.lat;
-  const lon = req.body?.lon;
-  const city = String(req.body?.city || '').trim();
-  if (lat == null || lon == null) {
-    return badRequest(res, 'Latitude and longitude are required.');
-  }
+  const normalized = normalizeFarmLocation(req.body || {});
+  if (normalized.error) return badRequest(res, normalized.error);
   await Setting.updateOne(
     { key: 'farm_location' },
-    { $set: { value: { raw_dms: rawDms, lat, lon, city } } },
+    { $set: { value: normalized.value } },
     { upsert: true },
   );
   return res.json({ status: 'ok' });
@@ -248,7 +249,9 @@ router.put('/settings/location', protect, ownerOnly, asyncHandler(async (req, re
 
 // ─── Manual trigger from the admin panel ────────────────────────────────────
 router.post('/settings/automations/trigger', protect, ownerOnly, asyncHandler(async (req, res) => {
-  const body = req.body || {};
+  const request = normalizeDigestRequest(req.body || {});
+  if (request.error) return badRequest(res, request.error);
+  const body = request.value;
   const settings = await Setting.findOne({ key: 'automations' });
   if (!settings) {
     return badRequest(res, 'Automation settings must be configured and saved first.');
@@ -275,7 +278,7 @@ router.post('/settings/automations/trigger', protect, ownerOnly, asyncHandler(as
 
   settingsData.last_run = Math.floor(Date.now() / 1000);
   await Setting.updateOne({ key: 'automations' }, { $set: { value: settingsData } });
-  return res.json({ status: 'ok', message: `Custom report successfully dispatched to: ${recipientsStr}` });
+  return res.json({ status: 'ok', message: 'Custom report dispatched successfully.' });
 }));
 
 // ─── External cron hook (cron-job.org / UptimeRobot / any pinger) ────────────
@@ -313,7 +316,10 @@ async function cronDispatch(req, res) {
     }
 
     // Same-day duplicate guard (local farm time), unless force=1 is passed.
-    const force = Number(req.query.force || 0) === 1;
+    if (req.query.force !== undefined && !['0', '1'].includes(String(req.query.force))) {
+      return sendHttpError(res, 400, 'force must be 0 or 1.');
+    }
+    const force = String(req.query.force || '0') === '1';
     const nowLocal = localParts();
     const nowKey = `${nowLocal.year}-${String(nowLocal.month).padStart(2, '0')}-${String(nowLocal.day).padStart(2, '0')}`;
     const lastRunTs = value.last_run || 0;
