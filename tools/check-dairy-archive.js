@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const cwd = path.join(root, 'dairy_farm/backend'), port = Number(process.env.MUF_ARCHIVE_CHECK_PORT || 5187);
-const base = `http://127.0.0.1:${port}`, child = spawn(process.execPath, ['server.js'], { cwd, env: { ...process.env, MEMORY_MODE: '1', PORT: String(port), JWT_SECRET: 'dairy-archive-check-secret', NODE_ENV: 'development', MONGO_URI: '', MONGODB_URI: '' }, stdio: ['ignore','pipe','pipe'] });
+const base = `http://127.0.0.1:${port}`, child = spawn(process.execPath, ['server.js'], { cwd, env: { ...process.env, MEMORY_MODE: '1', MUF_DEMO_PROFILE: 'basic', PORT: String(port), JWT_SECRET: 'dairy-archive-check-secret', NODE_ENV: 'development', MONGO_URI: '', MONGODB_URI: '' }, stdio: ['ignore','pipe','pipe'] });
 let logs = '', failures = 0;
 child.stdout.on('data', d => { logs += d; }); child.stderr.on('data', d => { logs += d; });
 const check = (v, label) => { console.log(`  ${v ? '✓' : '✗'} ${label}`); if (!v) failures++; };
