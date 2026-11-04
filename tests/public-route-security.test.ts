@@ -347,11 +347,13 @@ describe('linked-record validation in handler writes', () => {
     expect(validator).toContain('Field.findOne({ _id: fieldId })');
     expect(validator).toContain('Crop.findOne({ _id: cropCycleId })');
     const create = routes.split("router.post('/finance',")[1]?.split("router.put('/finance/:financeId'")[0] || '';
-    expect(create.indexOf('validateFinanceLinks(entry)')).toBeGreaterThanOrEqual(0);
-    expect(create.indexOf('validateFinanceLinks(entry)')).toBeLessThan(create.indexOf('Finance.insertMany'));
+    expect(create).toContain('normalizeFinanceInput(req.body || {}');
+    expect(create.indexOf('validateFinanceLinks(normalized.value)')).toBeGreaterThanOrEqual(0);
+    expect(create.indexOf('validateFinanceLinks(normalized.value)')).toBeLessThan(create.indexOf('Finance.insertMany'));
     const update = routes.split("router.put('/finance/:financeId'")[1]?.split("router.delete('/finance/:financeId'")[0] || '';
-    expect(update.indexOf('validateFinanceLinks(entry)')).toBeGreaterThanOrEqual(0);
-    expect(update.indexOf('validateFinanceLinks(entry)')).toBeLessThan(update.indexOf('replaceFarmRecord'));
+    expect(update).toContain('normalizeFinanceInput(body');
+    expect(update.indexOf('validateFinanceLinks(normalized.value)')).toBeGreaterThanOrEqual(0);
+    expect(update.indexOf('validateFinanceLinks(normalized.value)')).toBeLessThan(update.indexOf('replaceFarmRecord'));
   });
 
   it('validates Agri task crop and inventory links on single-record writes', () => {
