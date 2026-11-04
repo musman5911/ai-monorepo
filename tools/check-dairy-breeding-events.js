@@ -138,6 +138,30 @@ async function main() {
     ok(sameTagOtherFarm.status === 201, 'the same ear tag is allowed in a different farm');
     const protectedDelete = await call('DELETE', `/api/breeding/events/${calving.json?._id}`, { token: owner, farm: String(farmA._id) });
     ok(protectedDelete.status === 409, 'a calving event with linked calves cannot be deleted and orphan them');
+    const removedGeneratedCalves = [];
+    for (const calfId of calving.json?.generatedCalfIds || []) {
+      const removeCalf = await call('DELETE', `/api/cows/${calfId}`, { token: owner, farm: String(farmA._id) });
+      removedGeneratedCalves.push(removeCalf.status === 200);
+    }
+    ok(removedGeneratedCalves.length === 2 && removedGeneratedCalves.every(Boolean),
+      'generated calves can be removed through the cow cleanup route');
+    const removeResolvedCalving = await call('DELETE', `/api/breeding/events/${calving.json?._id}`, { token: owner, farm: String(farmA._id) });
+    ok(removeResolvedCalving.status === 200,
+      'calving event can be deleted after all generated calf records have been removed');
+
+    const healthCreate = await call('POST', '/api/health', {
+      token: owner, farm: String(farmA._id),
+      body: { cowId: 'cow8', date: today, type: 'checkup', description: 'Phase 19 memory-mode health deletion check', cost: 0 },
+    });
+    const healthId = healthCreate.json?._id;
+    ok(healthCreate.status === 201 && healthId, 'owner can create a health record for the memory-mode delete check');
+    if (healthId) {
+      const healthDelete = await call('DELETE', `/api/health/${healthId}`, { token: owner, farm: String(farmA._id) });
+      ok(healthDelete.status === 200, 'health record deletion succeeds in memory mode');
+      const remainingHealth = await call('GET', '/api/health', { token: owner, farm: String(farmA._id) });
+      ok(Array.isArray(remainingHealth.json) && !remainingHealth.json.some((row) => row._id === healthId),
+        'deleted health record is no longer returned');
+    }
 
     const listA = await call('GET', '/api/breeding/events?page=1&limit=20&cowId=cow8', { token: owner, farm: String(farmA._id) });
     ok(listA.status === 200 && listA.json?.events?.some((event) => event._id === eventId), 'event appears in paginated list for its farm and cow');

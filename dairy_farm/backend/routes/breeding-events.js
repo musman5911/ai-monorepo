@@ -259,7 +259,10 @@ router.delete('/events/:id', protect, adminOnly, async (req, res) => {
     const event = await BreedingEvent.findById(req.params.id).lean();
     if (!event) return res.status(404).json({ error: 'Breeding event not found' });
     if (event.type === 'calving' && (event.generatedCalfIds || []).length) {
-      return res.status(409).json({ error: 'This calving has linked calf records. Resolve the calf records before deleting the event.' });
+      const remainingCalves = await Cow.countDocuments({ _id: { $in: event.generatedCalfIds } });
+      if (remainingCalves > 0) {
+        return res.status(409).json({ error: 'This calving has linked calf records. Resolve the calf records before deleting the event.' });
+      }
     }
     await BreedingEvent.findByIdAndDelete(req.params.id);
     await syncCowDate(event.cowId, event.type);

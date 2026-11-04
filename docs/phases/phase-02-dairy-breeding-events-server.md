@@ -96,3 +96,8 @@ After the original Phase 2 checkpoint, the owner reported the Windows full suite
 5. Ask the owner before removing any feature (the Flock Home Birds trims are already allowed).
 6. Stay inside this phase's scope. If a shared MUF file changes, keep the three copies identical (`npm run check-sync`).
 7. Keep the other two apps working: run all three builds even when only one app changed.
+
+
+## Current-source audit regressions (2026-11-04)
+
+The final audit added two memory-mode HTTP regressions to the Dairy breeding checker: a calving event remains protected while any generated calf exists, but can be removed after all generated calf records are deleted; and a health record can be created and deleted without a memory-mode 500. These are part of the current follow-up check gate and do not replace the disposable Atlas backup/restore work in Phase 19.

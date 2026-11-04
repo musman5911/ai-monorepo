@@ -51,7 +51,7 @@ Source review does not replace browser, real-MongoDB or deployed-system verifica
 ## H to O
 | ID | Problem | Status | Note |
 |---|---|---|---|
-| H1 | A calving event with generated calves can never be deleted after the calves are deleted | NOT REPRODUCED | The guard exists in `breeding-events.js`; not run |
+| H1 | A calving event with generated calves could not be deleted after those calves were removed | FIXED | Delete now checks whether any generated calf records still exist. The memory-mode Dairy runtime checker verifies both the protective 409 while calves exist and successful event deletion after they are removed. |
 | I1 | Backups have no integrity protection | NOT CHECKED | |
 | I2 | A backup from another app partly "succeeds" | NOT CHECKED | |
 | I3 | Flock junk restore and fresh-instance round trip | NOT CHECKED | |
@@ -59,7 +59,7 @@ Source review does not replace browser, real-MongoDB or deployed-system verifica
 | K1 | Telegram bot expense amount unbounded | NOT CHECKED | |
 | L1 | Flock log redaction gap | NOT CHECKED | |
 | M1 to M4 | Accessibility: color contrast, label mismatch, an unnamed select in Agri | NOT CHECKED | Needs a browser: Phase 20 |
-| N1 | Dairy `DELETE /health/:id` returns 500 in memory mode | NOT CHECKED | |
+| N1 | Dairy `DELETE /health/:id` returns 500 in memory mode | TEST ADDED | The Dairy memory-mode runtime checker now creates a health record, deletes it and confirms it no longer appears in the list. Update this status after the current CI run passes. | |
 | O1 | Rate limiter blocks load and matrix testing | TRUE (observed) | The route-matrix draft got 255 HTTP 429 responses |
 | O2 | Red test `agri-fields-screens` | FIXED | Closed in the report |
 
