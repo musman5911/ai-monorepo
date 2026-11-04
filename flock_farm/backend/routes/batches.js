@@ -17,6 +17,7 @@ import { calculateBatchSummary, validateBatchEggLog } from '../batch-math.mjs';
 import { validateIncubationAllocations } from '../incubation-allocation.mjs';
 import { linkedBatchHistoryConflict } from '../batch-history-guards.mjs';
 import { acquireEggInventoryLock } from '../egg-inventory-lock.mjs';
+import { validateBatchImportPayload } from '../batch-import-validation.mjs';
 
 const router = express.Router();
 
@@ -180,11 +181,6 @@ router.get('/batches/export-all', authRequired, requireRole('admin'), async (_re
   }
 });
 
-// Strip _id/__v and Mongoose metadata from an imported record
-function stripMeta({ _id, __v, ...rest }) {
-  return rest;
-}
-
 router.post('/batches/import-all', authRequired, requireRole('admin'), async (req, res) => {
   let releaseInventoryLock;
   try {
@@ -193,14 +189,12 @@ router.post('/batches/import-all', authRequired, requireRole('admin'), async (re
     releaseInventoryLock = await acquireEggInventoryLock(DataStore);
     const historyConflict = linkedBatchHistoryConflict(await findLinkedBatchHistory());
     if (historyConflict) return res.status(409).json(historyConflict);
-    const batches = Array.isArray(req.body?.batches) ? req.body.batches.map(stripMeta) : [];
-    const feed_logs = Array.isArray(req.body?.feed_logs) ? req.body.feed_logs.map(stripMeta) : [];
-    const mortality_logs = Array.isArray(req.body?.mortality_logs) ? req.body.mortality_logs.map(stripMeta) : [];
-    const expense_logs = Array.isArray(req.body?.expense_logs) ? req.body.expense_logs.map(stripMeta) : [];
-    const sales_logs = Array.isArray(req.body?.sales_logs) ? req.body.sales_logs.map(stripMeta) : [];
-    const weight_logs = Array.isArray(req.body?.weight_logs) ? req.body.weight_logs.map(stripMeta) : [];
-    const egg_logs = Array.isArray(req.body?.egg_logs) ? req.body.egg_logs.map(stripMeta) : [];
-    const vaccination_logs = Array.isArray(req.body?.vaccination_logs) ? req.body.vaccination_logs.map(stripMeta) : [];
+    const validated = validateBatchImportPayload(req.body);
+    if (validated.error) return res.status(400).json({ error: validated.error });
+    const {
+      batches, feed_logs, mortality_logs, expense_logs,
+      sales_logs, weight_logs, egg_logs, vaccination_logs,
+    } = validated.value;
 
     // --- VALIDATE EVERYTHING FIRST, before touching existing data ---
     // A malformed backup file must never wipe the database: build all
