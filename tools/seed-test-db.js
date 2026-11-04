@@ -64,6 +64,7 @@ async function run() {
     Product: dbModule.Product
   };
 
+  let writesStarted = false;
   try {
     await connection.openUri(rawUri, { serverSelectionTimeoutMS: 15000 });
     const collections = await connection.db.listCollections({}, { nameOnly: true }).toArray();
@@ -87,6 +88,7 @@ async function run() {
     const uniqueModels = [...new Set(Object.values(models).filter((model) => model && typeof model.createIndexes === 'function'))];
     for (const model of uniqueModels) await model.createIndexes();
 
+    writesStarted = true;
     const farms = [];
     for (const definition of definitions) {
       const createdAt = definition.createdAt;
@@ -106,9 +108,7 @@ async function run() {
         const bcrypt = appRequire('bcryptjs');
         credentialField = { password: bcrypt.hashSync(account.password, 12) };
       }
-      const safeAccount = { ...account, ...credentialField, role: account.role === 'admin' ? 'owner' : account.role };
-      delete safeAccount.password;
-      accounts.push(safeAccount);
+      accounts.push(shared.buildSeedAccountDocument(account, credentialField));
     }
     await User.insertMany(accounts);
 
@@ -122,6 +122,12 @@ async function run() {
     console.log('[MUF seed] Inserted ' + farms.length + ' farms, ' + accounts.length + ' test accounts, and ' + plan.products.length + ' shop products.');
     console.log('[MUF seed] Farm-owned record counts: ' + Object.entries(finalCounts).map(([name, count]) => name + '=' + count).join(', '));
     console.log('[MUF seed] Seed date: ' + plan.today + '. All records are test data.');
+  } catch (error) {
+    if (writesStarted) {
+      const message = error && error.message ? error.message : String(error);
+      throw new Error(message + ' The target may contain partial seed data. Do not rerun --apply against it; use a new disposable database name or inspect it before an intentional --reset --apply.');
+    }
+    throw error;
   } finally {
     await connection.close();
     await mongoose.disconnect().catch(() => {});

@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import { validateIncubationAllocations } from '../flock_farm/backend/incubation-allocation.mjs';
 import {
   assertSeedPlanFarmOwnership,
+  buildSeedAccountDocument,
   buildSeedPlan,
   getDemoProfile,
   getFarmDefinitions,
@@ -237,6 +238,28 @@ it('keeps Flock batch logs, home birds and incubation allocation within each far
       expect(validateIncubationAllocations(bucket.value, farmBatches, farmEggLogs)).toBeNull();
     }
   }
+});
+
+it('keeps the hashed password field required by each app User model', () => {
+  const account = {
+    username: 'seed-owner',
+    password: 'plain-test-password',
+    role: 'admin',
+    farmIds: ['farm-one'],
+    displayName: 'Seed Owner'
+  };
+  for (const app of ['dairy', 'agri']) {
+    const farmAccount = buildSeedAccountDocument(account, { password: 'bcrypt-hash-' + app });
+    expect(farmAccount.password).toBe('bcrypt-hash-' + app);
+    expect(farmAccount.password).not.toBe('plain-test-password');
+    expect(farmAccount).not.toHaveProperty('passwordHash');
+    expect(farmAccount.role).toBe('owner');
+  }
+
+  const flockAccount = buildSeedAccountDocument(account, { passwordHash: 'flock-hash' });
+  expect(flockAccount.passwordHash).toBe('flock-hash');
+  expect(flockAccount).not.toHaveProperty('password');
+  expect(flockAccount.role).toBe('owner');
 });
 
 it('runs dry-run without importing app database models or requiring MongoDB', () => {

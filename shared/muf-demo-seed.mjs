@@ -293,6 +293,24 @@ export function assertSeedPlanFarmOwnership(plan, farmIds) {
   return true;
 }
 
+export function buildSeedAccountDocument(account, credentialField) {
+  if (!account || typeof account !== "object" || Array.isArray(account)) {
+    throw new Error("A seed account object is required.");
+  }
+  if (!credentialField || typeof credentialField !== "object" || Array.isArray(credentialField)) {
+    throw new Error("A hashed seed credential object is required.");
+  }
+  const accountFields = {};
+  for (const [key, value] of Object.entries(account)) {
+    if (key !== "password") accountFields[key] = value;
+  }
+  return {
+    ...accountFields,
+    ...credentialField,
+    role: account.role === "admin" ? "owner" : account.role
+  };
+}
+
 export async function insertSeedCollections(plan, models) {
   if (!plan || !models) throw new Error("A seed plan and model registry are required.");
   if (!plan.rich) return;
