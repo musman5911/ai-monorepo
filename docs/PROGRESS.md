@@ -467,3 +467,12 @@ The owner pulled commit `3814116` and reported these checks passing:
 The focused cache test covers all three service workers' user/farm cache partitioning and old-cache cleanup. The final-DB test verifies fail-closed configuration, explicit disposable-target and backup requirements, dry-run-by-default migration behavior, and required index source contracts. It is an offline test and does not connect to MongoDB. The full suite includes one conditional Mongoose-query test skipped because the Dairy backend packages were not installed in this root test environment; Vitest still reports all 441 executed tests passed.
 
 These are owner-supplied Windows CMD and browser results, not independently executed in this editing session. The standard command-line gate is now also reported passed: `npm run check-sync`, `npm run check-ui`, `npm run check-workbench` (23 checks), `npm run check-farms` (including Dairy breeding-event runtime checks), `npm run check-docs` (22 phase files plus guide-command validation), and `tools\\build-all.bat` (Dairy, Flock and Agri production builds). The automated workflow on commit `5a180ef` also completed successfully. The restored-copy real-MongoDB scenarios remain pending; do not run migration apply on production or ordinary app `.env` targets.
+
+
+## Phase 19 clean-install and full-suite checkpoint (2026-11-04; owner-supplied Windows CMD results)
+
+The owner ran `npm ci` successfully: 51 packages were added and 52 packages audited. The subsequent clean-install `npm test` run passed: 51 test files / 441 tests, zero failures. One conditional Mongoose-query test was skipped because the Dairy backend packages were not installed in the root test environment; the 441 executed tests passed.
+
+**Dependency warnings from `npm ci`:** npm reported 5 vulnerabilities (1 moderate, 2 high, 2 critical). It also reported that the `esbuild@0.28.2` postinstall script is not yet approved by the configured `allowScripts` policy. These warnings do not make the test run fail, but they remain unresolved and must be reviewed before release. No `npm audit fix`, forced dependency upgrade, or install-script approval was performed. Do not use `npm audit fix --force` or approve install scripts without reviewing the package and the expected build impact.
+
+The owner-supplied results complete the documented clean-install and test-suite steps. They do not complete the restored-copy MongoDB migration/backup checklist. Phase 19 remains **In progress**.

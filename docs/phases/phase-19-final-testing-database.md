@@ -179,6 +179,20 @@ The focused cache suite verifies the Dairy, Agri and Flock service-worker cache 
 
 Together with the immediately preceding browser checkpoint, the owner reports the farm-switch behavior in Agri and Flock passes without pressing F5, the Agri crop popup closes correctly, and Dairy farm data isolation passes. These are owner-supplied local results, not commands independently executed in this editing session.
 
-**Remaining command-line gate: passed (owner-supplied Windows CMD output, 2026-11-03).** The owner reports `npm run check-sync`, `npm run check-ui`, `npm run check-workbench` (23 source checks), `npm run check-farms` (Agri/Flock/Dairy farm-scope checks and Dairy breeding-event runtime checks), `npm run check-docs` (all 22 phase files, links/statuses and guide commands), and `tools\\build-all.bat` (Dairy, Flock and Agri production builds) all passed. `npm ci` was not repeated in this checkpoint; no dependency installation was needed for these checks. GitHub Actions run [41674013711](https://github.com/musman5911/ai-monorepo/actions/runs/41674013711) passed on commit `5a180ef`.
+**Remaining command-line gate: passed (owner-supplied Windows CMD output, 2026-11-03).** The owner reports `npm run check-sync`, `npm run check-ui`, `npm run check-workbench` (23 source checks), `npm run check-farms` (Agri/Flock/Dairy farm-scope checks and Dairy breeding-event runtime checks), `npm run check-docs` (all 22 phase files, links/statuses and guide commands), and `tools\\build-all.bat` (Dairy, Flock and Agri production builds) all passed. At that checkpoint, `npm ci` had not yet been repeated. The owner subsequently ran `npm ci` successfully on 2026-11-04 (51 packages added, 52 audited), followed by `npm test` (51 files / 441 tests passed; one conditional Mongoose-query test skipped because Dairy backend packages were not installed in the root test environment). npm reported 5 vulnerabilities (1 moderate, 2 high, 2 critical) and an unapproved `esbuild@0.28.2` postinstall script under `allowScripts`. These warnings remain unresolved; no automatic/forced audit fix or install-script approval was run. GitHub Actions run [41674013711](https://github.com/musman5911/ai-monorepo/actions/runs/41674013711) passed on commit `5a180ef`.
 
 **Phase disposition:** still **In progress**. The restored-backup real-MongoDB checklist remains unverified: backup restore to dedicated copies, guarded migration dry-run/apply/re-apply, before/after counts and farm ownership, indexes/query plans, persistent backup/restore scenarios, archive/photo scenarios, 84-case farm-deletion safety, large Flock image restore, two-backend egg-inventory lock, and database-size/cap measurements.
+
+
+## Phase 19 clean-install validation (2026-11-04; owner-supplied Windows CMD results)
+
+| Command/check | Result |
+|---|---|
+| `npm ci` | Completed successfully; 51 packages added, 52 packages audited |
+| `npm test` after clean install | Passed: 51 test files / 441 tests, zero failures |
+
+The full-suite output includes one conditional Mongoose-query test skipped because Dairy backend packages were not installed in the root test environment. All 441 executed tests passed.
+
+**Warnings requiring separate dependency review:** npm reported 5 vulnerabilities (1 moderate, 2 high, 2 critical). It also reported that the `esbuild@0.28.2` postinstall script is not approved by the configured `allowScripts` policy. The owner did not run `npm audit fix`, `npm audit fix --force`, or an install-script approval command. Treat the audit findings and the pending script approval as unresolved release-triage items; do not claim that the dependency audit is clean.
+
+The clean-install and full-test portion of the standard Phase 19 command-line gate is now complete. The restored-backup real-MongoDB scenarios remain open, and Phase 19 remains **In progress**.
