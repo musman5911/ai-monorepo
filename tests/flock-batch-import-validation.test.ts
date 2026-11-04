@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { validateBatchImportPayload } from '../flock_farm/backend/batch-import-validation.mjs';
 
-const validPayload = () => ({
+const validPayload = (): any => ({
   batches: [{
     _id: 'discard-me', __v: 0, farmId: 'other-farm', seedId: 'other-seed',
     batch_id: 'BAT-ONE', name: 'Layer A', type: 'Layer', start_date: '2026-01-01',

@@ -53,8 +53,9 @@ Source review does not replace browser, real-MongoDB or deployed-system verifica
 |---|---|---|---|
 | H1 | A calving event with generated calves could not be deleted after those calves were removed | FIXED | Delete now checks whether any generated calf records still exist. The memory-mode Dairy runtime checker verifies both the protective 409 while calves exist and successful event deletion after they are removed. |
 | I1 | Backups have no integrity protection | NOT CHECKED | |
-| I2 | Flock batch import silently treated missing collection arrays as empty, allowing omitted collections to be wiped | FIXED | Import now requires all eight exported arrays, validates every row in memory and Mongo modes, and checks each log references a batch included in the import before deleting existing records. Regression tests cover the export contract and destructive-operation ordering. Cross-app backup compatibility remains unverified. | |
-| I3 | Flock junk restore and fresh-instance round trip | NOT CHECKED | |
+| I2 | A backup from another app partly "succeeds" | NOT CHECKED | |
+| I3 | Flock junk restore and fresh-instance round trip | NOT CHECKED |
+| I4 | Flock batch import silently treated missing collection arrays as empty, allowing omitted collections to be wiped | FIXED | Import requires all eight exported arrays, validates every row in memory and Mongo modes, and checks each log references a batch included in the import before deleting existing records. Regression tests cover the export contract and destructive-operation ordering. Cross-app backup compatibility remains a separate unverified finding. | |
 | J1 | Flock import-all into a second farm fails with 500 | NOT CHECKED | |
 | K1 | Telegram bot expense amount unbounded | NOT CHECKED | |
 | L1 | Flock log redaction gap | NOT CHECKED | |
