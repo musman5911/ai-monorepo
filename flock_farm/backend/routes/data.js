@@ -21,6 +21,7 @@ import { acquireEggInventoryLock } from '../egg-inventory-lock.mjs';
 import { authRequired } from '../middleware/auth.js';
 import { MUF_ENV } from '../muf-env.mjs';
 import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.mjs';
+import { validateDataBucketValue, validateDataBaseVersion } from '../data-bucket-validation.mjs';
 
 const router = express.Router();
 
@@ -183,7 +184,14 @@ router.put('/data/:key', authRequired, async (req, res) => {
   }
   let releaseInventoryLock;
   try {
+    if (!req.body || typeof req.body !== 'object' || Array.isArray(req.body)) {
+      return res.status(400).json({ error: 'A JSON object with value and baseVersion is required.' });
+    }
     const { value, baseVersion } = req.body;
+    const versionInput = validateDataBaseVersion(baseVersion);
+    if (versionInput.error) return res.status(428).json({ error: versionInput.error });
+    const valueInput = validateDataBucketValue(key, value);
+    if (valueInput.error) return res.status(400).json({ error: valueInput.error });
 
     // Role gate first (cheap, no DB read needed for the non-birds cases)
     if (req.user.farmRole === 'worker' || (!req.user.farmRole && req.user.role !== 'admin')) {
@@ -210,19 +218,16 @@ router.put('/data/:key', authRequired, async (req, res) => {
     // update would already show the new value).
     const oldImageIds = (key === 'birds' || key === 'diary') ? extractImageIds(current ? current.value : null) : null;
 
-    // Optimistic-concurrency check (only when the client opts in by sending
-    // baseVersion — keeps backwards compatibility with older clients).
-    if (baseVersion !== undefined && baseVersion !== null) {
-      const base = Number(baseVersion);
-      if (!Number.isFinite(base) || base !== currentVersion) {
-        return res.status(409).json({
-          error: 'This data was changed by another user since you loaded it. Refresh to get the latest version.',
-          conflict: true,
-          key,
-          value: current ? current.value : null,
-          version: currentVersion,
-        });
-      }
+    // A baseVersion is mandatory: without it a stale client could silently
+    // overwrite another user's newer bucket value.
+    if (baseVersion !== currentVersion) {
+      return res.status(409).json({
+        error: 'This data was changed by another user since you loaded it. Refresh to get the latest version.',
+        conflict: true,
+        key,
+        value: current ? current.value : null,
+        version: currentVersion,
+      });
     }
 
     // Worker bird-write validation against the same snapshot we version-check

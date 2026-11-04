@@ -69,10 +69,10 @@ function makeResponse() {
   };
 }
 
-function makeRequest(value, key = 'incubation') {
+function makeRequest(value, key = 'incubation', baseVersion = 1) {
   return {
     params: { key },
-    body: { value, baseVersion: 1 },
+    body: { value, baseVersion },
     user: { role: 'owner', farmRole: 'owner' },
   };
 }
@@ -84,6 +84,14 @@ describe('incubation data route inventory lock integration', () => {
     state.savedValue = null;
     state.datastoreVersion = 1;
     vi.clearAllMocks();
+  });
+
+  it('requires an explicit version so stale clients cannot silently overwrite newer data', async () => {
+    const res = makeResponse();
+    await putIncubation(makeRequest([{ id: 2, sourceBatchId: 'BATCH-1', eggsSet: 10 }], 'incubation', undefined), res);
+    expect(res.statusCode).toBe(428);
+    expect(res.body.error).toMatch(/baseVersion is required/);
+    expect(state.savedValue).toBeNull();
   });
 
   it('saves a valid allocation and releases the lock', async () => {
