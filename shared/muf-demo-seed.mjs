@@ -129,7 +129,6 @@ function buildDairyCollections(farmIds, today) {
     const eventData = [
       { type: "heat", date: dateFromSeed(343, today), notes: "Observed standing heat." },
       { type: "service", date: dateFromSeed(341, today), sireSource: "farm_bull", bullId: bull, bullName: "Sher " + farmNo, notes: "Natural service by farm bull." },
-      { type: "service", date: dateFromSeed(339, today), sireSource: "outside_straw", semenCode: "STRAW-" + farmNo + "-A", bullName: "Approved outside sire", technician: "Demo technician" },
       { type: "pregnancy_check", date: dateFromSeed(291, today), result: "positive", notes: "Routine demo pregnancy check." },
       { type: "calving", date: dateFromSeed(61, today), calves: [{ gender: "female", earTag: "D-" + farmNo + "-K-001", outcome: "live" }], generatedCalfIds: [calf], notes: "Live calf linked to dam and sire." }
     ];
@@ -163,12 +162,16 @@ function buildAgriCollections(farmIds, today) {
       fields.push({ _id: id, seedId: p + "-field-" + n, farmId, name: "Field " + farmNo + "-" + n, acres: 1.5 + n * 0.75, notes: "Demo acreage for field/cycle testing" });
     }
     c.Field.push(...fields);
-    const cycles = [{ season: "Rabi", name: "Wheat", variety: "Galaxy-2013", offset: 210 }, { season: "Kharif", name: "Maize", variety: "Pioneer-30T87", offset: 95 }, { season: "Rabi", name: "Peas", variety: "Meteor", offset: 35 }];
+    const cycles = [
+      { season: "Rabi", name: "Wheat", variety: "Galaxy-2013", plantOffset: 354, harvestOffset: 198, year: 2025, status: "Completed" },
+      { season: "Kharif", name: "Maize", variety: "Pioneer-30T87", plantOffset: 126, harvestOffset: -20, year: 2026, status: "Growing" },
+      { season: "Rabi", name: "Peas", variety: "Meteor", plantOffset: 30, harvestOffset: -46, year: 2026, status: "Planted" }
+    ];
     const crops = [];
     const cycleCount = 2 + farmNo;
     for (let n = 0; n < cycleCount; n += 1) {
       const data = cycles[n % cycles.length], field = fields[n % fields.length], cropId = stableObjectId(p + "-crop-" + (n + 1));
-      crops.push({ _id: cropId, seedId: p + "-crop-" + (n + 1), farmId, name: data.name, variety: data.variety, status: n === 0 ? "Completed" : "Growing", field: field.name, fieldId: String(field._id), cycleId: p + "-cycle-" + (n + 1), season: data.season, crop_year: String(Number(today.slice(0, 4)) - (n === 0 ? 1 : 0)), plant_date: dateFromSeed(data.offset, today), harvest_date: dateFromSeed(Math.max(1, data.offset - 75), today), area_kanal: Math.max(2, Math.round(field.acres * 8)), yield_kg: n === 0 ? 2400 + farmNo * 250 : 0, yield_unit: "kg", seed_quantity: 18 + n * 4, seed_unit: "kg", seed_cost_per_unit: 850, notes: data.season + " crop cycle linked to " + field.name });
+      crops.push({ _id: cropId, seedId: p + "-crop-" + (n + 1), farmId, name: data.name, variety: data.variety, status: data.status, field: field.name, fieldId: String(field._id), cycleId: p + "-cycle-" + (n + 1), season: data.season, crop_year: String(data.year), plant_date: dateFromSeed(data.plantOffset, today), harvest_date: dateFromSeed(data.harvestOffset, today), area_kanal: Math.max(2, Math.round(field.acres * 8)), yield_kg: n === 0 ? 2400 + farmNo * 250 : 0, yield_unit: "kg", seed_quantity: 18 + n * 4, seed_unit: "kg", seed_cost_per_unit: 850, notes: data.season + " crop cycle linked to " + field.name });
     }
     c.Crop.push(...crops);
     crops.forEach((crop, n) => {
