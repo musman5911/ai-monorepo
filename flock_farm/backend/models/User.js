@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema(
       default: null,
       index: {
         unique: true,
-        partialFilterExpression: { email: { $type: 'string', $ne: null } },
+        partialFilterExpression: { email: { $type: 'string', $gt: '' } },
       },
       validate: {
         validator: (v) => (v == null) || (typeof v === 'string' && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v)),

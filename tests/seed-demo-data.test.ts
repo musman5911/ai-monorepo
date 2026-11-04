@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { validateIncubationAllocations } from '../flock_farm/backend/incubation-allocation.mjs';
@@ -238,6 +239,13 @@ it('keeps Flock batch logs, home birds and incubation allocation within each far
       expect(validateIncubationAllocations(bucket.value, farmBatches, farmEggLogs)).toBeNull();
     }
   }
+});
+
+it('uses a MongoDB-compatible partial filter for the unique Flock email index', () => {
+  const userModelPath = fileURLToPath(new URL('../flock_farm/backend/models/User.js', import.meta.url));
+  const source = readFileSync(userModelPath, 'utf8');
+  expect(source).toContain("partialFilterExpression: { email: { $type: 'string', $gt: '' } }");
+  expect(source).not.toContain("partialFilterExpression: { email: { $type: 'string', $ne: null } }");
 });
 
 it('keeps the hashed password field required by each app User model', () => {
