@@ -147,20 +147,31 @@ it('keeps Flock batch logs, home birds and incubation allocation within each far
       expect(batch?.farmId).toBe(log.farmId);
     }
   }
+  const supportedKeys = new Set([
+    'settings', 'birds', 'vaccinations', 'feed', 'eggs', 'customers', 'customerSales',
+    'expenses', 'incubation', 'checklist', 'diary', 'suppliers', 'supplierPayments',
+    'laborers', 'laborAttendance', 'laborAdvances'
+  ]);
   for (const bucket of plan.collections.DataStore) {
-    if (bucket.key === 'homeBirds') expect(bucket.value.length).toBeLessThanOrEqual(50);
+    expect(supportedKeys.has(bucket.key)).toBe(true);
     if (bucket.key === 'birds') {
+      expect(bucket.value.length).toBeLessThanOrEqual(50);
       for (const bird of bucket.value) {
         const source = plan.collections.Batch.find((batch) => batch.batch_id === bird.batchId);
         expect(source?.farmId).toBe(bucket.farmId);
       }
     }
-    if (bucket.key === 'incubations') {
+    if (bucket.key === 'incubation') {
+      const farmBatches = plan.collections.Batch.filter((batch) => batch.farmId === bucket.farmId);
+      const farmEggLogs = plan.collections.BatchEggLog.filter((log) => log.farmId === bucket.farmId);
       for (const incubation of bucket.value) {
-        const source = plan.collections.Batch.find((batch) => batch.batch_id === incubation.sourceBatchId);
+        const source = farmBatches.find((batch) => batch.batch_id === incubation.sourceBatchId);
         expect(source?.farmId).toBe(bucket.farmId);
-        expect(incubation.allocatedCount).toBeGreaterThan(0);
+        expect(incubation.eggsSet).toBeGreaterThan(0);
+        expect(incubation.hatched).toBeLessThanOrEqual(incubation.eggsSet);
       }
+      const { validateIncubationAllocations } = await import('../flock_farm/backend/incubation-allocation.mjs');
+      expect(validateIncubationAllocations(bucket.value, farmBatches, farmEggLogs)).toBeNull();
     }
   }
 });
