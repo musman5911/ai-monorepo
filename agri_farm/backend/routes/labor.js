@@ -4,6 +4,7 @@ import { Laborer, Attendance, LaborAdvance, Finance, Crop } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
+import { normalizeLaborerInput, normalizeAttendanceInput, normalizeLaborAdvanceInput } from '../record-validation.mjs';
 
 const router = express.Router();
 
@@ -23,18 +24,17 @@ router.get('/laborers', protect, requireAdmin, asyncHandler(async (_req, res) =>
 }));
 
 router.post('/laborers', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const body = req.body || {};
-  if (!String(body.name || '').trim()) return badRequest(res, 'Worker name is required.');
-  const payload = { ...body, name: String(body.name).trim(), daily_wage: toFloat(body.daily_wage) };
-  const doc = (await Laborer.insertMany([payload]))[0];
+  const normalized = normalizeLaborerInput(req.body || {});
+  if (normalized.error) return badRequest(res, normalized.error);
+  const doc = (await Laborer.insertMany([normalized.value]))[0];
   return res.status(201).json({ ...doc, _id: String(doc._id) });
 }));
 
 router.put('/laborers/:laborerId', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const body = req.body || {};
-  if (!String(body.name || '').trim()) return badRequest(res, 'Worker name is required.');
   const laborerId = req.params.laborerId;
-  const payload = { ...body, name: String(body.name).trim(), daily_wage: toFloat(body.daily_wage) };
+  const normalized = normalizeLaborerInput(req.body || {});
+  if (normalized.error) return badRequest(res, normalized.error);
+  const payload = normalized.value;
   const result = await Laborer.updateOne({ _id: parseOid(laborerId, 'laborer ID') }, { $set: payload });
   if (!result.matchedCount) return notFound(res, 'Field worker not found');
   return res.json({ ...payload, _id: laborerId });
@@ -57,18 +57,13 @@ router.get('/attendance', protect, requireAdmin, asyncHandler(async (req, res) =
 }));
 
 router.post('/attendance', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const body = req.body || {};
-  if (!body.laborer_id) return badRequest(res, 'Field worker is required.');
-  const laborer = await Laborer.findOne({ _id: parseOid(body.laborer_id, 'laborer ID') });
+  const normalized = normalizeAttendanceInput(req.body || {}, { defaultDate: todayStr() });
+  if (normalized.error) return badRequest(res, normalized.error);
+  const payload = normalized.value;
+  const laborer = await Laborer.findOne({ _id: parseOid(payload.laborer_id, 'laborer ID') });
   if (!laborer) return notFound(res, 'Field worker not found');
-
-  const payload = { ...body };
-  payload.date = payload.date || todayStr();
-  payload.crop_id = payload.crop_id || null;
   const cropError = await validateCropLink(payload.crop_id);
   if (cropError) return badRequest(res, cropError);
-  payload.posted = false;
-  payload.day_units = payload.day_type === 'full' ? 1.0 : 0.5;
 
   const existing = await Attendance.findOne({ laborer_id: payload.laborer_id, date: payload.date });
   if (existing) {
@@ -95,10 +90,15 @@ router.put('/attendance/:attId', protect, requireAdmin, asyncHandler(async (req,
     payload.day_units = body.day_type === 'full' ? 1.0 : 0.5;
   }
   if (body.date !== undefined) {
-    if (!/\d{4}-\d{2}-\d{2}/.test(String(body.date))) return badRequest(res, 'Invalid date');
-    const clash = await Attendance.findOne({ laborer_id: row.laborer_id, date: String(body.date), _id: { $ne: oid } });
+    const dateResult = normalizeAttendanceInput({
+      laborer_id: String(row.laborer_id), date: body.date, day_type: row.day_type || 'full',
+      crop_id: row.crop_id || null, field: body.field === undefined ? row.field || '' : body.field,
+      notes: body.notes === undefined ? row.notes || '' : body.notes,
+    });
+    if (dateResult.error) return badRequest(res, dateResult.error);
+    const clash = await Attendance.findOne({ laborer_id: row.laborer_id, date: dateResult.value.date, _id: { $ne: oid } });
     if (clash) return badRequest(res, 'This worker already has attendance on that date.');
-    payload.date = String(body.date);
+    payload.date = dateResult.value.date;
   }
   if (body.crop_id !== undefined) {
     const cropId = body.crop_id || null;
@@ -106,7 +106,14 @@ router.put('/attendance/:attId', protect, requireAdmin, asyncHandler(async (req,
     if (cropError) return badRequest(res, cropError);
     payload.crop_id = cropId;
   }
-  if (body.notes !== undefined) payload.notes = String(body.notes || '');
+  if (body.field !== undefined) {
+    if (typeof body.field !== 'string' || body.field.trim().length > 120) return badRequest(res, 'Field must be text no longer than 120 characters.');
+    payload.field = body.field.trim();
+  }
+  if (body.notes !== undefined) {
+    if (typeof body.notes !== 'string' || body.notes.length > 1000) return badRequest(res, 'Attendance notes must be text no longer than 1000 characters.');
+    payload.notes = body.notes.trim();
+  }
   await Attendance.updateOne({ _id: oid }, { $set: payload });
   return res.json({ ...row, ...payload, _id: String(row._id) });
 }));
@@ -129,14 +136,11 @@ router.get('/labor-advances', protect, requireAdmin, asyncHandler(async (_req, r
 }));
 
 router.post('/labor-advances', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const body = req.body || {};
-  if (!body.laborer_id) return badRequest(res, 'Field worker is required.');
-  const laborer = await Laborer.findOne({ _id: parseOid(body.laborer_id, 'laborer ID') });
+  const normalized = normalizeLaborAdvanceInput(req.body || {}, { defaultDate: todayStr() });
+  if (normalized.error) return badRequest(res, normalized.error);
+  const payload = normalized.value;
+  const laborer = await Laborer.findOne({ _id: parseOid(payload.laborer_id, 'laborer ID') });
   if (!laborer) return notFound(res, 'Field worker not found');
-  const amount = toFloat(body.amount);
-  if (!amount || amount <= 0) return badRequest(res, 'Advance amount must be greater than 0.');
-
-  const payload = { ...body, date: body.date || todayStr(), settled: false };
   const doc = (await LaborAdvance.insertMany([payload]))[0];
   return res.status(201).json({ ...doc, _id: String(doc._id) });
 }));
@@ -149,15 +153,25 @@ router.put('/labor-advances/:advId', protect, requireAdmin, asyncHandler(async (
   const body = req.body || {};
   const payload = {};
   if (body.amount !== undefined) {
-    const amount = toFloat(body.amount);
-    if (!amount || amount <= 0) return badRequest(res, 'Advance amount must be greater than 0.');
-    payload.amount = amount;
+    const result = normalizeLaborAdvanceInput({
+      laborer_id: String(row.laborer_id), date: row.date || todayStr(), amount: body.amount,
+      notes: row.notes || '',
+    });
+    if (result.error) return badRequest(res, result.error);
+    payload.amount = result.value.amount;
   }
   if (body.date !== undefined) {
-    if (!/\d{4}-\d{2}-\d{2}/.test(String(body.date))) return badRequest(res, 'Invalid date');
-    payload.date = String(body.date);
+    const result = normalizeLaborAdvanceInput({
+      laborer_id: String(row.laborer_id), date: body.date, amount: row.amount,
+      notes: body.notes === undefined ? row.notes || '' : body.notes,
+    });
+    if (result.error) return badRequest(res, result.error);
+    payload.date = result.value.date;
   }
-  if (body.notes !== undefined) payload.notes = String(body.notes || '');
+  if (body.notes !== undefined) {
+    if (typeof body.notes !== 'string' || body.notes.length > 1000) return badRequest(res, 'Advance notes must be text no longer than 1000 characters.');
+    payload.notes = body.notes.trim();
+  }
   await LaborAdvance.updateOne({ _id: oid }, { $set: payload });
   return res.json({ ...row, ...payload, _id: String(row._id) });
 }));
