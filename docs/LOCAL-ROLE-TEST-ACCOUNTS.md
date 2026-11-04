@@ -51,3 +51,15 @@ The rich profile deliberately has data in Farms 1–4, including the archived Fa
 - Generated records use stable `seed-` identifiers where supported by their models. The pseudo-random sequence is deterministic per app.
 
 The passwords above are deliberately simple because these accounts are for local QA only. Do not expose a memory-mode backend to the public internet.
+
+## Disposable Atlas demo databases (owner-reported 2026-11-04)
+
+The rich seed helper has been applied successfully to the following separate test databases. The same ten test-only accounts in the table above exist in each app's database; use the matching app database when testing that app.
+
+| App | Seeded database |
+|---|---|
+| Dairy | `muf_test_dairy_demo_retry1` |
+| Agri | `muf_test_agri_demo` |
+| Flock | `muf_test_flock_demo` |
+
+The original `muf_phase19_agri_local`, `muf_phase19_dairy_local`, and `muf_phase19_flock_local` database names remain separate and were not seed targets. The first failed Dairy target `muf_test_dairy_demo` is quarantined as potentially partially seeded; do not use it. See [Phase 19](phases/phase-19-final-testing-database.md) for observed collection counts, failure notes, and the remaining test plan. These accounts and databases are for disposable QA only, never production.

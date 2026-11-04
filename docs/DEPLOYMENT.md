@@ -151,13 +151,17 @@ For local in-memory demos, leave the Mongo URI unset and set `MEMORY_MODE=1`. Th
 
 The MongoDB seed helper is separate from ordinary app startup. It requires an explicit app and a database name matching `^muf_(phase19|test|demo|seed)_[a-z0-9_]+$`. It refuses production/live names, refuses `NODE_ENV=production`, and requires `MUF_SEED_ALLOW_REMOTE=1` for every non-local host. The helper checks for existing records before writing. It defaults to dry-run; dry-run validates the plan without importing app database models or opening a MongoDB connection. It cannot inspect existing database contents. During `--apply`, the helper checks for existing records before writes, and will only replace existing contents when both `--reset` and `--apply` are provided. Reset drops the selected database, so verify the target is disposable before using it. If an apply operation fails after writes begin, the helper warns that partial seed records may remain. Do not retry plain `--apply` against that database; use a new disposable database name, or inspect the database before an intentional reset.
 
-Windows CMD, local MongoDB example:
+Windows CMD example using an existing MongoDB Atlas cluster (a local MongoDB installation is not required):
 
 ```cmd
-set MUF_SEED_URI=mongodb://localhost:27017/muf_test_dairy_demo
-node tools\\seed-test-db.js --app dairy
-node tools\\seed-test-db.js --app dairy --apply
+cd /d F:\PROJECTS\dairy\muf-monorepo
+set "MUF_SEED_ALLOW_REMOTE=1"
+set "MUF_SEED_URI=PASTE_FULL_ATLAS_URI_WITH_DATABASE_muf_test_dairy_demo_HERE"
+node tools\seed-test-db.js --app dairy
+node tools\seed-test-db.js --app dairy --apply
 ```
 
-Use `--app agri` or `--app flock` for the other apps. For a deliberate repeat seed, run `node tools\\seed-test-db.js --app dairy --reset --apply` only against the same throwaway database. For remote testing, set `MUF_SEED_ALLOW_REMOTE=1` in the private CMD session and never paste or commit the URI. The tool reports the host and database name only. The root scripts are `npm run seed:test-db -- --app dairy` (arguments after `--` are passed through) and `npm run check-seed` (offline seed-plan tests).
+Use the relevant app's private `.env` URI as the basis, but change only the database path to a new disposable name. Do not change the `.env` file itself. Before `--apply`, check the host and database printed by the dry run. For Agri or Flock, set `MUF_SEED_URI` to that app's Atlas URI with its own test database name and use `--app agri` or `--app flock`. Keep the credentials private; the tool prints only the host and database name. The original app databases must not be seed targets. A dry run does not connect or check whether the database is empty; the existing-data check occurs on `--apply` before seed writes.
+
+An apply failure after writes begin can leave partial data. Do not simply retry against that database. Inspect it or use a new disposable database name. `--reset --apply` drops the selected database and must only be used after independently confirming it is disposable. The root scripts are `npm run seed:test-db -- --app dairy` (arguments after `--` are passed through) and `npm run check-seed` (offline seed-plan tests).
 

@@ -104,7 +104,7 @@ Phase 19 is **In progress**. Repository review found existing real-database migr
 
 Added a fail-closed configuration-and-backup preflight and a migration wrapper. The wrapper uses only the explicitly supplied `MUF_FINAL_DB_URI`, requires a dedicated Phase 19 database name, requires host confirmation, requires a fresh non-empty backup and manual confirmation that the backup opens and has been restored, and defaults migrations to dry-run. Unit tests cover these guards without connecting to MongoDB.
 
-**Live database verification is blocked on environment evidence:** no disposable MongoDB target or fresh backup has been supplied or verified in this session. No real database connection, migration, restore, deletion, or concurrency test has been attempted. Keep all real-DB checklist items unchecked until their outputs are observed.
+**Historical state at the Phase 19 start checkpoint (2026-10-29):** no disposable MongoDB target or fresh backup had yet been supplied or verified. No real database connection, migration, restore, deletion, or concurrency test had been attempted at that time. Later owner-reported Atlas seed results are recorded in the 2026-11-04 checkpoint below; the restored-backup migration and remaining real-DB checklist are still open.
 
 ## Initial automated validation (2026-10-29)
 
@@ -232,21 +232,21 @@ GitHub Actions run [40852928322](https://github.com/musman5911/ai-monorepo/actio
 
 ; names containing `prod`, `production`, or `live` are refused, as is `NODE_ENV=production`. Non-local hosts require the explicit `MUF_SEED_ALLOW_REMOTE=1` opt-in. A dry run is the default, validates the full plan locally, makes no writes, and does not open a MongoDB connection. It cannot inspect whether the target database already contains records; that check happens only during `--apply`. The helper refuses a database with existing records unless `--reset --apply` is explicitly supplied; that combination drops the selected database before recreating the fixture. Use it only on a verified throwaway database.
 
-Windows CMD example for a local empty test database:
+Windows CMD example for an existing MongoDB Atlas cluster (a local MongoDB service is not required):
 
 ```cmd
-set MUF_SEED_URI=mongodb://localhost:27017/muf_test_dairy_demo
-node tools\\seed-test-db.js --app dairy
-node tools\\seed-test-db.js --app dairy --apply
+cd /d F:\PROJECTS\dairy\muf-monorepo
+set "MUF_SEED_ALLOW_REMOTE=1"
+set "MUF_SEED_URI=PASTE_FULL_ATLAS_URI_WITH_DATABASE_muf_test_dairy_demo_HERE"
+node tools\seed-test-db.js --app dairy
+node tools\seed-test-db.js --app dairy --apply
 ```
 
-To deliberately replace this same disposable database on a later run:
+Replace the URI placeholder with the private connection string for that app, changing only the database path to its disposable name. Set a new `MUF_SEED_URI` for Agri and Flock before running their commands. Do not edit the app `.env` files for seeding, do not use the `muf_phase19_*_local` databases as seed targets, and do not paste credentials into chat or commit them. A dry run validates the target and plan but cannot inspect database contents; `--apply` performs the existing-data check before writes.
 
-```cmd
-node tools\\seed-test-db.js --app dairy --reset --apply
-```
+The owner-reported Atlas seed targets and observed results are recorded in the 2026-11-04 checkpoint below. The initial failed Dairy target `muf_test_dairy_demo` is quarantined because the first apply failed after farm creation; do not reuse it. The verified Dairy seed is `muf_test_dairy_demo_retry1`.
 
-For an Atlas or other remote endpoint, keep the URI private and set `MUF_SEED_ALLOW_REMOTE=1` only after independently confirming the target is a throwaway database. Do not commit a URI, backup, or generated data dump. The seeder is not a migration tool and must never be pointed at production.
+To deliberately replace a disposable database, `--reset --apply` drops that database. Do not use it unless the target has been independently checked and is confirmed disposable. The seeder is not a migration tool and must never be pointed at production.
 
 ## Rules for whoever works on this phase
 
@@ -337,3 +337,23 @@ The full-suite output includes one conditional Mongoose-query test skipped becau
 **Warnings requiring separate dependency review:** npm reported 5 vulnerabilities (1 moderate, 2 high, 2 critical). It also reported that the `esbuild@0.28.2` postinstall script is not approved by the configured `allowScripts` policy. The owner did not run `npm audit fix`, `npm audit fix --force`, or an install-script approval command. Treat the audit findings and the pending script approval as unresolved release-triage items; do not claim that the dependency audit is clean.
 
 The clean-install and full-test portion of the standard Phase 19 command-line gate is now complete. The restored-backup real-MongoDB scenarios remain open, and Phase 19 remains **In progress**.
+
+## Phase 19 disposable Atlas rich-seed checkpoint (2026-11-04; owner-supplied Windows CMD output)
+
+The owner ran the dry-run and `--apply` commands against three explicitly named disposable MongoDB Atlas databases. All three apply commands reported successful insertion of five farms, ten test accounts and eight shop products. The three original Phase 19 databases (`muf_phase19_agri_local`, `muf_phase19_dairy_local`, and `muf_phase19_flock_local`) were not used as seed targets.
+
+| App | Successfully seeded database | Farm-owned collection counts reported by the seeder |
+|---|---|---|
+| Dairy | `muf_test_dairy_demo_retry1` | `Cow=19`, `BreedingEvent=24`, `Milk=420`, `Expense=12`, `Health=4`, `Buyer=4`, `BuyerPayment=4`, `Supplier=4`, `SupplierPayment=4`, `Laborer=4`, `LaborAttendance=4`, `LaborAdvance=4`, `Rate=4`, `RateHistory=4`, `Sale=4`, `Product=8` |
+| Agri | `muf_test_agri_demo` | `Field=10`, `Crop=18`, `Finance=25`, `Task=8`, `Inventory=8`, `Liability=4`, `Laborer=4`, `Attendance=4`, `Supplier=4`, `SupplierPayment=4`, `Product=8` |
+| Flock | `muf_test_flock_demo` | `Batch=10`, `BatchFeedLog=10`, `BatchMortalityLog=10`, `BatchExpenseLog=10`, `BatchSaleLog=10`, `BatchWeightLog=10`, `BatchEggLog=10`, `BatchVaccinationLog=10`, `DataStore=64`, `Product=8` |
+
+Each successful apply reported `Inserted 5 farms, 10 test accounts, and 8 shop products`. The shared seed-plan tests cover the archived fourth farm, intentionally empty fifth farm, farm ownership, cross-farm links, account assignments, deterministic dates, product publication mix, and app-specific data invariants. This checkpoint records successful seeding output; it does not claim that every seeded screen, role workflow, archive/restore route, backup, or application-level MongoDB scenario has been manually exercised.
+
+**Failed first Dairy target:** `muf_test_dairy_demo` was used before the credential-field fix. Its apply failed with `User validation failed: password: Path password is required` after farm creation had started. Treat this database as potentially partially seeded and quarantined. Do not point an app at it, retry plain `--apply`, or reset it without an explicit inspection and decision. The verified Dairy dataset is `muf_test_dairy_demo_retry1`.
+
+**Flock index correction:** the first Flock apply stopped during index creation because Atlas rejected the old email partial-index predicate using `$ne: null`. The Flock User index was changed to a non-empty string predicate (`$type: 'string'`, `$gt: ''`); the subsequent apply to `muf_test_flock_demo` reported successful seeding.
+
+The owner also observed the non-fatal Mongoose warning that `collection` is a reserved schema pathname. It did not stop the three successful seed operations and remains a separate warning to review.
+
+**Next Phase 19 work:** verify the new datasets through the three application backends and browser screens without changing normal `.env` targets; then continue the separate backup/restore, restored-copy migration/idempotence, indexes/query plans, archive/photo, deletion-safety, Flock two-process lock, and database-size checks. Phase 19 remains **In progress**.

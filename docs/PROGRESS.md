@@ -482,4 +482,20 @@ The owner-supplied results complete the documented clean-install and test-suite 
 
 Added a shared deterministic seed-plan module, rich five-farm fixtures for Dairy, Agri and Flock, explicit test-only role assignments, app-specific seeded records, and a dry-run-first MongoDB seed helper. Added offline plan/safety tests and the `seed:test-db` / `check-seed` npm scripts. Updated memory-mode runtime checks to request the basic profile while their legacy assertions remain two-farm based. The final coordinated profile switch makes rich the normal local default and retains basic as the `NODE_ENV=test` default; `MUF_DEMO_PROFILE` explicitly overrides either choice.
 
-**Validation disposition for this implementation:** the GitHub connection was used to edit the branch. No local Windows commands, Vitest suite, syntax checks, build, MongoDB connection, or seed apply were run by the editing agent. Owner validation is pending. Do not interpret the new test file or tool source as an executed result. Phase 19 remains **In progress**; the real-MongoDB restore/migration checklist is still open.
+**Initial validation disposition for this implementation (at the time of the source commit):** the editing agent did not run local Windows commands, Vitest, syntax checks, builds, MongoDB connections, or seed applies. The owner subsequently completed the three Atlas seed applies; the exact owner-reported results and limitations are recorded in the Phase 19 Atlas checkpoint below. The restored-backup migration/restore checklist remains open, and Phase 19 remains **In progress**.
+
+## Phase 19 disposable Atlas rich-seed validation (2026-11-04; owner-supplied Windows CMD output)
+
+The owner successfully seeded the three rich demo plans into separate disposable Atlas databases. Each apply reported five farms, ten test accounts and eight shop products:
+
+| App | Disposable Atlas database | Observed collection counts |
+|---|---|---|
+| Dairy | `muf_test_dairy_demo_retry1` | Cow 19; BreedingEvent 24; Milk 420; Expense 12; Health 4; Buyer 4; BuyerPayment 4; Supplier 4; SupplierPayment 4; Laborer 4; LaborAttendance 4; LaborAdvance 4; Rate 4; RateHistory 4; Sale 4; Product 8 |
+| Agri | `muf_test_agri_demo` | Field 10; Crop 18; Finance 25; Task 8; Inventory 8; Liability 4; Laborer 4; Attendance 4; Supplier 4; SupplierPayment 4; Product 8 |
+| Flock | `muf_test_flock_demo` | Batch 10; BatchFeedLog 10; BatchMortalityLog 10; BatchExpenseLog 10; BatchSaleLog 10; BatchWeightLog 10; BatchEggLog 10; BatchVaccinationLog 10; DataStore 64; Product 8 |
+
+The original Phase 19 databases `muf_phase19_agri_local`, `muf_phase19_dairy_local` and `muf_phase19_flock_local` were not used. The first Dairy attempt against `muf_test_dairy_demo` failed after farm creation because hashed passwords were removed from the required `password` field; that target is quarantined as potentially partial. The corrected seeder was used successfully on `muf_test_dairy_demo_retry1`. Flock's first attempt was rejected at index creation because Atlas did not support the old `$ne: null` partial-index predicate; the predicate was changed to `$type: 'string'` and `$gt: ''`, after which Flock seeded successfully.
+
+GitHub Actions run [41777924353](https://github.com/musman5911/ai-monorepo/actions/runs/41777924353) completed successfully on commit `b0dd39b` after the Flock index correction and its regression test. The owner also observed a non-fatal Mongoose reserved-schema-path warning for `collection` during seed applies; it remains a separate review item.
+
+These owner-supplied outputs establish successful seed insertion only. They do not establish app/browser login or role isolation against these Atlas databases, backup/restore, migration idempotence, index/query-plan inspection, archive/photo scenarios, deletion-safety, Flock multi-process locking, or database-size measurements. Phase 19 remains **In progress**.
