@@ -1,4 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { spawnSync } from 'node:child_process';
+import { fileURLToPath } from 'node:url';
 import { validateIncubationAllocations } from '../flock_farm/backend/incubation-allocation.mjs';
 import {
   assertSeedPlanFarmOwnership,
@@ -235,6 +237,25 @@ it('keeps Flock batch logs, home birds and incubation allocation within each far
       expect(validateIncubationAllocations(bucket.value, farmBatches, farmEggLogs)).toBeNull();
     }
   }
+});
+
+it('runs dry-run without importing app database models or requiring MongoDB', () => {
+  const cli = fileURLToPath(new URL('../tools/seed-test-db.js', import.meta.url));
+  const result = spawnSync(process.execPath, [cli, '--app', 'dairy'], {
+    cwd: process.cwd(),
+    encoding: 'utf8',
+    env: {
+      ...process.env,
+      NODE_ENV: 'test',
+      MUF_SEED_URI: 'mongodb://127.0.0.1:27017/muf_test_dairy_demo'
+    }
+  });
+  expect(result.status).toBe(0);
+  expect(result.stdout).toContain('DRY RUN');
+  expect(result.stdout).toContain('Planned 5 farms, 8 shop products.');
+  expect(result.stdout).toContain('no MongoDB connection was opened');
+  expect(result.stderr).not.toContain('ECONNREFUSED');
+  expect(result.stderr).not.toContain('Mongoose');
 });
 
 describe('disposable Mongo seed command safety', () => {
