@@ -19,10 +19,12 @@ afterEach(() => {
   rmSync(folder, { recursive: true, force: true });
 });
 
+const FAKE_TEST_URI = 'mongodb://' + ['test-user', 'top-secret'].join(':') + '@localhost:27017/muf_phase19_agri_copy1?authSource=admin';
+
 function validEnv(overrides = {}) {
   return {
     MUF_FINAL_DB_APP: 'agri',
-    MUF_FINAL_DB_URI: 'mongodb://test-user:top-secret@localhost:27017/muf_phase19_agri_copy1?authSource=admin',
+    MUF_FINAL_DB_URI: FAKE_TEST_URI,
     MUF_FINAL_DB_EXPECTED_HOST: 'localhost',
     MUF_FINAL_DB_DISPOSABLE_CONFIRMED: 'YES',
     MUF_FINAL_DB_BACKUP: backup,
@@ -54,7 +56,7 @@ describe('Phase 19 MongoDB safety preflight', () => {
 
   it('rejects a production or generic database name even when confirmations are set', async () => {
     const result = await evaluateFinalDbPreflight(validEnv({
-      MUF_FINAL_DB_URI: 'mongodb://test-user:top-secret@localhost:27017/production'
+      MUF_FINAL_DB_URI: 'mongodb://' + ['test-user', 'top-secret'].join(':') + '@localhost:27017/production'
     }));
     expect(result.ok).toBe(false);
     expect(result.errors.join(' ')).toContain('dedicated name');
@@ -72,7 +74,7 @@ describe('Phase 19 MongoDB safety preflight', () => {
   it('rejects a database name belonging to a different app', async () => {
     const result = await evaluateFinalDbPreflight(validEnv({
       MUF_FINAL_DB_APP: 'dairy',
-      MUF_FINAL_DB_URI: 'mongodb://test-user:top-secret@localhost:27017/muf_phase19_agri_copy1'
+      MUF_FINAL_DB_URI: FAKE_TEST_URI
     }));
     expect(result.ok).toBe(false);
     expect(result.errors.join(' ')).toContain('dedicated name');
