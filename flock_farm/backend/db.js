@@ -30,6 +30,7 @@ const Image = (await import('./models/Image.js')).default;
 const User = (await import('./models/User.js')).default;
 const Farm = (await import('./models/Farm.js')).default;
 const ProductSchema = new mongoose.Schema({
+  seedId: { type: String, index: true },
   farmId: { type: String, required: true, index: true }, name: { type: String, required: true, trim: true, maxlength: 120 },
   kind: { type: String, required: true, trim: true, maxlength: 32 }, unit: { type: String, required: true, trim: true, maxlength: 32 },
   price: { type: Number, required: true, min: 0, max: 1000000000 }, quantity: { type: Number, required: true, min: 0, max: 1000000000 },
