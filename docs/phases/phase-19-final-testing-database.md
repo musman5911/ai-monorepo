@@ -116,7 +116,7 @@ The rich memory demo uses five distinct farms in each app. Farms 1–4 contain f
 
 `MUF_DEMO_PROFILE=basic` keeps the original two-farm fixture for older runtime checks. `MUF_DEMO_PROFILE=rich` selects the five-farm fixture; after compatibility updates the local demo default is rich. `MUF_SEED_TODAY=YYYY-MM-DD` pins generated dates, and the pseudo-random sequence is fixed per app. Role accounts and their farm assignments are listed in [LOCAL-ROLE-TEST-ACCOUNTS.md](../LOCAL-ROLE-TEST-ACCOUNTS.md). These passwords are test-only.
 
-The root helper `tools/seed-test-db.js` uses the same shared seed definitions as memory mode. It always seeds the rich profile and requires `--app dairy`, `--app agri`, or `--app flock`. It accepts the explicit `MUF_SEED_URI` first, then `MONGO_URI`/ `MONGODB_URI`. It prints only the hostname and database name, never the URI credentials.
+The root helper `tools/seed-test-db.js` uses the same shared seed definitions as memory mode. It always seeds the rich profile and requires `--app dairy`, `--app agri`, or `--app flock`. It accepts only the explicit `MUF_SEED_URI`; it never falls back to the ordinary app `MONGO_URI`/`MONGODB_URI`. It prints only the hostname and database name, never the URI credentials.
 
 The database name must match `^muf_(phase19|test|demo|seed)_[a-z0-9_]+# Phase 19: Final testing A: real MongoDB
 
