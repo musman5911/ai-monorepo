@@ -84,6 +84,7 @@ const PhotoAssetSchema = new mongoose.Schema({
 // Farms of this project (crop land only). See docs/FARMS_AND_ROLES.md.
 // Timestamps matter here: the oldest farm is the default farm.
 const FarmSchema = new mongoose.Schema({
+  seedId: { type: String, index: true },
   name: { type: String, required: true, trim: true },
   location: { type: String, default: '' },
   archived: { type: Boolean, default: false },
