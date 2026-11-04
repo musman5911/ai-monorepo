@@ -5,6 +5,7 @@ import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { mufIsFullRole } from '../muf-farms.mjs';
 import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
+import { normalizeCropInput } from '../record-validation.mjs';
 
 const router = express.Router();
 
@@ -86,34 +87,36 @@ async function validateFieldLink(body) {
 }
 
 router.post('/crops', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const link = await validateFieldLink(req.body || {});
+  const normalized = normalizeCropInput(req.body || {});
+  if (normalized.error) return badRequest(res, normalized.error);
+  const link = await validateFieldLink(normalized.value);
   if (!link.ok) return badRequest(res, link.message);
-  const payload = { ...(req.body || {}) };
-  if (link.fieldId) payload.fieldId = link.fieldId;
-  else delete payload.fieldId;
+  const payload = { ...normalized.value, ...(link.fieldId ? { fieldId: link.fieldId } : {}) };
   const doc = (await Crop.insertMany([payload]))[0];
   return res.status(201).json({ ...doc, _id: String(doc._id) });
 }));
 
 router.put('/crops/:cropId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.cropId, 'crop ID');
-  const link = await validateFieldLink(req.body || {});
+  const existing = await Crop.findOne({ _id: oid });
+  if (!existing) return notFound(res, 'Crop not found');
+  const body = { ...(req.body || {}) };
+  if (!Object.prototype.hasOwnProperty.call(body, 'fieldId')) body.fieldId = existing.fieldId || '';
+  const normalized = normalizeCropInput(body);
+  if (normalized.error) return badRequest(res, normalized.error);
+  const link = await validateFieldLink(normalized.value);
   if (!link.ok) return badRequest(res, link.message);
-  const payload = { ...(req.body || {}) };
-  if (link.fieldId) payload.fieldId = link.fieldId;
-  else if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'fieldId')) {
-    const existing = await Crop.findOne({ _id: oid });
-    if (existing?.fieldId) payload.fieldId = String(existing.fieldId);
-    else delete payload.fieldId;
-  } else delete payload.fieldId;
+  const payload = { ...normalized.value, ...(link.fieldId ? { fieldId: link.fieldId } : {}) };
   const result = await replaceFarmRecord(Crop, oid, payload);
   if (!result.matchedCount) return notFound(res, 'Crop not found');
-  return res.json({ ...(req.body || {}), _id: oid });
+  return res.json({ ...payload, _id: oid });
 }));
 
 router.patch('/crops/:cropId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const newStatus = req.body?.status;
-  if (!newStatus) return badRequest(res, 'Status is required');
+  if (!['Planted', 'Growing', 'Harvesting', 'Completed'].includes(newStatus)) {
+    return badRequest(res, 'Status must be Planted, Growing, Harvesting or Completed.');
+  }
   const oid = parseOid(req.params.cropId, 'crop ID');
   const result = await Crop.updateOne({ _id: oid }, { $set: { status: newStatus } });
   if (!result.matchedCount) return notFound(res, 'Crop not found');

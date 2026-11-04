@@ -6,6 +6,7 @@ import { protect, requireAdmin } from '../middleware/auth.js';
 import { HttpError, badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
 import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
+import { normalizeIrrigationInput, normalizeCropPhotoInput, normalizeSprayInput } from '../record-validation.mjs';
 
 const router = express.Router();
 
@@ -41,15 +42,11 @@ router.get('/irrigation', protect, asyncHandler(async (req, res) => {
 }));
 
 router.post('/irrigation', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const hours = toFloat(req.body?.hours);
-  if (hours <= 0) return badRequest(res, 'Irrigation hours must be greater than 0.');
-  if (!req.body?.crop_id) return badRequest(res, 'Crop is required for an irrigation log.');
-  const crop = await Crop.findOne({ _id: parseOid(req.body.crop_id, 'crop ID') });
+  const normalized = normalizeIrrigationInput(req.body || {}, { defaultDate: todayStr() });
+  if (normalized.error) return badRequest(res, normalized.error);
+  const payload = normalized.value;
+  const crop = await Crop.findOne({ _id: parseOid(payload.crop_id, 'crop ID') });
   if (!crop) return notFound(res, 'Crop not found');
-
-  const payload = { ...(req.body || {}) };
-  payload.date = payload.date || todayStr();
-  payload.hourly_rate = toFloat(payload.hourly_rate);
   payload.finance_id = null;
   payload.amount = 0.0;
 
@@ -103,16 +100,14 @@ router.get('/crop-photos', protect, asyncHandler(async (req, res) => {
 }));
 
 router.post('/crop-photos', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const { crop_id, image_base64 } = req.body || {};
-  if (!crop_id || !image_base64) return badRequest(res, 'Crop and photo are required.');
-  if (typeof image_base64 !== 'string' || (!image_base64.startsWith('data:image/') && !/^\/api\/photos\/[a-f0-9]{24}$/i.test(image_base64))) return badRequest(res, 'Crop photo must be an image data URL or a farm photo path.');
+  const normalized = normalizeCropPhotoInput(req.body || {}, { defaultDate: todayStr() });
+  if (normalized.error) return badRequest(res, normalized.error);
+  const { crop_id } = normalized.value;
   const crop = await Crop.findOne({ _id: parseOid(crop_id, 'crop ID') });
   if (!crop) return notFound(res, 'Crop not found');
   const existing = await CropPhoto.countDocuments({ crop_id });
   if (existing >= 3) return badRequest(res, 'This crop already has 3 diary photos.');
-  const payload = { ...(req.body || {}) };
-  payload.uploaded_at = payload.uploaded_at || todayStr();
-  const doc = (await CropPhoto.insertMany([payload]))[0];
+  const doc = (await CropPhoto.insertMany([normalized.value]))[0];
   return res.status(201).json({ ...doc, _id: String(doc._id) });
 }));
 
@@ -133,17 +128,11 @@ router.get('/spray', protect, asyncHandler(async (req, res) => {
 }));
 
 router.post('/spray', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const body = req.body || {};
-  if (!body.crop_id || !String(body.chemical || '').trim()) {
-    return badRequest(res, 'Crop and chemical name are required.');
-  }
-  const crop = await Crop.findOne({ _id: parseOid(body.crop_id, 'crop ID') });
+  const normalized = normalizeSprayInput(req.body || {}, { defaultDate: todayStr() });
+  if (normalized.error) return badRequest(res, normalized.error);
+  const payload = normalized.value;
+  const crop = await Crop.findOne({ _id: parseOid(payload.crop_id, 'crop ID') });
   if (!crop) return notFound(res, 'Crop not found');
-
-  const payload = { ...body };
-  payload.date = payload.date || todayStr();
-  payload.inventory_item_id = payload.inventory_item_id || null;
-  payload.inventory_qty_consumed = toFloat(payload.inventory_qty_consumed);
   if (payload.inventory_item_id && payload.inventory_qty_consumed > 0) {
     await deductInventory(payload.inventory_item_id, payload.inventory_qty_consumed);
     payload.inventory_deducted = true;

@@ -158,3 +158,68 @@ describe('Agri task input allowlist', () => {
     expect(normalizeTaskInput({ ...base, inventory_qty_consumed: 2 }).error).toMatch(/inventory item/);
   });
 });
+
+
+describe('Agri crop and crop-log input allowlists', () => {
+  it('normalizes crop form fields and strips caller-controlled metadata', async () => {
+    const { normalizeCropInput } = await import('../agri_farm/backend/record-validation.mjs');
+    expect(normalizeCropInput({
+      name: ' Wheat ', variety: ' Galaxy ', status: 'Growing',
+      plant_date: '2026-11-01', harvest_date: '2027-04-15',
+      field: 'Sector 1A', fieldId: '0123456789abcdef01234567',
+      yield_kg: '1200', yield_unit: 'kg', area_kanal: '4',
+      seed_quantity: '50', seed_unit: 'kg', seed_cost_per_unit: '200',
+      season: 'Rabi', crop_year: '2026', notes: 'test crop',
+      image_base64: '', farmId: 'other', role: 'owner',
+    })).toEqual({ value: {
+      name: 'Wheat', variety: 'Galaxy', status: 'Growing',
+      field: 'Sector 1A', fieldId: '0123456789abcdef01234567',
+      plant_date: '2026-11-01', harvest_date: '2027-04-15',
+      yield_kg: 1200, yield_unit: 'kg', area_kanal: 4,
+      notes: 'test crop', image_base64: '',
+      seed_quantity: 50, seed_unit: 'kg', seed_cost_per_unit: 200,
+      season: 'Rabi', crop_year: '2026',
+    } });
+  });
+
+  it('rejects invalid crop status, date order, year and amount values', async () => {
+    const { normalizeCropInput } = await import('../agri_farm/backend/record-validation.mjs');
+    const base = { name: 'Wheat', season: 'Rabi', crop_year: '2026' };
+    expect(normalizeCropInput({ ...base, status: 'Hidden' }).error).toMatch(/status/);
+    expect(normalizeCropInput({ ...base, plant_date: '2026-05-01', harvest_date: '2026-04-01' }).error).toMatch(/earlier/);
+    expect(normalizeCropInput({ ...base, crop_year: '20x6' }).error).toMatch(/four-digit/);
+    expect(normalizeCropInput({ ...base, area_kanal: 'Infinity' }).error).toMatch(/non-negative/);
+  });
+
+  it('normalizes irrigation and spray writes without trusting computed amount or inventory state', async () => {
+    const { normalizeIrrigationInput, normalizeSprayInput, normalizeCropPhotoInput } = await import('../agri_farm/backend/record-validation.mjs');
+    expect(normalizeIrrigationInput({
+      crop_id: '0123456789abcdef01234567', date: '2026-11-04', hours: '3',
+      tubewell: 'own', hourly_rate: '500', amount: 999999, finance_id: 'forged', farmId: 'other',
+    })).toEqual({ value: {
+      crop_id: '0123456789abcdef01234567', date: '2026-11-04',
+      hours: 3, tubewell: 'own', hourly_rate: 0, notes: '',
+    } });
+    expect(normalizeIrrigationInput({
+      crop_id: '0123456789abcdef01234567', date: '2026-11-04', hours: 1, tubewell: 'rented', hourly_rate: 0,
+    }).error).toMatch(/hourly rate/);
+    expect(normalizeSprayInput({
+      crop_id: '0123456789abcdef01234567', date: '2026-11-04', chemical: 'Pesticide',
+      inventory_item_id: null, inventory_qty_consumed: '2', inventory_deducted: true, farmId: 'other',
+    }).error).toMatch(/Select an inventory item/);
+    const spray = normalizeSprayInput({
+      crop_id: '0123456789abcdef01234567', date: '2026-11-04', chemical: ' Pesticide ',
+      dose: '2 ml', inventory_item_id: '1123456789abcdef01234567', inventory_qty_consumed: '1',
+      inventory_deducted: false,
+    });
+    expect(spray.value.inventory_deducted).toBe(false);
+    expect(spray.value.inventory_qty_consumed).toBe(1);
+    expect(normalizeCropPhotoInput({
+      crop_id: '0123456789abcdef01234567', image_base64: '/api/photos/2123456789abcdef01234567',
+      uploaded_at: '2026-11-04', label: 'Harvest', farmId: 'other',
+    }).value).toEqual({
+      crop_id: '0123456789abcdef01234567', image_base64: '/api/photos/2123456789abcdef01234567',
+      uploaded_at: '2026-11-04', label: 'Harvest',
+    });
+  });
+});

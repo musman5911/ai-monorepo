@@ -306,3 +306,156 @@ export function normalizeTaskInput(body = {}) {
     laborer_ids: laborerIds,
   } };
 }
+
+
+function normalizeImageReference(value, label, maxLength = 400_000) {
+  const result = cleanText(value, label, maxLength);
+  if (result.error || !result.value) return result;
+  const allowed = result.value.startsWith('data:image/')
+    || /^\/api\/photos\/[a-f0-9]{24}$/i.test(result.value)
+    || /^\/crop_cards\/[a-z0-9_.-]+$/i.test(result.value);
+  if (!allowed) return { error: `${label} must be an image data URL or a farm image path.` };
+  return result;
+}
+
+export function normalizeCropInput(body = {}) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { error: 'Crop details must be an object.' };
+  const name = cleanText(body.name, 'Crop name', 120, { required: true });
+  if (name.error) return name;
+  const variety = cleanText(body.variety, 'Crop variety', 120);
+  if (variety.error) return variety;
+  const status = body.status === undefined ? 'Growing' : body.status;
+  if (!['Planted', 'Growing', 'Harvesting', 'Completed'].includes(status)) {
+    return { error: 'Crop status must be Planted, Growing, Harvesting or Completed.' };
+  }
+  const field = cleanText(body.field, 'Field description', 120);
+  if (field.error) return field;
+  const fieldId = optionalId(body.fieldId, 'Field ID');
+  if (fieldId.error) return fieldId;
+  const plantDate = cleanDate(body.plant_date, 'Plant date');
+  if (plantDate.error) return plantDate;
+  const harvestDate = cleanDate(body.harvest_date, 'Harvest date');
+  if (harvestDate.error) return harvestDate;
+  if (plantDate.value && harvestDate.value && harvestDate.value < plantDate.value) {
+    return { error: 'Harvest date cannot be earlier than the planting date.' };
+  }
+  const numberFields = [
+    ['yield_kg', 'Expected yield', 0],
+    ['area_kanal', 'Crop area (kanal)', 1],
+    ['seed_quantity', 'Seed quantity', 0],
+    ['seed_cost_per_unit', 'Seed cost per unit', 0],
+  ];
+  const numbers = {};
+  for (const [fieldName, label, fallback] of numberFields) {
+    const parsed = cleanNumber(body[fieldName], label, { fallback });
+    if (parsed.error) return parsed;
+    numbers[fieldName] = parsed.value;
+  }
+  const yieldUnit = body.yield_unit === undefined ? 'kg' : body.yield_unit;
+  if (!['kg', 'maund', 'ton'].includes(yieldUnit)) return { error: 'Yield unit must be kg, maund or ton.' };
+  const seedUnit = body.seed_unit === undefined ? 'kg' : body.seed_unit;
+  if (!['kg', 'maund', 'bag'].includes(seedUnit)) return { error: 'Seed unit must be kg, maund or bag.' };
+  const season = cleanText(body.season, 'Season', 60, { required: true });
+  if (season.error) return season;
+  const cropYear = cleanText(String(body.crop_year ?? ''), 'Crop year', 4, { required: true });
+  if (cropYear.error) return cropYear;
+  if (!/^\d{4}$/.test(cropYear.value) || Number(cropYear.value) < 1900 || Number(cropYear.value) > 2200) {
+    return { error: 'Crop year must be a valid four-digit year.' };
+  }
+  const notes = cleanText(body.notes, 'Crop notes', 2000);
+  if (notes.error) return notes;
+  const image = normalizeImageReference(body.image_base64, 'Crop image');
+  if (image.error) return image;
+  return { value: {
+    name: name.value,
+    variety: variety.value,
+    status,
+    field: field.value,
+    fieldId: fieldId.value,
+    plant_date: plantDate.value,
+    harvest_date: harvestDate.value,
+    yield_kg: numbers.yield_kg,
+    yield_unit: yieldUnit,
+    area_kanal: numbers.area_kanal,
+    notes: notes.value,
+    image_base64: image.value,
+    seed_quantity: numbers.seed_quantity,
+    seed_unit: seedUnit,
+    seed_cost_per_unit: numbers.seed_cost_per_unit,
+    season: season.value,
+    crop_year: cropYear.value,
+  } };
+}
+
+export function normalizeIrrigationInput(body = {}, { defaultDate = '' } = {}) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { error: 'Irrigation details must be an object.' };
+  const cropId = optionalId(body.crop_id, 'Crop ID');
+  if (cropId.error || !cropId.value) return cropId.error ? cropId : { error: 'Crop is required for an irrigation log.' };
+  const date = cleanDate(body.date, 'Irrigation date', defaultDate);
+  if (date.error) return date;
+  if (!date.value) return { error: 'Irrigation date is required.' };
+  const hours = cleanNumber(body.hours, 'Irrigation hours', { positive: true });
+  if (hours.error) return hours;
+  const tubewell = body.tubewell === undefined ? 'rented' : body.tubewell;
+  if (!['rented', 'own'].includes(tubewell)) return { error: 'Tubewell must be rented or own.' };
+  const hourlyRate = cleanNumber(body.hourly_rate, 'Hourly rate', { fallback: 0 });
+  if (hourlyRate.error) return hourlyRate;
+  if (tubewell === 'rented' && hourlyRate.value <= 0) return { error: 'Rented tubewell needs an hourly rate greater than zero.' };
+  const notes = cleanText(body.notes, 'Irrigation notes', 1000);
+  if (notes.error) return notes;
+  return { value: {
+    crop_id: cropId.value,
+    date: date.value,
+    hours: hours.value,
+    tubewell,
+    hourly_rate: tubewell === 'rented' ? hourlyRate.value : 0,
+    notes: notes.value,
+  } };
+}
+
+export function normalizeSprayInput(body = {}, { defaultDate = '' } = {}) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { error: 'Spray details must be an object.' };
+  const cropId = optionalId(body.crop_id, 'Crop ID');
+  if (cropId.error || !cropId.value) return cropId.error ? cropId : { error: 'Crop is required for a spray log.' };
+  const date = cleanDate(body.date, 'Spray date', defaultDate);
+  if (date.error) return date;
+  if (!date.value) return { error: 'Spray date is required.' };
+  const chemical = cleanText(body.chemical, 'Chemical name', 160, { required: true });
+  if (chemical.error) return chemical;
+  const dose = cleanText(body.dose, 'Dose', 100);
+  if (dose.error) return dose;
+  const notes = cleanText(body.notes, 'Spray notes', 1000);
+  if (notes.error) return notes;
+  const image = normalizeImageReference(body.image_base64, 'Spray image');
+  if (image.error) return image;
+  const inventoryId = optionalId(body.inventory_item_id, 'Inventory item ID');
+  if (inventoryId.error) return inventoryId;
+  const quantity = cleanNumber(body.inventory_qty_consumed, 'Inventory quantity consumed', { fallback: 0 });
+  if (quantity.error) return quantity;
+  if (quantity.value > 0 && !inventoryId.value) return { error: 'Select an inventory item before recording a consumed quantity.' };
+  return { value: {
+    crop_id: cropId.value,
+    date: date.value,
+    chemical: chemical.value,
+    dose: dose.value,
+    notes: notes.value,
+    image_base64: image.value,
+    inventory_item_id: inventoryId.value,
+    inventory_qty_consumed: quantity.value,
+    inventory_deducted: false,
+  } };
+}
+
+export function normalizeCropPhotoInput(body = {}, { defaultDate = '' } = {}) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { error: 'Crop photo details must be an object.' };
+  const cropId = optionalId(body.crop_id, 'Crop ID');
+  if (cropId.error || !cropId.value) return cropId.error ? cropId : { error: 'Crop is required for a crop photo.' };
+  const image = normalizeImageReference(body.image_base64, 'Crop photo');
+  if (image.error || !image.value) return image.error ? image : { error: 'Crop photo is required.' };
+  const uploadedAt = cleanDate(body.uploaded_at, 'Upload date', defaultDate);
+  if (uploadedAt.error) return uploadedAt;
+  if (!uploadedAt.value) return { error: 'Upload date is required.' };
+  const label = cleanText(body.label, 'Photo label', 80);
+  if (label.error) return label;
+  return { value: { crop_id: cropId.value, image_base64: image.value, uploaded_at: uploadedAt.value, label: label.value } };
+}
