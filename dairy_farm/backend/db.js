@@ -418,6 +418,7 @@ const ArchiveRecordSchema = new mongoose.Schema({
 ArchiveRecordSchema.index({ farmId: 1, jobId: 1, sourceCollection: 1, sourceId: 1 }, { unique: true, name: 'archive_record_source_unique' });
 
 const FarmSchema = new mongoose.Schema({
+  seedId: { type: String, index: true },
   name: { type: String, required: true, trim: true },
   location: { type: String, default: '' },
   archived: { type: Boolean, default: false },
