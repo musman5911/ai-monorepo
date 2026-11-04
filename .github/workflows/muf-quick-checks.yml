@@ -56,6 +56,9 @@ jobs:
       - name: Run Phase 19 database safety tests
         run: npm run check-final-db
 
+      - name: Check deterministic demo seeds and seeder syntax
+        run: npm run check-seed
+
       - name: Check shared MUF parity
         run: npm run check-sync
 
