@@ -45,6 +45,8 @@ export async function seedDemoData() {
   const { default: BatchMortalityLog } = await import('./models/BatchMortalityLog.js');
   const { default: BatchExpenseLog } = await import('./models/BatchExpenseLog.js');
   const { default: BatchSaleLog } = await import('./models/BatchSaleLog.js');
+  const { default: BatchEggLog } = await import('./models/BatchEggLog.js');
+  const { default: BatchVaccinationLog } = await import('./models/BatchVaccinationLog.js');
   const { default: Farm } = await import('./models/Farm.js');
 
 
