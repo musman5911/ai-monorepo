@@ -425,6 +425,7 @@ const FarmSchema = new mongoose.Schema({
   createdBy: { type: String, default: '' },
 }, { timestamps: true });
 const ProductSchema = new mongoose.Schema({
+  seedId: { type: String, index: true },
   name: { type: String, required: true, trim: true, maxlength: 120 }, kind: { type: String, required: true, trim: true, maxlength: 32 },
   unit: { type: String, required: true, trim: true, maxlength: 32 }, price: { type: Number, required: true, min: 0, max: 1000000000 },
   quantity: { type: Number, required: true, min: 0, max: 1000000000 }, photoUrl: { type: String, default: '', maxlength: 500 }, published: { type: Boolean, default: false },
