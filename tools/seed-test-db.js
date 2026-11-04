@@ -29,8 +29,25 @@ async function run() {
   console.log(safeTargetSummary(target));
   if (!args.apply) console.log('No database writes will be performed. Add --apply to seed this disposable database.');
 
-  // Ensure importing the app model registry cannot select its in-memory adapter.
-  // The explicit, validated seed URI is the only connection target for this process.
+  const definitions = shared.getFarmDefinitions(args.app, 'rich');
+  const planPreviewToday = shared.getSeedToday();
+  const validationFarmIds = definitions.map((_, index) => 'seed-plan-farm-' + (index + 1));
+  const validationPlan = shared.buildSeedPlan(args.app, validationFarmIds, { today: planPreviewToday });
+  shared.assertSeedPlanFarmOwnership(validationPlan, validationFarmIds);
+  const planPreview = {
+    farms: definitions.length,
+    products: validationPlan.products.length,
+    today: planPreviewToday
+  };
+  if (!args.apply) {
+    console.log('[MUF seed] Planned ' + planPreview.farms + ' farms, ' + planPreview.products + ' shop products.');
+    console.log('[MUF seed] No documents were inserted.');
+    console.log('[MUF seed] Database contents were not inspected; no MongoDB connection was opened.');
+    return;
+  }
+
+  // No database packages are loaded and no database connection is attempted
+  // until after the dry-run branch above has returned.
   process.env.MEMORY_MODE = '0';
   process.env.ALLOW_MEMORY_MODE = '0';
   process.env.MONGO_URI = rawUri;
@@ -63,22 +80,6 @@ async function run() {
     }
     if (args.reset && !args.apply) {
       throw new Error('--reset requires --apply; a dry run never drops database contents.');
-    }
-
-    const definitions = shared.getFarmDefinitions(args.app, 'rich');
-    const planPreviewToday = shared.getSeedToday();
-    const validationFarmIds = definitions.map((_, index) => 'seed-plan-farm-' + (index + 1));
-    const validationPlan = shared.buildSeedPlan(args.app, validationFarmIds, { today: planPreviewToday });
-    shared.assertSeedPlanFarmOwnership(validationPlan, validationFarmIds);
-    const planPreview = {
-      farms: definitions.length,
-      products: validationPlan.products.length,
-      today: planPreviewToday
-    };
-    if (!args.apply) {
-      console.log('[MUF seed] Planned ' + planPreview.farms + ' farms, ' + planPreview.products + ' shop products.');
-      console.log('[MUF seed] No documents were inserted.');
-      return;
     }
 
     if (args.reset) await connection.dropDatabase();
