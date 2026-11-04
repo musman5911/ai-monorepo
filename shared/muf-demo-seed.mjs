@@ -107,7 +107,7 @@ function buildProducts(app, farmIds, today) {
 
 function buildDairyCollections(farmIds, today) {
   const c = { Cow: [], BreedingEvent: [], Milk: [], Expense: [], Health: [], Buyer: [], BuyerPayment: [], Supplier: [], SupplierPayment: [], Laborer: [], LaborAttendance: [], LaborAdvance: [], Rate: [], RateHistory: [], Sale: [] };
-  for (let farmNo = 2; farmNo <= 4; farmNo += 1) {
+  for (let farmNo = 1; farmNo <= 4; farmNo += 1) {
     const farmId = String(farmIds[farmNo - 1]);
     const p = "seed-dairy-f" + farmNo;
     const bull = p + "-bull-01";
@@ -122,13 +122,13 @@ function buildDairyCollections(farmIds, today) {
       for (let day = 0; day < 60; day += 1) c.Milk.push({ _id: p + "-milk-" + n + "-" + (day + 1), seedId: p + "-milk-" + n + "-" + (day + 1), farmId, cowId, date: dateFromSeed(day, today), morning: 7 + ((day + n) % 4), evening: 5 + ((day + 2 * n) % 3), calfMilk: 0.5, fatPercent: 3.8, snfPercent: 8.5 });
     }
     c.Cow.push({ _id: sold, seedId: sold, farmId, name: "Gulabo " + farmNo, breed: "Red Sindhi", gender: "female", earTag: "D-" + farmNo + "-S-001", status: "sold", birthDate: dateFromSeed(1600, today), weight: 360, lactationNumber: 5, batch: "Sold Animals", purchasePrice: 95000, fatherId: bull, fatherType: "farm", fatherName: "Sher " + farmNo });
-    c.Cow.push({ _id: calf, seedId: calf, farmId, name: "Chhoti " + farmNo, breed: "Sahiwal", gender: "female", earTag: "D-" + farmNo + "-K-001", status: "calf", birthDate: dateFromSeed(24, today), weight: 58, lactationNumber: 0, motherId: mother, fatherId: bull, fatherType: "farm", fatherName: "Sher " + farmNo, isCalf: true, batch: "Born on Farm" });
+    c.Cow.push({ _id: calf, seedId: calf, farmId, name: "Chhoti " + farmNo, breed: "Sahiwal", gender: "female", earTag: "D-" + farmNo + "-K-001", status: "calf", birthDate: dateFromSeed(4, today), weight: 58, lactationNumber: 0, motherId: mother, fatherId: bull, fatherType: "farm", fatherName: "Sher " + farmNo, isCalf: true, batch: "Born on Farm" });
     const eventData = [
-      { type: "heat", date: dateFromSeed(42, today), notes: "Observed standing heat." },
-      { type: "service", date: dateFromSeed(40, today), sireSource: "farm_bull", bullId: bull, bullName: "Sher " + farmNo, notes: "Natural service by farm bull." },
-      { type: "service", date: dateFromSeed(38, today), sireSource: "outside_straw", semenCode: "STRAW-" + farmNo + "-A", bullName: "Approved outside sire", technician: "Demo technician" },
-      { type: "pregnancy_check", date: dateFromSeed(18, today), result: "positive", notes: "Routine demo pregnancy check." },
-      { type: "calving", date: dateFromSeed(24, today), calves: [{ gender: "female", earTag: "D-" + farmNo + "-K-001", outcome: "live" }], generatedCalfIds: [calf], notes: "Live calf linked to dam and sire." }
+      { type: "heat", date: dateFromSeed(90, today), notes: "Observed standing heat." },
+      { type: "service", date: dateFromSeed(88, today), sireSource: "farm_bull", bullId: bull, bullName: "Sher " + farmNo, notes: "Natural service by farm bull." },
+      { type: "service", date: dateFromSeed(86, today), sireSource: "outside_straw", semenCode: "STRAW-" + farmNo + "-A", bullName: "Approved outside sire", technician: "Demo technician" },
+      { type: "pregnancy_check", date: dateFromSeed(50, today), result: "positive", notes: "Routine demo pregnancy check." },
+      { type: "calving", date: dateFromSeed(4, today), calves: [{ gender: "female", earTag: "D-" + farmNo + "-K-001", outcome: "live" }], generatedCalfIds: [calf], notes: "Live calf linked to dam and sire." }
     ];
     eventData.forEach((event, index) => c.BreedingEvent.push({ _id: p + "-event-" + (index + 1), seedId: p + "-event-" + (index + 1), farmId, cowId: mother, ...event }));
     c.BreedingEvent.push({ _id: p + "-sold-heat", seedId: p + "-sold-heat", farmId, cowId: sold, type: "heat", date: dateFromSeed(170, today), notes: "Historical event before sale." });
@@ -152,7 +152,7 @@ function buildDairyCollections(farmIds, today) {
 
 function buildAgriCollections(farmIds, today) {
   const c = { Field: [], Crop: [], Finance: [], Task: [], Inventory: [], Liability: [], Laborer: [], Attendance: [], Supplier: [], SupplierPayment: [] };
-  for (let farmNo = 2; farmNo <= 4; farmNo += 1) {
+  for (let farmNo = 1; farmNo <= 4; farmNo += 1) {
     const farmId = String(farmIds[farmNo - 1]), p = "seed-agri-f" + farmNo;
     const fields = [];
     for (let n = 1; n <= farmNo; n += 1) {
@@ -185,8 +185,8 @@ function buildAgriCollections(farmIds, today) {
 
 function buildFlockCollections(farmIds, today) {
   const c = { Batch: [], BatchFeedLog: [], BatchMortalityLog: [], BatchExpenseLog: [], BatchSaleLog: [], BatchWeightLog: [], BatchEggLog: [], BatchVaccinationLog: [], DataStore: [] };
-  for (let farmNo = 2; farmNo <= 4; farmNo += 1) {
-    const farmId = String(farmIds[farmNo - 1]), p = "seed-flock-f" + farmNo, batchCount = farmNo - 1;
+  for (let farmNo = 1; farmNo <= 4; farmNo += 1) {
+    const farmId = String(farmIds[farmNo - 1]), p = "seed-flock-f" + farmNo, batchCount = farmNo;
     const batches = [];
     for (let n = 1; n <= batchCount; n += 1) {
       const batchId = p + "-batch-" + n;
