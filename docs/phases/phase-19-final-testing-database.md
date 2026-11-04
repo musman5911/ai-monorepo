@@ -230,7 +230,7 @@ Added a fail-closed configuration-and-backup preflight and a migration wrapper. 
 
 GitHub Actions run [40852928322](https://github.com/musman5911/ai-monorepo/actions/runs/40852928322) passed on commit `83ecc481b68e645dd05f6929ab557d8d509ec5c3`: 48 test files / 424 tests passed; shared sync, UI safety, workbench source checks (23), farm scope, phase documentation and the seven-package production dependency audit all passed. The audit reported no high or critical production dependency findings. These are automated source/safety-guard checks only; this run did not connect to MongoDB or perform any backup, restore, migration, deletion or concurrency test.
 
-; names containing `prod`, `production`, or `live` are refused, as is `NODE_ENV=production`. Non-local hosts require the explicit `MUF_SEED_ALLOW_REMOTE=1` opt-in. A dry run is the default and makes no writes. The helper refuses a database with existing records unless `--reset --apply` is explicitly supplied; that combination drops the selected database before recreating the fixture. Use it only on a verified throwaway database.
+; names containing `prod`, `production`, or `live` are refused, as is `NODE_ENV=production`. Non-local hosts require the explicit `MUF_SEED_ALLOW_REMOTE=1` opt-in. A dry run is the default, validates the full plan locally, makes no writes, and does not open a MongoDB connection. It cannot inspect whether the target database already contains records; that check happens only during `--apply`. The helper refuses a database with existing records unless `--reset --apply` is explicitly supplied; that combination drops the selected database before recreating the fixture. Use it only on a verified throwaway database.
 
 Windows CMD example for a local empty test database:
 
