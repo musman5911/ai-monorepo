@@ -97,7 +97,7 @@ async function seedDemoData(db) {
     cw.weightHistory = [];
     for (let m = 11; m >= 0; m--) {
       const d = seedNow(); d.setMonth(d.getMonth() - m); d.setDate(6);
-      if (d > new Date()) continue;
+      if (d > seedNow()) continue;
       cw.weightHistory.push({
         id: `w-${cid}-${m}`,
         date: d.toISOString().slice(0, 10),
@@ -153,7 +153,7 @@ async function seedDemoData(db) {
     const month = Number(ds.slice(5, 7));
     const heat = (month >= 6 && month <= 8) ? 0.9 : 1; // summer dip
     for (const [cowId, avg] of Object.entries(cowYield)) {
-      if (Math.random() < 0.03) continue; // occasional missed entry
+      if (demoRandom() < 0.03) continue; // occasional missed entry
       milk.push({
         _id: `m${mid++}`, cowId, date: ds,
         morning: rnd(avg.m * 0.8, avg.m * 1.2) * heat,
@@ -181,7 +181,7 @@ async function seedDemoData(db) {
         const d = seedNow();
         d.setMonth(d.getMonth() - m);
         d.setDate(dayOfMonth);
-        if (d > new Date()) continue;
+        if (d > seedNow()) continue;
         const wobble = 0.85 + ((bpId * 37) % 30) / 100;
         buyerPayments.push({
           _id: `bp${bpId++}`,
@@ -270,7 +270,7 @@ async function seedDemoData(db) {
       const d = seedNow();
       d.setMonth(d.getMonth() - m);
       d.setDate(15);
-      if (d > new Date()) continue;
+      if (d > seedNow()) continue;
       const wobble = 0.8 + ((spId * 29) % 35) / 100;
       supplierPayments.push({
         _id: `sp${spId++}`, supplierId,
@@ -338,7 +338,7 @@ async function seedDemoData(db) {
     const ds = daysAgo(day);
     dailyLogs.push({
       _id: ds, date: ds,
-      checklist: checklist.map(item => ({ ...item, done: Math.random() > 0.08 })),
+      checklist: checklist.map(item => ({ ...item, done: demoRandom() > 0.08 })),
       notes: diaryNotes[day % diaryNotes.length] || '',
     });
   }
