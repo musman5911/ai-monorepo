@@ -18,7 +18,7 @@ async function start() {
   const child = spawn(process.execPath, ['server.js'], {
     cwd: PROJECT,
     env: {
-      ...process.env, MEMORY_MODE: '1', MONGO_URI: '', MONGODB_URI: '',
+      ...process.env, MEMORY_MODE: '1', MUF_DEMO_PROFILE: 'basic', MONGO_URI: '', MONGODB_URI: '',
       NODE_ENV: 'development', PORT: String(PORT), JWT_SECRET: 'phase2-breeding-events-test-secret',
     },
     stdio: ['ignore', 'pipe', 'pipe'],
