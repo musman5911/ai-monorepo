@@ -105,6 +105,21 @@ async function run() {
       User: dbModule.User,
       Product: dbModule.Product
     };
+    const validFarmIds = new Set(accountFarmIds);
+    for (const [modelName, documents] of Object.entries(plan.collections)) {
+      for (const document of documents) {
+        if (!document.farmId || !validFarmIds.has(String(document.farmId))) {
+          throw new Error('Seed plan contains a ' + modelName + ' record without a valid farmId.');
+        }
+      }
+    }
+    for (const product of plan.products) {
+      if (!product.farmId || !validFarmIds.has(String(product.farmId))) {
+        throw new Error('Seed plan contains a shop product without a valid farmId.');
+      }
+    }
+    const uniqueModels = [...new Set(Object.values(models).filter((model) => model && typeof model.createIndexes === 'function'))];
+    for (const model of uniqueModels) await model.createIndexes();
     await shared.insertSeedCollections(plan, models);
 
     const finalCounts = {};
