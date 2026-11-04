@@ -9,6 +9,7 @@ The plan, in order. Each phase has its own file in `docs/phases/` with scope, st
 3. **Command-line checks only until the end.** Phases 1 to 18 are tested with commands. Real MongoDB, browsers, phones and live sites are tested in Phases 19 to 21, once, after all building is finished. Nothing is postponed or left out.
 4. **Every phase adds a new command-line check** and updates the docs. `npm run check-docs` keeps the docs in step.
 5. **Never test on production data.** Final tests use disposable copies of your backups.
+6. **Seed only disposable databases.** Demo seeds are deterministic, profile-controlled, dry-run by default, and guarded by an allowlist of disposable database names.
 
 ## Phases
 
@@ -135,3 +136,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 **Phase 18 completion (2026-10-29):** Phase 18 is Done for command-line scope. The owner-supplied current-head Windows gate passed `npm run check-docs`, `npm test` (47 files / 412 tests), and `tools\\build-all.bat` (Dairy, Flock, and Agri all built). Latest CI run [40847463200](https://github.com/musman5911/ai-monorepo/actions/runs/40847463200) passed tests, sync/UI/workbench/farm/docs/guide-command checks, and production audit across all seven package sets with zero high/critical production findings. Phase 10's direct-build warning absence remains unverified. Real MongoDB, browser/phone and live deployment checks remain in Phases 19–21. See [Phase 18 details](phases/phase-18-documentation-and-handoff.md).
 
 **Phase 19 started (2026-10-29):** real-MongoDB validation is now In progress. Added a fail-closed preflight that requires a dedicated per-app test database, a fresh backup verified by the operator, and an explicit target-host confirmation, plus a migration wrapper that defaults to dry-run. No live database checks are claimed yet because no disposable MongoDB target or fresh backup has been verified in this session. See [Phase 19 details](phases/phase-19-final-testing-database.md).
+
+
+**Phase 19 demo-data note (2026-11-04):** rich per-farm demo fixtures and a dry-run-first disposable MongoDB seed helper are now part of the Phase 19 work. The helper is not a production migration tool. Local owner validation remains pending; Phase 19 is still **In progress**.
