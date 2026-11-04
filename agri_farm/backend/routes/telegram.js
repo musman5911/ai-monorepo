@@ -24,6 +24,7 @@ async function muf() {
 }
 
 const router = express.Router();
+const MAX_TELEGRAM_EXPENSE_AMOUNT = 1_000_000_000;
 
 const TOKEN = () => MUF_ENV.telegramBotToken || '';
 const WH_SECRET = () => MUF_ENV.telegramWebhookSecret || '';
@@ -181,7 +182,7 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
 
     if (cmd.kind === 'expense') {
       const qty = toFloat(cmd.qty);
-      if (qty <= 0) {
+      if (!Number.isFinite(qty) || qty <= 0 || qty > MAX_TELEGRAM_EXPENSE_AMOUNT) {
         await send(m.TG.noQty);
         return res.json({ ok: true });
       }

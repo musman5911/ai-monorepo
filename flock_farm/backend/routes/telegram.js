@@ -22,6 +22,7 @@ import {
 } from '../muf-telegram.mjs';
 
 const router = express.Router();
+const MAX_TELEGRAM_EXPENSE_AMOUNT = 1_000_000_000;
 
 const TOKEN = () => MUF_ENV.telegramBotToken || '';
 const WH_SECRET = () => MUF_ENV.telegramWebhookSecret || '';
@@ -178,7 +179,7 @@ router.post('/webhook/:secret', async (req, res) => {
     }
 
     if (cmd.kind === 'eggs' || cmd.kind === 'milk') { // "doodh" pe bhi anday hi samjho — flock farm hai
-      if (!cmd.qty || cmd.qty <= 0) return send(TG.noQty);
+      if (!Number.isFinite(Number(cmd.qty)) || Number(cmd.qty) <= 0 || Number(cmd.qty) > MAX_TELEGRAM_EXPENSE_AMOUNT) return send(TG.noQty);
       const eggs = await readStore('eggs', []);
       const idx = eggs.findIndex((r) => r.date === date);
       if (idx >= 0) {

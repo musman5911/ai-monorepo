@@ -478,3 +478,37 @@ describe('labor wage posting month validation', () => {
     expect(dairyHandler.indexOf("Month must be a valid YYYY-MM value.")).toBeLessThan(dairyHandler.indexOf("LaborAttendance.find()"));
   });
 });
+
+
+describe('authenticated response cache policy and security headers', () => {
+  it('adds a restrictive CSP to Dairy and Agri servers without inline script execution', () => {
+    for (const app of ['dairy_farm', 'agri_farm']) {
+      const server = source(`${app}/backend/server.js`);
+      expect(server).toContain("'script-src': [\"'self'\"]");
+      expect(server).toContain("'object-src': [\"'none'\"]");
+      expect(server).not.toContain('contentSecurityPolicy: false');
+    }
+  });
+
+  it('marks authenticated API responses private and non-cacheable in all apps', () => {
+    for (const app of ['dairy_farm', 'agri_farm', 'flock_farm']) {
+      const auth = source(`${app}/backend/middleware/auth.js`);
+      expect(auth).toContain("Cache-Control', 'private, no-store, max-age=0'");
+      expect(auth).toContain("Pragma', 'no-cache'");
+      expect(auth).toContain("Expires', '0'");
+    }
+    for (const app of ['dairy_farm', 'agri_farm']) {
+      const photos = source(`${app}/backend/routes/photos.js`);
+      expect(photos).toContain("Cache-Control', 'private, no-store, max-age=0'");
+      expect(photos).not.toContain("Cache-Control', 'private, max-age=3600'");
+    }
+  });
+
+  it('bounds Telegram expense writes across all three apps', () => {
+    for (const app of ['dairy_farm', 'agri_farm', 'flock_farm']) {
+      const routes = source(`${app}/backend/routes/telegram.js`);
+      expect(routes).toContain('MAX_TELEGRAM_EXPENSE_AMOUNT = 1_000_000_000');
+      expect(routes).toContain('MAX_TELEGRAM_EXPENSE_AMOUNT');
+    }
+  });
+});

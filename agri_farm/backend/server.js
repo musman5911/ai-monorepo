@@ -47,7 +47,20 @@ const app = express();
 app.set('trust proxy', 1);
 
 app.use(helmet({
-  contentSecurityPolicy: false,
+  contentSecurityPolicy: {
+    useDefaults: true,
+    directives: {
+      'default-src': ["'self'"],
+      'script-src': ["'self'"],
+      'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      'font-src': ["'self'", "https://fonts.gstatic.com", "data:"],
+      'img-src': ["'self'", "data:", "blob:", "https:"],
+      'connect-src': ["'self'", "https:", "http:", "ws:", "wss:"],
+      'object-src': ["'none'"],
+      'base-uri': ["'self'"],
+      'frame-ancestors': ["'self'"],
+    },
+  },
   crossOriginEmbedderPolicy: false,
 }));
 

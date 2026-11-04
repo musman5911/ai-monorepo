@@ -20,6 +20,9 @@ if (MUF_ENV.nodeEnv === 'production' && (SECRET === 'GENERATE-A-LONG-RANDOM-STRI
 }
 
 const authenticate = async (req, res, next, applyFarmScope = true) => {
+  res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) {
     if (MUF_ENV.logRequests) console.log(`[AUTH] ${req.method} ${req.originalUrl} -> 401 (no token)`);

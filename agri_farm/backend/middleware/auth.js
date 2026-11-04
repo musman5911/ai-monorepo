@@ -99,6 +99,9 @@ function toRequestUser(user) {
 }
 
 export async function protect(req, res, next) {
+  res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   const user = await resolveUser(req);
   if (!user) {
     res.setHeader('WWW-Authenticate', 'Bearer');
@@ -119,6 +122,9 @@ export async function protect(req, res, next) {
  * Authenticate an owner-only database-wide operation without selecting a farm.
  */
 export async function protectUnscoped(req, res, next) {
+  res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   const user = await resolveUser(req);
   if (!user) {
     res.setHeader('WWW-Authenticate', 'Bearer');

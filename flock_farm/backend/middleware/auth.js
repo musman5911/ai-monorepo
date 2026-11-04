@@ -29,6 +29,9 @@ export function signToken(user) {
  * sanitized plain object) and `req.token`.
  */
 async function authenticate(req, res, next, applyFarmScope = true) {
+  res.setHeader('Cache-Control', 'private, no-store, max-age=0');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
   try {
     let token = null;
 

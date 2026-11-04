@@ -126,12 +126,12 @@ router.get('/photos/:id', protect, async (req, res) => {
       if (!remote.ok) return res.status(502).json({ error: 'Cloudinary photo retrieval failed' });
       const bytes = Buffer.from(await remote.arrayBuffer());
       return res.set('Content-Type', photo.contentType || remote.headers.get('content-type') || 'application/octet-stream')
-        .set('Cache-Control', 'private, max-age=3600')
+        .set('Cache-Control', 'private, no-store, max-age=0')
         .send(bytes);
     }
     return res
       .set('Content-Type', photo.contentType || 'application/octet-stream')
-      .set('Cache-Control', 'private, max-age=3600')
+      .set('Cache-Control', 'private, no-store, max-age=0')
       .send(photoBytes(photo.data));
   } catch (err) {
     return res.status(500).json({ error: err.message || 'Photo retrieval failed' });
