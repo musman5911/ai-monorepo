@@ -66,12 +66,14 @@ async function run() {
     }
 
     const definitions = shared.getFarmDefinitions(args.app, 'rich');
-    const accountFarmIds = [];
-    const productCount = 8;
+    const planPreviewToday = shared.getSeedToday();
+    const validationFarmIds = definitions.map((_, index) => 'seed-plan-farm-' + (index + 1));
+    const validationPlan = shared.buildSeedPlan(args.app, validationFarmIds, { today: planPreviewToday });
+    shared.assertSeedPlanFarmOwnership(validationPlan, validationFarmIds);
     const planPreview = {
       farms: definitions.length,
-      products: productCount,
-      today: shared.getSeedToday()
+      products: validationPlan.products.length,
+      today: planPreviewToday
     };
     if (!args.apply) {
       console.log('[MUF seed] Planned ' + planPreview.farms + ' farms, ' + planPreview.products + ' shop products.');
@@ -89,9 +91,10 @@ async function run() {
       const createdAt = definition.createdAt;
       farms.push(await dbModule.Farm.create({ ...definition, createdAt, updatedAt: createdAt }));
     }
-    for (const farm of farms) accountFarmIds.push(String(farm._id));
-
+    const accountFarmIds = farms.map((farm) => String(farm._id));
     const plan = shared.buildSeedPlan(args.app, accountFarmIds, { today: planPreview.today });
+    shared.assertSeedPlanFarmOwnership(plan, accountFarmIds);
+
     const User = dbModule.User;
     const accounts = [];
     for (const account of plan.accounts) {
@@ -108,19 +111,6 @@ async function run() {
     }
     await User.insertMany(accounts);
 
-    const validFarmIds = new Set(accountFarmIds);
-    for (const [modelName, documents] of Object.entries(plan.collections)) {
-      for (const document of documents) {
-        if (!document.farmId || !validFarmIds.has(String(document.farmId))) {
-          throw new Error('Seed plan contains a ' + modelName + ' record without a valid farmId.');
-        }
-      }
-    }
-    for (const product of plan.products) {
-      if (!product.farmId || !validFarmIds.has(String(product.farmId))) {
-        throw new Error('Seed plan contains a shop product without a valid farmId.');
-      }
-    }
     await shared.insertSeedCollections(plan, models);
 
     const finalCounts = {};
