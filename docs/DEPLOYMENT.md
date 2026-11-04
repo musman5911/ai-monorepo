@@ -143,3 +143,21 @@ The Cloudinary environment names are now read by all three backends. They are op
 ## Secret handling
 
 Keep secrets in Replit Secrets or the deployment's secret manager. Never commit a real `.env`, connection string, JWT secret, SMTP password, Telegram token, cron secret, or cross-farm key. The tracked `.env.example` files must contain placeholders only.
+
+
+## Local rich demo data and disposable MongoDB seeding
+
+For local in-memory demos, leave the Mongo URI unset and set `MEMORY_MODE=1`. The rich profile is the normal local demo after compatibility checks are updated; use `MUF_DEMO_PROFILE=basic` for the older two-farm fixture required by legacy runtime checks. Generated dates can be pinned with `MUF_SEED_TODAY=YYYY-MM-DD`.
+
+The MongoDB seed helper is separate from ordinary app startup. It requires an explicit app and a database name matching `^muf_(phase19|test|demo|seed)_[a-z0-9_]+$`. It refuses production/live names, refuses `NODE_ENV=production`, and requires `MUF_SEED_ALLOW_REMOTE=1` for every non-local host. The helper checks for existing records before writing. It defaults to dry-run, and will only replace existing contents when both `--reset` and `--apply` are provided. Reset drops the selected database, so verify the target is disposable before using it.
+
+Windows CMD, local MongoDB example:
+
+```cmd
+set MUF_SEED_URI=mongodb://localhost:27017/muf_test_dairy_demo
+node tools\\seed-test-db.js --app dairy
+node tools\\seed-test-db.js --app dairy --apply
+```
+
+Use `--app agri` or `--app flock` for the other apps. For a deliberate repeat seed, run `node tools\\seed-test-db.js --app dairy --reset --apply` only against the same throwaway database. For remote testing, set `MUF_SEED_ALLOW_REMOTE=1` in the private CMD session and never paste or commit the URI. The tool reports the host and database name only. The root scripts are `npm run seed:test-db -- --app dairy` (arguments after `--` are passed through) and `npm run check-seed` (offline seed-plan tests).
+
