@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { validateIncubationAllocations } from '../flock_farm/backend/incubation-allocation.mjs';
 import {
   buildSeedPlan,
   getFarmDefinitions,
@@ -170,7 +171,6 @@ it('keeps Flock batch logs, home birds and incubation allocation within each far
         expect(incubation.eggsSet).toBeGreaterThan(0);
         expect(incubation.hatched).toBeLessThanOrEqual(incubation.eggsSet);
       }
-      const { validateIncubationAllocations } = await import('../flock_farm/backend/incubation-allocation.mjs');
       expect(validateIncubationAllocations(bucket.value, farmBatches, farmEggLogs)).toBeNull();
     }
   }
