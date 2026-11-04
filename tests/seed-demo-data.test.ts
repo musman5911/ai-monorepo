@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { validateIncubationAllocations } from '../flock_farm/backend/incubation-allocation.mjs';
 import {
+  assertSeedPlanFarmOwnership,
   buildSeedPlan,
+  getDemoProfile,
   getFarmDefinitions,
   parseSeedArgs,
   validateSeedTarget
@@ -33,6 +35,37 @@ function expectSameFarmLink(sourceFarmId: string, targetId: string, records: Arr
   expect(target, 'linked record exists').toBeTruthy();
   expect(String(target?.farmId)).toBe(sourceFarmId);
 }
+
+it('defaults to the basic profile only in test environments and rich otherwise', () => {
+  const previousProfile = process.env.MUF_DEMO_PROFILE;
+  const previousNodeEnv = process.env.NODE_ENV;
+  try {
+    delete process.env.MUF_DEMO_PROFILE;
+    process.env.NODE_ENV = 'test';
+    expect(getDemoProfile()).toBe('basic');
+    process.env.NODE_ENV = 'development';
+    expect(getDemoProfile()).toBe('rich');
+    process.env.MUF_DEMO_PROFILE = 'basic';
+    expect(getDemoProfile()).toBe('basic');
+    process.env.MUF_DEMO_PROFILE = 'rich';
+    expect(getDemoProfile()).toBe('rich');
+  } finally {
+    if (previousProfile === undefined) delete process.env.MUF_DEMO_PROFILE;
+    else process.env.MUF_DEMO_PROFILE = previousProfile;
+    if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
+    else process.env.NODE_ENV = previousNodeEnv;
+  }
+});
+
+it('validates every farm-owned seed record before writes', () => {
+  const plan = buildSeedPlan('dairy', FARM_IDS, { today: TODAY });
+  expect(assertSeedPlanFarmOwnership(plan, FARM_IDS)).toBe(true);
+  const invalidPlan = {
+    ...plan,
+    products: plan.products.map((product, index) => index === 0 ? { ...product, farmId: 'not-a-farm' } : product)
+  };
+  expect(() => assertSeedPlanFarmOwnership(invalidPlan, FARM_IDS)).toThrow(/valid farmId/);
+});
 
 describe.each(APPS)('%s rich demo seed plan', (app) => {
   const plan = buildSeedPlan(app, FARM_IDS, { today: TODAY });

@@ -147,7 +147,7 @@ Keep secrets in Replit Secrets or the deployment's secret manager. Never commit 
 
 ## Local rich demo data and disposable MongoDB seeding
 
-For local in-memory demos, leave the Mongo URI unset and set `MEMORY_MODE=1`. The rich profile is the normal local demo after compatibility checks are updated; use `MUF_DEMO_PROFILE=basic` for the older two-farm fixture required by legacy runtime checks. Generated dates can be pinned with `MUF_SEED_TODAY=YYYY-MM-DD`.
+For local in-memory demos, leave the Mongo URI unset and set `MEMORY_MODE=1`. The rich five-farm profile is the default unless `NODE_ENV=test`; test environments default to the original two-farm basic profile. Set `MUF_DEMO_PROFILE=basic` or `MUF_DEMO_PROFILE=rich` to override that choice explicitly. Generated dates can be pinned with `MUF_SEED_TODAY=YYYY-MM-DD`.
 
 The MongoDB seed helper is separate from ordinary app startup. It requires an explicit app and a database name matching `^muf_(phase19|test|demo|seed)_[a-z0-9_]+$`. It refuses production/live names, refuses `NODE_ENV=production`, and requires `MUF_SEED_ALLOW_REMOTE=1` for every non-local host. The helper checks for existing records before writing. It defaults to dry-run, and will only replace existing contents when both `--reset` and `--apply` are provided. Reset drops the selected database, so verify the target is disposable before using it.
 

@@ -2,7 +2,7 @@
 
 These are fake, test-only accounts. They are created by the local in-memory demo seed and by the disposable MongoDB seed helper. They must never be reused for a public deployment or a real user account.
 
-Set `MUF_DEMO_PROFILE=basic` for the original two-farm fixture, or `MUF_DEMO_PROFILE=rich` for the five-farm fixture. The rich profile is the default once the seed work is enabled. Data in memory mode is rebuilt on every backend restart.
+With no explicit profile, normal local memory mode defaults to `rich`; `NODE_ENV=test` defaults to `basic` for stable legacy tests. Set `MUF_DEMO_PROFILE=basic` for the original two-farm fixture, or `MUF_DEMO_PROFILE=rich` to force the five-farm fixture. Explicit `MUF_DEMO_PROFILE` always overrides the environment default. Data in memory mode is rebuilt whenever a backend restarts.
 
 ## Test accounts
 

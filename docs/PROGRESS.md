@@ -480,6 +480,6 @@ The owner-supplied results complete the documented clean-install and test-suite 
 
 ## Phase 19 rich demo and disposable seed implementation (2026-11-04)
 
-Added a shared deterministic seed-plan module, rich five-farm fixtures for Dairy, Agri and Flock, explicit test-only role assignments, app-specific seeded records, and a dry-run-first MongoDB seed helper. Added offline plan/safety tests and the `seed:test-db` / `check-seed` npm scripts. Updated memory-mode runtime checks to request the basic profile while their legacy assertions remain two-farm based.
+Added a shared deterministic seed-plan module, rich five-farm fixtures for Dairy, Agri and Flock, explicit test-only role assignments, app-specific seeded records, and a dry-run-first MongoDB seed helper. Added offline plan/safety tests and the `seed:test-db` / `check-seed` npm scripts. Updated memory-mode runtime checks to request the basic profile while their legacy assertions remain two-farm based. The final coordinated profile switch makes rich the normal local default and retains basic as the `NODE_ENV=test` default; `MUF_DEMO_PROFILE` explicitly overrides either choice.
 
 **Validation disposition for this implementation:** the GitHub connection was used to edit the branch. No local Windows commands, Vitest suite, syntax checks, build, MongoDB connection, or seed apply were run by the editing agent. Owner validation is pending. Do not interpret the new test file or tool source as an executed result. Phase 19 remains **In progress**; the real-MongoDB restore/migration checklist is still open.

@@ -37,7 +37,7 @@ export function getDemoProfile() {
   const selected = String(process.env.MUF_DEMO_PROFILE || "").trim().toLowerCase();
   if (selected && selected !== "basic" && selected !== "rich") throw new Error("MUF_DEMO_PROFILE must be either basic or rich.");
   if (selected) return selected;
-  return "basic"; // Switched to rich only in the final coordinated seed/docs commit.
+  return process.env.NODE_ENV === "test" ? "basic" : "rich";
 }
 
 export function getFarmDefinitions(app, profile = getDemoProfile()) {
