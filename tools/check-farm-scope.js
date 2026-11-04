@@ -80,7 +80,7 @@ async function startServer(project, port) {
   const cwd = path.join(ROOT, project.dir);
   const child = spawn(process.execPath, ['server.js'], {
     cwd,
-    env: { ...process.env, MEMORY_MODE: '1', PORT: String(port), JWT_SECRET: 'farm-scope-check-secret', NODE_ENV: 'development', MONGO_URI: '', MONGODB_URI: '' },
+    env: { ...process.env, MEMORY_MODE: '1', MUF_DEMO_PROFILE: 'basic', PORT: String(port), JWT_SECRET: 'farm-scope-check-secret', NODE_ENV: 'development', MONGO_URI: '', MONGODB_URI: '' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let log = '';
