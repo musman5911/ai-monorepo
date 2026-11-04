@@ -276,6 +276,23 @@ export function buildSeedPlan(app, farmIds, options = {}) {
   return { app, today, rich, farms: getFarmDefinitions(app, rich ? "rich" : "basic"), accounts: buildAccounts(app, farmIds), products, collections };
 }
 
+export function assertSeedPlanFarmOwnership(plan, farmIds) {
+  if (!plan || !Array.isArray(farmIds) || farmIds.length < 2) {
+    throw new Error("A seed plan and at least two farm IDs are required.");
+  }
+  const validFarmIds = new Set(farmIds.map(String));
+  const records = [
+    ...plan.products,
+    ...Object.values(plan.collections).flat()
+  ];
+  for (const record of records) {
+    if (!record.farmId || !validFarmIds.has(String(record.farmId))) {
+      throw new Error("Seed plan contains a farm-owned record without a valid farmId.");
+    }
+  }
+  return true;
+}
+
 export async function insertSeedCollections(plan, models) {
   if (!plan || !models) throw new Error("A seed plan and model registry are required.");
   if (!plan.rich) return;
