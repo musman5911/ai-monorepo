@@ -105,6 +105,26 @@ it('keeps Dairy ear tags unique within each farm and preserves a sold cow breedi
     expect(events.some((event) => event.type === 'heat')).toBe(true);
     expect(events.some((event) => event.type === 'service')).toBe(true);
   }
+  for (const milk of plan.collections.Milk) expectSameFarmLink(milk.farmId, milk.cowId, cows);
+  for (const event of plan.collections.BreedingEvent) {
+    expectSameFarmLink(event.farmId, event.cowId, cows);
+    if (event.bullId) expectSameFarmLink(event.farmId, event.bullId, cows);
+    for (const calfId of event.generatedCalfIds || []) expectSameFarmLink(event.farmId, calfId, cows);
+  }
+  for (const calf of cows.filter((cow) => cow.isCalf)) {
+    expectSameFarmLink(calf.farmId, calf.motherId, cows);
+    expectSameFarmLink(calf.farmId, calf.fatherId, cows);
+  }
+  for (const health of plan.collections.Health) expectSameFarmLink(health.farmId, health.cowId, cows);
+  for (const payment of plan.collections.BuyerPayment) expectSameFarmLink(payment.farmId, payment.buyerId, plan.collections.Buyer);
+  for (const payment of plan.collections.SupplierPayment) expectSameFarmLink(payment.farmId, payment.supplierId, plan.collections.Supplier);
+  for (const expense of plan.collections.Expense) {
+    if (expense.cowId) expectSameFarmLink(expense.farmId, expense.cowId, cows);
+    if (expense.supplierId) expectSameFarmLink(expense.farmId, expense.supplierId, plan.collections.Supplier);
+  }
+  for (const attendance of plan.collections.LaborAttendance) expectSameFarmLink(attendance.farmId, attendance.workerId, plan.collections.Laborer);
+  for (const advance of plan.collections.LaborAdvance) expectSameFarmLink(advance.farmId, advance.workerId, plan.collections.Laborer);
+  for (const sale of plan.collections.Sale) expectSameFarmLink(sale.farmId, sale.cowId, cows);
   expect(plan.collections.BreedingEvent.some((event) => event.type === 'pregnancy_check')).toBe(true);
   expect(plan.collections.BreedingEvent.some((event) => event.type === 'calving' && event.generatedCalfIds.length > 0)).toBe(true);
   expect(plan.collections.BreedingEvent.some((event) => event.type === 'service' && event.sireSource === 'farm_bull')).toBe(true);
@@ -130,6 +150,10 @@ it('keeps Agri field, crop-cycle, finance and labor references within one farm',
   }
   for (const attendance of plan.collections.Attendance) expectSameFarmLink(attendance.farmId, attendance.laborer_id, laborers);
   for (const payment of plan.collections.SupplierPayment) expectSameFarmLink(payment.farmId, payment.supplierId, suppliers);
+  for (const liability of plan.collections.Liability) expectSameFarmLink(liability.farmId, liability.supplierId, suppliers);
+  for (const finance of plan.collections.Finance) {
+    if (finance.crop_id) expect(finance.cycleId).toBeTruthy();
+  }
   expect(crops.every((crop) => crop.cycleId && crop.season && crop.fieldId)).toBe(true);
   expect(fields.every((field) => Number(field.acres) > 0)).toBe(true);
 });
