@@ -37,7 +37,7 @@ const WORKER_AVATAR = U('photo-1696371268939-5c5710319bde'); // farm worker with
 async function seedDemoData({
   Farm, User, Field, Crop, Finance, Task, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance,
-  Supplier, SupplierPayment,
+  Supplier, SupplierPayment, Product,
 }) {
   console.log('🌱 [Demo] Seeding in-memory database with realistic demo farm data...');
   const profile = getDemoProfile();
