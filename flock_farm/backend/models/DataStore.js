@@ -7,6 +7,7 @@ import mongoose from 'mongoose';
 // a drop-in replacement without needing to redesign the whole schema.
 const dataStoreSchema = new mongoose.Schema(
   {
+    seedId: { type: String, index: true },
     key: { type: String, required: true, index: true }, // e.g. 'birds'
     // Each bucket is isolated per farm. The migration tags existing buckets before
     // this compound unique index is created in MongoDB.
