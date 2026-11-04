@@ -1,7 +1,18 @@
 import { describe, expect, it } from 'vitest';
 import { normalizeInventoryInput, normalizeLiabilityInput } from '../agri_farm/backend/record-validation.mjs';
+import { readFileSync } from 'node:fs';
+import path from 'node:path';
 
 describe('Agri inventory and liability input allowlists', () => {
+  it('validates liability amounts before changing their payment status', () => {
+    const route = readFileSync(path.resolve(__dirname, '../agri_farm/backend/routes/liabilities.js'), 'utf8');
+    const payHandler = route.split("router.put('/liabilities/:itemId/pay'")[1] || '';
+    const amountGuard = payHandler.indexOf('if (!Number.isFinite(amount)');
+    const paidUpdate = payHandler.indexOf("status: 'Paid'");
+    expect(amountGuard).toBeGreaterThanOrEqual(0);
+    expect(amountGuard).toBeLessThan(paidUpdate);
+  });
+
   it('normalizes valid inventory data and strips unrelated mutation fields', () => {
     expect(normalizeInventoryInput({
       name: ' DAP Fertilizer ', category: 'fertilizer', current_stock: '3.5',

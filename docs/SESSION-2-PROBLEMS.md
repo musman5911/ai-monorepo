@@ -12,7 +12,7 @@ Source review does not replace browser, real-MongoDB or deployed-system verifica
 | A3 | Token lifetime too long | OWNER DECISION | Current defaults are Dairy 7 days, Flock 7 days and Agri 1440 minutes (24 hours). Whether to shorten any default needs the owner's policy decision. |
 | A4 | Session cookie missing HttpOnly/SameSite | FALSE | Agri and Flock cookies are httpOnly, sameSite lax, secure on HTTPS. Dairy sets no cookie |
 | A5 | Lost update: last write wins silently (Dairy, Agri PUT) | NOT CHECKED | |
-| A6 | Agri mass assignment on create | TRUE for liabilities and inventory | Raw `req.body` is inserted. Other Agri create routes not checked |
+| A6 | Agri mass assignment on create | FIXED for inventory and liabilities | These routes now normalize an allowlist for editable fields; liability status is server-controlled. Other Agri create routes remain outside this finding and continue to be reviewed separately. |
 
 ## B. Public data exposure
 | ID | Problem | Status | Note |

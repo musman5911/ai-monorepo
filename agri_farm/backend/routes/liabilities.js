@@ -45,6 +45,11 @@ router.put('/liabilities/:itemId/pay', protect, requireAdmin, asyncHandler(async
     return res.json({ status: 'already_paid' });
   }
 
+  const amount = Number(liability.amount_owed);
+  if (!Number.isFinite(amount) || amount <= 0 || amount > 1_000_000_000) {
+    return res.status(409).json({ error: 'This liability has an invalid amount and cannot be settled until corrected.' });
+  }
+
   await Liability.updateOne({ _id: itemId }, { $set: { status: 'Paid' } });
 
   let cropName = '';
@@ -55,10 +60,6 @@ router.put('/liabilities/:itemId/pay', protect, requireAdmin, asyncHandler(async
     } catch { /* ignore */ }
   }
 
-  const amount = Number(liability.amount_owed);
-  if (!Number.isFinite(amount) || amount <= 0 || amount > 1_000_000_000) {
-    return res.status(409).json({ error: 'This liability has an invalid amount and cannot be settled until corrected.' });
-  }
   await Finance.insertMany([{
     category: `Paid Off Debt: ${liability.creditor}${cropName}`,
     amount,
