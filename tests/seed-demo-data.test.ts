@@ -155,6 +155,10 @@ it('keeps Agri field, crop-cycle, finance and labor references within one farm',
     if (finance.crop_id) expect(finance.cycleId).toBeTruthy();
   }
   expect(crops.every((crop) => crop.cycleId && crop.season && crop.fieldId)).toBe(true);
+  for (const crop of crops) {
+    expect(crop.plant_date <= crop.harvest_date).toBe(true);
+  }
+  expect(crops.some((crop) => crop.status === 'Planted' && crop.harvest_date > TODAY)).toBe(true);
   expect(fields.every((field) => Number(field.acres) > 0)).toBe(true);
 });
 
