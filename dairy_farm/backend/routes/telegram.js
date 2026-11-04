@@ -149,7 +149,7 @@ router.post('/webhook/:secret', async (req, res) => {
     }
 
     if (cmd.kind === 'milk') {
-      if (!Number.isFinite(Number(cmd.qty)) || Number(cmd.qty) <= 0 || Number(cmd.qty) > MAX_TELEGRAM_EXPENSE_AMOUNT) return send(m.TG.noQty);
+      if (!cmd.qty || cmd.qty <= 0) return send(m.TG.noQty);
       const cows = await Cow.find();
       const name = (cmd.name || '').toLowerCase();
       const alive = cows.filter((c) => c.status !== 'sold');
@@ -172,7 +172,7 @@ router.post('/webhook/:secret', async (req, res) => {
     }
 
     if (cmd.kind === 'expense') {
-      if (!cmd.qty || cmd.qty <= 0) return send(m.TG.noQty);
+      if (!Number.isFinite(Number(cmd.qty)) || Number(cmd.qty) <= 0 || Number(cmd.qty) > MAX_TELEGRAM_EXPENSE_AMOUNT) return send(m.TG.noQty);
       const type = m.expenseHint(cmd.words);
       await Expense.create({ _id: randomUUID(), cowId: null, date, type, amount: cmd.qty, note: `${cmd.name || type} (Telegram: ${link.laborerName || link.username || chatId})`.trim() });
       return send(m.TG.saved(`خرچہ Rs ${cmd.qty.toLocaleString()} (${type}) — ${date}`));

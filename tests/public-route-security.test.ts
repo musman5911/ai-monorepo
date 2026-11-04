@@ -508,7 +508,8 @@ describe('authenticated response cache policy and security headers', () => {
     for (const app of ['dairy_farm', 'agri_farm', 'flock_farm']) {
       const routes = source(`${app}/backend/routes/telegram.js`);
       expect(routes).toContain('MAX_TELEGRAM_EXPENSE_AMOUNT = 1_000_000_000');
-      expect(routes).toContain('MAX_TELEGRAM_EXPENSE_AMOUNT');
+      const expenseHandler = routes.split("if (cmd.kind === 'expense')")[1] || '';
+      expect(expenseHandler.slice(0, 500)).toContain('MAX_TELEGRAM_EXPENSE_AMOUNT');
     }
   });
 });
