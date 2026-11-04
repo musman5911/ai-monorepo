@@ -442,6 +442,7 @@ const FARM_SCOPED = {
 };
 export const MUF_FARM_SCOPED_NAMES = Object.keys(FARM_SCOPED);
 for (const schema of Object.values(FARM_SCOPED)) {
+  if (!schema.path('seedId')) schema.add({ seedId: { type: String, index: true } });
   schema.add({ farmId: { type: String, index: true } });
 }
 ProductSchema.index({ farmId: 1, published: 1, updatedAt: -1 });
