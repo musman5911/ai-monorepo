@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const port = Number(process.env.MUF_AGRI_ARCHIVE_PORT || 5188);
 const base = `http://127.0.0.1:${port}`;
-const child = spawn(process.execPath, ['server.js'], { cwd: path.join(root, 'agri_farm/backend'), env: { ...process.env, MEMORY_MODE: '1', PORT: String(port), JWT_SECRET: 'agri-archive-check-secret', NODE_ENV: 'test', MONGO_URI: '', MONGODB_URI: '' }, stdio: ['ignore','pipe','pipe'] });
+const child = spawn(process.execPath, ['server.js'], { cwd: path.join(root, 'agri_farm/backend'), env: { ...process.env, MEMORY_MODE: '1', MUF_DEMO_PROFILE: 'basic', PORT: String(port), JWT_SECRET: 'agri-archive-check-secret', NODE_ENV: 'test', MONGO_URI: '', MONGODB_URI: '' }, stdio: ['ignore','pipe','pipe'] });
 let logs = '', failures = 0;
 child.stdout.on('data', d => { logs += d; }); child.stderr.on('data', d => { logs += d; });
 const check = (v, label) => { console.log(`  ${v ? '✓' : '✗'} ${label}`); if (!v) failures++; };
