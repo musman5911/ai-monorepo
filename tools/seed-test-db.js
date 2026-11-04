@@ -40,6 +40,12 @@ async function run() {
   const mongoose = appRequire('mongoose');
   const dbModule = await import(pathToFileURL(path.join(appRoot, 'db.js')).href);
   const connection = dbModule.Farm.db;
+  const models = {
+    ...(dbModule.MUF_FARM_MODELS || {}),
+    Farm: dbModule.Farm,
+    User: dbModule.User,
+    Product: dbModule.Product
+  };
 
   try {
     await connection.openUri(rawUri, { serverSelectionTimeoutMS: 15000 });
@@ -75,6 +81,9 @@ async function run() {
 
     if (args.reset) await connection.dropDatabase();
 
+    const uniqueModels = [...new Set(Object.values(models).filter((model) => model && typeof model.createIndexes === 'function'))];
+    for (const model of uniqueModels) await model.createIndexes();
+
     const farms = [];
     for (const definition of definitions) {
       const createdAt = definition.createdAt;
@@ -93,18 +102,12 @@ async function run() {
         const bcrypt = appRequire('bcryptjs');
         credentialField = { password: bcrypt.hashSync(account.password, 12) };
       }
-      const safeAccount = { ...account, ...credentialField };
+      const safeAccount = { ...account, ...credentialField, role: account.role === 'admin' ? 'owner' : account.role };
       delete safeAccount.password;
       accounts.push(safeAccount);
     }
     await User.insertMany(accounts);
 
-    const models = {
-      ...(dbModule.MUF_FARM_MODELS || {}),
-      Farm: dbModule.Farm,
-      User: dbModule.User,
-      Product: dbModule.Product
-    };
     const validFarmIds = new Set(accountFarmIds);
     for (const [modelName, documents] of Object.entries(plan.collections)) {
       for (const document of documents) {
@@ -118,8 +121,6 @@ async function run() {
         throw new Error('Seed plan contains a shop product without a valid farmId.');
       }
     }
-    const uniqueModels = [...new Set(Object.values(models).filter((model) => model && typeof model.createIndexes === 'function'))];
-    for (const model of uniqueModels) await model.createIndexes();
     await shared.insertSeedCollections(plan, models);
 
     const finalCounts = {};
