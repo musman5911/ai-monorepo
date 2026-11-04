@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 const farmSchema = new mongoose.Schema({
+  seedId: { type: String, index: true },
   name: { type: String, required: true, trim: true },
   location: { type: String, default: '' },
   archived: { type: Boolean, default: false },
