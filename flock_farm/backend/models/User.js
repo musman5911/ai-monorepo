@@ -5,6 +5,7 @@ import { mufNormalizeRole, mufLegacyRole } from '../muf-farms.mjs';
 
 const userSchema = new mongoose.Schema(
   {
+    seedId: { type: String, index: true },
     username: {
       type: String,
       required: [true, 'Username is required'],
