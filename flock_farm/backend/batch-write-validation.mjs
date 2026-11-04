@@ -14,6 +14,7 @@ function text(value, label, { required = false, max = 200, fallback = '' } = {})
 
 function number(value, label, { integer = false, fallback = 0 } = {}) {
   if (value === undefined || value === null || value === '') return { value: fallback };
+  if (typeof value === 'string' && !value.trim()) return fail(`${label} must be numeric.`);
   if (!['number', 'string'].includes(typeof value)) return fail(`${label} must be numeric.`);
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0 || parsed > MAX_COUNT_OR_COST || (integer && !Number.isSafeInteger(parsed))) {

@@ -32,7 +32,7 @@ describe('Flock batch create, patch and vaccination validation', () => {
   it('validates batch PATCH fields against existing start/end dates and ignores server fields', () => {
     const existing = { name: 'Batch A', type: 'Broiler', start_date: '2026-11-04', expected_end_date: '2027-03-01' };
     expect(normalizeBatchPatchInput({ expected_end_date: '2026-10-01' }, existing).error).toMatch(/earlier/);
-    expect(normalizeBatchPatchInput({ start_date: '2026-12-01', status: 'Closed', farmId: 'other' }, existing).error).toMatch(/earlier/);
+    expect(normalizeBatchPatchInput({ start_date: '2027-04-01', status: 'Closed', farmId: 'other' }, existing).error).toMatch(/earlier/);
     expect(normalizeBatchPatchInput({ status: 'Closed', farmId: 'other' }, existing).error).toMatch(/No supported/);
     expect(normalizeBatchPatchInput({ name: 'New name', status: 'Closed', farmId: 'other' }, existing)).toEqual({ value: { name: 'New name' } });
   });
@@ -57,5 +57,15 @@ describe('Flock batch create, patch and vaccination validation', () => {
     expect(route).toContain('normalizeBatchCreateInput(req.body || {})');
     expect(route).toContain('normalizeBatchPatchInput(req.body || {}, batch.toObject())');
     expect(route).toContain('normalizeVaccinationInput(req.body || {})');
+  });
+});
+
+
+describe('Flock bulk vaccination validation parity', () => {
+  it('uses the individual vaccination validator in bulk vaccination routes', () => {
+    const route = readFileSync(new URL('../flock_farm/backend/routes/batches.js', import.meta.url), 'utf8');
+    const vaccinationConfig = route.split('vaccination: {')[1]?.split('expense: {')[0] || '';
+    expect(vaccinationConfig).toContain('normalizeVaccinationInput(row)');
+    expect(vaccinationConfig).not.toContain('Number(row.bird_count');
   });
 });

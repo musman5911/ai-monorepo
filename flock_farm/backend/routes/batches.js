@@ -497,14 +497,8 @@ router.post('/batches/:batchId/logs/:logType/bulk', authRequired, async (req, re
       vaccination: {
         Model: BatchVaccinationLog,
         normalize(row) {
-          const date = cleanText(row.date);
-          const vaccine_name = cleanText(row.vaccine_name);
-          const dose = cleanText(row.dose);
-          const bird_count = Number(row.bird_count ?? 0);
-          const cost = Number(row.cost ?? 0);
-          if (!date || !vaccine_name) return 'date and vaccine_name are required';
-          if (![bird_count, cost].every(Number.isFinite) || bird_count < 0 || cost < 0) return 'bird_count and cost must be 0 or greater';
-          return { date, vaccine_name, dose, bird_count, cost, notes: cleanText(row.notes) };
+          const result = normalizeVaccinationInput(row);
+          return result.error || result.value;
         },
       },
       expense: {
