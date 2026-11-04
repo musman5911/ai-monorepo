@@ -8,15 +8,15 @@ echo "Starting Malik Usman Farms (Termux/Linux)..."
 
 # Start backends in background
 echo "[1/6] Starting Dairy backend on :3000..."
-MEMORY_MODE=1 PORT=3000 node dairy_farm/backend/server.js &
+MUF_DEMO_PROFILE=basic MEMORY_MODE=1 PORT=3000 node dairy_farm/backend/server.js &
 DAIRY_BE_PID=$!
 
 echo "[2/6] Starting Flock backend on :3001..."
-MEMORY_MODE=1 PORT=3001 node flock_farm/backend/server.js &
+MUF_DEMO_PROFILE=basic MEMORY_MODE=1 PORT=3001 node flock_farm/backend/server.js &
 FLOCK_BE_PID=$!
 
 echo "[3/6] Starting Agri backend on :8000..."
-MEMORY_MODE=1 PORT=8000 node agri_farm/backend/server.js &
+MUF_DEMO_PROFILE=basic MEMORY_MODE=1 PORT=8000 node agri_farm/backend/server.js &
 AGRI_BE_PID=$!
 
 # Wait a moment for backends to boot
