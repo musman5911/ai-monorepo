@@ -19,7 +19,7 @@ function safeTargetSummary(target) {
 async function run() {
   const shared = await import(pathToFileURL(path.join(ROOT, 'shared', 'muf-demo-seed.mjs')).href);
   const args = shared.parseSeedArgs(process.argv.slice(2));
-  const rawUri = String(process.env.MUF_SEED_URI || process.env.MONGO_URI || process.env.MONGODB_URI || '').trim();
+  const rawUri = String(process.env.MUF_SEED_URI || '').trim();
   const target = shared.validateSeedTarget(rawUri, {
     nodeEnv: process.env.NODE_ENV,
     allowRemote: process.env.MUF_SEED_ALLOW_REMOTE
