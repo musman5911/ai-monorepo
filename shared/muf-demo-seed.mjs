@@ -193,7 +193,8 @@ function buildFlockCollections(farmIds, today) {
     const batches = [];
     for (let n = 1; n <= batchCount; n += 1) {
       const batchId = p + "-batch-" + n;
-      const batch = { batch_id: batchId, farmId, seedId: batchId, name: (n === 1 ? "Broiler Batch " : "Layer Batch ") + farmNo + (n === 1 ? "" : "-" + n), type: n === 1 ? "Broiler" : "Layer", start_date: dateFromSeed(80 + n * 30, today), expected_end_date: dateFromSeed(10, today), intake_count: 80 + farmNo * 10, source: "Demo hatchery", cost_per_bird: 125 + n * 5, status: farmNo === 4 && n === batchCount ? "Closed" : "Active" };
+      const batchType = n === 1 ? "Layer" : n === 2 ? "Broiler" : "Breeder";
+      const batch = { batch_id: batchId, farmId, seedId: batchId, name: batchType + " Batch " + farmNo + (n === 1 ? "" : "-" + n), type: batchType, start_date: dateFromSeed(80 + n * 30, today), expected_end_date: dateFromSeed(10, today), intake_count: 80 + farmNo * 10, source: "Demo hatchery", cost_per_bird: 125 + n * 5, status: farmNo === 4 && n === batchCount ? "Closed" : "Active" };
       batches.push(batch); c.Batch.push(batch);
       c.BatchFeedLog.push({ seedId: batchId + "-feed", farmId, batch_id: batchId, date: dateFromSeed(5, today), feed_type: "Starter mash", quantity_kg: 22 + n * 4, rate_rs_per_kg: 118, notes: "Demo feed entry" });
       c.BatchMortalityLog.push({ seedId: batchId + "-mortality", farmId, batch_id: batchId, date: dateFromSeed(12, today), count: 1, reason: "Weak chick", notes: "Routine mortality log" });
