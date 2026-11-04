@@ -1,5 +1,6 @@
 // ---------------------------------------------------------------------------
 // DEMO DATA for MEMORY MODE ONLY (MEMORY_MODE=1, no MONGODB_URI set).
+import { buildSeedPlan, getDemoProfile, getFarmDefinitions, insertSeedCollections, dateFromSeed, seededRandom } from '../../shared/muf-demo-seed.mjs';
 //
 // Seeds the in-memory database with a full YEAR of realistic poultry-farm
 // data covering every module: birds, vaccinations, feed, eggs, expenses,
@@ -14,9 +15,11 @@
 
 function pad(n) { return String(n).padStart(2, '0'); }
 function dateStr(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
-function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return dateStr(d); }
-function rnd(min, max) { return Math.round(min + Math.random() * (max - min)); }
-function rnd1(min, max) { return Math.round((min + Math.random() * (max - min)) * 10) / 10; }
+const demoRandom = seededRandom('flock-demo');
+function daysAgo(n) { return dateFromSeed(n); }
+function seedNow() { return new Date(dateFromSeed(0) + 'T12:00:00.000Z'); }
+function rnd(min, max) { return Math.round(min + demoRandom() * (max - min)); }
+function rnd1(min, max) { return Math.round((min + demoRandom() * (max - min)) * 10) / 10; }
 
 // Demo photos (memory mode only): stable hot-links from Unsplash (free
 // license) — no image files stored in the repo.
@@ -45,44 +48,28 @@ export async function seedDemoData() {
   const { default: Farm } = await import('./models/Farm.js');
 
 
-  const farm1 = await Farm.create({
-    name: 'Farm 1', location: 'Local demo farm', archived: false,
-    createdAt: new Date('2020-01-01T00:00:00.000Z'), updatedAt: new Date('2020-01-01T00:00:00.000Z'),
-  });
-  const farm2 = await Farm.create({
-    name: 'Farm 2 - Access Test', location: 'Isolated role-testing farm', archived: false,
-    createdAt: new Date('2020-01-02T00:00:00.000Z'), updatedAt: new Date('2020-01-02T00:00:00.000Z'),
-  });
+  const profile = getDemoProfile();
+  const farmDefinitions = getFarmDefinitions('flock', profile);
+  const farms = [];
+  for (const definition of farmDefinitions) {
+    const createdAt = definition.createdAt;
+    farms.push(await Farm.create({ ...definition, createdAt, updatedAt: createdAt }));
+  }
+  const [farm1, farm2] = farms;
+  const plan = buildSeedPlan('flock', farms.map((farm) => String(farm._id)));
 
-
-
-  // ------------------------------------------------------------------ USERS
-  await User.create({
-    username: 'admin',
-    passwordHash: await User.hashPassword('admin123'),
-    role: 'admin',
-    displayName: 'Malik Usman',
-    active: true,
-    avatarBase64: ADMIN_AVATAR,
-  });
-  await User.create({
-    username: 'worker',
-    passwordHash: await User.hashPassword('worker123'),
-    role: 'worker',
-    displayName: 'Farm Worker',
-    active: true,
-    avatarBase64: WORKER_AVATAR,
-  });
-  await User.create({
-    username: 'manager', email: 'manager@flockfarm.test',
-    passwordHash: await User.hashPassword('manager123'), role: 'manager',
-    farmIds: [String(farm2._id)], displayName: 'Farm 2 Manager', active: true, avatarBase64: WORKER_AVATAR,
-  });
-  await User.create({
-    username: 'worker2', email: 'worker2@flockfarm.test',
-    passwordHash: await User.hashPassword('worker2123'), role: 'worker',
-    farmIds: [String(farm2._id)], displayName: 'Farm 2 Worker', active: true, avatarBase64: WORKER_AVATAR,
-  });
+  for (const account of plan.accounts) {
+    await User.create({
+      username: account.username,
+      email: account.email,
+      passwordHash: await User.hashPassword(account.password),
+      role: account.role,
+      farmIds: account.farmIds,
+      displayName: account.displayName,
+      active: true,
+      avatarBase64: account.username === 'admin' ? ADMIN_AVATAR : WORKER_AVATAR
+    });
+  }
 
   // --------------------------------------------------------------- SETTINGS
   const settings = {
@@ -130,7 +117,7 @@ export async function seedDemoData() {
   const vaccineNames = ['Newcastle (ND)', 'Gumboro (IBD)', 'Fowl Pox', 'Infectious Bronchitis', 'Deworming dose'];
   for (const b of birds) {
     if (b.status === 'Dead' && !b.dateDied) continue;
-    const boughtDaysAgo = Math.min(360, Math.round((Date.now() - new Date(b.dateBought).getTime()) / 86400000));
+    const boughtDaysAgo = Math.min(360, Math.round((seedNow().getTime() - new Date(b.dateBought).getTime()) / 86400000));
     for (let d = boughtDaysAgo - 10; d > 5; d -= rnd(28, 36)) {
       // stop vaccinating after sale/death
       if (b.saleDate && daysAgo(d) > b.saleDate) continue;
@@ -192,8 +179,8 @@ export async function seedDemoData() {
     const seasonal = (month >= 6 && month <= 8) ? -2 : (month >= 11 || month <= 2) ? 1 : 0;
     const collected = Math.max(0, rnd(4, 8) + seasonal);
     if (collected === 0) continue;
-    const broken = Math.random() < 0.15 ? 1 : 0;
-    const homeUse = Math.random() < 0.5 ? rnd(1, 2) : 0;
+    const broken = demoRandom() < 0.15 ? 1 : 0;
+    const homeUse = demoRandom() < 0.5 ? rnd(1, 2) : 0;
     const sold = Math.max(0, collected - broken - homeUse);
     eggs.push({
       date,
@@ -222,7 +209,7 @@ export async function seedDemoData() {
       date: daysAgo(d),
       eggsQty: qty,
       pricePerEgg: price,
-      amountPaid: Math.random() < 0.85 ? amount : Math.round(amount * 0.6),
+      amountPaid: demoRandom() < 0.85 ? amount : Math.round(amount * 0.6),
       notes: '',
     });
   }
@@ -348,7 +335,7 @@ export async function seedDemoData() {
   for (let d = 20; d >= 0; d--) {
     checklist.push({
       date: daysAgo(d),
-      completed: checklistTaskIds.filter(() => Math.random() > 0.1),
+      completed: checklistTaskIds.filter(() => demoRandom() > 0.1),
     });
   }
 
@@ -495,6 +482,9 @@ export async function seedDemoData() {
     { batch_id: 'batch-demo-2', date: daysAgo(14), avg_weight_g: 1220, sample_size: 10, notes: '' },
     { batch_id: 'batch-demo-2', date: daysAgo(3),  avg_weight_g: 1400, sample_size: 10, notes: 'On track for point-of-lay' },
   ]);
+
+  const { Product } = await import('./db.js');
+  if (plan.rich) await insertSeedCollections(plan, { Product, DataStore, Batch, BatchFeedLog, BatchWeightLog, BatchMortalityLog, BatchExpenseLog, BatchSaleLog, BatchEggLog, BatchVaccinationLog });
 
   console.log('🌱 Demo data seeded (1 year): birds, feed, eggs, sales, batches, health, diary.');
   console.log('🌱 Logins → admin / admin123   |   worker / worker123');
