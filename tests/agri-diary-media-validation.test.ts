@@ -46,3 +46,15 @@ describe('Agri diary media validation', () => {
     expect(route).not.toContain('function safeEntries');
   });
 });
+
+
+describe('Agri diary dates', () => {
+  it('rejects impossible day dates for direct photo and entry helper calls', () => {
+    expect(normalizeDiaryPhotos([], '2026-02-31').error).toMatch(/Invalid diary date/);
+    expect(normalizeDiaryEntries([], '2026-02-31').error).toMatch(/Invalid diary date/);
+  });
+  it('rejects malformed WebM base64 padding', () => {
+    const entry = { id: 'note-1', note: 'Voice note', photos: [], voiceBase64: 'data:audio/webm;base64,AAAAA' };
+    expect(normalizeDiaryEntries([entry], '2026-11-04').error).toMatch(/WebM audio/);
+  });
+});

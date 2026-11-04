@@ -19,6 +19,16 @@ export function escapeHtml(value) {
   })[character]);
 }
 
+export function normalizeRecipientEmails(value) {
+  if (value === undefined || value === null || value === '') return { value: [] };
+  if (typeof value !== 'string' || value.length > 1000) return { error: 'Recipient list must be text no longer than 1000 characters.' };
+  const recipients = value.split(',').map((email) => email.trim()).filter(Boolean);
+  if (recipients.length > 10 || recipients.some((email) => !EMAIL_PATTERN.test(email) || email.length > 254)) {
+    return { error: 'Enter up to 10 valid email addresses separated by commas.' };
+  }
+  return { value: [...new Set(recipients)] };
+}
+
 export function normalizeAutomationSettings(body = {}, { lastRun = 0 } = {}) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return { error: 'Automation settings must be an object.' };
@@ -30,13 +40,9 @@ export function normalizeAutomationSettings(body = {}, { lastRun = 0 } = {}) {
     return { error: 'Schedule must be daily, weekly on Sunday, or monthly on the first day.' };
   }
   const recipientInput = body.recipient === undefined || body.recipient === null ? '' : body.recipient;
-  if (typeof recipientInput !== 'string' || recipientInput.length > 1000) {
-    return { error: 'Recipient list must be text no longer than 1000 characters.' };
-  }
-  const recipients = recipientInput.split(',').map((email) => email.trim()).filter(Boolean);
-  if (recipients.length > 10 || recipients.some((email) => !EMAIL_PATTERN.test(email) || email.length > 254)) {
-    return { error: 'Enter up to 10 valid email addresses separated by commas.' };
-  }
+  const recipientResult = normalizeRecipientEmails(recipientInput);
+  if (recipientResult.error) return recipientResult;
+  const recipients = recipientResult.value;
   if (cronEnabled && recipients.length === 0) {
     return { error: 'At least one recipient email is required when scheduled reports are enabled.' };
   }
@@ -83,6 +89,9 @@ export function normalizeDigestRequest(body = {}) {
 export function normalizeFarmLocation(body = {}) {
   if (!body || typeof body !== 'object' || Array.isArray(body)) {
     return { error: 'Farm location must be an object.' };
+  }
+  if (body.lat === undefined || body.lat === null || body.lat === '' || body.lon === undefined || body.lon === null || body.lon === '') {
+    return { error: 'Latitude and longitude are required.' };
   }
   const lat = Number(body.lat);
   const lon = Number(body.lon);

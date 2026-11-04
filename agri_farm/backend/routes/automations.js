@@ -9,7 +9,7 @@ import { todayStr, localParts, localDateTimeStr } from '../utils/date.js';
 import { badRequest, sendHttpError, asyncHandler } from '../utils/helpers.js';
 import { maybeRunMonthlyAutoBackup } from './backup.js';
 import { MUF_ENV } from '../muf-env.mjs';
-import { escapeHtml, normalizeAutomationSettings, normalizeDigestRequest, normalizeFarmLocation } from '../automation-validation.mjs';
+import { escapeHtml, normalizeAutomationSettings, normalizeDigestRequest, normalizeFarmLocation, normalizeRecipientEmails } from '../automation-validation.mjs';
 
 const router = express.Router();
 
@@ -23,8 +23,9 @@ async function buildAndSendCustomDigest({
   includeFinance = true,
   includeTasks = true,
 }) {
-  const recipients = String(recipientEmailsStr || '').split(',').map((r) => r.trim()).filter(Boolean);
-  if (!recipients.length) return false;
+  const recipientResult = normalizeRecipientEmails(recipientEmailsStr);
+  if (recipientResult.error || !recipientResult.value.length) return false;
+  const recipients = recipientResult.value;
 
   const dateFilter = {};
   if (startDate) dateFilter.$gte = startDate;
@@ -158,8 +159,13 @@ export function startScheduler() {
     try {
       const settings = await Setting.findOne({ key: 'automations' });
       if (settings) {
-        const value = settings.value || {};
-        if (value.cron_enabled) {
+        const stored = settings.value || {};
+        const normalized = normalizeAutomationSettings(stored, { lastRun: Number(stored.last_run || 0) });
+        if (normalized.error) {
+          console.warn('⏰ [Cron Engine] Stored automation settings are invalid; skipping this run.');
+        } else {
+          const value = normalized.value;
+          if (value.cron_enabled) {
           const schedule = value.schedule || '0 8 * * *';
           const recipient = value.recipient || '';
           const lastRunTs = value.last_run || 0;
@@ -185,6 +191,7 @@ export function startScheduler() {
               console.log('⚠️ [Cron Engine] Failed to dispatch scheduled report email.');
             }
           }
+          }
         }
       }
       await maybeRunMonthlyAutoBackup();
@@ -207,9 +214,10 @@ router.get('/settings/automations', protect, ownerOnly, asyncHandler(async (req,
       recipient: req.user.email || '',
     });
   }
-  const normalized = normalizeAutomationSettings(settings.value || {});
+  const stored = settings.value || {};
+  const config = { ...stored, recipient: stored.recipient || req.user.email || '' };
+  const normalized = normalizeAutomationSettings(config, { lastRun: Number(stored.last_run || 0) });
   if (normalized.error) return res.status(500).json({ error: 'Stored automation settings are invalid. Save the settings again.' });
-  if (!normalized.value.recipient) normalized.value.recipient = req.user.email || '';
   return res.json(normalized.value);
 }));
 
@@ -257,11 +265,12 @@ router.post('/settings/automations/trigger', protect, ownerOnly, asyncHandler(as
     return badRequest(res, 'Automation settings must be configured and saved first.');
   }
 
-  const settingsData = settings.value || {};
-  const recipientsStr = String(settingsData.recipient || '').trim();
-  if (!recipientsStr) {
-    return badRequest(res, 'No recipient emails are configured in your automation rules.');
-  }
+  const stored = settings.value || {};
+  const normalized = normalizeAutomationSettings(stored, { lastRun: Number(stored.last_run || 0) });
+  if (normalized.error) return badRequest(res, 'Automation settings are invalid. Save valid recipient settings before dispatching.');
+  const settingsData = normalized.value;
+  const recipientsStr = settingsData.recipient;
+  if (!recipientsStr) return badRequest(res, 'No recipient emails are configured in your automation rules.');
 
   const sent = await buildAndSendCustomDigest({
     recipientEmailsStr: recipientsStr,
@@ -306,7 +315,10 @@ async function cronDispatch(req, res) {
     if (!settings) {
       return res.json({ status: 'skipped', reason: 'Automation settings not configured yet (save them in the Admin panel).' });
     }
-    const value = settings.value || {};
+    const stored = settings.value || {};
+    const normalized = normalizeAutomationSettings(stored, { lastRun: Number(stored.last_run || 0) });
+    if (normalized.error) return sendHttpError(res, 409, 'Automation settings are invalid. Save valid settings in the Admin panel.');
+    const value = normalized.value;
     if (!value.cron_enabled) {
       return res.json({ status: 'skipped', reason: 'Automations are disabled in the Admin panel.' });
     }

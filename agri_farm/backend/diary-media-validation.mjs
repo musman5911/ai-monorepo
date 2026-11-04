@@ -52,6 +52,7 @@ function cleanPhoto(photo, date) {
 }
 
 export function normalizeDiaryPhotos(photos, date) {
+  if (!validDate(date)) return fail('Invalid diary date.');
   if (!Array.isArray(photos) || photos.length > MAX_PHOTOS_PER_ENTRY) {
     return fail(`Photos must be a list of at most ${MAX_PHOTOS_PER_ENTRY} items.`);
   }
@@ -68,6 +69,7 @@ export function normalizeDiaryPhotos(photos, date) {
 }
 
 export function normalizeDiaryEntries(entries, date) {
+  if (!validDate(date)) return fail('Invalid diary date.');
   if (!Array.isArray(entries) || entries.length > MAX_ENTRIES_PER_DAY) {
     return fail(`Diary entries must be a list of at most ${MAX_ENTRIES_PER_DAY} items.`);
   }
@@ -87,7 +89,8 @@ export function normalizeDiaryEntries(entries, date) {
     if (entry.voiceBase64 !== undefined && entry.voiceBase64 !== null && entry.voiceBase64 !== '') {
       if (typeof entry.voiceBase64 !== 'string' ||
           entry.voiceBase64.length > VOICE_MAX_DATA_URL_LENGTH ||
-          !/^data:audio\/webm;base64,[A-Za-z0-9+/]+={0,2}$/.test(entry.voiceBase64)) {
+          !/^data:audio\/webm;base64,[A-Za-z0-9+/]+={0,2}$/.test(entry.voiceBase64) ||
+          entry.voiceBase64.slice(entry.voiceBase64.indexOf(',') + 1).length % 4 !== 0) {
         return fail('Voice note must be a valid WebM audio data URL within the size limit.');
       }
       voiceBase64 = entry.voiceBase64;

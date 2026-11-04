@@ -37,3 +37,21 @@ describe('Agri automation input validation', () => {
     expect(route).not.toContain('Custom report successfully dispatched to:');
   });
 });
+
+
+describe('stored automation normalization', () => {
+  it('validates recipients at the shared digest boundary and requires coordinates', async () => {
+    const { normalizeRecipientEmails, normalizeFarmLocation } = await import('../agri_farm/backend/automation-validation.mjs');
+    expect(normalizeRecipientEmails('owner@example.com, bad-email').error).toMatch(/valid email/);
+    expect(normalizeRecipientEmails('a@example.com, a@example.com').value).toEqual(['a@example.com']);
+    expect(normalizeFarmLocation({ lat: null, lon: 72.8 }).error).toMatch(/required/);
+    expect(normalizeFarmLocation({ lat: 33.8, lon: '' }).error).toMatch(/required/);
+  });
+  it('normalizes old settings in scheduler, cron and manual dispatch paths', () => {
+    const route = readFileSync(new URL('../agri_farm/backend/routes/automations.js', import.meta.url), 'utf8');
+    expect(route).toContain('normalizeAutomationSettings(stored');
+    expect(route).toContain('normalizeRecipientEmails(recipientEmailsStr)');
+    expect(route).toContain("message: 'Custom report dispatched successfully.'");
+    expect(route).not.toContain('Executing scheduled report cycle for ');
+  });
+});
