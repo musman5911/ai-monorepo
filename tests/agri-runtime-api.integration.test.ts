@@ -87,7 +87,7 @@ describe.sequential('Agri runtime API integration', () => {
         ...process.env,
         PORT: String(port),
         NODE_ENV: 'test',
-        MEMORY_MODE: '1',
+        MEMORY_MODE: '1', MUF_DEMO_PROFILE: 'basic',
         MONGO_URI: '',
         JWT_SECRET: 'agri-runtime-integration-test-secret-not-for-production',
         TELEGRAM_BOT_TOKEN: '',
