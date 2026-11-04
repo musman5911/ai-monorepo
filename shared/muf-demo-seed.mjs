@@ -45,6 +45,7 @@ export function getFarmDefinitions(app, profile = getDemoProfile()) {
   const source = profile === "rich" ? RICH_FARMS[app] : BASIC_FARMS;
   return source.map(([name, location], index) => ({
     name, location, archived: profile === "rich" && index === 3,
+    seedId: "seed-" + app + "-farm-" + (index + 1),
     createdAt: new Date(Date.UTC(2020, 0, index + 1))
   }));
 }
@@ -92,8 +93,10 @@ function buildProducts(app, farmIds, today) {
   for (let farmIndex = 0; farmIndex < Math.min(4, farmIds.length); farmIndex += 1) {
     for (let itemIndex = 0; itemIndex < 2; itemIndex += 1) {
       const [name, kind, unit] = categories[app][itemIndex];
+      const seedId = "seed-" + app + "-product-f" + (farmIndex + 1) + "-" + (itemIndex + 1);
       products.push({
-        seedId: "seed-" + app + "-product-f" + (farmIndex + 1) + "-" + (itemIndex + 1),
+        _id: stableObjectId(seedId),
+        seedId,
         farmId: String(farmIds[farmIndex]), name: name + " " + (farmIndex + 1), kind, unit,
         price: prices[farmIndex * 2 + itemIndex], quantity: quantities[farmIndex * 2 + itemIndex],
         photoUrl: "", published: (farmIndex + itemIndex) % 2 === 0,
