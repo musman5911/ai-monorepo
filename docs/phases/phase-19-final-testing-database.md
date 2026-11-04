@@ -13,6 +13,7 @@ Everything that needs a real MongoDB is tested on disposable copies of your back
 ## Scope
 
 - Restore each backup into a separate throwaway database (local MongoDB Community plus Compass, or a disposable Atlas database).
+- Build rich, farm-isolated demo fixtures and seed only explicitly named disposable MongoDB databases with the dry-run-first seed helper.
 - Migration for Agri, Dairy and Flock: dry run, apply, run again (idempotent); compare record counts and farm ownership before and after.
 - Index listings and representative query plans, including Flock's unique `(farmId, key)` index and the Dairy per-farm ear-tag index.
 - Persistent backup and restore on the copies: Agri diary media, Dairy suppliers and payments, Flock images (exact bytes and metadata), monthly chunks, and legacy backups.
@@ -35,7 +36,7 @@ Everything that needs a real MongoDB is tested on disposable copies of your back
 
 ## New command-line check
 
-`npm run check-final-db` runs the offline regression tests for the Phase 19 safety gate and migration wrapper. It must pass before live operations, but it does not connect to MongoDB and is not evidence that a real database test passed. Use `node tools/final-db-preflight.mjs`, `node tools/final-db-migrate.mjs`, and the read-only `node tools/final-db-inspect.mjs` for repeatable safety, migration, index/query-plan and database-size checks; keep every later database-test script under `tools/final-db-*.mjs`.
+`npm run check-final-db` runs the offline regression tests for the Phase 19 safety gate and migration wrapper. `npm run check-seed` exercises all three shared rich seed plans and the disposable-target safety rules without opening a MongoDB connection. Both are source/contract checks only and are not evidence that a real database test passed. Use `node tools/final-db-preflight.mjs`, `node tools/final-db-migrate.mjs`, and the read-only `node tools/final-db-inspect.mjs` for repeatable safety, migration, index/query-plan and database-size checks; keep every later database-test script under `tools/final-db-*.mjs`.
 
 ## Safety gate and repeatable migration commands
 
@@ -72,6 +73,8 @@ Do not paste a connection URI, username, password, backup contents, or real farm
 npm ci
 npm test
 npm run check-final-db
+npm run check-seed
+node --check tools\\seed-test-db.js
 npm run check-sync
 npm run check-ui
 npm run check-workbench
@@ -106,6 +109,144 @@ Added a fail-closed configuration-and-backup preflight and a migration wrapper. 
 ## Initial automated validation (2026-10-29)
 
 GitHub Actions run [40852928322](https://github.com/musman5911/ai-monorepo/actions/runs/40852928322) passed on commit `83ecc481b68e645dd05f6929ab557d8d509ec5c3`: 48 test files / 424 tests passed; shared sync, UI safety, workbench source checks (23), farm scope, phase documentation and the seven-package production dependency audit all passed. The audit reported no high or critical production dependency findings. These are automated source/safety-guard checks only; this run did not connect to MongoDB or perform any backup, restore, migration, deletion or concurrency test.
+
+## Rich demo fixtures and disposable database seed helper
+
+The rich memory demo uses five distinct farms in each app. Farms 1–4 contain farm-scoped data; Farm 4 is archived; Farm 5 is intentionally empty. Dairy includes 60 days of milk history, per-farm ear tags, breeding event types, linked calving calves, and a sold animal with retained breeding events. Agri includes fields, seasonal crop cycles, linked finance and tasks, inventory, liabilities, suppliers and labor records. Flock includes batch records and all batch log types, home birds capped at 50, and incubation allocations tied to a source batch. Each app has eight shop products with mixed publication states and no external product-image URL.
+
+`MUF_DEMO_PROFILE=basic` keeps the original two-farm fixture for older runtime checks. `MUF_DEMO_PROFILE=rich` selects the five-farm fixture; after compatibility updates the local demo default is rich. `MUF_SEED_TODAY=YYYY-MM-DD` pins generated dates, and the pseudo-random sequence is fixed per app. Role accounts and their farm assignments are listed in [LOCAL-ROLE-TEST-ACCOUNTS.md](../LOCAL-ROLE-TEST-ACCOUNTS.md). These passwords are test-only.
+
+The root helper `tools/seed-test-db.js` uses the same shared seed definitions as memory mode. It always seeds the rich profile and requires `--app dairy`, `--app agri`, or `--app flock`. It accepts the explicit `MUF_SEED_URI` first, then `MONGO_URI`/ `MONGODB_URI`. It prints only the hostname and database name, never the URI credentials.
+
+The database name must match `^muf_(phase19|test|demo|seed)_[a-z0-9_]+# Phase 19: Final testing A: real MongoDB
+
+**Status:** In progress
+
+## Goal
+
+Everything that needs a real MongoDB is tested on disposable copies of your backups.
+
+## Already in place (from Phase 0)
+
+- All earlier phases are implemented and pass the command-line checks.
+
+## Scope
+
+- Restore each backup into a separate throwaway database (local MongoDB Community plus Compass, or a disposable Atlas database).
+- Build rich, farm-isolated demo fixtures and seed only explicitly named disposable MongoDB databases with the dry-run-first seed helper.
+- Migration for Agri, Dairy and Flock: dry run, apply, run again (idempotent); compare record counts and farm ownership before and after.
+- Index listings and representative query plans, including Flock's unique `(farmId, key)` index and the Dairy per-farm ear-tag index.
+- Persistent backup and restore on the copies: Agri diary media, Dairy suppliers and payments, Flock images (exact bytes and metadata), monthly chunks, and legacy backups.
+- Flock egg-inventory lock with two backend processes on one MongoDB.
+- Repeat the 84-case farm-deletion safety run and a Flock restore of an image larger than 3.3 MB.
+- Archive and restore on the copies; photo storage with the default store.
+- Record the size of each database against the free-tier cap.
+
+## Out of scope
+
+- No production database, ever.
+
+## Steps
+
+1. Confirm the disposable target is separate from production and take a fresh backup that opens.
+2. Restore that backup only into a database named `muf_phase19_<app>_<copy>`; never reuse an app or production database.
+3. Run the safety preflight, migration dry run, apply, and repeat apply; compare record counts and farm ownership.
+4. Run the real-MongoDB scenarios one at a time and record observed output.
+5. Open a fix note for any failure.
+
+## New command-line check
+
+`npm run check-final-db` runs the offline regression tests for the Phase 19 safety gate and migration wrapper. `npm run check-seed` exercises all three shared rich seed plans and the disposable-target safety rules without opening a MongoDB connection. Both are source/contract checks only and are not evidence that a real database test passed. Use `node tools/final-db-preflight.mjs`, `node tools/final-db-migrate.mjs`, and the read-only `node tools/final-db-inspect.mjs` for repeatable safety, migration, index/query-plan and database-size checks; keep every later database-test script under `tools/final-db-*.mjs`.
+
+## Safety gate and repeatable migration commands
+
+The scripts never read an ordinary app `.env` connection URI as their target. Set these values only in a private local CMD session for one app at a time:
+
+| Variable | Requirement |
+|---|---|
+| `MUF_FINAL_DB_APP` | `agri`, `dairy`, or `flock` |
+| `MUF_FINAL_DB_URI` | Connection URI for the dedicated test database only |
+| `MUF_FINAL_DB_EXPECTED_HOST` | Exact target hostname as shown in the URI |
+| `MUF_FINAL_DB_BACKUP` | Absolute path to a fresh, non-empty backup file outside the repository |
+| `MUF_FINAL_DB_DISPOSABLE_CONFIRMED` | Set to `YES` only after independently confirming the target is not production |
+| `MUF_FINAL_DB_BACKUP_VALIDATED` | Set to `YES` only after the backup has been opened/read successfully |
+| `MUF_FINAL_DB_RESTORE_VERIFIED` | Set to `YES` only after restoring the backup to the target and sanity-checking records |
+| `MUF_FINAL_DB_FREE_TIER_CAP_MB` | Actual documented storage cap for this provider/tier, in MB; do not guess |
+
+The database name must start with `muf_phase19_agri_`, `muf_phase19_dairy_`, or `muf_phase19_flock_` according to the selected app. The backup file must be outside the repository and no older than 24 hours at preflight time. The preflight prints only the target host/database, backup name, size and SHA-256; it does not print URI credentials. After a restore is confirmed, set `MUF_FINAL_DB_FREE_TIER_CAP_MB` to the provider's actual documented cap, then run the read-only database inspector to list collections, estimated counts, index listings, representative query-plan metrics and the selected database's size share of that cap.
+
+Run `node tools\final-db-preflight.mjs --pre-restore` before restoring the backup. After restoring it and checking records, set `MUF_FINAL_DB_RESTORE_VERIFIED=YES` and run `node tools\final-db-preflight.mjs` again. The migration runner defaults to a dry run; applying changes requires the explicit `--apply` flag:
+
+```cmd
+node tools\final-db-preflight.mjs --pre-restore
+node tools\final-db-preflight.mjs
+node tools\final-db-inspect.mjs
+node tools\final-db-migrate.mjs
+node tools\final-db-migrate.mjs --apply
+node tools\final-db-migrate.mjs --apply
+```
+
+Do not paste a connection URI, username, password, backup contents, or real farm data into chat, issues, or committed files. The two `--apply` invocations are deliberately separate to test idempotence. Do not run them until the target restore has been independently verified. No database command should proceed if the target/backup safety confirmations are unavailable.
+## Command-line checks at the end of this phase
+
+```
+npm ci
+npm test
+npm run check-final-db
+npm run check-seed
+node --check tools\\seed-test-db.js
+npm run check-sync
+npm run check-ui
+npm run check-workbench
+npm run check-farms
+npm run check-docs
+tools\build-all.bat
+```
+Run the build in each app that this phase touched (or `tools\build-all.bat` for all three). `npm run check-workbench-runtime` is optional and needs port 5000 free.
+
+## Done checklist
+
+- [ ] Restore each backup into a separate throwaway database (local MongoDB Community plus Compass, or a disposable Atlas database).
+- [ ] Migration for Agri, Dairy and Flock: dry run, apply, run again (idempotent); compare record counts and farm ownership before and after.
+- [ ] Index listings and representative query plans, including Flock's unique `(farmId, key)` index and the Dairy per-farm ear-tag index.
+- [ ] Persistent backup and restore on the copies: Agri diary media, Dairy suppliers and payments, Flock images (exact bytes and metadata), monthly chunks, and legacy backups.
+- [ ] Flock egg-inventory lock with two backend processes on one MongoDB.
+- [ ] Repeat the 84-case farm-deletion safety run and a Flock restore of an image larger than 3.3 MB.
+- [ ] Archive and restore on the copies; photo storage with the default store.
+- [ ] Record the size of each database against the free-tier cap.
+- [ ] The new command-line check above exists and passes.
+- [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
+- [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
+
+## Phase 19 start (2026-10-29)
+
+Phase 19 is **In progress**. Repository review found existing real-database migration scripts in all three backends, backup/restore implementations for Agri, Dairy and Flock, archive storage, Flock image backup helpers, and the farm-scoped egg-inventory lock. Existing tests cover memory-mode/source contracts but do not prove real MongoDB behavior.
+
+Added a fail-closed configuration-and-backup preflight and a migration wrapper. The wrapper uses only the explicitly supplied `MUF_FINAL_DB_URI`, requires a dedicated Phase 19 database name, requires host confirmation, requires a fresh non-empty backup and manual confirmation that the backup opens and has been restored, and defaults migrations to dry-run. Unit tests cover these guards without connecting to MongoDB.
+
+**Live database verification is blocked on environment evidence:** no disposable MongoDB target or fresh backup has been supplied or verified in this session. No real database connection, migration, restore, deletion, or concurrency test has been attempted. Keep all real-DB checklist items unchecked until their outputs are observed.
+
+## Initial automated validation (2026-10-29)
+
+GitHub Actions run [40852928322](https://github.com/musman5911/ai-monorepo/actions/runs/40852928322) passed on commit `83ecc481b68e645dd05f6929ab557d8d509ec5c3`: 48 test files / 424 tests passed; shared sync, UI safety, workbench source checks (23), farm scope, phase documentation and the seven-package production dependency audit all passed. The audit reported no high or critical production dependency findings. These are automated source/safety-guard checks only; this run did not connect to MongoDB or perform any backup, restore, migration, deletion or concurrency test.
+
+; names containing `prod`, `production`, or `live` are refused, as is `NODE_ENV=production`. Non-local hosts require the explicit `MUF_SEED_ALLOW_REMOTE=1` opt-in. A dry run is the default and makes no writes. The helper refuses a database with existing records unless `--reset --apply` is explicitly supplied; that combination drops the selected database before recreating the fixture. Use it only on a verified throwaway database.
+
+Windows CMD example for a local empty test database:
+
+```cmd
+set MUF_SEED_URI=mongodb://localhost:27017/muf_test_dairy_demo
+node tools\\seed-test-db.js --app dairy
+node tools\\seed-test-db.js --app dairy --apply
+```
+
+To deliberately replace this same disposable database on a later run:
+
+```cmd
+node tools\\seed-test-db.js --app dairy --reset --apply
+```
+
+For an Atlas or other remote endpoint, keep the URI private and set `MUF_SEED_ALLOW_REMOTE=1` only after independently confirming the target is a throwaway database. Do not commit a URI, backup, or generated data dump. The seeder is not a migration tool and must never be pointed at production.
 
 ## Rules for whoever works on this phase
 
