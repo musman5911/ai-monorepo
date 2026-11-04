@@ -271,7 +271,7 @@ export function validateSeedTarget(uri, options = {}) {
   const nodeEnv = String(options.nodeEnv ?? process.env.NODE_ENV ?? "").toLowerCase();
   const allowRemote = String(options.allowRemote ?? process.env.MUF_SEED_ALLOW_REMOTE ?? "") === "1";
   if (nodeEnv === "production") throw new Error("Refusing to seed while NODE_ENV=production.");
-  if (typeof uri !== "string" || !uri.trim()) throw new Error("MUF_SEED_URI (or MONGO_URI) is required.");
+  if (typeof uri !== "string" || !uri.trim()) throw new Error("MUF_SEED_URI is required; app MONGO_URI values are never used implicitly.");
   let parsed;
   try { parsed = new URL(uri); } catch { throw new Error("The seed URI is not a valid MongoDB URL."); }
   if (parsed.protocol !== "mongodb:" && parsed.protocol !== "mongodb+srv:") throw new Error("Only mongodb:// and mongodb+srv:// URIs are supported.");
