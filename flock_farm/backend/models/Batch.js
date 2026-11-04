@@ -2,6 +2,7 @@ import mongoose from 'mongoose';
 
 const batchSchema = new mongoose.Schema(
   {
+    seedId: { type: String, index: true },
     batch_id: { type: String, required: true, unique: true, index: true },
     farmId: { type: String, index: true },
     name: { type: String, required: true, trim: true },
