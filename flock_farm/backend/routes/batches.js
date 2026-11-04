@@ -18,6 +18,7 @@ import { validateIncubationAllocations } from '../incubation-allocation.mjs';
 import { linkedBatchHistoryConflict } from '../batch-history-guards.mjs';
 import { acquireEggInventoryLock } from '../egg-inventory-lock.mjs';
 import { validateBatchImportPayload } from '../batch-import-validation.mjs';
+import { normalizeBatchCreateInput, normalizeBatchPatchInput, normalizeVaccinationInput } from '../batch-write-validation.mjs';
 
 const router = express.Router();
 
@@ -334,13 +335,9 @@ router.get('/batches/:batchId', authRequired, async (req, res) => {
 
 router.post('/batches', authRequired, requireRole('admin'), async (req, res) => {
   try {
-    const name = cleanText(req.body?.name);
-    const type = cleanText(req.body?.type);
-    const start_date = cleanText(req.body?.start_date);
-    const expected_end_date = cleanText(req.body?.expected_end_date) || null;
-    const intake_count = Number(req.body?.intake_count || 0);
-    const source = cleanText(req.body?.source);
-    const image_path = cleanText(req.body?.image_path);
+    const normalized = normalizeBatchCreateInput(req.body || {});
+    if (normalized.error) return res.status(400).json({ error: normalized.error });
+    const { name, type, start_date, expected_end_date, intake_count, source, image_path, cost_per_bird } = normalized.value;
     if (image_path) {
       const imageId = image_path.match(/^\/api\/images\/([a-f0-9]{24})$/i)?.[1];
       const farmId = String(req.farmContext?.farmId || '');
@@ -348,19 +345,6 @@ router.post('/batches', authRequired, requireRole('admin'), async (req, res) => 
         ? await Image.findOne({ _id: imageId, farmId, kind: 'batch' }).select('_id').lean()
         : null;
       if (!image) return res.status(400).json({ error: 'Batch photo must belong to the selected farm' });
-    }
-    const cost_per_bird = Number(req.body?.cost_per_bird || 0);
-
-    if (!name) return res.status(400).json({ error: 'Batch name is required' });
-    if (!['Broiler', 'Layer', 'Breeder', 'Custom'].includes(type)) {
-      return res.status(400).json({ error: 'Invalid batch type' });
-    }
-    if (!start_date) return res.status(400).json({ error: 'start_date is required' });
-    if (!Number.isFinite(intake_count) || intake_count < 0) {
-      return res.status(400).json({ error: 'intake_count must be 0 or greater' });
-    }
-    if (!Number.isFinite(cost_per_bird) || cost_per_bird < 0) {
-      return res.status(400).json({ error: 'cost_per_bird must be 0 or greater' });
     }
 
     let batch_id = batchIdCode();
@@ -392,24 +376,10 @@ router.patch('/batches/:batchId', authRequired, requireRole('admin'), async (req
     const batch = await getBatchByCode(req.params.batchId);
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
 
-    const patch = {};
-    if (req.body?.name !== undefined) {
-      const name = cleanText(req.body.name);
-      if (!name) return res.status(400).json({ error: 'Batch name cannot be empty' });
-      patch.name = name;
-    }
-    if (req.body?.type !== undefined) {
-      const type = cleanText(req.body.type);
-      if (!['Broiler', 'Layer', 'Breeder', 'Custom'].includes(type)) {
-        return res.status(400).json({ error: 'Invalid batch type' });
-      }
-      patch.type = type;
-    }
-    if (req.body?.start_date !== undefined) patch.start_date = cleanText(req.body.start_date);
-    if (req.body?.expected_end_date !== undefined) patch.expected_end_date = cleanText(req.body.expected_end_date) || null;
-    if (req.body?.source !== undefined) patch.source = cleanText(req.body.source);
-    if (req.body?.image_path !== undefined) {
-      patch.image_path = cleanText(req.body.image_path);
+    const normalized = normalizeBatchPatchInput(req.body || {}, batch.toObject());
+    if (normalized.error) return res.status(400).json({ error: normalized.error });
+    const patch = normalized.value;
+    if (Object.prototype.hasOwnProperty.call(patch, 'image_path')) {
       // Photo replaced or removed -> free the old image's DB space
       if (patch.image_path) {
         const imageId = patch.image_path.match(/^\/api\/images\/([a-f0-9]{24})$/i)?.[1];
@@ -422,11 +392,6 @@ router.patch('/batches/:batchId', authRequired, requireRole('admin'), async (req
       if (batch.image_path && batch.image_path !== patch.image_path) {
         await deleteImageByPath(batch.image_path, req.farmContext?.farmId);
       }
-    }
-    if (req.body?.cost_per_bird !== undefined) {
-      const cost = Number(req.body.cost_per_bird);
-      if (!Number.isFinite(cost) || cost < 0) return res.status(400).json({ error: 'cost_per_bird must be 0 or greater' });
-      patch.cost_per_bird = cost;
     }
 
     Object.assign(batch, patch);
@@ -683,16 +648,9 @@ router.post('/batches/:batchId/vaccination-logs', authRequired, async (req, res)
     if (!batch) return res.status(404).json({ error: 'Batch not found' });
     if (!ensureBatchOpen(batch, res)) return;
 
-    const date = cleanText(req.body?.date);
-    const vaccine_name = cleanText(req.body?.vaccine_name);
-    const dose = cleanText(req.body?.dose);
-    const bird_count = Number(req.body?.bird_count || 0);
-    const cost = Number(req.body?.cost || 0);
-    const notes = cleanText(req.body?.notes);
-    if (!date || !vaccine_name) return res.status(400).json({ error: 'date and vaccine_name are required' });
-    if (![bird_count, cost].every(Number.isFinite) || bird_count < 0 || cost < 0) {
-      return res.status(400).json({ error: 'bird_count and cost must be 0 or greater' });
-    }
+    const normalized = normalizeVaccinationInput(req.body || {});
+    if (normalized.error) return res.status(400).json({ error: normalized.error });
+    const { date, vaccine_name, dose, bird_count, cost, notes } = normalized.value;
 
     const log = await BatchVaccinationLog.create({
       batch_id: batch.batch_id, farmId: batch.farmId, date, vaccine_name, dose, bird_count, cost, notes,

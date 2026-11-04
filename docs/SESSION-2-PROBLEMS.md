@@ -44,7 +44,7 @@ Source review does not replace browser, real-MongoDB or deployed-system verifica
 | E9 to E12 | Supplier, laborer, attendance, advance and supplier-payment write validation | FIXED | New allowlisted validators strip unknown control fields, require finite bounded money values, and enforce exact calendar dates. Supplier-payment updates/deletes are now tied to the selected parent supplier. |
 | E6 | Inventory: no validation, raw update | FIXED | Current route normalizes an allowlist of name/category/current_stock/unit/low_stock_threshold before create/update; regression tests cover rejected values and stripped fields. |
 | E8 | Liabilities: empty or negative accepted | FIXED | Current route normalizes creditor/amount/date/crop/notes, requires a positive bounded amount, and sets status on creation server-side. |
-| F1 to F3 | Flock validation gaps (batch create/patch and individual vaccination logs) | NOT CHECKED | |
+| F1 to F3 | Flock batch create/patch and individual vaccination input validation | FIXED | Batch creation and edits now enforce bounded text/numbers, strict ISO calendar dates, valid date order and farm-owned image paths; status, batch IDs, seed IDs and farm IDs remain server-controlled. Individual vaccination logs now validate dates, finite bounded costs/counts, and text lengths. Regression tests cover the payload contracts. |
 | F4 | Flock generic data buckets accepted malformed value shapes and writes without baseVersion | FIXED | Every bucket now requires its expected top-level shape, bounded row count, plain JSON records, safe object keys, finite nested numbers and string/depth/node limits. Writes require a valid baseVersion and return 428 when it is missing, preventing silent last-write-wins updates. |
 
 ## G. Agri business rules
