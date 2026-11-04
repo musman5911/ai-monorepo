@@ -22,7 +22,7 @@ const connectDB = async () => {
     await seedDemoData({
       connectDB, Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance,
       Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, Farm,
-      PasswordReset, RateHistory, DailyLog, Sale, Meta, Product,
+      PasswordReset, RateHistory, DailyLog, Sale, Meta, Product, Product,
     });
     // Demo data is disposable, so the farms migration runs automatically here.
     await mufMigrateFarms({
