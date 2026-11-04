@@ -19,6 +19,8 @@
  * flock_farm/backend/demo-data.js.
  */
 import bcrypt from 'bcryptjs';
+import { buildSeedPlan, getDemoProfile, getFarmDefinitions, insertSeedCollections, getSeedToday, seededRandom } from '../../shared/muf-demo-seed.mjs';
+const demoRandom = seededRandom('agri-demo');
 // Demo photos (memory mode only): stable hot-links from Unsplash (free
 // license) — no image files stored in the repo.
 const U = (id) => `https://images.unsplash.com/${id}?w=800&q=70&fm=jpg`;
@@ -38,42 +40,21 @@ async function seedDemoData({
   Supplier, SupplierPayment,
 }) {
   console.log('🌱 [Demo] Seeding in-memory database with realistic demo farm data...');
+  const profile = getDemoProfile();
+  const farmDefinitions = getFarmDefinitions('agri', profile);
+  const farms = [];
+  for (const definition of farmDefinitions) {
+    const createdAt = definition.createdAt;
+    farms.push(await Farm.create({ ...definition, createdAt, updatedAt: createdAt }));
+  }
+  const [farm1, farm2] = farms;
+  const plan = buildSeedPlan('agri', farms.map((farm) => String(farm._id)));
 
-
-  const farm1 = await Farm.create({
-    name: 'Farm 1', location: 'Local demo farm', archived: false,
-    createdAt: new Date('2020-01-01T00:00:00.000Z'), updatedAt: new Date('2020-01-01T00:00:00.000Z'),
-  });
-  const farm2 = await Farm.create({
-    name: 'Farm 2 - Access Test', location: 'Isolated role-testing farm', archived: false,
-    createdAt: new Date('2020-01-02T00:00:00.000Z'), updatedAt: new Date('2020-01-02T00:00:00.000Z'),
-  });
-
-  // ---------------------------------------------------------------- USERS
-  await User.insertMany([
-    {
-      username: 'admin',
-      email: 'admin@agrifarm.com',
-      role: 'admin',
-      password: bcrypt.hashSync('admin123', 12),
-      avatar_base64: ADMIN_AVATAR,
-    },
-    {
-      username: 'worker',
-      email: '',
-      role: 'worker',
-      password: bcrypt.hashSync('worker123', 12),
-      avatar_base64: WORKER_AVATAR,
-    },
-    {
-      username: 'manager', email: 'manager@agrifarm.test', role: 'manager',
-      farmIds: [String(farm2._id)], password: bcrypt.hashSync('manager123', 12), avatar_base64: WORKER_AVATAR,
-    },
-    {
-      username: 'worker2', email: 'worker2@agrifarm.test', role: 'worker',
-      farmIds: [String(farm2._id)], password: bcrypt.hashSync('worker2123', 12), avatar_base64: WORKER_AVATAR,
-    },
-  ]);
+  await User.insertMany(plan.accounts.map((account) => ({
+    ...account,
+    password: bcrypt.hashSync(account.password, 12),
+    avatar_base64: account.username === 'admin' ? ADMIN_AVATAR : WORKER_AVATAR
+  })));
 
   // ---------------------------------------------------------------- FIELDS
   const fieldSeeds = [
@@ -227,7 +208,7 @@ async function seedDemoData({
 
   // Monthly farm-wide running costs across the full year (diesel + repairs),
   // so the Monthly Summary shows a continuous 12-month history.
-  const today = new Date();
+  const today = new Date(getSeedToday() + 'T12:00:00.000Z');
   for (let back = 12; back >= 0; back--) {
     let y = today.getFullYear();
     let m = today.getMonth() + 1 - back; // 1..12
@@ -271,7 +252,7 @@ async function seedDemoData({
   const payments = [];
   for (const [supplierId, monthly] of [[sup1Id, 14000.0], [sup2Id, 2400.0]]) {
     for (let m = 11; m >= 0; m--) {
-      const pd = new Date();
+      const pd = new Date(getSeedToday() + 'T12:00:00.000Z');
       let month = pd.getMonth() + 1 - m;
       let year = pd.getFullYear();
       while (month <= 0) { month += 12; year -= 1; }
@@ -428,7 +409,7 @@ async function seedDemoData({
   // produces); the current month stays unposted so the wage sheet has
   // live rows to show. Ali works 6 days/week, Raza 5; some half days.
   const wages = { [aliId]: ['Ali', 1200.0], [razaId]: ['Raza', 1000.0] };
-  const now = new Date();
+  const now = new Date(getSeedToday() + 'T12:00:00.000Z');
   const allRows = [];
   for (let back = 11; back >= 0; back--) {
     const mYear = (now.getMonth() + 1 - back) > 0 ? now.getFullYear() : now.getFullYear() - 1;
@@ -498,6 +479,8 @@ async function seedDemoData({
     { crop_id: cornId, image_base64: CROP_IMG.corn || 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAgCAIAAADbtmxLAAAAQUlEQVR42u3OQQkAIBAAwYtieVsYwAxiCCNYQJ+CcAP73MdEn+urAggIKB1o1HKsXXr9AwEBAQEBAQEBAQEBJQNtjyXml2CPRRMAAAAASUVORK5CYII=',
       uploaded_at: '2026-08-01', label: 'Tasseling stage — Sector 3C' },
   ]);
+
+  if (plan.rich) await insertSeedCollections(plan, { Field, Crop, Finance, Task, Inventory, Liability, Laborer, Attendance, Supplier, SupplierPayment, Product });
 
   console.log('🌱 [Demo] Demo data seeded successfully.');
   console.log('🌱 [Demo] Login -> admin / admin123  (or)  worker / worker123');
