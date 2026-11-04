@@ -91,3 +91,8 @@ These are current-head command-line results supplied by the owner. `npm ci` and 
 5. Ask the owner before removing any feature (the Flock Home Birds trims are already allowed).
 6. Stay inside this phase's scope. If a shared MUF file changes, keep the three copies identical (`npm run check-sync`).
 7. Keep the other two apps working: run all three builds even when only one app changed.
+
+
+## Audit remediation checkpoint (2026-11-04)
+
+The post-handoff repository audit identified a small set of code defects and stale historic instructions. Current follow-up changes add regression coverage for Agri inventory/liability validation, Dairy event edits after cow sale, and Flock multi-farm user creation. `docs/PHASE1_PLAN.md` is clarified as historical, and `docs/SESSION-2-PROBLEMS.md` now distinguishes fixed findings from owner decisions and Phase 19–21 verification. Phase 18 remains Done for its documentation/handoff scope; future docs edits continue to follow the normal check-docs gate.

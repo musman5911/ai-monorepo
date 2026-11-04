@@ -165,6 +165,32 @@ async function main() {
       ok(workerDelete.status === 403, 'worker cannot delete a breeding event');
     }
 
+    const soldCowCreate = await call('POST', '/api/cows', {
+      token: owner, farm: String(farmA._id),
+      body: { name: 'Phase 2 Sold Cow Notes Check', breed: 'Test breed', gender: 'female', status: 'active' },
+    });
+    const soldCowId = soldCowCreate.json?._id;
+    ok(soldCowCreate.status === 201 && soldCowId, 'owner can create a dedicated cow for the sold-history regression');
+    if (soldCowId) {
+      const soldCowEvent = await call('POST', '/api/breeding/events', {
+        token: owner, farm: String(farmA._id),
+        body: { cowId: soldCowId, type: 'heat', date: today, notes: 'before sale' },
+      });
+      const soldEventId = soldCowEvent.json?._id;
+      ok(soldCowEvent.status === 201 && soldEventId, 'owner can create a breeding event before the cow is sold');
+      if (soldEventId) {
+        const markSold = await call('PUT', `/api/cows/${soldCowId}`, {
+          token: owner, farm: String(farmA._id), body: { status: 'sold' },
+        });
+        ok(markSold.status === 200, 'cow can be marked sold while preserving its event history');
+        const editHistoricalNotes = await call('PUT', `/api/breeding/events/${soldEventId}`, {
+          token: owner, farm: String(farmA._id), body: { notes: 'updated after sale' },
+        });
+        ok(editHistoricalNotes.status === 200 && editHistoricalNotes.json?.notes === 'updated after sale',
+          'notes-only event edits remain possible after the linked cow is sold');
+      }
+    }
+
     const backup = await call('GET', '/api/backup', { token: owner });
     ok(backup.status === 200 && Array.isArray(backup.json?.breedingEvents) && backup.json.breedingEvents.some((event) => event._id === eventId), 'manual backup contains breeding events');
     if (backup.status === 200 && Array.isArray(backup.json?.breedingEvents)) {

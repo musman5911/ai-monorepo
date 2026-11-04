@@ -548,3 +548,8 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 **Disposition:** Phase 14 is **Done for command-line scope**. The owner-supplied tests verify the documented runtime matrix and regression suite, but do not claim real-MongoDB, browser/phone, or live-deployment verification; those remain in Phases 19–21. Five potential route-policy decisions (P14-R1 to P14-R5) remain documented in `docs/SESSION-2-PROBLEMS.md` for separate owner review and were not changed without an explicit policy decision. Public share cards remain intentionally bearer-link accessible with their documented safeguards.
 
 **Dependency note:** the `npm ci` audit warning is not a failed Phase 14 check, but the five reported vulnerabilities must be triaged before release.
+
+
+## Follow-up source remediation (2026-11-04)
+
+A later current-source audit found additional validation and history-edit defects after the Phase 14 command-line completion checkpoint. The related remediation batch adds Agri inventory/liability allowlists, Flock owner-selected farm assignments, and conditional reference validation for Dairy breeding-event edits after cow sale. The older Phase 14 route-policy decisions P14-R1 through P14-R5 remain owner decisions; no role boundary was silently changed. The unresolved security and test register is maintained in `docs/SESSION-2-PROBLEMS.md`.

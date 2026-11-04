@@ -59,8 +59,8 @@ function eventPayload(body, { partial = false } = {}) {
   return { payload, errors };
 }
 
-async function validateReferences(payload, res) {
-  if (payload.cowId !== undefined) {
+async function validateReferences(payload, res, { validateCow = true, validateSire = true } = {}) {
+  if (validateCow && payload.cowId !== undefined) {
     const cow = await Cow.findById(payload.cowId).lean();
     if (!cow) { res.status(400).json({ error: 'Cow not found in the selected farm' }); return false; }
     if (cow.gender === 'male' || cow.status === 'sold' || cow.status === 'inactive' || cow.status === 'calf' || cow.isCalf) {
@@ -68,7 +68,7 @@ async function validateReferences(payload, res) {
       return false;
     }
   }
-  if (payload.sireSource === 'farm_bull' && payload.bullId !== undefined) {
+  if (validateSire && payload.sireSource === 'farm_bull' && payload.bullId !== undefined) {
     const bull = await Cow.findById(payload.bullId).lean();
     if (!bull || bull.gender !== 'male' || bull.status === 'sold' || bull.status === 'calf' || bull.isCalf) {
       res.status(400).json({ error: 'In-farm sire must be a male animal in the selected farm' });
@@ -220,7 +220,17 @@ router.put('/events/:id', protect, async (req, res) => {
     const next = { ...existing, ...changes };
     const { payload, errors } = eventPayload(next);
     if (errors.length) return sendValidationError(res, errors);
-    if (!(await validateReferences(payload, res))) return;
+    const eventTypeChanged = changes.type !== undefined && changes.type !== existing.type;
+    const cowReferenceChanged = changes.cowId !== undefined
+      && String(changes.cowId) !== String(existing.cowId);
+    const sireFields = ['sireSource', 'bullId', 'bullName', 'semenCode'];
+    const sireReferenceChanged = eventTypeChanged || sireFields.some((field) =>
+      changes[field] !== undefined && String(changes[field] ?? '') !== String(existing[field] ?? '')
+    );
+    if (!(await validateReferences(payload, res, {
+      validateCow: cowReferenceChanged || eventTypeChanged,
+      validateSire: sireReferenceChanged,
+    }))) return;
     if (existing.type === 'calving' && (existing.generatedCalfIds || []).length) {
       const protectedFields = ['cowId', 'date', 'sireSource', 'bullId', 'bullName', 'semenCode'];
       const changedCoreData = protectedFields.some((field) =>

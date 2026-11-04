@@ -1,15 +1,15 @@
 # Session 2 problems (deferred until all 21 phases are finished)
 
-Source: the owner's A to O problem report and the ROLE-F1 finding, with a status for each item.
-Status key: **TRUE** (confirmed in the code), **FALSE** (the report is wrong), **FIXED?** (looks fixed in the code, not run), **NOT CHECKED**.
-"Confirmed" means someone read the code on the `muf-monorepo` branch around 2026-10-28. Nothing here was tested in a browser or on a real MongoDB. Nothing here is fixed in Phase 14 unless it is a cross-farm data leak or an unauthenticated write.
+Source: the owner's A to O problem report and the ROLE-F1 finding. This register was rechecked against `muf-monorepo` source on 2026-11-04.
+Status key: **TRUE** (confirmed in current source), **FALSE** (not present in current source), **FIXED** (implemented with a regression test/check), **NOT CHECKED** (requires further code or runtime review), **OWNER DECISION** (product policy must be approved).
+Source review does not replace browser, real-MongoDB or deployed-system verification; those remain in Phases 19–21.
 
 ## A. Session and auth
 | ID | Problem | Status | Note |
 |---|---|---|---|
 | A1 | Logout does not revoke the token (all 3 backends); Dairy has no logout route | TRUE | Dairy has no logout route. Agri and Flock logout only clear the cookie; no denylist exists |
 | A2 | Changing a password does not revoke old tokens | TRUE | No `tokenVersion` anywhere in the three backends |
-| A3 | Token lifetime too long | TRUE for Dairy and Flock | Both default to 7 days. Agri not re-checked |
+| A3 | Token lifetime too long | OWNER DECISION | Current defaults are Dairy 7 days, Flock 7 days and Agri 1440 minutes (24 hours). Whether to shorten any default needs the owner's policy decision. |
 | A4 | Session cookie missing HttpOnly/SameSite | FALSE | Agri and Flock cookies are httpOnly, sameSite lax, secure on HTTPS. Dairy sets no cookie |
 | A5 | Lost update: last write wins silently (Dairy, Agri PUT) | NOT CHECKED | |
 | A6 | Agri mass assignment on create | TRUE for liabilities and inventory | Raw `req.body` is inserted. Other Agri create routes not checked |
@@ -29,7 +29,7 @@ Status key: **TRUE** (confirmed in the code), **FALSE** (the report is wrong), *
 | C1 | CSP missing | TRUE for Dairy and Agri | `contentSecurityPolicy: false`. Flock has a CSP |
 | C2 | CORS reflects any origin with credentials | MOSTLY FALSE | Only when `NODE_ENV` is not production. The `.replit` files set production, where other origins are refused |
 | C3 | Authenticated responses cacheable | TRUE | No `no-store` on authenticated JSON (public cards got privacy headers in Phase 14) |
-| C4 | SVG upload served as active content (Flock) | NOT CHECKED | |
+| C4 | SVG upload served as active content (Flock) | FALSE | Uploads accept JPEG/PNG/WebP only and verify that the file's detected signature matches its declared MIME type before storing it. |
 | C5 | `<script>` stored verbatim in text fields | NOT CHECKED | |
 
 ## D, E, F. Input validation
@@ -37,16 +37,16 @@ Status key: **TRUE** (confirmed in the code), **FALSE** (the report is wrong), *
 |---|---|---|---|
 | D1, D2, D3 | Dairy: huge numbers, oversized strings, ghost cow ids | NOT CHECKED | Dairy uses shared input readers, so some of this may already be handled |
 | E1 to E5, E7, E9 to E12 | Agri validation gaps (crops, tasks, finance, suppliers, laborers, crop logs, automations, diary media) | NOT CHECKED | |
-| E6 | Inventory: no validation, raw update | TRUE | `$set: req.body` |
-| E8 | Liabilities: empty or negative accepted | TRUE | Raw insert |
+| E6 | Inventory: no validation, raw update | FIXED | Current route normalizes an allowlist of name/category/current_stock/unit/low_stock_threshold before create/update; regression tests cover rejected values and stripped fields. |
+| E8 | Liabilities: empty or negative accepted | FIXED | Current route normalizes creditor/amount/date/crop/notes, requires a positive bounded amount, and sets status on creation server-side. |
 | F1 to F4 | Flock validation gaps (batches, PATCH, vaccination logs, data buckets) | NOT CHECKED | |
 
 ## G. Agri business rules
 | ID | Problem | Status |
 |---|---|---|
-| G1 | Negative liability stored | TRUE |
-| G2 | Negative inventory through PUT | TRUE |
-| G3 | Field acres has no upper bound (1e12 accepted) | TRUE (only "finite and not negative" is checked) |
+| G1 | Negative liability stored | FIXED |
+| G2 | Negative inventory through PUT | FIXED |
+| G3 | Field acres has no upper bound (1e12 accepted) | OWNER DECISION | Current validation requires finite, non-negative acres. A maximum acreage cannot be selected safely without the owner's expected largest farm/field size. |
 
 ## H to O
 | ID | Problem | Status | Note |
@@ -66,17 +66,17 @@ Status key: **TRUE** (confirmed in the code), **FALSE** (the report is wrong), *
 ## ROLE-F1
 | ID | Problem | Status |
 |---|---|---|
-| ROLE-F1 | Flock `POST /auth/users` ignores the requested `farmIds` and assigns the creator's current farm | TRUE |
+| ROLE-F1 | Flock `POST /auth/users` ignores the requested `farmIds` and assigns the creator's current farm | FIXED | Owners can assign multiple existing active farms at creation; managers remain restricted to the selected farm when creating workers. |
 
 ## Found while verifying (not in the original report)
 | ID | Problem | Status | Note |
 |---|---|---|---|
-| X1 | A breeding event cannot be edited after its cow is sold: the server answers 400 "requires an active female animal", even for a notes-only edit | TRUE (reproduced in memory mode on 2026-10-26; not re-checked) | The cow should be re-validated only when the cow or bull changes |
+| X1 | A breeding event cannot be edited after its cow is sold: a notes-only edit incorrectly revalidates the cow | FIXED | Update validation now checks cow/sire references only when those references (or the event type) change; the Dairy runtime checker covers a notes-only edit after sale. |
 
 
 ## Phase 14 route-role review findings (deferred, not fixed)
 
-These routes are recorded for a separate owner decision. The inventory now states their current minimum role so the matrix tests that policy; these notes do not change route middleware in Phase 14.
+These routes are recorded for a separate owner decision. The inventory records the current minimum role so the matrix tests that policy; these notes do not change route middleware without the owner's approval.
 
 | ID | Route | Concern | Phase 14 action |
 |---|---|---|---|

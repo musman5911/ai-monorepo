@@ -49,6 +49,14 @@ describe('Phase 2 Dairy breeding events server contracts', () => {
     expect(routes).toContain('In-farm sire must be a male animal in the selected farm');
   });
 
+  it('does not revalidate unchanged cow or sire references during a notes-only edit', () => {
+    expect(routes).toContain('const eventTypeChanged = changes.type !== undefined && changes.type !== existing.type;');
+    expect(routes).toContain('const cowReferenceChanged = changes.cowId !== undefined');
+    expect(routes).toContain('validateCow: cowReferenceChanged || eventTypeChanged');
+    expect(routes).toContain('validateSire: sireReferenceChanged');
+    expect(routes).toContain('async function validateReferences(payload, res, { validateCow = true, validateSire = true } = {})');
+  });
+
   it('allows authenticated workers to create events but restricts event deletion to full-role users', () => {
     expect(routes).toMatch(/router.post\('\/events', protect,/);
     expect(routes).toMatch(/router.put\('\/events\/:id', protect,/);

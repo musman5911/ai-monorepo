@@ -7,6 +7,7 @@ import { mufMigrateFarms } from '../muf-farms.mjs';
 import PasswordReset from '../models/PasswordReset.js';
 import { signToken, authRequired, requireRole } from '../middleware/auth.js';
 import { sendVerificationCodeEmail, mailConfigured } from '../mailer.js';
+import { resolveNewUserFarmIds } from '../new-user-farm-assignment.mjs';
 
 const router = express.Router();
 const MIN_PASSWORD_LENGTH = 8;
@@ -260,12 +261,21 @@ router.post('/users', authRequired, userCreateAccess, async (req, res) => {
       const dup = await User.findOne({ email: cleanEmail });
       if (dup) return res.status(409).json({ error: 'Email already in use' });
     }
+    const activeFarms = await Farm.find({ archived: { $ne: true } }).select('_id').lean();
+    const assignment = resolveNewUserFarmIds({
+      requesterRole: req.user.farmRole,
+      targetRole: chosenRole,
+      requestedFarmIds: req.body?.farmIds,
+      selectedFarmId: req.farmContext?.farmId,
+      activeFarmIds: activeFarms.map((farm) => String(farm._id)),
+    });
+    if (assignment.error) return res.status(400).json({ error: assignment.error });
     const passwordHash = await User.hashPassword(String(password));
     const user = await User.create({
       username: normalized,
       passwordHash,
       role: chosenRole,
-      farmIds: ['worker', 'manager'].includes(chosenRole) && req.farmContext?.farmId ? [String(req.farmContext.farmId)] : [],
+      farmIds: assignment.farmIds,
       displayName: displayName || '',
       email: cleanEmail,
       active: true,

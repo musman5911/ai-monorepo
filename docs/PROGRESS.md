@@ -30,6 +30,11 @@ Last updated: 2026-11-04 (Dairy browser smoke test owner-reported; Agri/Flock ap
 | 17 | Automatic command-line checks on GitHub | Done | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Done | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | In progress | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
+
+## Phase 1–18 residual code audit (2026-11-04)
+
+A source audit of the current branch identified follow-up defects that were not caught by the earlier command-line completion gates. The first remediation batch fixes Dairy historical breeding-event edits after cow sale, adds allowlisted validation for Agri inventory/liability writes and settlement amounts, and restores explicit multi-farm assignments when an owner creates a Flock user. Focused Vitest coverage and the Dairy memory-mode runtime checker cover these changes. Phase 1–18 status labels remain Done for their documented command-line scope; this is a follow-up hardening record, not a claim that browser/real-database checks are complete. Remaining owner decisions and unverified security findings stay listed in `docs/SESSION-2-PROBLEMS.md`.
+
 | 20 | Final testing B: browser and phones | Not started | [phase-20-final-testing-browser-and-phones.md](phases/phase-20-final-testing-browser-and-phones.md) |
 | 21 | Final testing C: live deployment and sign-off | Not started | [phase-21-final-testing-live-and-signoff.md](phases/phase-21-final-testing-live-and-signoff.md) |
 

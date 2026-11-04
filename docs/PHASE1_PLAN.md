@@ -1,4 +1,4 @@
-> **Historical design record.** The phase numbers, "postponed" wording and step names (1A, 1B, 1C) in this file belong to the old plan. The current plan is `docs/ROADMAP.md` and `docs/phases/`; what was built is summarised in `docs/phases/phase-00-done-and-verified.md`. The design rules below (how farm scoping works and why) are still correct.
+> **Historical design record only.** The phase numbers, step names (1A, 1B, 1C), verification timing and checklists below belong to the retired plan. They are not active work instructions. The authoritative plan and phase status are `docs/ROADMAP.md`, `docs/PROGRESS.md` and `docs/phases/`. Browser, phone, real-MongoDB and deployment checks belong to Phases 19–21. The farm-scoping design notes below remain useful background.
 
 ## Phase 01 status after local verification (2026-10-24)
 
@@ -8,15 +8,15 @@ Owner-run local checkpoint on commit 26f6731:
 - Production builds passed: Dairy, Flock, and Agri. Non-fatal warnings were reported for Dairy mixed imports, Flock/Agri chunk sizes, and Agri's deprecated advancedChunks option.
 - Git status was clean after the checkpoint.
 
-## Phase 01 final completion policy
+## Superseded Phase 01 completion policy (historical, not current)
 
 The owner has explicitly changed the previous timing decision: finish ALL Phase 01 work now, including browser/role walkthroughs, migration/index verification, and backup/restore tests on disposable database copies. Do not defer these Phase 01 checks to the final pass for later phases. Never use production data.
 
-## Known code gap before large-image restore testing
+## Historical Flock restore body-limit finding (resolved in current source)
 
-Flock's server currently applies express.json({ limit: '10mb' }) globally before backup routes. The manual restore endpoint reads req.body, so an image backup larger than 10 MB is rejected before that endpoint can validate it. Fix the parser ordering/route-specific limit and add a regression covering a larger valid request before attempting a real backup restore.
+The Flock backend now selects a 100 MB JSON parser for `/backup/restore` and `/api/backup/restore`, while standard API bodies remain limited to 10 MB. This old 10 MB restore-limit finding is not an active code task. Full backup/restore validation is still part of the disposable-database verification plan.
 
-## Phase 01 active remaining checklist
+## Archived Phase 01 verification checklist (historical snapshot; live checks now belong to Phases 19–21)
 
 1. Fix the Flock manual restore body limit and verify the error/response path before mutation.
 2. Browser-test owner, manager, and worker flows in all three apps, including All farms read-only behavior, assigned-farm isolation, and owner-only management.
@@ -27,7 +27,7 @@ Flock's server currently applies express.json({ limit: '10mb' }) globally before
 7. Exercise concurrent requests across two farms against disposable MongoDB to confirm isolation and atomic farm-scoped deletion/update behavior.
 8. After the body-limit fix, rerun root tests, all root check commands, and all three frontend production builds; update this checklist with the exact final results.
 
-Historical design and migration notes follow. Any older statement below that Phase 01 browser/database checks are postponed is superseded by this status section.
+The checklist above records what remained at the 2026-10-24 checkpoint. It is retained for history only. Do not use it to reopen Phase 1 or to bypass the current Phase 19–21 safety workflow.
 
 ## Farm deletion safety follow-up (2026-10-23)
 
