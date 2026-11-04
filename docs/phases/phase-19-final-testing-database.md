@@ -95,6 +95,7 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [ ] Archive and restore on the copies; photo storage with the default store.
 - [ ] Record the size of each database against the free-tier cap.
 - [ ] The new command-line check above exists and passes.
+- [x] Owner-reported Dairy browser smoke test: Dashboard, Cows, Milk, Breeding, Health, Finance, Reports, and Admin > Backup all opened and displayed data.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
@@ -357,3 +358,11 @@ Each successful apply reported `Inserted 5 farms, 10 test accounts, and 8 shop p
 The owner also observed the non-fatal Mongoose warning that `collection` is a reserved schema pathname. It did not stop the three successful seed operations and remains a separate warning to review.
 
 **Next Phase 19 work:** verify the new datasets through the three application backends and browser screens without changing normal `.env` targets; then continue the separate backup/restore, restored-copy migration/idempotence, indexes/query plans, archive/photo, deletion-safety, Flock two-process lock, and database-size checks. Phase 19 remains **In progress**.
+
+## Dairy app browser smoke test (2026-11-04; owner-reported)
+
+The owner started the Dairy backend locally. The server listened on port `3000`, reported a MongoDB Atlas connection, and logged the non-fatal Mongoose warning that `collection` is a reserved schema pathname. The server also reported that the monthly automatic backup `auto-2026-11` was saved.
+
+The owner confirmed that the seeded Dairy data displayed correctly and that all of these screens loaded and worked during a browser-only smoke pass: Dashboard, Cows, Milk, Breeding, Health, Finance, Reports, and Admin > Backup (including the backup list). This is an owner-reported browser result; no CRUD edits, manual backup restore, farm-role/permission matrix, or destructive operation was performed in this pass.
+
+**Database-target evidence limitation:** the pasted startup log shows the Atlas hostname but does not print the database name. The launch instructions for this test specified the disposable database `muf_test_dairy_demo_retry1`, but the exact database path is not independently visible in the startup output. Treat the association with that disposable database as owner-configured/reported, and verify the URI database path before any write, restore, or migration operation. Production and the original Phase 19 databases remain out of scope.

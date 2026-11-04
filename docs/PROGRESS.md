@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-11-04 (rich demo data and disposable database seed tooling added; owner validation pending; real-database restore track remains open).
+Last updated: 2026-11-04 (Dairy browser smoke test owner-reported; Agri/Flock app verification and restored-backup track remain open).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -499,3 +499,5 @@ The original Phase 19 databases `muf_phase19_agri_local`, `muf_phase19_dairy_loc
 GitHub Actions run [41777924353](https://github.com/musman5911/ai-monorepo/actions/runs/41777924353) completed successfully on commit `b0dd39b` after the Flock index correction and its regression test. The owner also observed a non-fatal Mongoose reserved-schema-path warning for `collection` during seed applies; it remains a separate review item.
 
 These owner-supplied outputs establish successful seed insertion only. They do not establish app/browser login or role isolation against these Atlas databases, backup/restore, migration idempotence, index/query-plan inspection, archive/photo scenarios, deletion-safety, Flock multi-process locking, or database-size measurements. Phase 19 remains **In progress**.
+
+**Phase 19 Dairy browser checkpoint (2026-11-04):** the owner reports that the local Dairy backend started on port 3000, connected to the Atlas cluster, and displayed the seeded data. Dashboard, Cows, Milk, Breeding, Health, Finance, Reports, and Admin > Backup (backup list) all worked in the browser. Startup also logged that `auto-2026-11` was saved. The Mongoose reserved-pathname warning for `collection` was non-fatal. The startup log exposed the Atlas host but not the database name; the session was configured according to the instructions for `muf_test_dairy_demo_retry1`, so that exact target remains owner-reported rather than visible in the log. This was a read/navigation smoke test only: CRUD, manual restore, farm-role isolation and destructive safety were not tested. Phase 19 remains **In progress**; next is Dairy CRUD and role/farm-isolation testing, followed by Agri and Flock app verification and the remaining real-database scenarios.
