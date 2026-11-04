@@ -207,7 +207,7 @@ const connectDB = async () => {
       await seedDemoData({
         Farm, User, Field, Crop, Finance, Task, Inventory, Liability, Irrigation,
         CropPhoto, Spray, Laborer, Attendance, LaborAdvance,
-        Supplier, SupplierPayment,
+        Supplier, SupplierPayment, Product,
       });
     }
     // Demo data is disposable, so the farms migration runs automatically here.
