@@ -21,7 +21,7 @@ Source review does not replace browser, real-MongoDB or deployed-system verifica
 | B2 | Dairy and Agri farm location is public | TRUE | Dairy `GET /location` and Agri location are open for the weather widget. Flock not checked |
 | B3 | Agri public worker card shows wages and advances | TRUE | Same accepted share-card risk |
 | B4 | Flock image readable across farms | FIXED? | The lookup is scoped by farm (commit f1cf04d). Not run |
-| B5 | Agri worker responses too broad | NOT CHECKED | |
+| B5 | Agri worker responses too broad | FIXED for task API | Worker task lists now include only tasks assigned to the authenticated username and omit labor cost, inventory ledger IDs/quantities and crew record IDs. Owner/manager lists retain full fields. The public worker share-card wage exposure is tracked separately under B3. |
 
 ## C. Headers, CORS, cache, XSS
 | ID | Problem | Status | Note |

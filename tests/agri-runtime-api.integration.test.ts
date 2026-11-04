@@ -857,7 +857,7 @@ describe.sequential('Agri runtime API integration', () => {
     const unassignedTask = await request('/tasks', {
       method: 'POST',
       token: ownerToken,
-      body: { title: `${suffix}-unassigned`, assigned_to: 'someone-else', priority: 'Medium' },
+      body: { title: `${suffix}-unassigned`, assigned_to: 'someone-else', priority: 'Medium', labor_cost: 9900 },
     });
     expect(unassignedTask.response.status).toBe(201);
 
@@ -876,7 +876,7 @@ describe.sequential('Agri runtime API integration', () => {
     const assignedTask = await request('/tasks', {
       method: 'POST',
       token: ownerToken,
-      body: { title: `${suffix}-assigned`, assigned_to: 'worker', priority: 'Medium' },
+      body: { title: `${suffix}-assigned`, assigned_to: 'worker', priority: 'Medium', labor_cost: 4500 },
     });
     expect(assignedTask.response.status).toBe(201);
     const refreshedTasks = await request('/tasks?skip=0&limit=500', { token: ownerToken });
@@ -884,6 +884,16 @@ describe.sequential('Agri runtime API integration', () => {
     expect(assigned).toBeTruthy();
     if (assigned) {
       created.tasks.push(String(assigned._id));
+      expect(assigned.labor_cost).toBe(4500);
+      const workerTaskList = await request('/tasks?skip=0&limit=500', { token: workerToken });
+      expect(workerTaskList.response.status).toBe(200);
+      expect(workerTaskList.data.some((row) => row.title === `${suffix}-unassigned`)).toBe(false);
+      const assignedForWorker = workerTaskList.data.find((row) => row.title === `${suffix}-assigned`);
+      expect(assignedForWorker).toBeTruthy();
+      expect(assignedForWorker.labor_cost).toBeUndefined();
+      expect(assignedForWorker.inventory_item_id).toBeUndefined();
+      expect(assignedForWorker.inventory_qty_consumed).toBeUndefined();
+      expect(assignedForWorker.laborer_ids).toBeUndefined();
       const allowedCompletion = await request(`/tasks/${assigned._id}`, {
         method: 'PATCH',
         token: workerToken,

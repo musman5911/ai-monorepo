@@ -233,3 +233,14 @@ describe('Agri crop and crop-log input allowlists', () => {
     });
   });
 });
+
+
+describe('Agri irrigation route uses normalized hours', () => {
+  it('calculates rented-tubewell money and ledger quantity from the allowlisted payload', () => {
+    const route = readFileSync(new URL('../agri_farm/backend/routes/crop-logs.js', import.meta.url), 'utf8');
+    const handler = route.split("router.post('/irrigation'")[1]?.split("router.delete('/irrigation/:logId'")[0] || '';
+    expect(handler).toContain('payload.hours * payload.hourly_rate');
+    expect(handler).toContain('custom_qty: payload.hours');
+    expect(handler).not.toContain('Math.round(hours * payload.hourly_rate');
+  });
+});

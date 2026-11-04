@@ -54,7 +54,7 @@ router.post('/irrigation', protect, requireAdmin, asyncHandler(async (req, res) 
     if (payload.hourly_rate <= 0) {
       return badRequest(res, 'Rented tubewell needs an hourly rate.');
     }
-    const amount = Math.round(hours * payload.hourly_rate * 100) / 100;
+    const amount = Math.round(payload.hours * payload.hourly_rate * 100) / 100;
     payload.amount = amount;
     const fin = {
       category: 'Irrigation',
@@ -62,9 +62,9 @@ router.post('/irrigation', protect, requireAdmin, asyncHandler(async (req, res) 
       type: 'expense',
       date: payload.date,
       crop_id: payload.crop_id,
-      notes: `Rented tubewell: ${hours}h × Rs. ${payload.hourly_rate}/hr` + (payload.notes ? `. ${payload.notes}` : ''),
+      notes: `Rented tubewell: ${payload.hours}h × Rs. ${payload.hourly_rate}/hr` + (payload.notes ? `. ${payload.notes}` : ''),
       hourly_rate: payload.hourly_rate,
-      custom_qty: hours,
+      custom_qty: payload.hours,
       custom_price: payload.hourly_rate,
     };
     const finDoc = (await Finance.insertMany([fin]))[0];
