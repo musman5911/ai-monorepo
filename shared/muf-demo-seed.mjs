@@ -118,7 +118,7 @@ function buildDairyCollections(farmIds, today) {
     const sold = p + "-cow-sold";
     const calf = p + "-calf-01";
     c.Cow.push({ _id: bull, seedId: bull, farmId, name: "Sher " + farmNo, breed: "Sahiwal", gender: "male", earTag: "D-" + farmNo + "-B-001", status: "active", birthDate: dateFromSeed(1100, today), weight: 570, lactationNumber: 0, batch: "Breeding Bulls", purchasePrice: 185000 });
-    const activeCount = farmNo - 1;
+    const activeCount = Math.max(1, farmNo - 1);
     for (let n = 1; n <= activeCount; n += 1) {
       const cowId = n === 1 ? mother : p + "-cow-" + String(n).padStart(2, "0");
       c.Cow.push({ _id: cowId, seedId: cowId, farmId, name: (n === 1 ? "Noor " : "Rani ") + farmNo + (n === 1 ? "" : "-" + n), breed: n % 2 ? "Sahiwal" : "Holstein Friesian", gender: "female", earTag: "D-" + farmNo + "-C-" + String(n).padStart(3, "0"), status: "active", birthDate: dateFromSeed(800 + n * 70, today), weight: 390 + n * 22, lactationNumber: 2 + n, batch: "Lactating Group " + farmNo, calvingDate: dateFromSeed(61, today), purchasePrice: 145000 + n * 9000, fatherId: bull, fatherType: "farm", fatherName: "Sher " + farmNo });
