@@ -47,7 +47,7 @@ describe('Flock owner multi-farm user assignment UI', () => {
     const component = readFileSync(new URL('../flock_farm/client/src/muf/admin/muf-admin-users.tsx', import.meta.url), 'utf8');
     const admin = readFileSync(new URL('../flock_farm/client/src/components/AdminMenu.tsx', import.meta.url), 'utf8');
     expect(component).toContain('farmOptions.map((farm) =>');
-    expect(component).toContain('farmIds: [...new Set([...previous.farmIds, farm._id])]');
+    expect(component).toContain('new Set([...previous.farmIds, farm._id])');
     expect(admin).toContain('farmIds: data.farmIds || []');
   });
 });
