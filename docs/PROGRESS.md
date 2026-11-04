@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-11-03 (Phase 19 browser validation and 441-test automated suite passed; real-database restore track remains open).
+Last updated: 2026-11-04 (rich demo data and disposable database seed tooling added; owner validation pending; real-database restore track remains open).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -476,3 +476,10 @@ The owner ran `npm ci` successfully: 51 packages were added and 52 packages audi
 **Dependency warnings from `npm ci`:** npm reported 5 vulnerabilities (1 moderate, 2 high, 2 critical). It also reported that the `esbuild@0.28.2` postinstall script is not yet approved by the configured `allowScripts` policy. These warnings do not make the test run fail, but they remain unresolved and must be reviewed before release. No `npm audit fix`, forced dependency upgrade, or install-script approval was performed. Do not use `npm audit fix --force` or approve install scripts without reviewing the package and the expected build impact.
 
 The owner-supplied results complete the documented clean-install and test-suite steps. They do not complete the restored-copy MongoDB migration/backup checklist. Phase 19 remains **In progress**.
+
+
+## Phase 19 rich demo and disposable seed implementation (2026-11-04)
+
+Added a shared deterministic seed-plan module, rich five-farm fixtures for Dairy, Agri and Flock, explicit test-only role assignments, app-specific seeded records, and a dry-run-first MongoDB seed helper. Added offline plan/safety tests and the `seed:test-db` / `check-seed` npm scripts. Updated memory-mode runtime checks to request the basic profile while their legacy assertions remain two-farm based.
+
+**Validation disposition for this implementation:** the GitHub connection was used to edit the branch. No local Windows commands, Vitest suite, syntax checks, build, MongoDB connection, or seed apply were run by the editing agent. Owner validation is pending. Do not interpret the new test file or tool source as an executed result. Phase 19 remains **In progress**; the real-MongoDB restore/migration checklist is still open.
