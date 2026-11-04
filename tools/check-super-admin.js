@@ -25,7 +25,7 @@ async function start(project, port) {
     cwd,
     env: {
       ...process.env,
-      MEMORY_MODE: '1',
+      MEMORY_MODE: '1', MUF_DEMO_PROFILE: 'basic',
       MONGO_URI: '',
       MONGODB_URI: '',
       NODE_ENV: 'development',
