@@ -303,6 +303,18 @@ export async function telegramSendSummary(): Promise<{ sent: number; chats?: num
   return res.json();
 }
 
+export interface AssignableFarm { _id: string; name: string; archived?: boolean }
+
+export async function listAssignableFarms(): Promise<AssignableFarm[]> {
+  const res = await fetch('/api/farms', { headers: await authHeaders() });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || 'Failed to load farms');
+  }
+  const data = (await res.json()) as { farms: AssignableFarm[] };
+  return (data.farms || []).filter((farm) => !farm.archived);
+}
+
 export async function listUsers(): Promise<AuthUser[]> {
   const res = await fetch(`${AUTH_BASE}/users`, { headers: await authHeaders() });
   if (!res.ok) throw new Error('Failed to load users');
@@ -316,6 +328,7 @@ export async function createUser(userData: {
   role: 'admin' | 'worker';
   displayName?: string;
   email?: string;
+  farmIds?: string[];
 }): Promise<AuthUser> {
   const res = await fetch(`${AUTH_BASE}/users`, {
     method: 'POST',

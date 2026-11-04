@@ -12,7 +12,7 @@ import {
   logout as apiLogout, changePassword, changePasswordWithCode, requestProfileCode, AuthUser, updateMe, getToken,
   getTodaySummary, sendSummaryEmail, exportAllBatchData,
   getAutoBackup, runAutoBackup, restoreAutoBackup,
-  telegramStatus, telegramLinkCode, telegramUnlink, telegramSettings, telegramSaveSettings, telegramSendSummary, listUsers,
+  telegramStatus, telegramLinkCode, telegramUnlink, telegramSettings, telegramSaveSettings, telegramSendSummary, listUsers, listAssignableFarms,
   createUser, updateUser, deleteUser,
 } from '../api';
 import AvatarUploader from '../muf/ui/muf-avatar';
@@ -99,6 +99,26 @@ export default function AdminMenu(props: AdminMenuProps) {
   } = props;
 
   const [section, setSection] = useState<Section>('general');
+  const [assignableFarms, setAssignableFarms] = useState<{ _id: string; name: string }[]>([]);
+  const [assignableFarmsLoading, setAssignableFarmsLoading] = useState(false);
+  const [assignableFarmsError, setAssignableFarmsError] = useState('');
+  const activeFarmId = (() => {
+    try { return localStorage.getItem('muf_active_farm_flock') || ''; }
+    catch { return ''; }
+  })();
+
+  useEffect(() => {
+    if (!open || section !== 'users' || currentUser?.farmRole !== 'owner') return;
+    let cancelled = false;
+    setAssignableFarmsLoading(true);
+    setAssignableFarmsError('');
+    listAssignableFarms()
+      .then((farms) => { if (!cancelled) setAssignableFarms(farms); })
+      .catch((err) => { if (!cancelled) setAssignableFarmsError(err instanceof Error ? err.message : 'Failed to load farms'); })
+      .finally(() => { if (!cancelled) setAssignableFarmsLoading(false); });
+    return () => { cancelled = true; };
+  }, [open, section, currentUser?.farmRole]);
+
   const canManageProducts = currentUser?.farmRole === 'owner' || currentUser?.farmRole === 'manager' || currentUser?.role === 'admin';
   const visibleAdminTabs = ADMIN_TABS.filter((tab) => tab.id !== 'products' || canManageProducts);
   const [eggPrice, setEggPrice] = useState(settings.defaultPricePerEgg.toString());
@@ -479,8 +499,17 @@ export default function AdminMenu(props: AdminMenuProps) {
                 users={users.map(u => ({ _id: u._id || u.username, username: u.username, role: u.role, email: u.email, displayName: u.displayName, active: u.active !== false }))}
                 currentUsername={currentUser.username}
                 minPasswordLength={8}
+                farmOptions={assignableFarms}
+                farmOptionsLoading={assignableFarmsLoading}
+                farmOptionsError={assignableFarmsError}
+                allowMultiFarmAssignment={currentUser.farmRole === 'owner'}
+                defaultFarmId={activeFarmId}
                 onCreate={async (data) => {
-                  await createUser({ username: data.username, password: data.password, role: data.role as any, displayName: data.displayName, email: data.email });
+                  await createUser({
+                    username: data.username, password: data.password, role: data.role as any,
+                    displayName: data.displayName, email: data.email,
+                    ...(data.role === 'worker' && currentUser.farmRole === 'owner' ? { farmIds: data.farmIds || [] } : {}),
+                  });
                 }}
                 onEditProfile={async (user, data) => {
                   await updateUser(user._id, { username: data.username, password: data.password || undefined, adminPassword: data.adminPassword } as any);

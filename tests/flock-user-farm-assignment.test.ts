@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
 import { resolveNewUserFarmIds } from '../flock_farm/backend/new-user-farm-assignment.mjs';
 
 const activeFarms = ['farm-a', 'farm-b', 'farm-c'];
@@ -37,5 +38,16 @@ describe('Flock new-user farm assignment', () => {
     expect(resolveNewUserFarmIds({
       requesterRole: 'owner', targetRole: 'owner', activeFarmIds: activeFarms,
     })).toEqual({ farmIds: [] });
+  });
+});
+
+
+describe('Flock owner multi-farm user assignment UI', () => {
+  it('exposes active farm checkboxes and sends selected farm IDs to the create API', () => {
+    const component = readFileSync(new URL('../flock_farm/client/src/muf/admin/muf-admin-users.tsx', import.meta.url), 'utf8');
+    const admin = readFileSync(new URL('../flock_farm/client/src/components/AdminMenu.tsx', import.meta.url), 'utf8');
+    expect(component).toContain('farmOptions.map((farm) =>');
+    expect(component).toContain('farmIds: [...new Set([...previous.farmIds, farm._id])]');
+    expect(admin).toContain('farmIds: data.farmIds || []');
   });
 });

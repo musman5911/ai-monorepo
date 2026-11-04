@@ -13,6 +13,8 @@ import MufAdminCard from './muf-admin-card';
 import MufAdminButton from './muf-admin-button';
 import { L } from '../../i18n';
 
+const EMPTY_FARM_OPTIONS: { _id: string; name: string }[] = [];
+
 export interface MufAdminUser {
   _id: string;
   username: string;
@@ -28,7 +30,12 @@ interface MufAdminUsersProps {
   currentUsername: string;
   minPasswordLength?: number;
   // Create
-  onCreate: (data: { username: string; password: string; displayName: string; role: string; email: string }) => Promise<void>;
+  onCreate: (data: { username: string; password: string; displayName: string; role: string; email: string; farmIds?: string[] }) => Promise<void>;
+  farmOptions?: { _id: string; name: string }[];
+  farmOptionsLoading?: boolean;
+  farmOptionsError?: string;
+  allowMultiFarmAssignment?: boolean;
+  defaultFarmId?: string;
   // Per-user actions
   onToggleRole?: (user: MufAdminUser) => Promise<void> | void;
   onEditProfile: (user: MufAdminUser, data: { username: string; password: string; adminPassword: string }) => Promise<void>;
@@ -42,10 +49,19 @@ const inputClass = 'muf-field muf-admin-user-field w-full outline-none transitio
 export default function MufAdminUsers({
   users, usersLoading, currentUsername, minPasswordLength = 8,
   onCreate, onToggleRole, onEditProfile, onEditEmail, onToggleActive, onDelete,
+  farmOptions = EMPTY_FARM_OPTIONS, farmOptionsLoading = false, farmOptionsError = '',
+  allowMultiFarmAssignment = false, defaultFarmId = '',
 }: MufAdminUsersProps) {
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ username: '', password: '', displayName: '', role: 'worker', email: '' });
+  const [form, setForm] = useState<{ username: string; password: string; displayName: string; role: string; email: string; farmIds: string[] }>({ username: '', password: '', displayName: '', role: 'worker', email: '', farmIds: [] });
   const [creating, setCreating] = useState(false);
+
+  useEffect(() => {
+    if (!allowMultiFarmAssignment || !defaultFarmId || form.farmIds.length) return;
+    if (farmOptions.some((farm) => farm._id === defaultFarmId)) {
+      setForm((previous) => ({ ...previous, farmIds: [defaultFarmId] }));
+    }
+  }, [allowMultiFarmAssignment, defaultFarmId, farmOptions, form.farmIds.length]);
 
   // Edit state
   const [editId, setEditId] = useState<string | null>(null);
@@ -58,8 +74,11 @@ export default function MufAdminUsers({
     e.preventDefault();
     setCreating(true);
     try {
-      await onCreate({ ...form });
-      setForm({ username: '', password: '', displayName: '', role: 'worker', email: '' });
+      await onCreate({
+        ...form,
+        farmIds: allowMultiFarmAssignment && form.role === 'worker' ? form.farmIds : undefined,
+      });
+      setForm({ username: '', password: '', displayName: '', role: 'worker', email: '', farmIds: defaultFarmId ? [defaultFarmId] : [] });
       setShowForm(false);
     } finally { setCreating(false); }
   };
@@ -109,8 +128,41 @@ export default function MufAdminUsers({
                 <option value="admin">{L('Admin')}</option>
               </select>
               <input type="email" required={form.role === 'admin'} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder={form.role === 'admin' ? 'Email (required for admins)' : 'Email (optional)'} className="sm:col-span-2 w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 transition" />
+              {allowMultiFarmAssignment && form.role === 'worker' && (
+                <div className="sm:col-span-2 space-y-2">
+                  <label className="block text-xs font-bold text-slate-700 dark:text-slate-200">{L('Assign worker access to farms')} *</label>
+                  {farmOptionsLoading ? (
+                    <p className="text-xs text-slate-500">{L('Loading active farms...')}</p>
+                  ) : farmOptionsError ? (
+                    <p role="alert" className="text-xs text-red-600">{farmOptionsError}</p>
+                  ) : farmOptions.length === 0 ? (
+                    <p className="text-xs text-amber-600">{L('Create an active farm before assigning this worker.')}</p>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 rounded-xl border border-slate-200 dark:border-slate-700 p-3">
+                      {farmOptions.map((farm) => (
+                        <label key={farm._id} className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-200">
+                          <input
+                            type="checkbox"
+                            checked={form.farmIds.includes(farm._id)}
+                            onChange={(event) => setForm((previous) => ({
+                              ...previous,
+                              farmIds: event.target.checked
+                                ? [...new Set([...previous.farmIds, farm._id])]
+                                : previous.farmIds.filter((id) => id !== farm._id),
+                            }))}
+                          />
+                          {farm.name}
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-            <MufAdminButton type="submit" variant="secondary" size="md" disabled={creating}>
+            <MufAdminButton type="submit" variant="secondary" size="md" disabled={
+              creating || (allowMultiFarmAssignment && form.role === 'worker'
+                && (farmOptionsLoading || Boolean(farmOptionsError) || form.farmIds.length === 0))
+            }>
               {creating ? 'Creating...' : `Create ${form.role === 'admin' ? 'Admin' : 'Worker'}`}
             </MufAdminButton>
           </form>
