@@ -486,7 +486,12 @@ export async function seedDemoData() {
   ]);
 
   const { Product } = await import('./db.js');
-  if (plan.rich) await insertSeedCollections(plan, { Product, DataStore, Batch, BatchFeedLog, BatchWeightLog, BatchMortalityLog, BatchExpenseLog, BatchSaleLog, BatchEggLog, BatchVaccinationLog });
+  if (plan.rich) {
+    // Replace the original Farm 1 buckets with the shared rich buckets before
+    // inserting the other farms. This avoids duplicate (farmId, key) documents.
+    await DataStore.deleteMany({});
+    await insertSeedCollections(plan, { Product, DataStore, Batch, BatchFeedLog, BatchWeightLog, BatchMortalityLog, BatchExpenseLog, BatchSaleLog, BatchEggLog, BatchVaccinationLog });
+  }
 
   console.log('🌱 Demo data seeded (1 year): birds, feed, eggs, sales, batches, health, diary.');
   console.log('🌱 Logins → admin / admin123   |   worker / worker123');
