@@ -239,19 +239,7 @@ function buildFlockCollections(farmIds, today) {
       laborAdvances: [{ id: "seed-" + farmNo + "-labor-advance-1", workerId: "seed-" + farmNo + "-laborer-1", date: dateFromSeed(6, today), amount: 1200, settled: false }]
     };
     for (const [key, value] of Object.entries(buckets)) c.DataStore.push({ seedId: p + "-bucket-" + key, farmId, key, value, version: 0 });
-      birds, homeBirds: birds.slice(0, 8),
-      customers: [{ id: "seed-" + farmNo + "-customer-1", name: "Egg Customer " + farmNo, phone: "0303-00000" + farmNo }],
-      suppliers: [{ id: "seed-" + farmNo + "-supplier-1", name: "Feed Supplier " + farmNo }],
-      incubations: [{ id: "seed-" + farmNo + "-incubation-1", sourceBatchId: sourceBatch.batch_id, eggsSet: 24, allocatedCount: 8, hatchedCount: 7, dateSet: dateFromSeed(21, today) }],
-      feed: [{ id: "seed-" + farmNo + "-feed-1", date: dateFromSeed(5, today), feedType: "Layer mash", quantityKg: 22, rateRsPerKg: 118 }],
-      mortality: [{ id: "seed-" + farmNo + "-mortality-1", date: dateFromSeed(12, today), count: 1, reason: "Weak chick" }],
-      sales: [{ id: "seed-" + farmNo + "-sale-1", date: dateFromSeed(4, today), quantity: 12, amount: 15600, customerId: "seed-" + farmNo + "-customer-1" }],
-      weight: [{ id: "seed-" + farmNo + "-weight-1", date: dateFromSeed(3, today), averageWeight: 1450 }],
-      expenses: [{ id: "seed-" + farmNo + "-expense-1", date: dateFromSeed(9, today), category: "Medicine", amount: 1850 }],
-      eggs: [{ id: "seed-" + farmNo + "-eggs-1", date: dateFromSeed(1, today), totalEggsCollected: 42, sold: 34, homeUse: 4, brokenWasted: 2 }],
-      vaccinations: [{ id: "seed-" + farmNo + "-vaccination-1", date: dateFromSeed(7, today), vaccineName: "Newcastle (ND)", birdCount: 70, cost: 950 }]
-    };
-    for (const [key, value] of Object.entries(buckets)) c.DataStore.push({ seedId: p + "-bucket-" + key, farmId, key, value, version: 0 });
+
   }
   return c;
 }
