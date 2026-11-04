@@ -1,10 +1,11 @@
 // ─── Finance ledger routes — money-sensitive, admin-only ────────────────────
 import express from 'express';
-import { Finance, Crop, Field } from '../db.js';
+import { Finance, Crop, Field, Supplier } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
 import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
+import { normalizeFinanceInput } from '../record-validation.mjs';
 
 const router = express.Router();
 
@@ -63,36 +64,16 @@ router.post('/finance/bulk', protect, requireAdmin, asyncHandler(async (req, res
   if (rows.length > 200) return res.status(400).json({ error: 'A finance bulk request is limited to 200 rows' });
 
   const errors = [];
-  const prepared = rows.map((raw, index) => {
-    const rowNumber = index + 2;
-    const row = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
-    const category = String(row.category || '').trim();
-    const type = String(row.type || 'expense').trim().toLowerCase();
-    const amount = row.amount === undefined || row.amount === '' ? NaN : Number(row.amount);
-    const date = String(row.date || '').trim() || todayStr();
-    if (!category) errors.push({ row: rowNumber, message: 'Category is required.' });
-    if (type !== 'income' && type !== 'expense') errors.push({ row: rowNumber, message: 'Type must be income or expense.' });
-    if (!Number.isFinite(amount) || amount < 0) errors.push({ row: rowNumber, message: 'Amount must be a non-negative number.' });
-    if (Number.isNaN(Date.parse(date))) errors.push({ row: rowNumber, message: 'Date must be valid.' });
-    return {
-      category, type, amount, date,
-      crop_id: String(row.crop_id || '').trim() || null,
-      fieldId: String(row.fieldId || '').trim() || null,
-      cropCycleId: String(row.cropCycleId || '').trim() || null,
-      notes: String(row.notes || '').trim(),
-    };
-  });
-  for (let index = 0; index < prepared.length; index += 1) {
-    const row = prepared[index];
-    if (row.crop_id && (!/^[0-9a-fA-F]{24}$/.test(row.crop_id) || !(await Crop.findOne({ _id: row.crop_id })))) {
-      errors.push({ row: index + 2, message: 'Crop must exist in the selected farm.' });
+  const prepared = [];
+  for (let index = 0; index < rows.length; index += 1) {
+    const normalized = normalizeFinanceInput(rows[index], { defaultDate: todayStr() });
+    if (normalized.error) {
+      errors.push({ row: index + 2, message: normalized.error });
+      continue;
     }
-    if (row.fieldId && (!/^[0-9a-fA-F]{24}$/.test(row.fieldId) || !(await Field.findOne({ _id: row.fieldId })))) {
-      errors.push({ row: index + 2, message: 'Field must exist in the selected farm.' });
-    }
-    if (row.cropCycleId && (!/^[0-9a-fA-F]{24}$/.test(row.cropCycleId) || !(await Crop.findOne({ _id: row.cropCycleId })))) {
-      errors.push({ row: index + 2, message: 'Crop cycle must exist in the selected farm.' });
-    }
+    const linkError = await validateFinanceLinks(normalized.value);
+    if (linkError) errors.push({ row: index + 2, message: linkError });
+    else prepared.push(normalized.value);
   }
   if (errors.length) return res.status(400).json({ error: 'Bulk finance validation failed', details: errors });
   const inserted = await Finance.insertMany(prepared);
@@ -112,30 +93,35 @@ async function validateFinanceLinks(entry) {
   if (cropCycleId && (!/^[0-9a-fA-F]{24}$/.test(cropCycleId) || !(await Crop.findOne({ _id: cropCycleId })))) {
     return 'Crop cycle must exist in the selected farm.';
   }
+  const supplierId = String(entry.supplier_id || '').trim();
+  if (supplierId && (!/^[0-9a-fA-F]{24}$/.test(supplierId) || !(await Supplier.findOne({ _id: supplierId })))) {
+    return 'Supplier must exist in the selected farm.';
+  }
   return '';
 }
 
 router.post('/finance', protect, requireAdmin, asyncHandler(async (req, res) => {
-  const entry = { ...(req.body || {}) };
-  const linkError = await validateFinanceLinks(entry);
+  const normalized = normalizeFinanceInput(req.body || {}, { defaultDate: todayStr() });
+  if (normalized.error) return res.status(400).json({ error: normalized.error });
+  const linkError = await validateFinanceLinks(normalized.value);
   if (linkError) return res.status(400).json({ error: linkError });
-  if (!entry.date) entry.date = todayStr();
-  await Finance.insertMany([entry]);
+  await Finance.insertMany([normalized.value]);
   return res.status(201).json({ status: 'ok' });
 }));
 
 router.put('/finance/:financeId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.financeId, 'finance ID');
-  const entry = { ...(req.body || {}) };
   const existing = await Finance.findOne({ _id: oid });
-  if (existing) {
-    if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'fieldId') && existing.fieldId) entry.fieldId = String(existing.fieldId);
-    if (!Object.prototype.hasOwnProperty.call(req.body || {}, 'cropCycleId') && existing.cropCycleId) entry.cropCycleId = String(existing.cropCycleId);
-  }
-  const linkError = await validateFinanceLinks(entry);
+  if (!existing) return notFound(res, 'Finance entry not found');
+  const body = { ...(req.body || {}) };
+  if (!Object.prototype.hasOwnProperty.call(body, 'fieldId')) body.fieldId = existing.fieldId || null;
+  if (!Object.prototype.hasOwnProperty.call(body, 'cropCycleId')) body.cropCycleId = existing.cropCycleId || null;
+  if (!Object.prototype.hasOwnProperty.call(body, 'supplier_id')) body.supplier_id = existing.supplier_id || null;
+  const normalized = normalizeFinanceInput(body, { defaultDate: existing.date || todayStr() });
+  if (normalized.error) return res.status(400).json({ error: normalized.error });
+  const linkError = await validateFinanceLinks(normalized.value);
   if (linkError) return res.status(400).json({ error: linkError });
-  if (!entry.date) entry.date = todayStr();
-  const result = await replaceFarmRecord(Finance, oid, entry);
+  const result = await replaceFarmRecord(Finance, oid, normalized.value);
   if (!result.matchedCount) return notFound(res, 'Finance entry not found');
   try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
   return res.json({ status: 'ok' });

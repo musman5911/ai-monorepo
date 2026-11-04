@@ -184,3 +184,69 @@ export function normalizeLaborAdvanceInput(body = {}, { defaultDate = '' } = {})
     settled: false,
   } };
 }
+
+
+const FINANCE_NUMERIC_FIELDS = [
+  'quantity_sold', 'rate_per_unit', 'seed_qty_kg', 'seed_price_per_kg',
+  'plough_hours', 'cultivator_hours', 'fuel_cost', 'hourly_rate',
+  'labor_workers', 'labor_days', 'labor_wage_rate', 'fertilizer_bags',
+  'fertilizer_price_per_bag', 'custom_qty', 'custom_price',
+];
+
+function optionalId(value, label) {
+  if (value === undefined || value === null || value === '' || value === 'farm-wide') return { value: null };
+  const result = cleanText(value, label, 24, { required: true });
+  if (result.error) return result;
+  if (!/^[0-9a-fA-F]{24}$/.test(result.value)) return { error: `${label} must be a valid ID.` };
+  return result;
+}
+
+export function normalizeFinanceInput(body = {}, { defaultDate = '' } = {}) {
+  if (!body || typeof body !== 'object' || Array.isArray(body)) return { error: 'Finance details must be an object.' };
+  const category = cleanText(body.category, 'Category', 120, { required: true });
+  if (category.error) return category;
+  const type = body.type === undefined ? 'expense' : body.type;
+  if (!['income', 'expense'].includes(type)) return { error: 'Finance type must be income or expense.' };
+  const amount = cleanNumber(body.amount, 'Amount', { positive: true });
+  if (amount.error) return amount;
+  const date = cleanDate(body.date, 'Finance date', defaultDate);
+  if (date.error) return date;
+  if (!date.value) return { error: 'Finance date is required.' };
+
+  const cropId = optionalId(body.crop_id, 'Crop ID');
+  if (cropId.error) return cropId;
+  const fieldId = optionalId(body.fieldId, 'Field ID');
+  if (fieldId.error) return fieldId;
+  const cropCycleId = optionalId(body.cropCycleId, 'Crop cycle ID');
+  if (cropCycleId.error) return cropCycleId;
+  const supplierId = optionalId(body.supplier_id, 'Supplier ID');
+  if (supplierId.error) return supplierId;
+
+  const buyer = cleanText(body.buyer_name, 'Buyer name', 160);
+  if (buyer.error) return buyer;
+  const notes = cleanText(body.notes, 'Finance notes', 2000);
+  if (notes.error) return notes;
+  const receipt = cleanText(body.receipt_base64, 'Receipt reference', 500);
+  if (receipt.error) return receipt;
+
+  const value = {
+    category: category.value,
+    amount: amount.value,
+    type,
+    date: date.value,
+    crop_id: cropId.value,
+    fieldId: fieldId.value,
+    cropCycleId: cropCycleId.value,
+    supplier_id: supplierId.value,
+    buyer_name: buyer.value,
+    notes: notes.value,
+    receipt_base64: receipt.value,
+  };
+  for (const field of FINANCE_NUMERIC_FIELDS) {
+    if (body[field] === undefined || body[field] === null || body[field] === '') continue;
+    const parsed = cleanNumber(body[field], field);
+    if (parsed.error) return parsed;
+    value[field] = parsed.value;
+  }
+  return { value };
+}

@@ -59,7 +59,7 @@ describe('Agri supplier, payment and labor input allowlists', () => {
 
   it('rejects infinite/negative supplier payments and invalid calendar dates', async () => {
     const { normalizeSupplierPaymentInput } = await import('../agri_farm/backend/record-validation.mjs');
-    expect(normalizeSupplierPaymentInput({ amount: 'Infinity', date: '2026-11-01' }).error).toMatch(/between/);
+    expect(normalizeSupplierPaymentInput({ amount: 'Infinity', date: '2026-11-01' }).error).toMatch(/positive/);
     expect(normalizeSupplierPaymentInput({ amount: -10, date: '2026-11-01' }).error).toMatch(/positive/);
     expect(normalizeSupplierPaymentInput({ amount: 100, date: '2026-02-31' }).error).toMatch(/valid calendar date/);
     expect(normalizeSupplierPaymentInput({ amount: 100 }, { defaultDate: '2026-11-04' }).value.date).toBe('2026-11-04');
@@ -94,5 +94,35 @@ describe('Agri supplier, payment and labor input allowlists', () => {
     expect(normalizeLaborAdvanceInput({
       laborer_id: '0123456789abcdef01234567', date: '2026-11-04', amount: -1,
     }).error).toMatch(/positive/);
+  });
+});
+
+
+describe('Agri finance ledger input allowlist', () => {
+  it('preserves current ledger metadata while removing untrusted control fields', async () => {
+    const { normalizeFinanceInput } = await import('../agri_farm/backend/record-validation.mjs');
+    expect(normalizeFinanceInput({
+      category: 'Harvest sale', amount: '120000', type: 'income', date: '2026-11-04',
+      crop_id: '0123456789abcdef01234567', fieldId: '1123456789abcdef01234567',
+      cropCycleId: '2123456789abcdef01234567', supplier_id: '3123456789abcdef01234567',
+      buyer_name: 'Local mandi', quantity_sold: '1000', rate_per_unit: '120',
+      notes: 'grain sale', farmId: 'other-farm', role: 'owner', status: 'Paid',
+    })).toEqual({ value: {
+      category: 'Harvest sale', amount: 120000, type: 'income', date: '2026-11-04',
+      crop_id: '0123456789abcdef01234567', fieldId: '1123456789abcdef01234567',
+      cropCycleId: '2123456789abcdef01234567', supplier_id: '3123456789abcdef01234567',
+      buyer_name: 'Local mandi', quantity_sold: 1000, rate_per_unit: 120,
+      notes: 'grain sale', receipt_base64: '',
+    } });
+  });
+
+  it('rejects invalid amounts, types, dates and linked identifiers', async () => {
+    const { normalizeFinanceInput } = await import('../agri_farm/backend/record-validation.mjs');
+    const base = { category: 'Diesel', amount: 100, type: 'expense', date: '2026-11-04' };
+    expect(normalizeFinanceInput({ ...base, amount: 'Infinity' }).error).toMatch(/positive/);
+    expect(normalizeFinanceInput({ ...base, amount: -1 }).error).toMatch(/positive/);
+    expect(normalizeFinanceInput({ ...base, type: 'credit' }).error).toMatch(/income or expense/);
+    expect(normalizeFinanceInput({ ...base, date: '2026-02-31' }).error).toMatch(/valid calendar date/);
+    expect(normalizeFinanceInput({ ...base, crop_id: 'not-an-id' }).error).toMatch(/valid ID/);
   });
 });
