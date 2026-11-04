@@ -13,6 +13,7 @@
  *   Logins:  admin / admin123     worker / worker123
  */
 import bcrypt from 'bcryptjs';
+import { buildSeedPlan, getDemoProfile, getFarmDefinitions, insertSeedCollections, dateFromSeed, seededRandom, getSeedToday } from '../../shared/muf-demo-seed.mjs';
 
 // Demo photos (memory mode only): stable hot-links from Unsplash (free
 // license) — no image files stored in the repo. If a link is ever taken
@@ -32,39 +33,30 @@ const WORKER_AVATAR = U('photo-1696371268939-5c5710319bde'); // farm worker with
 
 function pad(n) { return String(n).padStart(2, '0'); }
 function dateStr(d) { return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`; }
-function daysAgo(n) { const d = new Date(); d.setDate(d.getDate() - n); return dateStr(d); }
-function rnd(min, max) { return Math.round((min + Math.random() * (max - min)) * 10) / 10; }
+const demoRandom = seededRandom('dairy-demo');
+function daysAgo(n) { return dateFromSeed(n); }
+function rnd(min, max) { return Math.round((min + demoRandom() * (max - min)) * 10) / 10; }
+function seedNow() { return new Date(getSeedToday() + 'T12:00:00.000Z'); }
 
 async function seedDemoData(db) {
   const { Cow, BreedingEvent, Milk, Expense, Rate, RateHistory, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, DailyLog, Sale, Laborer, LaborAttendance, Meta, Farm } = db;
 
 
-  const farm1 = await Farm.create({
-    name: 'Farm 1', location: 'Local demo farm', archived: false,
-    createdAt: new Date('2020-01-01T00:00:00.000Z'), updatedAt: new Date('2020-01-01T00:00:00.000Z'),
-  });
-  const farm2 = await Farm.create({
-    name: 'Farm 2 - Access Test', location: 'Isolated role-testing farm', archived: false,
-    createdAt: new Date('2020-01-02T00:00:00.000Z'), updatedAt: new Date('2020-01-02T00:00:00.000Z'),
-  });
+  const profile = getDemoProfile();
+  const farmDefinitions = getFarmDefinitions('dairy', profile);
+  const farms = [];
+  for (const definition of farmDefinitions) {
+    const createdAt = definition.createdAt;
+    farms.push(await Farm.create({ ...definition, createdAt, updatedAt: createdAt }));
+  }
+  const [farm1, farm2] = farms;
+  const plan = buildSeedPlan('dairy', farms.map((farm) => String(farm._id)));
 
-  // ────────────────────────────────────────── USERS
-  await User.create({
-    username: 'admin', password: await bcrypt.hash('admin123', 10),
-    role: 'admin', displayName: 'Malik Usman', email: 'admin@example.com', active: true, avatarBase64: ADMIN_AVATAR,
-  });
-  await User.create({
-    username: 'worker', password: await bcrypt.hash('worker123', 10),
-    role: 'worker', displayName: 'Farm Worker', email: '', active: true, avatarBase64: WORKER_AVATAR,
-  });
-  await User.create({
-    username: 'manager', password: await bcrypt.hash('manager123', 10), role: 'manager',
-    farmIds: [String(farm2._id)], displayName: 'Farm 2 Manager', email: 'manager@dairyfarm.test', active: true, avatarBase64: WORKER_AVATAR,
-  });
-  await User.create({
-    username: 'worker2', password: await bcrypt.hash('worker2123', 10), role: 'worker',
-    farmIds: [String(farm2._id)], displayName: 'Farm 2 Worker', email: 'worker2@dairyfarm.test', active: true, avatarBase64: WORKER_AVATAR,
-  });
+  await User.insertMany(await Promise.all(plan.accounts.map(async (account) => ({
+    ...account,
+    password: await bcrypt.hash(account.password, 10),
+    avatarBase64: account.username === 'admin' ? ADMIN_AVATAR : WORKER_AVATAR
+  }))));
 
   // ────────────────────────────────────────── COWS (herd with bulls + calves + sold)
   const cows = [
@@ -104,7 +96,7 @@ async function seedDemoData(db) {
     if (!cw) continue;
     cw.weightHistory = [];
     for (let m = 11; m >= 0; m--) {
-      const d = new Date(); d.setMonth(d.getMonth() - m); d.setDate(6);
+      const d = seedNow(); d.setMonth(d.getMonth() - m); d.setDate(6);
       if (d > new Date()) continue;
       cw.weightHistory.push({
         id: `w-${cid}-${m}`,
@@ -186,7 +178,7 @@ async function seedDemoData(db) {
   for (const [buyerId, monthlyAmount] of [['b1', 255000], ['b2', 105000], ['b3', 72000]]) {
     for (let m = 11; m >= 0; m--) {
       for (const dayOfMonth of [12, 26]) {
-        const d = new Date();
+        const d = seedNow();
         d.setMonth(d.getMonth() - m);
         d.setDate(dayOfMonth);
         if (d > new Date()) continue;
@@ -275,7 +267,7 @@ async function seedDemoData(db) {
   let spId = 1;
   for (const [supplierId, monthlyAmount] of [['sup1', 118000], ['sup2', 1300]]) {
     for (let m = 11; m >= 0; m--) {
-      const d = new Date();
+      const d = seedNow();
       d.setMonth(d.getMonth() - m);
       d.setDate(15);
       if (d > new Date()) continue;
@@ -365,7 +357,7 @@ async function seedDemoData(db) {
 
   const attendanceRows = [];
   const laborExpenses = [];
-  const nowD = new Date();
+  const nowD = seedNow();
   const thisMonthKey = `${nowD.getFullYear()}-${pad(nowD.getMonth() + 1)}`;
   for (let back = 11; back >= 0; back--) {
     const mDate = new Date(nowD.getFullYear(), nowD.getMonth() - back, 1);
@@ -420,6 +412,8 @@ async function seedDemoData(db) {
 
   // Feed-stock settings: the herd's assumed daily feed use (kg) + warning days.
   await Meta.create({ key: 'feed_stock_settings', value: { dailyUseKg: 52, lowStockDays: 14 } });
+
+  if (plan.rich) await insertSeedCollections(plan, { Cow, BreedingEvent, Milk, Expense, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, Laborer, LaborAttendance, LaborAdvance, Rate, RateHistory, Sale, Product: db.Product });
 
   console.log(`🌱 Demo data seeded (1 year): ${cows.length} animals, ${milk.length} milk entries, ${expenses.length} expenses, health, buyers, rates, sales, diary.`);
   console.log('🌱 Logins → admin / admin123   |   worker / worker123');
