@@ -39,7 +39,7 @@ function rnd(min, max) { return Math.round((min + demoRandom() * (max - min)) * 
 function seedNow() { return new Date(getSeedToday() + 'T12:00:00.000Z'); }
 
 async function seedDemoData(db) {
-  const { Cow, BreedingEvent, Milk, Expense, Rate, RateHistory, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, DailyLog, Sale, Laborer, LaborAttendance, Meta, Farm } = db;
+  const { Cow, BreedingEvent, Milk, Expense, Rate, RateHistory, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, DailyLog, Sale, Laborer, LaborAttendance, Meta, Farm, Product } = db;
 
 
   const profile = getDemoProfile();
@@ -413,7 +413,7 @@ async function seedDemoData(db) {
   // Feed-stock settings: the herd's assumed daily feed use (kg) + warning days.
   await Meta.create({ key: 'feed_stock_settings', value: { dailyUseKg: 52, lowStockDays: 14 } });
 
-  if (plan.rich) await insertSeedCollections(plan, { Cow, BreedingEvent, Milk, Expense, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, Laborer, LaborAttendance, LaborAdvance, Rate, RateHistory, Sale, Product: db.Product });
+  if (plan.rich) await insertSeedCollections(plan, { Cow, BreedingEvent, Milk, Expense, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, Laborer, LaborAttendance, LaborAdvance, Rate, RateHistory, Sale, Product });
 
   console.log(`🌱 Demo data seeded (1 year): ${cows.length} animals, ${milk.length} milk entries, ${expenses.length} expenses, health, buyers, rates, sales, diary.`);
   console.log('🌱 Logins → admin / admin123   |   worker / worker123');
