@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildSeedPlan, getFarmDefinitions } from '../shared/muf-demo-seed.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = (path: string) => readFileSync(resolve(root, path), 'utf8');
 
@@ -35,15 +36,21 @@ describe('global backup restore and local role-test setup', () => {
     expect(s).toContain('const canDelete = isAdmin && !isReadOnlyAll');
     expect(s).toContain('const canManageStructure = isAdmin && !isReadOnlyAll');
   });
-  it('seeds Farm 1 and Farm 2 roles in each memory demo', () => {
-    for (const p of ['agri_farm/backend/demo-data.js','dairy_farm/backend/demo-data.js','flock_farm/backend/demo-data.js']) {
-      const s=read(p);
-      expect(s).toContain("name: 'Farm 1'");
-      expect(s).toContain("name: 'Farm 2 - Access Test'");
-      expect(s).toContain("username: 'manager'");
-      expect(s).toContain("username: 'worker2'");
-      expect(s).toContain('farmIds: [String(farm2._id)]');
+  it('uses the shared basic farm and role fixture in each memory demo', () => {
+    for (const [app, path] of [
+      ['agri', 'agri_farm/backend/demo-data.js'],
+      ['dairy', 'dairy_farm/backend/demo-data.js'],
+      ['flock', 'flock_farm/backend/demo-data.js'],
+    ] as const) {
+      const source = read(path);
+      expect(source).toContain(`getFarmDefinitions('${app}', profile)`);
+      expect(source).toContain('buildSeedPlan');
     }
+    const farms = getFarmDefinitions('dairy', 'basic');
+    expect(farms.map((farm) => farm.name)).toEqual(['Farm 1', 'Farm 2 - Access Test']);
+    const plan = buildSeedPlan('dairy', ['farm-one', 'farm-two']);
+    expect(plan.accounts.find((user) => user.username === 'manager')?.farmIds).toEqual(['farm-two']);
+    expect(plan.accounts.find((user) => user.username === 'worker2')?.farmIds).toEqual(['farm-two']);
     expect(read('agri_farm/backend/db.js')).toContain('Farm, User, Field, Crop');
     expect(read('dairy_farm/backend/db.js')).toContain('User, Farm');
   });
