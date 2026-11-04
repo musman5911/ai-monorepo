@@ -147,6 +147,16 @@ describe('Agri task input allowlist', () => {
     } });
   });
 
+  it('rejects active SVG content from crop/task/spray photo fields', async () => {
+    const { normalizeCropInput, normalizeTaskInput, normalizeSprayInput } = await import('../agri_farm/backend/record-validation.mjs');
+    expect(normalizeCropInput({ name: 'Wheat', season: 'Rabi', crop_year: '2026', image_base64: 'data:image/svg+xml;base64,PHN2Zz4=' }).error).toMatch(/image/);
+    expect(normalizeTaskInput({ title: 'Irrigate', image_base64: 'data:image/svg+xml;base64,PHN2Zz4=' }).error).toMatch(/image/);
+    expect(normalizeSprayInput({
+      crop_id: '0123456789abcdef01234567', date: '2026-11-04', chemical: 'Test',
+      image_base64: 'data:image/svg+xml;base64,PHN2Zz4=',
+    }).error).toMatch(/image/);
+  });
+
   it('rejects malformed task dates, priorities, image references, amounts and crew lists', async () => {
     const { normalizeTaskInput } = await import('../agri_farm/backend/record-validation.mjs');
     const base = { title: 'Irrigate fields', priority: 'Medium' };

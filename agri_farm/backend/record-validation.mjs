@@ -226,7 +226,7 @@ export function normalizeFinanceInput(body = {}, { defaultDate = '' } = {}) {
   if (buyer.error) return buyer;
   const notes = cleanText(body.notes, 'Finance notes', 2000);
   if (notes.error) return notes;
-  const receipt = cleanText(body.receipt_base64, 'Receipt reference', 500);
+  const receipt = normalizeImageReference(body.receipt_base64, 'Receipt reference', 500);
   if (receipt.error) return receipt;
 
   const value = {
@@ -311,7 +311,7 @@ export function normalizeTaskInput(body = {}) {
 function normalizeImageReference(value, label, maxLength = 400_000) {
   const result = cleanText(value, label, maxLength);
   if (result.error || !result.value) return result;
-  const allowed = result.value.startsWith('data:image/')
+  const allowed = /^data:image\/(?:jpeg|png|webp);base64,/i.test(result.value)
     || /^\/api\/photos\/[a-f0-9]{24}$/i.test(result.value)
     || /^\/crop_cards\/[a-z0-9_.-]+$/i.test(result.value);
   if (!allowed) return { error: `${label} must be an image data URL or a farm image path.` };
