@@ -248,7 +248,7 @@ export async function seedDemoData() {
   ];
   const laborAttendanceBucket = [];
   {
-    const nowD = new Date();
+    const nowD = seedNow();
     const pad2 = (n) => String(n).padStart(2, '0');
     const thisMonthKey = `${nowD.getFullYear()}-${pad2(nowD.getMonth() + 1)}`;
     for (let back = 11; back >= 0; back--) {
@@ -367,10 +367,10 @@ export async function seedDemoData() {
   let spid = 1;
   for (const [supplierId, monthlyAmount] of [[1, 7500], [2, 550]]) {
     for (let m = 11; m >= 0; m--) {
-      const pd = new Date();
+      const pd = seedNow();
       pd.setMonth(pd.getMonth() - m);
       pd.setDate(18);
-      if (pd > new Date()) continue;
+      if (pd > seedNow()) continue;
       const wobble = 0.8 + ((spid * 31) % 35) / 100;
       supplierPayments.push({
         id: spid++,
