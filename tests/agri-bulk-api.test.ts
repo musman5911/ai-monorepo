@@ -13,7 +13,7 @@ describe("Agri task and finance bulk-import API contracts", () => {
     expect(bulk).toContain("rows.length > 200");
     expect(bulk).toContain("if (errors.length) return res.status(400)");
     expect(bulk.indexOf("if (errors.length) return res.status(400)")).toBeLessThan(bulk.indexOf("Task.insertMany(prepared)"));
-    expect(bulk).toContain("status: 'Pending'");
+    expect(bulk).toContain("row.status = 'Pending'");
     expect(bulk).toContain("cleanLaborerIds");
     expect(bulk).toContain("Crop must exist in the selected farm.");
     expect(bulk).toContain("Inventory item must exist in the selected farm.");
@@ -25,9 +25,11 @@ describe("Agri task and finance bulk-import API contracts", () => {
     expect(bulk).toContain("rows.length > 200");
     expect(bulk).toContain("if (errors.length) return res.status(400)");
     expect(bulk.indexOf("if (errors.length) return res.status(400)")).toBeLessThan(bulk.indexOf("Finance.insertMany(prepared)"));
-    expect(bulk).toContain("type !== 'income' && type !== 'expense'");
-    expect(bulk).toContain("category, type, amount, date");
+    expect(bulk).toContain("normalizeFinanceInput(rows[index], { defaultDate: todayStr() })");
+    expect(bulk).toContain("validateFinanceLinks(normalized.value)");
+    expect(bulk).toContain("prepared.push(normalized.value)");
     expect(bulk).not.toContain("...row");
+    expect(bulk).not.toContain("...rows");
     expect(bulk).toContain("Crop must exist in the selected farm.");
   });
 
