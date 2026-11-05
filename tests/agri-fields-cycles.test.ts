@@ -33,7 +33,7 @@ describe('Agri fields and crop-cycle server contracts', () => {
     expect(fields).toContain('Finance.countDocuments({ fieldId: id })');
   });
 
-  it('links finance to optional fields and crop cycles and groups analytics', () => {
+  it('links finance to optional fields and crop cycles and groups analytics', async () => {
     const finance = read('agri_farm/backend/routes/finance.js');
     const analytics = read('agri_farm/backend/routes/analytics.js');
     expect(finance).toContain("import { normalizeFinanceInput } from '../record-validation.mjs';");
@@ -42,18 +42,18 @@ describe('Agri fields and crop-cycle server contracts', () => {
     expect(finance).toContain('async function validateFinanceLinks');
     expect(finance).toContain('Crop cycle must exist in the selected farm.');
 
-    return import('../agri_farm/backend/record-validation.mjs').then(({ normalizeFinanceInput }) => {
-      const normalized = normalizeFinanceInput({
-        category: 'Field expense', amount: 25, date: '2026-11-05',
-        fieldId: '0123456789abcdef01234567',
-        cropCycleId: '1123456789abcdef01234567',
-      });
-      expect(normalized.error).toBeUndefined();
-      expect(normalized.value).toMatchObject({
-        fieldId: '0123456789abcdef01234567',
-        cropCycleId: '1123456789abcdef01234567',
-      });
+    const { normalizeFinanceInput } = await import('../agri_farm/backend/record-validation.mjs');
+    const normalized = normalizeFinanceInput({
+      category: 'Field expense', amount: 25, date: '2026-11-05',
+      fieldId: '0123456789abcdef01234567',
+      cropCycleId: '1123456789abcdef01234567',
     });
+    expect(normalized.error).toBeUndefined();
+    expect(normalized.value).toMatchObject({
+      fieldId: '0123456789abcdef01234567',
+      cropCycleId: '1123456789abcdef01234567',
+    });
+
     expect(analytics).toContain('byField: [...byFieldTotals.values()]');
     expect(analytics).toContain('bySeason: [...bySeasonTotals.values()]');
     expect(analytics).toContain('Unassigned / farm-wide');

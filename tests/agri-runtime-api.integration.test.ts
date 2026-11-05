@@ -64,7 +64,7 @@ async function waitUntilReady() {
   while (Date.now() < deadline) {
     if (serverProcess?.exitCode !== null && serverProcess?.exitCode !== undefined) {
       throw new Error(
-        `Agri test server exited early with code ${serverProcess.exitCode}.\\nChild output:\\n${serverOutput || '(no child output captured)'}`,
+        `Agri test server exited early with code ${serverProcess.exitCode}.\nChild output:\n${serverOutput || '(no child output captured)'}`,
       );
     }
     try {
