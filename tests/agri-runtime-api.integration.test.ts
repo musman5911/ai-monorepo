@@ -63,7 +63,9 @@ async function waitUntilReady() {
   let lastError = 'not started';
   while (Date.now() < deadline) {
     if (serverProcess?.exitCode !== null && serverProcess?.exitCode !== undefined) {
-      throw new Error(`Agri test server exited early with code ${serverProcess.exitCode}`);
+      throw new Error(
+        `Agri test server exited early with code ${serverProcess.exitCode}.\\nChild output:\\n${serverOutput || '(no child output captured)'}`,
+      );
     }
     try {
       const response = await fetch(`${baseUrl}/api/crops?limit=1`);

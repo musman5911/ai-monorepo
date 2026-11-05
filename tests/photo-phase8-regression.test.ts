@@ -74,15 +74,32 @@ describe('Phase 8 photo storage regression coverage', () => {
     expect(read('agri_farm/backend/routes/diary-media.js')).toContain('await cleanupOrphanPhotoAssets()');
   });
 
-  it('keeps legacy inline image values accepted while path-based records are migrated', () => {
+  it('keeps supported legacy JPEG values and protected photo paths accepted', async () => {
     const expense = read('dairy_farm/backend/routes/expenses.js');
     const cropLogs = read('agri_farm/backend/routes/crop-logs.js');
     const diary = read('agri_farm/backend/routes/diary-media.js');
     expect(expense).toContain("body.receiptBase64.startsWith('data:image/')");
     expect(expense).toContain('/api\\/photos\\/');
-    expect(cropLogs).toContain("image_base64.startsWith('data:image/')");
-    expect(cropLogs).toContain('/api\\/photos\\/');
-    expect(diary).toContain("p.data.startsWith('data:image/jpeg;base64,')");
-    expect(diary).toContain('/api\\/photos\\/');
+    expect(cropLogs).toContain('normalizeCropPhotoInput');
+    expect(cropLogs).toContain('normalizeSprayInput');
+    expect(diary).toContain('normalizeDiaryPhotos');
+
+    const cropId = '0123456789abcdef01234567';
+    const imagePath = '/api/photos/1123456789abcdef01234567';
+    const { normalizeCropPhotoInput } = await import('../agri_farm/backend/record-validation.mjs');
+    expect(normalizeCropPhotoInput({
+      crop_id: cropId, image_base64: 'data:image/jpeg;base64,AAAA', uploaded_at: '2026-11-05',
+    }).error).toBeUndefined();
+    expect(normalizeCropPhotoInput({
+      crop_id: cropId, image_base64: imagePath, uploaded_at: '2026-11-05',
+    }).error).toBeUndefined();
+
+    const { normalizeDiaryPhotos } = await import('../agri_farm/backend/diary-media-validation.mjs');
+    expect(normalizeDiaryPhotos([{
+      id: 'legacy-jpeg', data: 'data:image/jpeg;base64,AAAA', bytes: 3, createdAt: '2026-11-05',
+    }], '2026-11-05').error).toBeUndefined();
+    expect(normalizeDiaryPhotos([{
+      id: 'protected-path', data: imagePath, bytes: 3, createdAt: '2026-11-05',
+    }], '2026-11-05').error).toBeUndefined();
   });
 });
