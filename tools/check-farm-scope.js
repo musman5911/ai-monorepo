@@ -31,8 +31,8 @@ const PROJECTS = {
     },
     restore: '/api/restore',
     list: '/api/crops',
-    create: (tag) => ({ path: '/api/crops', body: { name: `Check ${tag}`, status: 'Growing', field: 'F1' } }),
-    update: (id) => ({ path: `/api/crops/${id}`, body: { name: 'Hacked', status: 'Growing' } }),
+    create: (tag) => ({ path: '/api/crops', body: { name: `Check ${tag}`, status: 'Growing', field: 'F1', season: 'Kharif', crop_year: '2099' } }),
+    update: (id) => ({ path: `/api/crops/${id}`, body: { name: 'Hacked', status: 'Growing', season: 'Kharif', crop_year: '2099' } }),
     remove: (id) => `/api/crops/${id}`,
     idOf: (row) => row._id,
     rows: (json) => (Array.isArray(json) ? json : []),
@@ -298,9 +298,9 @@ async function checkProject(name, project, port) {
       ok(fieldCrop.status === 201 && fieldCrop.json.fieldId === field.json._id, 'crop cycle can link to a field in the same farm');
       const crossFieldCrop = await call('POST', '/api/crops', {
         token: owner, farm: farmA,
-        body: { name: 'Invalid Cross-Farm Field Crop', status: 'Growing', fieldId: field.json._id },
+        body: { name: 'Invalid Cross-Farm Field Crop', status: 'Growing', fieldId: field.json._id, season: 'Kharif', crop_year: '2099' },
       });
-      ok(crossFieldCrop.status === 400, 'crop cycle cannot link to a field in another farm');
+      ok(crossFieldCrop.status === 400 && crossFieldCrop.json?.error === 'Field must exist in the selected farm', 'crop cycle cannot link to a field in another farm');
       const invalidField = await call('POST', '/api/fields', {
         token: owner, farm: farmB, body: { name: 'Invalid Area Field', acres: -1 },
       });
