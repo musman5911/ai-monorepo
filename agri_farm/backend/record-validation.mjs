@@ -266,8 +266,10 @@ export function normalizeTaskInput(body = {}) {
   if (notes.error) return notes;
   const image = cleanText(body.image_base64, 'Task image', 400_000);
   if (image.error) return image;
-  if (image.value && !image.value.startsWith('data:image/') && !/^\/api\/photos\/[a-f0-9]{24}$/i.test(image.value)) {
-    return { error: 'Task image must be an image data URL or a farm photo path.' };
+  if (image.value
+    && !/^data:image\/(?:jpeg|png|webp);base64,/i.test(image.value)
+    && !/^\/api\/photos\/[a-f0-9]{24}$/i.test(image.value)) {
+    return { error: 'Task image must be a JPEG, PNG, WebP data URL or a farm photo path.' };
   }
   const laborCost = cleanNumber(body.labor_cost, 'Labor cost', { fallback: 0 });
   if (laborCost.error) return laborCost;
