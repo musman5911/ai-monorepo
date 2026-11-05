@@ -29,33 +29,7 @@ router.get('/tasks', protect, asyncHandler(async (req, res) => {
   if (!isFullRole) {
     const username = readFilter(req.user.username).toLowerCase();
     if (!username) return res.status(403).json({ error: 'Worker account has no assigned username.' });
-    clauses.push({ assigned_to: { $regex: `^${escapeRegex(username)}// ─── Task routes (mirrors the previous FastAPI backend) ─────────────────────
-// Completing a task auto-logs a Labor expense, deducts inventory, and marks
-// the deployed field crew's attendance for today.
-import express from 'express';
-import { Task, Finance, Inventory, Laborer, Attendance, Crop } from '../db.js';
-import { mufIsFullRole } from '../muf-farms.mjs';
-import { protect, requireAdmin } from '../middleware/auth.js';
-import { notFound, forbidden, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
-import { todayStr } from '../utils/date.js';
-import { normalizeTaskInput } from '../record-validation.mjs';
-
-const router = express.Router();
-
-router.get('/tasks', protect, asyncHandler(async (req, res) => {
-  const rawSkip = req.query.skip === undefined ? 0 : (Array.isArray(req.query.skip) ? NaN : Number(req.query.skip));
-  const rawLimit = req.query.limit === undefined ? 100 : (Array.isArray(req.query.limit) ? NaN : Number(req.query.limit));
-  if (!Number.isSafeInteger(rawSkip) || rawSkip < 0) return res.status(400).json({ error: 'skip must be a non-negative integer' });
-  if (!Number.isSafeInteger(rawLimit) || rawLimit < 1) return res.status(400).json({ error: 'limit must be a positive integer' });
-  const skip = rawSkip;
-  const limit = Math.min(rawLimit, 500);
-  const readFilter = (value) => typeof value === 'string' ? value.trim() : '';
-  const escapeRegex = (value) => Array.from(value, (char) => {
-    const code = char.charCodeAt(0);
-    return [36, 46, 42, 43, 63, 94, 123, 125, 40, 41, 124, 91, 93, 92].includes(code)
-      ? String.fromCharCode(92) + char : char;
-  }).join('');
-, $options: 'i' } });
+    clauses.push({ assigned_to: { $regex: `^${escapeRegex(username)}$`, $options: 'i' } });
   }
   const status = readFilter(req.query.status);
   const cropId = readFilter(req.query.crop_id);
