@@ -244,7 +244,10 @@ describe.sequential('Agri runtime API integration', () => {
       const result = await request('/crops', {
         method: 'POST',
         token: ownerToken,
-        body: { name: `${suffix}-crop-${index}`, status, plant_date: '2026-10-01' },
+        body: {
+          name: `${suffix}-crop-${index}`, status, plant_date: '2026-10-01',
+          season: status === 'Completed' ? 'Kharif' : 'Rabi', crop_year: '2026',
+        },
       });
       expect(result.response.status).toBe(201);
       created.crops.push(String(result.data._id));
@@ -388,6 +391,8 @@ describe.sequential('Agri runtime API integration', () => {
       body: {
         name: suffix + ' private-yield-crop',
         status: 'Growing',
+        season: 'Kharif',
+        crop_year: '2026',
         yield_kg: 777,
         seed_quantity: 12,
         seed_cost_per_unit: 50,
@@ -547,11 +552,11 @@ describe.sequential('Agri runtime API integration', () => {
 
     const cropA = await request('/crops', {
       method: 'POST', token: ownerToken, farmId: farmA,
-      body: { name: suffix + ' farm-a crop', status: 'Growing' },
+      body: { name: suffix + ' farm-a crop', status: 'Growing', season: 'Kharif', crop_year: '2026' },
     });
     const cropB = await request('/crops', {
       method: 'POST', token: ownerToken, farmId: farmB,
-      body: { name: suffix + ' farm-b crop', status: 'Growing' },
+      body: { name: suffix + ' farm-b crop', status: 'Growing', season: 'Kharif', crop_year: '2026' },
     });
     expect(cropA.response.status).toBe(201);
     expect(cropB.response.status).toBe(201);
