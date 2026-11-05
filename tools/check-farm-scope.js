@@ -300,7 +300,7 @@ async function checkProject(name, project, port) {
         token: owner, farm: farmA,
         body: { name: 'Invalid Cross-Farm Field Crop', status: 'Growing', fieldId: field.json._id, season: 'Kharif', crop_year: '2099' },
       });
-      ok(crossFieldCrop.status === 400 && crossFieldCrop.json?.error === 'Field must exist in the selected farm', 'crop cycle cannot link to a field in another farm');
+      ok(crossFieldCrop.status === 400 && crossFieldCrop.json?.detail === 'Field must exist in the selected farm', 'crop cycle cannot link to a field in another farm');
       const invalidField = await call('POST', '/api/fields', {
         token: owner, farm: farmB, body: { name: 'Invalid Area Field', acres: -1 },
       });
