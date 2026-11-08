@@ -119,7 +119,7 @@ describe('financial route transaction contracts', () => {
     const create = source.split("router.post('/spray'")[1]?.split("router.delete('/spray/:logId'")[0] || '';
     expect(create).toContain('withFinancialTransaction([Crop, Inventory, Spray]');
     expect(create).toContain('adjustInventory(payload.inventory_item_id, payload.inventory_qty_consumed, false, session)');
-    expect(source).toContain('current_stock: { $gte: qty }');
+    expect(source).toContain('if (!restore) filter.current_stock = { $gte: qty };');
     const remove = source.split("router.delete('/spray/:logId'")[1] || '';
     expect(remove).toContain('withFinancialTransaction([Inventory, Spray]');
     expect(remove).toContain('adjustInventory(log.inventory_item_id, toFloat(log.inventory_qty_consumed), true, session)');

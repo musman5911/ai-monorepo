@@ -103,7 +103,8 @@ describe.sequential('Dairy financial posting integration', () => {
       request('/labor/attendance', { method: 'POST', token: ownerToken, body: attendancePayload }),
       request('/labor/attendance', { method: 'POST', token: ownerToken, body: attendancePayload }),
     ]);
-    expect([attendanceA.response.status, attendanceB.response.status].every((status) => [200, 201].includes(status))).toBe(true);
+    const attendanceStatuses = [attendanceA.response.status, attendanceB.response.status];
+    expect(attendanceStatuses.every((status) => [200, 201].includes(status)), JSON.stringify({ attendanceStatuses, a: attendanceA.data, b: attendanceB.data })).toBe(true);
     const attendanceRows = await request(`/labor/attendance?month=${month}`, { token: ownerToken });
     expect(attendanceRows.response.status).toBe(200);
     expect(attendanceRows.data.filter((row) => String(row.workerId) === String(worker.data._id) && row.date === date)).toHaveLength(1);
