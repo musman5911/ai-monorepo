@@ -537,4 +537,4 @@ if (USE_MEMORY) {
 const MUF_FARM_MODELS = { Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, RateHistory, DailyLog, Sale, PhotoAsset, Product, ArchiveJob, ArchiveRecord };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
 
-export { MUF_FARM_MODELS, Farm, connectDB, withFinancialTransaction, Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, Product, ArchiveJob, ArchiveRecord, Meta };
+export { MUF_FARM_MODELS, Farm, connectDB, Cow, BreedingEvent, Milk, Expense, Laborer, LaborAttendance, LaborAdvance, Rate, Health, Buyer, BuyerPayment, Supplier, SupplierPayment, User, PasswordReset, RateHistory, DailyLog, Sale, PhotoAsset, Product, ArchiveJob, ArchiveRecord, Meta, withFinancialTransaction };

@@ -1,6 +1,7 @@
 // ─── Loan & liability operations (admin only) ───────────────────────────────
 import express from 'express';
-import { Liability, Crop, Finance, withFinancialTransaction } from '../db.js';
+import { Liability, Crop, Finance } from '../db.js';
+import { withFinancialTransaction } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { notFound, parseOid, asyncHandler } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';

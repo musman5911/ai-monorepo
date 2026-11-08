@@ -2,7 +2,8 @@
 // Completing a task auto-logs a Labor expense, deducts inventory, and marks
 // the deployed field crew's attendance for today.
 import express from 'express';
-import { Task, Finance, Inventory, Laborer, Attendance, Crop, withFinancialTransaction } from '../db.js';
+import { Task, Finance, Inventory, Laborer, Attendance, Crop } from '../db.js';
+import { withFinancialTransaction } from '../db.js';
 import { mufIsFullRole } from '../muf-farms.mjs';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { notFound, forbidden, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';

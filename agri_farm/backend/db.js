@@ -262,9 +262,9 @@ const connectDB = async () => {
 };
 
 export {
-  connectDB, useMock, withFinancialTransaction,
+  connectDB, useMock,
   User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
   Supplier, SupplierPayment, Setting, DiaryMedia, PhotoAsset, Product, Farm, ArchiveJob, ArchiveRecord,
-  MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES,
+  MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES, withFinancialTransaction,
 };

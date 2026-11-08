@@ -5,7 +5,8 @@
 import { randomUUID } from 'crypto';
 import express from 'express';
 const router = express.Router();
-import { Laborer, LaborAttendance, LaborAdvance, Expense, withFinancialTransaction } from '../db.js';
+import { Laborer, LaborAttendance, LaborAdvance, Expense } from '../db.js';
+import { withFinancialTransaction } from '../db.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { todayStr } from '../utils/date.js';
 import {
@@ -217,7 +218,7 @@ router.delete('/advances/:id', protect, adminOnly, async (req, res) => {
 router.post('/post-wages', protect, adminOnly, async (req, res) => {
   try {
     const month = String((req.body && req.body.month) || todayStr().slice(0, 7)).trim();
-    if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)) return res.status(400).json({ error: 'Month must be a valid YYYY-MM value.' });
+    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return res.status(400).json({ error: 'Month must be a valid YYYY-MM value.' });
 
     const result = await withFinancialTransaction([LaborAttendance, Laborer, LaborAdvance, Expense], async (session) => {
       const options = session ? { session } : {};

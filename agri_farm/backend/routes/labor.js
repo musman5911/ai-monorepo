@@ -1,6 +1,7 @@
 // ─── Field labor: laborers, attendance, advances, month-end wage posting ─────
 import express from 'express';
-import { Laborer, Attendance, LaborAdvance, Finance, Crop, withFinancialTransaction } from '../db.js';
+import { Laborer, Attendance, LaborAdvance, Finance, Crop } from '../db.js';
+import { withFinancialTransaction } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
@@ -188,14 +189,11 @@ router.delete('/labor-advances/:advId', protect, requireAdmin, asyncHandler(asyn
 // ─── Post month wages into the finance ledger ───────────────────────────────
 router.post('/labor/post-wages', protect, requireAdmin, asyncHandler(async (req, res) => {
   const month = String(req.body?.month || todayStr().slice(0, 7)).trim();
-  if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)) return badRequest(res, 'Month must be a valid YYYY-MM value.');
+  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return badRequest(res, 'Month must be a valid YYYY-MM value.');
 
   const result = await withFinancialTransaction([Attendance, Laborer, LaborAdvance, Finance], async (session) => {
     const options = session ? { session } : {};
-    const attendanceQuery = Attendance.find({
-      date: { $regex: `^${month}-` },
-      posted: { $ne: true },
-    }).limit(100000);
+    const attendanceQuery = Attendance.find({ date: { $regex: `^${month}-` }, posted: { $ne: true } }).limit(100000);
     const rows = await (session ? attendanceQuery.session(session) : attendanceQuery);
     if (!rows.length) return { kind: 'no_rows' };
 
