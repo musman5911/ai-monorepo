@@ -23,6 +23,9 @@ describe('Flock generic data bucket validation', () => {
       { id: 'att-2', workerId: 'worker-2', date: '2026-11-08' },
     ]).error).toBeUndefined();
     expect(validateDataBucketValue('laborAttendance', [
+      { id: 'legacy-att-1', batchId: 'BATCH-1' },
+    ]).error).toBeUndefined();
+    expect(validateDataBucketValue('laborAttendance', [
       { id: 'att-1', workerId: 'worker-1', date: 'not-a-date' },
     ]).error).toMatch(/worker ID and YYYY-MM-DD date/);
   });
