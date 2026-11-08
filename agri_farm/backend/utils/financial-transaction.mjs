@@ -1,5 +1,31 @@
 let memoryTransactionQueue = Promise.resolve();
 
+function cloneMemoryValue(value) {
+  if (value === null || typeof value !== 'object') return value;
+  if (value instanceof Date) return new Date(value.getTime());
+  if (typeof Buffer !== 'undefined' && Buffer.isBuffer(value)) return Buffer.from(value);
+  if (value instanceof ArrayBuffer) return value.slice(0);
+  if (ArrayBuffer.isView(value)) return new value.constructor(value);
+  if (Array.isArray(value)) return value.map(cloneMemoryValue);
+  if (value instanceof Map) {
+    return new Map([...value.entries()].map(([key, item]) => [cloneMemoryValue(key), cloneMemoryValue(item)]));
+  }
+  if (value instanceof Set) return new Set([...value].map(cloneMemoryValue));
+
+  // Preserve memory-model prototypes (Dairy documents expose save/deleteOne
+  // through their prototype). structuredClone would flatten these into plain
+  // objects, breaking subsequent operations after a rollback.
+  const copy = Object.create(Object.getPrototypeOf(value));
+  for (const key of Reflect.ownKeys(value)) {
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (descriptor && Object.prototype.hasOwnProperty.call(descriptor, 'value')) {
+      descriptor.value = cloneMemoryValue(descriptor.value);
+    }
+    Object.defineProperty(copy, key, descriptor);
+  }
+  return copy;
+}
+
 /**
  * Run financial writes as one unit. Real MongoDB deployments use a session
  * transaction; the disposable memory adapter uses a serialized, rollbackable
@@ -16,7 +42,7 @@ export async function runFinancialTransaction({ mongoose, memoryMode = false, mo
 
     const snapshots = new Map();
     for (const model of new Set(models)) {
-      if (Array.isArray(model?._store)) snapshots.set(model, structuredClone(model._store));
+      if (Array.isArray(model?._store)) snapshots.set(model, cloneMemoryValue(model._store));
     }
 
     try {

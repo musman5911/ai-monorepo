@@ -37,6 +37,29 @@ describe.each([['Agri', runAgri], ['Dairy', runDairy]])('%s financial transactio
     expect(second._store).toEqual([{ value: 10 }]);
   });
 
+  it('preserves memory document prototypes after rollback', async () => {
+    const prototype = { save() { return 'model-save-method'; } };
+    const document = Object.assign(Object.create(prototype), {
+      value: 'before',
+      nested: { count: 1 },
+    });
+    const model = { _store: [document] };
+
+    await expect(run({
+      mongoose: null, memoryMode: true, models: [model],
+      work: async () => {
+        model._store[0].value = 'changed';
+        model._store[0].nested.count = 2;
+        throw new Error('force rollback');
+      },
+    })).rejects.toThrow('force rollback');
+
+    expect(model._store[0].value).toBe('before');
+    expect(model._store[0].nested.count).toBe(1);
+    expect(Object.getPrototypeOf(model._store[0])).toBe(prototype);
+    expect(model._store[0].save()).toBe('model-save-method');
+  });
+
   it('uses a MongoDB session transaction outside memory mode', async () => {
     const calls = [];
     const session = {
