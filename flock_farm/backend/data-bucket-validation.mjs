@@ -61,7 +61,7 @@ export function validateDataBucketValue(key, value) {
       // Older attendance buckets can contain history rows without worker/date
       // metadata. Preserve those rows; validate uniqueness when identity exists.
       if (!workerId && !date) continue;
-      if (!workerId || !/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) {
+      if (!workerId || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
         return { error: `Labor attendance record ${index + 1} must include a worker ID and YYYY-MM-DD date.` };
       }
       const workerDay = `${workerId}:${date}`;
