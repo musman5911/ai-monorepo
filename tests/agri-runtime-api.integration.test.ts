@@ -12,7 +12,7 @@ let ownerToken = '';
 let workerToken = '';
 let managerToken = '';
 let serverOutput = '';
-const created = { crops: [], tasks: [], finance: [], fields: [], liabilities: [], laborers: [] };
+const created = { crops: [], tasks: [], finance: [], fields: [], liabilities: [], laborers: [], inventory: [], sprays: [] };
 
 async function reservePort() {
   const server = createServer();
@@ -130,6 +130,8 @@ describe.sequential('Agri runtime API integration', () => {
 
   afterAll(async () => {
     if (baseUrl && ownerToken) {
+      for (const id of created.sprays) await request(`/spray/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
+      for (const id of created.inventory) await request(`/inventory/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.finance) await request(`/finance/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.liabilities) await request(`/liabilities/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.laborers) await request(`/laborers/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
@@ -920,6 +922,103 @@ describe.sequential('Agri runtime API integration', () => {
       expect(taskWageRows).toHaveLength(1);
       created.finance.push(String(taskWageRows[0]._id));
     }
+  });
+
+  it('keeps one worker/day attendance row across concurrent app and task writes', async () => {
+    const suffix = `runtime-attendance-${process.pid}-${Date.now()}`;
+    const worker = await request('/laborers', {
+      method: 'POST', token: ownerToken,
+      body: { name: suffix, daily_wage: 900, notes: 'Attendance race fixture' },
+    });
+    expect(worker.response.status).toBe(201);
+    const workerId = String(worker.data._id);
+    created.laborers.push(workerId);
+
+    const date = new Date().toISOString().slice(0, 10);
+    const month = date.slice(0, 7);
+    const attendancePayload = {
+      laborer_id: workerId, date, day_type: 'full', notes: 'Concurrent attendance fixture',
+    };
+    const [attendanceA, attendanceB] = await Promise.all([
+      request('/attendance', { method: 'POST', token: ownerToken, body: attendancePayload }),
+      request('/attendance', { method: 'POST', token: ownerToken, body: attendancePayload }),
+    ]);
+    expect(attendanceA.response.status).toBe(201);
+    expect(attendanceB.response.status).toBe(201);
+
+    const afterManual = await request(`/attendance?month=${month}`, { token: ownerToken });
+    const manualRows = afterManual.data.filter((row) =>
+      String(row.laborer_id) === workerId && row.date === date,
+    );
+    expect(manualRows).toHaveLength(1);
+
+    const task = await request('/tasks', {
+      method: 'POST', token: ownerToken,
+      body: {
+        title: `${suffix}-task`, assigned_to: 'owner', priority: 'Medium',
+        labor_cost: 0, inventory_item_id: null, inventory_qty_consumed: 0,
+        laborer_ids: [workerId],
+      },
+    });
+    expect(task.response.status).toBe(201);
+    const tasks = await request('/tasks?skip=0&limit=500', { token: ownerToken });
+    const taskRow = tasks.data.find((row) => row.title === `${suffix}-task`);
+    expect(taskRow).toBeTruthy();
+    created.tasks.push(String(taskRow._id));
+
+    const completion = await request(`/tasks/${taskRow._id}`, { method: 'PATCH', token: ownerToken });
+    expect(completion.response.status).toBe(200);
+    const afterTask = await request(`/attendance?month=${month}`, { token: ownerToken });
+    const finalRows = afterTask.data.filter((row) =>
+      String(row.laborer_id) === workerId && row.date === date,
+    );
+    expect(finalRows).toHaveLength(1);
+  });
+
+  it('deducts Agri spray stock atomically and restores it only when the log is deleted', async () => {
+    const suffix = `runtime-spray-${process.pid}-${Date.now()}`;
+    const date = new Date().toISOString().slice(0, 10);
+    const crop = await request('/crops', {
+      method: 'POST', token: ownerToken,
+      body: {
+        name: `${suffix}-crop`, status: 'Growing', fieldId: '',
+        season: 'Kharif', crop_year: date.slice(0, 4),
+      },
+    });
+    expect(crop.response.status).toBe(201);
+    created.crops.push(String(crop.data._id));
+
+    const stock = await request('/inventory', {
+      method: 'POST', token: ownerToken,
+      body: { name: `${suffix}-chemical`, category: 'pesticide', current_stock: 5, unit: 'litre', low_stock_threshold: 1 },
+    });
+    expect(stock.response.status).toBe(201);
+    const stockId = String(stock.data._id);
+    created.inventory.push(stockId);
+
+    const sprayPayload = {
+      crop_id: String(crop.data._id), date, chemical: 'Test spray', dose: '4 litres',
+      notes: 'Concurrent stock fixture', inventory_item_id: stockId, inventory_qty_consumed: 4,
+    };
+    const [sprayA, sprayB] = await Promise.all([
+      request('/spray', { method: 'POST', token: ownerToken, body: sprayPayload }),
+      request('/spray', { method: 'POST', token: ownerToken, body: sprayPayload }),
+    ]);
+    expect([sprayA.response.status, sprayB.response.status].sort()).toEqual([201, 400]);
+    const accepted = sprayA.response.status === 201 ? sprayA : sprayB;
+    const rejected = sprayA.response.status === 400 ? sprayA : sprayB;
+    expect(rejected.data.detail).toMatch(/Not enough stock/);
+    created.sprays.push(String(accepted.data._id));
+
+    const inventory = await request('/inventory', { token: ownerToken });
+    expect(inventory.response.status).toBe(200);
+    expect(inventory.data.find((row) => String(row._id) === stockId).current_stock).toBe(1);
+
+    const removed = await request(`/spray/${accepted.data._id}`, { method: 'DELETE', token: ownerToken });
+    expect(removed.response.status).toBe(200);
+    created.sprays = created.sprays.filter((id) => id !== String(accepted.data._id));
+    const restoredInventory = await request('/inventory', { token: ownerToken });
+    expect(restoredInventory.data.find((row) => String(row._id) === stockId).current_stock).toBe(5);
   });
 
   it('prevents duplicate liability settlement and month-end wage ledger postings', async () => {

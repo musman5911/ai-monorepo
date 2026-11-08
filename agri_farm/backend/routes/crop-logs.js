@@ -1,7 +1,6 @@
 // ─── Crop logs: irrigation + crop photo diary + spray/pesticide logs ────────
 import express from 'express';
 import { Irrigation, CropPhoto, Spray, Crop, Finance, Inventory, withFinancialTransaction } from '../db.js';
-import { mufLaborAttendanceId } from '../utils/attendance-id.mjs';
 import { mufIsFullRole } from '../muf-farms.mjs';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { HttpError, badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';

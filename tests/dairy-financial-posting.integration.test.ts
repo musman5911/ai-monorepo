@@ -98,11 +98,15 @@ describe.sequential('Dairy financial posting integration', () => {
 
     const date = new Date().toISOString().slice(0, 10);
     const month = date.slice(0, 7);
-    const attendance = await request('/labor/attendance', {
-      method: 'POST', token: ownerToken,
-      body: { workerId: String(worker.data._id), date, dayType: 'full', notes: 'Concurrent wage fixture' },
-    });
-    expect([200, 201]).toContain(attendance.response.status);
+    const attendancePayload = { workerId: String(worker.data._id), date, dayType: 'full', notes: 'Concurrent wage fixture' };
+    const [attendanceA, attendanceB] = await Promise.all([
+      request('/labor/attendance', { method: 'POST', token: ownerToken, body: attendancePayload }),
+      request('/labor/attendance', { method: 'POST', token: ownerToken, body: attendancePayload }),
+    ]);
+    expect([attendanceA.response.status, attendanceB.response.status].every((status) => [200, 201].includes(status))).toBe(true);
+    const attendanceRows = await request(`/labor/attendance?month=${month}`, { token: ownerToken });
+    expect(attendanceRows.response.status).toBe(200);
+    expect(attendanceRows.data.filter((row) => String(row.workerId) === String(worker.data._id) && row.date === date)).toHaveLength(1);
 
     const [postingA, postingB] = await Promise.all([
       request('/labor/post-wages', { method: 'POST', token: ownerToken, body: { month } }),

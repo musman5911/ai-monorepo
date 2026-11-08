@@ -99,6 +99,41 @@ describe('financial route transaction contracts', () => {
     expect(dairy).toContain('Expense.insertMany');
   });
 
+  it('uses stable attendance IDs and farm-scoped unique worker/day indexes in Agri and Dairy', () => {
+    const helper = read('agri_farm/backend/utils/attendance-id.mjs');
+    expect(helper).toContain('createHash');
+    expect(helper).toContain('muf-labor-attendance:');
+    expect(read('dairy_farm/backend/utils/attendance-id.mjs')).toBe(helper);
+
+    const agriDb = read('agri_farm/backend/db.js');
+    expect(agriDb).toContain('attendance_farm_worker_date_unique');
+    expect(agriDb).toContain('{ farmId: 1, laborer_id: 1, date: 1 }');
+
+    const dairyDb = read('dairy_farm/backend/db.js');
+    expect(dairyDb).toContain('labor_attendance_farm_worker_date_unique');
+    expect(dairyDb).toContain('{ farmId: 1, workerId: 1, date: 1 }');
+  });
+
+  it('keeps Agri spray inventory adjustments and spray-log writes in one transaction', () => {
+    const source = read('agri_farm/backend/routes/crop-logs.js');
+    const create = source.split("router.post('/spray'")[1]?.split("router.delete('/spray/:logId'")[0] || '';
+    expect(create).toContain('withFinancialTransaction([Crop, Inventory, Spray]');
+    expect(create).toContain('adjustInventory(payload.inventory_item_id, payload.inventory_qty_consumed, false, session)');
+    expect(source).toContain('current_stock: { $gte: qty }');
+    const remove = source.split("router.delete('/spray/:logId'")[1] || '';
+    expect(remove).toContain('withFinancialTransaction([Inventory, Spray]');
+    expect(remove).toContain('adjustInventory(log.inventory_item_id, toFloat(log.inventory_qty_consumed), true, session)');
+  });
+
+  it('prevents Agri and Dairy wage posting from silently paying duplicate worker/day history', () => {
+    const agri = read('agri_farm/backend/routes/labor.js');
+    const dairy = read('dairy_farm/backend/routes/labor.js');
+    expect(agri).toContain('kind: \'duplicate_attendance\'');
+    expect(dairy).toContain('kind: \'duplicate_attendance\'');
+    expect(agri).toContain('Duplicate worker/day attendance exists in this month');
+    expect(dairy).toContain('Duplicate worker/day attendance exists in this month');
+  });
+
   it('completes Agri tasks together with wage, stock, and attendance side effects', () => {
     const source = read('agri_farm/backend/routes/tasks.js');
     const handler = source.split("router.patch('/tasks/:taskId'")[1]?.split("router.delete('/tasks/:taskId'")[0] || '';
