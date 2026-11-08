@@ -5,6 +5,7 @@ import { withFinancialTransaction } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
+import { mufLaborAttendanceId } from '../utils/attendance-id.mjs';
 import { normalizeLaborerInput, normalizeAttendanceInput, normalizeLaborAdvanceInput } from '../record-validation.mjs';
 
 const router = express.Router();
@@ -45,7 +46,7 @@ router.delete('/laborers/:laborerId', protect, requireAdmin, asyncHandler(async 
   const laborerId = req.params.laborerId;
   const result = await Laborer.deleteOne({ _id: parseOid(laborerId, 'laborer ID') });
   if (!result.deletedCount) return notFound(res, 'Field worker not found');
-  await Attendance.deleteMany({ laborer_id: laborerId });
+  await Attendance.deleteMany({ laborer_id: laborerId, posted: { $ne: true } });
   return res.json({ status: 'ok' });
 }));
 
@@ -66,16 +67,50 @@ router.post('/attendance', protect, requireAdmin, asyncHandler(async (req, res) 
   const cropError = await validateCropLink(payload.crop_id);
   if (cropError) return badRequest(res, cropError);
 
-  const existing = await Attendance.findOne({ laborer_id: payload.laborer_id, date: payload.date });
-  if (existing) {
-    if (existing.posted) {
-      return badRequest(res, 'This day is already posted to the Labor ledger.');
+  const filter = { laborer_id: payload.laborer_id, date: payload.date };
+  let result;
+  try {
+    result = await withFinancialTransaction([Attendance], async (session) => {
+      const options = session ? { session } : {};
+      const query = Attendance.find(filter).limit(2);
+      const rows = await (session ? query.session(session) : query);
+      if (rows.length > 1) return { kind: 'duplicate_history' };
+      if (rows.length === 1) {
+        const existing = rows[0];
+        if (existing.posted) return { kind: 'posted' };
+        const update = await Attendance.updateOne(
+          { _id: existing._id, posted: { $ne: true } },
+          { $set: payload },
+          options,
+        );
+        if ((update.matchedCount ?? update.modifiedCount ?? 0) === 0) return { kind: 'posted' };
+        return { kind: 'ok', id: String(existing._id) };
+      }
+      const doc = (await Attendance.insertMany([{
+        ...payload,
+        _id: mufLaborAttendanceId(payload.laborer_id, payload.date),
+      }], options))[0];
+      return { kind: 'ok', id: String(doc._id) };
+    });
+  } catch (error) {
+    // A second server process may win the same deterministic _id/compound key.
+    // Re-read after the failed transaction instead of reporting a false 500.
+    if (error?.code !== 11000) throw error;
+    const raced = await Attendance.find(filter).limit(2);
+    if (raced.length > 1) return res.status(409).json({ error: 'Duplicate attendance history exists for this worker and date. Resolve it before editing or posting wages.' });
+    if (raced.length === 1 && !raced[0].posted) {
+      const update = await Attendance.updateOne(
+        { _id: raced[0]._id, posted: { $ne: true } },
+        { $set: payload },
+      );
+      if (update.matchedCount) return res.status(201).json({ ...payload, _id: String(raced[0]._id) });
     }
-    await Attendance.updateOne({ _id: existing._id }, { $set: payload });
-    return res.status(201).json({ ...payload, _id: String(existing._id) });
+    if (raced.length === 1) return badRequest(res, 'This day is already posted to the Labor ledger.');
+    throw error;
   }
-  const doc = (await Attendance.insertMany([payload]))[0];
-  return res.status(201).json({ ...doc, _id: String(doc._id) });
+  if (result.kind === 'duplicate_history') return res.status(409).json({ error: 'Duplicate attendance history exists for this worker and date. Resolve it before editing or posting wages.' });
+  if (result.kind === 'posted') return badRequest(res, 'This day is already posted to the Labor ledger.');
+  return res.status(201).json({ ...payload, _id: result.id });
 }));
 
 router.put('/attendance/:attId', protect, requireAdmin, asyncHandler(async (req, res) => {
@@ -97,8 +132,8 @@ router.put('/attendance/:attId', protect, requireAdmin, asyncHandler(async (req,
       notes: body.notes === undefined ? row.notes || '' : body.notes,
     });
     if (dateResult.error) return badRequest(res, dateResult.error);
-    const clash = await Attendance.findOne({ laborer_id: row.laborer_id, date: dateResult.value.date, _id: { $ne: oid } });
-    if (clash) return badRequest(res, 'This worker already has attendance on that date.');
+    const clashes = await Attendance.find({ laborer_id: row.laborer_id, date: dateResult.value.date, _id: { $ne: oid } }).limit(2);
+    if (clashes.length) return badRequest(res, 'This worker already has attendance on that date.');
     payload.date = dateResult.value.date;
   }
   if (body.crop_id !== undefined) {
@@ -115,7 +150,16 @@ router.put('/attendance/:attId', protect, requireAdmin, asyncHandler(async (req,
     if (typeof body.notes !== 'string' || body.notes.length > 1000) return badRequest(res, 'Attendance notes must be text no longer than 1000 characters.');
     payload.notes = body.notes.trim();
   }
-  await Attendance.updateOne({ _id: oid }, { $set: payload });
+  try {
+    const result = await Attendance.updateOne(
+      { _id: oid, posted: { $ne: true } },
+      { $set: payload },
+    );
+    if (!result.matchedCount) return badRequest(res, 'Posted attendance cannot be edited. Remove the Labor ledger entry first if needed.');
+  } catch (error) {
+    if (error?.code === 11000) return badRequest(res, 'This worker already has attendance on that date.');
+    throw error;
+  }
   return res.json({ ...row, ...payload, _id: String(row._id) });
 }));
 
@@ -126,7 +170,8 @@ router.delete('/attendance/:attId', protect, requireAdmin, asyncHandler(async (r
   if (row.posted) {
     return badRequest(res, 'Posted attendance cannot be deleted. Remove the Labor ledger entry first if needed.');
   }
-  await Attendance.deleteOne({ _id: oid });
+  const removed = await Attendance.deleteOne({ _id: oid, posted: { $ne: true } });
+  if (!removed.deletedCount) return badRequest(res, 'Posted attendance cannot be deleted. Remove the Labor ledger entry first if needed.');
   return res.json({ status: 'ok' });
 }));
 
@@ -196,6 +241,12 @@ router.post('/labor/post-wages', protect, requireAdmin, asyncHandler(async (req,
     const attendanceQuery = Attendance.find({ date: { $regex: `^${month}-` }, posted: { $ne: true } }).limit(100000);
     const rows = await (session ? attendanceQuery.session(session) : attendanceQuery);
     if (!rows.length) return { kind: 'no_rows' };
+    const attendanceDays = new Set();
+    for (const row of rows) {
+      const key = `${String(row.laborer_id)}:${String(row.date)}`;
+      if (attendanceDays.has(key)) return { kind: 'duplicate_attendance' };
+      attendanceDays.add(key);
+    }
 
     const laborersQuery = Laborer.find({}).limit(100000);
     const laborersList = await (session ? laborersQuery.session(session) : laborersQuery);
@@ -277,6 +328,7 @@ router.post('/labor/post-wages', protect, requireAdmin, asyncHandler(async (req,
   });
 
   if (result.kind === 'no_rows') return badRequest(res, 'No unposted attendance remains for this month.');
+  if (result.kind === 'duplicate_attendance') return res.status(409).json({ error: 'Duplicate worker/day attendance exists in this month. Resolve the duplicate rows before posting wages.' });
   if (result.kind === 'zero_total') return badRequest(res, 'Wage total is 0. Set daily wages on field workers first.');
   return res.json({ status: 'ok', amount: result.amount, notes: result.notes });
 }));

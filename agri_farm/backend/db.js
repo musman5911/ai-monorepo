@@ -127,6 +127,20 @@ for (const schema of Object.values(FARM_SCOPED)) {
   if (indexes) for (const keys of indexes) schema.index(keys);
   else schema.index({ farmId: 1 });
 }
+// A worker can have only one attendance row per date in a farm. Partial
+// filtering keeps pre-farm legacy rows outside the index until migration.
+AttendanceSchema.index(
+  { farmId: 1, laborer_id: 1, date: 1 },
+  {
+    unique: true,
+    name: 'attendance_farm_worker_date_unique',
+    partialFilterExpression: {
+      farmId: { $type: 'string' },
+      laborer_id: { $type: 'string' },
+      date: { $type: 'string' },
+    },
+  },
+);
 ProductSchema.index({ farmId: 1, published: 1, updatedAt: -1 });
 
 // ─── Models ─────────────────────────────────────────────────────────────────

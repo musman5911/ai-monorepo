@@ -9,6 +9,7 @@ import { Laborer, LaborAttendance, LaborAdvance, Expense } from '../db.js';
 import { withFinancialTransaction } from '../db.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { todayStr } from '../utils/date.js';
+import { mufLaborAttendanceId } from '../utils/attendance-id.mjs';
 import {
   readString,
   readDate,
@@ -97,24 +98,50 @@ router.post('/attendance', protect, adminOnly, async (req, res) => {
     if (!worker) return res.status(404).json({ error: 'Worker not found' });
 
     // Upsert by worker+date — one attendance row per worker per day.
-    const all = await LaborAttendance.find();
-    const existing = all.find((r) => r.workerId === workerId && r.date === date);
-    if (existing) {
-      if (existing.posted) return res.status(400).json({ error: 'This day is already posted to the wages ledger.' });
-      existing.dayType = dayType;
-      existing.notes = notes || '';
-      await existing.save();
-      return res.json(existing);
+    let result;
+    try {
+      result = await withFinancialTransaction([LaborAttendance], async (session) => {
+        const options = session ? { session } : {};
+        const query = LaborAttendance.find({ workerId, date }).limit(2);
+        const rows = await (session ? query.session(session) : query);
+        if (rows.length > 1) return { kind: 'duplicate_history' };
+        if (rows.length === 1) {
+          const existing = rows[0];
+          if (existing.posted) return { kind: 'posted' };
+          const update = await LaborAttendance.updateOne(
+            { _id: existing._id, posted: { $ne: true } },
+            { $set: { dayType, notes: notes || '' } },
+            options,
+          );
+          if (!update.matchedCount) return { kind: 'posted' };
+          const updatedQuery = LaborAttendance.findById(existing._id);
+          const updated = await (session ? updatedQuery.session(session) : updatedQuery);
+          return { kind: 'ok', doc: updated };
+        }
+        const doc = (await LaborAttendance.insertMany([{
+          _id: mufLaborAttendanceId(workerId, date),
+          workerId, date, dayType, posted: false, notes: notes || '',
+        }], options))[0];
+        return { kind: 'ok', doc };
+      });
+    } catch (error) {
+      // Another server instance can win the deterministic attendance key.
+      if (error?.code !== 11000) throw error;
+      const raced = await LaborAttendance.find({ workerId, date }).limit(2);
+      if (raced.length > 1) return res.status(409).json({ error: 'Duplicate attendance history exists for this worker and date. Resolve it before editing or posting wages.' });
+      if (raced.length === 1 && !raced[0].posted) {
+        const update = await LaborAttendance.updateOne(
+          { _id: raced[0]._id, posted: { $ne: true } },
+          { $set: { dayType, notes: notes || '' } },
+        );
+        if (update.matchedCount) return res.json({ ...raced[0], dayType, notes: notes || '' });
+      }
+      if (raced.length === 1) return res.status(400).json({ error: 'This day is already posted to the wages ledger.' });
+      throw error;
     }
-    const doc = await LaborAttendance.create({
-      _id: 'la' + Date.now() + '-' + randomUUID().slice(0, 6),
-      workerId,
-      date,
-      dayType,
-      posted: false,
-      notes: notes || '',
-    });
-    res.status(201).json(doc);
+    if (result.kind === 'duplicate_history') return res.status(409).json({ error: 'Duplicate attendance history exists for this worker and date. Resolve it before editing or posting wages.' });
+    if (result.kind === 'posted') return res.status(400).json({ error: 'This day is already posted to the wages ledger.' });
+    res.status(201).json(result.doc);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -124,19 +151,30 @@ router.put('/attendance/:id', protect, adminOnly, async (req, res) => {
     const doc = await LaborAttendance.findById(req.params.id);
     if (!doc) return res.status(404).json({ error: 'Attendance not found' });
     if (doc.posted) return res.status(400).json({ error: 'This day is already posted to the wages ledger.' });
-    if (req.body.dayType !== undefined) doc.dayType = readEnum(req.body || {}, 'dayType', ['full', 'half'], errors) || doc.dayType;
-    if (req.body.notes !== undefined) doc.notes = readString(req.body || {}, 'notes', errors) || '';
+    const changes = {};
+    if (req.body.dayType !== undefined) changes.dayType = readEnum(req.body || {}, 'dayType', ['full', 'half'], errors) || doc.dayType;
+    if (req.body.notes !== undefined) changes.notes = readString(req.body || {}, 'notes', errors) || '';
     if (req.body.date !== undefined) {
       const nextDate = readDate(req.body || {}, 'date', errors);
       if (nextDate && nextDate !== doc.date) {
-        const clash = (await LaborAttendance.find()).find((r) => r.workerId === doc.workerId && r.date === nextDate && r._id !== doc._id);
-        if (clash) return res.status(409).json({ error: 'Duplicate entry', message: 'This worker already has attendance on that date.' });
-        doc.date = nextDate;
+        const clashes = await LaborAttendance.find({ workerId: doc.workerId, date: nextDate, _id: { $ne: doc._id } }).limit(2);
+        if (clashes.length) return res.status(409).json({ error: 'Duplicate entry', message: 'This worker already has attendance on that date.' });
+        changes.date = nextDate;
       }
     }
     if (errors.length) return sendValidationError(res, errors);
-    await doc.save();
-    res.json(doc);
+    try {
+      const result = await LaborAttendance.updateOne(
+        { _id: doc._id, posted: { $ne: true } },
+        { $set: changes },
+      );
+      if (!result.matchedCount) return res.status(400).json({ error: 'This day is already posted to the wages ledger.' });
+    } catch (error) {
+      if (error?.code === 11000) return res.status(409).json({ error: 'Duplicate entry', message: 'This worker already has attendance on that date.' });
+      throw error;
+    }
+    const updated = await LaborAttendance.findById(doc._id);
+    res.json(updated);
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -145,7 +183,8 @@ router.delete('/attendance/:id', protect, adminOnly, async (req, res) => {
     const row = await LaborAttendance.findById(req.params.id);
     if (!row) return res.status(404).json({ error: 'Attendance row not found' });
     if (row.posted) return res.status(400).json({ error: 'Posted attendance cannot be deleted. Remove the wage expense first if needed.' });
-    await LaborAttendance.findByIdAndDelete(req.params.id);
+    const removed = await LaborAttendance.deleteOne({ _id: row._id, posted: { $ne: true } });
+    if (!removed.deletedCount) return res.status(400).json({ error: 'Posted attendance cannot be deleted. Remove the wage expense first if needed.' });
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -226,6 +265,12 @@ router.post('/post-wages', protect, adminOnly, async (req, res) => {
       const all = await (session ? attendanceQuery.session(session) : attendanceQuery);
       const rows = all.filter((row) => String(row.date || '').startsWith(month) && !row.posted);
       if (!rows.length) return { kind: 'no_rows' };
+      const attendanceDays = new Set();
+      for (const row of rows) {
+        const key = `${String(row.workerId)}:${String(row.date)}`;
+        if (attendanceDays.has(key)) return { kind: 'duplicate_attendance' };
+        attendanceDays.add(key);
+      }
 
       const workersQuery = Laborer.find();
       const workers = await (session ? workersQuery.session(session) : workersQuery);
@@ -293,6 +338,7 @@ router.post('/post-wages', protect, adminOnly, async (req, res) => {
     });
 
     if (result.kind === 'no_rows') return res.status(400).json({ error: 'No unposted attendance remains for this month.' });
+    if (result.kind === 'duplicate_attendance') return res.status(409).json({ error: 'Duplicate worker/day attendance exists in this month. Resolve the duplicate rows before posting wages.' });
     if (result.kind === 'zero_total') return res.status(400).json({ error: 'Wage total is 0. Set daily wages on workers first.' });
     res.json({ ok: true, amount: result.amount, note: result.note });
   } catch (e) { res.status(500).json({ error: e.message }); }

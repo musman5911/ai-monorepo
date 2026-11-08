@@ -82,6 +82,18 @@ async function ensureIndexes() {
       Sale.collection.createIndex({ farmId: 1, date: -1 }, { name: 'sale_farm_date' }),
       Cow.collection.createIndex({ farmId: 1, status: 1, createdAt: -1 }, { name: 'cow_farm_status_created' }),
       LaborAttendance.collection.createIndex({ farmId: 1, date: -1 }, { name: 'labor_attendance_farm_date' }),
+      LaborAttendance.collection.createIndex(
+        { farmId: 1, workerId: 1, date: 1 },
+        {
+          unique: true,
+          name: 'labor_attendance_farm_worker_date_unique',
+          partialFilterExpression: {
+            farmId: { $type: 'string' },
+            workerId: { $type: 'string' },
+            date: { $type: 'string' },
+          },
+        },
+      ),
       LaborAdvance.collection.createIndex({ farmId: 1, date: -1 }, { name: 'labor_advance_farm_date' }),
       Supplier.collection.createIndex({ farmId: 1, name: 1 }, { name: 'supplier_farm_name' }),
       SupplierPayment.collection.createIndex({ farmId: 1, supplierId: 1, date: -1 }, { name: 'supplier_payment_farm_supplier_date' }),

@@ -1,6 +1,7 @@
 // ─── Crop logs: irrigation + crop photo diary + spray/pesticide logs ────────
 import express from 'express';
-import { Irrigation, CropPhoto, Spray, Crop, Finance, Inventory } from '../db.js';
+import { Irrigation, CropPhoto, Spray, Crop, Finance, Inventory, withFinancialTransaction } from '../db.js';
+import { mufLaborAttendanceId } from '../utils/attendance-id.mjs';
 import { mufIsFullRole } from '../muf-farms.mjs';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { HttpError, badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
@@ -11,16 +12,26 @@ import { normalizeIrrigationInput, normalizeCropPhotoInput, normalizeSprayInput 
 const router = express.Router();
 
 // Inventory deduct/restore helper (same rules as the Python backend)
-async function deductInventory(itemId, qty, restore = false) {
+async function adjustInventory(itemId, qty, restore = false, session = null) {
   if (!itemId || !qty) return;
   const oid = parseOid(String(itemId), 'inventory item ID');
-  const item = await Inventory.findOne({ _id: oid });
+  const options = session ? { session } : {};
+  const query = Inventory.findOne({ _id: oid });
+  const item = await (session ? query.session(session) : query);
   if (!item) throw new HttpError(400, 'Inventory item not found');
-  const delta = restore ? qty : -qty;
-  if (!restore && (toFloat(item.current_stock) < qty)) {
-    throw new HttpError(400, 'Not enough stock to deduct for this spray.');
+
+  const filter = { _id: oid };
+  if (!restore) filter.current_stock = { $gte: qty };
+  const result = await Inventory.updateOne(
+    filter,
+    { $inc: { current_stock: restore ? qty : -qty } },
+    options,
+  );
+  if ((result.matchedCount ?? result.modifiedCount ?? 0) === 0) {
+    throw new HttpError(400, restore
+      ? 'Inventory item not found.'
+      : 'Not enough stock to deduct for this spray.');
   }
-  await Inventory.updateOne({ _id: oid }, { $inc: { current_stock: delta } });
 }
 
 // ─── Irrigation ──────────────────────────────────────────────────────────────
@@ -131,31 +142,43 @@ router.post('/spray', protect, requireAdmin, asyncHandler(async (req, res) => {
   const normalized = normalizeSprayInput(req.body || {}, { defaultDate: todayStr() });
   if (normalized.error) return badRequest(res, normalized.error);
   const payload = normalized.value;
-  const crop = await Crop.findOne({ _id: parseOid(payload.crop_id, 'crop ID') });
-  if (!crop) return notFound(res, 'Crop not found');
-  if (payload.inventory_item_id && payload.inventory_qty_consumed > 0) {
-    await deductInventory(payload.inventory_item_id, payload.inventory_qty_consumed);
-    payload.inventory_deducted = true;
-  } else {
-    payload.inventory_deducted = false;
-  }
-  const doc = (await Spray.insertMany([payload]))[0];
-  return res.status(201).json({ ...doc, _id: String(doc._id) });
+
+  const result = await withFinancialTransaction([Crop, Inventory, Spray], async (session) => {
+    const options = session ? { session } : {};
+    const cropQuery = Crop.findOne({ _id: parseOid(payload.crop_id, 'crop ID') });
+    const crop = await (session ? cropQuery.session(session) : cropQuery);
+    if (!crop) return { kind: 'crop_not_found' };
+
+    if (payload.inventory_item_id && payload.inventory_qty_consumed > 0) {
+      await adjustInventory(payload.inventory_item_id, payload.inventory_qty_consumed, false, session);
+      payload.inventory_deducted = true;
+    } else {
+      payload.inventory_deducted = false;
+    }
+
+    const doc = (await Spray.insertMany([payload], options))[0];
+    return { kind: 'ok', doc };
+  });
+  if (result.kind === 'crop_not_found') return notFound(res, 'Crop not found');
+  return res.status(201).json({ ...result.doc, _id: String(result.doc._id) });
 }));
 
 router.delete('/spray/:logId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.logId, 'spray ID');
-  const log = await Spray.findOne({ _id: oid });
-  if (!log) return notFound(res, 'Spray log not found');
-  if (log.inventory_deducted && log.inventory_item_id && log.inventory_qty_consumed) {
-    try {
-      await deductInventory(log.inventory_item_id, toFloat(log.inventory_qty_consumed), true);
-    } catch (e) {
-      if (e instanceof HttpError) return res.status(e.status).json({ detail: e.detail });
-      throw e;
+  const result = await withFinancialTransaction([Inventory, Spray], async (session) => {
+    const options = session ? { session } : {};
+    const query = Spray.findOne({ _id: oid });
+    const log = await (session ? query.session(session) : query);
+    if (!log) return { kind: 'not_found' };
+
+    if (log.inventory_deducted && log.inventory_item_id && log.inventory_qty_consumed) {
+      await adjustInventory(log.inventory_item_id, toFloat(log.inventory_qty_consumed), true, session);
     }
-  }
-  await Spray.deleteOne({ _id: oid });
+    const removed = await Spray.deleteOne({ _id: oid }, options);
+    if (!removed.deletedCount) throw new Error('Spray log changed during deletion; retry the request.');
+    return { kind: 'ok' };
+  });
+  if (result.kind === 'not_found') return notFound(res, 'Spray log not found');
   try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
   return res.json({ status: 'ok' });
 }));

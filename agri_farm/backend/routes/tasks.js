@@ -2,6 +2,7 @@
 // Completing a task auto-logs a Labor expense, deducts inventory, and marks
 // the deployed field crew's attendance for today.
 import express from 'express';
+import { mufLaborAttendanceId } from '../utils/attendance-id.mjs';
 import { Task, Finance, Inventory, Laborer, Attendance, Crop } from '../db.js';
 import { withFinancialTransaction } from '../db.js';
 import { mufIsFullRole } from '../muf-farms.mjs';
@@ -165,7 +166,7 @@ router.put('/tasks/:taskId', protect, requireAdmin, asyncHandler(async (req, res
 
 router.patch('/tasks/:taskId', protect, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.taskId, 'task ID');
-  const result = await withFinancialTransaction([Task, Finance, Inventory, Laborer, Attendance], async (session) => {
+  const completeTask = () => withFinancialTransaction([Task, Finance, Inventory, Laborer, Attendance], async (session) => {
     const options = session ? { session } : {};
     const taskQuery = Task.findOne({ _id: oid });
     const task = await (session ? taskQuery.session(session) : taskQuery);
@@ -227,6 +228,7 @@ router.patch('/tasks/:taskId', protect, asyncHandler(async (req, res) => {
         const existing = await (session ? attendanceQuery.session(session) : attendanceQuery);
         if (existing) continue;
         await Attendance.insertMany([{
+          _id: mufLaborAttendanceId(laborerId, attDate),
           laborer_id: laborerId,
           date: attDate,
           day_type: 'full',
@@ -242,6 +244,17 @@ router.patch('/tasks/:taskId', protect, asyncHandler(async (req, res) => {
 
     return { kind: 'ok', crewMarked };
   });
+
+  let result;
+  try {
+    result = await completeTask();
+  } catch (error) {
+    // A concurrent task on another app instance can insert the same stable
+    // worker/day attendance key first. Its transaction wins; retry this task
+    // transaction so the existing row is observed and the task can complete.
+    if (error?.code !== 11000) throw error;
+    result = await completeTask();
+  }
 
   if (result.kind === 'not_found') return notFound(res, 'Task not found');
   if (result.kind === 'forbidden') return forbidden(res, 'You can only complete tasks that are assigned to you.');

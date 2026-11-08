@@ -8,6 +8,8 @@
 // (any long random string). Both unset → telegram stays silently off.
 import express from 'express';
 import { randomUUID, timingSafeEqual } from 'crypto';
+import { withFinancialTransaction } from '../db.js';
+import { mufLaborAttendanceId } from '../utils/attendance-id.mjs';
 const router = express.Router();
 const MAX_TELEGRAM_EXPENSE_AMOUNT = 1_000_000_000;
 import { protect, adminOnly } from '../middleware/auth.js';
@@ -180,9 +182,30 @@ router.post('/webhook/:secret', async (req, res) => {
 
     if (cmd.kind === 'attendance') {
       if (!link.laborerId) return send('آپ کے کھاتے کے ساتھ مزدور پروفائل منسلک نہیں — ایڈمن سے کہیں کہ لنک کوڈ بناتے وقت ورکر بھی چنے۔');
-      const already = await LaborAttendance.findOne({ workerId: link.laborerId, date });
-      if (already) return send(`آج کی حاضری پہلے سے لگی ہے (${date})۔`);
-      await LaborAttendance.create({ _id: randomUUID(), workerId: link.laborerId, date, dayType: 'full', posted: false, notes: 'via Telegram' });
+      let attendanceResult;
+      try {
+        attendanceResult = await withFinancialTransaction([LaborAttendance], async (session) => {
+          const options = session ? { session } : {};
+          const query = LaborAttendance.find({ workerId: link.laborerId, date }).limit(2);
+          const rows = await (session ? query.session(session) : query);
+          if (rows.length) return { kind: 'already', duplicate: rows.length > 1 };
+          await LaborAttendance.insertMany([{
+            _id: mufLaborAttendanceId(link.laborerId, date),
+            workerId: link.laborerId,
+            date,
+            dayType: 'full',
+            posted: false,
+            notes: 'via Telegram',
+          }], options);
+          return { kind: 'created' };
+        });
+      } catch (error) {
+        if (error?.code !== 11000) throw error;
+        const existing = await LaborAttendance.find({ workerId: link.laborerId, date }).limit(2);
+        if (existing.length) attendanceResult = { kind: 'already', duplicate: existing.length > 1 };
+        else throw error;
+      }
+      if (attendanceResult.kind === 'already') return send(`آج کی حاضری پہلے سے لگی ہے (${date})۔`);
       return send(m.TG.saved(`حاضری (پورا دن) — ${date}`));
     }
 
