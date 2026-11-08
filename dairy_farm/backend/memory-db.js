@@ -174,6 +174,16 @@ function createModel(name, schema) {
       return d;
     },
 
+    // Mongoose-compatible conditional single-record update. Matched counts
+    // are used by race-safe attendance and other transition guards.
+    async updateOne(filter, update) {
+      const d = store.find((x) => matches(x, filter || {})) || null;
+      if (!d) return { matchedCount: 0, modifiedCount: 0 };
+      applyUpdate(d, update || {});
+      d.updatedAt = new Date();
+      return { matchedCount: 1, modifiedCount: 1 };
+    },
+
     async findByIdAndDelete(id) {
       const idx = store.findIndex((x) => x._id === id);
       if (idx === -1) return null;
