@@ -103,6 +103,8 @@ describe('financial route transaction contracts', () => {
     const helper = read('agri_farm/backend/utils/attendance-id.mjs');
     expect(helper).toContain('createHash');
     expect(helper).toContain('muf-labor-attendance:');
+    expect(helper).toContain('mufGetFarmContext');
+    expect(helper).toContain('farmId +');
     expect(read('dairy_farm/backend/utils/attendance-id.mjs')).toBe(helper);
 
     const agriDb = read('agri_farm/backend/db.js');
@@ -141,5 +143,6 @@ describe('financial route transaction contracts', () => {
     expect(handler).toContain("status: { $ne: 'Completed' }");
     expect(handler).toContain('Finance.insertMany');
     expect(handler).toContain('current_stock: { $gte: qtyConsumed }');
+    expect(handler).toContain("error.code = 'INSUFFICIENT_STOCK'");
   });
 });

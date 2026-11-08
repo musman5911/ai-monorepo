@@ -212,7 +212,9 @@ router.patch('/tasks/:taskId', protect, asyncHandler(async (req, res) => {
         options,
       );
       if ((stock.matchedCount ?? stock.modifiedCount ?? 0) === 0) {
-        console.log(`Skipped inventory deduction: insufficient stock or item not found for ${invItemId}`);
+        const error = new Error('Not enough inventory stock to complete this task. Restock the item or correct the consumed quantity.');
+        error.code = 'INSUFFICIENT_STOCK';
+        throw error;
       }
     }
 
@@ -249,11 +251,21 @@ router.patch('/tasks/:taskId', protect, asyncHandler(async (req, res) => {
   try {
     result = await completeTask();
   } catch (error) {
+    if (error?.code === 'INSUFFICIENT_STOCK') {
+      return res.status(409).json({ error: error.message, code: error.code });
+    }
     // A concurrent task on another app instance can insert the same stable
     // worker/day attendance key first. Its transaction wins; retry this task
     // transaction so the existing row is observed and the task can complete.
     if (error?.code !== 11000) throw error;
-    result = await completeTask();
+    try {
+      result = await completeTask();
+    } catch (retryError) {
+      if (retryError?.code === 'INSUFFICIENT_STOCK') {
+        return res.status(409).json({ error: retryError.message, code: retryError.code });
+      }
+      throw retryError;
+    }
   }
 
   if (result.kind === 'not_found') return notFound(res, 'Task not found');

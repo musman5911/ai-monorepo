@@ -975,6 +975,44 @@ describe.sequential('Agri runtime API integration', () => {
     expect(finalRows).toHaveLength(1);
   });
 
+  it('does not complete a task or post wages when its requested stock is unavailable', async () => {
+    const suffix = `runtime-task-stock-${process.pid}-${Date.now()}`;
+    const inventoryItem = await request('/inventory', {
+      method: 'POST', token: ownerToken,
+      body: { name: `${suffix}-item`, category: 'seed', current_stock: 1, unit: 'kg', low_stock_threshold: 0 },
+    });
+    expect(inventoryItem.response.status).toBe(201);
+    const inventoryId = String(inventoryItem.data._id);
+    created.inventory.push(inventoryId);
+
+    const task = await request('/tasks', {
+      method: 'POST', token: ownerToken,
+      body: {
+        title: `${suffix}-task`, assigned_to: 'owner', priority: 'High',
+        labor_cost: 250, inventory_item_id: inventoryId, inventory_qty_consumed: 2,
+        laborer_ids: [],
+      },
+    });
+    expect(task.response.status).toBe(201);
+    const taskRows = await request('/tasks?skip=0&limit=500', { token: ownerToken });
+    const taskRow = taskRows.data.find((row) => row.title === `${suffix}-task`);
+    expect(taskRow).toBeTruthy();
+    created.tasks.push(String(taskRow._id));
+
+    const completion = await request(`/tasks/${taskRow._id}`, { method: 'PATCH', token: ownerToken });
+    expect(completion.response.status).toBe(409);
+    expect(completion.data.code).toBe('INSUFFICIENT_STOCK');
+
+    const freshTasks = await request('/tasks?skip=0&limit=500', { token: ownerToken });
+    expect(freshTasks.data.find((row) => String(row._id) === String(taskRow._id)).status).not.toBe('Completed');
+
+    const freshInventory = await request('/inventory', { token: ownerToken });
+    expect(freshInventory.data.find((row) => String(row._id) === inventoryId).current_stock).toBe(1);
+
+    const finance = await request('/finance?skip=0&limit=500', { token: ownerToken });
+    expect(finance.data.some((row) => row.category === `Labor Wages - ${suffix}-task`)).toBe(false);
+  });
+
   it('deducts Agri spray stock atomically and restores it only when the log is deleted', async () => {
     const suffix = `runtime-spray-${process.pid}-${Date.now()}`;
     const date = new Date().toISOString().slice(0, 10);
