@@ -1,6 +1,6 @@
 // ─── Field labor: laborers, attendance, advances, month-end wage posting ─────
 import express from 'express';
-import { Laborer, Attendance, LaborAdvance, Finance, Crop } from '../db.js';
+import { Laborer, Attendance, LaborAdvance, Finance, Crop, withFinancialTransaction } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
@@ -188,71 +188,99 @@ router.delete('/labor-advances/:advId', protect, requireAdmin, asyncHandler(asyn
 // ─── Post month wages into the finance ledger ───────────────────────────────
 router.post('/labor/post-wages', protect, requireAdmin, asyncHandler(async (req, res) => {
   const month = String(req.body?.month || todayStr().slice(0, 7)).trim();
-  if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return badRequest(res, 'Month must be a valid YYYY-MM value.');
+  if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)) return badRequest(res, 'Month must be a valid YYYY-MM value.');
 
-  const rows = await Attendance.find({ date: { $regex: `^${month}-` }, posted: { $ne: true } }).limit(100000);
-  if (!rows.length) return badRequest(res, 'No unposted attendance remains for this month.');
+  const result = await withFinancialTransaction([Attendance, Laborer, LaborAdvance, Finance], async (session) => {
+    const options = session ? { session } : {};
+    const attendanceQuery = Attendance.find({
+      date: { $regex: `^${month}-` },
+      posted: { $ne: true },
+    }).limit(100000);
+    const rows = await (session ? attendanceQuery.session(session) : attendanceQuery);
+    if (!rows.length) return { kind: 'no_rows' };
 
-  const laborersList = await Laborer.find({}).limit(100000);
-  const laborers = {};
-  for (const l of laborersList) laborers[String(l._id)] = l;
+    const laborersQuery = Laborer.find({}).limit(100000);
+    const laborersList = await (session ? laborersQuery.session(session) : laborersQuery);
+    const laborers = {};
+    for (const laborer of laborersList) laborers[String(laborer._id)] = laborer;
 
-  const byLaborer = {};
-  for (const row of rows) {
-    const lid = row.laborer_id;
-    if (!byLaborer[lid]) byLaborer[lid] = [];
-    byLaborer[lid].push(row);
-  }
+    const byLaborer = {};
+    for (const row of rows) {
+      const lid = row.laborer_id;
+      if (!byLaborer[lid]) byLaborer[lid] = [];
+      byLaborer[lid].push(row);
+    }
 
-  const lines = [];
-  let total = 0;
-  let totalDays = 0;
-  const cropIds = rows.filter((r) => r.crop_id).map((r) => r.crop_id);
-  const cropId = cropIds.length && new Set(cropIds).size === 1 ? cropIds[0] : null;
+    const lines = [];
+    let total = 0;
+    let totalDays = 0;
+    const cropIds = rows.filter((row) => row.crop_id).map((row) => row.crop_id);
+    const cropId = cropIds.length && new Set(cropIds).size === 1 ? cropIds[0] : null;
 
-  for (const [lid, group] of Object.entries(byLaborer)) {
-    const laborer = laborers[lid] || {};
-    const days = Math.round(group.reduce((acc, r) => acc + toFloat(r.day_units ?? (r.day_type === 'full' ? 1.0 : 0.5)), 0) * 100) / 100;
-    const wage = toFloat(laborer.daily_wage);
-    const amount = Math.round(days * wage * 100) / 100;
-    total += amount;
-    totalDays += days;
-    // Python {n:g} formatting: trim trailing zeros (24.0 -> "24")
-    const g = (n) => String(Math.round(n * 100) / 100);
-    lines.push(`${laborer.name || 'Worker'} ${g(days)}d × Rs. ${g(wage)}`);
-  }
+    for (const [lid, group] of Object.entries(byLaborer)) {
+      const laborer = laborers[lid] || {};
+      const days = Math.round(group.reduce((acc, row) => acc + toFloat(row.day_units ?? (row.day_type === 'full' ? 1.0 : 0.5)), 0) * 100) / 100;
+      const wage = toFloat(laborer.daily_wage);
+      const amount = Math.round(days * wage * 100) / 100;
+      total += amount;
+      totalDays += days;
+      const g = (n) => String(Math.round(n * 100) / 100);
+      lines.push(`${laborer.name || 'Worker'} ${g(days)}d × Rs. ${g(wage)}`);
+    }
 
-  if (total <= 0) {
-    return badRequest(res, 'Wage total is 0. Set daily wages on field workers first.');
-  }
+    total = Math.round(total * 100) / 100;
+    if (total <= 0) return { kind: 'zero_total' };
 
-  const fin = {
-    category: 'Labor',
-    amount: Math.round(total * 100) / 100,
-    type: 'expense',
-    date: `${month}-28`,
-    crop_id: cropId,
-    notes: `Monthly labor wages ${month}: ` + lines.join('; '),
-    labor_workers: Number(Object.keys(byLaborer).length),
-    labor_days: totalDays,
-    labor_wage_rate: totalDays ? Math.round((total / totalDays) * 100) / 100 : 0,
-  };
-  // Advances already paid out are settled by this posting — the ledger
-  // amount stays the GROSS wages (an advance was early payment of the same
-  // money).
-  const openAdvances = await LaborAdvance.find({ settled: { $ne: true } }).limit(100000);
-  const advanceTotal = Math.round(openAdvances.reduce((acc, a) => acc + toFloat(a.amount), 0) * 100) / 100;
-  if (advanceTotal > 0) {
-    fin.notes += ` (advance already paid Rs. ${advanceTotal}; cash payable now Rs. ${Math.max(0, Math.round((total - advanceTotal) * 100) / 100)})`;
-  }
+    const fin = {
+      category: 'Labor',
+      amount: total,
+      type: 'expense',
+      date: `${month}-28`,
+      crop_id: cropId,
+      notes: `Monthly labor wages ${month}: ` + lines.join('; '),
+      labor_workers: Number(Object.keys(byLaborer).length),
+      labor_days: totalDays,
+      labor_wage_rate: totalDays ? Math.round((total / totalDays) * 100) / 100 : 0,
+    };
 
-  const finDoc = (await Finance.insertMany([fin]))[0];
-  const ids = rows.map((r) => r._id);
-  await Attendance.updateMany({ _id: { $in: ids } }, { $set: { posted: true, finance_id: String(finDoc._id) } });
-  if (openAdvances.length) {
-    await LaborAdvance.updateMany({ settled: { $ne: true } }, { $set: { settled: true } });
-  }
-  return res.json({ status: 'ok', amount: fin.amount, notes: fin.notes });
+    const advancesQuery = LaborAdvance.find({ settled: { $ne: true } }).limit(100000);
+    const openAdvances = await (session ? advancesQuery.session(session) : advancesQuery);
+    const advanceTotal = Math.round(openAdvances.reduce((acc, advance) => acc + toFloat(advance.amount), 0) * 100) / 100;
+    if (advanceTotal > 0) {
+      fin.notes += ` (advance already paid Rs. ${advanceTotal}; cash payable now Rs. ${Math.max(0, Math.round((total - advanceTotal) * 100) / 100)})`;
+    }
+
+    const finDoc = (await Finance.insertMany([fin], options))[0];
+    const ids = rows.map((row) => row._id);
+    const posted = await Attendance.updateMany(
+      { _id: { $in: ids }, posted: { $ne: true } },
+      { $set: { posted: true, finance_id: String(finDoc._id) } },
+      options,
+    );
+    const postedCount = posted.matchedCount ?? posted.modifiedCount ?? 0;
+    if (postedCount !== ids.length) {
+      throw new Error('Attendance changed during wage posting. The financial transaction was rolled back; retry the posting.');
+    }
+
+    if (openAdvances.length) {
+      const advanceIds = openAdvances.map((advance) => advance._id);
+      const settled = await LaborAdvance.updateMany(
+        { _id: { $in: advanceIds }, settled: { $ne: true } },
+        { $set: { settled: true } },
+        options,
+      );
+      const settledCount = settled.matchedCount ?? settled.modifiedCount ?? 0;
+      if (settledCount !== advanceIds.length) {
+        throw new Error('Labor advances changed during wage posting. The financial transaction was rolled back; retry the posting.');
+      }
+    }
+
+    return { kind: 'ok', amount: fin.amount, notes: fin.notes };
+  });
+
+  if (result.kind === 'no_rows') return badRequest(res, 'No unposted attendance remains for this month.');
+  if (result.kind === 'zero_total') return badRequest(res, 'Wage total is 0. Set daily wages on field workers first.');
+  return res.json({ status: 'ok', amount: result.amount, notes: result.notes });
 }));
 
 export default router;

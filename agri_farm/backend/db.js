@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { runFinancialTransaction as runMufFinancialTransaction } from './utils/financial-transaction.mjs';
 import { createStore } from './memory-db.js';
 import { MUF_ENV, mufEnvHasMongo } from './muf-env.mjs';
 import { mufScopeModels, mufMigrateFarms, mufLoadDefaultFarm } from './muf-farms.mjs';
@@ -198,6 +199,10 @@ const MUF_FARM_MODELS = {
 };
 mufScopeModels(MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES);
 
+function withFinancialTransaction(models, work) {
+  return runMufFinancialTransaction({ mongoose, memoryMode: useMock, models, work });
+}
+
 const connectDB = async () => {
   if (useMock) {
     console.log('🧠 [Database] MEMORY_MODE=1 — using in-memory demo database (data is lost on restart).');
@@ -257,7 +262,7 @@ const connectDB = async () => {
 };
 
 export {
-  connectDB, useMock,
+  connectDB, useMock, withFinancialTransaction,
   User, Field, Crop, Finance, Task, Reset, Inventory, Liability, Irrigation,
   CropPhoto, Spray, Laborer, Attendance, LaborAdvance, TelegramMeta,
   Supplier, SupplierPayment, Setting, DiaryMedia, PhotoAsset, Product, Farm, ArchiveJob, ArchiveRecord,

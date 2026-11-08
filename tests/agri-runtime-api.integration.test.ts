@@ -12,7 +12,7 @@ let ownerToken = '';
 let workerToken = '';
 let managerToken = '';
 let serverOutput = '';
-const created = { crops: [], tasks: [], finance: [], fields: [] };
+const created = { crops: [], tasks: [], finance: [], fields: [], liabilities: [], laborers: [] };
 
 async function reservePort() {
   const server = createServer();
@@ -131,6 +131,8 @@ describe.sequential('Agri runtime API integration', () => {
   afterAll(async () => {
     if (baseUrl && ownerToken) {
       for (const id of created.finance) await request(`/finance/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
+      for (const id of created.liabilities) await request(`/liabilities/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
+      for (const id of created.laborers) await request(`/laborers/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.tasks) await request(`/tasks/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.crops) await request(`/crops/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.fields) await request(`/fields/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
@@ -901,19 +903,75 @@ describe.sequential('Agri runtime API integration', () => {
       expect(assignedForWorker.inventory_item_id).toBeUndefined();
       expect(assignedForWorker.inventory_qty_consumed).toBeUndefined();
       expect(assignedForWorker.laborer_ids).toBeUndefined();
-      const allowedCompletion = await request(`/tasks/${assigned._id}`, {
-        method: 'PATCH',
-        token: workerToken,
-      });
-      expect(allowedCompletion.response.status).toBe(200);
-      expect(allowedCompletion.data.status).toBe('ok');
-      expect(allowedCompletion.data.already_completed).not.toBe(true);
-      const repeatedCompletion = await request(`/tasks/${assigned._id}`, {
-        method: 'PATCH',
-        token: workerToken,
-      });
+      const [completionA, completionB] = await Promise.all([
+        request(`/tasks/${assigned._id}`, { method: 'PATCH', token: workerToken }),
+        request(`/tasks/${assigned._id}`, { method: 'PATCH', token: workerToken }),
+      ]);
+      expect(completionA.response.status).toBe(200);
+      expect(completionB.response.status).toBe(200);
+      expect([completionA.data, completionB.data].filter((row) => row.already_completed === true)).toHaveLength(1);
+      expect([completionA.data, completionB.data].filter((row) => row.already_completed !== true)).toHaveLength(1);
+      const repeatedCompletion = await request(`/tasks/${assigned._id}`, { method: 'PATCH', token: workerToken });
       expect(repeatedCompletion.response.status).toBe(200);
       expect(repeatedCompletion.data.already_completed).toBe(true);
+
+      const taskLedger = await request(`/finance?skip=0&limit=500&search=${encodeURIComponent(`Labor Wages - ${assigned.title}`)}`, { token: ownerToken });
+      const taskWageRows = taskLedger.data.filter((row) => row.category === `Labor Wages - ${assigned.title}`);
+      expect(taskWageRows).toHaveLength(1);
+      created.finance.push(String(taskWageRows[0]._id));
     }
   });
+
+  it('prevents duplicate liability settlement and month-end wage ledger postings', async () => {
+    const suffix = `runtime-financial-${process.pid}-${Date.now()}`;
+    const creditor = `Financial safety ${suffix}`;
+    const liability = await request('/liabilities', {
+      method: 'POST', token: ownerToken,
+      body: { creditor, amount_owed: 875, due_date: '', crop_id: null, notes: 'Concurrent settlement fixture' },
+    });
+    expect(liability.response.status).toBe(201);
+    created.liabilities.push(String(liability.data._id));
+
+    const [paymentA, paymentB] = await Promise.all([
+      request(`/liabilities/${liability.data._id}/pay`, { method: 'PUT', token: ownerToken }),
+      request(`/liabilities/${liability.data._id}/pay`, { method: 'PUT', token: ownerToken }),
+    ]);
+    expect(paymentA.response.status).toBe(200);
+    expect(paymentB.response.status).toBe(200);
+    expect([paymentA.data.status, paymentB.data.status].sort()).toEqual(['already_paid', 'ok']);
+
+    const worker = await request('/laborers', {
+      method: 'POST', token: ownerToken,
+      body: { name: `Wage fixture ${suffix}`, daily_wage: 1234, notes: '' },
+    });
+    expect(worker.response.status).toBe(201);
+    created.laborers.push(String(worker.data._id));
+
+    const date = new Date().toISOString().slice(0, 10);
+    const month = date.slice(0, 7);
+    const attendance = await request('/attendance', {
+      method: 'POST', token: ownerToken,
+      body: { laborer_id: String(worker.data._id), date, day_type: 'full', notes: 'Concurrent wage fixture' },
+    });
+    expect(attendance.response.status).toBe(201);
+
+    const [wageA, wageB] = await Promise.all([
+      request('/labor/post-wages', { method: 'POST', token: ownerToken, body: { month } }),
+      request('/labor/post-wages', { method: 'POST', token: ownerToken, body: { month } }),
+    ]);
+    expect([wageA.response.status, wageB.response.status].sort()).toEqual([200, 400]);
+
+    const ledger = await request('/finance?skip=0&limit=500', { token: ownerToken });
+    expect(ledger.response.status).toBe(200);
+    const liabilityRows = ledger.data.filter((row) => row.category === `Paid Off Debt: ${creditor}`);
+    expect(liabilityRows).toHaveLength(1);
+    const wageRows = ledger.data.filter((row) =>
+      row.category === 'Labor' &&
+      String(row.notes || '').includes(`Monthly labor wages ${month}:`) &&
+      String(row.notes || '').includes(`Wage fixture ${suffix} 1d × Rs. 1234`),
+    );
+    expect(wageRows).toHaveLength(1);
+    created.finance.push(String(liabilityRows[0]._id), String(wageRows[0]._id));
+  });
+
 });

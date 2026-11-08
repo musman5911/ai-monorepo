@@ -5,7 +5,7 @@
 import { randomUUID } from 'crypto';
 import express from 'express';
 const router = express.Router();
-import { Laborer, LaborAttendance, LaborAdvance, Expense } from '../db.js';
+import { Laborer, LaborAttendance, LaborAdvance, Expense, withFinancialTransaction } from '../db.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { todayStr } from '../utils/date.js';
 import {
@@ -217,59 +217,83 @@ router.delete('/advances/:id', protect, adminOnly, async (req, res) => {
 router.post('/post-wages', protect, adminOnly, async (req, res) => {
   try {
     const month = String((req.body && req.body.month) || todayStr().slice(0, 7)).trim();
-    if (!/^\d{4}-(0[1-9]|1[0-2])$/.test(month)) return res.status(400).json({ error: 'Month must be a valid YYYY-MM value.' });
+    if (!/^\\d{4}-(0[1-9]|1[0-2])$/.test(month)) return res.status(400).json({ error: 'Month must be a valid YYYY-MM value.' });
 
-    const all = await LaborAttendance.find();
-    const rows = all.filter((r) => String(r.date || '').startsWith(month) && !r.posted);
-    if (!rows.length) return res.status(400).json({ error: 'No unposted attendance remains for this month.' });
+    const result = await withFinancialTransaction([LaborAttendance, Laborer, LaborAdvance, Expense], async (session) => {
+      const options = session ? { session } : {};
+      const attendanceQuery = LaborAttendance.find();
+      const all = await (session ? attendanceQuery.session(session) : attendanceQuery);
+      const rows = all.filter((row) => String(row.date || '').startsWith(month) && !row.posted);
+      if (!rows.length) return { kind: 'no_rows' };
 
-    const workers = await Laborer.find();
-    const byId = new Map(workers.map((w) => [w._id, w]));
+      const workersQuery = Laborer.find();
+      const workers = await (session ? workersQuery.session(session) : workersQuery);
+      const byId = new Map(workers.map((worker) => [worker._id, worker]));
 
-    const lines = [];
-    let total = 0;
-    const byWorker = new Map();
-    for (const row of rows) {
-      if (!byWorker.has(row.workerId)) byWorker.set(row.workerId, []);
-      byWorker.get(row.workerId).push(row);
-    }
-    for (const [wid, group] of byWorker) {
-      const worker = byId.get(wid) || { name: 'Worker', dailyWage: 0 };
-      const days = group.reduce((s, r) => s + rowUnits(r), 0);
-      const wage = Number(worker.dailyWage) || 0;
-      total += days * wage;
-      lines.push(`${worker.name} ${days}d × Rs. ${wage}`);
-    }
-    total = Math.round(total * 100) / 100;
-    if (total <= 0) return res.status(400).json({ error: 'Wage total is 0. Set daily wages on workers first.' });
+      const lines = [];
+      let total = 0;
+      const byWorker = new Map();
+      for (const row of rows) {
+        if (!byWorker.has(row.workerId)) byWorker.set(row.workerId, []);
+        byWorker.get(row.workerId).push(row);
+      }
+      for (const [workerId, group] of byWorker) {
+        const worker = byId.get(workerId) || { name: 'Worker', dailyWage: 0 };
+        const days = group.reduce((sum, row) => sum + rowUnits(row), 0);
+        const wage = Number(worker.dailyWage) || 0;
+        total += days * wage;
+        lines.push(`${worker.name} ${days}d × Rs. ${wage}`);
+      }
+      total = Math.round(total * 100) / 100;
+      if (total <= 0) return { kind: 'zero_total' };
 
-    // Advances already paid out are settled by this posting — the ledger
-    // amount stays the GROSS wages (the advance was part of the same money).
-    const allAdvances = await LaborAdvance.find();
-    const openAdvances = allAdvances.filter((a) => !a.settled);
-    const advanceTotal = Math.round(openAdvances.reduce((s, a) => s + (Number(a.amount) || 0), 0) * 100) / 100;
-    const advNote = advanceTotal > 0
-      ? ` (advance already paid Rs. ${advanceTotal}; cash payable now Rs. ${Math.max(0, Math.round((total - advanceTotal) * 100) / 100)})`
-      : '';
+      const advancesQuery = LaborAdvance.find();
+      const allAdvances = await (session ? advancesQuery.session(session) : advancesQuery);
+      const openAdvances = allAdvances.filter((advance) => !advance.settled);
+      const advanceTotal = Math.round(openAdvances.reduce((sum, advance) => sum + (Number(advance.amount) || 0), 0) * 100) / 100;
+      const advNote = advanceTotal > 0
+        ? ` (advance already paid Rs. ${advanceTotal}; cash payable now Rs. ${Math.max(0, Math.round((total - advanceTotal) * 100) / 100)})`
+        : '';
 
-    const expense = await Expense.create({
-      _id: 'e-wages-' + month + '-' + Date.now(),
-      cowId: null,
-      date: `${month}-28`,
-      type: 'labor',
-      amount: total,
-      note: `Monthly labor wages ${month}: ${lines.join('; ')}${advNote}`,
+      const expense = (await Expense.insertMany([{
+        _id: 'e-wages-' + month + '-' + randomUUID(),
+        cowId: null,
+        date: `${month}-28`,
+        type: 'labor',
+        amount: total,
+        note: `Monthly labor wages ${month}: ${lines.join('; ')}${advNote}`,
+      }], options))[0];
+
+      const attendanceIds = rows.map((row) => row._id);
+      const posted = await LaborAttendance.updateMany(
+        { _id: { $in: attendanceIds }, posted: { $ne: true } },
+        { $set: { posted: true, expenseId: String(expense._id) } },
+        options,
+      );
+      const postedCount = posted.matchedCount ?? posted.modifiedCount ?? 0;
+      if (postedCount !== attendanceIds.length) {
+        throw new Error('Attendance changed during wage posting. The expense transaction was rolled back; retry the posting.');
+      }
+
+      if (openAdvances.length) {
+        const advanceIds = openAdvances.map((advance) => advance._id);
+        const settled = await LaborAdvance.updateMany(
+          { _id: { $in: advanceIds }, settled: { $ne: true } },
+          { $set: { settled: true } },
+          options,
+        );
+        const settledCount = settled.matchedCount ?? settled.modifiedCount ?? 0;
+        if (settledCount !== advanceIds.length) {
+          throw new Error('Labor advances changed during wage posting. The expense transaction was rolled back; retry the posting.');
+        }
+      }
+
+      return { kind: 'ok', amount: total, note: expense.note };
     });
-    for (const row of rows) {
-      row.posted = true;
-      row.expenseId = expense._id;
-      await row.save();
-    }
-    for (const adv of openAdvances) {
-      adv.settled = true;
-      await adv.save();
-    }
-    res.json({ ok: true, amount: total, note: expense.note });
+
+    if (result.kind === 'no_rows') return res.status(400).json({ error: 'No unposted attendance remains for this month.' });
+    if (result.kind === 'zero_total') return res.status(400).json({ error: 'Wage total is 0. Set daily wages on workers first.' });
+    res.json({ ok: true, amount: result.amount, note: result.note });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 

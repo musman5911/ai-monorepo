@@ -2,7 +2,7 @@
 // Completing a task auto-logs a Labor expense, deducts inventory, and marks
 // the deployed field crew's attendance for today.
 import express from 'express';
-import { Task, Finance, Inventory, Laborer, Attendance, Crop } from '../db.js';
+import { Task, Finance, Inventory, Laborer, Attendance, Crop, withFinancialTransaction } from '../db.js';
 import { mufIsFullRole } from '../muf-farms.mjs';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { notFound, forbidden, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
@@ -164,30 +164,31 @@ router.put('/tasks/:taskId', protect, requireAdmin, asyncHandler(async (req, res
 
 router.patch('/tasks/:taskId', protect, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.taskId, 'task ID');
-  const task = await Task.findOne({ _id: oid });
-  if (!task) return notFound(res, 'Task not found');
+  const result = await withFinancialTransaction([Task, Finance, Inventory, Laborer, Attendance], async (session) => {
+    const options = session ? { session } : {};
+    const taskQuery = Task.findOne({ _id: oid });
+    const task = await (session ? taskQuery.session(session) : taskQuery);
+    if (!task) return { kind: 'not_found' };
 
-  // Authorization: admins can complete any task; a worker may only complete
-  // tasks assigned to them.
-  if (!mufIsFullRole(req.user.role)) {
-    const assignedTo = String(task.assigned_to || '').toLowerCase().trim();
-    if (assignedTo !== String(req.user.username || '').toLowerCase().trim()) {
-      return forbidden(res, 'You can only complete tasks that are assigned to you.');
+    if (!mufIsFullRole(req.user.role)) {
+      const assignedTo = String(task.assigned_to || '').toLowerCase().trim();
+      if (assignedTo !== String(req.user.username || '').toLowerCase().trim()) {
+        return { kind: 'forbidden' };
+      }
     }
-  }
 
-  // Idempotency guard: completing an already-completed task must not
-  // double-log labor wages or double-deduct inventory.
-  if (task.status === 'Completed') {
-    return res.json({ status: 'ok', already_completed: true });
-  }
+    if (task.status === 'Completed') return { kind: 'already_completed' };
 
-  await Task.updateOne({ _id: oid }, { $set: { status: 'Completed' } });
+    // Claim the transition in the same transaction as every side effect.
+    const claim = await Task.updateOne(
+      { _id: oid, status: { $ne: 'Completed' } },
+      { $set: { status: 'Completed' } },
+      options,
+    );
+    if ((claim.matchedCount ?? claim.modifiedCount ?? 0) === 0) return { kind: 'already_completed' };
 
-  // 1. Auto-log labor wages if greater than 0
-  const laborCost = Number(task.labor_cost || 0);
-  if (laborCost > 0) {
-    try {
+    const laborCost = Number(task.labor_cost || 0);
+    if (laborCost > 0) {
       await Finance.insertMany([{
         category: `Labor Wages - ${task.title}`,
         amount: laborCost,
@@ -195,43 +196,37 @@ router.patch('/tasks/:taskId', protect, asyncHandler(async (req, res) => {
         date: todayStr(),
         crop_id: null,
         notes: `Wages paid to ${task.assigned_to || 'Workers'} for completing task: ${task.title}`,
-      }]);
-    } catch (finErr) {
-      console.log('Failed to auto-log labor wage:', finErr.message);
+      }], options);
     }
-  }
 
-  // 2. Auto-deduct inventory if specified (only when enough stock is available)
-  const invItemId = task.inventory_item_id;
-  const qtyConsumed = Number(task.inventory_qty_consumed || 0);
-  if (invItemId && qtyConsumed > 0) {
-    try {
-      const invItem = await Inventory.findOne({ _id: String(invItemId) });
-      if (invItem && (Number(invItem.current_stock) || 0) >= qtyConsumed) {
-        await Inventory.updateOne({ _id: String(invItemId) }, { $inc: { current_stock: -qtyConsumed } });
-      } else {
-        console.log(`⚠️ Skipped inventory deduction: insufficient stock or item not found for ${invItemId}`);
+    const invItemId = task.inventory_item_id;
+    const qtyConsumed = Number(task.inventory_qty_consumed || 0);
+    if (invItemId && qtyConsumed > 0) {
+      // Keep the stock check in the update filter to prevent concurrent tasks
+      // from consuming the same remaining units.
+      const stock = await Inventory.updateOne(
+        { _id: String(invItemId), current_stock: { $gte: qtyConsumed } },
+        { $inc: { current_stock: -qtyConsumed } },
+        options,
+      );
+      if ((stock.matchedCount ?? stock.modifiedCount ?? 0) === 0) {
+        console.log(`Skipped inventory deduction: insufficient stock or item not found for ${invItemId}`);
       }
-    } catch (invErr) {
-      console.log('Failed to auto-deduct inventory stock:', invErr.message);
     }
-  }
 
-  // 3. Auto-mark attendance for the deployed field crew (full day, today).
-  // Skips laborers already marked for the date so manual entries are never
-  // overwritten; posted (locked) days are also left untouched.
-  const crewIds = task.laborer_ids || [];
-  let crewMarked = 0;
-  if (crewIds.length) {
-    const attDate = todayStr();
-    for (const lid of crewIds) {
-      try {
-        const laborer = await Laborer.findOne({ _id: lid });
+    const crewIds = task.laborer_ids || [];
+    let crewMarked = 0;
+    if (crewIds.length) {
+      const attDate = todayStr();
+      for (const laborerId of crewIds) {
+        const laborerQuery = Laborer.findOne({ _id: laborerId });
+        const laborer = await (session ? laborerQuery.session(session) : laborerQuery);
         if (!laborer) continue;
-        const existing = await Attendance.findOne({ laborer_id: lid, date: attDate });
-        if (existing) continue; // already marked today (manually or by another task)
+        const attendanceQuery = Attendance.findOne({ laborer_id: laborerId, date: attDate });
+        const existing = await (session ? attendanceQuery.session(session) : attendanceQuery);
+        if (existing) continue;
         await Attendance.insertMany([{
-          laborer_id: lid,
+          laborer_id: laborerId,
           date: attDate,
           day_type: 'full',
           day_units: 1.0,
@@ -239,15 +234,18 @@ router.patch('/tasks/:taskId', protect, asyncHandler(async (req, res) => {
           field: '',
           notes: `Auto: task '${task.title}' completed`,
           posted: false,
-        }]);
+        }], options);
         crewMarked += 1;
-      } catch (attErr) {
-        console.log('Failed to auto-mark crew attendance:', attErr.message);
       }
     }
-  }
 
-  return res.json({ status: 'ok', crew_attendance_marked: crewMarked });
+    return { kind: 'ok', crewMarked };
+  });
+
+  if (result.kind === 'not_found') return notFound(res, 'Task not found');
+  if (result.kind === 'forbidden') return forbidden(res, 'You can only complete tasks that are assigned to you.');
+  if (result.kind === 'already_completed') return res.json({ status: 'ok', already_completed: true });
+  return res.json({ status: 'ok', crew_attendance_marked: result.crewMarked });
 }));
 
 router.delete('/tasks/:taskId', protect, requireAdmin, asyncHandler(async (req, res) => {
