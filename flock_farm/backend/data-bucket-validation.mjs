@@ -53,6 +53,21 @@ export function validateDataBucketValue(key, value) {
   } else {
     return { error: 'Unknown data bucket.' };
   }
+  if (key === 'laborAttendance') {
+    const seenWorkerDays = new Set();
+    for (const [index, row] of value.entries()) {
+      const workerId = typeof row.workerId === 'string' ? row.workerId.trim() : '';
+      const date = typeof row.date === 'string' ? row.date.trim() : '';
+      if (!workerId || !/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) {
+        return { error: `Labor attendance record ${index + 1} must include a worker ID and YYYY-MM-DD date.` };
+      }
+      const workerDay = `${workerId}:${date}`;
+      if (seenWorkerDays.has(workerDay)) {
+        return { error: `Worker "${workerId}" already has attendance for ${date}. Duplicate worker/day records are not allowed.` };
+      }
+      seenWorkerDays.add(workerDay);
+    }
+  }
   const error = inspectJson(value);
   return error ? { error } : { value };
 }

@@ -10,6 +10,23 @@ describe('Flock generic data bucket validation', () => {
     expect(validateDataBucketValue('settings', { dailySummary: true }).error).toBeUndefined();
   });
 
+  it('rejects missing attendance identity and duplicate worker/day records', () => {
+    expect(validateDataBucketValue('laborAttendance', [
+      { id: 'att-1', workerId: 'worker-1', date: '2026-11-08', dayType: 'full' },
+    ]).error).toBeUndefined();
+    expect(validateDataBucketValue('laborAttendance', [
+      { id: 'att-1', workerId: 'worker-1', date: '2026-11-08', dayType: 'full' },
+      { id: 'att-2', workerId: 'worker-1', date: '2026-11-08', dayType: 'half' },
+    ]).error).toMatch(/already has attendance/);
+    expect(validateDataBucketValue('laborAttendance', [
+      { id: 'att-1', workerId: 'worker-1', date: '2026-11-08' },
+      { id: 'att-2', workerId: 'worker-2', date: '2026-11-08' },
+    ]).error).toBeUndefined();
+    expect(validateDataBucketValue('laborAttendance', [
+      { id: 'att-1', workerId: 'worker-1', date: 'not-a-date' },
+    ]).error).toMatch(/worker ID and YYYY-MM-DD date/);
+  });
+
   it('rejects unsafe nested keys, non-finite numbers, deep structures and oversized strings', () => {
     const polluted = JSON.parse('{"safe":1,"__proto__":{"isAdmin":true}}');
     expect(validateDataBucketValue('settings', polluted).error).toMatch(/blocked object key/);

@@ -117,6 +117,20 @@ describe('incubation data route inventory lock integration', () => {
   });
 
 
+  it('rejects duplicate worker/day rows before saving the attendance bucket', async () => {
+    const value = [
+      { id: 'att-1', workerId: 'worker-1', date: '2026-11-08', batchId: 'BATCH-1' },
+      { id: 'att-2', workerId: 'worker-1', date: '2026-11-08', batchId: 'BATCH-1' },
+    ];
+    const res = makeResponse();
+    await putIncubation(makeRequest(value, 'laborAttendance'), res);
+
+    expect(res.statusCode).toBe(400);
+    expect(res.body.error).toMatch(/already has attendance/);
+    expect(state.savedValue).toBeNull();
+    expect(state.lockHeld).toBe(false);
+  });
+
   it('also serializes batch-linked labor attendance writes with batch deletion', async () => {
     const value = [{ id: 'att-1', batchId: 'BATCH-1' }];
     const res = makeResponse();

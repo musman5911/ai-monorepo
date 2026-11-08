@@ -10,6 +10,7 @@ import express from 'express';
 import { timingSafeEqual } from 'crypto';
 import { authRequired, requireRole } from '../middleware/auth.js';
 import DataStore from '../models/DataStore.js';
+import { acquireEggInventoryLock } from '../egg-inventory-lock.mjs';
 import Farm from '../models/Farm.js';
 import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext, mufIsOwner } from '../muf-farms.mjs';
 import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
@@ -210,12 +211,26 @@ router.post('/webhook/:secret', async (req, res) => {
 
     if (cmd.kind === 'attendance') {
       if (!link.laborerId) return send('آپ کے کھاتے کے ساتھ مزدور پروفائل منسلک نہیں — ایڈمن سے کہیں کہ لنک کوڈ بناتے وقت ورکر بھی چنے۔');
-      const attendance = await readStore('laborAttendance', []);
-      const already = attendance.find((r) => String(r.workerId) === String(link.laborerId) && r.date === date);
-      if (already) return send(`آج کی حاضری پہلے سے لگی ہے (${date})۔`);
-      attendance.push({ id: `la-tg-${Date.now()}`, workerId: link.laborerId, date, dayType: 'full', posted: false, notes: 'via Telegram' });
-      await writeStore('laborAttendance', attendance);
-      return send(TG.saved(`حاضری (پورا دن) — ${date}`));
+      // Use the same persisted farm lock as the app's attendance bucket route.
+      // This prevents Telegram and browser saves from racing on stale snapshots.
+      const release = await acquireEggInventoryLock(DataStore);
+      try {
+        const attendance = await readStore('laborAttendance', []);
+        const already = attendance.find((r) => String(r.workerId) === String(link.laborerId) && r.date === date);
+        if (already) return send(`آج کی حاضری پہلے سے لگی ہے (${date})۔`);
+        attendance.push({
+          id: `la-tg-${String(mufGetFarmContext()?.farmId || mufGetDefaultFarmId())}-${link.laborerId}-${date}`,
+          workerId: link.laborerId,
+          date,
+          dayType: 'full',
+          posted: false,
+          notes: 'via Telegram',
+        });
+        await writeStore('laborAttendance', attendance);
+        return send(TG.saved(`حاضری (پورا دن) — ${date}`));
+      } finally {
+        await release();
+      }
     }
 
     if (cmd.kind === 'summary') {
