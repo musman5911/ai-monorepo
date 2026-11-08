@@ -1,5 +1,5 @@
 // Shared route helpers for the agri backend (error format + id validation).
-import { mufRunUnscoped } from '../muf-farms.mjs';
+import { mufGetFarmContext, mufRunUnscoped } from '../muf-farms.mjs';
 
 // FastAPI-style error payload: { detail: '...' } — the React frontend reads
 // err.response.data.detail everywhere.
@@ -36,12 +36,21 @@ export function parseOid(value, label = 'ID') {
 // within the farm first (404 if it belongs elsewhere), then replace it while keeping
 // its farmId. Returns { matchedCount } like replaceOne.
 export async function replaceFarmRecord(Model, oid, doc) {
-  const existing = await Model.findOne({ _id: oid });
+  const ctx = mufGetFarmContext();
+  if (!ctx || ctx.mode !== 'single' || !ctx.farmId) {
+    throw new Error('replaceFarmRecord requires one selected farm.');
+  }
+
+  // Carry the selected farm through the replacement itself. The preceding
+  // scoped read is not enough: a record could be moved between that read and
+  // replaceOne, which runs unscoped because mongoose blocks replaceOne in a
+  // request context.
+  const filter = { _id: oid, farmId: ctx.farmId };
+  const existing = await Model.findOne(filter);
   if (!existing) return { matchedCount: 0, modifiedCount: 0 };
-  const next = { ...doc };
-  delete next.farmId;
-  if (existing.farmId) next.farmId = existing.farmId;
-  return mufRunUnscoped(() => Model.replaceOne({ _id: oid }, next));
+
+  const next = { ...doc, farmId: ctx.farmId };
+  return mufRunUnscoped(() => Model.replaceOne(filter, next));
 }
 
 // Wrap a route handler so thrown HttpError / unexpected errors become JSON.

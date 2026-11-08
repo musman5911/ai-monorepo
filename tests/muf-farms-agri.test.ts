@@ -76,6 +76,30 @@ describe('agri scoping', () => {
     expect(row).toMatchObject({ name: 'Maize', farmId: 'fa' });
     expect(row.old).toBeUndefined(); // still a full replace, like before
   });
+
+  it('does not replace a record if it moves farms after the scoped read', async () => {
+    const m = setup();
+    await mufRunWithFarmContext(ctxA, () => m.Crop.create({ _id: 'c1', name: 'Wheat', old: 1 }));
+
+    const originalReplaceOne = m.Crop.replaceOne.bind(m.Crop);
+    m.Crop.replaceOne = async (filter, replacement) => {
+      // Simulate an owner moving the record after the request's read, but
+      // before its unscoped full-record replacement.
+      await mufRunUnscoped(() => m.Crop.updateOne(
+        { _id: 'c1' },
+        { $set: { farmId: 'fb' } },
+      ));
+      return originalReplaceOne(filter, replacement);
+    };
+
+    const result = await mufRunWithFarmContext(ctxA, () =>
+      replaceFarmRecord(m.Crop, 'c1', { name: 'Unauthorized replacement' }),
+    );
+    expect(result.matchedCount).toBe(0);
+
+    const row = await mufRunUnscoped(() => m.Crop.findOne({ _id: 'c1' }));
+    expect(row).toMatchObject({ name: 'Wheat', farmId: 'fb', old: 1 });
+  });
 });
 
 describe('agri migration', () => {
