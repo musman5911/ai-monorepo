@@ -23,6 +23,7 @@ async function restoreMissingFarms(payload) {
 }
 import { sendMail, mailConfigured, mufEmail } from '../utils/mailer.js';
 import { MUF_ENV } from '../muf-env.mjs';
+import { withRestoreRecovery } from '../../../shared/muf-restore-recovery.mjs';
 
 // GET /api/backup — download full database as JSON
 router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
@@ -125,60 +126,68 @@ router.post('/restore', protectUnscoped, ...adminOnly, async (req, res) => {
   }
 
   const hasData = Object.keys(COLLECTIONS).some(key => Array.isArray(payload[key]) && payload[key].length > 0);
-  if (!hasData) {
-    return res.status(400).json({ error: 'Backup contains no data to restore' });
-  }
+  if (!hasData) return res.status(400).json({ error: 'Backup contains no data to restore' });
 
-  // Prefer atomic transaction; fall back for standalone Mongo / memory mode.
-  // IMPORTANT: startSession() must live INSIDE the try — in memory mode there
-  // is no Mongo connection, it throws after a buffering timeout, and an
-  // unhandled rejection here used to CRASH the whole server.
   let session = null;
   try {
-    let usedTransaction = false;
+    const usedTransaction = await withRestoreRecovery({
+      createSnapshot: async () => {
+        // The monthly slot is refreshed from a full current-state snapshot.
+        // A failed snapshot aborts before any collection is cleared.
+        const stored = await maybeRunMonthlyAutoBackup(true);
+        return stored.payload;
+      },
+      restore: async () => {
+        let atomic = false;
+        if (!MUF_ENV.memoryMode && mongoose.connection.readyState === 1) {
+          try { session = await mongoose.startSession(); } catch { session = null; }
+        }
 
-    if (!MUF_ENV.memoryMode && mongoose.connection.readyState === 1) {
-      try { session = await mongoose.startSession(); } catch { session = null; }
-    }
+        await restoreMissingFarms(payload);
+        if (session) {
+          try {
+            await session.withTransaction(async () => {
+              await restoreCollections(payload, session);
+            });
+            atomic = true;
+          } catch (txErr) {
+            const msg = String(txErr?.message || txErr || '');
+            const noTxn =
+              msg.includes('Transaction numbers are only allowed') ||
+              msg.includes('replica set') ||
+              msg.includes('not supported') ||
+              txErr?.code === 20 ||
+              txErr?.codeName === 'IllegalOperation';
+            if (!noTxn) throw txErr;
 
-    await restoreMissingFarms(payload);
-    if (session) {
-      try {
-        await session.withTransaction(async () => {
-          await restoreCollections(payload, session);
-        });
-        usedTransaction = true;
-      } catch (txErr) {
-        const msg = String(txErr?.message || txErr || '');
-        const noTxn =
-          msg.includes('Transaction numbers are only allowed') ||
-          msg.includes('replica set') ||
-          msg.includes('not supported') ||
-          txErr?.code === 20 ||
-          txErr?.codeName === 'IllegalOperation';
+            console.warn('Backup restore: transactions unavailable, using sequential restore with rollback protection.');
+            await restoreCollections(payload, null);
+          }
+        } else {
+          await restoreCollections(payload, null);
+        }
 
-        if (!noTxn) throw txErr;
+        await tagAfterRestore();
+        return atomic;
+      },
+      rollback: async (snapshot) => {
+        await restoreMissingFarms(snapshot);
+        await restoreCollections(snapshot, null);
+        await tagAfterRestore();
+      },
+    });
 
-        // Standalone fallback — not atomic, but functional
-        console.warn('Backup restore: transactions unavailable, using sequential restore.');
-        await restoreCollections(payload, null);
-      }
-    } else {
-      // Memory mode / not connected: plain sequential restore.
-      await restoreCollections(payload, null);
-    }
-
-    await tagAfterRestore();
-    res.json({
+    return res.json({
       success: true,
       message: usedTransaction
         ? 'Data restored successfully (atomic)'
-        : 'Data restored successfully (sequential)',
+        : 'Data restored successfully (sequential; recovery snapshot saved)',
+      recoverySnapshot: 'saved',
     });
   } catch (e) {
-    res.status(500).json({ error: `Restore failed: ${e.message}` });
+    return res.status(500).json({ error: `Restore failed: ${e.message}` });
   } finally {
-    if (session) session.endSession();
+    if (session) await session.endSession().catch((error) => console.error('Failed to end restore session:', error));
   }
 });
 
@@ -286,11 +295,26 @@ router.post('/restore-auto', protectUnscoped, ...adminOnly, async (_req, res) =>
     const value = (existing && existing.value) || null;
     if (!value || !value.payload) return res.status(404).json({ error: 'No auto-backup available yet' });
     validateBackupPayload(value.payload);
-    await restoreMissingFarms(value.payload);
-    await restoreCollections(value.payload, null);
-    await tagAfterRestore();
-    res.json({ success: true, message: `Restored from ${value.name}` });
-  } catch (e) { res.status(500).json({ error: `Restore failed: ${e.message}` }); }
+    await withRestoreRecovery({
+      createSnapshot: async () => {
+        const stored = await maybeRunMonthlyAutoBackup(true);
+        return stored.payload;
+      },
+      restore: async () => {
+        await restoreMissingFarms(value.payload);
+        await restoreCollections(value.payload, null);
+        await tagAfterRestore();
+      },
+      rollback: async (snapshot) => {
+        await restoreMissingFarms(snapshot);
+        await restoreCollections(snapshot, null);
+        await tagAfterRestore();
+      },
+    });
+    return res.json({ success: true, message: `Restored from ${value.name}`, recoverySnapshot: 'saved' });
+  } catch (e) {
+    return res.status(500).json({ error: `Restore failed: ${e.message}` });
+  }
 });
 
 export default router;
