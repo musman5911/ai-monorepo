@@ -7,6 +7,7 @@ import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-fa
 import { HttpError, badRequest, notFound, asyncHandler } from '../utils/helpers.js';
 import { sendEmail, mufEmail, mailConfigured } from '../utils/mailer.js';
 import { MUF_ENV } from '../muf-env.mjs';
+import { withRestoreRecovery } from '../../../shared/muf-restore-recovery.mjs';
 
 const router = express.Router();
 
@@ -220,17 +221,17 @@ router.get('/backup', protectUnscoped, ...requireAdmin, asyncHandler(async (_req
 router.post('/restore', protectUnscoped, ...requireAdmin, asyncHandler(async (req, res) => {
   const payload = req.body || {};
   validateBackupPayload(payload);
-  // Safety net: snapshot current data into the auto-backup slot before the
-  // destructive restore, so a mistaken restore can be undone via /restore/auto.
-  try {
-    await maybeRunMonthlyAutoBackup(true);
-  } catch (snapErr) {
-    console.log(`⚠️ [Restore] Pre-restore snapshot failed (continuing): ${snapErr.message}`);
-  }
-  if (!await applyBackupPayload(payload)) {
-    return badRequest(res, 'Backup has no valid data to restore');
-  }
-  return res.json({ status: 'ok' });
+  const restored = await withRestoreRecovery({
+    createSnapshot: async () => {
+      // Persist the rollback point before touching any source collection.
+      const stored = await maybeRunMonthlyAutoBackup(true);
+      return stored.payload;
+    },
+    restore: () => applyBackupPayload(payload),
+    rollback: (snapshot) => applyBackupPayload(snapshot),
+  });
+  if (!restored) return badRequest(res, 'Backup has no valid data to restore');
+  return res.json({ status: 'ok', recoverySnapshot: 'saved' });
 }));
 
 router.get('/backup/auto', protectUnscoped, ...requireAdmin, asyncHandler(async (_req, res) => {
@@ -254,8 +255,17 @@ router.post('/restore/auto', protectUnscoped, ...requireAdmin, asyncHandler(asyn
   const payload = value.payload;
   if (!payload) return notFound(res, 'No automatic monthly backup is stored yet.');
   validateBackupPayload(payload);
-  await applyBackupPayload(payload);
-  return res.json({ status: 'ok', name: value.name });
+  await withRestoreRecovery({
+    createSnapshot: async () => {
+      // Capture the current state first. The target payload is already held in
+      // memory, so refreshing the monthly slot does not lose the requested restore.
+      const stored = await maybeRunMonthlyAutoBackup(true);
+      return stored.payload;
+    },
+    restore: () => applyBackupPayload(payload),
+    rollback: (snapshot) => applyBackupPayload(snapshot),
+  });
+  return res.json({ status: 'ok', name: value.name, recoverySnapshot: 'saved' });
 }));
 
 export { maybeRunMonthlyAutoBackup };
