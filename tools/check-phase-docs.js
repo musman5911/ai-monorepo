@@ -66,77 +66,20 @@ for (const r of rows) {
 }
 
 // Phase 19 contains a destructive-database safety rule. Guard the complete
-// sentence as well as the one-title rule above so a duplicate paste cannot
-// split the sentence while still leaving the visible status/index checks green.
+// sentence so accidental duplicate pastes cannot split it while status/index
+// checks continue to pass.
 const phase19Row = rows.find((r) => r.n === 19);
 if (phase19Row) {
   const phase19Path = path.join(PHASES, phase19Row.file);
   const phase19Text = fs.existsSync(phase19Path) ? read(phase19Path) : '';
-  const safetyRule = 'The database name must match `^muf_(phase19|test|demo|seed)_[a-z0-9_]+#!/usr/bin/env node
-// Docs check (`npm run check-docs`). Keeps the phase documents honest and in step:
-//   - docs/phases/README.md lists every phase file, and every row has a file
-//   - each phase file has the required sections and the same status as the index
-//   - Phase 0 is Done, there are 12+ later phases, the last three are final testing
-//   - docs/PROGRESS.md and docs/ROADMAP.md mention every phase
-//   - relative links in the phase docs resolve
-//   - RULES.md carries the phase workflow rules
-const fs = require('node:fs');
-const path = require('node:path');
-
-const ROOT = path.resolve(__dirname, '..');
-const DOCS = path.join(ROOT, 'docs');
-const PHASES = path.join(DOCS, 'phases');
-const STATUSES = new Set(['Done', 'In progress', 'Not started']);
-const REQUIRED = [
-  'Goal', 'Already in place', 'Scope', 'Out of scope', 'Steps', 'New command-line check',
-  'Command-line checks at the end of this phase', 'Done checklist', 'Rules for whoever works on this phase',
-];
-const REQUIRED_PHASE0 = ['Evidence', 'What is done', 'Not done', 'Not verified'];
-
-let failures = 0;
-const ok = (cond, label) => {
-  if (cond) console.log(`  ✓ ${label}`);
-  else { failures += 1; console.log(`  ✗ ${label}`); }
-};
-const read = (p) => fs.readFileSync(p, 'utf8');
-
-console.log('\nPhase docs check');
-const indexPath = path.join(PHASES, 'README.md');
-ok(fs.existsSync(indexPath), 'docs/phases/README.md exists');
-if (!fs.existsSync(indexPath)) { process.exit(1); }
-
-const rows = [];
-for (const line of read(indexPath).split(/\r?\n/)) {
-  const m = line.match(/^\|\s*(\d+)\s*\|\s*(.+?)\s*\|\s*(Done|In progress|Not started)\s*\|\s*\[([^\]]+)\]\(([^)]+)\)\s*\|$/);
-  if (m) rows.push({ n: Number(m[1]), title: m[2], status: m[3], file: m[5] });
-}
-ok(rows.length >= 13, `the index lists Phase 0 plus at least 12 later phases (found ${rows.length})`);
-ok(rows.every((r, i) => r.n === i), 'phase numbers run 0, 1, 2 ... without gaps');
-ok(rows[0] && rows[0].status === 'Done', 'Phase 0 is Done');
-const lastThree = rows.slice(-3);
-ok(lastThree.length === 3 && lastThree.every((r) => /^Final testing/.test(r.title)), 'the last three phases are the final testing phases');
-ok(rows.slice(1, -3).every((r) => !/^Final testing/.test(r.title)), 'no final-testing phase appears before the end');
-
-const onDisk = fs.readdirSync(PHASES).filter((f) => /^phase-\d+-.*\.md$/.test(f));
-ok(onDisk.length === rows.length, `every phase file is listed and every row has a file (${onDisk.length} files, ${rows.length} rows)`);
-
-for (const r of rows) {
-  const p = path.join(PHASES, r.file);
-  if (!fs.existsSync(p)) { ok(false, `Phase ${r.n}: file ${r.file} exists`); continue; }
-  const text = read(p);
-  const status = (text.match(/\*\*Status:\*\*\s*([^\n.]+)/) || [])[1];
-  const head = text.split(/\r?\n/)[0];
-  const h1s = text.match(/^# .+$/gm) || [];
-  ok(h1s.length === 1 && h1s[0] === head, `Phase ${r.n}: has exactly one top-level title at the start of the file`);
-  ok(new RegExp(`^# Phase ${r.n}:`).test(head), `Phase ${r.n}: title line starts with "# Phase ${r.n}:"`);
-  ok(status && STATUSES.has(status.trim()) && status.trim() === r.status, `Phase ${r.n}: status matches the index (${r.status})`);
-  const required = r.n === 0 ? REQUIRED_PHASE0 : REQUIRED;
-  const missing = required.filter((h) => !new RegExp(`^##+ ${h}`, 'm').test(text));
-  ok(missing.length === 0, `Phase ${r.n}: has all required sections${missing.length ? ` (missing: ${missing.join(', ')})` : ''}`);
-  if (r.n > 0) {
-    const nc = (text.split(/^## New command-line check\s*$/m)[1] || '').split(/^## /m)[0].trim();
-    ok(nc.length > 20, `Phase ${r.n}: names a new command-line check`);
-; names containing `prod`, `production`, or `live` are refused, as is `NODE_ENV=production`.';
+  const tick = String.fromCharCode(96);
+  const safetyRule = [
+    'The database name must match ', tick,
+    '^muf_(phase19|test|demo|seed)_[a-z0-9_]+$', tick,
+    '; names containing ', tick, 'prod', tick, ', ', tick, 'production', tick,
+    ', or ', tick, 'live', tick, ' are refused, as is ',
+    tick, 'NODE_ENV=production', tick, '.',
+  ].join('');
   ok(phase19Text.includes(safetyRule), 'Phase 19 keeps the complete disposable-database name safety rule intact');
 }
 
