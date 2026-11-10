@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import express from 'express';
 const router = express.Router();
-import { Cow, Milk, Expense, Health, Sale, Rate, RateHistory } from '../db.js';
+import { Cow, Milk, Expense, Health, Sale, Rate, RateHistory, BreedingEvent } from '../db.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import {
   readString,
@@ -446,21 +446,30 @@ router.delete('/:id', protect, adminOnly, async (req, res) => {
     const cow = await Cow.findById(cowId);
     if (!cow) return res.status(404).json({ error: 'Not found' });
 
-    // Cascade: remove all linked operational data so reports don't keep ghosts
-    await Promise.all([
-      Expense.deleteMany({ $or: [{ cowId }, { _purchaseCowId: cowId }] }),
-      Milk.deleteMany({ cowId }),
-      Health.deleteMany({ cowId }),
-      Sale.deleteMany({ cowId }),
-      // Detach offspring mother link + calving history refs on other cows
-      Cow.updateMany({ motherId: cowId }, { $set: { motherId: '' } }),
-      Cow.updateMany(
-        { 'calvingHistory.calfId': cowId },
-        { $pull: { calvingHistory: { calfId: cowId } } }
-      ),
+    const [
+      milkRecords, healthRecords, expenseRecords, saleRecords,
+      breedingRecords, dependentCows, calvingHistoryLinks,
+    ] = await Promise.all([
+      Milk.countDocuments({ cowId }),
+      Health.countDocuments({ cowId }),
+      Expense.countDocuments({ $or: [{ cowId }, { _purchaseCowId: cowId }] }),
+      Sale.countDocuments({ cowId }),
+      BreedingEvent.countDocuments({ $or: [{ cowId }, { bullId: cowId }, { generatedCalfIds: cowId }] }),
+      Cow.countDocuments({ $or: [{ motherId: cowId }, { fatherId: cowId }] }),
+      Cow.countDocuments({ 'calvingHistory.calfId': cowId }),
     ]);
+    const linkedRecords = milkRecords + healthRecords + expenseRecords + saleRecords
+      + breedingRecords + dependentCows + calvingHistoryLinks;
+    if (linkedRecords) {
+      return res.status(409).json({
+        error: 'This animal has linked milk, health, financial, sale, breeding or lineage history. Keep it in the register and mark it inactive instead of deleting its history.',
+        milkRecords, healthRecords, expenseRecords, saleRecords,
+        breedingRecords, dependentCows, calvingHistoryLinks,
+      });
+    }
 
-    await Cow.findByIdAndDelete(cowId);
+    const result = await Cow.deleteOne({ _id: cowId });
+    if (!result.deletedCount) return res.status(404).json({ error: 'Not found' });
     try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
     res.json({ deleted: true });
   } catch (e) { res.status(500).json({ error: e.message }); }

@@ -1,6 +1,6 @@
 // ─── Crop routes (mirrors the previous FastAPI backend) ─────────────────────
 import express from 'express';
-import { Crop, CropPhoto, Spray, Field } from '../db.js';
+import { Crop, CropPhoto, Spray, Field, Finance, Liability, Irrigation, Task, Attendance } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { mufIsFullRole } from '../muf-farms.mjs';
@@ -126,12 +126,29 @@ router.patch('/crops/:cropId', protect, requireAdmin, asyncHandler(async (req, r
 router.delete('/crops/:cropId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const cropId = req.params.cropId;
   const oid = parseOid(cropId, 'crop ID');
+  const crop = await Crop.findOne({ _id: oid });
+  if (!crop) return notFound(res, 'Crop not found');
+
+  const [linkedFinance, linkedLiabilities, linkedTasks, linkedIrrigation, linkedSprays, linkedAttendance] = await Promise.all([
+    Finance.countDocuments({ crop_id: cropId }),
+    Liability.countDocuments({ crop_id: cropId }),
+    Task.countDocuments({ crop_id: cropId }),
+    Irrigation.countDocuments({ crop_id: cropId }),
+    Spray.countDocuments({ crop_id: cropId }),
+    Attendance.countDocuments({ crop_id: cropId }),
+  ]);
+  const linkedRecords = linkedFinance + linkedLiabilities + linkedTasks + linkedIrrigation + linkedSprays + linkedAttendance;
+  if (linkedRecords) {
+    return res.status(409).json({
+      error: 'This crop is linked to finance, liabilities, tasks or field history. Move or remove those records before deleting the crop.',
+      linkedFinance, linkedLiabilities, linkedTasks, linkedIrrigation, linkedSprays, linkedAttendance,
+    });
+  }
+
+  // Crop diary photos are dependent media, not ledger/history records.
   const result = await Crop.deleteOne({ _id: oid });
   if (!result.deletedCount) return notFound(res, 'Crop not found');
-  // Free storage: remove this crop's diary photos (and spray-log photos)
-  // so deleted crops never leave orphaned image data in the database.
   await CropPhoto.deleteMany({ crop_id: cropId });
-  await Spray.updateMany({ crop_id: cropId }, { $set: { image_base64: '' } });
   try { await cleanupOrphanPhotoAssets(); } catch (cleanupError) { console.error('[photos] orphan cleanup deferred:', cleanupError); }
   return res.json({ status: 'ok' });
 }));

@@ -1,7 +1,7 @@
 import { randomUUID } from 'crypto';
 import express from 'express';
 const router = express.Router();
-import { Buyer, BuyerPayment } from '../db.js';
+import { Buyer, BuyerPayment, Milk } from '../db.js';
 import { protect, adminOnly } from '../middleware/auth.js';
 import { readString, readNonNegativeNumber, sendValidationError } from './input.js';
 
@@ -46,7 +46,20 @@ router.put('/:id', protect, adminOnly, async (req, res) => {
 
 router.delete('/:id', protect, adminOnly, async (req, res) => {
   try {
-    await Buyer.findByIdAndDelete(req.params.id);
+    const buyer = await Buyer.findById(req.params.id);
+    if (!buyer) return res.status(404).json({ error: 'Buyer not found' });
+    const [payments, milkRecords] = await Promise.all([
+      BuyerPayment.countDocuments({ buyerId: String(buyer._id) }),
+      Milk.countDocuments({ buyerId: String(buyer._id) }),
+    ]);
+    if (payments || milkRecords) {
+      return res.status(409).json({
+        error: 'This buyer has payment or milk-sale history. Remove or reconcile those linked records before deleting the buyer.',
+        linkedPayments: payments, linkedMilkRecords: milkRecords,
+      });
+    }
+    const removed = await Buyer.deleteOne({ _id: buyer._id });
+    if (!removed.deletedCount) return res.status(404).json({ error: 'Buyer not found' });
     res.json({ deleted: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -81,9 +94,11 @@ router.post('/:id/payments', protect, async (req, res) => {
 
 router.put('/:id/payments/:paymentId', protect, adminOnly, async (req, res) => {
   try {
+    const buyer = await Buyer.findById(req.params.id);
+    if (!buyer) return res.status(404).json({ error: 'Buyer not found' });
     const errors = [];
-    const payment = await BuyerPayment.findById(req.params.paymentId);
-    if (!payment) return res.status(404).json({ error: 'Payment not found' });
+    const payment = await BuyerPayment.findOne({ _id: req.params.paymentId, buyerId: String(buyer._id) });
+    if (!payment) return res.status(404).json({ error: 'Payment not found for this buyer' });
     if (req.body.date !== undefined) payment.date = readString(req.body, 'date', errors, { required: true, allowEmpty: false });
     if (req.body.amount !== undefined) {
       const amount = readNonNegativeNumber(req.body, 'amount', errors, { required: true });
@@ -99,7 +114,10 @@ router.put('/:id/payments/:paymentId', protect, adminOnly, async (req, res) => {
 
 router.delete('/:id/payments/:paymentId', protect, adminOnly, async (req, res) => {
   try {
-    await BuyerPayment.findByIdAndDelete(req.params.paymentId);
+    const buyer = await Buyer.findById(req.params.id);
+    if (!buyer) return res.status(404).json({ error: 'Buyer not found' });
+    const removed = await BuyerPayment.deleteOne({ _id: req.params.paymentId, buyerId: String(buyer._id) });
+    if (!removed.deletedCount) return res.status(404).json({ error: 'Payment not found for this buyer' });
     res.json({ deleted: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });

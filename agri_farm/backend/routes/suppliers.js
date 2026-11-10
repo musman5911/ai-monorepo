@@ -3,7 +3,7 @@
 // in the expense form) so nothing is counted twice; payments made to the
 // supplier live in their own collection. Balance = purchases - payments.
 import express from 'express';
-import { Supplier, SupplierPayment } from '../db.js';
+import { Supplier, SupplierPayment, Finance } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { badRequest, notFound, parseOid, asyncHandler, replaceFarmRecord } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
@@ -34,9 +34,21 @@ router.put('/suppliers/:supplierId', protect, requireAdmin, asyncHandler(async (
 
 router.delete('/suppliers/:supplierId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const supplierId = req.params.supplierId;
-  const result = await Supplier.deleteOne({ _id: parseOid(supplierId, 'supplier ID') });
+  const oid = parseOid(supplierId, 'supplier ID');
+  const supplier = await Supplier.findOne({ _id: oid });
+  if (!supplier) return notFound(res, 'Supplier not found');
+  const [linkedPayments, linkedFinance] = await Promise.all([
+    SupplierPayment.countDocuments({ supplier_id: String(supplier._id) }),
+    Finance.countDocuments({ supplier_id: String(supplier._id) }),
+  ]);
+  if (linkedPayments || linkedFinance) {
+    return res.status(409).json({
+      error: 'This supplier has payment or purchase history. Keep the supplier record or reconcile those entries before deleting it.',
+      linkedPayments, linkedFinance,
+    });
+  }
+  const result = await Supplier.deleteOne({ _id: oid });
   if (!result.deletedCount) return notFound(res, 'Supplier not found');
-  await SupplierPayment.deleteMany({ supplier_id: supplierId });
   return res.json({ status: 'ok' });
 }));
 

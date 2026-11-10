@@ -1,6 +1,6 @@
 // ─── Inventory & stock operations (admin only) ──────────────────────────────
 import express from 'express';
-import { Inventory } from '../db.js';
+import { Inventory, Task, Spray } from '../db.js';
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { parseOid, asyncHandler, notFound } from '../utils/helpers.js';
 import { normalizeInventoryInput } from '../record-validation.mjs';
@@ -33,7 +33,20 @@ router.put('/inventory/:itemId', protect, requireAdmin, asyncHandler(async (req,
 
 router.delete('/inventory/:itemId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.itemId, 'inventory ID');
-  await Inventory.deleteOne({ _id: oid });
+  const item = await Inventory.findOne({ _id: oid });
+  if (!item) return notFound(res, 'Inventory item not found');
+  const [linkedTasks, linkedSprays] = await Promise.all([
+    Task.countDocuments({ inventory_item_id: String(oid) }),
+    Spray.countDocuments({ inventory_item_id: String(oid) }),
+  ]);
+  if (linkedTasks || linkedSprays) {
+    return res.status(409).json({
+      error: 'This inventory item is linked to tasks or spray logs. Update those records before deleting the item.',
+      linkedTasks, linkedSprays,
+    });
+  }
+  const result = await Inventory.deleteOne({ _id: oid });
+  if (!result.deletedCount) return notFound(res, 'Inventory item not found');
   return res.json({ status: 'ok' });
 }));
 

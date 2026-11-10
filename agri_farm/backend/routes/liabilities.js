@@ -32,8 +32,18 @@ router.put('/liabilities/:itemId', protect, requireAdmin, asyncHandler(async (re
   if (normalized.value.crop_id && !(await Crop.findById(normalized.value.crop_id).lean())) {
     return res.status(400).json({ error: 'Crop must exist in the selected farm.' });
   }
-  const result = await Liability.updateOne({ _id: oid }, { $set: normalized.value });
-  if (result.matchedCount === 0) return notFound(res, 'Liability not found');
+  const existing = await Liability.findOne({ _id: oid });
+  if (!existing) return notFound(res, 'Liability not found');
+  if (existing.status === 'Paid') {
+    return res.status(409).json({ error: 'A settled liability is locked because its settlement is recorded in the finance ledger.' });
+  }
+  const result = await Liability.updateOne(
+    { _id: oid, status: { $ne: 'Paid' } },
+    { $set: normalized.value },
+  );
+  if (!result.matchedCount) {
+    return res.status(409).json({ error: 'This liability was settled while the update was being saved. Settled liabilities cannot be edited.' });
+  }
   return res.json({ status: 'ok' });
 }));
 
@@ -86,7 +96,15 @@ router.put('/liabilities/:itemId/pay', protect, requireAdmin, asyncHandler(async
 }));
 router.delete('/liabilities/:itemId', protect, requireAdmin, asyncHandler(async (req, res) => {
   const oid = parseOid(req.params.itemId, 'liability ID');
-  await Liability.deleteOne({ _id: oid });
+  const liability = await Liability.findOne({ _id: oid });
+  if (!liability) return notFound(res, 'Liability not found');
+  if (liability.status === 'Paid') {
+    return res.status(409).json({ error: 'A settled liability cannot be deleted because its payment is retained in the finance ledger.' });
+  }
+  const result = await Liability.deleteOne({ _id: oid, status: { $ne: 'Paid' } });
+  if (!result.deletedCount) {
+    return res.status(409).json({ error: 'This liability was settled while deletion was being processed. Settled liabilities cannot be deleted.' });
+  }
   return res.json({ status: 'ok' });
 }));
 
