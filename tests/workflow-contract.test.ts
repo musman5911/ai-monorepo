@@ -29,6 +29,11 @@ describe('GitHub Actions quick-check workflow contract', () => {
       'npm run check-workbench',
       'npm run check-farms',
       'npm run check-docs',
+      'npm run check-route-permissions',
+      'npm run check-route-matrix',
+      'npm run check-secrets',
+      'npm run check-super-admin',
+      'npm run check-archive',
       'npm run check-audit',
     ]);
     expect(workflow).not.toMatch(/npm run build|build-all\.bat|check-workbench-runtime|audit-muf-design-system/);
