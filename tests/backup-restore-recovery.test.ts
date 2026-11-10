@@ -50,6 +50,22 @@ describe('backup restore recovery', () => {
       .rejects.toThrow('requires createSnapshot, restore and rollback');
   });
 
+  it('serializes Flock daily summary sends and skips a date that was already sent', () => {
+    const flockCron = read('flock_farm/backend/routes/cron.js');
+    expect(flockCron).toContain('acquireEggInventoryLock(DataStore, farmId)');
+    expect(flockCron).toContain('DAILY_SUMMARY_STATE_KEY');
+    expect(flockCron).toContain("state?.value?.lastSentDate === summary.date");
+    expect(flockCron).toContain('await releaseLock()');
+  });
+
+  it('prevents overlapping Agri scheduler loops and report dispatches in one process', () => {
+    const agri = read('agri_farm/backend/routes/automations.js');
+    expect(agri).toContain('if (schedulerLoopRunning) return;');
+    expect(agri).toContain('if (digestDispatchInFlight)');
+    expect(agri).toContain('schedulerLoopRunning = false;');
+    expect(agri).toContain('digestDispatchInFlight = false;');
+  });
+
   it('uses recovery snapshots in all three backup restore routes', () => {
     for (const path of [
       'agri_farm/backend/routes/backup.js',

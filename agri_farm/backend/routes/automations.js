@@ -149,13 +149,18 @@ function isTimeToRun(schedule, lastRunTs, nowParts) {
   return false;
 }
 
-export function startScheduler() {
+export let schedulerLoopRunning = false;
+let digestDispatchInFlight = false;
+
+function startScheduler() {
   if (MUF_ENV.disableInternalScheduler) {
     console.log('⏰ [Cron Engine] Internal scheduler disabled (DISABLE_INTERNAL_SCHEDULER=1). Use an external cron to ping /cron/dispatch-report.');
     return;
   }
   console.log('⏰ [Cron Engine] Background scheduler engine initialized and monitoring triggers.');
   setInterval(async () => {
+    if (schedulerLoopRunning) return;
+    schedulerLoopRunning = true;
     try {
       const settings = await Setting.findOne({ key: 'automations' });
       if (settings) {
@@ -175,20 +180,29 @@ export function startScheduler() {
 
           const now = localParts();
           if (isTimeToRun(schedule, lastRunTs, now)) {
-            console.log('⏰ [Cron Engine] Executing scheduled report cycle...');
-            const sent = await buildAndSendCustomDigest({
-              recipientEmailsStr: recipient,
-              allFields: false,
-              includeCrops,
-              includeFinance,
-              includeTasks,
-            });
-            if (sent) {
-              value.last_run = Math.floor(Date.now() / 1000);
-              await Setting.updateOne({ key: 'automations' }, { $set: { value } });
-              console.log('⏰ [Cron Engine] Report cycle successfully completed. Next run scheduled.');
+            if (digestDispatchInFlight) {
+              console.log('⏰ [Cron Engine] A report dispatch is already running; this tick was skipped.');
             } else {
-              console.log('⚠️ [Cron Engine] Failed to dispatch scheduled report email.');
+              digestDispatchInFlight = true;
+              try {
+                console.log('⏰ [Cron Engine] Executing scheduled report cycle...');
+                const sent = await buildAndSendCustomDigest({
+                  recipientEmailsStr: recipient,
+                  allFields: false,
+                  includeCrops,
+                  includeFinance,
+                  includeTasks,
+                });
+                if (sent) {
+                  value.last_run = Math.floor(Date.now() / 1000);
+                  await Setting.updateOne({ key: 'automations' }, { $set: { value } });
+                  console.log('⏰ [Cron Engine] Report cycle successfully completed. Next run scheduled.');
+                } else {
+                  console.log('⚠️ [Cron Engine] Failed to dispatch scheduled report email.');
+                }
+              } finally {
+                digestDispatchInFlight = false;
+              }
             }
           }
           }
@@ -197,6 +211,8 @@ export function startScheduler() {
       await maybeRunMonthlyAutoBackup();
     } catch (e) {
       console.log(`⚠️ [Cron Engine] Background scheduler loop issue: ${e.message}`);
+    } finally {
+      schedulerLoopRunning = false;
     }
   }, 60 * 1000);
 }
@@ -343,19 +359,25 @@ async function cronDispatch(req, res) {
       }
     }
 
-    const sent = await buildAndSendCustomDigest({
-      recipientEmailsStr: recipientsStr,
-      allFields: false,
-      includeCrops: value.alert_soil !== false,
-      includeFinance: value.alert_finance !== false,
-      includeTasks: value.alert_tasks !== false,
-    });
-    if (!sent) return sendHttpError(res, 500, 'Mailer failed to deliver the report. Check SMTP secrets.');
+    if (digestDispatchInFlight) return sendHttpError(res, 409, 'A scheduled report dispatch is already running. Retry shortly.');
+    digestDispatchInFlight = true;
+    try {
+      const sent = await buildAndSendCustomDigest({
+        recipientEmailsStr: recipientsStr,
+        allFields: false,
+        includeCrops: value.alert_soil !== false,
+        includeFinance: value.alert_finance !== false,
+        includeTasks: value.alert_tasks !== false,
+      });
+      if (!sent) return sendHttpError(res, 500, 'Mailer failed to deliver the report. Check SMTP secrets.');
 
-    value.last_run = Math.floor(Date.now() / 1000);
-    await Setting.updateOne({ key: 'automations' }, { $set: { value } });
-    await maybeRunMonthlyAutoBackup();
-    return res.json({ status: 'ok', message: 'Report dispatched successfully.', sent_at_local: localDateTimeStr() });
+      value.last_run = Math.floor(Date.now() / 1000);
+      await Setting.updateOne({ key: 'automations' }, { $set: { value } });
+      await maybeRunMonthlyAutoBackup();
+      return res.json({ status: 'ok', message: 'Report dispatched successfully.', sent_at_local: localDateTimeStr() });
+    } finally {
+      digestDispatchInFlight = false;
+    }
   } catch (e) {
     console.error(`[Cron] dispatch-report failed:`, e);
     return sendHttpError(res, 500, 'Internal server error');

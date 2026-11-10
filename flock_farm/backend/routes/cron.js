@@ -7,6 +7,7 @@ import { authRequired, requireRole } from '../middleware/auth.js';
 import User from '../models/User.js';
 import { MUF_ENV } from '../muf-env.mjs';
 import { mufGetDefaultFarmId } from '../muf-farms.mjs';
+import { acquireEggInventoryLock } from '../egg-inventory-lock.mjs';
 
 const router = express.Router();
 
@@ -38,6 +39,8 @@ const FB = {
 };
 
 // GET /api/cron/daily-summary?key=CRON_SECRET — called by cron-job.org
+const DAILY_SUMMARY_STATE_KEY = 'cron_daily_summary_state';
+
 router.get('/cron/daily-summary', async (req, res) => {
   const secret = MUF_ENV.cronSecret;
   if (!secret) return res.status(503).json({ error: 'CRON_SECRET not configured' });
@@ -49,7 +52,11 @@ router.get('/cron/daily-summary', async (req, res) => {
   const farmId = mufGetDefaultFarmId();
   if (!farmId) return res.status(503).json({ error: 'Default farm is not configured' });
 
+  let releaseLock;
   try {
+    // This lock is persisted in DataStore, so simultaneous cron requests and
+    // app writes across server processes cannot both run on the same farm.
+    releaseLock = await acquireEggInventoryLock(DataStore, farmId);
     const [birds, expenses, feed, eggs, settings, vaccinations, customerSales] = await Promise.all([
       loadBucket('birds', FB.birds, farmId),
       loadBucket('expenses', FB.expenses, farmId),
@@ -60,16 +67,34 @@ router.get('/cron/daily-summary', async (req, res) => {
       loadBucket('customerSales', FB.customerSales, farmId),
     ]);
     const summary = buildDailySummary({ birds, expenses, feed, eggs, vaccinations, customerSales, settings });
+    const state = await DataStore.findOne({ key: DAILY_SUMMARY_STATE_KEY, farmId });
+    if (state?.value?.lastSentDate === summary.date) {
+      return res.json({ ok: true, date: summary.date, skipped: true, reason: 'already_sent_today' });
+    }
+
     await sendSummaryEmail({
       to: recipients,
       subject: `🐔 Usman Flock Farm Daily Summary — ${summary.date}`,
       text: summary.text,
       html: summary.html,
     });
-    res.json({ ok: true, date: summary.date });
+    await DataStore.findOneAndUpdate(
+      { key: DAILY_SUMMARY_STATE_KEY, farmId },
+      { $set: { value: { lastSentDate: summary.date, sentAt: new Date().toISOString() } } },
+      { upsert: true, new: true },
+    );
+    return res.json({ ok: true, date: summary.date });
   } catch (err) {
+    if (err?.code === 'EGG_INVENTORY_BUSY') {
+      return res.status(409).json({ error: err.message, code: err.code, retryable: true });
+    }
     console.error('cron daily-summary error:', err);
-    res.status(500).json({ error: 'Failed to send summary' });
+    return res.status(500).json({ error: 'Failed to send summary' });
+  } finally {
+    if (releaseLock) {
+      try { await releaseLock(); }
+      catch (error) { console.error('Failed to release daily-summary lock:', error); }
+    }
   }
 });
 
