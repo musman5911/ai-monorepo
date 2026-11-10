@@ -4,12 +4,19 @@ import { mufGetDefaultFarmId, mufGetFarmContext } from './muf-farms.mjs';
 // implement Mongo's compound unique indexes. Real Mongo deployments are also
 // protected by the persisted unique DataStore key, including across processes.
 const localLocks = new Set();
+const STALE_LOCK_AFTER_MS = 30 * 60 * 1000;
 
 export const FLOCK_EGG_INVENTORY_LOCK_KEY = '__flock_egg_inventory_lock__';
 
-function lockIdentity(farmId) {
+function resolveFarmId(farmId) {
   const context = mufGetFarmContext();
-  return String(farmId ?? context?.farmId ?? mufGetDefaultFarmId() ?? '__unscoped__');
+  const resolved = farmId ?? context?.farmId ?? mufGetDefaultFarmId();
+  const value = resolved == null ? '' : String(resolved).trim();
+  return value || null;
+}
+
+function lockIdentity(farmId) {
+  return String(farmId || '__unscoped__');
 }
 
 function busyError() {
@@ -20,14 +27,31 @@ function busyError() {
 }
 
 export async function acquireEggInventoryLock(DataStore, farmId) {
-  const identity = lockIdentity(farmId);
+  const resolvedFarmId = resolveFarmId(farmId);
+  const identity = lockIdentity(resolvedFarmId);
   if (localLocks.has(identity)) throw busyError();
   localLocks.add(identity);
 
+  const farmFilter = resolvedFarmId
+    ? { farmId: resolvedFarmId }
+    : { farmId: { $exists: false } };
   let lock;
   try {
-    const record = { key: FLOCK_EGG_INVENTORY_LOCK_KEY, value: { acquiredAt: new Date().toISOString() } };
-    if (farmId !== undefined && farmId !== null && String(farmId)) record.farmId = String(farmId);
+    // A process crash can skip finally and leave a persisted lock behind.
+    // Reclaim only records older than the lease window; active operations keep
+    // their lock, and the per-farm unique key still arbitrates concurrent hosts.
+    const staleBefore = new Date(Date.now() - STALE_LOCK_AFTER_MS).toISOString();
+    await DataStore.findOneAndDelete({
+      key: FLOCK_EGG_INVENTORY_LOCK_KEY,
+      ...farmFilter,
+      'value.acquiredAt': { $lt: staleBefore },
+    });
+
+    const record = {
+      key: FLOCK_EGG_INVENTORY_LOCK_KEY,
+      value: { acquiredAt: new Date().toISOString() },
+    };
+    if (resolvedFarmId) record.farmId = resolvedFarmId;
     lock = await DataStore.create(record);
   } catch (error) {
     localLocks.delete(identity);
@@ -39,8 +63,7 @@ export async function acquireEggInventoryLock(DataStore, farmId) {
   return async function releaseEggInventoryLock() {
     if (released) return;
     released = true;
-    const filter = { _id: lock._id, key: FLOCK_EGG_INVENTORY_LOCK_KEY };
-    if (farmId !== undefined && farmId !== null && String(farmId)) filter.farmId = String(farmId);
+    const filter = { _id: lock._id, key: FLOCK_EGG_INVENTORY_LOCK_KEY, ...farmFilter };
     try {
       await DataStore.findOneAndDelete(filter);
     } finally {

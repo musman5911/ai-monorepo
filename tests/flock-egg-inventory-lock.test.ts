@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { acquireEggInventoryLock, acquireEggInventoryLocks, FLOCK_EGG_INVENTORY_LOCK_KEY } from '../flock_farm/backend/egg-inventory-lock.mjs';
+import { mufRunWithFarmContext } from '../flock_farm/backend/muf-farms.mjs';
 
-function createAtomicStore() {
-  let lock = null;
+function createAtomicStore(initialLock: any = null) {
+  let lock = initialLock;
   let nextId = 1;
   return {
     async create(doc) {
@@ -16,7 +17,13 @@ function createAtomicStore() {
       return created;
     },
     async findOneAndDelete(filter) {
-      if (lock && String(lock._id) === String(filter._id) && lock.key === filter.key) {
+      if (!lock || lock.key !== filter.key) return null;
+      if (filter.farmId && String(lock.farmId) !== String(filter.farmId)) return null;
+      if (filter.farmId?.$exists === false && lock.farmId !== undefined) return null;
+      const staleBefore = filter['value.acquiredAt']?.$lt;
+      const stale = staleBefore && lock.value?.acquiredAt && lock.value.acquiredAt < staleBefore;
+      const owned = filter._id && String(lock._id) === String(filter._id);
+      if (stale || owned) {
         const removed = lock;
         lock = null;
         return removed;
@@ -72,6 +79,36 @@ describe('Flock egg inventory lock', () => {
     const releaseSecond = await acquireEggInventoryLock(store);
     expect(store.hasLock()).toBe(true);
     await releaseSecond();
+  });
+
+  it('reclaims a persisted lock left stale by a crashed process', async () => {
+    const stale = {
+      _id: 'stale-lock',
+      key: FLOCK_EGG_INVENTORY_LOCK_KEY,
+      farmId: 'farm-stale',
+      value: { acquiredAt: new Date(Date.now() - 31 * 60 * 1000).toISOString() },
+    };
+    const store = createAtomicStore(stale);
+    const release = await acquireEggInventoryLock(store, 'farm-stale');
+    expect(store.hasLock()).toBe(true);
+    await release();
+    expect(store.hasLock()).toBe(false);
+  });
+
+  it('persists the selected farm ID when the caller relies on farm context', async () => {
+    const store = createFarmStore();
+    const context = (farmId: string) => ({
+      mode: 'single' as const,
+      farmId,
+      farmIds: [farmId],
+      userId: 'lock-test',
+    });
+    const releaseA = await mufRunWithFarmContext(context('context-farm-a'), () => acquireEggInventoryLock(store));
+    const releaseB = await mufRunWithFarmContext(context('context-farm-b'), () => acquireEggInventoryLock(store));
+    expect(store.hasFarm('context-farm-a')).toBe(true);
+    expect(store.hasFarm('context-farm-b')).toBe(true);
+    await releaseA();
+    await releaseB();
   });
 
   it('makes release idempotent', async () => {
