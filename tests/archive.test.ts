@@ -57,6 +57,14 @@ describe('Phase 11 shared archive server contracts', () => {
     expect(shared).toContain('ArchiveRecord.find({ farmId, jobId })');
     expect(shared).toContain('Model.deleteOne({ _id:item.sourceId, farmId })');
   });
+  it('deletes only the exact archived source snapshot to avoid read/delete races', () => {
+    expect(shared).toContain('const sourceFilter = {');
+    expect(shared).toContain('...item.originalRecord');
+    expect(shared).toContain('const removed = await Model.deleteOne(sourceFilter)');
+    expect(shared).toContain('const remaining = await Model.findOne({ _id:item.sourceId, farmId }).select(\'_id\').lean()');
+    expect(shared).toContain('the active record was preserved');
+  });
+
   it('supports archive reads, idempotent retry and conflict-aware restoration', () => {
     expect(shared).toContain("job.state === 'archived'");
     expect(shared).toContain("router.get('/jobs/:jobId/records'");

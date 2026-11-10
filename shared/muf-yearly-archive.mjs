@@ -113,13 +113,25 @@ export function createYearlyArchiveRouter({
       if (req.body?.confirmJobId !== String(job._id) || req.body?.confirmFarmName !== farm.name) return res.status(400).json({ error:'Type the exact farm name and job ID to confirm',code:'ARCHIVE_CONFIRMATION_REQUIRED' });
       const Model = sources[job.collection], records = await recordsFor(farmId,String(job._id));
       if (records.length !== job.sourceCount) return res.status(409).json({ error:'Snapshot incomplete; no records were removed' });
-      for (const item of records) {
-        const current = await Model.findOne({ _id:item.sourceId, farmId }).lean();
-        if (current && !same(current,item.originalRecord)) return res.status(409).json({ error:'A source record changed after export; no further records were removed',sourceId:item.sourceId });
-      }
       await ArchiveJob.findOneAndUpdate({ _id:job._id, farmId },{ $set:{ state:'archive_partial' } });
       try {
-        for (const item of records) await Model.deleteOne({ _id:item.sourceId, farmId });
+        for (const item of records) {
+          // Compare the complete saved document in the delete filter itself.
+          // A separate read-then-delete check has a race: an edit can land
+          // after the read and be deleted by the later operation.
+          const sourceFilter = {
+            ...item.originalRecord,
+            _id: item.originalRecord?._id || item.sourceId,
+            farmId,
+          };
+          const removed = await Model.deleteOne(sourceFilter);
+          if (!removed.deletedCount) {
+            const remaining = await Model.findOne({ _id:item.sourceId, farmId }).select('_id').lean();
+            // Missing means an earlier retry already removed it. Existing means
+            // its contents changed after export, so leave it active and stop.
+            if (remaining) throw new Error('A source record changed after export; the active record was preserved.');
+          }
+        }
         await ArchiveJob.findOneAndUpdate({ _id:job._id, farmId },{ $set:{ state:'archived' } });
         return res.json({ ok:true,state:'archived',count:records.length });
       } catch(error) { console.error('[archive] interrupted; snapshot retained:',error); return res.status(500).json({ error:'Removal interrupted; archive copies remain available. Inspect status before retrying.' }); }
