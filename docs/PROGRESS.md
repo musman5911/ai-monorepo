@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-11-04 (Dairy browser smoke test owner-reported; Agri/Flock app verification and restored-backup track remain open).
+Last updated: 2026-11-10 (repository hardening and CI verification; Phase 19 real-database work, Phase 20 device/browser testing and Phase 21 live sign-off remain open).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -30,6 +30,21 @@ Last updated: 2026-11-04 (Dairy browser smoke test owner-reported; Agri/Flock ap
 | 17 | Automatic command-line checks on GitHub | Done | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Done | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | In progress | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
+
+## Phase 1–18 operational hardening and final CI checkpoint (2026-11-10)
+
+A follow-up source audit was completed after the earlier phase command-line gates. The work was grouped into repository changes on `muf-monorepo`:
+
+- Financial posting and rollback safeguards (Agri and Dairy).
+- Attendance and inventory consistency across app, task and Telegram paths.
+- Linked-record deletion protection in Agri and Dairy, including ownership checks on nested Dairy payment routes.
+- Recovery snapshots before destructive backup restores in all three apps, with rollback attempts and explicit errors if restore/recovery fails.
+- Agri scheduler overlap protection, Flock farm-scoped daily-summary deduplication, Flock inventory lock farm identity/lease recovery, and atomic Telegram linking operations.
+- Yearly archive deletion now compares the saved record contents in the delete operation itself, protecting edits made between the earlier validation and deletion.
+
+These changes were regression-tested in GitHub Actions. The source/test suite reached 62 files / 561 tests, with additional check groups of 16/16 and 22/22 and all farm-scope checks passing on the branch before the final workflow trigger update. The frontend verification workflow was then enabled for pushes and pull requests to `muf-monorepo`; its current run is the release-build check for all three frontends and the workbench runtime. Record its final result once the run completes.
+
+**Important boundary:** these are repository source, test, and CI results. They do not establish successful live Atlas restore/migration tests, two-process MongoDB lock tests, every role workflow in a browser, phone behavior, or production deployment. Phase 19 remains **In progress**, Phase 20 remains **Not started**, and Phase 21 remains **Not started**. No production database was used for these source changes.
 
 ## Phase 1–18 residual code audit (2026-11-04)
 
