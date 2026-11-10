@@ -130,6 +130,7 @@ const TWINS = [
   ['muf-login.tsx',              'dairy_farm/client/src/muf/ui/muf-login.tsx',              'flock_farm/client/src/muf/ui/muf-login.tsx'],
   ['muf-a11y.ts',               'dairy_farm/client/src/muf/core/muf-a11y.ts',               'flock_farm/client/src/muf/core/muf-a11y.ts'],
   ['muf-worker-panel.tsx',      'dairy_farm/client/src/muf/ui/muf-worker-panel.tsx',      'flock_farm/client/src/muf/ui/muf-worker-panel.tsx'],
+  ['muf-admin-users.tsx',       'dairy_farm/client/src/muf/admin/muf-admin-users.tsx',       'flock_farm/client/src/muf/admin/muf-admin-users.tsx'],
 ];
 // Shared Telegram farm-context helper must be byte-identical in all three backends.
 const TELEGRAM_FARM_HELPERS = [
