@@ -1,7 +1,12 @@
 name: MUF frontend checks
 
 on:
-  # Run only on demand when a deliberate verification pass is needed.
+  # Keep all three production builds and the workbench runtime smoke test
+  # enforced on the active development branch and its pull requests.
+  push:
+    branches: [muf-monorepo]
+  pull_request:
+    branches: [muf-monorepo]
   workflow_dispatch:
 
 permissions:
