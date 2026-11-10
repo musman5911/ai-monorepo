@@ -71,6 +71,21 @@ describe('Phase 7: Telegram farm isolation', () => {
     expect(route).toContain('no linked admin chat');
   });
 
+  it('consumes Telegram link codes atomically and updates links by chat key', () => {
+    const agri = source('agri_farm', 'backend/routes/telegram.js');
+    const dairy = source('dairy_farm', 'backend/routes/telegram.js');
+    const flock = source('flock_farm', 'backend/routes/telegram.js');
+    expect(agri).toContain('async function tgConsumeCode(code, nowMs)');
+    expect(agri).toContain('await tgSetEntry(\'links\', chatId');
+    expect(dairy).toContain('async function consumeLinkCode(code, nowMs)');
+    expect(dairy).toContain('await setMetaEntry(LINKS_KEY, chatId');
+    expect(flock).toContain('async function consumeStoreCode(code, nowMs, farmId)');
+    expect(flock).toContain('await setStoreEntry(LINKS_KEY, chatId, linkRecord, targetFarmId)');
+    for (const route of [agri, dairy, flock]) {
+      expect(route).toMatch(/\[\`value\.\$\{code\}\.expires\`\]: \{ \$gte: nowMs \}/);
+    }
+  });
+
   it('uses the deterministic attendance identity for Agri Telegram submissions', () => {
     const route = source('agri_farm', 'backend/routes/telegram.js');
     expect(route).toContain("import { mufLaborAttendanceId } from '../utils/attendance-id.mjs'");

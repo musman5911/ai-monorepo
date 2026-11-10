@@ -41,6 +41,32 @@ async function writeMeta(key, value) {
   await Meta.findOneAndUpdate({ key }, { $set: { key, value } }, { upsert: true, new: true });
 }
 
+async function setMetaEntry(key, entryKey, entryValue) {
+  await Meta.findOneAndUpdate(
+    { key },
+    { $set: { key, [`value.${entryKey}`]: entryValue } },
+    { upsert: true, new: true },
+  );
+}
+
+async function unsetMetaEntry(key, entryKey) {
+  await Meta.findOneAndUpdate(
+    { key },
+    { $unset: { [`value.${entryKey}`]: 1 } },
+  );
+}
+
+async function consumeLinkCode(code, nowMs) {
+  return Meta.findOneAndUpdate(
+    {
+      key: CODES_KEY,
+      [`value.${code}`]: { $exists: true },
+      [`value.${code}.expires`]: { $gte: nowMs },
+    },
+    { $unset: { [`value.${code}`]: 1 } },
+  );
+}
+
 // Local farm hour (PKT-aware, same offset the daily summary uses)
 function farmHour() {
   return (new Date().getUTCHours() + TZ_OFFSET_HOURS + 24) % 24;
@@ -85,12 +111,18 @@ router.post('/link-code', protect, adminOnly, async (req, res) => {
     }
     if (!userId && !laborerId) return res.status(400).json({ error: 'Pick an app user or a wage worker to link' });
     const codes = await readMeta(CODES_KEY);
-    // prune expired
     const now = Date.now();
-    for (const [c, v] of Object.entries(codes)) if ((v.expires || 0) < now) delete codes[c];
-    const code = m.tgNewLinkCode();
-    codes[code] = { userId: userId || '', username, laborerId: laborerId || '', laborerName, farmId: String(farmId), expires: now + 15 * 60 * 1000 };
-    await writeMeta(CODES_KEY, codes);
+    let code = m.tgNewLinkCode();
+    for (let attempt = 0; attempt < 8 && codes[code] && (codes[code].expires || 0) >= now; attempt += 1) {
+      code = m.tgNewLinkCode();
+    }
+    if (codes[code] && (codes[code].expires || 0) >= now) {
+      return res.status(503).json({ error: 'Could not allocate a unique Telegram link code. Try again.' });
+    }
+    await setMetaEntry(CODES_KEY, code, {
+      userId: userId || '', username, laborerId: laborerId || '', laborerName,
+      farmId: String(farmId), expires: now + 15 * 60 * 1000,
+    });
     res.json({ code, expiresInMinutes: 15 });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -101,8 +133,7 @@ router.delete('/links/:chatId', protect, adminOnly, async (req, res) => {
     const links = await readMeta(LINKS_KEY);
     const link = links[req.params.chatId];
     if (!link || mufTelegramFarmId(link) !== String(mufGetFarmContext()?.farmId || '')) return res.status(404).json({ error: 'Telegram chat not found in selected farm' });
-    delete links[req.params.chatId];
-    await writeMeta(LINKS_KEY, links);
+    await unsetMetaEntry(LINKS_KEY, req.params.chatId);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -127,16 +158,15 @@ router.post('/webhook/:secret', async (req, res) => {
       const codes = await readMeta(CODES_KEY);
       const entry = codes[cmd.code];
       if (!entry || (entry.expires || 0) < Date.now() || !mufTelegramFarmId(entry)) return send(m.TG.linkBad);
-      delete codes[cmd.code];
-      links[chatId] = {
+      const consumed = await consumeLinkCode(cmd.code, Date.now());
+      if (!consumed) return send(m.TG.linkBad);
+      await setMetaEntry(LINKS_KEY, chatId, {
         userId: entry.userId, username: entry.username,
         laborerId: entry.laborerId, laborerName: entry.laborerName,
         farmId: mufTelegramFarmId(entry),
         linkedAt: new Date().toISOString(),
         tgName: [msg.from?.first_name, msg.from?.last_name].filter(Boolean).join(' '),
-      };
-      await writeMeta(CODES_KEY, codes);
-      await writeMeta(LINKS_KEY, links);
+      });
       return send(m.TG.linkOk(entry.laborerName || entry.username || 'worker'));
     }
 

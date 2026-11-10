@@ -45,6 +45,32 @@ async function tgWrite(key, value) {
   await TelegramMeta.updateOne({ key }, { $set: { key, value } }, { upsert: true });
 }
 
+async function tgSetEntry(key, entryKey, entryValue) {
+  await TelegramMeta.findOneAndUpdate(
+    { key },
+    { $set: { key, [`value.${entryKey}`]: entryValue } },
+    { upsert: true, new: true },
+  );
+}
+
+async function tgUnsetEntry(key, entryKey) {
+  await TelegramMeta.findOneAndUpdate(
+    { key },
+    { $unset: { [`value.${entryKey}`]: 1 } },
+  );
+}
+
+async function tgConsumeCode(code, nowMs) {
+  return TelegramMeta.findOneAndUpdate(
+    {
+      key: 'codes',
+      [`value.${code}`]: { $exists: true },
+      [`value.${code}.expires`]: { $gte: nowMs },
+    },
+    { $unset: { [`value.${code}`]: 1 } },
+  );
+}
+
 const AGRI_TG_HELP = [
   '🌾 عثمان ایگری فارم بوٹ — ایسے لکھیں:',
   '',
@@ -92,17 +118,18 @@ router.post('/link-code', protect, requireAdmin, asyncHandler(async (req, res) =
   }
   const codes = await tgRead('codes');
   const nowMs = Date.now();
-  const fresh = {};
-  for (const [c, v] of Object.entries(codes)) {
-    if ((v.expires || 0) >= nowMs) fresh[c] = v;
-  }
   const m = await muf();
-  const code = m.tgNewLinkCode();
-  fresh[code] = {
+  let code = m.tgNewLinkCode();
+  for (let attempt = 0; attempt < 8 && codes[code] && (codes[code].expires || 0) >= nowMs; attempt += 1) {
+    code = m.tgNewLinkCode();
+  }
+  if (codes[code] && (codes[code].expires || 0) >= nowMs) {
+    return res.status(503).json({ detail: 'Could not allocate a unique Telegram link code. Try again.' });
+  }
+  await tgSetEntry('codes', code, {
     userId, username, laborerId, laborerName, farmId: String(farmId),
     expires: nowMs + 15 * 60 * 1000,
-  };
-  await tgWrite('codes', fresh);
+  });
   return res.json({ code, expiresInMinutes: 15 });
 }));
 
@@ -110,8 +137,7 @@ router.delete('/links/:chatId', protect, requireAdmin, asyncHandler(async (req, 
   const links = await tgRead('links');
   const link = links[req.params.chatId];
   if (!link || mufTelegramFarmId(link) !== String(mufGetFarmContext()?.farmId || '')) return res.status(404).json({ detail: 'Telegram chat not found in selected farm' });
-  delete links[req.params.chatId];
-  await tgWrite('links', links);
+  await tgUnsetEntry('links', req.params.chatId);
   return res.json({ ok: true });
 }));
 
@@ -144,9 +170,13 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
         await send(m.TG.linkBad);
         return res.json({ ok: true });
       }
-      delete codes[cmd.code];
+      const consumed = await tgConsumeCode(cmd.code, nowMs);
+      if (!consumed) {
+        await send(m.TG.linkBad);
+        return res.json({ ok: true });
+      }
       const from = msg.from || {};
-      links[chatId] = {
+      await tgSetEntry('links', chatId, {
         userId: entry.userId || '',
         username: entry.username || '',
         laborerId: entry.laborerId || '',
@@ -154,9 +184,7 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
         farmId: mufTelegramFarmId(entry),
         linkedAt: new Date().toISOString(),
         tgName: [from.first_name, from.last_name].filter(Boolean).join(' '),
-      };
-      await tgWrite('codes', codes);
-      await tgWrite('links', links);
+      });
       await send(m.TG.linkOk(entry.laborerName || entry.username || 'worker'));
       return res.json({ ok: true });
     }

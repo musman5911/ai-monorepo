@@ -55,6 +55,35 @@ async function writeStore(key, value) {
   await DataStore.findOneAndUpdate(filter, { $set: { key, value, version } }, { upsert: true, new: true });
 }
 
+async function setStoreEntry(key, entryKey, entryValue, farmId = mufGetFarmContext()?.farmId || mufGetDefaultFarmId()) {
+  if (!farmId) throw new Error('Farm scope is required for Telegram state updates.');
+  return DataStore.findOneAndUpdate(
+    { key, farmId: String(farmId) },
+    { $set: { key, [`value.${entryKey}`]: entryValue }, $inc: { version: 1 } },
+    { upsert: true, new: true },
+  );
+}
+
+async function unsetStoreEntry(key, entryKey, farmId = mufGetFarmContext()?.farmId || mufGetDefaultFarmId()) {
+  if (!farmId) throw new Error('Farm scope is required for Telegram state updates.');
+  return DataStore.findOneAndUpdate(
+    { key, farmId: String(farmId) },
+    { $unset: { [`value.${entryKey}`]: 1 }, $inc: { version: 1 } },
+  );
+}
+
+async function consumeStoreCode(code, nowMs, farmId) {
+  return DataStore.findOneAndUpdate(
+    {
+      key: CODES_KEY,
+      farmId: String(farmId),
+      [`value.${code}`]: { $exists: true },
+      [`value.${code}.expires`]: { $gte: nowMs },
+    },
+    { $unset: { [`value.${code}`]: 1 }, $inc: { version: 1 } },
+  );
+}
+
 // ── Admin: status ──
 router.get('/status', authRequired, requireRole('admin'), async (_req, res) => {
   try {
@@ -94,10 +123,17 @@ router.post('/link-code', authRequired, requireRole('admin'), async (req, res) =
     if (!userId && !laborerId) return res.status(400).json({ error: 'Pick an app user or a wage worker to link' });
     const codes = await readStore(CODES_KEY, {});
     const now = Date.now();
-    for (const [c, v] of Object.entries(codes)) if ((v.expires || 0) < now) delete codes[c];
-    const code = tgNewLinkCode();
-    codes[code] = { userId: userId || '', username, laborerId: laborerId || '', laborerName, farmId: String(farmId), expires: now + 15 * 60 * 1000 };
-    await writeStore(CODES_KEY, codes);
+    let code = tgNewLinkCode();
+    for (let attempt = 0; attempt < 8 && codes[code] && (codes[code].expires || 0) >= now; attempt += 1) {
+      code = tgNewLinkCode();
+    }
+    if (codes[code] && (codes[code].expires || 0) >= now) {
+      return res.status(503).json({ error: 'Could not allocate a unique Telegram link code. Try again.' });
+    }
+    await setStoreEntry(CODES_KEY, code, {
+      userId: userId || '', username, laborerId: laborerId || '', laborerName,
+      farmId: String(farmId), expires: now + 15 * 60 * 1000,
+    }, farmId);
     res.json({ code, expiresInMinutes: 15 });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -106,8 +142,10 @@ router.post('/link-code', authRequired, requireRole('admin'), async (req, res) =
 router.delete('/links/:chatId', authRequired, requireRole('admin'), async (req, res) => {
   try {
     const links = await readStore(LINKS_KEY, {});
-    delete links[req.params.chatId];
-    await writeStore(LINKS_KEY, links);
+    if (!links[req.params.chatId] || mufTelegramFarmId(links[req.params.chatId]) !== String(mufGetFarmContext()?.farmId || '')) {
+      return res.status(404).json({ error: 'Telegram chat not found in selected farm' });
+    }
+    await unsetStoreEntry(LINKS_KEY, req.params.chatId);
     res.json({ ok: true });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
@@ -144,8 +182,10 @@ router.post('/webhook/:secret', async (req, res) => {
 
     if (cmd.kind === 'link') {
       if (!codeEntry || (codeEntry.expires || 0) < Date.now() || !mufTelegramFarmId(codeEntry) || mufTelegramFarmId(codeEntry) !== targetFarmId) return send(TG.linkBad);
-      delete codes[cmd.code];
-      links[chatId] = {
+      const consumed = await mufRunTelegramFarm(targetFarmId, mufRunWithFarmContext, () =>
+        consumeStoreCode(cmd.code, Date.now(), targetFarmId));
+      if (!consumed) return send(TG.linkBad);
+      const linkRecord = {
         userId: codeEntry.userId, username: codeEntry.username,
         laborerId: codeEntry.laborerId, laborerName: codeEntry.laborerName,
         farmId: targetFarmId,
@@ -156,17 +196,11 @@ router.post('/webhook/:secret', async (req, res) => {
         const oldFarmId = String(farm._id);
         if (oldFarmId === targetFarmId) continue;
         await mufRunTelegramFarm(oldFarmId, mufRunWithFarmContext, async () => {
-          const oldLinks = await readStore(LINKS_KEY, {});
-          if (oldLinks[chatId]) {
-            delete oldLinks[chatId];
-            await writeStore(LINKS_KEY, oldLinks);
-          }
+          await unsetStoreEntry(LINKS_KEY, chatId, oldFarmId);
         });
       }
-      await mufRunTelegramFarm(targetFarmId, mufRunWithFarmContext, async () => {
-        await writeStore(CODES_KEY, codes);
-        await writeStore(LINKS_KEY, links);
-      });
+      await mufRunTelegramFarm(targetFarmId, mufRunWithFarmContext, () =>
+        setStoreEntry(LINKS_KEY, chatId, linkRecord, targetFarmId));
       return send(TG.linkOk(codeEntry.laborerName || codeEntry.username || 'worker'));
     }
 
