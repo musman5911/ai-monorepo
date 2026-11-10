@@ -74,5 +74,20 @@ jobs:
       - name: Check phase documentation
         run: npm run check-docs
 
+      - name: Check route inventory and server mounts
+        run: npm run check-route-permissions
+
+      - name: Check route role and farm matrix
+        run: npm run check-route-matrix
+
+      - name: Scan tracked files for secrets
+        run: npm run check-secrets
+
+      - name: Verify owner-only Super Admin and per-farm summaries
+        run: npm run check-super-admin
+
+      - name: Verify yearly archive flows in all three apps
+        run: npm run check-archive
+
       - name: Audit production dependencies in all package sets
         run: npm run check-audit

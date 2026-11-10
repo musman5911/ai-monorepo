@@ -144,3 +144,9 @@ jobs:
       - name: Build app with its configured TypeScript/Vite command
         working-directory: ${{ matrix.app.path }}
         run: npm run build
+
+      - name: Enforce the production JavaScript bundle budget
+        env:
+          MUF_BUNDLE_APP: ${{ matrix.app.name }}
+        run: |
+          node -e "const { BUDGETS, checkBundleSizes } = require('./tools/check-bundle-size.js'); const budget = BUDGETS.find((item) => item.app === process.env.MUF_BUNDLE_APP); if (!budget) throw new Error('Missing bundle budget'); const result = checkBundleSizes(process.cwd(), [budget]); for (const item of result.results) console.log(item.app + ': largest ' + (item.largest ? (item.largest.bytes / 1024).toFixed(1) + ' KiB' : 'no assets') + ' / ' + (item.maxBytes / 1024).toFixed(0) + ' KiB'); if (result.issues.length) { for (const issue of result.issues) console.error(issue); process.exit(1); }"
