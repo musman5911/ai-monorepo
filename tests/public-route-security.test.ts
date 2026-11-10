@@ -5,6 +5,44 @@ import { resolve } from 'node:path';
 const root = resolve(__dirname, '..');
 const source = (relativePath: string) => readFileSync(resolve(root, relativePath), 'utf8');
 
+describe('linked-record deletion integrity', () => {
+  it('protects Agri crop, inventory, supplier and settled-liability history', () => {
+    const crops = source('agri_farm/backend/routes/crops.js');
+    const inventory = source('agri_farm/backend/routes/inventory.js');
+    const suppliers = source('agri_farm/backend/routes/suppliers.js');
+    const liabilities = source('agri_farm/backend/routes/liabilities.js');
+
+    expect(crops).toContain('Finance.countDocuments({ crop_id: cropId })');
+    expect(crops).toContain('Liability.countDocuments({ crop_id: cropId })');
+    expect(crops).toContain('Task.countDocuments({ crop_id: cropId })');
+    expect(crops).toContain('return res.status(409).json({');
+    expect(inventory).toContain('Task.countDocuments({ inventory_item_id: String(oid) })');
+    expect(inventory).toContain('Spray.countDocuments({ inventory_item_id: String(oid) })');
+    expect(suppliers).toContain('Finance.countDocuments({ supplier_id: String(supplier._id) })');
+    expect(suppliers).not.toContain('SupplierPayment.deleteMany');
+    expect(liabilities).toContain("existing.status === 'Paid'");
+    expect(liabilities).toContain('Settled liabilities cannot be deleted');
+  });
+
+  it('preserves Dairy animal history and scopes buyer/supplier payments to their parent', () => {
+    const cows = source('dairy_farm/backend/routes/cows.js');
+    const buyers = source('dairy_farm/backend/routes/buyers.js');
+    const suppliers = source('dairy_farm/backend/routes/suppliers.js');
+
+    expect(cows).toContain('BreedingEvent.countDocuments');
+    expect(cows).toContain('Health.countDocuments({ cowId })');
+    expect(cows).toContain('Expense.countDocuments({ $or: [{ cowId }, { _purchaseCowId: cowId }] })');
+    expect(cows).not.toContain('Expense.deleteMany({ $or: [{ cowId }, { _purchaseCowId: cowId }] })');
+
+    expect(buyers).toContain('BuyerPayment.findOne({ _id: req.params.paymentId, buyerId: String(buyer._id) })');
+    expect(buyers).toContain('BuyerPayment.deleteOne({ _id: req.params.paymentId, buyerId: String(buyer._id) })');
+    expect(buyers).toContain('BuyerPayment.countDocuments({ buyerId: String(buyer._id) })');
+    expect(suppliers).toContain('SupplierPayment.findOne({ _id: req.params.paymentId, supplierId: String(supplier._id) })');
+    expect(suppliers).toContain('SupplierPayment.deleteOne({ _id: req.params.paymentId, supplierId: String(supplier._id) })');
+    expect(suppliers).toContain('Expense.countDocuments({ supplierId: String(supplier._id) })');
+  });
+});
+
 describe('public share-card privacy controls', () => {
   for (const app of ['dairy_farm', 'flock_farm', 'agri_farm']) {
     it(`${app} share cards disable caching and indexing`, () => {

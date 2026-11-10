@@ -12,7 +12,7 @@ let ownerToken = '';
 let workerToken = '';
 let managerToken = '';
 let serverOutput = '';
-const created = { crops: [], tasks: [], finance: [], fields: [], liabilities: [], laborers: [], inventory: [], sprays: [] };
+const created = { crops: [], tasks: [], finance: [], fields: [], liabilities: [], laborers: [], inventory: [], sprays: [], suppliers: [] };
 
 async function reservePort() {
   const server = createServer();
@@ -131,11 +131,12 @@ describe.sequential('Agri runtime API integration', () => {
   afterAll(async () => {
     if (baseUrl && ownerToken) {
       for (const id of created.sprays) await request(`/spray/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
-      for (const id of created.inventory) await request(`/inventory/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
+      for (const id of created.tasks) await request(`/tasks/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.finance) await request(`/finance/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.liabilities) await request(`/liabilities/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
+      for (const id of created.suppliers) await request(`/suppliers/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.laborers) await request(`/laborers/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
-      for (const id of created.tasks) await request(`/tasks/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
+      for (const id of created.inventory) await request(`/inventory/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.crops) await request(`/crops/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
       for (const id of created.fields) await request(`/fields/${id}`, { method: 'DELETE', token: ownerToken }).catch(() => {});
     }
@@ -1059,6 +1060,74 @@ describe.sequential('Agri runtime API integration', () => {
     expect(restoredInventory.data.find((row) => String(row._id) === stockId).current_stock).toBe(5);
   });
 
+  it('blocks deletion of crops, inventory and suppliers while history still references them', async () => {
+    const suffix = `runtime-linked-delete-${process.pid}-${Date.now()}`;
+    const date = new Date().toISOString().slice(0, 10);
+    const crop = await request('/crops', {
+      method: 'POST', token: ownerToken,
+      body: { name: `${suffix}-crop`, status: 'Growing', season: 'Kharif', crop_year: date.slice(0, 4) },
+    });
+    expect(crop.response.status).toBe(201);
+    const cropId = String(crop.data._id);
+    created.crops.push(cropId);
+
+    const supplier = await request('/suppliers', {
+      method: 'POST', token: ownerToken,
+      body: { name: `${suffix}-supplier`, phone: '', notes: '' },
+    });
+    expect(supplier.response.status).toBe(201);
+    const supplierId = String(supplier.data._id);
+    created.suppliers.push(supplierId);
+
+    const finance = await request('/finance', {
+      method: 'POST', token: ownerToken,
+      body: {
+        category: `${suffix}-purchase`, type: 'expense', amount: 240,
+        date, crop_id: cropId, supplier_id: supplierId, notes: 'Linked-record deletion fixture',
+      },
+    });
+    expect(finance.response.status).toBe(201);
+
+    const deleteCrop = await request(`/crops/${cropId}`, { method: 'DELETE', token: ownerToken });
+    expect(deleteCrop.response.status).toBe(409);
+    expect(deleteCrop.data.linkedFinance).toBe(1);
+    const cropStillExists = await request(`/crops?skip=0&limit=500&search=${encodeURIComponent(suffix)}`, { token: ownerToken });
+    expect(cropStillExists.data.some((row) => String(row._id) === cropId)).toBe(true);
+
+    const deleteSupplier = await request(`/suppliers/${supplierId}`, { method: 'DELETE', token: ownerToken });
+    expect(deleteSupplier.response.status).toBe(409);
+    expect(deleteSupplier.data.linkedFinance).toBe(1);
+    const suppliers = await request('/suppliers', { token: ownerToken });
+    expect(suppliers.data.some((row) => String(row._id) === supplierId)).toBe(true);
+
+    const inventory = await request('/inventory', {
+      method: 'POST', token: ownerToken,
+      body: { name: `${suffix}-stock`, category: 'seed', current_stock: 10, unit: 'kg', low_stock_threshold: 1 },
+    });
+    expect(inventory.response.status).toBe(201);
+    const inventoryId = String(inventory.data._id);
+    created.inventory.push(inventoryId);
+
+    const task = await request('/tasks', {
+      method: 'POST', token: ownerToken,
+      body: {
+        title: `${suffix}-task`, priority: 'High', assigned_to: 'owner',
+        labor_cost: 0, inventory_item_id: inventoryId, inventory_qty_consumed: 1, laborer_ids: [],
+      },
+    });
+    expect(task.response.status).toBe(201);
+    const taskRows = await request('/tasks?skip=0&limit=500', { token: ownerToken });
+    const taskRow = taskRows.data.find((row) => row.title === `${suffix}-task`);
+    expect(taskRow).toBeTruthy();
+    created.tasks.push(String(taskRow._id));
+
+    const deleteInventory = await request(`/inventory/${inventoryId}`, { method: 'DELETE', token: ownerToken });
+    expect(deleteInventory.response.status).toBe(409);
+    expect(deleteInventory.data.linkedTasks).toBe(1);
+    const inventoryStillExists = await request('/inventory', { token: ownerToken });
+    expect(inventoryStillExists.data.some((row) => String(row._id) === inventoryId)).toBe(true);
+  });
+
   it('prevents duplicate liability settlement and month-end wage ledger postings', async () => {
     const suffix = `runtime-financial-${process.pid}-${Date.now()}`;
     const creditor = `Financial safety ${suffix}`;
@@ -1076,6 +1145,8 @@ describe.sequential('Agri runtime API integration', () => {
     expect(paymentA.response.status).toBe(200);
     expect(paymentB.response.status).toBe(200);
     expect([paymentA.data.status, paymentB.data.status].sort()).toEqual(['already_paid', 'ok']);
+    const deleteSettled = await request(`/liabilities/${liability.data._id}`, { method: 'DELETE', token: ownerToken });
+    expect(deleteSettled.response.status).toBe(409);
 
     const worker = await request('/laborers', {
       method: 'POST', token: ownerToken,

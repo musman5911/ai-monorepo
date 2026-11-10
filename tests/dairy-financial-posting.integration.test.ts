@@ -89,6 +89,101 @@ describe.sequential('Dairy financial posting integration', () => {
     }
   }, 10_000);
 
+  it('keeps buyer and supplier payment rows attached to their actual parent records', async () => {
+    const suffix = `dairy-linked-${process.pid}-${Date.now()}`;
+
+    const buyerA = await request('/buyers', { method: 'POST', token: ownerToken, body: { name: `${suffix}-buyer-a` } });
+    const buyerB = await request('/buyers', { method: 'POST', token: ownerToken, body: { name: `${suffix}-buyer-b` } });
+    expect(buyerA.response.status).toBe(201);
+    expect(buyerB.response.status).toBe(201);
+    const buyerAId = String(buyerA.data._id);
+    const buyerBId = String(buyerB.data._id);
+
+    const buyerPayment = await request(`/buyers/${buyerAId}/payments`, {
+      method: 'POST', token: ownerToken,
+      body: { date: '2026-11-10', amount: 100, note: 'Parent-link regression' },
+    });
+    expect(buyerPayment.response.status).toBe(201);
+    const buyerPaymentId = String(buyerPayment.data._id);
+
+    const wrongBuyerUpdate = await request(`/buyers/${buyerBId}/payments/${buyerPaymentId}`, {
+      method: 'PUT', token: ownerToken, body: { amount: 999 },
+    });
+    expect(wrongBuyerUpdate.response.status).toBe(404);
+    const wrongBuyerDelete = await request(`/buyers/${buyerBId}/payments/${buyerPaymentId}`, {
+      method: 'DELETE', token: ownerToken,
+    });
+    expect(wrongBuyerDelete.response.status).toBe(404);
+    const buyerRows = await request(`/buyers/${buyerAId}/payments`, { token: ownerToken });
+    expect(buyerRows.data).toHaveLength(1);
+    expect(buyerRows.data[0].amount).toBe(100);
+    const blockedBuyerDelete = await request(`/buyers/${buyerAId}`, { method: 'DELETE', token: ownerToken });
+    expect(blockedBuyerDelete.response.status).toBe(409);
+    const removedBuyerPayment = await request(`/buyers/${buyerAId}/payments/${buyerPaymentId}`, {
+      method: 'DELETE', token: ownerToken,
+    });
+    expect(removedBuyerPayment.response.status).toBe(200);
+    expect((await request(`/buyers/${buyerAId}`, { method: 'DELETE', token: ownerToken })).response.status).toBe(200);
+    expect((await request(`/buyers/${buyerBId}`, { method: 'DELETE', token: ownerToken })).response.status).toBe(200);
+
+    const supplierA = await request('/suppliers', { method: 'POST', token: ownerToken, body: { name: `${suffix}-supplier-a` } });
+    const supplierB = await request('/suppliers', { method: 'POST', token: ownerToken, body: { name: `${suffix}-supplier-b` } });
+    expect(supplierA.response.status).toBe(201);
+    expect(supplierB.response.status).toBe(201);
+    const supplierAId = String(supplierA.data._id);
+    const supplierBId = String(supplierB.data._id);
+
+    const supplierPayment = await request(`/suppliers/${supplierAId}/payments`, {
+      method: 'POST', token: ownerToken,
+      body: { date: '2026-11-10', amount: 150, note: 'Parent-link regression' },
+    });
+    expect(supplierPayment.response.status).toBe(201);
+    const supplierPaymentId = String(supplierPayment.data._id);
+
+    const wrongSupplierUpdate = await request(`/suppliers/${supplierBId}/payments/${supplierPaymentId}`, {
+      method: 'PUT', token: ownerToken, body: { amount: 999 },
+    });
+    expect(wrongSupplierUpdate.response.status).toBe(404);
+    const wrongSupplierDelete = await request(`/suppliers/${supplierBId}/payments/${supplierPaymentId}`, {
+      method: 'DELETE', token: ownerToken,
+    });
+    expect(wrongSupplierDelete.response.status).toBe(404);
+    const supplierRows = await request(`/suppliers/${supplierAId}/payments`, { token: ownerToken });
+    expect(supplierRows.data).toHaveLength(1);
+    expect(supplierRows.data[0].amount).toBe(150);
+    const blockedSupplierDelete = await request(`/suppliers/${supplierAId}`, { method: 'DELETE', token: ownerToken });
+    expect(blockedSupplierDelete.response.status).toBe(409);
+    const removedSupplierPayment = await request(`/suppliers/${supplierAId}/payments/${supplierPaymentId}`, {
+      method: 'DELETE', token: ownerToken,
+    });
+    expect(removedSupplierPayment.response.status).toBe(200);
+    expect((await request(`/suppliers/${supplierAId}`, { method: 'DELETE', token: ownerToken })).response.status).toBe(200);
+    expect((await request(`/suppliers/${supplierBId}`, { method: 'DELETE', token: ownerToken })).response.status).toBe(200);
+  });
+
+  it('refuses to delete a cow while milk, health or financial history is attached', async () => {
+    const suffix = `dairy-cow-history-${process.pid}-${Date.now()}`;
+    const cow = await request('/cows', {
+      method: 'POST', token: ownerToken, body: { name: suffix, breed: 'Sahiwal', gender: 'female' },
+    });
+    expect(cow.response.status).toBe(201);
+    const cowId = String(cow.data._id);
+
+    const health = await request('/health', {
+      method: 'POST', token: ownerToken,
+      body: { cowId, date: '2026-11-10', type: 'checkup', description: 'Keep this health history', cost: 45 },
+    });
+    expect(health.response.status).toBe(201);
+
+    const deleted = await request(`/cows/${cowId}`, { method: 'DELETE', token: ownerToken });
+    expect(deleted.response.status).toBe(409);
+    expect(deleted.data.healthRecords).toBe(1);
+    expect(deleted.data.expenseRecords).toBe(1);
+    expect((await request(`/cows/${cowId}`, { token: ownerToken })).response.status).toBe(200);
+    const healthRows = await request(`/health?cowId=${cowId}`, { token: ownerToken });
+    expect(healthRows.data).toHaveLength(1);
+  });
+
   it('posts one wage expense when two month-end requests race', async () => {
     const suffix = `dairy-wage-${process.pid}-${Date.now()}`;
     const worker = await request('/labor/workers', {
