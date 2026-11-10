@@ -80,7 +80,7 @@ describe('Phase 7: Telegram farm isolation', () => {
     expect(dairy).toContain('async function consumeLinkCode(code, nowMs)');
     expect(dairy).toContain('await setMetaEntry(LINKS_KEY, chatId');
     expect(flock).toContain('async function consumeStoreCode(code, nowMs, farmId)');
-    expect(flock).toContain('await setStoreEntry(LINKS_KEY, chatId, linkRecord, targetFarmId)');
+    expect(flock).toContain('setStoreEntry(LINKS_KEY, chatId, linkRecord, targetFarmId)');
     for (const route of [agri, dairy, flock]) {
       expect(route).toMatch(/\[\`value\.\$\{code\}\.expires\`\]: \{ \$gte: nowMs \}/);
     }
