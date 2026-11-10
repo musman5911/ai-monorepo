@@ -23,6 +23,7 @@ import Farm from '../models/Farm.js';
 import Image from '../models/Image.js';
 import { serializeBackupImages, restoreBackupImages, splitBase64Image, assembleBase64ImageParts } from '../muf-backup-images.mjs';
 import { mufGetDefaultFarmId, mufIsOwner, mufRunUnscoped } from '../muf-farms.mjs';
+import { withRestoreRecovery } from '../../../shared/muf-restore-recovery.mjs';
 
 const router = express.Router();
 
@@ -52,9 +53,9 @@ const BATCH_MODELS = {
   batchVaccinationLogs: BatchVaccinationLog,
 };
 
-async function collectBackupPayload() {
+async function collectBackupPayload({ acquireLocks = true } = {}) {
   const farmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
-  const releaseLocks = await acquireEggInventoryLocks(DataStore, farmIds);
+  const releaseLocks = acquireLocks ? await acquireEggInventoryLocks(DataStore, farmIds) : null;
   try {
   const payload = {
     exportDate: new Date().toISOString(),
@@ -86,7 +87,7 @@ async function collectBackupPayload() {
   }
   return payload;
   } finally {
-    await releaseLocks();
+    if (releaseLocks) await releaseLocks();
   }
 }
 
@@ -244,12 +245,12 @@ function currentAutoBackupName(now = new Date()) {
   return `auto-${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, '0')}`;
 }
 
-export async function maybeRunMonthlyAutoBackup(force = false) {
+export async function maybeRunMonthlyAutoBackup(force = false, { locksHeld = false } = {}) {
   const name = currentAutoBackupName();
   const existing = await DataStore.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
   const value = (existing && existing.value) || {};
   if (!force && value.name === name && value.payload && value.imageSnapshotId) return value;
-  const fullPayload = await collectBackupPayload();
+  const fullPayload = await collectBackupPayload({ acquireLocks: !locksHeld });
   const imageSnapshotId = new Date().toISOString().replace(/[^0-9A-Za-z]/g, '') + '_' + Math.random().toString(36).slice(2, 10);
   const imageChunkCount = await saveMonthlyImageChunks(imageSnapshotId, fullPayload.images || []);
   const stored = {
@@ -311,13 +312,29 @@ router.post('/backup/restore', authRequiredUnscoped, ownerUnscoped, async (req, 
     const payload = req.body;
     validateBackupPayload(payload);
     if (Array.isArray(payload.images)) restoreBackupImages(payload.images);
-    const farmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
-    releaseLocks = await acquireEggInventoryLocks(DataStore, farmIds);
-    await restoreBackupPayload(payload);
-    res.json({ ok: true, message: 'Backup restored.' });
+
+    const existingFarmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
+    const backupFarmIds = [
+      ...(Array.isArray(payload.farms) ? payload.farms.map((farm) => farm.id || farm._id) : []),
+      ...Object.values(payload.farmBuckets || {}).flatMap((rows) => Array.isArray(rows) ? rows.map((row) => row?.farmId) : []),
+    ];
+    releaseLocks = await acquireEggInventoryLocks(DataStore, [...existingFarmIds, ...backupFarmIds]);
+
+    await withRestoreRecovery({
+      createSnapshot: async () => {
+        // The restore locks are already held, so snapshot without reacquiring them.
+        const stored = await maybeRunMonthlyAutoBackup(true, { locksHeld: true });
+        return expandMonthlyImagePayload(stored);
+      },
+      restore: () => restoreBackupPayload(payload),
+      rollback: (snapshot) => restoreBackupPayload(snapshot),
+    });
+    res.json({ ok: true, message: 'Backup restored.', recoverySnapshot: 'saved' });
   } catch (err) {
     if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
-    res.status(400).json({ error: `Restore failed: ${err.message}` });
+    const status = ['RESTORE_ROLLED_BACK', 'RESTORE_AND_ROLLBACK_FAILED'].includes(err?.code) ? 500 : 400;
+    console.error('POST /api/backup/restore error:', err);
+    res.status(status).json({ error: `Restore failed: ${err.message}`, code: err?.code || 'RESTORE_FAILED' });
   } finally {
     if (releaseLocks) { try { await releaseLocks(); } catch (e) { console.error('Failed to release restore locks:', e); } }
   }
@@ -356,18 +373,28 @@ router.post('/backup/restore-auto', authRequiredUnscoped, ownerUnscoped, async (
     if (!value || !value.payload) return res.status(404).json({ error: 'No auto-backup available yet' });
     const payload = await expandMonthlyImagePayload(value);
     validateBackupPayload(payload);
+
     const existingFarmIds = (await Farm.find({}).lean()).map((farm) => String(farm._id));
     const backupFarmIds = [
       ...(Array.isArray(payload.farms) ? payload.farms.map((farm) => farm.id || farm._id) : []),
       ...Object.values(payload.farmBuckets || {}).flatMap((rows) => Array.isArray(rows) ? rows.map((row) => row?.farmId) : []),
     ];
     releaseLocks = await acquireEggInventoryLocks(DataStore, [...existingFarmIds, ...backupFarmIds]);
-    await restoreBackupPayload(payload);
-    res.json({ ok: true, message: `Restored from ${value.name}` });
+
+    await withRestoreRecovery({
+      createSnapshot: async () => {
+        const stored = await maybeRunMonthlyAutoBackup(true, { locksHeld: true });
+        return expandMonthlyImagePayload(stored);
+      },
+      restore: () => restoreBackupPayload(payload),
+      rollback: (snapshot) => restoreBackupPayload(snapshot),
+    });
+    return res.json({ ok: true, message: `Restored from ${value.name}`, recoverySnapshot: 'saved' });
   } catch (err) {
     if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
+    const status = ['RESTORE_ROLLED_BACK', 'RESTORE_AND_ROLLBACK_FAILED'].includes(err?.code) ? 500 : 400;
     console.error('POST /api/backup/restore-auto error:', err);
-    res.status(500).json({ error: `Restore failed: ${err.message}` });
+    return res.status(status).json({ error: `Restore failed: ${err.message}`, code: err?.code || 'RESTORE_FAILED' });
   } finally {
     if (releaseLocks) {
       try { await releaseLocks(); }
