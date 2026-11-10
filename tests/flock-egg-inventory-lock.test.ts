@@ -18,8 +18,8 @@ function createAtomicStore(initialLock: any = null) {
     },
     async findOneAndDelete(filter) {
       if (!lock || lock.key !== filter.key) return null;
-      if (filter.farmId && String(lock.farmId) !== String(filter.farmId)) return null;
       if (filter.farmId?.$exists === false && lock.farmId !== undefined) return null;
+      if (typeof filter.farmId === 'string' && String(lock.farmId) !== filter.farmId) return null;
       const leaseExpiredAt = filter.$or?.[0]?.['value.expiresAt']?.$lte;
       const legacyStaleBefore = filter.$or?.[1]?.['value.acquiredAt']?.$lt;
       const leaseExpired = leaseExpiredAt && lock.value?.expiresAt && lock.value.expiresAt <= leaseExpiredAt;
