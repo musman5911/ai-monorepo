@@ -14,7 +14,7 @@ describe('backup restore recovery', () => {
       createSnapshot: async () => { throw new Error('snapshot unavailable'); },
       restore: async () => { restored = true; },
       rollback: async () => { rolledBack = true; },
-    })).rejects.toThrow('snapshot unavailable');
+    })).rejects.toMatchObject({ code: 'RESTORE_SNAPSHOT_FAILED', message: expect.stringContaining('snapshot unavailable') });
 
     expect(restored).toBe(false);
     expect(rolledBack).toBe(false);

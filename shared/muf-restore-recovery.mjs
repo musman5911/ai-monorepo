@@ -7,9 +7,19 @@ export async function withRestoreRecovery({ createSnapshot, restore, rollback })
     throw new TypeError('Restore recovery requires createSnapshot, restore and rollback functions.');
   }
 
-  // Keep this outside the restore try block: a failed snapshot must never allow
-  // the destructive operation to start.
-  const snapshot = await createSnapshot();
+  // Keep this before the restore try block: a failed snapshot must never
+  // allow the destructive operation to start.
+  let snapshot;
+  try {
+    snapshot = await createSnapshot();
+  } catch (snapshotError) {
+    const error = new Error(
+      `Restore was not started because the recovery snapshot failed: ${snapshotError?.message || snapshotError}`,
+    );
+    error.code = 'RESTORE_SNAPSHOT_FAILED';
+    error.cause = snapshotError;
+    throw error;
+  }
 
   try {
     return await restore();
