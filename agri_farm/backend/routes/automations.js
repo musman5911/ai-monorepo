@@ -152,7 +152,7 @@ function isTimeToRun(schedule, lastRunTs, nowParts) {
 export let schedulerLoopRunning = false;
 let digestDispatchInFlight = false;
 
-function startScheduler() {
+export function startScheduler() {
   if (MUF_ENV.disableInternalScheduler) {
     console.log('⏰ [Cron Engine] Internal scheduler disabled (DISABLE_INTERNAL_SCHEDULER=1). Use an external cron to ping /cron/dispatch-report.');
     return;
