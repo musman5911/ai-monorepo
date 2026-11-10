@@ -20,10 +20,12 @@ function createAtomicStore(initialLock: any = null) {
       if (!lock || lock.key !== filter.key) return null;
       if (filter.farmId && String(lock.farmId) !== String(filter.farmId)) return null;
       if (filter.farmId?.$exists === false && lock.farmId !== undefined) return null;
-      const staleBefore = filter['value.acquiredAt']?.$lt;
-      const stale = staleBefore && lock.value?.acquiredAt && lock.value.acquiredAt < staleBefore;
+      const leaseExpiredAt = filter.$or?.[0]?.['value.expiresAt']?.$lte;
+      const legacyStaleBefore = filter.$or?.[1]?.['value.acquiredAt']?.$lt;
+      const leaseExpired = leaseExpiredAt && lock.value?.expiresAt && lock.value.expiresAt <= leaseExpiredAt;
+      const legacyStale = legacyStaleBefore && !lock.value?.expiresAt && lock.value?.acquiredAt && lock.value.acquiredAt < legacyStaleBefore;
       const owned = filter._id && String(lock._id) === String(filter._id);
-      if (stale || owned) {
+      if (leaseExpired || legacyStale || owned) {
         const removed = lock;
         lock = null;
         return removed;
@@ -90,6 +92,23 @@ describe('Flock egg inventory lock', () => {
     };
     const store = createAtomicStore(stale);
     const release = await acquireEggInventoryLock(store, 'farm-stale');
+    expect(store.hasLock()).toBe(true);
+    await release();
+    expect(store.hasLock()).toBe(false);
+  });
+
+  it('reclaims a lock whose lease expired even if its original timestamp is recent', async () => {
+    const expired = {
+      _id: 'expired-lease',
+      key: FLOCK_EGG_INVENTORY_LOCK_KEY,
+      farmId: 'farm-expired',
+      value: {
+        acquiredAt: new Date(Date.now() - 2 * 60 * 1000).toISOString(),
+        expiresAt: new Date(Date.now() - 1000).toISOString(),
+      },
+    };
+    const store = createAtomicStore(expired);
+    const release = await acquireEggInventoryLock(store, 'farm-expired');
     expect(store.hasLock()).toBe(true);
     await release();
     expect(store.hasLock()).toBe(false);

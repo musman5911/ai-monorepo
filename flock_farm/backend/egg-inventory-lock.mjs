@@ -5,6 +5,8 @@ import { mufGetDefaultFarmId, mufGetFarmContext } from './muf-farms.mjs';
 // protected by the persisted unique DataStore key, including across processes.
 const localLocks = new Set();
 const STALE_LOCK_AFTER_MS = 30 * 60 * 1000;
+const LOCK_LEASE_MS = 5 * 60 * 1000;
+const LOCK_HEARTBEAT_MS = 60 * 1000;
 
 export const FLOCK_EGG_INVENTORY_LOCK_KEY = '__flock_egg_inventory_lock__';
 
@@ -40,16 +42,24 @@ export async function acquireEggInventoryLock(DataStore, farmId) {
     // A process crash can skip finally and leave a persisted lock behind.
     // Reclaim only records older than the lease window; active operations keep
     // their lock, and the per-farm unique key still arbitrates concurrent hosts.
-    const staleBefore = new Date(Date.now() - STALE_LOCK_AFTER_MS).toISOString();
+    const now = Date.now();
+    const staleBefore = new Date(now - STALE_LOCK_AFTER_MS).toISOString();
+    const nowIso = new Date(now).toISOString();
     await DataStore.findOneAndDelete({
       key: FLOCK_EGG_INVENTORY_LOCK_KEY,
       ...farmFilter,
-      'value.acquiredAt': { $lt: staleBefore },
+      $or: [
+        { 'value.expiresAt': { $lte: nowIso } },
+        { 'value.expiresAt': { $exists: false }, 'value.acquiredAt': { $lt: staleBefore } },
+      ],
     });
 
     const record = {
       key: FLOCK_EGG_INVENTORY_LOCK_KEY,
-      value: { acquiredAt: new Date().toISOString() },
+      value: {
+        acquiredAt: nowIso,
+        expiresAt: new Date(now + LOCK_LEASE_MS).toISOString(),
+      },
     };
     if (resolvedFarmId) record.farmId = resolvedFarmId;
     lock = await DataStore.create(record);
@@ -60,9 +70,26 @@ export async function acquireEggInventoryLock(DataStore, farmId) {
   }
 
   let released = false;
+  const heartbeat = typeof DataStore.findOneAndUpdate === 'function'
+    ? setInterval(async () => {
+        try {
+          const refreshed = await DataStore.findOneAndUpdate(
+            { _id: lock._id, key: FLOCK_EGG_INVENTORY_LOCK_KEY, ...farmFilter },
+            { $set: { 'value.expiresAt': new Date(Date.now() + LOCK_LEASE_MS).toISOString() } },
+            { new: true },
+          );
+          if (!refreshed) console.error('[Flock lock] Lease refresh found no matching lock record.');
+        } catch (error) {
+          console.error('[Flock lock] Lease refresh failed:', error?.message || error);
+        }
+      }, LOCK_HEARTBEAT_MS)
+    : null;
+  heartbeat?.unref?.();
+
   return async function releaseEggInventoryLock() {
     if (released) return;
     released = true;
+    if (heartbeat) clearInterval(heartbeat);
     const filter = { _id: lock._id, key: FLOCK_EGG_INVENTORY_LOCK_KEY, ...farmFilter };
     try {
       await DataStore.findOneAndDelete(filter);
