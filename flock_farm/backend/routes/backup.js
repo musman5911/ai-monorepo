@@ -332,7 +332,7 @@ router.post('/backup/restore', authRequiredUnscoped, ownerUnscoped, async (req, 
     res.json({ ok: true, message: 'Backup restored.', recoverySnapshot: 'saved' });
   } catch (err) {
     if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
-    const status = ['RESTORE_ROLLED_BACK', 'RESTORE_AND_ROLLBACK_FAILED'].includes(err?.code) ? 500 : 400;
+    const status = ['RESTORE_SNAPSHOT_FAILED', 'RESTORE_ROLLED_BACK', 'RESTORE_AND_ROLLBACK_FAILED'].includes(err?.code) ? 500 : 400;
     console.error('POST /api/backup/restore error:', err);
     res.status(status).json({ error: `Restore failed: ${err.message}`, code: err?.code || 'RESTORE_FAILED' });
   } finally {
@@ -392,7 +392,7 @@ router.post('/backup/restore-auto', authRequiredUnscoped, ownerUnscoped, async (
     return res.json({ ok: true, message: `Restored from ${value.name}`, recoverySnapshot: 'saved' });
   } catch (err) {
     if (err?.code === 'EGG_INVENTORY_BUSY') return res.status(409).json({ error: err.message, code: err.code, retryable: true });
-    const status = ['RESTORE_ROLLED_BACK', 'RESTORE_AND_ROLLBACK_FAILED'].includes(err?.code) ? 500 : 400;
+    const status = ['RESTORE_SNAPSHOT_FAILED', 'RESTORE_ROLLED_BACK', 'RESTORE_AND_ROLLBACK_FAILED'].includes(err?.code) ? 500 : 400;
     console.error('POST /api/backup/restore-auto error:', err);
     return res.status(status).json({ error: `Restore failed: ${err.message}`, code: err?.code || 'RESTORE_FAILED' });
   } finally {
