@@ -71,6 +71,14 @@ describe('Phase 7: Telegram farm isolation', () => {
     expect(route).toContain('no linked admin chat');
   });
 
+  it('uses the deterministic attendance identity for Agri Telegram submissions', () => {
+    const route = source('agri_farm', 'backend/routes/telegram.js');
+    expect(route).toContain("import { mufLaborAttendanceId } from '../utils/attendance-id.mjs'");
+    expect(route).toContain('_id: mufLaborAttendanceId(link.laborerId, date)');
+    expect(route).toContain('if (error?.code !== 11000) throw error');
+    expect(route).toContain('const raced = await Attendance.findOne({ laborer_id: link.laborerId, date })');
+  });
+
   it('scopes Dairy manual email summaries to the selected or assigned farms', () => {
     const route = source('dairy_farm', 'backend/routes/email.js');
     expect(route).toContain('mufRunWithFarmContext');

@@ -13,6 +13,7 @@ import { TelegramMeta, User, Laborer, Finance, Attendance, Crop, Farm } from '..
 import { protect, requireAdmin } from '../middleware/auth.js';
 import { parseOid, asyncHandler, toFloat } from '../utils/helpers.js';
 import { todayStr } from '../utils/date.js';
+import { mufLaborAttendanceId } from '../utils/attendance-id.mjs';
 import { MUF_ENV, mufTestRateLimitMax } from '../muf-env.mjs';
 import { mufGetDefaultFarmId, mufGetFarmContext, mufRunWithFarmContext, mufIsFullRole, mufIsOwner } from '../muf-farms.mjs';
 import { mufTelegramFarmId, mufRunTelegramFarm } from '../muf-telegram-farms.mjs';
@@ -210,16 +211,28 @@ router.post('/webhook/:secret', asyncHandler(async (req, res) => {
         await send(`آج کی حاضری پہلے سے لگی ہے (${date})۔`);
         return res.json({ ok: true });
       }
-      await Attendance.insertMany([{
-        laborer_id: link.laborerId,
-        date,
-        day_type: 'full',
-        day_units: 1.0,
-        crop_id: null,
-        field: '',
-        notes: 'via Telegram',
-        posted: false,
-      }]);
+      try {
+        await Attendance.insertMany([{
+          _id: mufLaborAttendanceId(link.laborerId, date),
+          laborer_id: link.laborerId,
+          date,
+          day_type: 'full',
+          day_units: 1.0,
+          crop_id: null,
+          field: '',
+          notes: 'via Telegram',
+          posted: false,
+        }]);
+      } catch (error) {
+        // The app, task runner and Telegram all use the same deterministic
+        // identity. A concurrent winner is a successful duplicate, not a
+        // second attendance row or a silent webhook failure.
+        if (error?.code !== 11000) throw error;
+        const raced = await Attendance.findOne({ laborer_id: link.laborerId, date });
+        if (!raced) throw error;
+        await send(`آج کی حاضری پہلے سے لگی ہے (${date})۔`);
+        return res.json({ ok: true });
+      }
       await send(m.TG.saved(`حاضری (پورا دن) — ${date}`));
       return res.json({ ok: true });
     }
