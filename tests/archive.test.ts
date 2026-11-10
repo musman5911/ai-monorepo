@@ -55,7 +55,9 @@ describe('Phase 11 shared archive server contracts', () => {
   it('keeps archive jobs, snapshots, and source operations farm-filtered', () => {
     expect(shared).toContain('ArchiveJob.findOne({ _id: jobId, farmId })');
     expect(shared).toContain('ArchiveRecord.find({ farmId, jobId })');
-    expect(shared).toContain('Model.deleteOne({ _id:item.sourceId, farmId })');
+    expect(shared).toContain('const sourceFilter = {');
+    expect(shared).toContain('...item.originalRecord');
+    expect(shared).toContain('Model.deleteOne(sourceFilter)');
   });
   it('deletes only the exact archived source snapshot to avoid read/delete races', () => {
     expect(shared).toContain('const sourceFilter = {');

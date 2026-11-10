@@ -274,7 +274,9 @@ describe('backup, restore, archive and deletion boundaries', () => {
     const shared = source('shared/muf-yearly-archive.mjs');
     expect(shared).toContain('ArchiveJob.findOne({ _id: jobId, farmId })');
     expect(shared).toContain('ArchiveRecord.find({ farmId, jobId })');
-    expect(shared).toContain('Model.deleteOne({ _id:item.sourceId, farmId })');
+    expect(shared).toContain('const sourceFilter = {');
+    expect(shared).toContain('...item.originalRecord');
+    expect(shared).toContain('Model.deleteOne(sourceFilter)');
   });
 });
 
