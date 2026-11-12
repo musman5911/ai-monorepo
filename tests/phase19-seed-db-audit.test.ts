@@ -81,7 +81,7 @@ describe('Phase 19 read-only Atlas seed audit target gate', () => {
   it('never falls back to MONGO_URI or accepts a production environment', () => {
     const noExplicitUri = validatePhase19AuditTarget(validEnv('dairy', {
       MUF_PHASE19_AUDIT_URI: '',
-      MONGO_URI: 'mongodb+srv://prod-user:prod-pass@' + HOST + '/dairyfarm'
+      MONGO_URI: 'mongodb+srv://' + HOST + '/dairyfarm'
     }));
     expect(noExplicitUri.ok).toBe(false);
     expect(noExplicitUri.errors.join(' ')).toContain('MUF_PHASE19_AUDIT_URI is required');
