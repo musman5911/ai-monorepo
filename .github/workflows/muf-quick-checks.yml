@@ -56,6 +56,9 @@ jobs:
       - name: Run Phase 19 database safety tests
         run: npm run check-final-db
 
+      - name: Run Phase 19 read-only seed audit contract tests
+        run: npm run check-phase19-audit
+
       - name: Check deterministic demo seeds and seeder syntax
         run: npm run check-seed
 

@@ -21,7 +21,8 @@
     "check-shop": "vitest run tests/shop-isolation.test.ts",
     "check-final-db": "vitest run tests/final-db-preflight.test.ts",
     "seed:test-db": "node tools/seed-test-db.js",
-    "check-seed": "node --check tools/seed-test-db.js && vitest run tests/seed-demo-data.test.ts"
+    "check-seed": "node --check tools/seed-test-db.js && vitest run tests/seed-demo-data.test.ts",
+    "check-phase19-audit": "node --check tools/phase19-audit-seed-db.mjs && vitest run tests/phase19-seed-db-audit.test.ts"
   },
   "devDependencies": {
     "vitest": "^3.0.0"

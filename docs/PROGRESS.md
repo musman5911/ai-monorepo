@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-11-10 (repository hardening and CI verification; Phase 19 real-database work, Phase 20 device/browser testing and Phase 21 live sign-off remain open).
+Last updated: 2026-11-12 (repository hardening and CI verification; Phase 19 real-database work, Phase 20 device/browser testing and Phase 21 live sign-off remain open).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -49,6 +49,13 @@ A follow-up source audit was completed after the earlier phase command-line gate
 - The seven-package production dependency audit found zero production vulnerabilities in every package set. The `npm ci` install summary still displayed five full dependency-tree advisories (1 moderate, 2 high, 2 critical); do not interpret the production-only audit as a full development-dependency audit.
 
 **Important boundary:** these are repository source, automated test, memory-mode integration, and CI results. They do not establish successful live Atlas backup/restore/migration tests, two-process MongoDB lock tests, every role workflow in a browser, phone behavior, or production deployment. Phase 19 remains **In progress**, Phase 20 remains **Not started**, and Phase 21 remains **Not started**. No production database was used for this work.
+
+## Phase 19 Step 10 audit tooling (2026-11-12)
+
+Added a separate read-only inventory tool for the three owner-reported rich-seed Atlas databases. Its target allowlist is limited to muf_test_agri_demo, muf_test_dairy_demo_retry1, and muf_test_flock_demo; it requires exact host/database acknowledgements and an Atlas user with the built-in read role for the selected database. The tool does not load app .env files, does not read MONGO_URI, and performs no writes or schema/index creation. Offline tests cover the allowlist, cross-app and production rejection, URI fallback rejection, read-only acknowledgement, and required Dairy/Flock indexes.
+
+**Verification boundary:** this is repository tooling and source-level guard coverage. No Atlas connection was made in this editing session because the private read-only URIs and live database access are not available here. Step 10 remains pending until all three local reports have been observed and recorded. Phase 19 remains **In progress**; Phases 20 and 21 remain **Not started**.
+
 
 ## Phase 1–18 residual code audit (2026-11-04)
 

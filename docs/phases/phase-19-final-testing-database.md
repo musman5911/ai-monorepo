@@ -254,3 +254,33 @@ The owner started the Dairy backend locally. The server listened on port `3000`,
 The owner confirmed that the seeded Dairy data displayed correctly and that all of these screens loaded and worked during a browser-only smoke pass: Dashboard, Cows, Milk, Breeding, Health, Finance, Reports, and Admin > Backup (including the backup list). This is an owner-reported browser result; no CRUD edits, manual backup restore, farm-role/permission matrix, or destructive operation was performed in this pass.
 
 **Database-target evidence limitation:** the pasted startup log shows the Atlas hostname but does not print the database name. The launch instructions for this test specified the disposable database `muf_test_dairy_demo_retry1`, but the exact database path is not independently visible in the startup output. Treat the association with that disposable database as owner-configured/reported, and verify the URI database path before any write, restore, or migration operation. Production and the original Phase 19 databases remain out of scope.
+
+
+## Step 10: read-only inventory of the three rich-seed Atlas databases (2026-11-12)
+
+The three successful rich-seed targets have a separate, read-only audit path. This is deliberately separate from the restored-backup migration workflow:
+
+| App | Exact allowed database |
+|---|---|
+| Agri | **muf_test_agri_demo** |
+| Dairy | **muf_test_dairy_demo_retry1** |
+| Flock | **muf_test_flock_demo** |
+
+Added tools/phase19-audit-seed-db.mjs. It refuses any database name outside that exact app/database allowlist, requires an independently supplied expected host and database name, requires an explicit read-only acknowledgement, and refuses NODE_ENV=production. It does not load dotenv or an app .env, does not fall back to MONGO_URI, and does not import any application model or server module. The MongoDB connection disables automatic index creation and collection creation. It only issues collection-listing, count, index-listing, aggregate-summary, explain, and database-statistics reads. It never inserts, updates, deletes, seeds, migrates, creates indexes, restores, or drops data.
+
+**Atlas credential requirement:** create or use a separate Atlas database user with the built-in read role on only the selected test database. Do not use an Atlas admin, readWrite, or production application user for this inventory. The script's MUF_PHASE19_AUDIT_READ_ONLY=YES is an operator acknowledgement, not a technical inspection of the Atlas user's grants; the read-only database role is therefore required.
+
+Windows CMD example, run from the repository root for one app at a time:
+
+    set "MUF_PHASE19_AUDIT_APP=dairy"
+    set "MUF_PHASE19_AUDIT_URI=PASTE_THE_DAIRY_READ_ONLY_ATLAS_URI_HERE"
+    set "MUF_PHASE19_AUDIT_EXPECTED_HOST=EXACT_ATLAS_HOSTNAME"
+    set "MUF_PHASE19_AUDIT_EXPECTED_DB=muf_test_dairy_demo_retry1"
+    set "MUF_PHASE19_AUDIT_READ_ONLY=YES"
+    node tools\phase19-audit-seed-db.mjs
+
+Repeat with the Agri and Flock app/database names and their corresponding read-only URIs. The hostname value must be only the exact hostname portion, not a URL. Do not paste a connection URI, username, password, farm data, or user data into chat or commit them. The optional MUF_PHASE19_AUDIT_FREE_TIER_CAP_MB must only be set to a storage cap confirmed in the provider's current plan documentation; otherwise the script reports actual database size without calculating a cap percentage.
+
+The report includes exact farm, user, and shop-product counts; archived-farm and user-role summaries; collection document estimates and index definitions; the two required app-specific unique-index checks; a representative query plan; and database size. It does not print farm names, usernames, password data, or record contents. Warnings are inventory findings to review, not proof that the connection failed. Compare collection counts to the owner-reported 2026-11-04 seed baseline in this document and investigate differences before Step 11.
+
+**Status:** source and offline guard tests added; no Atlas URI or live database connection was available to this editing session. Step 10 is not complete until the owner runs the read-only audit against all three exact targets and records the observed reports. The legacy restored-backup preflight and migration guards remain unchanged.
