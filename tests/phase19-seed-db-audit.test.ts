@@ -3,6 +3,7 @@ import {
   APPROVED_SEED_DATABASES,
   inspectPhase19SeedDatabase,
   requiredPhase19AuditIndexWarnings,
+  resolvePhase19QueryProbe,
   validatePhase19AuditTarget
 } from '../tools/phase19-audit-seed-db.mjs';
 
@@ -104,6 +105,50 @@ describe('Phase 19 read-only Atlas seed audit target gate', () => {
     });
     expect(result.ok).toBe(false);
     expect(connectionAttempted).toBe(false);
+  });
+});
+
+describe('Phase 19 representative query probes', () => {
+  it('uses projected real seeded keys for the Dairy query plan without returning other fields', async () => {
+    let capturedFilter;
+    let capturedOptions;
+    const db = {
+      collection(name) {
+        expect(name).toBe('cows');
+        return {
+          async findOne(filter, options) {
+            capturedFilter = filter;
+            capturedOptions = options;
+            return { farmId: 'seed-farm-1', earTag: 'D-1-C-001', name: 'not projected' };
+          }
+        };
+      }
+    };
+
+    const probe = await resolvePhase19QueryProbe(db, 'dairy');
+    expect(capturedFilter).toEqual({
+      farmId: { $type: 'string', $gt: '' },
+      earTag: { $type: 'string', $gt: '' }
+    });
+    expect(capturedOptions).toEqual({ projection: { farmId: 1, earTag: 1, _id: 0 } });
+    expect(probe).toEqual({
+      filter: { farmId: 'seed-farm-1', earTag: 'D-1-C-001' },
+      source: 'existing-document'
+    });
+  });
+
+  it('uses a synthetic no-match fallback when the selected collection has no usable sample', async () => {
+    const db = {
+      collection() {
+        return { async findOne() { return null; } };
+      }
+    };
+    const probe = await resolvePhase19QueryProbe(db, 'dairy');
+    expect(probe.source).toBe('synthetic-fallback');
+    expect(probe.filter).toEqual({
+      farmId: '__muf_phase19_read_only_probe__',
+      earTag: '__muf_phase19_read_only_probe__'
+    });
   });
 });
 

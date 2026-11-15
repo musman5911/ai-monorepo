@@ -22,9 +22,36 @@ const REQUIRED_COLLECTIONS = {
 };
 
 const QUERY_PROBES = {
-  agri: { collection: 'fields', filter: { farmId: '__muf_phase19_read_only_probe__' } },
-  dairy: { collection: 'cows', filter: { farmId: '__muf_phase19_read_only_probe__', earTag: '__muf_phase19_read_only_probe__' } },
-  flock: { collection: 'datastores', filter: { farmId: '__muf_phase19_read_only_probe__', key: '__muf_phase19_read_only_probe__' } }
+  agri: {
+    collection: 'fields',
+    sampleFilter: { farmId: { $type: 'string', $gt: '' } },
+    sampleFields: ['farmId'],
+    fallbackFilter: { farmId: '__muf_phase19_read_only_probe__' }
+  },
+  dairy: {
+    collection: 'cows',
+    sampleFilter: {
+      farmId: { $type: 'string', $gt: '' },
+      earTag: { $type: 'string', $gt: '' }
+    },
+    sampleFields: ['farmId', 'earTag'],
+    fallbackFilter: {
+      farmId: '__muf_phase19_read_only_probe__',
+      earTag: '__muf_phase19_read_only_probe__'
+    }
+  },
+  flock: {
+    collection: 'datastores',
+    sampleFilter: {
+      farmId: { $type: 'string', $gt: '' },
+      key: { $type: 'string', $gt: '' }
+    },
+    sampleFields: ['farmId', 'key'],
+    fallbackFilter: {
+      farmId: '__muf_phase19_read_only_probe__',
+      key: '__muf_phase19_read_only_probe__'
+    }
+  }
 };
 
 function parseMongoTarget(uriText) {
@@ -132,6 +159,29 @@ function collectIndexNames(node, names = []) {
 function numeric(value) {
   const result = Number(value);
   return Number.isFinite(result) ? result : 0;
+}
+
+/**
+ * Build a representative query using only indexed key fields projected from
+ * one existing seed document. This avoids judging index selection with a
+ * guaranteed no-match sentinel query on tiny demo collections.
+ */
+export async function resolvePhase19QueryProbe(db, app) {
+  const probe = QUERY_PROBES[app];
+  if (!probe) throw new Error('No representative query probe is configured for this app.');
+  const projection = Object.fromEntries(probe.sampleFields.map((field) => [field, 1]));
+  projection._id = 0;
+  const sample = await db.collection(probe.collection).findOne(probe.sampleFilter, { projection });
+  const hasUsableSample = probe.sampleFields.every((field) =>
+    typeof sample?.[field] === 'string' && sample[field].length > 0
+  );
+  if (!hasUsableSample) {
+    return { filter: probe.fallbackFilter, source: 'synthetic-fallback' };
+  }
+  return {
+    filter: Object.fromEntries(probe.sampleFields.map((field) => [field, sample[field]])),
+    source: 'existing-document'
+  };
 }
 
 function safeErrorMessage(error, uriText) {
@@ -255,12 +305,14 @@ export async function inspectPhase19SeedDatabase(env = process.env, dependencies
     };
     if (collectionNames.has(probe.collection)) {
       try {
-        const explain = await db.collection(probe.collection).find(probe.filter).limit(1).explain('executionStats');
+        const resolvedProbe = await resolvePhase19QueryProbe(db, gate.app);
+        const explain = await db.collection(probe.collection).find(resolvedProbe.filter).limit(1).explain('executionStats');
         const indexesUsed = collectIndexNames(explain.queryPlanner?.winningPlan);
         queryPlan = {
           collection: probe.collection,
           status: 'completed',
-          filterFields: Object.keys(probe.filter),
+          probeSource: resolvedProbe.source,
+          filterFields: Object.keys(resolvedProbe.filter),
           winningPlanStage: explain.queryPlanner?.winningPlan?.queryPlan?.stage || explain.queryPlanner?.winningPlan?.stage || 'unknown',
           indexesUsed,
           nReturned: numeric(explain.executionStats?.nReturned),
@@ -271,7 +323,11 @@ export async function inspectPhase19SeedDatabase(env = process.env, dependencies
           ? 'datastore_farm_key_unique'
           : (gate.app === 'dairy' ? 'cow_farm_ear_tag_unique' : null);
         if (requiredIndexName && !indexesUsed.includes(requiredIndexName)) {
-          warnings.push('Representative query plan did not use ' + requiredIndexName + '.');
+          if (resolvedProbe.source === 'existing-document') {
+            warnings.push('Representative query plan did not use ' + requiredIndexName + ' for a query matching an existing seed document.');
+          } else {
+            warnings.push('No usable sample document was found; usage of ' + requiredIndexName + ' could not be evaluated against a matching record.');
+          }
         }
       } catch (error) {
         warnings.push('Query-plan inspection failed for ' + probe.collection + ': ' + safeErrorMessage(error, env.MUF_PHASE19_AUDIT_URI));
