@@ -306,7 +306,7 @@ The owner has now supplied live read-only audit results for the rich-seed databa
 
 The reported database sizes were approximately 1.121 MB (Agri), 3.066 MB (Dairy) and 2.164 MB (Flock, earlier report). No free-tier percentage is claimed because a provider cap was not supplied to the audit. This audit is read-only and does not replace the guarded restored-backup migration tests.
 
-**Step 10 disposition:** partially verified. Agri and Dairy reports are accepted; the updated Flock hinted-index report remains open. No production database was accessed.
+**Step 10 disposition (final, 2026-11-15):** **Complete.** Agri, Dairy and Flock read-only reports have all been observed. The Flock report confirms that both the representative query and the separate required-index probe used `datastore_farm_key_unique`; each returned one record and examined one key and one document. All three audit reports had zero warnings. No production database was accessed.
 
 ## Step 11: Dairy browser role and farm-isolation checkpoint (2026-11-15; owner-reported)
 
@@ -344,3 +344,21 @@ No farm records were created, edited or deleted during these role-visibility che
 
 Phase 19 remains **In progress**. Phase 20 (browser and phones beyond the Phase 19 database-backed app checks) and Phase 21 (live deployment/sign-off) remain **Not started**. No production database or production farm data was used for the checks recorded here.
 
+
+
+## Step 10 final closure: all three seeded Atlas audits passed (2026-11-15)
+
+The owner supplied the final Flock read-only audit report for `muf_test_flock_demo`, closing the last outstanding part of Step 10. The report confirms:
+
+- Exact target app/host/database: `flock` / `cluster0.evx4thz.mongodb.net` / `muf_test_flock_demo`.
+- Anchor counts match the rich seed baseline: five farms (one archived), ten users and eight shop products.
+- Required unique datastore index `datastore_farm_key_unique` exists on `(farmId, key)`.
+- The representative query completed using `datastore_farm_key_unique`.
+- The separate `requiredIndexProbe` completed using the same required index; both probes returned one document and examined one index key and one document.
+- Warnings: empty array.
+- Database size: 2.164 MB storage plus indexes (0.056 MB data, 0.441 MB storage, 1.723 MB indexes). No provider free-tier cap was configured, so no cap percentage is claimed.
+- The audit explicitly reported read-only operations only and no insert, update, delete, index-build, migration, seed or drop operation.
+
+Together with the previously recorded clean Agri and Dairy reports, this closes the read-only seeded-database inventory for all three apps. It does **not** close the separate restored-backup migration/index and end-to-end persistence scenarios in the main checklist.
+
+**Step 10 status: Complete.** Step 11 Dairy browser tests continue; Worker4 was blocked by the login throttle, and Worker5/Worker6 remain pending.
