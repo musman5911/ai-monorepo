@@ -142,3 +142,10 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 19 Dairy browser checkpoint (2026-11-04):** owner-reported smoke testing passed for Dairy Dashboard, Cows, Milk, Breeding, Health, Finance, Reports, and Admin > Backup. The backend ran on port 3000, connected to the Atlas cluster, and reported saving `auto-2026-11`. The startup log did not expose the database name; `muf_test_dairy_demo_retry1` was the configured target from the test instructions, but this association is not independently confirmed by that log. CRUD, backup restore, role/farm isolation, Agri/Flock browser tests, and the remaining Phase 19 database scenarios are still open. Phase 19 remains **In progress**.
+
+## Phase 19 Step 10–11 checkpoint (2026-11-15)
+
+Owner-reported Dairy role/farm visibility tests have passed for the owner, manager, Worker, Manager2, Manager3 (archived-only access correctly denied), Worker2 and Worker3. Worker4 was blocked by the 15-minute login throttle, so that account remains untested; Worker5 and Worker6 also remain pending. No records were changed during the visibility checks. The manager UI correction is committed as `20db59c`; the local Dairy frontend build and frontend CI passed.
+
+The read-only Agri and Dairy Atlas audits are accepted. Flock needs one rerun to record the required hinted `datastore_farm_key_unique` probe introduced in `cd70ef4`. The quick CI workflow passed tests and source guards but failed at the final production dependency audit. Phase 19 remains **In progress**. See [the detailed Phase 19 record](phases/phase-19-final-testing-database.md) for all remaining work, including cross-farm CRUD, Agri/Flock browser checks, restored-copy migration/idempotence, persistent backup/restore, archive/photo, deletion safety, two-process Flock locking and database-size/cap checks.
+

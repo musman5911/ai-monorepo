@@ -2,7 +2,7 @@
 
 Where the project stands, in one place. The detailed plan for each phase is in `docs/phases/`; the old dated log is kept unchanged in `docs/archive/`.
 
-Last updated: 2026-11-12 (repository hardening and CI verification; Phase 19 real-database work, Phase 20 device/browser testing and Phase 21 live sign-off remain open).
+Last updated: 2026-11-15 (Phase 19 read-only Atlas audit and Dairy browser role-isolation checkpoint; Phase 19 remains in progress).
 
 **Honesty rule:** a result is written down only if the command was actually run and its output was seen. "Built" is not the same as "verified": command-line checks do not prove browser behavior or real-MongoDB behavior; those are checked in Phases 19 to 21.
 
@@ -30,6 +30,17 @@ Last updated: 2026-11-12 (repository hardening and CI verification; Phase 19 rea
 | 17 | Automatic command-line checks on GitHub | Done | [phase-17-automatic-checks-ci.md](phases/phase-17-automatic-checks-ci.md) |
 | 18 | Documentation and handoff | Done | [phase-18-documentation-and-handoff.md](phases/phase-18-documentation-and-handoff.md) |
 | 19 | Final testing A: real MongoDB | In progress | [phase-19-final-testing-database.md](phases/phase-19-final-testing-database.md) |
+
+## Phase 19 Step 10–11 checkpoint (2026-11-15; owner-reported)
+
+Read-only Atlas auditing is partially complete: Agri and Dairy reports are accepted; the updated Flock required-index probe on `datastore_farm_key_unique` still needs to be rerun. Dairy's natural query plan used `cow_farm_status_created`, while its separate hinted probe successfully used `cow_farm_ear_tag_unique` with one key and one document examined and no warnings.
+
+Dairy browser farm-role visibility has passed for the owner (all five farms), manager (Farms 2 and 3, Worker-only user creation UI and no role-changing buttons), Worker (Farm 1), Manager2 (Farm 3), Manager3 (archived-only farm correctly denied), Worker2 (Farms 2 and 3), and Worker3 (Farm 2). Worker4 is **blocked, not failed**: the login limiter returned `Too many login attempts. Please try again in 15 minutes.`, so its Farm 3 visibility was not observed. Worker5 (archived Farm 4) and Worker6 (Farm 2) remain untested. No records were changed during these role-visibility checks.
+
+The manager UI correction is on commit `20db59c`. The owner's local Dairy TypeScript/Vite build passed; frontend CI run [43741459525](https://github.com/musman5911/ai-monorepo/actions/runs/43741459525) passed. Quick CI run [43741459532](https://github.com/musman5911/ai-monorepo/actions/runs/43741459532) passed tests and source checks but failed only at the final production dependency-audit step. That dependency issue is separate from the browser role tests.
+
+Remaining Phase 19 work is detailed in [the Phase 19 record](phases/phase-19-final-testing-database.md): rerun the Flock audit; finish the Dairy role matrix and CRUD/owner flows; verify Agri and Flock in their browsers; complete restored-copy migration/idempotence, backup/restore, archive/photo, deletion-safety, Flock two-process lock and database-size/cap tests. Phase 19 remains **In progress**.
+
 
 ## Phase 1–18 operational hardening and final CI checkpoint (2026-11-10)
 

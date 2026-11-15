@@ -120,3 +120,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 19 browser checkpoint (2026-11-04):** the owner reports that all primary Dairy screens (Dashboard, Cows, Milk, Breeding, Health, Finance, Reports, and Admin > Backup) loaded and displayed data against the intended disposable Atlas setup. The startup log confirmed the Atlas host and automatic backup message but did not identify the database name; see [Phase 19 details](phase-19-final-testing-database.md) for the evidence limitation and remaining tests. Phase 19 is still **In progress**.
+
+**Phase 19 current checkpoint (2026-11-15):** owner-reported Dairy farm-role visibility checks have passed for seven account/role cases; Worker4 was blocked by the login rate limiter and Worker5/Worker6 remain pending. Agri and Dairy read-only Atlas audits are accepted; the updated Flock hinted-index audit remains pending. Phase 19 is still **In progress**. See [Phase 19 details](phase-19-final-testing-database.md) for the recorded results and remaining restored-copy, backup/restore, cross-farm CRUD, archive/photo, deletion-safety and concurrency work.
+
