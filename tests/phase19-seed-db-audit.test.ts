@@ -4,6 +4,7 @@ import {
   inspectPhase19SeedDatabase,
   requiredPhase19AuditIndexWarnings,
   resolvePhase19QueryProbe,
+  requiredPhase19HintIndexWarnings,
   validatePhase19AuditTarget
 } from '../tools/phase19-audit-seed-db.mjs';
 
@@ -149,6 +150,31 @@ describe('Phase 19 representative query probes', () => {
       farmId: '__muf_phase19_read_only_probe__',
       earTag: '__muf_phase19_read_only_probe__'
     });
+  });
+});
+
+describe('Phase 19 required-index query-plan verification', () => {
+  it('accepts the hinted Dairy unique ear-tag index even when the natural plan chooses another index', () => {
+    const naturalIndexesUsed = ['cow_farm_status_created'];
+    const hintedIndexesUsed = ['cow_farm_ear_tag_unique'];
+    expect(naturalIndexesUsed).not.toContain('cow_farm_ear_tag_unique');
+    expect(requiredPhase19HintIndexWarnings('dairy', 'existing-document', hintedIndexesUsed)).toEqual([]);
+  });
+
+  it('warns when the required index cannot be exercised by the hinted query', () => {
+    expect(requiredPhase19HintIndexWarnings('dairy', 'existing-document', ['cow_farm_status_created'])).toEqual([
+      'The hinted representative query did not use the required index cow_farm_ear_tag_unique.'
+    ]);
+    expect(requiredPhase19HintIndexWarnings('dairy', 'existing-document', [], 'hint rejected')).toEqual([
+      'The hinted query could not verify cow_farm_ear_tag_unique: hint rejected'
+    ]);
+    expect(requiredPhase19HintIndexWarnings('flock', 'synthetic-fallback', [])).toEqual([
+      'No existing sample document was available to verify datastore_farm_key_unique with a matching query.'
+    ]);
+  });
+
+  it('does not impose app-specific required-index probes on Agri', () => {
+    expect(requiredPhase19HintIndexWarnings('agri', 'existing-document', [])).toEqual([]);
   });
 });
 

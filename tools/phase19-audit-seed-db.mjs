@@ -156,6 +156,28 @@ function collectIndexNames(node, names = []) {
   return [...new Set(names)];
 }
 
+/**
+ * The optimizer may reasonably choose another index for a tiny demo dataset.
+ * Validate required-index usability with a separate, read-only hinted explain
+ * rather than treating natural index selection as a correctness requirement.
+ */
+export function requiredPhase19HintIndexWarnings(app, probeSource, indexesUsed, failure = '') {
+  const requiredIndexName = app === 'flock'
+    ? 'datastore_farm_key_unique'
+    : (app === 'dairy' ? 'cow_farm_ear_tag_unique' : null);
+  if (!requiredIndexName) return [];
+  if (probeSource !== 'existing-document') {
+    return ['No existing sample document was available to verify ' + requiredIndexName + ' with a matching query.'];
+  }
+  if (failure) {
+    return ['The hinted query could not verify ' + requiredIndexName + ': ' + failure];
+  }
+  if (!indexesUsed.includes(requiredIndexName)) {
+    return ['The hinted representative query did not use the required index ' + requiredIndexName + '.'];
+  }
+  return [];
+}
+
 function numeric(value) {
   const result = Number(value);
   return Number.isFinite(result) ? result : 0;
@@ -308,6 +330,57 @@ export async function inspectPhase19SeedDatabase(env = process.env, dependencies
         const resolvedProbe = await resolvePhase19QueryProbe(db, gate.app);
         const explain = await db.collection(probe.collection).find(resolvedProbe.filter).limit(1).explain('executionStats');
         const indexesUsed = collectIndexNames(explain.queryPlanner?.winningPlan);
+        const requiredIndexName = gate.app === 'flock'
+          ? 'datastore_farm_key_unique'
+          : (gate.app === 'dairy' ? 'cow_farm_ear_tag_unique' : null);
+        let requiredIndexProbe = null;
+        if (requiredIndexName && resolvedProbe.source === 'existing-document') {
+          try {
+            const hintedExplain = await db.collection(probe.collection)
+              .find(resolvedProbe.filter)
+              .hint(requiredIndexName)
+              .limit(1)
+              .explain('executionStats');
+            const hintedIndexesUsed = collectIndexNames(hintedExplain.queryPlanner?.winningPlan);
+            requiredIndexProbe = {
+              indexName: requiredIndexName,
+              status: 'completed',
+              indexesUsed: hintedIndexesUsed,
+              nReturned: numeric(hintedExplain.executionStats?.nReturned),
+              totalKeysExamined: numeric(hintedExplain.executionStats?.totalKeysExamined),
+              totalDocsExamined: numeric(hintedExplain.executionStats?.totalDocsExamined)
+            };
+            warnings.push(...requiredPhase19HintIndexWarnings(
+              gate.app,
+              resolvedProbe.source,
+              hintedIndexesUsed
+            ));
+          } catch (error) {
+            const hintError = safeErrorMessage(error, env.MUF_PHASE19_AUDIT_URI);
+            requiredIndexProbe = {
+              indexName: requiredIndexName,
+              status: 'failed',
+              error: hintError
+            };
+            warnings.push(...requiredPhase19HintIndexWarnings(
+              gate.app,
+              resolvedProbe.source,
+              [],
+              hintError
+            ));
+          }
+        } else if (requiredIndexName) {
+          requiredIndexProbe = {
+            indexName: requiredIndexName,
+            status: 'skipped',
+            reason: 'No existing sample document was available for a matching query.'
+          };
+          warnings.push(...requiredPhase19HintIndexWarnings(
+            gate.app,
+            resolvedProbe.source,
+            []
+          ));
+        }
         queryPlan = {
           collection: probe.collection,
           status: 'completed',
@@ -317,18 +390,9 @@ export async function inspectPhase19SeedDatabase(env = process.env, dependencies
           indexesUsed,
           nReturned: numeric(explain.executionStats?.nReturned),
           totalKeysExamined: numeric(explain.executionStats?.totalKeysExamined),
-          totalDocsExamined: numeric(explain.executionStats?.totalDocsExamined)
+          totalDocsExamined: numeric(explain.executionStats?.totalDocsExamined),
+          requiredIndexProbe
         };
-        const requiredIndexName = gate.app === 'flock'
-          ? 'datastore_farm_key_unique'
-          : (gate.app === 'dairy' ? 'cow_farm_ear_tag_unique' : null);
-        if (requiredIndexName && !indexesUsed.includes(requiredIndexName)) {
-          if (resolvedProbe.source === 'existing-document') {
-            warnings.push('Representative query plan did not use ' + requiredIndexName + ' for a query matching an existing seed document.');
-          } else {
-            warnings.push('No usable sample document was found; usage of ' + requiredIndexName + ' could not be evaluated against a matching record.');
-          }
-        }
       } catch (error) {
         warnings.push('Query-plan inspection failed for ' + probe.collection + ': ' + safeErrorMessage(error, env.MUF_PHASE19_AUDIT_URI));
       }
