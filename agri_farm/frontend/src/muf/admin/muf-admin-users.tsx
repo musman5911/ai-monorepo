@@ -19,6 +19,7 @@ export interface MufAdminUser {
   _id: string;
   username: string;
   role: string;
+  farmRole?: 'owner' | 'manager' | 'worker';
   email?: string;
   displayName?: string;
   active?: boolean;
@@ -36,6 +37,7 @@ interface MufAdminUsersProps {
   farmOptionsError?: string;
   allowMultiFarmAssignment?: boolean;
   defaultFarmId?: string;
+  allowAdminCreation?: boolean;
   // Per-user actions
   onToggleRole?: (user: MufAdminUser) => Promise<void> | void;
   onEditProfile: (user: MufAdminUser, data: { username: string; password: string; adminPassword: string }) => Promise<void>;
@@ -46,11 +48,24 @@ interface MufAdminUsersProps {
 
 const inputClass = 'muf-field muf-admin-user-field w-full outline-none transition';
 
+function getRoleLabel(user: MufAdminUser): string {
+  const role = user.farmRole || user.role;
+  if (role === 'owner') return L('Owner');
+  if (role === 'manager') return L('Manager');
+  if (role === 'worker') return L('Worker');
+  return L('Admin');
+}
+
+function isElevatedRole(user: MufAdminUser): boolean {
+  const role = user.farmRole || user.role;
+  return role === 'owner' || role === 'manager' || role === 'admin';
+}
+
 export default function MufAdminUsers({
   users, usersLoading, currentUsername, minPasswordLength = 8,
   onCreate, onToggleRole, onEditProfile, onEditEmail, onToggleActive, onDelete,
   farmOptions = EMPTY_FARM_OPTIONS, farmOptionsLoading = false, farmOptionsError = '',
-  allowMultiFarmAssignment = false, defaultFarmId = '',
+  allowMultiFarmAssignment = false, defaultFarmId = '', allowAdminCreation = true,
 }: MufAdminUsersProps) {
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState<{ username: string; password: string; displayName: string; role: string; email: string; farmIds: string[] }>({ username: '', password: '', displayName: '', role: 'worker', email: '', farmIds: [] });
@@ -74,9 +89,11 @@ export default function MufAdminUsers({
     e.preventDefault();
     setCreating(true);
     try {
+      const role = allowAdminCreation ? form.role : 'worker';
       await onCreate({
         ...form,
-        farmIds: allowMultiFarmAssignment && form.role === 'worker' ? form.farmIds : undefined,
+        role,
+        farmIds: allowMultiFarmAssignment && role === 'worker' ? form.farmIds : undefined,
       });
       setForm({ username: '', password: '', displayName: '', role: 'worker', email: '', farmIds: defaultFarmId ? [defaultFarmId] : [] });
       setShowForm(false);
@@ -108,7 +125,7 @@ export default function MufAdminUsers({
   return (
     <div className="space-y-6">
       {/* ── Register New User ── */}
-      <MufAdminCard icon={<UserPlus className="w-5 h-5" />} title={L('Register New User')} subtitle={L('Create admin and worker accounts for your farm team')}>
+      <MufAdminCard icon={<UserPlus className="w-5 h-5" />} title={L('Register New User')} subtitle={L(allowAdminCreation ? 'Create admin and worker accounts for your farm team' : 'Create worker accounts for your assigned farms')}>
         <div className="flex items-center justify-end gap-2 mb-3">
           <MufAdminButton variant={showForm ? 'secondary' : 'primary'} size="sm" icon={<UserPlus className="w-4 h-4" />}
             onClick={() => setShowForm(!showForm)}
@@ -125,7 +142,7 @@ export default function MufAdminUsers({
               <input value={form.displayName} onChange={(e) => setForm({ ...form, displayName: e.target.value })} placeholder={L('Display name (optional)')} className={inputClass} />
               <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} className={inputClass}>
                 <option value="worker">{L('Worker')}</option>
-                <option value="admin">{L('Admin')}</option>
+                {allowAdminCreation && <option value="admin">{L('Admin')}</option>}
               </select>
               <input type="email" required={form.role === 'admin'} value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} placeholder={form.role === 'admin' ? 'Email (required for admins)' : 'Email (optional)'} className="sm:col-span-2 w-full border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-2.5 text-sm bg-white dark:bg-slate-950 outline-none focus:border-farm-500 focus:ring-2 focus:ring-farm-500/20 transition" />
               {allowMultiFarmAssignment && form.role === 'worker' && (
@@ -163,14 +180,14 @@ export default function MufAdminUsers({
               creating || (allowMultiFarmAssignment && form.role === 'worker'
                 && (farmOptionsLoading || Boolean(farmOptionsError) || form.farmIds.length === 0))
             }>
-              {creating ? 'Creating...' : `Create ${form.role === 'admin' ? 'Admin' : 'Worker'}`}
+              {creating ? 'Creating...' : `Create ${allowAdminCreation && form.role === 'admin' ? 'Admin' : 'Worker'}`}
             </MufAdminButton>
           </form>
         )}
       </MufAdminCard>
 
       {/* ── Registered Users ── */}
-      <MufAdminCard icon={<Users className="w-5 h-5" />} title={`Registered Users (${users.length})`} subtitle="Manage access levels and credentials">
+      <MufAdminCard icon={<Users className="w-5 h-5" />} title={`Registered Users (${users.length})`} subtitle={L(allowAdminCreation ? 'Manage access levels and credentials' : 'Manage worker profiles and credentials')}>
         <div className="space-y-2">
           {usersLoading ? (
             <div className="text-sm text-slate-500 py-8 text-center">{L('Loading users...')}</div>
@@ -181,15 +198,15 @@ export default function MufAdminUsers({
               <div key={user._id} className={`flex flex-wrap items-center justify-between gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-800 ${user.active === false ? 'opacity-60' : ''}`}>
                 {/* Left: Avatar + info */}
                 <div className="flex items-center gap-3 min-w-0">
-                  <div className={`muf-admin-user-avatar shrink-0 ${user.role === 'admin' ? 'is-admin' : ''}`}>
-                    {user.role === 'admin' ? <Shield className="w-4 h-4" /> : <UserRound className="w-4 h-4" />}
+                  <div className={`muf-admin-user-avatar shrink-0 ${isElevatedRole(user) ? 'is-admin' : ''}`}>
+                    {isElevatedRole(user) ? <Shield className="w-4 h-4" /> : <UserRound className="w-4 h-4" />}
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-bold text-slate-800 dark:text-slate-100 font-mono truncate">{user.username}</span>
                       {user.username === currentUsername && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-farm-100 dark:bg-farm-900/40 text-farm-700 dark:text-farm-300">you</span>}
                       {user.active === false && <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300">inactive</span>}
-                      <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">{user.role}</span>
+                      <span className="text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-300 dark:border-slate-700">{getRoleLabel(user)}</span>
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400 truncate">
                       {user.displayName || 'No display name'}
@@ -200,7 +217,7 @@ export default function MufAdminUsers({
 
                 {/* Right: Action buttons */}
                 <div className="flex items-center gap-1 flex-wrap">
-                  {onToggleRole && (
+                  {allowAdminCreation && onToggleRole && (
                     <button onClick={() => onToggleRole(user)} disabled={user.username === currentUsername} title={user.role === 'admin' ? 'Make worker' : 'Make admin'} className="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 disabled:opacity-30 transition">
                       <ShieldCheck className="w-4 h-4" />
                     </button>

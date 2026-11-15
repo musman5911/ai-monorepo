@@ -703,6 +703,7 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
               users={users}
               usersLoading={usersLoading}
               currentUsername={username || ''}
+              allowAdminCreation={isOwner}
               minPasswordLength={MIN_PASSWORD_LENGTH}
               onCreate={async (data) => {
                 setNewUser({ username: data.username, password: data.password, displayName: data.displayName, role: data.role as UserRole, email: data.email });
