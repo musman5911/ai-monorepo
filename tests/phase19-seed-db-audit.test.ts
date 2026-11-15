@@ -66,13 +66,15 @@ describe('Phase 19 read-only Atlas seed audit target gate', () => {
     expect(expectedMismatch.ok).toBe(false);
   });
 
-  it('rejects a host mismatch, missing read-only acknowledgement, and non-Atlas URI', () => {
+  it('rejects a host mismatch, missing script-read-only acknowledgement, and non-Atlas URI', () => {
     expect(validatePhase19AuditTarget(validEnv('dairy', {
       MUF_PHASE19_AUDIT_EXPECTED_HOST: 'another-cluster.example'
     })).ok).toBe(false);
-    expect(validatePhase19AuditTarget(validEnv('dairy', {
+    const missingAcknowledgement = validatePhase19AuditTarget(validEnv('dairy', {
       MUF_PHASE19_AUDIT_READ_ONLY: 'NO'
-    })).ok).toBe(false);
+    }));
+    expect(missingAcknowledgement.ok).toBe(false);
+    expect(missingAcknowledgement.errors.join(' ')).toContain('this tool issues read-only database operations');
     expect(validatePhase19AuditTarget(validEnv('dairy', {
       MUF_PHASE19_AUDIT_URI: 'mongodb://localhost:27017/' + APPROVED_SEED_DATABASES.dairy
     })).ok).toBe(false);

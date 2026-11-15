@@ -268,18 +268,20 @@ The three successful rich-seed targets have a separate, read-only audit path. Th
 
 Added tools/phase19-audit-seed-db.mjs. It refuses any database name outside that exact app/database allowlist, requires an independently supplied expected host and database name, requires an explicit read-only acknowledgement, and refuses NODE_ENV=production. It does not load dotenv or an app .env, does not fall back to MONGO_URI, and does not import any application model or server module. The MongoDB connection disables automatic index creation and collection creation. It only issues collection-listing, count, index-listing, aggregate-summary, explain, and database-statistics reads. It never inserts, updates, deletes, seeds, migrates, creates indexes, restores, or drops data.
 
-**Atlas credential requirement:** create or use a separate Atlas database user with the built-in read role on only the selected test database. Do not use an Atlas admin, readWrite, or production application user for this inventory. The script's MUF_PHASE19_AUDIT_READ_ONLY=YES is an operator acknowledgement, not a technical inspection of the Atlas user's grants; the read-only database role is therefore required.
+**Atlas credential requirement:** a separate Atlas user with the built-in `read` role on only the selected test database is the least-privilege option, but this particular audit tool does not require that role. The current implementation issues only collection-listing, count, index-listing, aggregate-summary, explain, and database-statistics reads; it contains no insert, update, delete, seed, migration, index-build, restore, or drop operation. Therefore, the existing app database user can be used for this inventory even if its Atlas role includes write permission. The `MUF_PHASE19_AUDIT_READ_ONLY=YES` setting acknowledges the tool's read-only behavior; it does not inspect or change the Atlas user's permissions.
+
+The audit validates the URI's database path against the exact app/database allowlist before opening a connection. Your production databases can be on the same Atlas cluster: because their database names differ, they are rejected as audit targets. Do not change the URI database path to a production database. The audit still does not load `.env` automatically or fall back to `MONGO_URI`; copy the existing test-database URI into the explicit audit variable locally.
 
 Windows CMD example, run from the repository root for one app at a time:
 
     set "MUF_PHASE19_AUDIT_APP=dairy"
-    set "MUF_PHASE19_AUDIT_URI=PASTE_THE_DAIRY_READ_ONLY_ATLAS_URI_HERE"
+    set /p "MUF_PHASE19_AUDIT_URI=Paste the Dairy MONGO_URI from .env here: "
     set "MUF_PHASE19_AUDIT_EXPECTED_HOST=EXACT_ATLAS_HOSTNAME"
     set "MUF_PHASE19_AUDIT_EXPECTED_DB=muf_test_dairy_demo_retry1"
     set "MUF_PHASE19_AUDIT_READ_ONLY=YES"
     node tools\phase19-audit-seed-db.mjs
 
-Repeat with the Agri and Flock app/database names and their corresponding read-only URIs. The hostname value must be only the exact hostname portion, not a URL. Do not paste a connection URI, username, password, farm data, or user data into chat or commit them. The optional MUF_PHASE19_AUDIT_FREE_TIER_CAP_MB must only be set to a storage cap confirmed in the provider's current plan documentation; otherwise the script reports actual database size without calculating a cap percentage.
+For the URI prompt, paste the value after `MONGO_URI=` without surrounding quotes. The expected host is only the exact hostname portion (for example, `cluster0.xxxxx.mongodb.net`), not a URL and not a username/password. Repeat with the Agri and Flock app/database names and their corresponding test-database URIs. Do not paste a connection URI, username, password, farm data, or user data into chat or commit them. The optional MUF_PHASE19_AUDIT_FREE_TIER_CAP_MB must only be set to a storage cap confirmed in the provider's current plan documentation; otherwise the script reports actual database size without calculating a cap percentage.
 
 The report includes exact farm, user, and shop-product counts; archived-farm and user-role summaries; collection document estimates and index definitions; the two required app-specific unique-index checks; a representative query plan; and database size. It does not print farm names, usernames, password data, or record contents. Warnings are inventory findings to review, not proof that the connection failed. Compare collection counts to the owner-reported 2026-11-04 seed baseline in this document and investigate differences before Step 11.
 

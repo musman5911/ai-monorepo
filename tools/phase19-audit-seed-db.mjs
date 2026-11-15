@@ -84,7 +84,7 @@ export function validatePhase19AuditTarget(env = process.env) {
   }
 
   if (env.MUF_PHASE19_AUDIT_READ_ONLY !== 'YES') {
-    errors.push('Set MUF_PHASE19_AUDIT_READ_ONLY=YES only after using an Atlas database user with the read role on this database only.');
+    errors.push('Set MUF_PHASE19_AUDIT_READ_ONLY=YES to acknowledge that this tool issues read-only database operations; this flag does not verify MongoDB user permissions.');
   }
   if (String(env.NODE_ENV || '').toLowerCase() === 'production') {
     errors.push('The read-only seed audit is refused while NODE_ENV=production.');
