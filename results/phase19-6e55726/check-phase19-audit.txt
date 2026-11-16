@@ -1,0 +1,19 @@
+6e55726de41a3c7f6a70424aaaf5f94c69b2a881
+COMMAND ["npm", "run", "check-phase19-audit"]
+CWD /home/user/ai-monorepo/.phase19-test
+
+> check-phase19-audit
+> node --check tools/phase19-audit-seed-db.mjs && vitest run tests/phase19-seed-db-audit.test.ts
+
+
+ RUN  v3.2.7 /home/user/ai-monorepo/.phase19-test
+
+ ✓ tests/phase19-seed-db-audit.test.ts (13 tests) 9ms
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  14:59:21
+   Duration  293ms (transform 62ms, setup 0ms, collect 72ms, tests 9ms, environment 0ms, prepare 67ms)
+
+
+EXIT=0 TIMEOUT=False

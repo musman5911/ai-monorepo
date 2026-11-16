@@ -1,0 +1,74 @@
+6e55726de41a3c7f6a70424aaaf5f94c69b2a881
+COMMAND ["npm", "run", "check-audit"]
+CWD /home/user/ai-monorepo/.phase19-test
+
+> check-audit
+> node tools/check-audit.js
+
+
+=== root tools (.) ===
+found 0 vulnerabilities
+
+=== Dairy backend (dairy_farm/backend) ===
+# npm audit report
+
+mongoose  8.0.0 - 8.24.6
+Severity: high
+Mongoose: Connection-level sanitizeFilter not applied - https://github.com/advisories/GHSA-gg4r-jv3p-qx3c
+Mongoose: Discriminator key values matching inherited properties (e.g. __t: 'constructor') bypass schema casting and can poison collections - https://github.com/advisories/GHSA-wr5m-5jph-8m96
+Mongoose walks into inherited properties when hydrating, setting, and merging, allowing overwrites of built-in functions (denial of service) and shared schema state - https://github.com/advisories/GHSA-8332-j7wj-wjw4
+Mongoose: Prototype pollution via Schema.prototype.virtual() - https://github.com/advisories/GHSA-6972-9mcm-vhwj
+fix available via `npm audit fix`
+node_modules/mongoose
+
+1 high severity vulnerability
+
+To address all issues, run:
+  npm audit fix
+
+=== Dairy client (dairy_farm/client) ===
+found 0 vulnerabilities
+
+=== Flock backend (flock_farm/backend) ===
+# npm audit report
+
+mongoose  8.0.0 - 8.24.6
+Severity: high
+Mongoose: Connection-level sanitizeFilter not applied - https://github.com/advisories/GHSA-gg4r-jv3p-qx3c
+Mongoose: Discriminator key values matching inherited properties (e.g. __t: 'constructor') bypass schema casting and can poison collections - https://github.com/advisories/GHSA-wr5m-5jph-8m96
+Mongoose walks into inherited properties when hydrating, setting, and merging, allowing overwrites of built-in functions (denial of service) and shared schema state - https://github.com/advisories/GHSA-8332-j7wj-wjw4
+Mongoose: Prototype pollution via Schema.prototype.virtual() - https://github.com/advisories/GHSA-6972-9mcm-vhwj
+fix available via `npm audit fix`
+node_modules/mongoose
+
+1 high severity vulnerability
+
+To address all issues, run:
+  npm audit fix
+
+=== Flock client (flock_farm/client) ===
+found 0 vulnerabilities
+
+=== Agri backend (agri_farm/backend) ===
+# npm audit report
+
+mongoose  8.0.0 - 8.24.6
+Severity: high
+Mongoose: Connection-level sanitizeFilter not applied - https://github.com/advisories/GHSA-gg4r-jv3p-qx3c
+Mongoose: Discriminator key values matching inherited properties (e.g. __t: 'constructor') bypass schema casting and can poison collections - https://github.com/advisories/GHSA-wr5m-5jph-8m96
+Mongoose walks into inherited properties when hydrating, setting, and merging, allowing overwrites of built-in functions (denial of service) and shared schema state - https://github.com/advisories/GHSA-8332-j7wj-wjw4
+Mongoose: Prototype pollution via Schema.prototype.virtual() - https://github.com/advisories/GHSA-6972-9mcm-vhwj
+fix available via `npm audit fix`
+node_modules/mongoose
+
+1 high severity vulnerability
+
+To address all issues, run:
+  npm audit fix
+
+=== Agri frontend (agri_farm/frontend) ===
+found 0 vulnerabilities
+
+Dependency audit failed: fix high/critical production findings or document an approved, concrete exception.
+
+EXIT=1 TIMEOUT=False

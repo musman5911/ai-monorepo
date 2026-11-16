@@ -1,0 +1,19 @@
+6e55726de41a3c7f6a70424aaaf5f94c69b2a881
+COMMAND ["npm", "run", "check-final-db"]
+CWD /home/user/ai-monorepo/.phase19-test
+
+> check-final-db
+> vitest run tests/final-db-preflight.test.ts
+
+
+ RUN  v3.2.7 /home/user/ai-monorepo/.phase19-test
+
+ ✓ tests/final-db-preflight.test.ts (16 tests) 55ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  14:59:18
+   Duration  441ms (transform 133ms, setup 0ms, collect 153ms, tests 55ms, environment 0ms, prepare 74ms)
+
+
+EXIT=0 TIMEOUT=False

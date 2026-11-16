@@ -1,0 +1,13 @@
+6e55726de41a3c7f6a70424aaaf5f94c69b2a881
+COMMAND ["npm", "run", "check-route-matrix"]
+CWD /home/user/ai-monorepo/.phase19-test
+
+> check-route-matrix
+> node tools/check-route-matrix.js
+
+Route matrix dairy: 135 route declarations checked across four identities.
+Route matrix agri: 140 route declarations checked across four identities.
+Route matrix flock: 87 route declarations checked across four identities.
+Route matrix passed: all discovered routes matched documented authorization expectations.
+
+EXIT=0 TIMEOUT=False

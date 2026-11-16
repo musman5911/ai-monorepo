@@ -1,0 +1,7 @@
+6e55726de41a3c7f6a70424aaaf5f94c69b2a881
+COMMAND ["npm", "ci", "--no-audit", "--no-fund"]
+CWD /home/user/ai-monorepo/.phase19-test/flock_farm/backend
+
+added 118 packages in 1s
+
+EXIT=0 TIMEOUT=False

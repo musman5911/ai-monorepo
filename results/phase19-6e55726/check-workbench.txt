@@ -1,0 +1,36 @@
+6e55726de41a3c7f6a70424aaaf5f94c69b2a881
+COMMAND ["npm", "run", "check-workbench"]
+CWD /home/user/ai-monorepo/.phase19-test
+
+> check-workbench
+> node tools/check-muf-workbench.js
+
+
+MUF workbench source safety check
+  ✓ workbench has a dedicated mount point
+  ✓ drafts use a namespaced browser-local key
+  ✓ undo/redo controls are present
+  ✓ CSS and JSON export controls are present
+  ✓ canvas ordering, duplication and deletion exist
+  ✓ responsive preview presets exist
+  ✓ the editor has no publish-to-production handler
+  ✓ editor contains no API client or network request
+  ✓ editor loads its isolated stylesheet
+  ✓ workbench stylesheet has tablet/mobile layout breakpoints
+  ✓ workbench respects reduced-motion preference
+  ✓ workbench route is registered through Vite development middleware
+  ✓ development route matches an explicit path only
+  ✓ development route serves the dedicated editor HTML
+  ✓ custom workbench HTML passes through Vite HTML transforms
+  ✓ workbench is not imported by the production app entry points
+  ✓ editor module and stylesheet are isolated from other app source files
+  ✓ normal production build script does not explicitly invoke the workbench
+  ✓ no new Puck dependency was added to the app manifest
+  ✓ runtime smoke test can target the development workbench URL
+  ✓ runtime smoke test checks the editor mount, module and stylesheet
+  ✓ runtime smoke test checks Vite and React refresh wiring
+  ✓ runtime smoke test has a network timeout and fails with a non-zero exit code
+
+All 23 workbench source checks passed. This does not replace a local TypeScript build or browser review.
+
+EXIT=0 TIMEOUT=False

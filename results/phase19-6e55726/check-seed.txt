@@ -1,0 +1,19 @@
+6e55726de41a3c7f6a70424aaaf5f94c69b2a881
+COMMAND ["npm", "run", "check-seed"]
+CWD /home/user/ai-monorepo/.phase19-test
+
+> check-seed
+> node --check tools/seed-test-db.js && vitest run tests/seed-demo-data.test.ts
+
+
+ RUN  v3.2.7 /home/user/ai-monorepo/.phase19-test
+
+ ✓ tests/seed-demo-data.test.ts (22 tests) 150ms
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  14:59:20
+   Duration  537ms (transform 127ms, setup 0ms, collect 143ms, tests 150ms, environment 0ms, prepare 85ms)
+
+
+EXIT=0 TIMEOUT=False

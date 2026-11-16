@@ -1,0 +1,19 @@
+6e55726de41a3c7f6a70424aaaf5f94c69b2a881
+COMMAND ["npm", "run", "check-shop"]
+CWD /home/user/ai-monorepo/.phase19-test
+
+> check-shop
+> vitest run tests/shop-isolation.test.ts
+
+
+ RUN  v3.2.7 /home/user/ai-monorepo/.phase19-test
+
+ ✓ tests/shop-isolation.test.ts (7 tests) 12ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  14:59:17
+   Duration  284ms (transform 41ms, setup 0ms, collect 33ms, tests 12ms, environment 0ms, prepare 79ms)
+
+
+EXIT=0 TIMEOUT=False

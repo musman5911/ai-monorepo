@@ -1,0 +1,185 @@
+{
+  "revision": "6e55726de41a3c7f6a70424aaaf5f94c69b2a881",
+  "jobs": [
+    {
+      "name": "install-.",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 3.13
+    },
+    {
+      "name": "install-dairy_farm-backend",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.78
+    },
+    {
+      "name": "install-agri_farm-backend",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.17
+    },
+    {
+      "name": "install-flock_farm-backend",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.22
+    },
+    {
+      "name": "install-dairy_farm-client",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 5.8
+    },
+    {
+      "name": "install-agri_farm-frontend",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 5.89
+    },
+    {
+      "name": "install-flock_farm-client",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 6.0
+    },
+    {
+      "name": "upstream-tests",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 16.27
+    },
+    {
+      "name": "build-dairy_farm",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 21.39
+    },
+    {
+      "name": "build-agri_farm",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.82
+    },
+    {
+      "name": "build-flock_farm",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 17.92
+    },
+    {
+      "name": "check-sync",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.52
+    },
+    {
+      "name": "check-ui",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.21
+    },
+    {
+      "name": "check-workbench",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.17
+    },
+    {
+      "name": "check-workbench-runtime",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.78
+    },
+    {
+      "name": "check-farms",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 9.4
+    },
+    {
+      "name": "check-breeding-events",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.57
+    },
+    {
+      "name": "check-super-admin",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 7.3
+    },
+    {
+      "name": "check-docs",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.21
+    },
+    {
+      "name": "check-bundle-size",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.21
+    },
+    {
+      "name": "check-archive",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 6.29
+    },
+    {
+      "name": "check-audit",
+      "exit": 1,
+      "timeout": false,
+      "seconds": 3.73
+    },
+    {
+      "name": "check-route-permissions",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.17
+    },
+    {
+      "name": "check-route-matrix",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 11.54
+    },
+    {
+      "name": "check-shop",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.97
+    },
+    {
+      "name": "check-final-db",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.18
+    },
+    {
+      "name": "check-seed",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.27
+    },
+    {
+      "name": "check-phase19-audit",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.92
+    },
+    {
+      "name": "check-secrets",
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.26
+    },
+    {
+      "name": "historical-acceptance",
+      "exit": 1,
+      "timeout": false,
+      "seconds": 108.38
+    }
+  ]
+}
