@@ -178,3 +178,10 @@ After the backup was downloaded, the owner created `PH19-BACKUP-RESTORE-PROBE` a
 Supplier/payment verification on Hattar showed Feed Supplier 1 and its khata ledger: purchase Rs 14,800, payment Rs 4,800, balance Rs 10,000. The ledger arithmetic matched. No success or error notice appeared after restore; the data-level checks nevertheless show that the post-backup record was removed, so the restore operation is considered passed while visible completion feedback remains a UI issue.
 
 **Dairy manual JSON backup/restore: Passed on the disposable test target, with the stated verification limits.** Agri/Flock backup, media, monthly chunks, legacy formats, restored-copy migration/idempotence and remaining Phase 19 scenarios stay open. No production data was used.
+
+
+## Phase 19 Dairy monthly automatic backup/restore verification (2026-11-16; owner-reported)
+
+The owner confirmed that the existing `auto-2026-11` monthly snapshot was available and its Download action enabled. The downloaded `auto-2026-11.json` was valid JSON version 3 and showed five farms, 19 cows, 420 milk records, 13 expenses, four suppliers, four supplier payments, 24 breeding events, one archive job and one archive record. The owner restored that existing snapshot, switched to Empty Trial Unit (Farm 5), confirmed that the post-snapshot `PH19-BACKUP-RESTORE-PROBE` expense had returned, then deleted only that temporary record. No new snapshot was created.
+
+**Dairy monthly automatic backup/restore: Passed; temporary data cleaned up.** This is separate from monthly chunk-format and legacy-backup testing, which remain open. The manual JSON restore notification fix is already committed in `1003462` and included in branch head `4115c398`; local pull/browser confirmation remains pending. Phase 19 remains **In progress**. No production data was used.

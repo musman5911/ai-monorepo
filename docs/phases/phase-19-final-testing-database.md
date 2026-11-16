@@ -88,8 +88,9 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 
 - [ ] Restore each backup into a separate throwaway database (local MongoDB Community plus Compass, or a disposable Atlas database).
 - [ ] Migration for Agri, Dairy and Flock: dry run, apply, run again (idempotent); compare record counts and farm ownership before and after.
-- [ ] Index listings and representative query plans, including Flock's unique `(farmId, key)` index and the Dairy per-farm ear-tag index.
+- [x] Index listings and representative query plans, including Flock's unique `(farmId, key)` index and the Dairy per-farm ear-tag index (all three Step 10 read-only audits passed).
 - [x] Dairy manual JSON backup/restore round trip on the disposable seeded-data database, including disappearance of a post-backup probe expense and restored supplier/payment visibility.
+- [x] Dairy monthly automatic backup download/restore round trip; the post-snapshot probe expense returned after restore and was then deleted.
 - [ ] Remaining persistent backup and restore scenarios: Agri diary media, Flock images (exact bytes and metadata), monthly chunks, and legacy backups.
 - [ ] Flock egg-inventory lock with two backend processes on one MongoDB.
 - [ ] Repeat the 84-case farm-deletion safety run and a Flock restore of an image larger than 3.3 MB.
@@ -341,10 +342,10 @@ No farm records were changed during the role-visibility checks. Worker4 was subs
 
 ## Remaining Phase 19 work after the 2026-11-16 checkpoint
 
-1. Review/fix the missing visible success/failure feedback after Dairy's manual JSON restore. The restore data changes were verified on the disposable target; the owner-only yearly archive/restore and public-shop publication/unpublication flows are also complete.
+1. Pull and verify the already-committed manual-restore notification fix (`1003462`, included in current head `4115c398`). The restore data changes are verified; do not repeat the backup cycle solely to test the toast. The owner-only yearly archive/restore, public-shop publication/unpublication and Dairy manual/monthly backup restore flows are complete.
 2. Run the equivalent seeded-data browser and farm-isolation checks for Agri and Flock.
 3. Complete the restored-copy MongoDB track for all three apps: create fresh backups of disposable test data, restore each only into a separate `muf_phase19_<app>_<copy>` database, run the guarded migration dry run, apply and apply again, and compare counts and farm ownership before/after. No migration apply or restored-copy test is recorded as complete yet.
-4. Complete the remaining persistent backup/restore scenarios: Agri diary media; Flock image bytes/metadata; monthly chunks and legacy backup formats. The Dairy manual JSON backup/restore round trip and supplier/payment check are recorded below.
+4. Complete the remaining persistent backup/restore scenarios: Agri diary media; Flock image bytes/metadata; monthly chunks and legacy backup formats. Dairy manual JSON and monthly automatic backup/restore are complete.
 5. Complete the Flock egg-inventory lock test with two backend processes against the same disposable MongoDB.
 6. Repeat the 84-case farm-deletion safety run and restore a Flock image larger than 3.3 MB.
 7. Complete Agri and Flock archive/restore tests and the default photo-store tests; record each database's measured size against a provider cap that has been independently confirmed.
@@ -443,3 +444,12 @@ The owner performed a manual JSON backup/restore round trip against the disposab
 **UI feedback note:** the owner did not observe the expected `Data restored` success notice or any error notice. The data-level checks above indicate that the restore operation did execute, but the visible completion feedback was not observed and remains a UI issue to review. The owner did not repeat the restore solely to chase the missing notice.
 
 **Disposition:** the Dairy manual JSON backup/restore round trip and a representative supplier/payment check are **Passed on the disposable test target**, with the cow-count limitation and missing visible restore notice recorded above. This does not close monthly backup-chunk/legacy-format tests or the Agri/Flock backup/restore work. Phase 19 remains **In progress**. No production database or production farm data was used.
+
+
+## Step 11 Dairy monthly automatic backup and restore verification (2026-11-16; owner-reported)
+
+The owner confirmed that Admin Hub → Backup displayed `Last auto backup: auto-2026-11` and that its Download action was enabled. The downloaded `auto-2026-11.json` was inspected as a valid JSON version 3 snapshot, exported at `2026-11-16T17:07:06.199Z`. The owner-reported file contents included five farms, 19 cows, 420 milk records, 13 expenses, four suppliers, four supplier payments, 24 breeding events, one archive job and one archive record.
+
+The owner restored the existing `auto-2026-11` snapshot using **Restore from it**. The owner then switched to Empty Trial Unit (Farm 5), confirmed that `PH19-BACKUP-RESTORE-PROBE` was present after the monthly restore, and deleted only that temporary test expense. This is the expected round-trip behavior because the probe had been created after the monthly snapshot was generated.
+
+**Dairy monthly automatic backup/restore: Passed; temporary probe cleaned up.** No new automatic snapshot was generated during the check. This closes the Dairy manual JSON and monthly automatic backup/restore browser flows, but does not cover monthly backup chunk formats or legacy backup formats. Phase 19 remains **In progress**; no production database was used.
