@@ -22,6 +22,16 @@ describe('Dairy Admin Hub owner-only sections', () => {
     expect(panel).toMatch(/\{section === 'backup' && isOwner && \(/);
   });
 
+
+  it('shows floating success and error notices for manual JSON restore', () => {
+    expect(panel).toMatch(
+      /await api\\.restoreBackup\\(data\\);\\s*await loadAll\\(\\);\\s*flash\\('success', 'Data restored'\\);\\s*notify\\('Data restored', 'success'\\);/
+    );
+    expect(panel).toContain("notify(message, 'error')");
+    expect(panel).toContain("reader.onerror = () => {");
+    expect(panel).toContain("Could not read backup file");
+  });
+
   it('keeps full-database backup and restore routes owner-protected on the server', () => {
     expect(backupRoutes).toMatch(/router\.get\(['"]\/['"],\s*protectUnscoped,\s*\.\.\.adminOnly/);
     expect(backupRoutes).toMatch(/router\.post\(['"]\/restore['"],\s*protectUnscoped,\s*\.\.\.adminOnly/);

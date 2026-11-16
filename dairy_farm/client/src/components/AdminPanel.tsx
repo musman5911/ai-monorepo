@@ -511,9 +511,17 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
         await api.restoreBackup(data);
         await loadAll();
         flash('success', 'Data restored');
+        notify('Data restored', 'success');
       } catch (err) {
-        flash('error', err instanceof Error ? `Restore failed: ${err.message}` : 'Restore failed');
+        const message = err instanceof Error ? `Restore failed: ${err.message}` : 'Restore failed';
+        flash('error', message);
+        notify(message, 'error');
       }
+    };
+    reader.onerror = () => {
+      const message = 'Could not read backup file';
+      flash('error', message);
+      notify(message, 'error');
     };
     reader.readAsText(file);
   }
