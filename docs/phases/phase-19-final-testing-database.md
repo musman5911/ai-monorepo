@@ -96,6 +96,10 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [ ] Record the size of each database against the free-tier cap.
 - [ ] The new command-line check above exists and passes.
 - [x] Owner-reported Dairy browser smoke test: Dashboard, Cows, Milk, Breeding, Health, Finance, Reports, and Admin > Backup all opened and displayed data.
+- [x] Dairy seeded role/farm visibility matrix: all ten owner/manager/worker test accounts produced the expected farm list or archived-farm denial.
+- [x] Dairy cross-farm CRUD isolation between Farm 2 and Farm 3: create, read, edit, delete and post-delete absence checks passed; both temporary test records were cleaned up.
+- [x] Dairy Admin Hub role visibility: manager cannot see My Farms, Backup or Yearly Archive; owner retains My Farms, Backup and Yearly Archive visibility.
+- [ ] Dairy public-shop product publication/unpublication browser flow.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
@@ -322,25 +326,26 @@ The owner tested the Dairy rich-seed role matrix through the browser using the d
 | Manager (`manager3`) assigned only to archived Farm 4 | Login reached the application but farm access was denied with `You are not assigned to any farm.` This is the expected fail-closed result for a non-owner assigned only to an archived farm. | Passed |
 | Worker (`worker2`) | Only Khanpur Milk Farm (Farm 2) and Taxila Cattle Unit (Farm 3) were visible. | Passed |
 | Worker (`worker3`) | Only Khanpur Milk Farm (Farm 2) was visible. | Passed |
-| Worker (`worker4`) assigned to Farm 3 | Sign-in was blocked by the login limiter with `Too many login attempts. Please try again in 15 minutes.`; no farm list was observed. | Blocked, not failed |
+| Worker (`worker4`) assigned to Farm 3 | Re-tested after the 15-minute login throttle cleared; only Taxila Cattle Unit (Farm 3) was visible. | Passed |
+| Worker (`worker5`) assigned only to archived Farm 4 | Login was denied with `You are not assigned to any farm.` | Passed |
+| Worker (`worker6`) assigned to Farm 2 | Only Khanpur Milk Farm (Farm 2) was visible. | Passed |
 
-No farm records were created, edited or deleted during these role-visibility checks. The Worker4 result is not evidence of a farm-permission defect; it is an authentication rate-limit response and the account's farm visibility remains untested.
+No farm records were changed during the role-visibility checks. Worker4 was subsequently re-tested after the login throttle cleared and passed; Worker5 and Worker6 were also tested. All ten seeded role accounts now have an observed result, recorded in the 2026-11-16 update below.
 
-**Remaining Dairy browser checks:** after the login throttle clears, verify Worker4 sees only Farm 3; verify Worker5 (assigned only to archived Farm 4) is denied; and verify Worker6 sees only Farm 2. Then exercise farm-scoped create/edit/delete with unique test records in two active farms and prove that switching farms does not expose or alter the other farm's records. The owner-only archive/restore controls, real backup/restore behavior, and product publication behavior also remain to be exercised. The manager's New User form was inspected but not submitted.
+**Remaining Dairy browser checks:** complete the MU Farms public-shop publication/unpublication flow, exercise owner-only archive/restore actions on disposable records, and perform the real backup/restore scenarios against a separately verified disposable target. The manager's New User form was inspected but not submitted.
 
 **Build and CI for the manager UI correction:** the owner pulled commit `20db59c`; the local Dairy frontend TypeScript/Vite build passed (3,224 modules transformed). GitHub Actions frontend workflow [43741459525](https://github.com/musman5911/ai-monorepo/actions/runs/43741459525) passed, including the three frontend builds. Quick workflow [43741459532](https://github.com/musman5911/ai-monorepo/actions/runs/43741459532) passed its test suite and source/documentation/security checks through the production dependency audit, but the final production dependency-audit step failed. Resolve that separate dependency finding and rerun the workflow before release sign-off.
 
 ## Remaining Phase 19 work after the 2026-11-15 checkpoint
 
-1. Complete Step 10 by rerunning the read-only Flock audit with the hinted `datastore_farm_key_unique` probe.
-2. Complete the outstanding Dairy role matrix (Worker4, Worker5 and Worker6), then test cross-farm CRUD isolation and the owner-only archive/restore, backup/restore and shop-publication flows.
-3. Run the equivalent seeded-data browser and farm-isolation checks for Agri and Flock.
-4. Complete the restored-copy MongoDB track for all three apps: create fresh backups of disposable test data, restore each only into a separate `muf_phase19_<app>_<copy>` database, run the guarded migration dry run, apply and apply again, and compare counts and farm ownership before/after. No migration apply or restored-copy test is recorded as complete yet.
-5. Complete persistent backup/restore scenarios: Agri diary media; Dairy suppliers and payments; Flock image bytes/metadata; monthly chunks and legacy backup formats.
-6. Complete the Flock egg-inventory lock test with two backend processes against the same disposable MongoDB.
-7. Repeat the 84-case farm-deletion safety run and restore a Flock image larger than 3.3 MB.
-8. Complete archive/restore and default photo-store tests, and record each database's measured size against a provider cap that has been independently confirmed.
-9. Resolve the separate production dependency-audit failure and rerun the quick CI workflow.
+1. Complete the remaining Dairy-specific flows: public-shop product publication/unpublication, owner-only archive/restore actions, and real backup/restore behavior on a verified disposable target.
+2. Run the equivalent seeded-data browser and farm-isolation checks for Agri and Flock.
+3. Complete the restored-copy MongoDB track for all three apps: create fresh backups of disposable test data, restore each only into a separate `muf_phase19_<app>_<copy>` database, run the guarded migration dry run, apply and apply again, and compare counts and farm ownership before/after. No migration apply or restored-copy test is recorded as complete yet.
+4. Complete persistent backup/restore scenarios: Agri diary media; Dairy suppliers and payments; Flock image bytes/metadata; monthly chunks and legacy backup formats.
+5. Complete the Flock egg-inventory lock test with two backend processes against the same disposable MongoDB.
+6. Repeat the 84-case farm-deletion safety run and restore a Flock image larger than 3.3 MB.
+7. Complete archive/restore and default photo-store tests, and record each database's measured size against a provider cap that has been independently confirmed.
+8. Resolve the separate production dependency-audit failure and rerun the quick CI workflow.
 
 Phase 19 remains **In progress**. Phase 20 (browser and phones beyond the Phase 19 database-backed app checks) and Phase 21 (live deployment/sign-off) remain **Not started**. No production database or production farm data was used for the checks recorded here.
 
@@ -362,3 +367,31 @@ The owner supplied the final Flock read-only audit report for `muf_test_flock_de
 Together with the previously recorded clean Agri and Dairy reports, this closes the read-only seeded-database inventory for all three apps. It does **not** close the separate restored-backup migration/index and end-to-end persistence scenarios in the main checklist.
 
 **Step 10 status: Complete.** Step 11 Dairy browser tests continue; Worker4 was blocked by the login throttle, and Worker5/Worker6 remain pending.
+
+
+## Step 11 update: Dairy role matrix, cross-farm CRUD and Admin Hub permissions (2026-11-16; owner-reported)
+
+This update supersedes the pending Worker4/Worker5/Worker6 items in the 2026-11-15 checkpoint. All ten seeded Dairy role accounts have now been tested:
+
+| Account / role | Observed result | Status |
+|---|---|---|
+| Owner (`admin`) | All five farms visible, including archived Farm 4. | Passed |
+| Manager (`manager`) | Farm 2 (Khanpur Milk Farm) and Farm 3 (Taxila Cattle Unit) only. | Passed |
+| Worker (`worker`) | Farm 1 (Hattar Dairy Unit) only. | Passed |
+| Manager2 (`manager2`) | Farm 3 only. | Passed |
+| Manager3 (`manager3`), archived Farm 4 only | Denied with `You are not assigned to any farm.` | Passed |
+| Worker2 (`worker2`) | Farms 2 and 3 only. | Passed |
+| Worker3 (`worker3`) | Farm 2 only. | Passed |
+| Worker4 (`worker4`) | Re-tested after the login throttle cleared; Farm 3 only. | Passed |
+| Worker5 (`worker5`), archived Farm 4 only | Denied with `You are not assigned to any farm.` | Passed |
+| Worker6 (`worker6`) | Farm 2 only. | Passed |
+
+**Cross-farm CRUD isolation:** while signed in as a manager assigned to Farms 2 and 3, the owner created a uniquely named test record in each farm. Each record appeared only in its selected farm. The Farm 2 record was edited and remained absent from Farm 3; deleting it did not affect the Farm 3 record. The Farm 3 record was then deleted. Refresh checks confirmed both temporary records were absent. The seeded records were not reported changed.
+
+**Manager Admin Hub:** after pulling commit `beac7883922f44eca3b7b43f91fce53e994638a5`, the manager view showed General, MU Farms products, Users, Reports, Telegram and Buyers, while My Farms and Backup were hidden. Yearly Archive was not available under Reports. The manager's own role label remained Manager, New User remained available, the role selector showed Worker only, and role-changing buttons were hidden.
+
+**Owner access preservation:** the owner account still sees My Farms, Backup and Reports → Yearly Archive. Backup and restore controls were visible. The owner did not click Restore, execute an archive operation, or change My Farms settings. This confirms visibility/access preservation only; it is not a real restore or archive-operation test.
+
+The Admin Hub restriction is implemented in `dairy_farm/client/src/components/AdminPanel.tsx` and covered by `tests/dairy-admin-owner-sections.test.ts`. The frontend workflow on commit `beac788` passed: [GitHub Actions run 43891986764](https://github.com/musman5911/ai-monorepo/actions/runs/43891986764). The quick-check workflow on the same commit failed only at the production dependency-audit step: [GitHub Actions run 43891986654](https://github.com/musman5911/ai-monorepo/actions/runs/43891986654). Do not treat that workflow as fully passed.
+
+**Step 11 disposition:** the Dairy seeded role/farm matrix, cross-farm CRUD isolation and manager/owner Admin Hub visibility checks are complete based on the owner's browser observations. Dairy shop publication, actual archive/restore operations, and real backup/restore remain open. Phase 19 remains **In progress**; no production database was used.

@@ -152,3 +152,6 @@ The read-only audits for Agri, Dairy and Flock are all accepted. The final Flock
 
 
 **Phase 19 Step 10 completion (2026-11-15):** all three read-only audits on the rich-seed Atlas targets are complete with no warnings. The final Flock run verified the representative query and required-index probe through `datastore_farm_key_unique`. This closes Step 10 only; the remaining database-backed integration and restored-copy tests keep Phase 19 **In progress**. See the detailed Phase 19 record.
+
+
+**Phase 19 Dairy Step 11 update (2026-11-16):** all ten seeded Dairy role accounts now have expected visibility/denial results; cross-farm create/read/edit/delete isolation between Farms 2 and 3 passed and the temporary records were cleaned up. The manager no longer sees My Farms or Backup, and cannot see Yearly Archive; the owner still sees My Farms, Backup and Yearly Archive. Frontend CI passed on commit `beac788`; quick checks still fail at the production dependency-audit step. Dairy shop publication and actual archive/backup/restore operations remain open, as do Agri/Flock browser tests and the remaining restored-copy database tests. Phase 19 remains **In progress**. See [Phase 19 details](phases/phase-19-final-testing-database.md).

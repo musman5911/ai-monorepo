@@ -553,3 +553,16 @@ These owner-supplied outputs establish successful seed insertion only. They do n
 The final Flock audit against `muf_test_flock_demo` passed. It found five farms (one archived), ten users and eight products, confirmed `datastore_farm_key_unique`, and showed both the representative query and required-index probe using that index (one key and one document examined; one record returned). Warnings were empty. The database measured 2.164 MB including indexes; no provider cap was configured. With the previously accepted clean Agri and Dairy reports, **Step 10 is now Complete for all three seeded Atlas audit targets**. The tool reported read-only operations only.
 
 This does not complete restored-backup migration, cross-app browser tests, backup/restore, archive/photo, deletion-safety, Flock concurrency or the separate production dependency-audit issue. Phase 19 remains **In progress**. See [the Phase 19 record](phases/phase-19-final-testing-database.md).
+
+
+## Phase 19 Step 11 Dairy browser checkpoint (2026-11-16; owner-reported)
+
+The Dairy seeded role/farm matrix is now complete across all ten test accounts. Owner sees all five farms; Manager sees Farms 2 and 3; Worker sees Farm 1; Manager2 sees Farm 3; Manager3 (archived Farm 4 only) is denied; Worker2 sees Farms 2 and 3; Worker3 sees Farm 2; Worker4 sees Farm 3 after a successful retry following the login throttle; Worker5 (archived Farm 4 only) is denied; Worker6 sees Farm 2.
+
+Cross-farm CRUD isolation passed between Farm 2 and Farm 3. Each temporary test record was visible only in its own farm; create, edit, delete and refresh/post-delete checks passed. Both temporary records were deleted and confirmed absent.
+
+The manager Admin Hub now hides My Farms and Backup; Reports remains visible but Yearly Archive is hidden. The manager's role label, Worker-only new-user role selection and hidden role-change controls were also checked. The owner account still sees My Farms, Backup and Reports → Yearly Archive, including backup/restore controls. No restore, archive operation or My Farms setting change was performed.
+
+The correction is in commit `beac7883922f44eca3b7b43f91fce53e994638a5`, with regression coverage in `tests/dairy-admin-owner-sections.test.ts`. The frontend Actions run [43891986764](https://github.com/musman5911/ai-monorepo/actions/runs/43891986764) passed. The quick-check run [43891986654](https://github.com/musman5911/ai-monorepo/actions/runs/43891986654) failed at the production dependency-audit step; it is not a fully green run.
+
+**Disposition:** Dairy role/farm visibility, cross-farm CRUD isolation and manager/owner Admin Hub visibility are passed. Dairy shop publication and actual archive/backup/restore operations remain open. Agri/Flock browser validation and the restored-copy MongoDB migration and persistence scenarios also remain open. Phase 19 remains **In progress**.

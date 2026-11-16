@@ -126,3 +126,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 19 Step 10 complete (2026-11-15):** all three seeded Atlas read-only audits passed. The final Flock report confirmed the required `datastore_farm_key_unique` probe completed with one key and one document examined and no warnings. The remaining Phase 19 work is unchanged; see [Phase 19 details](phase-19-final-testing-database.md).
+
+
+**Phase 19 Dairy Step 11 update (2026-11-16):** the owner reports all ten seeded Dairy role accounts passed their expected farm-visibility/archived-farm-denial checks. Cross-farm CRUD isolation between Farms 2 and 3 passed and both temporary test records were removed. Manager Admin Hub hides My Farms, Backup and Yearly Archive; owner access to My Farms, Backup and Yearly Archive remains visible. Dairy shop publication, actual archive/backup/restore, Agri/Flock browser checks and the restored-copy database track remain open. Phase 19 remains **In progress**. See [Phase 19 details](phase-19-final-testing-database.md).
