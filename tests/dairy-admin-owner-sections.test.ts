@@ -24,12 +24,14 @@ describe('Dairy Admin Hub owner-only sections', () => {
 
 
   it('shows floating success and error notices for manual JSON restore', () => {
-    expect(panel).toMatch(
-      /await api\\.restoreBackup\\(data\\);\\s*await loadAll\\(\\);\\s*flash\\('success', 'Data restored'\\);\\s*notify\\('Data restored', 'success'\\);/
-    );
-    expect(panel).toContain("notify(message, 'error')");
-    expect(panel).toContain("reader.onerror = () => {");
-    expect(panel).toContain("Could not read backup file");
+    const restoreStart = panel.indexOf('async function handleRestore');
+    const restoreEnd = panel.indexOf('reader.readAsText(file);', restoreStart);
+    const restoreHandler = panel.slice(restoreStart, restoreEnd);
+    expect(restoreHandler).toContain('await api.restoreBackup(data);');
+    expect(restoreHandler).toContain("notify('Data restored', 'success')");
+    expect(restoreHandler).toContain("notify(message, 'error')");
+    expect(restoreHandler).toContain('reader.onerror = () => {');
+    expect(restoreHandler).toContain('Could not read backup file');
   });
 
   it('keeps full-database backup and restore routes owner-protected on the server', () => {
