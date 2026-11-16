@@ -167,3 +167,14 @@ The owner completed the actual Yearly Archive cycle on the disposable Dairy seed
 The archive preview included one record before the 2025-11-16 cutoff. The owner waited for the export download before executing; the UI reported `archived; 1 record(s) processed`. The 2020 Finance filter then returned no expenses. Restoring the same archive job reported `restored; 1 record(s) processed`, and the original expense reappeared. The owner then deleted only that temporary record and confirmed the same date range was empty again.
 
 **Dairy owner-only Yearly Archive and restore: Passed; temporary data cleaned up.** This closes the Dairy archive/restore browser check only. Dairy persistent backup/restore, Agri/Flock browser and archive flows, default photo storage, restored-backup migration/idempotence, other persistence/deletion/concurrency checks, measured database-cap usage and the production dependency-audit failure remain open. Phase 19 remains **In progress**. No production data was used.
+
+
+## Phase 19 Dairy manual JSON backup/restore verification (2026-11-16; owner-reported)
+
+The owner downloaded `dairy_backup_2026-11-16.json` from the disposable Dairy target `muf_test_dairy_demo_retry1`. Node.js parsed it as valid JSON version 4, with five farms and all expected arrays; counts included 19 cows, 420 milk records, 12 expenses, four suppliers, four supplier payments, one archive job and one archive snapshot record. The full collection-count output is recorded in the Phase 19 detail file.
+
+After the backup was downloaded, the owner created `PH19-BACKUP-RESTORE-PROBE` as a temporary expense in Empty Trial Unit. After restoring the downloaded file through Admin Hub → Backup → Restore from File, that post-backup probe was absent. The owner confirmed all five farms were visible, and cow records were visible in Hattar (4), Khanpur (4) and Taxila (5), for 13 records observed across those accessible farms. Archived Tarnol Unit was not inspected, so the backup's total of 19 cows was not fully reconciled.
+
+Supplier/payment verification on Hattar showed Feed Supplier 1 and its khata ledger: purchase Rs 14,800, payment Rs 4,800, balance Rs 10,000. The ledger arithmetic matched. No success or error notice appeared after restore; the data-level checks nevertheless show that the post-backup record was removed, so the restore operation is considered passed while visible completion feedback remains a UI issue.
+
+**Dairy manual JSON backup/restore: Passed on the disposable test target, with the stated verification limits.** Agri/Flock backup, media, monthly chunks, legacy formats, restored-copy migration/idempotence and remaining Phase 19 scenarios stay open. No production data was used.
