@@ -578,3 +578,12 @@ The owner completed the Dairy product publication/unpublication browser test usi
 - Deleted the temporary product and confirmed it was gone from the manager product list.
 
 The owner reports no seeded products were modified. **Dairy public-shop publication/unpublication is complete.** Actual owner-only archive/restore and real backup/restore remain open. Agri/Flock browser validation, restored-copy MongoDB migrations and persistence tests, Flock concurrency/deletion-safety checks, database-cap measurements, and the production dependency-audit issue also remain open. Phase 19 stays **In progress**; this browser check used no production database.
+
+
+## Phase 19 Dairy Yearly Archive and restore verification (2026-11-16; owner-reported)
+
+The owner completed the actual Yearly Archive cycle on the disposable Dairy seeded-data setup, using Empty Trial Unit (Farm 5) and one temporary Misc expense dated 2020-01-15, amount 1, note `PH19-YEARLY-ARCHIVE-TEST`.
+
+The archive preview included one record before the 2025-11-16 cutoff. The owner waited for the export download before executing; the UI reported `archived; 1 record(s) processed`. The 2020 Finance filter then returned no expenses. Restoring the same archive job reported `restored; 1 record(s) processed`, and the original expense reappeared. The owner then deleted only that temporary record and confirmed the same date range was empty again.
+
+**Dairy owner-only Yearly Archive and restore: Passed; temporary data cleaned up.** This closes the Dairy archive/restore browser check only. Dairy persistent backup/restore, Agri/Flock browser and archive flows, default photo storage, restored-backup migration/idempotence, other persistence/deletion/concurrency checks, measured database-cap usage and the production dependency-audit failure remain open. Phase 19 remains **In progress**. No production data was used.

@@ -132,3 +132,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 19 Dairy public-shop checkpoint (2026-11-16):** the owner verified that a draft product stays hidden from the Incognito public shop, publishing makes it visible, and unpublishing hides it again. The temporary product was deleted and confirmed absent. The public-shop publication flow is complete; actual archive/restore and real backup/restore remain open. Phase 19 is still In progress. See [Phase 19 details](phase-19-final-testing-database.md).
+
+
+**Phase 19 Dairy Yearly Archive checkpoint (2026-11-16):** the owner completed the disposable-data archive and restore cycle on Empty Trial Unit. One temporary 2020 expense was archived, confirmed absent from active Finance, restored and confirmed visible, then deleted and confirmed absent. Dairy Yearly Archive/restore is complete; Dairy backup/restore and the remaining Agri/Flock, migration, persistence, photo-store, deletion-safety and concurrency checks remain open. Phase 19 stays **In progress**. See [Phase 19 details](phase-19-final-testing-database.md).

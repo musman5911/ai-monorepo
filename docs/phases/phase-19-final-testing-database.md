@@ -92,7 +92,9 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [ ] Persistent backup and restore on the copies: Agri diary media, Dairy suppliers and payments, Flock images (exact bytes and metadata), monthly chunks, and legacy backups.
 - [ ] Flock egg-inventory lock with two backend processes on one MongoDB.
 - [ ] Repeat the 84-case farm-deletion safety run and a Flock restore of an image larger than 3.3 MB.
-- [ ] Archive and restore on the copies; photo storage with the default store.
+- [x] Dairy owner-only yearly archive and restore operation on the disposable seeded-data database; the temporary expense was restored and then removed.
+- [ ] Agri and Flock archive/restore on disposable copies.
+- [ ] Default photo-store behavior on disposable copies.
 - [ ] Record the size of each database against the free-tier cap.
 - [ ] The new command-line check above exists and passes.
 - [x] Owner-reported Dairy browser smoke test: Dashboard, Cows, Milk, Breeding, Health, Finance, Reports, and Admin > Backup all opened and displayed data.
@@ -336,15 +338,15 @@ No farm records were changed during the role-visibility checks. Worker4 was subs
 
 **Build and CI for the manager UI correction:** the owner pulled commit `20db59c`; the local Dairy frontend TypeScript/Vite build passed (3,224 modules transformed). GitHub Actions frontend workflow [43741459525](https://github.com/musman5911/ai-monorepo/actions/runs/43741459525) passed, including the three frontend builds. Quick workflow [43741459532](https://github.com/musman5911/ai-monorepo/actions/runs/43741459532) passed its test suite and source/documentation/security checks through the production dependency audit, but the final production dependency-audit step failed. Resolve that separate dependency finding and rerun the workflow before release sign-off.
 
-## Remaining Phase 19 work after the 2026-11-15 checkpoint
+## Remaining Phase 19 work after the 2026-11-16 checkpoint
 
-1. Complete the remaining Dairy-specific flows: owner-only archive/restore actions and real backup/restore behavior on a verified disposable target. The public-shop product publication/unpublication flow is complete.
+1. Complete the remaining Dairy-specific flow: real backup/restore behavior on a separately verified disposable target. The owner-only yearly archive/restore operation and public-shop publication/unpublication flow are complete.
 2. Run the equivalent seeded-data browser and farm-isolation checks for Agri and Flock.
 3. Complete the restored-copy MongoDB track for all three apps: create fresh backups of disposable test data, restore each only into a separate `muf_phase19_<app>_<copy>` database, run the guarded migration dry run, apply and apply again, and compare counts and farm ownership before/after. No migration apply or restored-copy test is recorded as complete yet.
 4. Complete persistent backup/restore scenarios: Agri diary media; Dairy suppliers and payments; Flock image bytes/metadata; monthly chunks and legacy backup formats.
 5. Complete the Flock egg-inventory lock test with two backend processes against the same disposable MongoDB.
 6. Repeat the 84-case farm-deletion safety run and restore a Flock image larger than 3.3 MB.
-7. Complete archive/restore and default photo-store tests, and record each database's measured size against a provider cap that has been independently confirmed.
+7. Complete Agri and Flock archive/restore tests and the default photo-store tests; record each database's measured size against a provider cap that has been independently confirmed.
 8. Resolve the separate production dependency-audit failure and rerun the quick CI workflow.
 
 Phase 19 remains **In progress**. Phase 20 (browser and phones beyond the Phase 19 database-backed app checks) and Phase 21 (live deployment/sign-off) remain **Not started**. No production database or production farm data was used for the checks recorded here.
@@ -411,3 +413,17 @@ The owner tested a temporary Dairy product named `PH19-DAIRY-SHOP-TEST` in the l
 The owner reports that the seeded products were not changed. This verifies the draft/published visibility switch and cleanup in the local browser flow; it does not establish deployed cross-origin feed or WhatsApp order delivery behavior.
 
 **Dairy public-shop publication/unpublication flow: Complete.** Remaining Dairy work is the actual owner-only archive/restore operation and real backup/restore on a separately verified disposable target. Phase 19 remains **In progress**.
+
+
+## Step 11 Dairy Yearly Archive operation and restoration (2026-11-16; owner-reported)
+
+The owner completed the actual Dairy owner-only Yearly Archive operation against the disposable seeded-data setup, using the intentionally empty QA farm **Empty Trial Unit (Farm 5)**. The only test record was a temporary farm-wide Misc expense dated **2020-01-15**, amount **1**, with note `PH19-YEARLY-ARCHIVE-TEST`. No seeded business records were selected for this test.
+
+- The archive preview prepared a snapshot containing **1 record** before the cutoff date **2025-11-16**.
+- The owner waited for the archive export download before executing the job. The UI then reported: `Archive status: archived; 1 record(s) processed.`
+- The owner checked Finance → Expenses with the 2020 date range and confirmed **No expenses found** while the record was archived.
+- The owner restored the same job. The UI reported: `Restore status: restored; 1 record(s) processed.`
+- The owner confirmed the original expense reappeared with its original date and details.
+- The owner deleted only the temporary `PH19-YEARLY-ARCHIVE-TEST` expense after the restore check, then repeated the date-range check and confirmed no expense remained.
+
+**Dairy owner-only Yearly Archive and restore: Passed.** The temporary test record was cleaned up; the archive job remains as test history. This verifies the Dairy browser archive/restore flow on disposable seeded data. It does not verify Agri/Flock archive flows, default photo storage, or the separate persistent backup/restore scenarios. Phase 19 remains **In progress**; no production database or production farm data was used.
