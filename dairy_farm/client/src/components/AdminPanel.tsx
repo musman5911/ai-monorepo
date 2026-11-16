@@ -519,7 +519,7 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
   }
 
 
-  const sections: { id: string; label: string; icon: any }[] = [
+  const allSections: { id: string; label: string; icon: any }[] = [
     { id: 'profile', label: L('General'), icon: Settings },
     { id: 'farms', label: L('My Farms'), icon: Globe2 },
     { id: 'products', label: L('MU Farms products'), icon: Store },
@@ -528,7 +528,12 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
     { id: 'backup', label: L('Backup'), icon: Database },
     { id: 'telegram', label: L('Telegram'), icon: Send },
     { id: 'buyers', label: L('Buyers'), icon: Baby },
-  ] as const;
+  ];
+  // My Farms contains cross-app connection settings/shared-key configuration,
+  // and Backup covers the full database. Both are owner-only surfaces.
+  const sections = isOwner
+    ? allSections
+    : allSections.filter((item) => item.id !== 'farms' && item.id !== 'backup');
 
   return (
     <MufAdminShell
@@ -770,7 +775,7 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
             />
           )}
 
-          {section === 'farms' && <MyFarmsPanel />}
+          {section === 'farms' && isOwner && <MyFarmsPanel />}
           {section === 'products' && <ProductManager kinds={[{ value: 'milk', label: 'Milk' }, { value: 'animal', label: 'Animal without a buyer' }]} getHeaders={() => {
             let token = ''; let farmId = '';
             try { token = localStorage.getItem('dm_token') || ''; farmId = localStorage.getItem('muf_active_farm_dairy') || ''; } catch { /* storage unavailable */ }
@@ -796,7 +801,7 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
             </div>
           )}
 
-          {section === 'backup' && (
+          {section === 'backup' && isOwner && (
             <div className="space-y-6">
               {/* Manual Backup */}
               <MufAdminCard icon={<Database className="w-5 h-5" />} title={L('Manual Backup')} subtitle={L('Download or share your farm data')}>
