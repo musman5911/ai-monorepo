@@ -26,8 +26,8 @@ describe('Phase 11 shared archive server contracts', () => {
   });
   it('uses UUID-compatible string IDs for archive jobs and snapshot records in all apps', () => {
     for (const db of [dairyDb, flockDb, agriDb]) {
-      expect(db).toMatch(/const ArchiveJobSchema = new mongoose\\.Schema\\(\\{\\s*_id:\\s*\\{\\s*type:\\s*String\\s*\\}/);
-      expect(db).toMatch(/const ArchiveRecordSchema = new mongoose\\.Schema\\(\\{\\s*_id:\\s*\\{\\s*type:\\s*String\\s*\\}/);
+      expect(db).toContain('const ArchiveJobSchema = new mongoose.Schema({\n  _id: { type: String },');
+      expect(db).toContain('const ArchiveRecordSchema = new mongoose.Schema({\n  _id: { type: String },');
     }
   });
   it('registers Flock and Agri archive models in memory and real database modes', () => {
