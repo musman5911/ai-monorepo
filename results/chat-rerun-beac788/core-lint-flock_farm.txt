@@ -1,0 +1,10 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "--prefix", "flock_farm/client", "run", "lint"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+
+> flock-farm-client@1.0.0 lint
+> tsc --noEmit
+
+
+EXIT=0 TIMEOUT=False SECONDS=36.99

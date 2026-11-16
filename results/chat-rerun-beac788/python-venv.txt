@@ -1,0 +1,4 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["python3", "-m", "venv", "/home/user/ai-monorepo/.cache/chat-rerun/python-tools"]
+
+EXIT=0

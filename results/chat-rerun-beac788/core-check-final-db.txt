@@ -1,0 +1,20 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "run", "check-final-db"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+
+> check-final-db
+> vitest run tests/final-db-preflight.test.ts
+
+
+ RUN  v3.2.7 /home/user/ai-monorepo/.cache/chat-rerun/source
+
+ ✓ tests/final-db-preflight.test.ts (16 tests) 71ms
+
+ Test Files  1 passed (1)
+      Tests  16 passed (16)
+   Start at  15:15:02
+   Duration  822ms (transform 152ms, setup 0ms, collect 160ms, tests 71ms, environment 0ms, prepare 185ms)
+
+
+EXIT=0 TIMEOUT=False SECONDS=2.35

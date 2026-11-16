@@ -1,0 +1,73 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["node", "--test", "--test-concurrency=1", "tests/full-rerun/scale.test.mjs"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+TAP version 13
+# {"app":"dairy","route":"/farms","method":"GET","status":200,"ms":4,"bytes":430}
+# {"app":"dairy","route":"/cows","method":"POST","status":201,"ms":4,"bytes":494}
+# {"app":"dairy","route":"/buyers","method":"POST","status":201,"ms":4,"bytes":199}
+# {"app":"dairy","fixture":{"ok":true,"count":50000,"insertMs":465.267016,"rssBefore":139051008,"rssAfter":195043328}}
+# {"app":"dairy","route":"/milk/summary?cowId=90a73562-c94f-4f9f-ae94-654388e00843","method":"GET","status":200,"ms":128,"bytes":76}
+# {"expected":{"count":50000,"liters":15000,"revenue":1500000},"actual":{"count":50000,"totalLiters":15000,"saleableLiters":15000,"revenue":1500000}}
+# {"app":"dairy","route":"/milk?cowId=90a73562-c94f-4f9f-ae94-654388e00843&page=1&limit=100","method":"GET","status":200,"ms":102,"bytes":29478}
+# {"app":"dairy","route":"/backup","method":"GET","status":200,"ms":507,"bytes":15778185}
+# Subtest: NEW-SCALE-1: 50k milk records over three years retain penny precision and untruncated summary
+ok 1 - NEW-SCALE-1: 50k milk records over three years retain penny precision and untruncated summary
+  ---
+  duration_ms: 2464.504418
+  type: 'test'
+  ...
+# {"app":"agri","route":"/farms","method":"GET","status":200,"ms":4,"bytes":430}
+# {"app":"agri","route":"/analytics/summary","method":"GET","status":200,"ms":13,"bytes":26193}
+# {"app":"agri","fixture":{"ok":true,"count":100000,"insertMs":225.64764999999989,"rssBefore":110768128,"rssAfter":168607744}}
+# {"app":"agri","route":"/analytics/summary","method":"GET","status":200,"ms":531,"bytes":29258}
+# {"before":{"entries":57,"income":1166000,"expense":1431500,"net":-265500,"farmWideIncome":8000,"farmWideExpense":923100},"after":{"entries":100057,"income":1166500.0000004657,"expense":1432000.0000004657,"net":-265500,"farmWideIncome":8500.000000010914,"farmWideExpense":923600.0000004657},"expectedDelta":{"entries":100000,"income":500,"expense":500,"net":0}}
+# Subtest: NEW-SCALE-2: 100k finance records preserve analytics totals
+ok 2 - NEW-SCALE-2: 100k finance records preserve analytics totals
+  ---
+  duration_ms: 3332.375435
+  type: 'test'
+  ...
+# {"app":"agri","route":"/farms","method":"GET","status":200,"ms":5,"bytes":430}
+# {"app":"agri","route":"/analytics/summary","method":"GET","status":200,"ms":17,"bytes":26193}
+# {"app":"agri","fixture":{"ok":true,"count":100000,"insertMs":223.65098300000045,"rssBefore":109461504,"rssAfter":166678528}}
+# {"app":"agri","route":"/analytics/summary","method":"GET","status":200,"ms":383,"bytes":29258}
+# {"before":{"entries":57,"income":1166000,"expense":1431500,"net":-265500,"farmWideIncome":8000,"farmWideExpense":923100},"after":{"entries":100057,"income":1166500.0000004657,"expense":1432000.0000004657,"net":-265500,"farmWideIncome":8500.000000010914,"farmWideExpense":923600.0000004657},"expectedDelta":{"entries":100000,"income":500,"expense":500,"net":0}}
+# {"app":"agri","route":"/backup","method":"GET","status":200,"ms":681,"bytes":17321321}
+# {"backupTotal":100000,"expectedTotal":100057,"expectedFixture":100000,"actualFixture":99943}
+# Subtest: BL-5 NEW-SCALE-3: full backup retains all finance rows beyond 100000 total
+not ok 3 - BL-5 NEW-SCALE-3: full backup retains all finance rows beyond 100000 total
+  ---
+  duration_ms: 3789.873709
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/full-rerun/scale.test.mjs:39:2'
+  failureType: 'testCodeFailure'
+  error: |-
+    BL-5: backup silently truncated finance fixture rows
+    
+    99943 !== 100000
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 100000
+  actual: 99943
+  operator: 'strictEqual'
+  stack: |-
+    file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/full-rerun/scale.test.mjs:56:12
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async fixture (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/full-rerun/scale.test.mjs:22:3)
+    async TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/full-rerun/scale.test.mjs:40:3)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 2
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 9694.739909
+
+EXIT=1 TIMEOUT=False SECONDS=9.84

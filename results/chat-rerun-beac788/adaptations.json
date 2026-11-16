@@ -1,0 +1,67 @@
+[
+  {
+    "path": "tests/round3/build-full-specs.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "f76d1ad31fd3800c2a42cfd01984321361e8fcc498b3d46742b86f9282ab4dae"
+  },
+  {
+    "path": "tests/round3/final-p1-rerun.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "582a9d8a9ac693e1edd11ba4b3a9ea8305f162d8d40373d8f9f6a66e386ea235"
+  },
+  {
+    "path": "tests/round3/fastcheck-commands.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "e9e8480170f4c2cb35b8c3217b078a410f4a465a4f704203af2dd0d355ec4f73"
+  },
+  {
+    "path": "tests/round3/phase1-dynamic.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "82237e92ee5d1f98a0d300c5b5910e158272470497677f2b7b271edb97e22934"
+  },
+  {
+    "path": "tests/round3/phase1b-prod-proxy-cards.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "0ff51515e509d10f851991f6fb7f094c1a7cab9f441c535b15089d79269582a4"
+  },
+  {
+    "path": "tests/round3/phase1c-protocol-chaos-load.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "d26d4cb610d5ed6a637c3e4a8627f3096731f4186442a3dadb5b1afc5ff7020b"
+  },
+  {
+    "path": "tests/round3/phase1d-followups.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "0ccdb1580ea60b36d231b3dd9f159ab2c5d9b0ce83065167f642221698755537"
+  },
+  {
+    "path": "tests/round3/phase3-flock-cards-reverse.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "c687688f38243bfd30ff822d6841b043ed725161edac1860afea9c5de5fc2479"
+  },
+  {
+    "path": "tests/round3/run-schemathesis-full.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "4df29d6643924c5d980d0f509e1a2122fe8865f92056e9ddc9c32ca1848c9765"
+  },
+  {
+    "path": "tests/round3/hypothesis_agri.py",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "c2916649ebfd6752177f4496f49bb2344b536b09222150376a12694a88eed133"
+  },
+  {
+    "path": "tests/full-rerun/bruno-smoke.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "b222f8c40c5f041d1929f9fc8614383e560bdcca02725da31bdf7fe86164e2f5"
+  },
+  {
+    "path": "tests/full-rerun/eslint.config.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "4ec28162fc64891d0310be1c126ce224ffbdc66884afb09e5c7fe9d0b9d4f847"
+  },
+  {
+    "path": "tests/full-rerun/seed-schema-load.mjs",
+    "reason": "Relocate isolated test/tool paths and recorded revision; no application changes",
+    "before": "5675663a77f77b070ab73915d36ffae1038713ed68ccf8bd03cff551e6e80da6"
+  }
+]

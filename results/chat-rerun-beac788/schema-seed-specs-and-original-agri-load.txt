@@ -1,0 +1,6 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["node", "tests/full-rerun/seed-schema-load.mjs"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+
+EXIT=0 TIMEOUT=False SECONDS=65.94

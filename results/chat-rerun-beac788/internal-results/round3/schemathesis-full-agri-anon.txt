@@ -1,0 +1,1139 @@
+git rev-parse HEAD: beac7883922f44eca3b7b43f91fce53e994638a5
+app=agri role=anon environment=direct local server NODE_ENV=test MEMORY_MODE=1 no proxy
+command: schemathesis run tests/round3/specs-full/spec-agri-full.yaml --url http://127.0.0.1:18302/api -n 2 
+setup: ready=true tokenAcquired=false
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from tests/round3/specs-full/spec-agri-full.yaml (in
+ 1.00s)
+
+     Base URL:         http://127.0.0.1:18302/api
+     Specification:    Open API 3.0.3
+     Operations:       104 selected / 104 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ⏭   Examples (in 0.09s)
+
+     ⏭  104 skipped
+
+ ❌  Coverage (in 1.97s)
+
+     ✅  57 passed  ❌  47 failed
+
+ ❌  Fuzzing (in 4.68s)
+
+     ✅  97 passed  ❌   7 failed
+
+=================================== FAILURES ===================================
+_______________________________ GET /check-setup _______________________________
+1. Test Case ID: 5frQYJ
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /check-setup`
+
+- ST201 Schema-violating request accepted
+
+    Invalid data should have been rejected
+    Expected: 400, 401, 403, 404, 405, 406, 409, 415, 422, 428, 429, 5xx
+    Invalid component: Missing `Authorization` at header
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"setup_done":true,"is_mock":true}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18302/api/check-setup
+
+    st replay 5frQYJ
+
+______________________________ GET /farm-summary _______________________________
+1. Test Case ID: EUW0L2
+
+- ST203 Missing required header accepted
+
+    Got 404 when missing required 'Authorization' header, expected 401
+
+[404] Not Found:
+
+    `{"error":"Not enabled"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18302/api/farm-summary
+
+    st replay EUW0L2
+
+_________________________________ GET /health __________________________________
+1. Test Case ID: fpaJqd
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /health`
+
+- ST201 Schema-violating request accepted
+
+    Invalid data should have been rejected
+    Expected: 400, 401, 403, 404, 405, 406, 409, 415, 422, 428, 429, 5xx
+    Invalid component: Missing `Authorization` at header
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"message":"Welcome to Usman Agri Farm Management API!"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18302/api/health
+
+    st replay fpaJqd
+
+_____________________________ GET /products/public _____________________________
+1. Test Case ID: uvcikI
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /products/public`
+
+- ST201 Schema-violating request accepted
+
+    Invalid data should have been rejected
+    Expected: 400, 401, 403, 404, 405, 406, 409, 415, 422, 428, 429, 5xx
+    Invalid component: Missing `Authorization` at header
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"products":[]}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18302/api/products/public
+
+    st replay uvcikI
+
+____________________________ POST /forgot-password _____________________________
+1. Test Case ID: vKSUvE
+
+- ST203 Missing required header accepted
+
+    Got 400 when missing required 'Authorization' header, expected 401
+
+[400] Bad Request:
+
+    `{"detail":"Admin email is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/forgot-password
+
+    st replay vKSUvE
+
+2. Test Case ID: 4vBJGP
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Admin email is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/forgot-password
+
+    st replay 4vBJGP
+
+_________________________________ POST /logout _________________________________
+1. Test Case ID: EiP9gn
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `POST /logout`
+
+- ST201 Schema-violating request accepted
+
+    Invalid data should have been rejected
+    Expected: 400, 401, 403, 404, 405, 406, 409, 415, 422, 428, 429, 5xx
+    Invalid component: Missing `Authorization` at header
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"status":"ok"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/logout
+
+    st replay EiP9gn
+
+_____________________________ POST /reset-password _____________________________
+1. Test Case ID: QGCMjz
+
+- ST203 Missing required header accepted
+
+    Got 400 when missing required 'Authorization' header, expected 401
+
+[400] Bad Request:
+
+    `{"detail":"Email, code, and new password are required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/reset-password
+
+    st replay QGCMjz
+
+2. Test Case ID: eNGfFb
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Email, code, and new password are required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/reset-password
+
+    st replay eNGfFb
+
+_________________________________ POST /signup _________________________________
+1. Test Case ID: W67iTD
+
+- ST203 Missing required header accepted
+
+    Got 403 when missing required 'Authorization' header, expected 401
+
+[403] Forbidden:
+
+    `{"detail":"Registration is restricted to owners and managers only."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/signup
+
+    st replay W67iTD
+
+_______________________ POST /telegram/webhook/{secret} ________________________
+1. Test Case ID: KtSDCN
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `POST /telegram/webhook/{secret}`
+
+- ST201 Schema-violating request accepted
+
+    Invalid data should have been rejected
+    Expected: 400, 401, 403, 404, 405, 406, 409, 415, 422, 428, 429, 5xx
+    Invalid component: Missing `Authorization` at header
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"ok":true}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/webhook/0
+
+    st replay KtSDCN
+
+___________________________ TRACE /analytics/summary ___________________________
+1. Test Case ID: NMDQEo
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /analytics/summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/analytics/summary
+
+    st replay NMDQEo
+
+______________________________ TRACE /attendance _______________________________
+1. Test Case ID: Ss3ZEF
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /attendance"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/attendance
+
+    st replay Ss3ZEF
+
+________________________________ TRACE /backup _________________________________
+1. Test Case ID: Oz63Ex
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /backup"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/backup
+
+    st replay Oz63Ex
+
+______________________________ TRACE /backup/auto ______________________________
+1. Test Case ID: MsGF8o
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /backup/auto"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/backup/auto
+
+    st replay MsGF8o
+
+____________________________ TRACE /change-password ____________________________
+1. Test Case ID: hyFVko
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /change-password"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/change-password
+
+    st replay hyFVko
+
+______________________________ TRACE /crop-photos ______________________________
+1. Test Case ID: bBVZxd
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /crop-photos"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/crop-photos
+
+    st replay bBVZxd
+
+_________________________________ TRACE /crops _________________________________
+1. Test Case ID: ykXllr
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /crops"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/crops
+
+    st replay ykXllr
+
+__________________________ TRACE /diary-media/entries __________________________
+1. Test Case ID: 9mm5Ku
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /diary-media/entries"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/diary-media/entries
+
+    st replay 9mm5Ku
+
+________________________________ TRACE /fields _________________________________
+1. Test Case ID: 4Cvkts
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /fields"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/fields
+
+    st replay 4Cvkts
+
+________________________________ TRACE /finance ________________________________
+1. Test Case ID: swy5ez
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /finance"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/finance
+
+    st replay swy5ez
+
+_____________________________ TRACE /finance/bulk ______________________________
+1. Test Case ID: wkbv7Z
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /finance/bulk"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/finance/bulk
+
+    st replay wkbv7Z
+
+_______________________________ TRACE /inventory _______________________________
+1. Test Case ID: U8xjef
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /inventory"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/inventory
+
+    st replay U8xjef
+
+______________________________ TRACE /irrigation _______________________________
+1. Test Case ID: J6rfxD
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /irrigation"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/irrigation
+
+    st replay J6rfxD
+
+____________________________ TRACE /labor-advances _____________________________
+1. Test Case ID: HDjX2W
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /labor-advances"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/labor-advances
+
+    st replay HDjX2W
+
+___________________________ TRACE /labor/post-wages ____________________________
+1. Test Case ID: BeSjpD
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /labor/post-wages"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/labor/post-wages
+
+    st replay BeSjpD
+
+_______________________________ TRACE /laborers ________________________________
+1. Test Case ID: b92vjb
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /laborers"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/laborers
+
+    st replay b92vjb
+
+______________________________ TRACE /liabilities ______________________________
+1. Test Case ID: EXiYiV
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /liabilities"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/liabilities
+
+    st replay EXiYiV
+
+_________________________________ TRACE /login _________________________________
+1. Test Case ID: bgQzxn
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /login"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/login
+
+    st replay bgQzxn
+
+________________________________ TRACE /photos _________________________________
+1. Test Case ID: J687Cc
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /photos"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/photos
+
+    st replay J687Cc
+
+________________________ TRACE /photos/cleanup-orphans _________________________
+1. Test Case ID: Q6CtoP
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /photos/cleanup-orphans"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/photos/cleanup-orphans
+
+    st replay Q6CtoP
+
+____________________________ TRACE /photos/orphans _____________________________
+1. Test Case ID: J7Sc3M
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /photos/orphans"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/photos/orphans
+
+    st replay J7Sc3M
+
+_______________________________ TRACE /products ________________________________
+1. Test Case ID: KfMbgU
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /products"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/products
+
+    st replay KfMbgU
+
+_________________________ TRACE /request-profile-code __________________________
+1. Test Case ID: 8Qavw9
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /request-profile-code"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/request-profile-code
+
+    st replay 8Qavw9
+
+________________________________ TRACE /restore ________________________________
+1. Test Case ID: MdlPmy
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /restore"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/restore
+
+    st replay MdlPmy
+
+_____________________________ TRACE /restore/auto ______________________________
+1. Test Case ID: MCyV7q
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /restore/auto"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/restore/auto
+
+    st replay MCyV7q
+
+_________________________________ TRACE /spray _________________________________
+1. Test Case ID: y7393G
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /spray"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/spray
+
+    st replay y7393G
+
+_______________________ TRACE /super-admin/farm-summary ________________________
+1. Test Case ID: VJbfEl
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /super-admin/farm-summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/super-admin/farm-summary
+
+    st replay VJbfEl
+
+_______________________________ TRACE /suppliers _______________________________
+1. Test Case ID: orE4Jn
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /suppliers"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/suppliers
+
+    st replay orE4Jn
+
+________________________ TRACE /suppliers/payments/all _________________________
+1. Test Case ID: J5OFCf
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /suppliers/payments/all"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/suppliers/payments/all
+
+    st replay J5OFCf
+
+_________________________________ TRACE /tasks _________________________________
+1. Test Case ID: CzcrzN
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /tasks"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/tasks
+
+    st replay CzcrzN
+
+______________________________ TRACE /tasks/bulk _______________________________
+1. Test Case ID: GdVnVN
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /tasks/bulk"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/tasks/bulk
+
+    st replay GdVnVN
+
+_____________________________ TRACE /telegram/cron _____________________________
+1. Test Case ID: tl9vAA
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/cron"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/cron
+
+    st replay tl9vAA
+
+__________________________ TRACE /telegram/link-code ___________________________
+1. Test Case ID: 1MVzP1
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/link-code"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/link-code
+
+    st replay 1MVzP1
+
+_________________________ TRACE /telegram/send-summary _________________________
+1. Test Case ID: 3HR0y5
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/send-summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/send-summary
+
+    st replay 3HR0y5
+
+___________________________ TRACE /telegram/settings ___________________________
+1. Test Case ID: AkN8uT
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/settings"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/settings
+
+    st replay AkN8uT
+
+____________________________ TRACE /telegram/status ____________________________
+1. Test Case ID: FmQBIT
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/status"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/telegram/status
+
+    st replay FmQBIT
+
+_________________________________ TRACE /users _________________________________
+1. Test Case ID: B2KI9D
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /users"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/users
+
+    st replay B2KI9D
+
+_______________________________ TRACE /users/me ________________________________
+1. Test Case ID: jplkGc
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /users/me"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/users/me
+
+    st replay jplkGc
+
+=================================== WARNINGS ===================================
+
+Authentication failed: 93 operations returned only 401/403 responses
+
+401 Unauthorized (92 operations):
+  - DELETE /attendance/{attId}
+  - DELETE /crop-photos/{photoId}
+  - DELETE /crops/{cropId}
+  - DELETE /fields/{fieldId}
+  - DELETE /finance/{financeId}
+  - DELETE /inventory/{itemId}
+  - DELETE /irrigation/{logId}
+  - DELETE /labor-advances/{advId}
+  - DELETE /laborers/{laborerId}
+  - DELETE /liabilities/{itemId}
+  - DELETE /photos/{id}
+  - DELETE /products/{id}
+  - DELETE /spray/{logId}
+  - DELETE /suppliers/{supplierId}
+  - DELETE /suppliers/{supplierId}/payments/{paymentId}
+  - DELETE /tasks/{taskId}
+  - DELETE /telegram/links/{chatId}
+  - DELETE /users/{userId}
+  - GET /analytics/summary
+  - GET /attendance
+  - GET /backup
+  - GET /backup/auto
+  - GET /crop-photos
+  - GET /crops
+  - GET /diary-media/entries
+  - GET /diary-media/{date}
+  - GET /fields
+  - GET /finance
+  - GET /inventory
+  - GET /irrigation
+  - GET /labor-advances
+  - GET /laborers
+  - GET /liabilities
+  - GET /photos/orphans
+  - GET /photos/{id}
+  - GET /products
+  - GET /spray
+  - GET /super-admin/farm-summary
+  - GET /suppliers
+  - GET /suppliers/payments/all
+  - GET /tasks
+  - GET /telegram/cron
+  - GET /telegram/settings
+  - GET /telegram/status
+  - GET /users
+  - GET /users/me
+  - PATCH /crops/{cropId}
+  - PATCH /tasks/{taskId}
+  - PATCH /users/{userId}/edit
+  - POST /attendance
+  - POST /change-password
+  - POST /crop-photos
+  - POST /crops
+  - POST /fields
+  - POST /finance
+  - POST /finance/bulk
+  - POST /inventory
+  - POST /irrigation
+  - POST /labor-advances
+  - POST /labor/post-wages
+  - POST /laborers
+  - POST /liabilities
+  - POST /login
+  - POST /photos
+  - POST /photos/cleanup-orphans
+  - POST /products
+  - POST /request-profile-code
+  - POST /restore
+  - POST /restore/auto
+  - POST /spray
+  - POST /suppliers
+  - POST /suppliers/{supplierId}/payments
+  - POST /tasks
+  - POST /tasks/bulk
+  - POST /telegram/cron
+  - POST /telegram/link-code
+  - POST /telegram/send-summary
+  - PUT /attendance/{attId}
+  - PUT /crops/{cropId}
+  - PUT /fields/{fieldId}
+  - PUT /finance/{financeId}
+  - PUT /inventory/{itemId}
+  - PUT /labor-advances/{advId}
+  - PUT /laborers/{laborerId}
+  - PUT /liabilities/{itemId}
+  - PUT /liabilities/{itemId}/pay
+  - PUT /products/{id}
+  - PUT /suppliers/{supplierId}
+  - PUT /suppliers/{supplierId}/payments/{paymentId}
+  - PUT /tasks/{taskId}
+  - PUT /telegram/settings
+  - PUT /users/me
+403 Forbidden (1 operation):
+  - POST /signup
+
+💡 Ensure valid authentication credentials are set via `--auth` or `-H`
+
+Missing test data: 3 operations repeatedly returned 404 Not Found, preventing tests from reaching your API's core logic
+
+No links point to this operation:
+  - GET /farm-summary
+
+💡 Provide realistic parameter values in your config file so tests can access existing resources
+
+No links point to these operations - nothing in the schema appears to supply the data they need (2 operations):
+  - GET /cards/supplier/{id}
+  - GET /cards/worker/{id}
+
+💡 Schemathesis found no operation that creates this data - create it outside the test run and supply the identifiers in your config file
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 104/104
+  Tested: 104
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ ST401 API accepts requests without authentication: 5
+  ❌ ST203 Missing required header accepted: 9
+  ❌ ST202 Schema-valid request rejected: 2
+  ❌ ST201 Schema-violating request accepted: 5
+  ❌ ST204 Wrong response to undeclared method: 38
+
+For more information, run `st explain <code>` for ST201, ST202, ST203, ST204, ST401.
+
+Warnings:
+  ⚠️ Authentication failed: 93 operations returned only 401/403 responses
+  ⚠️ Missing test data: 3 operations repeatedly returned 404 responses
+
+Test cases:
+  757 generated, 49 found 59 unique failures
+
+Seed: 308239450148942532709525504326010520562
+
+======================= 59 failures, 2 warnings in 7.31s =======================
+
+SCHemathesis exit=1

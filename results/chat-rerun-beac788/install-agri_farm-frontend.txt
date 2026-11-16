@@ -1,0 +1,6 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "ci", "--no-audit", "--no-fund"]
+
+added 142 packages in 5s
+
+EXIT=0

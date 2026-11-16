@@ -1,0 +1,17 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["node_modules/.bin/vitest", "run", "--maxWorkers=1", "--testTimeout=30000", "tests/api-deep/timing-reset-auto-deep.test.ts", "-t", "session cookie"]
+EXTRA_ENV {}
+Original business setup assumed seed rate older than yesterday. Retry uses documented seed-date environment, no application edits.
+
+ RUN  v3.2.7 /home/user/ai-monorepo/.cache/chat-rerun/source
+
+ ✓ tests/api-deep/timing-reset-auto-deep.test.ts (8 tests | 5 skipped) 5994ms
+   ✓ ROUND 7: timing, reset, auto-backup, cookies > agri: session cookie (if issued) is HttpOnly + SameSite  308ms
+
+ Test Files  1 passed (1)
+      Tests  3 passed | 5 skipped (8)
+   Start at  15:20:30
+   Duration  6.27s (transform 74ms, setup 0ms, collect 79ms, tests 5.99s, environment 0ms, prepare 62ms)
+
+
+EXIT=0

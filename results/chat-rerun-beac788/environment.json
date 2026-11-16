@@ -1,0 +1,13 @@
+{
+  "revision": "beac7883922f44eca3b7b43f91fce53e994638a5",
+  "python": "3.11.2",
+  "tools": {
+    "mongod": null,
+    "docker": null,
+    "java": null,
+    "python2": null,
+    "chromium": null
+  },
+  "local_mongo_connect_ex": 111,
+  "safety": "No Atlas target, no real external service credentials; tests only. Browser user-deferred."
+}

@@ -1,0 +1,34 @@
+[
+  {
+    "name": "install-.",
+    "exit": 0
+  },
+  {
+    "name": "install-dairy_farm-backend",
+    "exit": 0
+  },
+  {
+    "name": "install-agri_farm-backend",
+    "exit": 0
+  },
+  {
+    "name": "install-flock_farm-backend",
+    "exit": 0
+  },
+  {
+    "name": "install-dairy_farm-client",
+    "exit": 0
+  },
+  {
+    "name": "install-agri_farm-frontend",
+    "exit": 0
+  },
+  {
+    "name": "install-flock_farm-client",
+    "exit": 0
+  },
+  {
+    "name": "root-test-tools",
+    "exit": 0
+  }
+]

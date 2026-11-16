@@ -1,0 +1,38 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["node_modules/.bin/stryker", "run", "tests/full-rerun/stryker-farms.config.json"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+[32m15:11:24 (6409) INFO ProjectReader[39m Found 1 of 1709 file(s) to be mutated.
+[32m15:11:26 (6409) INFO Instrumenter[39m Instrumented 1 source file(s) with 891 mutant(s)
+[32m15:11:31 (6409) INFO ConcurrencyTokenProvider[39m Creating 2 test runner process(es).
+[91m15:11:33 (6409) ERROR Stryker[39m Unexpected error occurred while running Stryker Error: ENOENT: no such file or directory, copyfile '/home/user/ai-monorepo/.cache/chat-rerun/source/.hypothesis/examples/1a7794909a4a89d6/a866bb9e7cca6064' -> '/home/user/ai-monorepo/.cache/chat-rerun/source/.stryker-tmp-farms-rerun/sandbox-4R6bU4/.hypothesis/examples/1a7794909a4a89d6/a866bb9e7cca6064'
+    at async Object.copyFile (node:internal/fs/promises:621:10)
+    at async FileSystemAction.execute (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@stryker-mutator/core/dist/src/fs/file-system.js:16:28)
+    at async file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@stryker-mutator/core/dist/src/fs/file-system.js:33:9 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'copyfile',
+  path: '/home/user/ai-monorepo/.cache/chat-rerun/source/.hypothesis/examples/1a7794909a4a89d6/a866bb9e7cca6064',
+  dest: '/home/user/ai-monorepo/.cache/chat-rerun/source/.stryker-tmp-farms-rerun/sandbox-4R6bU4/.hypothesis/examples/1a7794909a4a89d6/a866bb9e7cca6064'
+}
+[32m15:11:33 (6409) INFO Stryker[39m This might be a known problem with a solution documented in our troubleshooting guide.
+[32m15:11:33 (6409) INFO Stryker[39m You can find it at https://stryker-mutator.io/docs/stryker-js/troubleshooting/
+[32m15:11:33 (6409) INFO Stryker[39m Still having trouble figuring out what went wrong? Try `npx stryker run --fileLogLevel trace --logLevel debug` to get some more info.
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+Error: ENOENT: no such file or directory, copyfile '/home/user/ai-monorepo/.cache/chat-rerun/source/.hypothesis/examples/1a7794909a4a89d6/a866bb9e7cca6064' -> '/home/user/ai-monorepo/.cache/chat-rerun/source/.stryker-tmp-farms-rerun/sandbox-4R6bU4/.hypothesis/examples/1a7794909a4a89d6/a866bb9e7cca6064'
+    at async Object.copyFile (node:internal/fs/promises:621:10)
+    at async FileSystemAction.execute (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@stryker-mutator/core/dist/src/fs/file-system.js:16:28)
+    at async file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@stryker-mutator/core/dist/src/fs/file-system.js:33:9 {
+  errno: -2,
+  code: 'ENOENT',
+  syscall: 'copyfile',
+  path: '/home/user/ai-monorepo/.cache/chat-rerun/source/.hypothesis/examples/1a7794909a4a89d6/a866bb9e7cca6064',
+  dest: '/home/user/ai-monorepo/.cache/chat-rerun/source/.stryker-tmp-farms-rerun/sandbox-4R6bU4/.hypothesis/examples/1a7794909a4a89d6/a866bb9e7cca6064'
+}
+
+Node.js v22.22.3
+
+EXIT=1 TIMEOUT=False SECONDS=13.80

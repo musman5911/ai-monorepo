@@ -1,0 +1,181 @@
+{
+  "revision": "beac7883922f44eca3b7b43f91fce53e994638a5",
+  "jobs": [
+    {
+      "name": "phase1-dynamic",
+      "args": [
+        "node",
+        "tests/round3/phase1-dynamic.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 24.02
+    },
+    {
+      "name": "phase1b-prod-proxy-cards",
+      "args": [
+        "node",
+        "tests/round3/phase1b-prod-proxy-cards.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 65.91
+    },
+    {
+      "name": "phase1c-protocol-chaos-load",
+      "args": [
+        "node",
+        "tests/round3/phase1c-protocol-chaos-load.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 37.3
+    },
+    {
+      "name": "phase1d-followups",
+      "args": [
+        "node",
+        "tests/round3/phase1d-followups.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 21.88
+    },
+    {
+      "name": "phase3-flock-cards-reverse",
+      "args": [
+        "node",
+        "tests/round3/phase3-flock-cards-reverse.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 3.92
+    },
+    {
+      "name": "final-p1-rerun",
+      "args": [
+        "node",
+        "tests/round3/final-p1-rerun.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 29.0
+    },
+    {
+      "name": "fastcheck-commands",
+      "args": [
+        "node",
+        "tests/round3/fastcheck-commands.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 5.29
+    },
+    {
+      "name": "idor-authz-matrix-dairy",
+      "args": [
+        "node",
+        "tests/round3/idor-authz-matrix.mjs",
+        "dairy"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 6.75
+    },
+    {
+      "name": "idor-authz-matrix-agri",
+      "args": [
+        "node",
+        "tests/round3/idor-authz-matrix.mjs",
+        "agri"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 11.79
+    },
+    {
+      "name": "idor-authz-matrix-flock",
+      "args": [
+        "node",
+        "tests/round3/idor-authz-matrix.mjs",
+        "flock"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 5.63
+    },
+    {
+      "name": "authz-matrix-dairy",
+      "args": [
+        "node",
+        "tests/verification/authz-matrix.mjs",
+        "dairy"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 7.34
+    },
+    {
+      "name": "authz-matrix-agri",
+      "args": [
+        "node",
+        "tests/verification/authz-matrix.mjs",
+        "agri"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 11.4
+    },
+    {
+      "name": "authz-matrix-flock",
+      "args": [
+        "node",
+        "tests/verification/authz-matrix.mjs",
+        "flock"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 5.34
+    },
+    {
+      "name": "hypothesis",
+      "args": [
+        "python",
+        "tests/round3/hypothesis_agri.py"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 6.59
+    },
+    {
+      "name": "contested-curl",
+      "args": [
+        "bash",
+        "tests/verification/contested-probes.sh"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 48.71
+    },
+    {
+      "name": "load-nine",
+      "args": [
+        "bash",
+        "tests/verification/run-load.sh"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 244.52
+    },
+    {
+      "name": "bruno",
+      "args": [
+        "node",
+        "tests/full-rerun/bruno-smoke.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 6.19
+    }
+  ]
+}

@@ -1,0 +1,406 @@
+{
+  "revision": "beac7883922f44eca3b7b43f91fce53e994638a5",
+  "jobs": [
+    {
+      "name": "upstream",
+      "args": [
+        "node_modules/.bin/vitest",
+        "run",
+        "--maxWorkers=1",
+        "--testTimeout=30000",
+        "--reporter=json",
+        "--outputFile=/home/user/ai-monorepo/results/chat-rerun-beac788/upstream.json",
+        "tests/admin-users-hook-import.test.ts",
+        "tests/agri-automation-validation.test.ts",
+        "tests/agri-bulk-api.test.ts",
+        "tests/agri-bulk-import.test.ts",
+        "tests/agri-diary-media-validation.test.ts",
+        "tests/agri-fields-cycles.test.ts",
+        "tests/agri-fields-screens.test.ts",
+        "tests/agri-photo-storage.test.ts",
+        "tests/agri-record-validation.test.ts",
+        "tests/agri-runtime-api.integration.test.ts",
+        "tests/archive-screens.test.ts",
+        "tests/archive.test.ts",
+        "tests/auth-production-config.test.ts",
+        "tests/backup-restore-recovery.test.ts",
+        "tests/check-bundle-size.test.ts",
+        "tests/cloudinary-store.test.ts",
+        "tests/dairy-admin-owner-sections.test.ts",
+        "tests/dairy-api-usage.test.ts",
+        "tests/dairy-breeding-events.test.ts",
+        "tests/dairy-breeding-screens.test.ts",
+        "tests/dairy-calving-creates-calf.test.ts",
+        "tests/dairy-financial-posting.integration.test.ts",
+        "tests/dairy-photo-runtime.integration.test.ts",
+        "tests/farm-api-cache-isolation.test.ts",
+        "tests/final-db-preflight.test.ts",
+        "tests/financial-posting-safety.test.ts",
+        "tests/flock-batch-history-guards.test.ts",
+        "tests/flock-batch-import-validation.test.ts",
+        "tests/flock-batch-labor.test.ts",
+        "tests/flock-batch-math.test.ts",
+        "tests/flock-batch-write-validation.test.ts",
+        "tests/flock-dark-login-background.test.ts",
+        "tests/flock-data-bucket-validation.test.ts",
+        "tests/flock-data-route-allocation.test.ts",
+        "tests/flock-egg-inventory-coordination.test.ts",
+        "tests/flock-egg-inventory-lock.test.ts",
+        "tests/flock-first-owner-setup.test.ts",
+        "tests/flock-image-backup.test.ts",
+        "tests/flock-image-references.test.ts",
+        "tests/flock-incubation-allocation.test.ts",
+        "tests/flock-user-farm-assignment.test.ts",
+        "tests/muf-charts.test.ts",
+        "tests/muf-compare.test.ts",
+        "tests/muf-env-rate-limit.test.ts",
+        "tests/muf-farms-agri.test.ts",
+        "tests/muf-farms.test.ts",
+        "tests/muf-storage.test.ts",
+        "tests/muf-urdu-fallback-coverage.test.ts",
+        "tests/muf-zakat.test.ts",
+        "tests/phase-1-super-admin.test.ts",
+        "tests/phase1-backup-farm-context.test.ts",
+        "tests/phase19-seed-db-audit.test.ts",
+        "tests/phase3-farm-isolation.test.ts",
+        "tests/phase3-pagination.test.ts",
+        "tests/phase4-breeding-lineage.test.ts",
+        "tests/photo-client-migration.test.ts",
+        "tests/photo-phase8-regression.test.ts",
+        "tests/public-products.test.ts",
+        "tests/public-route-security.test.ts",
+        "tests/route-matrix-policy.test.ts",
+        "tests/seed-demo-data.test.ts",
+        "tests/shop-isolation.test.ts",
+        "tests/smoke.test.ts",
+        "tests/telegram-farm-scope.test.ts",
+        "tests/workflow-contract.test.ts"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 90.43
+    },
+    {
+      "name": "build-dairy_farm",
+      "args": [
+        "npm",
+        "--prefix",
+        "dairy_farm/client",
+        "run",
+        "build"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 65.47
+    },
+    {
+      "name": "build-agri_farm",
+      "args": [
+        "npm",
+        "--prefix",
+        "agri_farm/frontend",
+        "run",
+        "build"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 5.44
+    },
+    {
+      "name": "build-flock_farm",
+      "args": [
+        "npm",
+        "--prefix",
+        "flock_farm/client",
+        "run",
+        "build"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 50.9
+    },
+    {
+      "name": "check-sync",
+      "args": [
+        "npm",
+        "run",
+        "check-sync"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.5
+    },
+    {
+      "name": "check-ui",
+      "args": [
+        "npm",
+        "run",
+        "check-ui"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.53
+    },
+    {
+      "name": "check-workbench",
+      "args": [
+        "npm",
+        "run",
+        "check-workbench"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.38
+    },
+    {
+      "name": "check-workbench-runtime",
+      "args": [
+        "npm",
+        "run",
+        "check-workbench-runtime"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 5.82
+    },
+    {
+      "name": "check-farms",
+      "args": [
+        "npm",
+        "run",
+        "check-farms"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 16.33
+    },
+    {
+      "name": "check-breeding-events",
+      "args": [
+        "npm",
+        "run",
+        "check-breeding-events"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 3.86
+    },
+    {
+      "name": "check-super-admin",
+      "args": [
+        "npm",
+        "run",
+        "check-super-admin"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 14.22
+    },
+    {
+      "name": "check-docs",
+      "args": [
+        "npm",
+        "run",
+        "check-docs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.53
+    },
+    {
+      "name": "check-bundle-size",
+      "args": [
+        "npm",
+        "run",
+        "check-bundle-size"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.48
+    },
+    {
+      "name": "check-archive",
+      "args": [
+        "npm",
+        "run",
+        "check-archive"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 12.35
+    },
+    {
+      "name": "check-audit",
+      "args": [
+        "npm",
+        "run",
+        "check-audit"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 7.14
+    },
+    {
+      "name": "check-secrets",
+      "args": [
+        "npm",
+        "run",
+        "check-secrets"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.68
+    },
+    {
+      "name": "check-route-permissions",
+      "args": [
+        "npm",
+        "run",
+        "check-route-permissions"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.48
+    },
+    {
+      "name": "check-route-matrix",
+      "args": [
+        "npm",
+        "run",
+        "check-route-matrix"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 25.94
+    },
+    {
+      "name": "check-shop",
+      "args": [
+        "npm",
+        "run",
+        "check-shop"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 1.71
+    },
+    {
+      "name": "check-final-db",
+      "args": [
+        "npm",
+        "run",
+        "check-final-db"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 2.35
+    },
+    {
+      "name": "check-seed",
+      "args": [
+        "npm",
+        "run",
+        "check-seed"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 2.86
+    },
+    {
+      "name": "check-phase19-audit",
+      "args": [
+        "npm",
+        "run",
+        "check-phase19-audit"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 2.25
+    },
+    {
+      "name": "lint-agri_farm",
+      "args": [
+        "npm",
+        "--prefix",
+        "agri_farm/frontend",
+        "run",
+        "lint"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.64
+    },
+    {
+      "name": "lint-flock_farm",
+      "args": [
+        "npm",
+        "--prefix",
+        "flock_farm/client",
+        "run",
+        "lint"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 36.99
+    },
+    {
+      "name": "acceptance-business",
+      "args": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "tests/acceptance-business/agri-business.test.mjs",
+        "tests/acceptance-business/dairy-business.test.mjs",
+        "tests/acceptance-business/dates-tz.test.mjs",
+        "tests/acceptance-business/flock-business.test.mjs",
+        "tests/acceptance/backups.test.mjs",
+        "tests/acceptance/flock-cards-farm-scope.test.mjs",
+        "tests/acceptance/frontend-service-worker-logout.test.mjs",
+        "tests/acceptance/headers-csp.test.mjs",
+        "tests/acceptance/input-bounds.test.mjs",
+        "tests/acceptance/money-validation.test.mjs",
+        "tests/acceptance/photos.test.mjs",
+        "tests/acceptance/sessions-auth.test.mjs",
+        "tests/acceptance/telegram.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 169.53
+    },
+    {
+      "name": "new-manager",
+      "args": [
+        "node",
+        "--test",
+        "tests/chat-rerun-beac788/manager-boundary.test.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 9.84
+    },
+    {
+      "name": "scale",
+      "args": [
+        "node",
+        "--test",
+        "--test-concurrency=1",
+        "tests/full-rerun/scale.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 9.84
+    },
+    {
+      "name": "shop-and-business-probes",
+      "args": [
+        "node",
+        "--test",
+        "tests/full-rerun/latest-surface.test.mjs",
+        "tests/full-rerun/business-probes.test.mjs"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 10.27
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "run", "check-super-admin"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+
+> check-super-admin
+> node tools/check-super-admin.js
+
+  ✓ Agri navigation gates Super Admin on the owner role
+  ✓ Dairy navigation gates Super Admin on the owner role
+  ✓ Flock navigation gates Super Admin on the owner role
+
+Agri: owner-only Super Admin summary
+  ✓ seeded owner can log in
+  ✓ owner can read the Super Admin farm summary
+  ✓ owner receives a separate entry for each active farm
+  ✓ each farm entry contains its own identity and metrics
+  ✓ owner can create a manager assigned to a farm
+  ✓ owner can create a worker assigned to a farm
+  ✓ manager can log in
+  ✓ worker can log in
+  ✓ manager receives HTTP 403 on owner-only summary data
+  ✓ worker receives HTTP 403 on owner-only summary data
+
+Dairy: owner-only Super Admin summary
+  ✓ seeded owner can log in
+  ✓ owner can read the Super Admin farm summary
+  ✓ owner receives a separate entry for each active farm
+  ✓ each farm entry contains its own identity and metrics
+  ✓ owner can create a manager assigned to a farm
+  ✓ owner can create a worker assigned to a farm
+  ✓ manager can log in
+  ✓ worker can log in
+  ✓ manager receives HTTP 403 on owner-only summary data
+  ✓ worker receives HTTP 403 on owner-only summary data
+
+Flock: owner-only Super Admin summary
+  ✓ seeded owner can log in
+  ✓ owner can read the Super Admin farm summary
+  ✓ owner receives a separate entry for each active farm
+  ✓ each farm entry contains its own identity and metrics
+  ✓ owner can create a manager assigned to a farm
+  ✓ owner can create a worker assigned to a farm
+  ✓ manager can log in
+  ✓ worker can log in
+  ✓ manager receives HTTP 403 on owner-only summary data
+  ✓ worker receives HTTP 403 on owner-only summary data
+
+All Super Admin checks passed.
+
+EXIT=0 TIMEOUT=False SECONDS=14.22

@@ -1,0 +1,2079 @@
+git rev-parse HEAD: beac7883922f44eca3b7b43f91fce53e994638a5
+app=agri role=owner environment=direct local server NODE_ENV=test MEMORY_MODE=1 no proxy
+command: schemathesis run tests/round3/specs-full/spec-agri-full.yaml --url http://127.0.0.1:18302/api -n 2 -H Authorization: Bearer <redacted>
+setup: ready=true tokenAcquired=true
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from tests/round3/specs-full/spec-agri-full.yaml (in
+ 1.52s)
+
+     Base URL:         http://127.0.0.1:18302/api
+     Specification:    Open API 3.0.3
+     Operations:       104 selected / 104 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ⏭   Examples (in 0.16s)
+
+     ⏭  104 skipped
+
+ ❌  Coverage (in 2.86s)
+
+     ✅  23 passed  ❌  81 failed
+
+ ❌  Fuzzing (in 2.43s)
+
+     ✅  39 passed  ❌  65 failed
+
+=================================== FAILURES ===================================
+__________________________ DELETE /attendance/{attId} __________________________
+1. Test Case ID: DDxlcI
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid attendance ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/attendance/0
+
+    st replay DDxlcI
+
+________________________ DELETE /crop-photos/{photoId} _________________________
+1. Test Case ID: f4PQt4
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid photo ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/crop-photos/0
+
+    st replay f4PQt4
+
+____________________________ DELETE /crops/{cropId} ____________________________
+1. Test Case ID: FRcnEu
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid crop ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/crops/0
+
+    st replay FRcnEu
+
+___________________________ DELETE /fields/{fieldId} ___________________________
+1. Test Case ID: PTl2JL
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid field ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/fields/0
+
+    st replay PTl2JL
+
+_________________________ DELETE /finance/{financeId} __________________________
+1. Test Case ID: pwUdVr
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid finance ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/finance/0
+
+    st replay pwUdVr
+
+__________________________ DELETE /inventory/{itemId} __________________________
+1. Test Case ID: tvNwRl
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid inventory ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/inventory/0
+
+    st replay tvNwRl
+
+__________________________ DELETE /irrigation/{logId} __________________________
+1. Test Case ID: pseHhA
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid irrigation ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/irrigation/0
+
+    st replay pseHhA
+
+________________________ DELETE /labor-advances/{advId} ________________________
+1. Test Case ID: AKwSdz
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid advance ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/labor-advances/0
+
+    st replay AKwSdz
+
+_________________________ DELETE /laborers/{laborerId} _________________________
+1. Test Case ID: 5PN4XR
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid laborer ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/laborers/0
+
+    st replay 5PN4XR
+
+_________________________ DELETE /liabilities/{itemId} _________________________
+1. Test Case ID: NGvEZo
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid liability ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/liabilities/0
+
+    st replay NGvEZo
+
+____________________________ DELETE /products/{id} _____________________________
+1. Test Case ID: x0kiax
+
+- ST101 Server error
+
+[500] Internal Server Error:
+
+    `{"error":"Could not delete product."}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/products/74723105bc9272c849a9f3a1
+
+    st replay x0kiax
+
+____________________________ DELETE /spray/{logId} _____________________________
+1. Test Case ID: clbKbQ
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid spray ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/spray/0
+
+    st replay clbKbQ
+
+________________________ DELETE /suppliers/{supplierId} ________________________
+1. Test Case ID: cvjNrg
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid supplier ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/suppliers/0
+
+    st replay cvjNrg
+
+_____________ DELETE /suppliers/{supplierId}/payments/{paymentId} ______________
+1. Test Case ID: Xb7Kad
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid supplier ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/suppliers/0/payments/0
+
+    st replay Xb7Kad
+
+____________________________ DELETE /tasks/{taskId} ____________________________
+1. Test Case ID: bo9cGD
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid task ID format"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/tasks/0
+
+    st replay bo9cGD
+
+____________________________ DELETE /users/{userId} ____________________________
+1. Test Case ID: kzC1w4
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"You cannot delete your own account"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/users/74723105bc9272c849a9f3a1
+
+    st replay kzC1w4
+
+_______________________________ GET /check-setup _______________________________
+1. Test Case ID: Mo6lR9
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /check-setup`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"setup_done":true,"is_mock":true}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18302/api/check-setup
+
+    st replay Mo6lR9
+
+___________________________ GET /diary-media/{date} ____________________________
+1. Test Case ID: n0b6w2
+
+- ST101 Server error
+
+[500] Internal Server Error:
+
+    `{"detail":"Internal server error"}`
+
+Reproduce with:
+
+    curl -X GET -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/diary-media/0
+
+    st replay n0b6w2
+
+______________________________ GET /farm-summary _______________________________
+1. Test Case ID: GXYuwt
+
+- ST203 Missing required header accepted
+
+    Got 404 when missing required 'Authorization' header, expected 401
+
+[404] Not Found:
+
+    `{"error":"Not enabled"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18302/api/farm-summary
+
+    st replay GXYuwt
+
+_________________________________ GET /health __________________________________
+1. Test Case ID: m3QFwT
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /health`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"message":"Welcome to Usman Agri Farm Management API!"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18302/api/health
+
+    st replay m3QFwT
+
+_____________________________ GET /products/public _____________________________
+1. Test Case ID: cv1eav
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `GET /products/public`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"products":[]}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:18302/api/products/public
+
+    st replay cv1eav
+
+____________________________ PATCH /crops/{cropId} _____________________________
+1. Test Case ID: lMfD6y
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Status must be Planted, Growing, Harvesting or Completed."}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/crops/0
+
+    st replay lMfD6y
+
+____________________________ PATCH /tasks/{taskId} _____________________________
+1. Test Case ID: AdGJYi
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid task ID format"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/tasks/0
+
+    st replay AdGJYi
+
+__________________________ PATCH /users/{userId}/edit __________________________
+1. Test Case ID: x4ejZq
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Administrator current password is required for confirmation"}`
+
+Reproduce with:
+
+    curl -X PATCH -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/users/74723105bc9272c849a9f3a1/edit
+
+    st replay x4ejZq
+
+_______________________________ POST /attendance _______________________________
+1. Test Case ID: I9bYx3
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Worker ID is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/attendance
+
+    st replay I9bYx3
+
+____________________________ POST /change-password _____________________________
+1. Test Case ID: Mv0xer
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"New password is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/change-password
+
+    st replay Mv0xer
+
+______________________________ POST /crop-photos _______________________________
+1. Test Case ID: aAgSfg
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Crop is required for a crop photo."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/crop-photos
+
+    st replay aAgSfg
+
+_________________________________ POST /crops __________________________________
+1. Test Case ID: 6d5D7w
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Crop name is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/crops
+
+    st replay 6d5D7w
+
+_________________________________ POST /fields _________________________________
+1. Test Case ID: 1kIdM0
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Field name is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/fields
+
+    st replay 1kIdM0
+
+________________________________ POST /finance _________________________________
+1. Test Case ID: xnL4YO
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Category is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/finance
+
+    st replay xnL4YO
+
+______________________________ POST /finance/bulk ______________________________
+1. Test Case ID: qBvZOD
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"rows must be a non-empty array"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/finance/bulk
+
+    st replay qBvZOD
+
+____________________________ POST /forgot-password _____________________________
+1. Test Case ID: VUcjNN
+
+- ST203 Missing required header accepted
+
+    Got 400 when missing required 'Authorization' header, expected 401
+
+[400] Bad Request:
+
+    `{"detail":"Admin email is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/forgot-password
+
+    st replay VUcjNN
+
+2. Test Case ID: 1a6rQ8
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Admin email is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/forgot-password
+
+    st replay 1a6rQ8
+
+_______________________________ POST /inventory ________________________________
+1. Test Case ID: 3K0mqI
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Item name is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/inventory
+
+    st replay 3K0mqI
+
+_______________________________ POST /irrigation _______________________________
+1. Test Case ID: 5ExOh1
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Crop is required for an irrigation log."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/irrigation
+
+    st replay 5ExOh1
+
+_____________________________ POST /labor-advances _____________________________
+1. Test Case ID: ZUHXMo
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Worker ID is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/labor-advances
+
+    st replay ZUHXMo
+
+________________________________ POST /laborers ________________________________
+1. Test Case ID: DGBFlK
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Worker name is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/laborers
+
+    st replay DGBFlK
+
+______________________________ POST /liabilities _______________________________
+1. Test Case ID: MUo0f2
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Creditor name is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/liabilities
+
+    st replay MUo0f2
+
+_________________________________ POST /logout _________________________________
+1. Test Case ID: Duay6P
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `POST /logout`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"status":"ok"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/logout
+
+    st replay Duay6P
+
+_________________________________ POST /photos _________________________________
+1. Test Case ID: UtzoEE
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Photo must be a valid JPEG, PNG or WebP data URL"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/photos
+
+    st replay UtzoEE
+
+________________________________ POST /products ________________________________
+1. Test Case ID: Fp8aPy
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Name is required (120 characters max)."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/products
+
+    st replay Fp8aPy
+
+__________________________ POST /request-profile-code __________________________
+1. Test Case ID: BQVosG
+
+- ST101 Server error
+
+[500] Internal Server Error:
+
+    `{"detail":"SMTP service failed to deliver the verification code. Please check that SMTP credentials are configured correctly in the environment."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/request-profile-code
+
+    st replay BQVosG
+
+_____________________________ POST /reset-password _____________________________
+1. Test Case ID: 8P0ocj
+
+- ST203 Missing required header accepted
+
+    Got 400 when missing required 'Authorization' header, expected 401
+
+[400] Bad Request:
+
+    `{"detail":"Email, code, and new password are required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/reset-password
+
+    st replay 8P0ocj
+
+2. Test Case ID: 9BnzGe
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Email, code, and new password are required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/reset-password
+
+    st replay 9BnzGe
+
+________________________________ POST /restore _________________________________
+1. Test Case ID: Re5NRA
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Backup has no valid data to restore. Expected keys like 'crops', 'finance', 'tasks'..."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/restore
+
+    st replay Re5NRA
+
+______________________________ POST /restore/auto ______________________________
+1. Test Case ID: Y7BqV3
+
+- ST201 Schema-violating request accepted
+
+    Invalid data should have been rejected
+    Expected: 400, 401, 403, 404, 405, 406, 409, 415, 422, 428, 429, 5xx
+    Invalid component: in body - violates `type` (was object, became array)
+
+[200] OK:
+
+    `{"status":"ok","name":"auto-2026-11","recoverySnapshot":"saved"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '[]' http://127.0.0.1:18302/api/restore/auto
+
+    st replay Y7BqV3
+
+_________________________________ POST /signup _________________________________
+1. Test Case ID: lv2TQC
+
+- ST203 Missing required header accepted
+
+    Got 403 when missing required 'Authorization' header, expected 401
+
+[403] Forbidden:
+
+    `{"detail":"Registration is restricted to owners and managers only."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/signup
+
+    st replay lv2TQC
+
+2. Test Case ID: aAw6P8
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Password must be at least 6 characters long."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/signup
+
+    st replay aAw6P8
+
+_________________________________ POST /spray __________________________________
+1. Test Case ID: ACu44N
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Crop is required for a spray log."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/spray
+
+    st replay ACu44N
+
+_______________________________ POST /suppliers ________________________________
+1. Test Case ID: 5WlpJJ
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Supplier name is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/suppliers
+
+    st replay 5WlpJJ
+
+____________________ POST /suppliers/{supplierId}/payments _____________________
+1. Test Case ID: Da9mMf
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid supplier ID format"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/suppliers/0/payments
+
+    st replay Da9mMf
+
+_________________________________ POST /tasks __________________________________
+1. Test Case ID: C1FA2E
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Task title is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/tasks
+
+    st replay C1FA2E
+
+_______________________________ POST /tasks/bulk _______________________________
+1. Test Case ID: 11e6et
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"rows must be a non-empty array"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/tasks/bulk
+
+    st replay 11e6et
+
+___________________________ POST /telegram/link-code ___________________________
+1. Test Case ID: inueKY
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Pick an app user or a wage worker to link"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/link-code
+
+    st replay inueKY
+
+_______________________ POST /telegram/webhook/{secret} ________________________
+1. Test Case ID: XrxqHm
+
+- ST401 API accepts requests without authentication
+
+    Expected 401 or 403, got `200 OK` for `POST /telegram/webhook/{secret}`
+
+- ST203 Missing required header accepted
+
+    Got 200 when missing required 'Authorization' header, expected 401
+
+[200] OK:
+
+    `{"ok":true}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/webhook/0
+
+    st replay XrxqHm
+
+___________________________ PUT /attendance/{attId} ____________________________
+1. Test Case ID: jRrqD2
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid attendance ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/attendance/0
+
+    st replay jRrqD2
+
+_____________________________ PUT /crops/{cropId} ______________________________
+1. Test Case ID: JXFnSb
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid crop ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/crops/0
+
+    st replay JXFnSb
+
+___________________________ PUT /diary-media/{date} ____________________________
+1. Test Case ID: 7NUTBN
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"Invalid diary date."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/diary-media/0
+
+    st replay 7NUTBN
+
+____________________________ PUT /fields/{fieldId} _____________________________
+1. Test Case ID: REYDFv
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid field ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/fields/0
+
+    st replay REYDFv
+
+___________________________ PUT /finance/{financeId} ___________________________
+1. Test Case ID: QJA83j
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid finance ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/finance/0
+
+    st replay QJA83j
+
+___________________________ PUT /inventory/{itemId} ____________________________
+1. Test Case ID: IKcSz7
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid inventory ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/inventory/0
+
+    st replay IKcSz7
+
+_________________________ PUT /labor-advances/{advId} __________________________
+1. Test Case ID: gKiDDY
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid advance ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/labor-advances/0
+
+    st replay gKiDDY
+
+__________________________ PUT /laborers/{laborerId} ___________________________
+1. Test Case ID: PMhbB6
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Worker name is required."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/laborers/0
+
+    st replay PMhbB6
+
+__________________________ PUT /liabilities/{itemId} ___________________________
+1. Test Case ID: 2KUFZU
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid liability ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/liabilities/0
+
+    st replay 2KUFZU
+
+________________________ PUT /liabilities/{itemId}/pay _________________________
+1. Test Case ID: mRjHTD
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid liability ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/liabilities/0/pay
+
+    st replay mRjHTD
+
+______________________________ PUT /products/{id} ______________________________
+1. Test Case ID: Aszlqt
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"error":"No supported fields supplied."}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/products/74723105bc9272c849a9f3a1
+
+    st replay Aszlqt
+
+_________________________ PUT /suppliers/{supplierId} __________________________
+1. Test Case ID: qoGJz6
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid supplier ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/suppliers/0
+
+    st replay qoGJz6
+
+_______________ PUT /suppliers/{supplierId}/payments/{paymentId} _______________
+1. Test Case ID: ViFiJD
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid supplier ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/suppliers/0/payments/0
+
+    st replay ViFiJD
+
+_____________________________ PUT /tasks/{taskId} ______________________________
+1. Test Case ID: uHgEkh
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+[400] Bad Request:
+
+    `{"detail":"Invalid task ID format"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/x-www-form-urlencoded' http://127.0.0.1:18302/api/tasks/0
+
+    st replay uHgEkh
+
+___________________________ TRACE /analytics/summary ___________________________
+1. Test Case ID: ag3LuM
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /analytics/summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/analytics/summary
+
+    st replay ag3LuM
+
+______________________________ TRACE /attendance _______________________________
+1. Test Case ID: t827WW
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /attendance"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/attendance
+
+    st replay t827WW
+
+________________________________ TRACE /backup _________________________________
+1. Test Case ID: GkjKCm
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /backup"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/backup
+
+    st replay GkjKCm
+
+______________________________ TRACE /backup/auto ______________________________
+1. Test Case ID: EvkS5U
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /backup/auto"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/backup/auto
+
+    st replay EvkS5U
+
+____________________________ TRACE /change-password ____________________________
+1. Test Case ID: gV9RGL
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /change-password"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/change-password
+
+    st replay gV9RGL
+
+______________________________ TRACE /crop-photos ______________________________
+1. Test Case ID: WOTqX7
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /crop-photos"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/crop-photos
+
+    st replay WOTqX7
+
+_________________________________ TRACE /crops _________________________________
+1. Test Case ID: IgrWBo
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /crops"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/crops
+
+    st replay IgrWBo
+
+__________________________ TRACE /diary-media/entries __________________________
+1. Test Case ID: TNAAup
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /diary-media/entries"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/diary-media/entries
+
+    st replay TNAAup
+
+________________________________ TRACE /fields _________________________________
+1. Test Case ID: 2ZWREa
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /fields"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/fields
+
+    st replay 2ZWREa
+
+________________________________ TRACE /finance ________________________________
+1. Test Case ID: Vi0hh0
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /finance"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/finance
+
+    st replay Vi0hh0
+
+_____________________________ TRACE /finance/bulk ______________________________
+1. Test Case ID: VKFj06
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /finance/bulk"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/finance/bulk
+
+    st replay VKFj06
+
+_______________________________ TRACE /inventory _______________________________
+1. Test Case ID: fQrDI6
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /inventory"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/inventory
+
+    st replay fQrDI6
+
+______________________________ TRACE /irrigation _______________________________
+1. Test Case ID: GqxqSD
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /irrigation"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/irrigation
+
+    st replay GqxqSD
+
+____________________________ TRACE /labor-advances _____________________________
+1. Test Case ID: fS8e1M
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /labor-advances"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/labor-advances
+
+    st replay fS8e1M
+
+___________________________ TRACE /labor/post-wages ____________________________
+1. Test Case ID: IQWADV
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /labor/post-wages"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/labor/post-wages
+
+    st replay IQWADV
+
+_______________________________ TRACE /laborers ________________________________
+1. Test Case ID: rGSEnR
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /laborers"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/laborers
+
+    st replay rGSEnR
+
+______________________________ TRACE /liabilities ______________________________
+1. Test Case ID: KteZ6C
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /liabilities"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/liabilities
+
+    st replay KteZ6C
+
+_________________________________ TRACE /login _________________________________
+1. Test Case ID: dvjRcB
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /login"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/login
+
+    st replay dvjRcB
+
+________________________________ TRACE /photos _________________________________
+1. Test Case ID: WzwYgL
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /photos"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/photos
+
+    st replay WzwYgL
+
+________________________ TRACE /photos/cleanup-orphans _________________________
+1. Test Case ID: UHdlDr
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /photos/cleanup-orphans"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/photos/cleanup-orphans
+
+    st replay UHdlDr
+
+____________________________ TRACE /photos/orphans _____________________________
+1. Test Case ID: qxbkhE
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /photos/orphans"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/photos/orphans
+
+    st replay qxbkhE
+
+_______________________________ TRACE /products ________________________________
+1. Test Case ID: LrBeVW
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /products"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/products
+
+    st replay LrBeVW
+
+_________________________ TRACE /request-profile-code __________________________
+1. Test Case ID: 3LvX99
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /request-profile-code"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/request-profile-code
+
+    st replay 3LvX99
+
+________________________________ TRACE /restore ________________________________
+1. Test Case ID: 8a3kmu
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /restore"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/restore
+
+    st replay 8a3kmu
+
+_____________________________ TRACE /restore/auto ______________________________
+1. Test Case ID: glqyP4
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /restore/auto"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/restore/auto
+
+    st replay glqyP4
+
+_________________________________ TRACE /spray _________________________________
+1. Test Case ID: U3j0Gg
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /spray"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/spray
+
+    st replay U3j0Gg
+
+_______________________ TRACE /super-admin/farm-summary ________________________
+1. Test Case ID: DxbAz7
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /super-admin/farm-summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/super-admin/farm-summary
+
+    st replay DxbAz7
+
+_______________________________ TRACE /suppliers _______________________________
+1. Test Case ID: KeEuMW
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /suppliers"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/suppliers
+
+    st replay KeEuMW
+
+________________________ TRACE /suppliers/payments/all _________________________
+1. Test Case ID: pXfDGQ
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /suppliers/payments/all"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/suppliers/payments/all
+
+    st replay pXfDGQ
+
+_________________________________ TRACE /tasks _________________________________
+1. Test Case ID: F5OPlj
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /tasks"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/tasks
+
+    st replay F5OPlj
+
+______________________________ TRACE /tasks/bulk _______________________________
+1. Test Case ID: n28GMt
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /tasks/bulk"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/tasks/bulk
+
+    st replay n28GMt
+
+_____________________________ TRACE /telegram/cron _____________________________
+1. Test Case ID: uCjKZc
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/cron"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/cron
+
+    st replay uCjKZc
+
+__________________________ TRACE /telegram/link-code ___________________________
+1. Test Case ID: z1B2IL
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/link-code"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/link-code
+
+    st replay z1B2IL
+
+_________________________ TRACE /telegram/send-summary _________________________
+1. Test Case ID: Ulh6NT
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/send-summary"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/send-summary
+
+    st replay Ulh6NT
+
+___________________________ TRACE /telegram/settings ___________________________
+1. Test Case ID: 2TnSYA
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/settings"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/telegram/settings
+
+    st replay 2TnSYA
+
+____________________________ TRACE /telegram/status ____________________________
+1. Test Case ID: q2ii1O
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /telegram/status"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/telegram/status
+
+    st replay q2ii1O
+
+_________________________________ TRACE /users _________________________________
+1. Test Case ID: dyEIax
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /users"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' http://127.0.0.1:18302/api/users
+
+    st replay dyEIax
+
+_______________________________ TRACE /users/me ________________________________
+1. Test Case ID: 899Uqv
+
+- ST204 Wrong response to undeclared method
+
+    Unsupported method TRACE returned 404, expected 405 Method Not Allowed
+
+    Return 405 for methods not listed in the OpenAPI spec
+
+[404] Not Found:
+
+    `{"detail":"API route not found: TRACE /users/me"}`
+
+Reproduce with:
+
+    curl -X TRACE -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:18302/api/users/me
+
+    st replay 899Uqv
+
+=================================== WARNINGS ===================================
+
+Authentication failed: 24 operations returned only 401/403 responses
+
+401 Unauthorized (24 operations):
+  - GET /telegram/cron
+  - POST /attendance
+  - POST /change-password
+  - POST /crop-photos
+  - POST /crops
+  - POST /fields
+  - POST /finance
+  - POST /finance/bulk
+  - POST /inventory
+  - POST /irrigation
+  - POST /labor-advances
+  - POST /laborers
+  - POST /liabilities
+  - POST /login
+  - POST /photos
+  - POST /products
+  - POST /request-profile-code
+  - POST /restore
+  - POST /spray
+  - POST /suppliers
+  - POST /tasks
+  - POST /tasks/bulk
+  - POST /telegram/cron
+  - POST /telegram/link-code
+
+💡 Ensure valid authentication credentials are set via `--auth` or `-H`
+
+Missing test data: 7 operations repeatedly returned 404 Not Found, preventing tests from reaching your API's core logic
+
+No links point to this operation:
+  - GET /farm-summary
+
+💡 Provide realistic parameter values in your config file so tests can access existing resources
+
+No links point to these operations - nothing in the schema appears to supply the data they need (6 operations):
+  - DELETE /crop-photos/{photoId}
+  - DELETE /photos/{id}
+  - DELETE /telegram/links/{chatId}
+  - GET /cards/supplier/{id}
+  - GET /cards/worker/{id}
+  - GET /photos/{id}
+
+💡 Schemathesis found no operation that creates this data - create it outside the test run and supply the identifiers in your config file
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 104/104
+  Tested: 104
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ ST401 API accepts requests without authentication: 5
+  ❌ ST101 Server error: 3
+  ❌ ST203 Missing required header accepted: 9
+  ❌ ST202 Schema-valid request rejected: 56
+  ❌ ST201 Schema-violating request accepted: 1
+  ❌ ST204 Wrong response to undeclared method: 38
+
+For more information, run `st explain <code>` for ST101, ST201, ST202, ST203, ST204, ST401.
+
+Warnings:
+  ⚠️ Authentication failed: 24 operations returned only 401/403 responses
+  ⚠️ Missing test data: 7 operations repeatedly returned 404 responses
+
+Test cases:
+  494 generated, 107 found 112 unique failures
+
+Seed: 284943909818441534484893111244994682554
+
+====================== 112 failures, 2 warnings in 5.81s =======================
+
+SCHemathesis exit=1

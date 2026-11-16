@@ -1,0 +1,5 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET farms,HTTPError('401 Client Error: Unauthorized for url: GET farms'),95,2026-11-16T15:15:54Z,2026-11-16T15:16:16Z
+GET,GET list paged,HTTPError('401 Client Error: Unauthorized for url: GET list paged'),47,2026-11-16T15:15:54Z,2026-11-16T15:16:16Z
+POST,/api/auth/login,HTTPError('429 Client Error: Too Many Requests for url: /api/auth/login'),5,2026-11-16T15:15:53Z,2026-11-16T15:15:53Z
+GET,GET list,HTTPError('401 Client Error: Unauthorized for url: GET list'),243,2026-11-16T15:15:53Z,2026-11-16T15:16:16Z

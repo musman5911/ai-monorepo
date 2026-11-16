@@ -1,0 +1,20 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "run", "check-seed"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+
+> check-seed
+> node --check tools/seed-test-db.js && vitest run tests/seed-demo-data.test.ts
+
+
+ RUN  v3.2.7 /home/user/ai-monorepo/.cache/chat-rerun/source
+
+ ✓ tests/seed-demo-data.test.ts (22 tests) 312ms
+
+ Test Files  1 passed (1)
+      Tests  22 passed (22)
+   Start at  15:15:04
+   Duration  1.10s (transform 191ms, setup 0ms, collect 207ms, tests 312ms, environment 0ms, prepare 159ms)
+
+
+EXIT=0 TIMEOUT=False SECONDS=2.86

@@ -1,0 +1,11 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "run", "check-route-permissions"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+
+> check-route-permissions
+> node tools/check-route-permissions.js
+
+Route permission inventory passed: 49 route modules are documented; all route modules are documented, imported by their server, and visibly mounted.
+
+EXIT=0 TIMEOUT=False SECONDS=0.48

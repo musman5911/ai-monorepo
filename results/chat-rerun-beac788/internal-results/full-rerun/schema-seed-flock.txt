@@ -1,0 +1,185 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND schemathesis run tests/toolchain/spec-flock.yaml --url http://127.0.0.1:21977/api -n 2 --workers 2 -H Authorization:Bearer <local-test-token>
+SETUP token acquired=true; specs identical to tests/round3/specs/spec-flock.yaml
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from tests/toolchain/spec-flock.yaml (in 0.77s)
+
+     Base URL:         http://127.0.0.1:21977/api
+     Specification:    Open API 3.0.3
+     Operations:       4 selected / 4 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ⏭   Examples (in 0.04s)
+
+     ⏭  4 skipped
+
+ ❌  Coverage (in 0.36s)
+
+     ❌ 4 failed
+
+ ❌  Fuzzing (in 0.16s)
+
+     ✅ 1 passed  ❌ 3 failed
+
+=================================== FAILURES ===================================
+_____________________________ DELETE /batches/{id} _____________________________
+1. Test Case ID: zlGkAI
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Authentication required"}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:21977/api/batches/8a075f2210afe8821b2f22ea
+
+    st replay zlGkAI
+
+2. Test Case ID: 3vil5Y
+
+- ST103 Undocumented status code
+
+    Received: 404
+    Documented: 200
+
+[404] Not Found:
+
+    `{"error":"Batch not found"}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:21977/api/batches/8a075f2210afe8821b2f22ea
+
+    st replay 3vil5Y
+
+_________________________________ GET /batches _________________________________
+1. Test Case ID: wV2EoL
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Authentication required"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:21977/api/batches
+
+    st replay wV2EoL
+
+______________________________ GET /batches/{id} _______________________________
+1. Test Case ID: AV8Y0R
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Authentication required"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:21977/api/batches/8a075f2210afe8821b2f22ea
+
+    st replay AV8Y0R
+
+2. Test Case ID: fYGo16
+
+- ST103 Undocumented status code
+
+    Received: 404
+    Documented: 200
+
+[404] Not Found:
+
+    `{"error":"Batch not found"}`
+
+Reproduce with:
+
+    curl -X GET -H 'Authorization: [Filtered]' http://127.0.0.1:21977/api/batches/8a075f2210afe8821b2f22ea
+
+    st replay fYGo16
+
+________________________________ POST /batches _________________________________
+1. Test Case ID: fqa7YA
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"error":"Authentication required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "type": "", "start_date": "", "intake_count": 0, "cost_per_bird": 0}' http://127.0.0.1:21977/api/batches
+
+    st replay fqa7YA
+
+2. Test Case ID: bu8Xlr
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 201
+
+[400] Bad Request:
+
+    `{"error":"Batch name is required."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' http://127.0.0.1:21977/api/batches
+
+    st replay bu8Xlr
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 4/4
+  Tested: 4
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ ST202 Schema-valid request rejected: 1
+  ❌ ST103 Undocumented status code: 7
+
+For more information, run `st explain <code>` for ST103, ST202.
+
+Test cases:
+  8 generated, 7 found 8 unique failures
+
+Seed: 27022316873206885403384140367175803585
+
+============================= 8 failures in 0.64s ==============================
+
+
+EXIT=1 ERROR=

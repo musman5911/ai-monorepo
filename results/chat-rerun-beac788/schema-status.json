@@ -1,0 +1,35 @@
+{
+  "revision": "beac7883922f44eca3b7b43f91fce53e994638a5",
+  "jobs": [
+    {
+      "name": "regenerate-full-specs",
+      "args": [
+        "node",
+        "tests/round3/build-full-specs.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 0.24
+    },
+    {
+      "name": "full-nine-roles",
+      "args": [
+        "node",
+        "tests/round3/run-schemathesis-full.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 150.18
+    },
+    {
+      "name": "seed-specs-and-original-agri-load",
+      "args": [
+        "node",
+        "tests/full-rerun/seed-schema-load.mjs"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 65.94
+    }
+  ]
+}

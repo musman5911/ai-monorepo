@@ -1,0 +1,14 @@
+[
+  {
+    "name": "extra-node-tools",
+    "exit": 0
+  },
+  {
+    "name": "python-venv",
+    "exit": 0
+  },
+  {
+    "name": "python-tools",
+    "exit": 0
+  }
+]

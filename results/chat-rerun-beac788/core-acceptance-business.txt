@@ -1,0 +1,901 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["node", "--test", "--test-concurrency=1", "tests/acceptance-business/agri-business.test.mjs", "tests/acceptance-business/dairy-business.test.mjs", "tests/acceptance-business/dates-tz.test.mjs", "tests/acceptance-business/flock-business.test.mjs", "tests/acceptance/backups.test.mjs", "tests/acceptance/flock-cards-farm-scope.test.mjs", "tests/acceptance/frontend-service-worker-logout.test.mjs", "tests/acceptance/headers-csp.test.mjs", "tests/acceptance/input-bounds.test.mjs", "tests/acceptance/money-validation.test.mjs", "tests/acceptance/photos.test.mjs", "tests/acceptance/sessions-auth.test.mjs", "tests/acceptance/telegram.test.mjs"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+TAP version 13
+# FINDING CHECK BL-2: posting 2027-03 wages settled 2 unrelated seeded advances (expected 0)
+# Subtest: BL-2: post-wages settles only the posted month's advances (agri)
+not ok 1 - BL-2: post-wages settles only the posted month's advances (agri)
+  ---
+  duration_ms: 5271.430762
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance-business/agri-business.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    BL-2 BUG: posting wages for 2027-03 settled 2 advances of other workers/months
+    
+    2 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 2
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance-business/agri-business.test.mjs:25:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: BL-guard: liability pay books exactly one finance expense, second pay is a no-op (agri)
+ok 2 - BL-guard: liability pay books exactly one finance expense, second pay is a no-op (agri)
+  ---
+  duration_ms: 4401.653976
+  type: 'test'
+  ...
+# Subtest: BL-guard: analytics finance totals equal the sum of the finance records (agri)
+ok 3 - BL-guard: analytics finance totals equal the sum of the finance records (agri)
+  ---
+  duration_ms: 3539.196635
+  type: 'test'
+  ...
+# FINDING CHECK BL-1: posting 2027-03 wages settled 2 unrelated seeded advances (expected 0)
+# Subtest: BL-1: post-wages settles only the posted month's advances (dairy)
+not ok 4 - BL-1: post-wages settles only the posted month's advances (dairy)
+  ---
+  duration_ms: 2284.880167
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance-business/dairy-business.test.mjs:7:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    BL-1 BUG: posting wages for 2027-03 settled 2 advances belonging to other workers/months — their advance balances now wrongly show as settled
+    
+    2 !== 0
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 2
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance-business/dairy-business.test.mjs:25:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: BL-guard: milk summary saleable/revenue matches hand calculation (dairy)
+ok 5 - BL-guard: milk summary saleable/revenue matches hand calculation (dairy)
+  ---
+  duration_ms: 2336.322352
+  type: 'test'
+  ...
+# FINDING CHECK BL-4: at 01:30 PKT on 2026-10-28, farm-summary Today's milk = "136 L"; records dated 2026-10-28 total 11 L
+# Subtest: BL-4: farm-summary "Today's milk" uses the Pakistan farm day, not UTC (dairy)
+not ok 6 - BL-4: farm-summary "Today's milk" uses the Pakistan farm day, not UTC (dairy)
+  ---
+  duration_ms: 1717.844832
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance-business/dates-tz.test.mjs:16:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    BL-4 BUG: farm-summary "Today's milk" = "136 L" at 01:30 Pakistan time, but the records dated today (2026-10-28 PKT) total 11 L — the summary is using the UTC day (2026-10-27)
+    
+    '136 L' !== '11 L'
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: '11 L'
+  actual: '136 L'
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance-business/dates-tz.test.mjs:45:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# FINDING CHECK BL-3: sell 50 eggs from 80 in stock -> HTTP 400 {"error":"Sold, home-use and broken eggs cannot exceed collected eggs"}
+# Subtest: BL-3: eggs collected Monday can be sold Tuesday from stock (flock)
+not ok 7 - BL-3: eggs collected Monday can be sold Tuesday from stock (flock)
+  ---
+  duration_ms: 2045.62503
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance-business/flock-business.test.mjs:8:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    BL-3 BUG: selling 50 of 80 stocked eggs was rejected (HTTP 400) because validation only looks at same-day collection
+    
+    400 !== 201
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 201
+  actual: 400
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance-business/flock-business.test.mjs:19:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: BL-guard: batch summary matches hand calculation, incl. all-dead batch (flock)
+ok 8 - BL-guard: batch summary matches hand calculation, incl. all-dead batch (flock)
+  ---
+  duration_ms: 1500.237248
+  type: 'test'
+  ...
+# Subtest: I1: tampered backup is rejected on restore (dairy)
+not ok 9 - I1: tampered backup is rejected on restore (dairy)
+  ---
+  duration_ms: 1855.409723
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/backups.test.mjs:5:1'
+  failureType: 'testCodeFailure'
+  error: 'tampered backup restored (200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/backups.test.mjs:16:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: I2: another app's backup is rejected, not partially imported (dairy restores agri backup)
+not ok 10 - I2: another app's backup is rejected, not partially imported (dairy restores agri backup)
+  ---
+  duration_ms: 6535.066302
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/backups.test.mjs:20:1'
+  failureType: 'testCodeFailure'
+  error: 'cross-app backup accepted (200: {"success":true,"message":"Data restored successfully (sequential; recovery snapshot saved)","recove)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/backups.test.mjs:28:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: I3: junk backup payload is rejected cleanly (flock)
+ok 11 - I3: junk backup payload is rejected cleanly (flock)
+  ---
+  duration_ms: 945.750252
+  type: 'test'
+  ...
+# Subtest: PH-3: agri backup includes uploaded PhotoAsset photos so restore cannot silently lose them
+not ok 12 - PH-3: agri backup includes uploaded PhotoAsset photos so restore cannot silently lose them
+  ---
+  duration_ms: 2455.808693
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/backups.test.mjs:41:1'
+  failureType: 'testCodeFailure'
+  error: 'backup JSON contains no PhotoAsset collection — uploaded photos would be lost on restore'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/backups.test.mjs:53:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: B1-B3 (flock forward): anonymous card for sequential id 1 does not expose phone/balance
+not ok 13 - B1-B3 (flock forward): anonymous card for sequential id 1 does not expose phone/balance
+  ---
+  duration_ms: 1524.659014
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/flock-cards-farm-scope.test.mjs:12:1'
+  failureType: 'testCodeFailure'
+  error: 'anonymous card 200 exposes a phone number'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/flock-cards-farm-scope.test.mjs:18:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: B1-B3 (flock reverse): Farm B customer link shows Farm B data, not Farm A
+not ok 14 - B1-B3 (flock reverse): Farm B customer link shows Farm B data, not Farm A
+  ---
+  duration_ms: 1419.26677
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/flock-cards-farm-scope.test.mjs:23:1'
+  failureType: 'testCodeFailure'
+  error: 'Farm B link (id 1) served Farm A private data'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/flock-cards-farm-scope.test.mjs:38:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# FINDING CHECK ROLE-F1: requested farmIds=[5269fc507d0f6972b7439d7c] (Farm B), server assigned [5269fc507d0f6972b7439d7c]
+# Subtest: ROLE-F1: creating a user with farmIds assigns exactly those farms (flock)
+ok 15 - ROLE-F1: creating a user with farmIds assigns exactly those farms (flock)
+  ---
+  duration_ms: 1519.533577
+  type: 'test'
+  ...
+# Subtest: J1: importing Farm A batch export into Farm B succeeds (flock)
+not ok 16 - J1: importing Farm A batch export into Farm B succeeds (flock)
+  ---
+  duration_ms: 1455.331105
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/flock-cards-farm-scope.test.mjs:70:1'
+  failureType: 'testCodeFailure'
+  error: 'import into Farm B failed (500: {"error":"Failed to import batch data"})'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/flock-cards-farm-scope.test.mjs:82:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: R3-FE-1: service-worker API cache is cleared on logout (dairy)
+ok 17 - R3-FE-1: service-worker API cache is cleared on logout (dairy) # SKIP playwright-core/@sparticuz/chromium unavailable: Cannot find package 'playwright-core' imported from /home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/frontend-service-worker-logout.test.mjs
+  ---
+  duration_ms: 3.01701
+  type: 'test'
+  ...
+# Subtest: R3-FE-1: service-worker API cache is cleared on logout (agri)
+ok 18 - R3-FE-1: service-worker API cache is cleared on logout (agri) # SKIP playwright-core/@sparticuz/chromium unavailable: Cannot find package 'playwright-core' imported from /home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/frontend-service-worker-logout.test.mjs
+  ---
+  duration_ms: 0.648751
+  type: 'test'
+  ...
+# Subtest: R3-FE-1: service-worker API cache is cleared on logout (flock)
+ok 19 - R3-FE-1: service-worker API cache is cleared on logout (flock) # SKIP playwright-core/@sparticuz/chromium unavailable: Cannot find package 'playwright-core' imported from /home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/frontend-service-worker-logout.test.mjs
+  ---
+  duration_ms: 0.466383
+  type: 'test'
+  ...
+# Subtest: R3-FE-1 (source): api-cache cleanup is wired into the real logout path (dairy)
+not ok 20 - R3-FE-1 (source): api-cache cleanup is wired into the real logout path (dairy)
+  ---
+  duration_ms: 3.311405
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/frontend-service-worker-logout.test.mjs:69:1'
+  failureType: 'testCodeFailure'
+  error: 'logout path never deletes the service-worker API cache (dairyfarmapi-v2) in production code'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/frontend-service-worker-logout.test.mjs:78:10)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: C1: production responses include Content-Security-Policy (dairy)
+ok 21 - C1: production responses include Content-Security-Policy (dairy)
+  ---
+  duration_ms: 852.662864
+  type: 'test'
+  ...
+# Subtest: C1: production responses include Content-Security-Policy (agri)
+ok 22 - C1: production responses include Content-Security-Policy (agri)
+  ---
+  duration_ms: 830.973781
+  type: 'test'
+  ...
+# Subtest: C3: authenticated responses send Cache-Control no-store (dairy)
+ok 23 - C3: authenticated responses send Cache-Control no-store (dairy)
+  ---
+  duration_ms: 1656.106735
+  type: 'test'
+  ...
+# Subtest: C3: authenticated responses send Cache-Control no-store (agri)
+ok 24 - C3: authenticated responses send Cache-Control no-store (agri)
+  ---
+  duration_ms: 2934.31626
+  type: 'test'
+  ...
+# Subtest: C3: authenticated responses send Cache-Control no-store (flock)
+ok 25 - C3: authenticated responses send Cache-Control no-store (flock)
+  ---
+  duration_ms: 1467.238264
+  type: 'test'
+  ...
+# Subtest: SG-2: production boot refuses MEMORY_MODE=1 (dairy)
+ok 26 - SG-2: production boot refuses MEMORY_MODE=1 (dairy)
+  ---
+  duration_ms: 814.572405
+  type: 'test'
+  ...
+# Subtest: SG-2: production boot refuses MEMORY_MODE=1 (agri)
+ok 27 - SG-2: production boot refuses MEMORY_MODE=1 (agri)
+  ---
+  duration_ms: 806.262926
+  type: 'test'
+  ...
+# Subtest: SG-2: production boot refuses MEMORY_MODE=1 (flock)
+ok 28 - SG-2: production boot refuses MEMORY_MODE=1 (flock)
+  ---
+  duration_ms: 809.980651
+  type: 'test'
+  ...
+# Subtest: SG-1: production boot refuses weak JWT_SECRET "secret" (dairy)
+ok 29 - SG-1: production boot refuses weak JWT_SECRET "secret" (dairy)
+  ---
+  duration_ms: 10075.440414
+  type: 'test'
+  ...
+# Subtest: SG-1: production boot refuses weak JWT_SECRET "secret" (agri)
+ok 30 - SG-1: production boot refuses weak JWT_SECRET "secret" (agri)
+  ---
+  duration_ms: 6050.256305
+  type: 'test'
+  ...
+# Subtest: SG-1: production boot refuses weak JWT_SECRET "secret" (flock)
+not ok 31 - SG-1: production boot refuses weak JWT_SECRET "secret" (flock)
+  ---
+  duration_ms: 848.242139
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/headers-csp.test.mjs:65:3'
+  failureType: 'testCodeFailure'
+  error: 'production server booted with JWT_SECRET=secret'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/headers-csp.test.mjs:78:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# FINDING CHECK RL-1/proxy: wrong-login statuses via appending proxy: 401,401,401,401,401,429
+# Subtest: RL-1 (behind appending proxy): rotating fake XFF still gets rate-limited 429 (dairy)
+ok 32 - RL-1 (behind appending proxy): rotating fake XFF still gets rate-limited 429 (dairy)
+  ---
+  duration_ms: 2480.881341
+  type: 'test'
+  ...
+# FINDING CHECK RL-1/direct: wrong-login statuses with rotating XFF, direct: 401,401,401,401,401,401,401,401,401,401,401,401,401,401
+# Subtest: RL-1 (direct exposure, P2): rotating X-Forwarded-For must not defeat the login limiter (dairy)
+not ok 33 - RL-1 (direct exposure, P2): rotating X-Forwarded-For must not defeat the login limiter (dairy)
+  ---
+  duration_ms: 3279.306784
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/headers-csp.test.mjs:134:1'
+  failureType: 'testCodeFailure'
+  error: 'RL-1 BUG (direct exposure, P2): 14 wrong logins with rotating X-Forwarded-For never got a 429 (got 401,401,401,401,401,401,401,401,401,401,401,401,401,401) — the limiter trusts a spoofable header'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/headers-csp.test.mjs:139:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: E1: empty crop create is rejected (agri)
+ok 34 - E1: empty crop create is rejected (agri)
+  ---
+  duration_ms: 3152.981177
+  type: 'test'
+  ...
+# Subtest: FZ-3: operator objects in crop string fields are rejected, not stored as {} (agri)
+ok 35 - FZ-3: operator objects in crop string fields are rejected, not stored as {} (agri)
+  ---
+  duration_ms: 3041.27861
+  type: 'test'
+  ...
+# Subtest: FZ-1: a 5 MB single text field is rejected (dairy cow notes)
+not ok 36 - FZ-1: a 5 MB single text field is rejected (dairy cow notes)
+  ---
+  duration_ms: 2001.976667
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/input-bounds.test.mjs:23:1'
+  failureType: 'testCodeFailure'
+  error: '5MB field stored (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/input-bounds.test.mjs:29:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: D1: absurd numeric cow weight is rejected (dairy)
+not ok 37 - D1: absurd numeric cow weight is rejected (dairy)
+  ---
+  duration_ms: 1781.5062
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/input-bounds.test.mjs:33:1'
+  failureType: 'testCodeFailure'
+  error: 'weight=1e15 accepted (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/input-bounds.test.mjs:39:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: FZ-2: impossible calendar date 2026-02-30 is rejected (dairy daily log)
+not ok 38 - FZ-2: impossible calendar date 2026-02-30 is rejected (dairy daily log)
+  ---
+  duration_ms: 1074.228157
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/input-bounds.test.mjs:43:1'
+  failureType: 'testCodeFailure'
+  error: '2026-02-30 accepted (404: {"error":"API route not found: POST /dailylog"})'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/input-bounds.test.mjs:48:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: F1: batch with negative initial count is rejected (flock)
+ok 39 - F1: batch with negative initial count is rejected (flock)
+  ---
+  duration_ms: 1010.967469
+  type: 'test'
+  ...
+# Subtest: A6: create cannot forge role/farm ownership fields (agri crop create)
+ok 40 - A6: create cannot forge role/farm ownership fields (agri crop create)
+  ---
+  duration_ms: 2352.94573
+  type: 'test'
+  ...
+# Subtest: A5: stale writer does not silently overwrite a newer update (dairy cow)
+not ok 41 - A5: stale writer does not silently overwrite a newer update (dairy cow)
+  ---
+  duration_ms: 1388.269494
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/input-bounds.test.mjs:77:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    stale overwrite accepted silently (200)
+    
+    200 !== 409
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 409
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/input-bounds.test.mjs:88:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: G1: negative liability amount_owed is rejected (agri)
+ok 42 - G1: negative liability amount_owed is rejected (agri)
+  ---
+  duration_ms: 1987.328485
+  type: 'test'
+  ...
+# Subtest: G2: negative inventory quantity is rejected on create and update (agri)
+not ok 43 - G2: negative inventory quantity is rejected on create and update (agri)
+  ---
+  duration_ms: 2378.71469
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/money-validation.test.mjs:16:1'
+  failureType: 'testCodeFailure'
+  error: 'valid inventory create should work'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/money-validation.test.mjs:24:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: G3: absurd field area is rejected (agri)
+not ok 44 - G3: absurd field area is rejected (agri)
+  ---
+  duration_ms: 2362.664088
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/money-validation.test.mjs:32:1'
+  failureType: 'testCodeFailure'
+  error: 'acres=1e12 accepted (201)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/money-validation.test.mjs:37:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: E5: negative finance amount is rejected (agri)
+ok 45 - E5: negative finance amount is rejected (agri)
+  ---
+  duration_ms: 2364.318652
+  type: 'test'
+  ...
+# Subtest: PH-1 (INFO, needs design decision): uploaded photo is served without EXIF/GPS bytes (dairy)
+not ok 46 - PH-1 (INFO, needs design decision): uploaded photo is served without EXIF/GPS bytes (dairy)
+  ---
+  duration_ms: 1274.702068
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'GPS/EXIF marker served back byte-identical'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:42:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: PH-2 (INFO, needs design decision): worker cannot delete photos (dairy)
+not ok 47 - PH-2 (INFO, needs design decision): worker cannot delete photos (dairy)
+  ---
+  duration_ms: 1929.344533
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:46:3'
+  failureType: 'testCodeFailure'
+  error: 'worker deleted a photo (200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:55:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: PH-1 (INFO, needs design decision): uploaded photo is served without EXIF/GPS bytes (agri)
+not ok 48 - PH-1 (INFO, needs design decision): uploaded photo is served without EXIF/GPS bytes (agri)
+  ---
+  duration_ms: 4967.853776
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:31:3'
+  failureType: 'testCodeFailure'
+  error: 'GPS/EXIF marker served back byte-identical'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:42:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: PH-2 (INFO, needs design decision): worker cannot delete photos (agri)
+not ok 49 - PH-2 (INFO, needs design decision): worker cannot delete photos (agri)
+  ---
+  duration_ms: 6484.473448
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:46:3'
+  failureType: 'testCodeFailure'
+  error: 'worker deleted a photo (200)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:55:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: PH-F2: flock images are not served with public immutable year-long caching
+ok 50 - PH-F2: flock images are not served with public immutable year-long caching
+  ---
+  duration_ms: 2478.526009
+  type: 'test'
+  ...
+# Subtest: P8-1: flock diary photo paths resolve on the backend (no /api/photos 404)
+not ok 51 - P8-1: flock diary photo paths resolve on the backend (no /api/photos 404)
+  ---
+  duration_ms: 2825.046893
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:73:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    image path returned 404
+    
+    404 !== 200
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 200
+  actual: 404
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/photos.test.mjs:81:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A1: token is rejected after logout (dairy)
+not ok 52 - A1: token is rejected after logout (dairy)
+  ---
+  duration_ms: 2528.181803
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: 'logout must exist and succeed, got 404'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:18:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# Subtest: A1: token is rejected after logout (agri)
+not ok 53 - A1: token is rejected after logout (agri)
+  ---
+  duration_ms: 6439.459798
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    old token still works after logout (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:20:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A1: token is rejected after logout (flock)
+not ok 54 - A1: token is rejected after logout (flock)
+  ---
+  duration_ms: 2490.501633
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:11:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    old token still works after logout (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:20:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A3: token lifetime is at most 24h (dairy)
+not ok 55 - A3: token lifetime is at most 24h (dairy)
+  ---
+  duration_ms: 2506.301645
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:27:3'
+  failureType: 'testCodeFailure'
+  error: 'TTL is 168h'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:32:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: A3: token lifetime is at most 24h (flock)
+not ok 56 - A3: token lifetime is at most 24h (flock)
+  ---
+  duration_ms: 2446.14172
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:27:3'
+  failureType: 'testCodeFailure'
+  error: 'TTL is 168h'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:32:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# FINDING CHECK A2: token issued BEFORE password change returns HTTP 200 on /api/auth/me AFTER the change
+# Subtest: A2: old token is rejected after password change (dairy)
+not ok 57 - A2: old token is rejected after password change (dairy)
+  ---
+  duration_ms: 4094.06661
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:45:1'
+  failureType: 'testCodeFailure'
+  error: |-
+    A2 BUG: token issued before the password change still works after it (HTTP 200, expected 401)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:66:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: BC-1: login rejects password differing only after byte 72 (dairy)
+not ok 58 - BC-1: login rejects password differing only after byte 72 (dairy)
+  ---
+  duration_ms: 2583.692763
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:73:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    truncated-variant password logged in (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:86:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# Subtest: BC-1: login rejects password differing only after byte 72 (flock)
+not ok 59 - BC-1: login rejects password differing only after byte 72 (flock)
+  ---
+  duration_ms: 3101.399098
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:73:3'
+  failureType: 'testCodeFailure'
+  error: |-
+    truncated-variant password logged in (200)
+    
+    200 !== 401
+    
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 401
+  actual: 200
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/sessions-auth.test.mjs:86:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# FINDING CHECK K1/dairy: after one bot message "kharcha 999999999", marker found=true, amount 999999999 found=true
+# Subtest: K1: telegram bot rejects a 999,999,999 single-message expense (dairy)
+not ok 60 - K1: telegram bot rejects a 999,999,999 single-message expense (dairy)
+  ---
+  duration_ms: 4406.815681
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/telegram.test.mjs:18:3'
+  failureType: 'testCodeFailure'
+  error: 'K1 BUG (dairy): one Telegram message booked a Rs 999,999,999 expense (marker=true, amount=true)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/telegram.test.mjs:41:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:296:3)
+  ...
+# FINDING CHECK K1/agri: after one bot message "kharcha 999999999", marker found=false, amount 999999999 found=true
+# Subtest: K1: telegram bot rejects a 999,999,999 single-message expense (agri)
+not ok 61 - K1: telegram bot rejects a 999,999,999 single-message expense (agri)
+  ---
+  duration_ms: 7163.264852
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/telegram.test.mjs:18:3'
+  failureType: 'testCodeFailure'
+  error: 'K1 BUG (agri): one Telegram message booked a Rs 999,999,999 expense (marker=false, amount=true)'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/telegram.test.mjs:41:14)
+    process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+# FINDING CHECK K1/flock: after one bot message "kharcha 999999999", marker found=false, amount 999999999 found=false
+# Subtest: K1: telegram bot rejects a 999,999,999 single-message expense (flock)
+ok 62 - K1: telegram bot rejects a 999,999,999 single-message expense (flock)
+  ---
+  duration_ms: 4647.891234
+  type: 'test'
+  ...
+# Subtest: CRON-LOG-1: cron secret is not printed to server logs (agri)
+not ok 63 - CRON-LOG-1: cron secret is not printed to server logs (agri)
+  ---
+  duration_ms: 6984.718498
+  type: 'test'
+  location: '/home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/telegram.test.mjs:48:1'
+  failureType: 'testCodeFailure'
+  error: 'cron ?key= secret appeared verbatim in server logs'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/tests/acceptance/telegram.test.mjs:54:12)
+    async Test.run (node:internal/test_runner/test:1054:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:744:7)
+  ...
+1..63
+# tests 63
+# suites 0
+# pass 25
+# fail 35
+# cancelled 0
+# skipped 3
+# todo 0
+# duration_ms 169386.393398
+
+EXIT=1 TIMEOUT=False SECONDS=169.53

@@ -1,0 +1,13 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["madge", "--circular", "flock_farm/backend"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+- Finding files
+Processed 58 files (2.4s) (1 warning)
+
+✖ Found 1 circular dependency!
+
+1) db.js > demo-data.js
+
+
+EXIT=1 TIMEOUT=False SECONDS=2.72

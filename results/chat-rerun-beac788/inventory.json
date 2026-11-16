@@ -1,0 +1,940 @@
+{
+  "revision": "beac7883922f44eca3b7b43f91fce53e994638a5",
+  "files": [
+    {
+      "path": "tests/acceptance/README.md",
+      "kind": "support",
+      "sha256": "c4d379f3c7078ae43de445df791176edab56607f17430c5efecf0a39a22435de"
+    },
+    {
+      "path": "tests/acceptance/_harness.mjs",
+      "kind": "support",
+      "sha256": "9cb2d7a3ef820ffa3d5193b817a82894a4d13322de78b1b94665ddecace9a4f3"
+    },
+    {
+      "path": "tests/acceptance/backups.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "0d3ed04664f3a2e47a3805fff3c4045897022b57694d8590773161bd60522464"
+    },
+    {
+      "path": "tests/acceptance/flock-cards-farm-scope.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "a2b6549453264986be7ebd2ce9ce5458b875a3986038e0ffe6f9d6e1f0f1c2d3"
+    },
+    {
+      "path": "tests/acceptance/frontend-service-worker-logout.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "9bf095f850bb9c2d4a0b72d00729ef0aee656c4d9f5196ab57d601a1011f229e"
+    },
+    {
+      "path": "tests/acceptance/headers-csp.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "3b6e58bb1790999d31b6d4602ae8c7ff7a6f8a6fc85be516ad7e7a06030ea114"
+    },
+    {
+      "path": "tests/acceptance/input-bounds.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "4fd8eb764b9daf5123e613c7708da06914d8eabeb7a755066d3921306872baf9"
+    },
+    {
+      "path": "tests/acceptance/money-validation.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "196ea98a52db66af44988c57302e7a4a06549cb5892c77b2074a2415ecb087de"
+    },
+    {
+      "path": "tests/acceptance/photos.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "85aadb3d4d034ce4cfcf4e41343e2573aa2218b9c2f31d4bb92436b5b164cfb8"
+    },
+    {
+      "path": "tests/acceptance/sessions-auth.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "2e53f0a3eebb152d6fb65148832ed57bd5011eae82785a14bde7670c8f75035f"
+    },
+    {
+      "path": "tests/acceptance/telegram.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "03d884871dc99a09616789433be2b57357a60b89f65ad5f28525a248374a6bcf"
+    },
+    {
+      "path": "tests/acceptance-business/README.md",
+      "kind": "support",
+      "sha256": "c37e24e21cffb9e399d5e5f92c25dd527150922065cee96d63a4758a9b66b8c4"
+    },
+    {
+      "path": "tests/acceptance-business/agri-business.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "f2ca690f39621f6fc8d556949d530b85ce7ff5333dc734fc7f93f4febf179a4b"
+    },
+    {
+      "path": "tests/acceptance-business/dairy-business.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "580da91085cf0c5171b0fbd8a92f308d03b9cec2c28a57f22bf48f2417af2246"
+    },
+    {
+      "path": "tests/acceptance-business/dates-tz.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "2231dce92ff3ca21e0629d191d1756ac21f172acbcfd6302d3f7236f7d6a13ac"
+    },
+    {
+      "path": "tests/acceptance-business/flock-business.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "7ecd87c7c79dc37e62dbe4c70b86e4a93606ab36820cc5f998d1a29487e5f526"
+    },
+    {
+      "path": "tests/acceptance-business/freeze-date.mjs",
+      "kind": "superseded-setup-or-instrumentation-not-a-suite",
+      "sha256": "0c3285338deea846d4fccdff2e13f1739351a2d9217e8147235b90c84baf9bf6"
+    },
+    {
+      "path": "tests/acceptance-business/frozen-server.mjs",
+      "kind": "support",
+      "sha256": "f8aa936ce61ca71c6faa62221a18508e6e94ce397c4a20aa7406485841d0e931"
+    },
+    {
+      "path": "tests/admin-users-hook-import.test.ts",
+      "kind": "current-upstream",
+      "sha256": "530959e1edf7fd1c81658a124a7f764f4a327480b524a03c00d2d7daa4ac4cc7"
+    },
+    {
+      "path": "tests/agri-automation-validation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "8c85738fc089d085a78ebf0898bde02be31b012131bfa9807f253e4e8480cefd"
+    },
+    {
+      "path": "tests/agri-bulk-api.test.ts",
+      "kind": "current-upstream",
+      "sha256": "dbb8d6cc3851a2aa83c083b53c0ff9ea51bdb30e9429642731366d4a4f0db93e"
+    },
+    {
+      "path": "tests/agri-bulk-import.test.ts",
+      "kind": "current-upstream",
+      "sha256": "1777d5ef29bab905ae8cd9340c6b33ab9aac1633d946b523b27934595d4dc4d4"
+    },
+    {
+      "path": "tests/agri-diary-media-validation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "2ceb3041044b5740b3b86bfcda9f930e1b79e2cd7c2b058e3db7c01acb6971fb"
+    },
+    {
+      "path": "tests/agri-fields-cycles.test.ts",
+      "kind": "current-upstream",
+      "sha256": "002ac7a0cab84aba38fd246fca0187f5a3249f61adb89c686da3a452aef8fe7b"
+    },
+    {
+      "path": "tests/agri-fields-screens.test.ts",
+      "kind": "current-upstream",
+      "sha256": "7bec548386c7840a1b2678c8c410199731f3009144219735ddb31650ffea509a"
+    },
+    {
+      "path": "tests/agri-photo-storage.test.ts",
+      "kind": "current-upstream",
+      "sha256": "278f041727e74f84b3c33f7b830f44286df193852486ee1fb408b2902c35a74b"
+    },
+    {
+      "path": "tests/agri-record-validation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "363cda854f87f96a49baa363d3c1032dd317405a39c20a8cabdb75b5c72adf75"
+    },
+    {
+      "path": "tests/agri-runtime-api.integration.test.ts",
+      "kind": "current-upstream",
+      "sha256": "5b5f9a4be4531f61cb27303c62dda4fadfde16f2e2b9f6be608fa6d9fc223af8"
+    },
+    {
+      "path": "tests/api-deep/agri-analytics-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "130cebabd1341d2e740b8251ff5971f00c8d9f232386ed026386a981e55b5921"
+    },
+    {
+      "path": "tests/api-deep/agri-filters-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "3d03aff254a51790748990ed06284973e0dbc94903f83f83119fe68f1cd17d65"
+    },
+    {
+      "path": "tests/api-deep/agri-liabilities-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "0c7911596343a42c44afc5ed5360cd2949f30e4d6b98e060bca978928e00d0eb"
+    },
+    {
+      "path": "tests/api-deep/allfarms-deletion-analytics-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "1472bffa82917f0acf2f7e3b13fff21541d4bf48c3467ab409c44141c0d25c26"
+    },
+    {
+      "path": "tests/api-deep/auth-isolation-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "cefb2b9806087f776886048f51fbc9bab57694665913e19131d95d278c86cac4"
+    },
+    {
+      "path": "tests/api-deep/backup-media-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "2032ae7f0862105f10d58c13dcfd4610ed8034281f3b168925df0feef1e60a5c"
+    },
+    {
+      "path": "tests/api-deep/concurrency-invariants.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "4759d3c82daf2f5462e0f4eb059cc7d9769e20563f1fa5218b7e4eb644dea8d7"
+    },
+    {
+      "path": "tests/api-deep/coverage-sweep-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "751887ef5082b56a17a4c3a0ec77e5ec7a536f4d11baf490190866f2dc5ab4d8"
+    },
+    {
+      "path": "tests/api-deep/coverage-sweep2-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "572527b7f7b5a8edf4ee5fd41fd1e2878cff042d35c16366df617800634d6d18"
+    },
+    {
+      "path": "tests/api-deep/cross-realm-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "2f44a43c467c94fc7fac7ab0f4affb8b64bc34608035f9061d859c1ad6b6be7b"
+    },
+    {
+      "path": "tests/api-deep/farm-delete-data-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "4c55220c1e8426078ba3ac4149bf9739968a5856b1087166239da9f5767ed2de"
+    },
+    {
+      "path": "tests/api-deep/farm-transfer-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "e5b92980187f865c20d82c6cdaa608b9b224a2eed7bd6c4e61b702b7b4b33035"
+    },
+    {
+      "path": "tests/api-deep/fidelity-precision-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "d9fda843a891dd6874391c900545b9546e4469477103cde032449111b365a687"
+    },
+    {
+      "path": "tests/api-deep/flock-destructive-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "d1af69db09f38774eca459e05c9b7ec58b317c12f14c6afcee4d9a4ecc1ea4c1"
+    },
+    {
+      "path": "tests/api-deep/frontend-contract-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "3a98deefae093295ab11a6b30a47a64a195fecb1811b6a64bc874d3f319a0d4a"
+    },
+    {
+      "path": "tests/api-deep/fuzz-robustness.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "bef78883e66d65610867935b17e8310e466c9ce7edcf6720ab9b3c16438249f8"
+    },
+    {
+      "path": "tests/api-deep/ids-unicode-uploads-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "c34864ff414461dbf85b4e9666a925faac2f5c2b3b2b05b818d695a8b0d8bd6d"
+    },
+    {
+      "path": "tests/api-deep/last-surface-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "726138b641f38c281d0a50d9bc7635b84e4fee394184972d6e3918106723f766"
+    },
+    {
+      "path": "tests/api-deep/load-lifetime-smuggling-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "51a074c4dfdf83dc1d5a40e03e3dbf765ce3abbf1534c2fa18aee059e761dcb1"
+    },
+    {
+      "path": "tests/api-deep/pagination-dates-backup-abuse.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "e48cf5a260bcc0b9d5735f7b7744408f3aa93e0b935c32f721ee0c85f3f58cba"
+    },
+    {
+      "path": "tests/api-deep/protocol-exotic-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "6d47266a774587304cbf449ea05f56b3c0c03627be2d62b21836c21e58567505"
+    },
+    {
+      "path": "tests/api-deep/public-surface-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "fcbfb6db61124fd2bd1d9c50a4cd12be748c399763e7f6ba24e60fc9324f3667"
+    },
+    {
+      "path": "tests/api-deep/q1-delete-pinpoint-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "3e53f69b25befed1c19d114e68bb6a5361138eb9ef98b8dfc494d127f47ba776"
+    },
+    {
+      "path": "tests/api-deep/round1-breeding-events.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "2aaf4c10ba34bf0f96d8c3149712061d77d3cc6f6e9d96d6530cf92cba186d95"
+    },
+    {
+      "path": "tests/api-deep/round10-flock-import-images.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "5421ae42754e600e36f07c6ff2b44f94d69fa6fe7070e472d31888b2bab8752b"
+    },
+    {
+      "path": "tests/api-deep/round11-role-agri.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "4c8ae885834e97bfff7fd9efe3cc7a6493fbe8743a914a4b8725b8a93fe6eca2"
+    },
+    {
+      "path": "tests/api-deep/round11-role-flock.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "36b250063368aceb508beee664ef8289b605d77d46728f7d6ca9661696434370"
+    },
+    {
+      "path": "tests/api-deep/round11-role-system.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "875013bea5a80f493a84ea27397493aafdb00066cfd30cc3438ec58844873401"
+    },
+    {
+      "path": "tests/api-deep/round12-photos-cloudinary.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "ccce812f0a6460935e3a9a53721f69b5a7b804ca82ccfa18ebc23394d359ddfa"
+    },
+    {
+      "path": "tests/api-deep/round12-photos-flock.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "f7ba4aee80c0ee59e58566b68b1b9654e17fdbc60c294bcf117e5a9bdc276ac1"
+    },
+    {
+      "path": "tests/api-deep/round13-sessions.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "1151f6e05da22e54d93cf771c88a0626c7a68affec742d34a2be3a25738d64c7"
+    },
+    {
+      "path": "tests/api-deep/round14-fuzz.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "f6705b66c358a231853dbb301d587d204527f8d21757facda2af3ce5a521766d"
+    },
+    {
+      "path": "tests/api-deep/round15-concurrency.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "6eaa27b6f54f34ca96e261306e333cc2a130f27bc80fcc5acd5ae9635d473a68"
+    },
+    {
+      "path": "tests/api-deep/round2-agri-fields.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "16a8f6abc28d92a3e954551c33184fc1f9f3572047695a9afa191e4df48dbb07"
+    },
+    {
+      "path": "tests/api-deep/round3-super-admin.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "9e59b1c8e93167446924aa5f91c2b6f762cb0fd31553048a3b683f7a2945bfff"
+    },
+    {
+      "path": "tests/api-deep/round4-backup-newmodels.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "d97a1a9d8dbc473f45fa7a88f42d3b098d18159427934a6a1c4a52fa6f935706"
+    },
+    {
+      "path": "tests/api-deep/round6-breeding-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "d42d522c5cbae7f9b3a4cdc98ed9d576c666183d1f3fecc83277945a1cb031f1"
+    },
+    {
+      "path": "tests/api-deep/round7-agri-fields-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "e33d74f4c8d118da5642972aedbcf3c7d25cd966ebee7d6dca57ecb98d34d332"
+    },
+    {
+      "path": "tests/api-deep/round8-summary-accuracy.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "d5490ac08bea6bed2154023d0021ef6f6e56f6ae1ce13befb79c9833652036f7"
+    },
+    {
+      "path": "tests/api-deep/round9-backup-integrity.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "732b29d97434c2e3bbc138074aaa7de219f259dec5db2cc682c1deaaabd6e492"
+    },
+    {
+      "path": "tests/api-deep/session-escalation-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "730bb7eb2e3c3cf0794537915a271efff934e62ca99005b5bb765d82b2fbed93"
+    },
+    {
+      "path": "tests/api-deep/telegram-bot-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "dc5be66df507833ed0d6c594d9e1d0d3191453dbc7debde31d357aaad12426e1"
+    },
+    {
+      "path": "tests/api-deep/timing-reset-auto-deep.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "fc6ba12682d4d9733ea06baf16bd844c8752e9da6cfe0f8aa5411e5a696ffbf2"
+    },
+    {
+      "path": "tests/api-matrix/agri.api-matrix.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "1dae5fbb4b63c08477a3ec0cd6edb6b55e7a09f6891c2a6302c8e36adeae1869"
+    },
+    {
+      "path": "tests/api-matrix/backup-import-export.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "25d259e63953699477896d2c900cc38346c87f5c6873ce57168b93c55bdb8891"
+    },
+    {
+      "path": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "03a97c311230b719e2e73bf17c08b849bbaa7999a38f07e11cb4683099ad66c2"
+    },
+    {
+      "path": "tests/api-matrix/flock.api-matrix.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "890e34cc6caa935a461844e602ff3d923792c1bb8fabdb9c3513f5551a95229f"
+    },
+    {
+      "path": "tests/api-matrix/harness.ts",
+      "kind": "support",
+      "sha256": "988553be0135ce62a0c996cc36c0957fca7863410764034f6c2ff0b778f686fe"
+    },
+    {
+      "path": "tests/archive-screens.test.ts",
+      "kind": "current-upstream",
+      "sha256": "4f146f0791275aa3ef46539e3b0ead43b0bf8add0ef04c1cfe8974e875d5ab54"
+    },
+    {
+      "path": "tests/archive.test.ts",
+      "kind": "current-upstream",
+      "sha256": "06e36d140e8f88ce8fa4e3999882b8a79bcccc3c00eac7c91870ef93b783088e"
+    },
+    {
+      "path": "tests/auth-production-config.test.ts",
+      "kind": "current-upstream",
+      "sha256": "8a7a4cb8f4362856591dd28b11f46bc1641695fbe212cdf5fa5f9ab465bb526f"
+    },
+    {
+      "path": "tests/backup-restore-recovery.test.ts",
+      "kind": "current-upstream",
+      "sha256": "17e69e48f1a3f4e7938212de02d371871ae7ce4819ae4b51806a7fa9a25d7acc"
+    },
+    {
+      "path": "tests/chat-rerun-beac788/manager-boundary.test.mjs",
+      "kind": "new-manager",
+      "sha256": "bc397f812f8cc46854b6cd0e8330937b6cd3cea98bcad558a5d8344b871cc3f6"
+    },
+    {
+      "path": "tests/check-bundle-size.test.ts",
+      "kind": "current-upstream",
+      "sha256": "befb9bc2b363f1394cc520597d5ceed567bffc34d77690ca10b47c10efacfa57"
+    },
+    {
+      "path": "tests/cloudinary-store.test.ts",
+      "kind": "current-upstream",
+      "sha256": "17719d14ffb0314aec8b6d1231517d7d57ebd8b711265fcca2e475a1f101c797"
+    },
+    {
+      "path": "tests/dairy-admin-owner-sections.test.ts",
+      "kind": "current-upstream",
+      "sha256": "85faf9ec7392d26f92770663087b63a53bb59bbd7e901d7e6be6370ce1db3d50"
+    },
+    {
+      "path": "tests/dairy-api-usage.test.ts",
+      "kind": "current-upstream",
+      "sha256": "a5d0a3feeda524078f7817fe1d19535e31a27a233555a563814e250c90685bc1"
+    },
+    {
+      "path": "tests/dairy-breeding-events.test.ts",
+      "kind": "current-upstream",
+      "sha256": "ce9a85852145905a14335decaf4fe3300ecb583a0fd821e6821e9a11a010ad11"
+    },
+    {
+      "path": "tests/dairy-breeding-screens.test.ts",
+      "kind": "current-upstream",
+      "sha256": "e2cbddfc917e8b75b0296c093ded28ee0724e215493b6bf40983682ca15bffde"
+    },
+    {
+      "path": "tests/dairy-calving-creates-calf.test.ts",
+      "kind": "current-upstream",
+      "sha256": "6461ff832b889384bb9b48d9d2db41f3407c2b5a22ac9ea35940a870da106a62"
+    },
+    {
+      "path": "tests/dairy-financial-posting.integration.test.ts",
+      "kind": "current-upstream",
+      "sha256": "7d3e18c11d3d75416b8ddf4580140c2cd2db93a1cbe3c5c29e18f7acc4665476"
+    },
+    {
+      "path": "tests/dairy-photo-runtime.integration.test.ts",
+      "kind": "current-upstream",
+      "sha256": "51b883215a7d26e2271f47f8602a523b9fba0061e86848f0ded350af64af914f"
+    },
+    {
+      "path": "tests/farm-api-cache-isolation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "072f180f61933727294662f428dc769d20700460fbd9f473503f911a2edf39c1"
+    },
+    {
+      "path": "tests/final-db-preflight.test.ts",
+      "kind": "current-upstream",
+      "sha256": "1766a2fba49a9d92e71f3ff88dad044a5d0ee31de17d72a469e388b235af2f17"
+    },
+    {
+      "path": "tests/financial-posting-safety.test.ts",
+      "kind": "current-upstream",
+      "sha256": "876c7a10de792233e0f04c464684c915176cb1a8b5869be0f0b5a72697acb99a"
+    },
+    {
+      "path": "tests/flock-batch-history-guards.test.ts",
+      "kind": "current-upstream",
+      "sha256": "7d904eaeec60b059ab84c557ac7f9a41923818f15065aab41b9b11227d807687"
+    },
+    {
+      "path": "tests/flock-batch-import-validation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "ba202de8da0fcaa6e9f0a812fbd551d027a751bb9c0f154db55924cbf1b8ba5a"
+    },
+    {
+      "path": "tests/flock-batch-labor.test.ts",
+      "kind": "current-upstream",
+      "sha256": "5565bc015ae176d3e3403dfb0cc1ed8e47b728b367c8a7fdc5d05d6ec1003f85"
+    },
+    {
+      "path": "tests/flock-batch-math.test.ts",
+      "kind": "current-upstream",
+      "sha256": "f0e126f622a0d4f47cf4f7a3a975633ca7fbd8823d80cff8a4bc40cf85486d0d"
+    },
+    {
+      "path": "tests/flock-batch-write-validation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "deb86bb966509b2aa71b7f4850e0550be97570e0400ab0d3508067e6159319f2"
+    },
+    {
+      "path": "tests/flock-dark-login-background.test.ts",
+      "kind": "current-upstream",
+      "sha256": "6628dcc5b2fda51e5859f9056c400b103aa392ea4394007c407a69ece6e36f31"
+    },
+    {
+      "path": "tests/flock-data-bucket-validation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "37783d1ad1e047bc4b35f7b0910487757e182e6cec4f7f0fd337088413e7ea41"
+    },
+    {
+      "path": "tests/flock-data-route-allocation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "739b87754063a899852d2de80ea5b827569ec84549172eeaf04a2b7c040b2258"
+    },
+    {
+      "path": "tests/flock-egg-inventory-coordination.test.ts",
+      "kind": "current-upstream",
+      "sha256": "ee3a03d3af2251b88f9d54cb79d5f3556caf7eaea314698c09dbb70114510b32"
+    },
+    {
+      "path": "tests/flock-egg-inventory-lock.test.ts",
+      "kind": "current-upstream",
+      "sha256": "19457baca8301d1680ab6f3fbdae4cbd318c69941d732b0eb76239c36232f8da"
+    },
+    {
+      "path": "tests/flock-first-owner-setup.test.ts",
+      "kind": "current-upstream",
+      "sha256": "5d926a075ad3393f441b28eda46cabed14de5205bc7f7133f96a9af21191e823"
+    },
+    {
+      "path": "tests/flock-image-backup.test.ts",
+      "kind": "current-upstream",
+      "sha256": "27b304c9ef89b76e064ae34386c83f972ac90112b370e7152746ce9b8c9b0754"
+    },
+    {
+      "path": "tests/flock-image-references.test.ts",
+      "kind": "current-upstream",
+      "sha256": "f7b4916b216bded2093935361ca349992ca3049ed10154dc8cd437a72fb707c8"
+    },
+    {
+      "path": "tests/flock-incubation-allocation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "89e9beb807046b6f35fd0513b2e9e6f23a7d04b36b17f23f7ebfef8e68e30a0a"
+    },
+    {
+      "path": "tests/flock-user-farm-assignment.test.ts",
+      "kind": "current-upstream",
+      "sha256": "90d4084a865a4e92ca8db37eb52ab598d1778b4d912df353255a2dfa66382468"
+    },
+    {
+      "path": "tests/full-rerun/README.md",
+      "kind": "support",
+      "sha256": "15397e7c273306c70695494e0fc8e28d306b1fcac7e221c02c169df27df7de73"
+    },
+    {
+      "path": "tests/full-rerun/bruno-smoke.mjs",
+      "kind": "support",
+      "sha256": "f4318c71a3dfa65136032797f39d795684307fa00e6cd264a4d1f56de0e24347"
+    },
+    {
+      "path": "tests/full-rerun/business-probes.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "080cf8734a8a0154312ae36b3769573a01fa1cfa94f619069d86ccc0c89d9815"
+    },
+    {
+      "path": "tests/full-rerun/eslint.config.mjs",
+      "kind": "support",
+      "sha256": "c047a04462b6ebda0e2aeb5f330a75d4db0b490ea665a7a8e307842818dab837"
+    },
+    {
+      "path": "tests/full-rerun/latest-surface.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "701d2bffc734d406878533071785ccdfaa572284fc7319f41267519417d4b630"
+    },
+    {
+      "path": "tests/full-rerun/scale-server.mjs",
+      "kind": "support",
+      "sha256": "0883f2c15f98bae59d45cea21ad49812b9028a69151f00c88e3098a32863a2ae"
+    },
+    {
+      "path": "tests/full-rerun/scale.test.mjs",
+      "kind": "historical-node-test",
+      "sha256": "7e454cd56e6bcd8710ef44c764acb2fb3a622eb83132d79edeba029a5aa39fff"
+    },
+    {
+      "path": "tests/full-rerun/seed-schema-load.mjs",
+      "kind": "support",
+      "sha256": "b830508f558feb4ff82e3b6920a92461af49d93c3ca65b06a2aab6656f48213c"
+    },
+    {
+      "path": "tests/full-rerun/stryker-farms.config.json",
+      "kind": "support",
+      "sha256": "75227cb5428ae83dfae8ef4b9654c1a0ed15014a4071a99671896345420e0720"
+    },
+    {
+      "path": "tests/full-rerun/stryker.config.json",
+      "kind": "support",
+      "sha256": "4f484e1dd926e59f6c2aa1c8f4e3719a768aa79a3ddb5e1f6d290975af590a17"
+    },
+    {
+      "path": "tests/full-rerun/vitest-farm-mutation.config.mjs",
+      "kind": "support",
+      "sha256": "776454ac352f21cc4f3ae5376ad125832a1e72329600c75466954b50f4a20a6c"
+    },
+    {
+      "path": "tests/full-rerun/vitest-mutation.config.mjs",
+      "kind": "support",
+      "sha256": "524aff812cf20f9b151f5684a2777166d3f7c5afa9a8e1b67ef964f7e966a354"
+    },
+    {
+      "path": "tests/muf-charts.test.ts",
+      "kind": "current-upstream",
+      "sha256": "d957cd511b37bafffc87c892e7cd57f84cd1606a0a41fdb547d2ae78bfe03f51"
+    },
+    {
+      "path": "tests/muf-compare.test.ts",
+      "kind": "current-upstream",
+      "sha256": "72bb806fab329aaa1d1bcc77d2a5f0d819e8aefeaf2bf846f42aa6fffb3a189d"
+    },
+    {
+      "path": "tests/muf-env-rate-limit.test.ts",
+      "kind": "current-upstream",
+      "sha256": "eb08f60db30dec6e13d2f016812d327a381bf17f04391f1fdaa828ae5851dce8"
+    },
+    {
+      "path": "tests/muf-farms-agri.test.ts",
+      "kind": "current-upstream",
+      "sha256": "071d3cf65d42ce079f68d46cbda3c4743125b9ac6a70b4179b74be240fe774de"
+    },
+    {
+      "path": "tests/muf-farms.test.ts",
+      "kind": "current-upstream",
+      "sha256": "35b5b2c1ca33f172e0d6a36a552577eeba19c2c4648970139d8da05144bd882b"
+    },
+    {
+      "path": "tests/muf-storage.test.ts",
+      "kind": "current-upstream",
+      "sha256": "d20ddc398ce681137e87f8e97acfd2a774a2710692dc5bc782da2511276f201b"
+    },
+    {
+      "path": "tests/muf-urdu-fallback-coverage.test.ts",
+      "kind": "current-upstream",
+      "sha256": "1aa8b57ccee2aa2fc996323f6c53ccea416924fe4b66259afc0805497ac45807"
+    },
+    {
+      "path": "tests/muf-zakat.test.ts",
+      "kind": "current-upstream",
+      "sha256": "3c56ddafa2838eaf2c374f4d2b4a422e69ffdd3a6005f515153993e3f6abe23b"
+    },
+    {
+      "path": "tests/phase-1-super-admin.test.ts",
+      "kind": "current-upstream",
+      "sha256": "cdd927402cff9119e98bbd0c5f0982b524e941e802da00b34cc15fbb181d18c2"
+    },
+    {
+      "path": "tests/phase1-backup-farm-context.test.ts",
+      "kind": "current-upstream",
+      "sha256": "204e5744822c86ade2ece3765145cd42fbbfd78139fb29d0f4e4e3803e3cbc80"
+    },
+    {
+      "path": "tests/phase19-seed-db-audit.test.ts",
+      "kind": "current-upstream",
+      "sha256": "3f3cae35c9ac055a27296c516ac17cdc1705bfed454604fee3092d54baa5720f"
+    },
+    {
+      "path": "tests/phase3-farm-isolation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "be19576407608c2ecf8d3920f3c076c4848c210e8120299f472cc42642a8f0e8"
+    },
+    {
+      "path": "tests/phase3-pagination.test.ts",
+      "kind": "current-upstream",
+      "sha256": "9c5f99d064c330ba0c04d505825067326c71b48e686ff7099a3938424fd05179"
+    },
+    {
+      "path": "tests/phase4-breeding-lineage.test.ts",
+      "kind": "current-upstream",
+      "sha256": "9809cb16d9476ecb08f8ea5acbed4ffdb4a42105aec7c40594ea4b9b7b7e3bdf"
+    },
+    {
+      "path": "tests/photo-client-migration.test.ts",
+      "kind": "current-upstream",
+      "sha256": "597cb719b6b7245879378a8a1ff81d9116336ae5bed9a3d043387ea1c5609890"
+    },
+    {
+      "path": "tests/photo-phase8-regression.test.ts",
+      "kind": "current-upstream",
+      "sha256": "a5ed8c87853a6e9527ce5268a6435170177af8cfd036553b405b3ee0a1fdec54"
+    },
+    {
+      "path": "tests/public-products.test.ts",
+      "kind": "current-upstream",
+      "sha256": "62db94e401ff5f01efe2a20b33f77ff4417524523051ca1ba61e333cb2cba536"
+    },
+    {
+      "path": "tests/public-route-security.test.ts",
+      "kind": "current-upstream",
+      "sha256": "960c44e9aaad756d13ce4274dceca8936d7fe224395df81869701a766a172d38"
+    },
+    {
+      "path": "tests/round3/build-full-specs.mjs",
+      "kind": "support",
+      "sha256": "ac2a04ecd59c1fe6aabaf604841ca3732078b665ae13e3dffb357257b9182bfa"
+    },
+    {
+      "path": "tests/round3/fastcheck-commands.mjs",
+      "kind": "support",
+      "sha256": "680ff14d0ff666bbf8321b6820d04697c01d870b8aabb61bd618a76b3609c491"
+    },
+    {
+      "path": "tests/round3/final-p1-rerun.mjs",
+      "kind": "support",
+      "sha256": "66ca6c78cb3b202b0ad0a162a4cde4cf0efaf69942045856ee516e635938e5b6"
+    },
+    {
+      "path": "tests/round3/hypothesis_agri.py",
+      "kind": "support",
+      "sha256": "d7e225d6fff90cb42ead17334469ca9cc0a4814d79f40e65f3b6d9ff70c32a29"
+    },
+    {
+      "path": "tests/round3/idor-authz-matrix.mjs",
+      "kind": "support",
+      "sha256": "14dea60c6a2aee3fe05d400bbbc5392ba25c7fdc1ab1fe2af2fda0fa16cc3d0c"
+    },
+    {
+      "path": "tests/round3/patch-crypto.mjs",
+      "kind": "superseded-setup-or-instrumentation-not-a-suite",
+      "sha256": "e51c930b92a140080fc3daa2f770bb1e472791c504ce6c73a93485f349e40315"
+    },
+    {
+      "path": "tests/round3/phase0-probe.sh",
+      "kind": "superseded-setup-or-instrumentation-not-a-suite",
+      "sha256": "234d6f6191eb4337973cc39b949207373f38e52cc00b3e5d6c510fc80b12f5b1"
+    },
+    {
+      "path": "tests/round3/phase1-dynamic.mjs",
+      "kind": "support",
+      "sha256": "45e0f6427e641643322f53dcdefb30ce8fccb668b9ff7e541a3e3f0d44cc6cd1"
+    },
+    {
+      "path": "tests/round3/phase1b-prod-proxy-cards.mjs",
+      "kind": "support",
+      "sha256": "264e5b396a74840227a4afa3f7481bf13eff6b4441d80a560c4eea98c6676c63"
+    },
+    {
+      "path": "tests/round3/phase1c-protocol-chaos-load.mjs",
+      "kind": "support",
+      "sha256": "ee7977a1346935f2d53928ddedeb7f3573831aeb4eb1e0b0559e598a45b11a49"
+    },
+    {
+      "path": "tests/round3/phase1d-followups.mjs",
+      "kind": "support",
+      "sha256": "5dc6f0a919afe4f6854a247de42c2c5e6b74fca29050006012eb857c3e9e8dbf"
+    },
+    {
+      "path": "tests/round3/phase3-browser.mjs",
+      "kind": "owner-browser-deferred",
+      "sha256": "7a0c7c6daad50ce83a6d20ba67d3fd33243f2d352d7d5d9e485e7b4ed45b2537"
+    },
+    {
+      "path": "tests/round3/phase3-flock-cards-reverse.mjs",
+      "kind": "support",
+      "sha256": "3959f29c22882f63b25c36315c64913a473676b4b204ff1433c850d233017d52"
+    },
+    {
+      "path": "tests/round3/phase3b-state.mjs",
+      "kind": "owner-browser-deferred",
+      "sha256": "ab74aba8212ddba327c01939194f83b8de50be90b788c9dcf4ff38fbe7c5aec9"
+    },
+    {
+      "path": "tests/round3/run-schemathesis-full.mjs",
+      "kind": "support",
+      "sha256": "fa284ade4e085441e50dac1ea7721ba0a5550671ab28217bd03f34b1b8933fdd"
+    },
+    {
+      "path": "tests/round3/semgrep-custom.yaml",
+      "kind": "support",
+      "sha256": "3565656612bc1204cf88a0c3799f52fa98fd31fe8e0bc9cffa393b3c8f405393"
+    },
+    {
+      "path": "tests/round3/specs/spec-agri.yaml",
+      "kind": "support",
+      "sha256": "f1386ccfee3d20d3d05eb94b1436e207a9d26c21015bcdf88a4e1e6529e490b8"
+    },
+    {
+      "path": "tests/round3/specs/spec-dairy.yaml",
+      "kind": "support",
+      "sha256": "30e162977005831fab94dea3a4acad70efb88a7479fad04cf6042e208d831091"
+    },
+    {
+      "path": "tests/round3/specs/spec-flock.yaml",
+      "kind": "support",
+      "sha256": "85c9b8681920a278f3af1f67ec6a9758c97049ca704ecfb20c4e5874649acfdb"
+    },
+    {
+      "path": "tests/round3/specs-full/spec-agri-full.yaml",
+      "kind": "support",
+      "sha256": "b8b0b57b1bdf6ff1b7b3883f3fb722d3abc1f6c68188ec352cbfb57c36eb8857"
+    },
+    {
+      "path": "tests/round3/specs-full/spec-dairy-full.yaml",
+      "kind": "support",
+      "sha256": "b4dd6e8464099ef6d68ece4b41ced1073dacd2f81ad9cbe116683fe53a3ee52f"
+    },
+    {
+      "path": "tests/round3/specs-full/spec-flock-full.yaml",
+      "kind": "support",
+      "sha256": "919a32c09a389a24f4f9265015a2f5c9fd95ddd41e683b6a85c20dd1274afb8f"
+    },
+    {
+      "path": "tests/round3/stryker.config.json",
+      "kind": "support",
+      "sha256": "795d51bb3ca7269fbe1d1072d04d342fb10557762e923a42e99f7946822daff5"
+    },
+    {
+      "path": "tests/route-matrix-policy.test.ts",
+      "kind": "current-upstream",
+      "sha256": "488f32d21baae62ec7ad472c1a212bfcde708b6cc09fbeab753540d5ae36a290"
+    },
+    {
+      "path": "tests/seed-demo-data.test.ts",
+      "kind": "current-upstream",
+      "sha256": "02682e42594af92d531c802000ff4b902550531ab02418a322966b4026fbe68a"
+    },
+    {
+      "path": "tests/shop-isolation.test.ts",
+      "kind": "current-upstream",
+      "sha256": "8a1ecf3e5df78be06611c539f655912506bbe5b9d62fe5d33704b8473808d6c3"
+    },
+    {
+      "path": "tests/smoke.test.ts",
+      "kind": "current-upstream",
+      "sha256": "88823e846aebe789ea7071ea2fc22dd74c72ade79e3b7d93ae0cd738f21305dd"
+    },
+    {
+      "path": "tests/telegram-farm-scope.test.ts",
+      "kind": "current-upstream",
+      "sha256": "0cd252588e265ad2c384de81696dc91d63ad32ea16a6129630162e4e9f002e49"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/agri-login.bru",
+      "kind": "support",
+      "sha256": "9f9e881214bc0ccff0907c336354e68425c06ca127b8cf4bb83e6e1f7faffb17"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/bruno.json",
+      "kind": "support",
+      "sha256": "0eac49c26350cfeecc065bd5763332c632c283b1c5ef09377fe56d3636c5478b"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/dairy-cows-list.bru",
+      "kind": "support",
+      "sha256": "93c67ccd4cab389cb620f52c8fd73e3105b8563ff5f1a16b735250f627255341"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/dairy-login.bru",
+      "kind": "support",
+      "sha256": "7351b481222c2b02a48c36a8ff92668b15fc51e70fa1e1e0c44e8480254a498d"
+    },
+    {
+      "path": "tests/toolchain/bruno/farm-apis/flock-batches-list.bru",
+      "kind": "support",
+      "sha256": "a68833d1e288229f1709e6913dc71dd8aad8a107c21149229fcd8665c613dfcb"
+    },
+    {
+      "path": "tests/toolchain/fastcheck-invariants.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "8a91f9205832af31c8f67227042abbec9197e8e20e71e94cced6131c91b1f56a"
+    },
+    {
+      "path": "tests/toolchain/security-scan.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "e88769c7087133a0757543a892d8f6f6470085b5e8983360f967805a8ee376f6"
+    },
+    {
+      "path": "tests/toolchain/spawn.mjs",
+      "kind": "support",
+      "sha256": "45630bb73dc63784f174f8d856f88e0f6feacd1de37a9ab8da9d63a93926517b"
+    },
+    {
+      "path": "tests/toolchain/spec-agri.yaml",
+      "kind": "support",
+      "sha256": "f1386ccfee3d20d3d05eb94b1436e207a9d26c21015bcdf88a4e1e6529e490b8"
+    },
+    {
+      "path": "tests/toolchain/spec-dairy.yaml",
+      "kind": "support",
+      "sha256": "30e162977005831fab94dea3a4acad70efb88a7479fad04cf6042e208d831091"
+    },
+    {
+      "path": "tests/toolchain/spec-flock.yaml",
+      "kind": "support",
+      "sha256": "85c9b8681920a278f3af1f67ec6a9758c97049ca704ecfb20c4e5874649acfdb"
+    },
+    {
+      "path": "tests/toolchain/stryker.config.json",
+      "kind": "support",
+      "sha256": "5e201d0931e92f8008e8f04c0ccaafb93afb0391ba660c9271299ca749b05d72"
+    },
+    {
+      "path": "tests/verification/RUN-REAL-MONGO.md",
+      "kind": "support",
+      "sha256": "5ed09fb67c110987ef8af932d3b00ce413b4265f12d134a10e575e788dcf581b"
+    },
+    {
+      "path": "tests/verification/authz-matrix.mjs",
+      "kind": "support",
+      "sha256": "14dea60c6a2aee3fe05d400bbbc5392ba25c7fdc1ab1fe2af2fda0fa16cc3d0c"
+    },
+    {
+      "path": "tests/verification/contested-probes.sh",
+      "kind": "support",
+      "sha256": "5a88b0eea3449b1023472441a29911ebb3e423b99b1ae1ee00107e72b67eb41e"
+    },
+    {
+      "path": "tests/verification/load-locust.py",
+      "kind": "support",
+      "sha256": "836cfcbd888022d0ba32ce5060ff6ebce8ea5148a4861f3d23ce00280c6ecb30"
+    },
+    {
+      "path": "tests/verification/locust-agri.py",
+      "kind": "support",
+      "sha256": "fdbfe81c05a84bfcec968b67300eedd7f514dd1aa611ac074a134a5c0e9af05b"
+    },
+    {
+      "path": "tests/verification/run-load.sh",
+      "kind": "support",
+      "sha256": "2973e6bd40c75a543be156cf321efaf141f7c527e866bdcc2d59e810b592ab20"
+    },
+    {
+      "path": "tests/verification/semgrep-rules.yml",
+      "kind": "support",
+      "sha256": "8ccfe5ec33073c44ad72b418ec63f6f9f9810be2b8fbeb124ed52b5009fc4d5e"
+    },
+    {
+      "path": "tests/verification/unit-farm-guards.test.ts",
+      "kind": "historical-vitest",
+      "sha256": "543bba1881775ddf0ee3df53973fd1b9e25929a1db8797ca2c063e8d8302ae04"
+    },
+    {
+      "path": "tests/workflow-contract.test.ts",
+      "kind": "current-upstream",
+      "sha256": "7f6f8223fe3d36842e0caf7e433c84398f1ac459bbee72d8b129ab9050b11115"
+    }
+  ]
+}

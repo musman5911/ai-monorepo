@@ -1,0 +1,6 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "install", "--no-save", "--package-lock=false", "--no-audit", "--no-fund", "fast-check", "autocannon", "@stryker-mutator/core", "@stryker-mutator/vitest-runner", "@babel/parser", "@babel/traverse"]
+
+added 216 packages, removed 1 package, and changed 10 packages in 16s
+
+EXIT=0

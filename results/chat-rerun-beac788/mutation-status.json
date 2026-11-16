@@ -1,0 +1,27 @@
+{
+  "revision": "beac7883922f44eca3b7b43f91fce53e994638a5",
+  "jobs": [
+    {
+      "name": "stryker.config.json",
+      "args": [
+        "node_modules/.bin/stryker",
+        "run",
+        "tests/full-rerun/stryker.config.json"
+      ],
+      "exit": 0,
+      "timeout": false,
+      "seconds": 83.22
+    },
+    {
+      "name": "stryker-farms.config.json",
+      "args": [
+        "node_modules/.bin/stryker",
+        "run",
+        "tests/full-rerun/stryker-farms.config.json"
+      ],
+      "exit": 1,
+      "timeout": false,
+      "seconds": 13.8
+    }
+  ]
+}

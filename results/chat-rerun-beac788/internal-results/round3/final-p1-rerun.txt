@@ -1,0 +1,17 @@
+git rev-parse HEAD: beac7883922f44eca3b7b43f91fce53e994638a5
+date: 2026-11-16T15:13:30.109Z
+FINAL P1 RERUN on newest tip (memory mode, NODE_ENV=test, direct server)
+
+### FLOCK http://127.0.0.1:19601
+[B1-B3 rerun] anon GET /api/cards/customer/1 -> 503; contains phone 0301-1234567: false; contains name Khan: false
+[A1 rerun] POST /api/auth/logout -> 200
+[A1 rerun] reuse old token GET /api/data/customers -> 200 (200 = STILL FAILING non-revocation)
+
+### DAIRY http://127.0.0.1:19602
+[A1 rerun] POST /api/auth/logout -> 404
+[A1 rerun] reuse old token GET /api/cows -> 200 (200 = STILL FAILING)
+
+### AGRI http://127.0.0.1:19603
+[A1 rerun] POST /api/auth/logout -> 200
+[A1 rerun] reuse old token GET /api/fields -> 200 (200 = STILL FAILING)
+[neg-liability rerun] POST /api/liabilities amount=-5000 -> 400 body={"error":"Amount owed must be a positive number no greater than 1000000000."}

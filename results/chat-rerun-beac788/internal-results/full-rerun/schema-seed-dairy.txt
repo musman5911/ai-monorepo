@@ -1,0 +1,524 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND schemathesis run tests/toolchain/spec-dairy.yaml --url http://127.0.0.1:21975/api -n 2 --workers 2 -H Authorization:Bearer <local-test-token>
+SETUP token acquired=true; specs identical to tests/round3/specs/spec-dairy.yaml
+Schemathesis v4.33.4
+━━━━━━━━━━━━━━━━━━━━
+
+ ✅  Loaded specification from tests/toolchain/spec-dairy.yaml (in 0.86s)
+
+     Base URL:         http://127.0.0.1:21975/api
+     Specification:    Open API 3.0.3
+     Operations:       16 selected / 16 total
+
+ ✅  API capabilities:
+
+     Supports NULL byte in headers:                            ✘
+     Accepts backslash and control characters in URL paths:    ✓
+
+ ⏭   Examples (in 0.03s)
+
+     ⏭  16 skipped
+
+ ❌  Coverage (in 2.11s)
+
+     ❌ 16 failed
+
+ ❌  Fuzzing (in 1.17s)
+
+     ✅  7 passed  ❌  9 failed
+
+=================================== FAILURES ===================================
+______________________________ DELETE /cows/{id} _______________________________
+1. Test Case ID: LCSGjT
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:21975/api/cows/0
+
+    st replay LCSGjT
+
+2. Test Case ID: EekNPz
+
+- ST103 Undocumented status code
+
+    Received: 409
+    Documented: 200
+
+[409] Conflict:
+
+    `{"error":"This animal has linked milk, health, financial, sale, breeding or lineage history. Keep it in the register and mark it inactive instead of deleting its history.","milkRecords":0,"healthRecords":0,"expenseRecords":1,"saleRecords":0,"breedingRecords":0,"dependentCows":0,"calvingHistoryLinks":0}`
+
+Reproduce with:
+
+    curl -X DELETE -H 'Authorization: [Filtered]' http://127.0.0.1:21975/api/cows/cow16
+
+    st replay EekNPz
+
+______________________________ DELETE /milk/{id} _______________________________
+1. Test Case ID: 4BrQji
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X DELETE http://127.0.0.1:21975/api/milk/0
+
+    st replay 4BrQji
+
+_________________________________ GET /buyers __________________________________
+1. Test Case ID: 0ulX2P
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:21975/api/buyers
+
+    st replay 0ulX2P
+
+__________________________________ GET /cows ___________________________________
+1. Test Case ID: JHVWNp
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:21975/api/cows
+
+    st replay JHVWNp
+
+________________________________ GET /cows/{id} ________________________________
+1. Test Case ID: RfQ6XO
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:21975/api/cows/0
+
+    st replay RfQ6XO
+
+2. Test Case ID: P0rnn8
+
+- ST103 Undocumented status code
+
+    Received: 404
+    Documented: 200
+
+[404] Not Found:
+
+    `{"error":"Not found"}`
+
+Reproduce with:
+
+    curl -X GET -H 'Authorization: [Filtered]' http://127.0.0.1:21975/api/cows/w-cow11-5
+
+    st replay P0rnn8
+
+________________________________ GET /expenses _________________________________
+1. Test Case ID: isw56U
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:21975/api/expenses
+
+    st replay isw56U
+
+_________________________________ GET /health __________________________________
+1. Test Case ID: 11DcAK
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:21975/api/health
+
+    st replay 11DcAK
+
+__________________________________ GET /milk ___________________________________
+1. Test Case ID: Zmdg9W
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:21975/api/milk
+
+    st replay Zmdg9W
+
+________________________________ GET /suppliers ________________________________
+1. Test Case ID: WGPGYl
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X GET http://127.0.0.1:21975/api/suppliers
+
+    st replay WGPGYl
+
+_________________________________ POST /buyers _________________________________
+1. Test Case ID: MqPwmd
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "phone": "", "amount": 0, "quantity": 0, "date": "", "type": "", "category": ""}' http://127.0.0.1:21975/api/buyers
+
+    st replay MqPwmd
+
+2. Test Case ID: Gt0ZEy
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 201
+
+[400] Bad Request:
+
+    `{"error":"Request body contains invalid JSON."}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d false http://127.0.0.1:21975/api/buyers
+
+    st replay Gt0ZEy
+
+__________________________________ POST /cows __________________________________
+1. Test Case ID: 1k2nUj
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "breed": "", "gender": "female", "status": "", "age": 0, "weight_kg": 0}' http://127.0.0.1:21975/api/cows
+
+    st replay 1k2nUj
+
+2. Test Case ID: jy57zb
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+    Hint: The request body contains 1 additional property not defined in the schema (`Ðx`). The server appears to reject properties the schema allows. Declare `additionalProperties: false` if extras are not accepted, or make the server ignore unknown fields.
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 201
+
+[400] Bad Request:
+
+    `{"error":"name is required; breed is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{"\u00d0x": true}' http://127.0.0.1:21975/api/cows
+
+    st replay jy57zb
+
+________________________________ POST /expenses ________________________________
+1. Test Case ID: TWjqzw
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "phone": "", "amount": 0, "quantity": 0, "date": "", "type": "", "category": ""}' http://127.0.0.1:21975/api/expenses
+
+    st replay TWjqzw
+
+2. Test Case ID: yXsNwA
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 201
+
+[400] Bad Request:
+
+    `{"error":"date is required; type is required; amount is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:21975/api/expenses
+
+    st replay yXsNwA
+
+_________________________________ POST /health _________________________________
+1. Test Case ID: tqGDrU
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "phone": "", "amount": 0, "quantity": 0, "date": "", "type": "", "category": ""}' http://127.0.0.1:21975/api/health
+
+    st replay tqGDrU
+
+2. Test Case ID: mLnc9w
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 201
+
+[400] Bad Request:
+
+    `{"error":"cowId is required; date is required; type is required; description is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:21975/api/health
+
+    st replay mLnc9w
+
+__________________________________ POST /milk __________________________________
+1. Test Case ID: fbfnpO
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"cowId": "", "date": "", "quantity": 0, "session": "[Filtered]"}' http://127.0.0.1:21975/api/milk
+
+    st replay fbfnpO
+
+2. Test Case ID: YrGK2Q
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 201
+
+[400] Bad Request:
+
+    `{"error":"cowId is required; date is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:21975/api/milk
+
+    st replay YrGK2Q
+
+_______________________________ POST /suppliers ________________________________
+1. Test Case ID: Buqzui
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 201
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Content-Type: application/json' -d '{"name": "", "phone": "", "amount": 0, "quantity": 0, "date": "", "type": "", "category": ""}' http://127.0.0.1:21975/api/suppliers
+
+    st replay Buqzui
+
+2. Test Case ID: IhA10D
+
+- ST202 Schema-valid request rejected
+
+    Valid data should have been accepted
+    Expected: 2xx, 3xx, 401, 403, 404, 409, 429, 5xx
+
+- ST103 Undocumented status code
+
+    Received: 400
+    Documented: 201
+
+[400] Bad Request:
+
+    `{"error":"name is required"}`
+
+Reproduce with:
+
+    curl -X POST -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:21975/api/suppliers
+
+    st replay IhA10D
+
+________________________________ PUT /cows/{id} ________________________________
+1. Test Case ID: pELctJ
+
+- ST103 Undocumented status code
+
+    Received: 401
+    Documented: 200
+
+[401] Unauthorized:
+
+    `{"error":"Not authorized"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Content-Type: application/json' -d '{"name": "", "breed": "", "gender": "female", "status": "", "age": 0, "weight_kg": 0}' http://127.0.0.1:21975/api/cows/0
+
+    st replay pELctJ
+
+2. Test Case ID: Y7NnwM
+
+- ST103 Undocumented status code
+
+    Received: 404
+    Documented: 200
+
+[404] Not Found:
+
+    `{"error":"Not found"}`
+
+Reproduce with:
+
+    curl -X PUT -H 'Authorization: [Filtered]' -H 'Content-Type: application/json' -d '{}' http://127.0.0.1:21975/api/cows/0
+
+    st replay Y7NnwM
+
+=================================== SUMMARY ====================================
+
+API Operations:
+  Selected: 16/16
+  Tested: 16
+
+Test Phases:
+  ⏭  Examples
+  ❌ Coverage
+  ❌ Fuzzing
+  ⏭  Stateful (not applicable)
+
+Failures:
+  ❌ ST202 Schema-valid request rejected: 5
+  ❌ ST103 Undocumented status code: 25
+
+For more information, run `st explain <code>` for ST103, ST202.
+
+Test cases:
+  34 generated, 25 found 30 unique failures
+
+Seed: 277296174397578222223205776074345102020
+
+============================= 30 failures in 3.41s =============================
+
+
+EXIT=1 ERROR=

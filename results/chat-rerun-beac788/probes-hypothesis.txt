@@ -1,0 +1,12 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["python", "tests/round3/hypothesis_agri.py"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+git rev-parse HEAD: beac7883922f44eca3b7b43f91fce53e994638a5
+command: python3 tests/round3/hypothesis_agri.py
+environment: Agri direct local server, NODE_ENV=test, MEMORY_MODE=1
+setup token acquired: True
+Hypothesis liability: PASS (no counterexample in 12 examples)
+Hypothesis inventory: PASS (no counterexample in 12 examples)
+
+EXIT=0 TIMEOUT=False SECONDS=6.59

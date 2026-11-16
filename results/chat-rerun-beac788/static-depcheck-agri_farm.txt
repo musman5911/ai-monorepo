@@ -1,0 +1,7 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["depcheck", "agri_farm/backend"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+No depcheck issue
+
+EXIT=0 TIMEOUT=False SECONDS=5.19

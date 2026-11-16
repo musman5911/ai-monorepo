@@ -1,0 +1,20 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "run", "check-phase19-audit"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+
+> check-phase19-audit
+> node --check tools/phase19-audit-seed-db.mjs && vitest run tests/phase19-seed-db-audit.test.ts
+
+
+ RUN  v3.2.7 /home/user/ai-monorepo/.cache/chat-rerun/source
+
+ ✓ tests/phase19-seed-db-audit.test.ts (13 tests) 29ms
+
+ Test Files  1 passed (1)
+      Tests  13 passed (13)
+   Start at  15:15:07
+   Duration  815ms (transform 119ms, setup 0ms, collect 133ms, tests 29ms, environment 0ms, prepare 174ms)
+
+
+EXIT=0 TIMEOUT=False SECONDS=2.25

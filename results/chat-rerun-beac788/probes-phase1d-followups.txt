@@ -1,0 +1,198 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["node", "tests/round3/phase1d-followups.mjs"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+git rev-parse HEAD: beac7883922f44eca3b7b43f91fce53e994638a5
+command: node tests/round3/phase1d-followups.mjs
+environment: direct local servers, NODE_ENV=test, MEMORY_MODE=1, LOG_REQUESTS=1; production-mode section labelled separately
+[dairy test stdout] [startup] PORT env=19101 -> listening on 19101
+[dairy test stdout] 🧠 In-memory store active (MEMORY_MODE=1) — no MongoDB connection.
+[dairy test stderr] (node:10372) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `no
+[dairy test stderr] (node:10372) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[dairy test stdout] Server running on port 19101
+[dairy test stdout] 🌱 Demo data seeded (1 year): 16 animals, 3190 milk entries, 257 expenses, health, buyers, rates, sales, diary.
+[dairy test stdout] 🌱 Logins → admin / admin123   |   worker / worker123
+[dairy test stdout] [farms] tagged 16 Cow record(s)
+[dairy test stdout] [farms] tagged 4 BreedingEvent record(s)
+[dairy test stdout] [farms] tagged 3190 Milk record(s)
+[dairy test stdout] [farms] tagged 268 Expense record(s)
+[dairy test stdout] [farms] tagged 3 Laborer record(s)
+[dairy test stdout] [farms] tagged 753 LaborAttendance record(s)
+[dairy test stdout] [farms] tagged 2 LaborAdvance record(s)
+[farms] tagged 1 Rate record(s)
+[dairy test stdout] [farms] tagged 15 Health record(s)
+[farms] tagged 3 Buyer record(s)
+[dairy test stdout] [farms] tagged 69 BuyerPayment record(s)
+[dairy test stdout] [farms] tagged 2 Supplier record(s)
+[dairy test stdout] [farms] tagged 24 SupplierPayment record(s)
+[dairy test stdout] [farms] tagged 8 RateHistory record(s)
+[dairy test stdout] [farms] tagged 30 DailyLog record(s)
+[dairy test stdout] [farms] tagged 1 Sale record(s)
+[dairy test stdout] [farms] converted 1 admin account(s) to owner
+[dairy test stdout] 💾 [Auto Backup] Saved auto-2026-11
+dairy setup owner=ok
+[dairy test stdout] [REQ] POST /api/auth/login auth=NO -> 200 (276ms)
+[agri test stdout] [startup] PORT env=19102 -> listening on 19102
+[agri test stdout] 🧠 [Database] MEMORY_MODE=1 — using in-memory demo database (data is lost on restart).
+[agri test stdout] 🌱 [Demo] Seeding in-memory database with realistic demo farm data...
+[agri test stdout] 🌱 [Demo] Demo data seeded successfully.
+🌱 [Demo] Login -> admin / admin123  (or)  worker / worker123
+[agri test stdout] [farms] tagged 6 Crop record(s)
+[agri test stdout] [farms] tagged 57 Finance record(s)
+[agri test stdout] [farms] tagged 5 Task record(s)
+[agri test stdout] [farms] tagged 4 Inventory record(s)
+[agri test stdout] [farms] tagged 2 Liability record(s)
+[agri test stdout] [farms] tagged 15 Irrigation record(s)
+[farms] tagged 2 CropPhoto record(s)
+[agri test stdout] [farms] tagged 6 Spray record(s)
+[agri test stdout] [farms] tagged 2 Laborer record(s)
+[agri test stdout] [farms] tagged 552 Attendance record(s)
+[agri test stdout] [farms] tagged 2 LaborAdvance record(s)
+[farms] tagged 2 Supplier record(s)
+[agri test stdout] [farms] tagged 22 SupplierPayment record(s)
+[agri test stdout] [farms] converted 1 admin account(s) to owner
+[agri test stdout] 👑 [Status] Administrator account verified.
+[agri test stdout] 💾 [Auto Backup] Saved auto-2026-11
+[agri test stdout] ⏰ [Cron Engine] Internal scheduler disabled (DISABLE_INTERNAL_SCHEDULER=1). Use an external cron to ping /cron/dispatch-report.
+[agri test stderr] (node:10479) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `no
+[agri test stderr] (node:10479) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[agri test stdout] Server running on port 19102
+agri setup owner=ok
+[agri test stdout] [REQ] POST /api/login auth=NO -> 200 (854ms)
+[flock test stderr] ⚠️  MEMORY_DB mode: using in-process data store — all data is lost on restart. NEVER use in production.
+[flock test stdout] ◇ injected env (0) from .env // tip: ◈ secrets for agents [www.dotenvx.com]
+[flock test stderr] ⚠️  dist/index.html not found — frontend will not be served until `npm run build`.
+[flock test stdout] [startup] PORT env=19103 -> listening on 19103
+[flock test stdout] 🧠 In-memory store active (MEMORY_MODE=1) — no MongoDB connection.
+[flock test stderr] (node:10698) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+(Use `no
+[flock test stderr] (node:10698) [MONGOOSE] Warning: `collection` is a reserved schema pathname and may break some functionality. You are allowed to use it, but use at your own risk. To disable this warning pass `suppressReservedKeysWarning` as a schema option.
+[flock test stdout] 🐔 Flock Farm server running on port 19103
+[flock test stdout] 🌱 Demo data seeded (1 year): birds, feed, eggs, sales, batches, health, diary.
+[flock test stdout] 🌱 Logins → admin / admin123   |   worker / worker123
+[flock test stdout] [farms] tagged 16 DataStore record(s)
+[flock test stdout] [farms] tagged 2 Batch record(s)
+[flock test stdout] [farms] tagged 26 BatchFeedLog record(s)
+[flock test stdout] [farms] tagged 5 BatchMortalityLog record(s)
+[flock test stdout] [farms] tagged 5 BatchExpenseLog record(s)
+[flock test stdout] [farms] tagged 2 BatchSaleLog record(s)
+[flock test stdout] [farms] tagged 12 BatchWeightLog record(s)
+[flock test stdout] [farms] converted 1 admin account(s) to owner
+[flock test stdout] 💾 [Auto Backup] Saved auto-2026-11
+flock setup owner=ok
+
+=== FLOCK CARDS: enumeration quantification (anon, from id 1) ===
+flock customer: anon ids 1..20 -> 200 at [1,2,3], first 404 at 4 (limiter 60/15m shared per IP; this probe used <=20 requests)
+flock customer id=1 FIELDS: Customer Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Customer Card | — November 2026 | کسٹمر کارڈ — نومبر 2026 | Name | نام | Khan General Store | Phone | فون نمبر | 0301-1234567 | Total egg sales | کل اندوں کی فروخت | Rs 12,775 | روپے 12,775 | Total collected | کل وصول ہوئے | Rs 12,555 | روپے 12,555 | Sales this month (2026-11) | اس ماہ کی فروخت | Rs 525 | روپے 525 | Collected this month | اس ماہ کی وصولی | Rs 525 | روپے 525 | Balance to collect | باقی رقم (لینے کو) | Rs 220 | روپے 220 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس 
+flock customer id=2 FIELDS: Customer Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Customer Card | — November 2026 | کسٹمر کارڈ — نومبر 2026 | Name | نام | Chacha Rafiq | Phone | فون نمبر | 0333-5551234 | Total egg sales | کل اندوں کی فروخت | Rs 11,525 | روپے 11,525 | Total collected | کل وصول ہوئے | Rs 11,305 | روپے 11,305 | Sales this month (2026-11) | اس ماہ کی فروخت | Rs 525 | روپے 525 | Collected this month | اس ماہ کی وصولی | Rs 525 | روپے 525 | Balance to collect | باقی رقم (لینے کو) | Rs 220 | روپے 220 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو
+flock customer id=3 FIELDS: Customer Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Customer Card | — November 2026 | کسٹمر کارڈ — نومبر 2026 | Name | نام | Madina Karyana | Phone | فون نمبر | 0312-9876543 | Total egg sales | کل اندوں کی فروخت | Rs 12,240 | روپے 12,240 | Total collected | کل وصول ہوئے | Rs 11,721 | روپے 11,721 | Sales this month (2026-11) | اس ماہ کی فروخت | Rs 0 | روپے 0 | Collected this month | اس ماہ کی وصولی | Rs 0 | روپے 0 | Balance to collect | باقی رقم (لینے کو) | Rs 519 | روپے 519 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی د
+flock supplier: anon ids 1..20 -> 200 at [1,2], first 404 at 3 (limiter 60/15m shared per IP; this probe used <=20 requests)
+flock supplier id=1 FIELDS: Supplier Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Supplier Card | — November 2026 | سپلائیئر کارڈ — نومبر 2026 | Name | نام | Malik Feed &amp; Wanda Store | Phone | فون نمبر | 0300-1112233 | Total purchases (udhaar) | کل خریداری | Rs 117,785 | روپے 117,785 | Total paid | کل ادا شدہ | Rs 82,950 | روپے 82,950 | Balance to pay | باقی رقم (ادائیگی کو) | Rs 34,835 | روپے 34,835 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-16
+flock supplier id=2 FIELDS: Supplier Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Supplier Card | — November 2026 | سپلائیئر کارڈ — نومبر 2026 | Name | نام | Wah Vet &amp; Medicine Centre | Phone | فون نمبر | 0345-7778899 | Total purchases (udhaar) | کل خریداری | Rs 9,527 | روپے 9,527 | Total paid | کل ادا شدہ | Rs 5,926 | روپے 5,926 | Balance to pay | باقی رقم (ادائیگی کو) | Rs 3,601 | روپے 3,601 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک محفوظ رکھیں؛ جس کے پاس لنک ہو وہی دیکھ سکتا ہے۔ | THANK YOU! | شکریہ! | Generated 2026-11-16
+flock worker bucket ids (owner view): lw-demo-1, lw-demo-2
+flock worker id=lw-demo-1 anon HTTP 200 FIELDS: Worker Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Worker Card | — November 2026 | ورکر کارڈ — نومبر 2026 | Name | نام | Shakeel | Worker ID | ورکر آئی ڈی | lw-demo-1 | Daily wage | روزانہ مزدوری | Rs 300 | روپے 300 | Attendance (2026-11) | اس ماہ کی حاضری | 7 days | 7 دن | Wages for this month | اس ماہ کی مزدوری | Rs 2,100 | روپے 2,100 | Advance (udhaar) due | باقی اُدھار | Rs 1,500 | روپے 1,500 | Net payable this month | اس ماہ کی خالص رقم | Rs 600 | روپے 600 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا لنک
+flock worker id=lw-demo-2 anon HTTP 200 FIELDS: Worker Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Worker Card | — November 2026 | ورکر کارڈ — نومبر 2026 | Name | نام | Irfan | Worker ID | ورکر آئی ڈی | lw-demo-2 | Daily wage | روزانہ مزدوری | Rs 200 | روپے 200 | Attendance (2026-11) | اس ماہ کی حاضری | 3 days (2 full + 2 half) | 3 دن | Wages for this month | اس ماہ کی مزدوری | Rs 600 | روپے 600 | Advance (udhaar) due | باقی اُدھار | None | نہیں | Net payable this month | اس ماہ کی خالص رقم | Rs 600 | روپے 600 | Usman Flock Farm — for your reference. Keep this card safe; anyone with the link can see it. | Usman Flock Farm — آپ کی رفرنس کے لیے۔ اس کارڈ کا ل
+flock worker id guessability: ids are lw-<epoch ms> (client LaborTab.tsx: id: `lw-${Date.now()}`). Enumerating one day = 86,400,000 possible ms values; at 60 req/15min/IP that is infeasible from one IP (~3.9 years of windows), but the timestamp is known to the day if creation date is known, narrowing to that day; IP rotation defeats the per-IP limiter (no global limiter observed). Customer/supplier integer ids remain trivially enumerable (max+1).
+
+=== FLOCK CARDS: two-farm context test ===
+flock farms list HTTP 200 farmA=154ef55b3578dfc356223ea1 farms=154ef55b3578dfc356223ea1,672d047c0b2b4b959a4a00d8
+flock farmA customers bucket: [{"id":1,"name":"Khan General Store","phone":"0301-1234567","notes":"Daily egg pickup — pays weekly"},{"id":2,"name":"Chacha Rafiq","phone":"0333-5551234","notes":"Neighbour — buys desi eggs"},{"id":3,"name":"Madina Karyana","phone":"0312-9876543","notes":"Bulk buyer, negotiated Rs.24/egg"}]
+flock create farmB HTTP 201 farmB=eec21cc87cd7a951d625e0f5 body={"id":"eec21cc87cd7a951d625e0f5","_id":"eec21cc87cd7a951d625e0f5","name":"R3 Farm B","location":"","archived":false,"createdAt":"2026-11-16T15:13:17.822Z"}
+flock farmB PUT customers (id=1 FARM-B-ONLY) HTTP 200 version=1
+flock farmB customers after PUT: [{"id":1,"name":"FARM-B-ONLY CUSTOMER","phone":"0399-0000001"}]
+flock farmA customers after farmB PUT: [{"id":1,"name":"Khan General Store","phone":"0301-1234567","notes":"Daily egg pickup — pays weekly"},{"id":2,"name":"Chacha Rafiq","phone":"0333-5551234","notes":"Neighbour — buys desi eggs"},{"id":3,"name":"Madina Karyana","phone":"0312-9876543","notes":"Bulk buyer, negotiated Rs.24/egg"}]
+flock ANON /cards/customer/1 (no farm context) HTTP 200 SHOWS: Customer Card — Usman Flock Farm | Usman Flock Farm | POULTRY FARM MANAGEMENT SYSTEM | Customer Card | — November 2026 | کسٹمر کارڈ — نومبر 2026 | Name | نام | Khan General Store | Phone | فون نمبر | 0301-1234567 | Total egg sales | کل اندوں کی فروخت | Rs 12,775 | روپے 12,775 | Total collected | کل وصول ہوئے | Rs 12,555 | روپے 12,555 | Sales this month (2026-11) | اس ماہ کی فروخت | Rs 525 | روپے 525 | Collected this month | اس ماہ کی وصولی | Rs 525 | روپے 525 | Balance to collect | باقی رقم (لین
+Interpretation: whichever farm name appears above is what an anonymous caller gets for id 1. If it is farm A (default) while farm B has its own id 1, the card route does not take farm context from the request; it resolves the default/first farm bucket. Cross-farm reading of farm B by anon would require the bucket selection to change; record exactly what was observed.
+
+=== CRON ?key= LOGGING per app (LOG_REQUESTS=1, stdout captured above/below) ===
+flock cron correct ?key HTTP 503
+agri cron correct ?key HTTP 200
+[agri test stdout] [REQ] GET /api/cron/dispatch-report?key=[SECURITY_DATA] auth=NO -> 200 (1ms)
+dairy telegram cron ?key HTTP 200 (Dairy has no /cron/* route; telegram cron is its key-in-URL equivalent)
+[dairy test stdout] [REQ] GET /api/telegram/cron?key=[SECURITY_DATA] auth=NO -> 200 (1ms)
+^^ Compare [REQ] stdout lines: an app logs the full ?key= URL only if a [REQ] line containing key=[SECURITY_DATA] appears for it above.
+
+=== AGRI operator-object payloads on string/enum fields ===
+agri crop field name={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop name must be text."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (6ms)
+[REQ] POST /api/crops auth=YES(len=224) -> 400 (1ms)
+agri crop field status={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+agri crop field season={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (6ms)
+agri crop field crop_type={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (2ms)
+agri crop field variety={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop variety must be text."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (4ms)
+agri crop field unit={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (6ms)
+agri crop field notes={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (5ms)
+agri crop field plant_date={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (12ms)
+agri crop field harvest_date={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (10ms)
+agri crop field area_kanal={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (2ms)
+agri crop field fieldId={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (4ms)
+agri crop field field_id={"$ne":"x"} -> HTTP 400 stored=undefined body={"detail":"Crop status must be Planted, Growing, Harvesting or Completed."}
+[agri test stdout] [REQ] POST /api/crops auth=YES(len=224) -> 400 (3ms)
+agri liabilities operator-in-name/creditor/title -> HTTP 400 body={"error":"Creditor name must be text."}
+[agri test stdout] [REQ] POST /api/liabilities auth=YES(len=224) -> 400 (9ms)
+agri inventory operator-in-name/creditor/title -> HTTP 400 body={"error":"Item name must be text."}
+[agri test stdout] [REQ] POST /api/inventory auth=YES(len=224) -> 400 (3ms)
+agri tasks operator-in-name/creditor/title -> HTTP 400 body={"error":"Task title must be text."}
+[agri test stdout] [REQ] POST /api/tasks auth=YES(len=224) -> 400 (3ms)
+agri suppliers operator-in-name/creditor/title -> HTTP 400 body={"detail":"Supplier name must be text."}
+
+=== Unconfigured-SMTP / service routes: status + body (SMTP unset in this env) ===
+dairy POST /api/auth/forgot-password (SMTP unconfigured) -> HTTP 503 body={"error":"Email is not configured on this server"}
+[dairy test stdout] [REQ] POST /api/auth/forgot-password auth=NO -> 503 (1ms)
+dairy POST /api/auth/reset-password (SMTP unconfigured) -> HTTP 400 body={"error":"Invalid or expired code"}
+[dairy test stdout] [REQ] POST /api/auth/reset-password auth=NO -> 400 (1ms)
+[agri test stdout] [REQ] POST /api/suppliers auth=YES(len=224) -> 400 (18ms)
+dairy POST /api/auth/change-password (SMTP unconfigured) -> HTTP 400 body={"error":"New password is required"}
+[dairy test stdout] [REQ] POST /api/auth/change-password auth=YES(len=223) -> 400 (9ms)
+flock POST /api/auth/forgot-password (SMTP unconfigured) -> HTTP 503 body={"error":"Email is not configured on this server"}
+flock POST /api/auth/reset-password (SMTP unconfigured) -> HTTP 400 body={"error":"Invalid or expired code"}
+agri POST /api/forgot-password (SMTP unconfigured) -> HTTP 404 body={"detail":"No administrator account with this email was found."}
+[agri test stdout] [REQ] POST /api/forgot-password auth=NO -> 404 (0ms)
+agri POST /api/reset-password (SMTP unconfigured) -> HTTP 400 body={"detail":"Invalid verification code."}
+[agri test stdout] [REQ] POST /api/reset-password auth=NO -> 400 (1ms)
+agri POST /api/request-profile-code (SMTP unconfigured) -> HTTP 401 body={"detail":"Invalid or expired authentication credentials"}
+[agri test stdout] [REQ] POST /api/request-profile-code auth=NO -> 401 (1ms)
+agri POST /api/settings/automations/trigger (SMTP unconfigured) -> HTTP 400 body={"detail":"Automation settings must be configured and saved first."}
+
+=== PRODUCTION-MODE full header sets (no real DB; fake MONGO_URI; dist absent until Phase 3 builds) ===
+[agri test stdout] [REQ] POST /api/settings/automations/trigger auth=YES(len=224) -> 400 (1ms)
+dairy PROD HTML /: HTTP 200
+  headers: {"accept-ranges":"bytes","cache-control":"public, max-age=0","connection":"keep-alive","content-length":"2307","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;upgrade-insecure-requests;connect-src 'self' https: http: ws: wss:","content-type":"text/html; charset=UTF-8","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","date":"Mon, 16 Nov 2026 15:13:21 GMT","etag":"W/\"903-1a1e4eabea1\"","keep-alive":"timeout=5","last-modified":"Mon, 16 Nov 2026 15:12:31 GMT","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","vary":"Origin","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0"}
+  bodyStart: <!DOCTYPE html> <html lang="en">   <head>     <link rel="preconnect" href="https://fonts.googleapis.
+dairy PROD API /api/farms: HTTP 503
+  headers: {"connection":"keep-alive","content-length":"62","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;upgrade-insecure-requests;connect-src 'self' https: http: ws: wss:","content-type":"application/json; charset=utf-8","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","date":"Mon, 16 Nov 2026 15:13:21 GMT","etag":"W/\"3e-oMyVMPSxorRYulQtYlNmba3nJVA\"","keep-alive":"timeout=5","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","vary":"Origin","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0"}
+  bodyStart: {"error":"Server is starting, please retry in a few seconds."}
+dairy PROD ERROR /api/nope: HTTP 503
+  headers: {"connection":"keep-alive","content-length":"62","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;upgrade-insecure-requests;connect-src 'self' https: http: ws: wss:","content-type":"application/json; charset=utf-8","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","date":"Mon, 16 Nov 2026 15:13:21 GMT","etag":"W/\"3e-oMyVMPSxorRYulQtYlNmba3nJVA\"","keep-alive":"timeout=5","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","vary":"Origin","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0"}
+  bodyStart: {"error":"Server is starting, please retry in a few seconds."}
+agri PROD HTML /: HTTP 200
+  headers: {"accept-ranges":"bytes","access-control-allow-credentials":"true","cache-control":"public, max-age=0","connection":"keep-alive","content-length":"3074","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;upgrade-insecure-requests;connect-src 'self' https: http: ws: wss:","content-type":"text/html; charset=UTF-8","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","date":"Mon, 16 Nov 2026 15:13:23 GMT","etag":"W/\"c02-1a1e4ead6c5\"","keep-alive":"timeout=5","last-modified":"Mon, 16 Nov 2026 15:12:38 GMT","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","vary":"Origin","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0"}
+  bodyStart: <!doctype html> <html lang="en">   <head>     <script>       // Local Vite testing: remove stale PWA
+agri PROD API /api/farms: HTTP 503
+  headers: {"access-control-allow-credentials":"true","connection":"keep-alive","content-length":"62","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;upgrade-insecure-requests;connect-src 'self' https: http: ws: wss:","content-type":"application/json; charset=utf-8","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","date":"Mon, 16 Nov 2026 15:13:23 GMT","etag":"W/\"3e-oMyVMPSxorRYulQtYlNmba3nJVA\"","keep-alive":"timeout=5","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","vary":"Origin","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0"}
+  bodyStart: {"error":"Server is starting, please retry in a few seconds."}
+agri PROD ERROR /api/nope: HTTP 503
+  headers: {"access-control-allow-credentials":"true","connection":"keep-alive","content-length":"62","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https:;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;upgrade-insecure-requests;connect-src 'self' https: http: ws: wss:","content-type":"application/json; charset=utf-8","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","date":"Mon, 16 Nov 2026 15:13:23 GMT","etag":"W/\"3e-oMyVMPSxorRYulQtYlNmba3nJVA\"","keep-alive":"timeout=5","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","vary":"Origin","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0"}
+  bodyStart: {"error":"Server is starting, please retry in a few seconds."}
+flock PROD HTML /: HTTP 200
+  headers: {"connection":"keep-alive","content-length":"83","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https://images.unsplash.com;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;connect-src 'self' https: http: ws: wss:","content-type":"text/plain; charset=utf-8","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","date":"Mon, 16 Nov 2026 15:13:25 GMT","etag":"W/\"53-aeLYv1urAuGHF2Wlndn2dWvEHQk\"","keep-alive":"timeout=5","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0"}
+  bodyStart: Flock Farm API is running. Build the frontend (npm run build) or visit /api/health.
+flock PROD API /api/farms: HTTP 503
+  headers: {"connection":"keep-alive","content-length":"62","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https://images.unsplash.com;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;connect-src 'self' https: http: ws: wss:","content-type":"application/json; charset=utf-8","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","date":"Mon, 16 Nov 2026 15:13:25 GMT","etag":"W/\"3e-oMyVMPSxorRYulQtYlNmba3nJVA\"","keep-alive":"timeout=5","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0"}
+  bodyStart: {"error":"Server is starting, please retry in a few seconds."}
+flock PROD ERROR /api/nope: HTTP 503
+  headers: {"connection":"keep-alive","content-length":"62","content-security-policy":"default-src 'self';base-uri 'self';font-src 'self' https://fonts.gstatic.com data:;form-action 'self';frame-ancestors 'self';img-src 'self' data: blob: https://images.unsplash.com;object-src 'none';script-src 'self';script-src-attr 'none';style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;connect-src 'self' https: http: ws: wss:","content-type":"application/json; charset=utf-8","cross-origin-opener-policy":"same-origin","cross-origin-resource-policy":"same-origin","date":"Mon, 16 Nov 2026 15:13:25 GMT","etag":"W/\"3e-oMyVMPSxorRYulQtYlNmba3nJVA\"","keep-alive":"timeout=5","origin-agent-cluster":"?1","referrer-policy":"no-referrer","strict-transport-security":"max-age=31536000; includeSubDomains","x-content-type-options":"nosniff","x-dns-prefetch-control":"off","x-download-options":"noopen","x-frame-options":"SAMEORIGIN","x-permitted-cross-domain-policies":"none","x-xss-protection":"0"}
+  bodyStart: {"error":"Server is starting, please retry in a few seconds."}
+
+EXIT=0 TIMEOUT=False SECONDS=21.88

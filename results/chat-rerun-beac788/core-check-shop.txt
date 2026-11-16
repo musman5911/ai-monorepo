@@ -1,0 +1,20 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "run", "check-shop"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+
+> check-shop
+> vitest run tests/shop-isolation.test.ts
+
+
+ RUN  v3.2.7 /home/user/ai-monorepo/.cache/chat-rerun/source
+
+ ✓ tests/shop-isolation.test.ts (7 tests) 6ms
+
+ Test Files  1 passed (1)
+      Tests  7 passed (7)
+   Start at  15:15:00
+   Duration  384ms (transform 64ms, setup 0ms, collect 49ms, tests 6ms, environment 0ms, prepare 106ms)
+
+
+EXIT=0 TIMEOUT=False SECONDS=1.71

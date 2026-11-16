@@ -1,0 +1,321 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["bash", "tests/verification/run-load.sh"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+== dairy @ 10 users
+[2026-11-16 15:15:52,919] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-16 15:15:52,920] e2b/INFO/locust.main: Run time limit set to 25 seconds
+[2026-11-16 15:15:52,975] e2b/INFO/locust.runners: Ramping to 10 users at a rate of 20.00 per second
+[2026-11-16 15:15:52,976] e2b/INFO/locust.runners: All users spawned: {"FarmUser": 10} (10 total users)
+[2026-11-16 15:16:17,435] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-16 15:16:17,483] e2b/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/auth/login                                                                   10    5(50.00%) |    939     897     990    950 |    0.41        0.21
+GET      GET farms                                                                        195   98(50.26%) |      2       1      28      2 |    8.00        4.02
+GET      GET list                                                                         496  246(49.60%) |      3       1      66      2 |   20.35       10.09
+GET      GET list paged                                                                    88   48(54.55%) |      2       1      11      2 |    3.61        1.97
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                       789  397(50.32%) |     14       1     990      2 |   32.36       16.29
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/auth/login                                                                       950    960    960    960    990    990    990    990    990    990    990     10
+GET      GET farms                                                                               2      2      2      2      4      5      8     11     29     29     29    195
+GET      GET list                                                                                2      2      3      3      4      6     18     59     67     67     67    496
+GET      GET list paged                                                                          2      2      2      3      3      4      6     12     12     12     12     88
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                              2      2      3      3      4      6     29    920    990    990    990    789
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+5                  POST /api/auth/login: HTTPError('429 Client Error: Too Many Requests for url: /api/auth/login')     
+246                GET GET list: HTTPError('401 Client Error: Unauthorized for url: GET list')                         
+48                 GET GET list paged: HTTPError('401 Client Error: Unauthorized for url: GET list paged')             
+98                 GET GET farms: HTTPError('401 Client Error: Unauthorized for url: GET farms')                       
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+== dairy @ 50 users
+[2026-11-16 15:16:18,443] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-16 15:16:18,444] e2b/INFO/locust.main: Run time limit set to 25 seconds
+[2026-11-16 15:16:18,473] e2b/INFO/locust.runners: Ramping to 50 users at a rate of 20.00 per second
+[2026-11-16 15:16:20,475] e2b/INFO/locust.runners: All users spawned: {"FarmUser": 50} (50 total users)
+[2026-11-16 15:16:43,147] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-16 15:16:43,168] e2b/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/auth/login                                                                   50  50(100.00%) |     50       3     110     45 |    2.03        2.03
+GET      GET farms                                                                        969 969(100.00%) |      3       0      81      2 |   39.33       39.33
+GET      GET list                                                                        2512 2512(100.00%) |      2       0      76      2 |  101.96      101.96
+GET      GET list paged                                                                   457 457(100.00%) |      2       1      70      2 |   18.55       18.55
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                      3988 3988(100.00%) |      3       0     110      2 |  161.87      161.87
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/auth/login                                                                        45     60     80     83    100    110    110    110    110    110    110     50
+GET      GET farms                                                                               2      2      3      3      5     10     25     47     82     82     82    969
+GET      GET list                                                                                2      2      2      3      4      7     18     35     62     77     77   2512
+GET      GET list paged                                                                          2      2      2      2      4      6     16     19     71     71     71    457
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                              2      2      2      3      4     10     35     48    100    110    110   3988
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+50                 POST /api/auth/login: HTTPError('429 Client Error: Too Many Requests for url: /api/auth/login')     
+222                GET GET list: HTTPError('401 Client Error: Unauthorized for url: GET list')                         
+100                GET GET farms: HTTPError('401 Client Error: Unauthorized for url: GET farms')                       
+38                 GET GET list paged: HTTPError('401 Client Error: Unauthorized for url: GET list paged')             
+419                GET GET list paged: HTTPError('429 Client Error: Too Many Requests for url: GET list paged')        
+2290               GET GET list: HTTPError('429 Client Error: Too Many Requests for url: GET list')                    
+869                GET GET farms: HTTPError('429 Client Error: Too Many Requests for url: GET farms')                  
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+== dairy @ 200 users
+[2026-11-16 15:16:43,608] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-16 15:16:43,608] e2b/INFO/locust.main: Run time limit set to 25 seconds
+[2026-11-16 15:16:43,625] e2b/INFO/locust.runners: Ramping to 200 users at a rate of 20.00 per second
+[2026-11-16 15:16:52,637] e2b/INFO/locust.runners: All users spawned: {"FarmUser": 200} (200 total users)
+[2026-11-16 15:17:08,411] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-16 15:17:08,573] e2b/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/auth/login                                                                  200 200(100.00%) |     30       5     118     24 |    8.02        8.02
+GET      GET farms                                                                       2972 2972(100.00%) |     26       0     214     12 |  119.16      119.16
+GET      GET list                                                                        7625 7625(100.00%) |     26       0     213     12 |  305.71      305.71
+GET      GET list paged                                                                  1571 1571(100.00%) |     25       0     211     12 |   62.99       62.99
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                     12368 12368(100.00%) |     26       0     214     13 |  495.87      495.87
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/auth/login                                                                        24     31     38     48     59     64    100    120    120    120    120    200
+GET      GET farms                                                                              12     25     36     46     80    100    120    130    180    210    210   2972
+GET      GET list                                                                               12     25     37     47     80     99    120    130    180    210    210   7625
+GET      GET list paged                                                                         12     24     36     45     79     96    120    120    180    210    210   1571
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                             13     25     37     46     79     99    120    130    180    210    210  12368
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+200                POST /api/auth/login: HTTPError('429 Client Error: Too Many Requests for url: /api/auth/login')     
+7625               GET GET list: HTTPError('429 Client Error: Too Many Requests for url: GET list')                    
+1571               GET GET list paged: HTTPError('429 Client Error: Too Many Requests for url: GET list paged')        
+2972               GET GET farms: HTTPError('429 Client Error: Too Many Requests for url: GET farms')                  
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+== agri @ 10 users
+[2026-11-16 15:17:13,694] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-16 15:17:13,694] e2b/INFO/locust.main: Run time limit set to 25 seconds
+[2026-11-16 15:17:13,706] e2b/INFO/locust.runners: Ramping to 10 users at a rate of 20.00 per second
+[2026-11-16 15:17:13,707] e2b/INFO/locust.runners: All users spawned: {"FarmUser": 10} (10 total users)
+[2026-11-16 15:17:38,537] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-16 15:17:38,609] e2b/INFO/locust.main: Shutting down (exit code 0)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/login                                                                        10     0(0.00%) |   1759     319    3195   1900 |    0.40        0.00
+GET      GET farms                                                                        174     0(0.00%) |     47       1    2216      3 |    6.99        0.00
+GET      GET list                                                                         450     0(0.00%) |     18       1    2874      3 |   18.07        0.00
+GET      GET list paged                                                                    90     0(0.00%) |      3       1       9      3 |    3.61        0.00
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                       724     0(0.00%) |     47       1    3195      3 |   29.07        0.00
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/login                                                                           1900   2200   2600   2900   3200   3200   3200   3200   3200   3200   3200     10
+GET      GET farms                                                                               3      3      3      4      6      8   1300   1900   2200   2200   2200    174
+GET      GET list                                                                                3      3      3      4      5      8     21     40   2900   2900   2900    450
+GET      GET list paged                                                                          3      3      4      4      5      6      9      9      9      9      9     90
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                              3      3      3      4      6      9    980   1900   3200   3200   3200    724
+
+== agri @ 50 users
+[2026-11-16 15:17:40,010] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-16 15:17:40,011] e2b/INFO/locust.main: Run time limit set to 25 seconds
+[2026-11-16 15:17:40,115] e2b/INFO/locust.runners: Ramping to 50 users at a rate of 20.00 per second
+[2026-11-16 15:17:42,121] e2b/INFO/locust.runners: All users spawned: {"FarmUser": 50} (50 total users)
+[2026-11-16 15:18:04,355] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-16 15:18:04,443] e2b/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/login                                                                        50  50(100.00%) |     63       6     195     52 |    2.06        2.06
+GET      GET farms                                                                        998 998(100.00%) |      4       0     164      2 |   41.06       41.06
+GET      GET list                                                                        2324 2324(100.00%) |      4       1     175      2 |   95.62       95.62
+GET      GET list paged                                                                   463 463(100.00%) |      4       1     146      2 |   19.05       19.05
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                      3835 3835(100.00%) |      5       0     195      2 |  157.79      157.79
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/login                                                                             52     69     87     99    170    190    200    200    200    200    200     50
+GET      GET farms                                                                               2      2      3      3      7     18     35     77    160    160    160    998
+GET      GET list                                                                                2      2      3      3      7     17     34     72    150    180    180   2324
+GET      GET list paged                                                                          2      2      3      3      6     11     32     61    150    150    150    463
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                              2      2      3      3      9     22     49     85    180    200    200   3835
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+50                 POST /api/login: HTTPError('429 Client Error: Too Many Requests for url: /api/login')               
+2324               GET GET list: HTTPError('401 Client Error: Unauthorized for url: GET list')                         
+463                GET GET list paged: HTTPError('401 Client Error: Unauthorized for url: GET list paged')             
+998                GET GET farms: HTTPError('401 Client Error: Unauthorized for url: GET farms')                       
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+== agri @ 200 users
+[2026-11-16 15:18:06,021] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-16 15:18:06,022] e2b/INFO/locust.main: Run time limit set to 25 seconds
+[2026-11-16 15:18:06,039] e2b/INFO/locust.runners: Ramping to 200 users at a rate of 20.00 per second
+[2026-11-16 15:18:15,515] e2b/INFO/locust.runners: All users spawned: {"FarmUser": 200} (200 total users)
+[2026-11-16 15:18:30,478] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-16 15:18:31,358] e2b/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/login                                                                       200 200(100.00%) |    157      14     745    110 |    7.90        7.90
+GET      GET farms                                                                       1794 1794(100.00%) |    189       1     823    190 |   70.88       70.88
+GET      GET list                                                                        4502 4502(100.00%) |    190       0     682    190 |  177.86      177.86
+GET      GET list paged                                                                   897 897(100.00%) |    194       1     657    190 |   35.44       35.44
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                      7393 7393(100.00%) |    189       0     823    180 |  292.08      292.08
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/login                                                                            110    160    210    220    270    480    700    720    750    750    750    200
+GET      GET farms                                                                             190    240    280    290    370    430    490    530    820    820    820   1794
+GET      GET list                                                                              190    250    280    300    370    430    490    520    660    680    680   4502
+GET      GET list paged                                                                        190    250    280    300    370    450    500    530    660    660    660    897
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                            180    240    280    300    370    430    490    530    700    820    820   7393
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+200                POST /api/login: HTTPError('429 Client Error: Too Many Requests for url: /api/login')               
+242                GET GET list: HTTPError('401 Client Error: Unauthorized for url: GET list')                         
+92                 GET GET farms: HTTPError('401 Client Error: Unauthorized for url: GET farms')                       
+46                 GET GET list paged: HTTPError('401 Client Error: Unauthorized for url: GET list paged')             
+4260               GET GET list: HTTPError('429 Client Error: Too Many Requests for url: GET list')                    
+1702               GET GET farms: HTTPError('429 Client Error: Too Many Requests for url: GET farms')                  
+851                GET GET list paged: HTTPError('429 Client Error: Too Many Requests for url: GET list paged')        
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+== flock @ 10 users
+[2026-11-16 15:18:37,016] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-16 15:18:37,016] e2b/INFO/locust.main: Run time limit set to 25 seconds
+[2026-11-16 15:18:37,030] e2b/INFO/locust.runners: Ramping to 10 users at a rate of 20.00 per second
+[2026-11-16 15:18:37,033] e2b/INFO/locust.runners: All users spawned: {"FarmUser": 10} (10 total users)
+[2026-11-16 15:19:01,464] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-16 15:19:01,484] e2b/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/auth/login                                                                   10     0(0.00%) |   2923    2863    3028   2900 |    0.41        0.00
+GET      GET farms                                                                        176  108(61.36%) |      3       1      84      2 |    7.20        4.42
+GET      GET list                                                                         439  265(60.36%) |      3       1     103      2 |   17.97       10.85
+GET      GET list paged                                                                   103   56(54.37%) |      3       1      90      2 |    4.22        2.29
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                       728  429(58.93%) |     43       1    3028      2 |   29.80       17.56
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/auth/login                                                                      2900   2900   2900   3000   3000   3000   3000   3000   3000   3000   3000     10
+GET      GET farms                                                                               2      2      2      2      3      4      7     83     84     84     84    176
+GET      GET list                                                                                2      2      3      3      4      5      8     76    100    100    100    439
+GET      GET list paged                                                                          2      2      3      3      4      6     13     17     91     91     91    103
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                              2      2      3      3      4      6     86   2900   3000   3000   3000    728
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+265                GET GET list: HTTPError('429 Client Error: Too Many Requests for url: GET list')                    
+56                 GET GET list paged: HTTPError('429 Client Error: Too Many Requests for url: GET list paged')        
+108                GET GET farms: HTTPError('429 Client Error: Too Many Requests for url: GET farms')                  
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+== flock @ 50 users
+[2026-11-16 15:19:02,368] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-16 15:19:02,369] e2b/INFO/locust.main: Run time limit set to 25 seconds
+[2026-11-16 15:19:02,391] e2b/INFO/locust.runners: Ramping to 50 users at a rate of 20.00 per second
+[2026-11-16 15:19:04,393] e2b/INFO/locust.runners: All users spawned: {"FarmUser": 50} (50 total users)
+[2026-11-16 15:19:26,997] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-16 15:19:27,017] e2b/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/auth/login                                                                   50  50(100.00%) |     49       5      83     54 |    2.03        2.03
+GET      GET farms                                                                        961 961(100.00%) |      2       0      85      2 |   39.07       39.07
+GET      GET list                                                                        2489 2489(100.00%) |      2       0      81      2 |  101.20      101.20
+GET      GET list paged                                                                   502 502(100.00%) |      2       0      63      2 |   20.41       20.41
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                      4002 4002(100.00%) |      3       0      85      2 |  162.72      162.72
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/auth/login                                                                        54     61     73     77     80     82     83     83     83     83     83     50
+GET      GET farms                                                                               2      2      2      2      3      4     11     50     86     86     86    961
+GET      GET list                                                                                2      2      2      2      3      5     19     47     79     82     82   2489
+GET      GET list paged                                                                          2      2      2      2      3      5     17     52     64     64     64    502
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                              2      2      2      2      3      6     38     62     82     86     86   4002
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+50                 POST /api/auth/login: HTTPError('429 Client Error: Too Many Requests for url: /api/auth/login')     
+2489               GET GET list: HTTPError('429 Client Error: Too Many Requests for url: GET list')                    
+502                GET GET list paged: HTTPError('429 Client Error: Too Many Requests for url: GET list paged')        
+961                GET GET farms: HTTPError('429 Client Error: Too Many Requests for url: GET farms')                  
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+== flock @ 200 users
+[2026-11-16 15:19:27,375] e2b/INFO/locust.main: Starting Locust 2.47.0
+[2026-11-16 15:19:27,375] e2b/INFO/locust.main: Run time limit set to 25 seconds
+[2026-11-16 15:19:27,386] e2b/INFO/locust.runners: Ramping to 200 users at a rate of 20.00 per second
+[2026-11-16 15:19:36,393] e2b/INFO/locust.runners: All users spawned: {"FarmUser": 200} (200 total users)
+[2026-11-16 15:19:52,213] e2b/INFO/locust.main: --run-time limit reached, shutting down
+[2026-11-16 15:19:52,240] e2b/INFO/locust.main: Shutting down (exit code 1)
+Type     Name                                                                          # reqs      # fails |    Avg     Min     Max    Med |   req/s  failures/s
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+POST     /api/auth/login                                                                  200 200(100.00%) |     16       5      40     17 |    8.05        8.05
+GET      GET farms                                                                       3370 3370(100.00%) |      2       0      44      2 |  135.63      135.63
+GET      GET list                                                                        8439 8439(100.00%) |      2       0      43      2 |  339.63      339.63
+GET      GET list paged                                                                  1685 1685(100.00%) |      2       0      33      2 |   67.81       67.81
+--------|----------------------------------------------------------------------------|-------|-------------|-------|-------|-------|-------|--------|-----------
+         Aggregated                                                                     13694 13694(100.00%) |      2       0      44      2 |  551.12      551.12
+
+Response time percentiles (approximated)
+Type     Name                                                                                  50%    66%    75%    80%    90%    95%    98%    99%  99.9% 99.99%   100% # reqs
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+POST     /api/auth/login                                                                        17     18     20     21     24     27     29     31     41     41     41    200
+GET      GET farms                                                                               2      2      3      3      5      8     16     20     34     45     45   3370
+GET      GET list                                                                                2      2      3      3      5      8     13     18     30     44     44   8439
+GET      GET list paged                                                                          2      2      3      3      5      8     14     18     32     33     33   1685
+--------|--------------------------------------------------------------------------------|--------|------|------|------|------|------|------|------|------|------|------|------
+         Aggregated                                                                              2      2      3      3      5     10     17     21     32     44     45  13694
+
+Error report
+# occurrences      Error                                                                                               
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+200                POST /api/auth/login: HTTPError('429 Client Error: Too Many Requests for url: /api/auth/login')     
+3290               GET GET farms: HTTPError('429 Client Error: Too Many Requests for url: GET farms')                  
+1647               GET GET list paged: HTTPError('429 Client Error: Too Many Requests for url: GET list paged')        
+8277               GET GET list: HTTPError('429 Client Error: Too Many Requests for url: GET list')                    
+162                GET GET list: HTTPError('401 Client Error: Unauthorized for url: GET list')                         
+38                 GET GET list paged: HTTPError('401 Client Error: Unauthorized for url: GET list paged')             
+80                 GET GET farms: HTTPError('401 Client Error: Unauthorized for url: GET farms')                       
+------------------|---------------------------------------------------------------------------------------------------------------------------------------------
+
+LOAD DONE
+
+EXIT=0 TIMEOUT=False SECONDS=244.52

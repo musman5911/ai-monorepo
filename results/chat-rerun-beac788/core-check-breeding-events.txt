@@ -1,0 +1,47 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["npm", "run", "check-breeding-events"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+
+> check-breeding-events
+> node tools/check-dairy-breeding-events.js
+
+
+Phase 2: Dairy breeding event runtime checks
+  ✓ seeded owner can log in
+  ✓ demo data provides two farms for isolation testing
+  ✓ owner can create a valid breeding event
+  ✓ creating a heat event synchronizes the legacy cow heatDate
+  ✓ owner can edit an existing breeding event
+  ✓ editing an event resynchronizes the legacy cow date
+  ✓ service event accepts a valid in-farm bull
+  ✓ service event synchronizes the legacy breeding date
+  ✓ calving creates one live calf record per twin and excludes stillbirth from live calf records
+  ✓ calving event synchronizes the legacy cow calving date
+  ✓ generated calves carry gender, date, mother, farm bull and calf status
+  ✓ duplicate ear tag is refused within the same farm, ignoring case
+  ✓ the same ear tag is allowed in a different farm
+  ✓ a calving event with linked calves cannot be deleted and orphan them
+  ✓ generated calves can be removed through the cow cleanup route
+  ✓ calving event can be deleted after all generated calf records have been removed
+  ✓ owner can create a health record for the memory-mode delete check
+  ✓ health record deletion succeeds in memory mode
+  ✓ deleted health record is no longer returned
+  ✓ event appears in paginated list for its farm and cow
+  ✓ list response includes pagination metadata
+  ✓ farm B cannot see an event created in farm A
+  ✓ invalid event dates are rejected
+  ✓ seeded worker can log in
+  ✓ worker can create a breeding event
+  ✓ worker cannot delete a breeding event
+  ✓ owner can create a dedicated cow for the sold-history regression
+  ✓ owner can create a breeding event before the cow is sold
+  ✓ cow can be marked sold while preserving its event history
+  ✓ notes-only event edits remain possible after the linked cow is sold
+  ✓ manual backup contains breeding events
+  ✓ backup restore succeeds with breeding events included
+  ✓ restored backup retains breeding events
+
+All Dairy breeding event checks passed.
+
+EXIT=0 TIMEOUT=False SECONDS=3.86

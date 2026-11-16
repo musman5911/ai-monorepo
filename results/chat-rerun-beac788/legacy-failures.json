@@ -1,0 +1,789 @@
+{
+  "revision": "beac7883922f44eca3b7b43f91fce53e994638a5",
+  "failures": [
+    {
+      "file": "tests/api-deep/agri-analytics-deep.test.ts",
+      "name": "ROUND 20: agri analytics + bulk isolation cross-farm bulk import: finance rows naming a farm-B crop cannot be planted from farm A",
+      "failureMessages": [
+        "AssertionError: cropB create \u2192 400 {\"detail\":\"Season is required.\"} farm=5602abfb1fde85c5958d42e6: expected '' to be truthy\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-analytics-deep.test.ts:52:118\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/agri-filters-deep.test.ts",
+      "name": "ROUND 16: agri filter engine crop filters match exactly (status / season / field / combined / all)",
+      "failureMessages": [
+        "AssertionError: expected [ 200, 201 ] to include 400\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at mkCrop (/home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-filters-deep.test.ts:15:22)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-filters-deep.test.ts:34:15\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/agri-filters-deep.test.ts",
+      "name": "ROUND 16: agri filter engine crop search is partial + case-insensitive and regex-safe",
+      "failureMessages": [
+        "AssertionError: lowercase partial search missed: expected false to be true // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-filters-deep.test.ts:57:103\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/agri-filters-deep.test.ts",
+      "name": "ROUND 16: agri filter engine crop_id filter validates format and matches exactly",
+      "failureMessages": [
+        "AssertionError: GET /crops?crop_id=undefined&limit=10: expected 400 to be 200 // Object.is equality\n    at list (/home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-filters-deep.test.ts:22:45)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-filters-deep.test.ts:69:26\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/agri-filters-deep.test.ts",
+      "name": "ROUND 16: agri filter engine worker cannot filter their way into Completed crops",
+      "failureMessages": [
+        "AssertionError: expected [ 200, 201 ] to include 400\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at mkCrop (/home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-filters-deep.test.ts:15:22)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-filters-deep.test.ts:75:18\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/agri-filters-deep.test.ts",
+      "name": "ROUND 16: agri filter engine filter injection shapes never 500 and never widen results",
+      "failureMessages": [
+        "AssertionError: object-style status filter was honored (injection): expected false to be true // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-filters-deep.test.ts:96:125\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/agri-liabilities-deep.test.ts",
+      "name": "ROUND 22: agri liabilities + inventory inventory: negative quantity via update is rejected; worker blocked everywhere",
+      "failureMessages": [
+        "AssertionError: create \u2192 400 {\"error\":\"Current stock is required.\"}: expected 400 to be 201 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/agri-liabilities-deep.test.ts:55:104\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/allfarms-deletion-analytics-deep.test.ts",
+      "name": "ROUND 17: all-farms, deletion, analytics agri analytics: worker view redacts yields and finance; owner sees them",
+      "failureMessages": [
+        "AssertionError: expected '' to be truthy\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/allfarms-deletion-analytics-deep.test.ts:103:20\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/auth-isolation-deep.test.ts",
+      "name": "DEEP: forged tokens + cross-farm isolation cross-farm isolation holds for agri crops and flock batches too",
+      "failureMessages": [
+        "AssertionError: agri cross-farm crop list leak: expected '[]' not to contain ''\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/auth-isolation-deep.test.ts:133:82\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/backup-media-deep.test.ts",
+      "name": "ROUND 19: backup media fidelity agri: diary media photo survives backup \u2192 wipe \u2192 restore",
+      "failureMessages": [
+        "AssertionError: diary photo gone after restore: expected '{\"detail\":\"Internal server error\"}' to contain 'ph-mxmwjerrnu'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/backup-media-deep.test.ts:36:74\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/concurrency-invariants.test.ts",
+      "name": "DEEP: concurrency + invariants agri: rented-tubewell irrigation finance expense equals hours \u00d7 rate",
+      "failureMessages": [
+        "AssertionError: expected 400 to be 201 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/concurrency-invariants.test.ts:107:33\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/coverage-sweep-deep.test.ts",
+      "name": "ROUND 11: coverage sweep dairy farm GPS location is not public (flock requires auth for the same data)",
+      "failureMessages": [
+        "AssertionError: farm location served without login: expected 200 to be 401 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/coverage-sweep-deep.test.ts:25:62\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/coverage-sweep-deep.test.ts",
+      "name": "ROUND 11: coverage sweep dairy dailylog: write/read round-trip; garbage dates are 4xx not 500",
+      "failureMessages": [
+        "AssertionError: dailylog PUT not-a-date must reject: expected 200 to be greater than or equal to 400\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/coverage-sweep-deep.test.ts:89:68\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/coverage-sweep2-deep.test.ts",
+      "name": "ROUND 12: agri coverage + unknown routes agri farm GPS location is not public",
+      "failureMessages": [
+        "AssertionError: agri farm location served without login: expected 200 to be 401 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/coverage-sweep2-deep.test.ts:24:67\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/coverage-sweep2-deep.test.ts",
+      "name": "ROUND 12: agri coverage + unknown routes agri diary-media: round-trip works, garbage dates and mega-payloads are safe",
+      "failureMessages": [
+        "AssertionError: expected '{\"detail\":\"Internal server error\"}' to contain 'Agri diary mxmwjepiyk'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/coverage-sweep2-deep.test.ts:48:38\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/cross-realm-deep.test.ts",
+      "name": "ROUND 4: cross-realm + smuggling lost update: stale writer cannot silently overwrite (dairy)",
+      "failureMessages": [
+        "AssertionError: dairy silent lost-update (no version/conflict check): expected 200 to be 409 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/cross-realm-deep.test.ts:78:91\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/cross-realm-deep.test.ts",
+      "name": "ROUND 4: cross-realm + smuggling lost update: stale writer cannot silently overwrite (agri)",
+      "failureMessages": [
+        "AssertionError: agri silent lost-update (no version/conflict check): expected 404 to be 409 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/cross-realm-deep.test.ts:88:91\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/farm-delete-data-deep.test.ts",
+      "name": "ROUND 18: deleteData farm wipe + restore flock + agri: deleteData farm wipe works in memory mode too",
+      "failureMessages": [
+        "AssertionError: expected [ 200, 201 ] to include 400\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/farm-delete-data-deep.test.ts:53:24\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/farm-transfer-deep.test.ts",
+      "name": "ROUND 24: farm-transfer mass assignment agri inventory PUT cannot move an item into farm B via body farmId",
+      "failureMessages": [
+        "AssertionError: expected '' to be truthy\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/farm-transfer-deep.test.ts:25:20\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/farm-transfer-deep.test.ts",
+      "name": "ROUND 24: farm-transfer mass assignment agri crop CREATE with body farmId of farm B stays in the active farm",
+      "failureMessages": [
+        "AssertionError: expected [ 200, 201 ] to include 400\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/farm-transfer-deep.test.ts:42:24\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/fidelity-precision-deep.test.ts",
+      "name": "ROUND 10: fidelity + precision dairy backup fidelity: one of EVERY resource survives export \u2192 delete \u2192 restore",
+      "failureMessages": [
+        "AssertionError: expected 200 to be 404 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/fidelity-precision-deep.test.ts:46:37\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/fidelity-precision-deep.test.ts",
+      "name": "ROUND 10: fidelity + precision money precision: 2^53+1 and float sums do not silently corrupt",
+      "failureMessages": [
+        "AssertionError: expected [ 200, 201 ] to include 400\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/fidelity-precision-deep.test.ts:71:24\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/ids-unicode-uploads-deep.test.ts",
+      "name": "ROUND 6: ids, unicode, uploads flock upload: script-bearing SVG cannot be stored and served back as active content",
+      "failureMessages": [
+        "AssertionError: svg upload rejected with 500: expected [ 400, 415 ] to include 500\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/ids-unicode-uploads-deep.test.ts:83:67\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/last-surface-deep.test.ts",
+      "name": "ROUND 14: last surfaces agri public worker card does not expose wages/advances to unauthenticated visitors",
+      "failureMessages": [
+        "AssertionError: public worker card leaks daily wage: expected '<!DOCTYPE html>\\n<html lang=\"en\" dir=\u2026' not to contain '1,777'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/last-surface-deep.test.ts:65:61\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/load-lifetime-smuggling-deep.test.ts",
+      "name": "ROUND 8: load, lifetime, smuggling, deps dairy: token lifetime is at most 24 hours",
+      "failureMessages": [
+        "AssertionError: dairy access-token lifetime is 168h: expected 168 to be less than or equal to 24\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/load-lifetime-smuggling-deep.test.ts:52:65\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runSuite (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/load-lifetime-smuggling-deep.test.ts",
+      "name": "ROUND 8: load, lifetime, smuggling, deps flock: token lifetime is at most 24 hours",
+      "failureMessages": [
+        "AssertionError: flock access-token lifetime is 168h: expected 168 to be less than or equal to 24\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/load-lifetime-smuggling-deep.test.ts:52:65\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:155:11\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:26\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1897:20\n    at new Promise (<anonymous>)\n    at runWithTimeout (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1863:10)\n    at runTest (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1574:12)\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at runSuite (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)\n    at runSuite (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:1729:8)"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/pagination-dates-backup-abuse.test.ts",
+      "name": "DEEP: pagination, dates, backup abuse backup abuse: cross-app restore is rejected (no silent mis-import)",
+      "failureMessages": [
+        "AssertionError: dairy backup \u2192 agri restore: expected 200 to be greater than or equal to 400\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/pagination-dates-backup-abuse.test.ts:91:63\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/public-surface-deep.test.ts",
+      "name": "ROUND 5: public surface + headers dairy public buyer card does not expose phone number to unauthenticated visitors",
+      "failureMessages": [
+        "AssertionError: public card leaks buyer phone number: expected '<!DOCTYPE html>\\n<html lang=\"en\" dir=\u2026' not to contain '0300-7654321'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/public-surface-deep.test.ts:29:62\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/public-surface-deep.test.ts",
+      "name": "ROUND 5: public surface + headers flock: CORS does not reflect arbitrary origins with credentials",
+      "failureMessages": [
+        "AssertionError: flock preflight reflects evil origin WITH credentials: expected false to be true // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/public-surface-deep.test.ts:93:127\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/public-surface-deep.test.ts",
+      "name": "ROUND 5: public surface + headers agri: CORS does not reflect arbitrary origins with credentials",
+      "failureMessages": [
+        "AssertionError: agri preflight reflects evil origin WITH credentials: expected false to be true // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/public-surface-deep.test.ts:93:127\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/q1-delete-pinpoint-deep.test.ts",
+      "name": "ROUND 23: Q1 DELETE pinpoint + flock import scoping flock import-all into farm B does not leak into farm A",
+      "failureMessages": [
+        "AssertionError: import into B \u2192 500: expected 500 to be less than 300\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/q1-delete-pinpoint-deep.test.ts:75:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round10-flock-import-images.test.ts",
+      "name": "ROUND R10: flock import + images import-all into farm B does not leak batches into farm A",
+      "failureMessages": [
+        "AssertionError: import into B \u2192 500: expected 500 to be less than 300\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round10-flock-import-images.test.ts:47:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round11-role-agri.test.ts",
+      "name": "ROUND 11B: role system (agri) manager: farm list = assigned only; unassigned header 403; B data invisible in all-mode",
+      "failureMessages": [
+        "AssertionError: expected [ 200, 201 ] to include 400\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round11-role-agri.test.ts:50:24\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round11-role-agri.test.ts",
+      "name": "ROUND 11B: role system (agri) manager: writes in all-mode 400; body farmId smuggle stays in assigned farm; fields admin ops work only in scope",
+      "failureMessages": [
+        "AssertionError: smuggle create \u2192 400: expected [ 200, 201 ] to include 400\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round11-role-agri.test.ts:61:68\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round12-photos-cloudinary.test.ts",
+      "name": "ROUND 12: photos (dairy, fallback mode) EXIF/GPS: uploaded JPEG bytes are served back \u2014 is EXIF stripped?",
+      "failureMessages": [
+        "AssertionError: EXIF GPS marker still present in served bytes (not stripped): expected true to be false // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round12-photos-cloudinary.test.ts:94:105\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round12-photos-cloudinary.test.ts",
+      "name": "ROUND 12: photos (dairy, fallback mode) role checks: worker upload/delete behaviour is explicit",
+      "failureMessages": [
+        "AssertionError: worker delete photo \u2192 200: expected [ 403, 404 ] to include 200\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round12-photos-cloudinary.test.ts:102:74\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round12-photos-cloudinary.test.ts",
+      "name": "ROUND 12: photos (agri, fallback mode) EXIF/GPS: uploaded JPEG bytes are served back \u2014 is EXIF stripped?",
+      "failureMessages": [
+        "AssertionError: EXIF GPS marker still present in served bytes (not stripped): expected true to be false // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round12-photos-cloudinary.test.ts:94:105\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round12-photos-cloudinary.test.ts",
+      "name": "ROUND 12: photos (agri, fallback mode) role checks: worker upload/delete behaviour is explicit",
+      "failureMessages": [
+        "AssertionError: worker delete photo \u2192 200: expected [ 403, 404 ] to include 200\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round12-photos-cloudinary.test.ts:102:74\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round12-photos-cloudinary.test.ts",
+      "name": "ROUND 12: photos (agri, fallback mode) photos survive backup? dairy/agri backup must contain the photo or its bytes",
+      "failureMessages": [
+        "AssertionError: photo id absent from backup (photos lost on restore): expected false to be true // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round12-photos-cloudinary.test.ts:124:93\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round12-photos-flock.test.ts",
+      "name": "ROUND 12B: photos (flock) validation: SVG rejected on both upload routes; wrong field name rejected",
+      "failureMessages": [
+        "AssertionError: expected 500 to be less than 500\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round12-photos-flock.test.ts:69:24\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round12-photos-flock.test.ts",
+      "name": "ROUND 12B: photos (flock) P8-1: flock /api/photos/:id (what the diary UI requests) exists",
+      "failureMessages": [
+        "AssertionError: GET /api/photos/:id \u2192 404 (diary UI builds these URLs): expected 404 to be 200 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round12-photos-flock.test.ts:81:92\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round13-sessions.test.ts",
+      "name": "ROUND 13 sessions (dairy) bcrypt 72-byte: password differing only after byte 72 must NOT authenticate",
+      "failureMessages": [
+        "AssertionError: correct 73-byte login (got 429): expected 429 to be 200 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round13-sessions.test.ts:97:73\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round13-sessions.test.ts",
+      "name": "ROUND 13 sessions (dairy) login rate limiter cannot be reset by spoofing X-Forwarded-For",
+      "failureMessages": [
+        "AssertionError: limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round13-sessions.test.ts:130:118\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round13-sessions.test.ts",
+      "name": "ROUND 13 sessions (agri) login rate limiter cannot be reset by spoofing X-Forwarded-For",
+      "failureMessages": [
+        "AssertionError: limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round13-sessions.test.ts:130:118\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round13-sessions.test.ts",
+      "name": "ROUND 13 sessions (flock) bcrypt 72-byte: password differing only after byte 72 must NOT authenticate",
+      "failureMessages": [
+        "AssertionError: byte-73-differing login (want 401, got 200 \u2014 200 means bcrypt 72-byte truncation): expected 200 to be 401 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round13-sessions.test.ts:99:125\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round13-sessions.test.ts",
+      "name": "ROUND 13 sessions (flock) login rate limiter cannot be reset by spoofing X-Forwarded-For",
+      "failureMessages": [
+        "AssertionError: limiter must still engage when XFF is spoofed (else trust-proxy XFF resets the bucket): expected false to be true // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round13-sessions.test.ts:130:118\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round14-fuzz.test.ts",
+      "name": "ROUND 14 fuzz (dairy) body-size limits: 5MB field and 12MB body are not accepted as normal creates",
+      "failureMessages": [
+        "AssertionError: 5MB name must not be a normal 201 create: expected 201 not to be 201 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round14-fuzz.test.ts:86:84\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round14-fuzz.test.ts",
+      "name": "ROUND 14 dairy date edges (dailylog) invalid calendar dates are rejected, not stored or 500",
+      "failureMessages": [
+        "AssertionError: 2026-02-30 should be 4xx, got 200: expected 200 to be greater than or equal to 400\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round14-fuzz.test.ts:116:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round15-concurrency.test.ts",
+      "name": "ROUND 15 concurrency (agri) 20x parallel identical creates: no 5xx (duplicate count recorded)",
+      "failureMessages": [
+        "AssertionError: at least one record must exist: expected 0 to be greater than or equal to 1\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round15-concurrency.test.ts:34:55\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round15-concurrency.test.ts",
+      "name": "ROUND 15 concurrency (agri) 10x parallel DELETE of the same record: exactly one success, no 5xx",
+      "failureMessages": [
+        "AssertionError: expected '' to be truthy\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round15-concurrency.test.ts:40:18\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round2-agri-fields.test.ts",
+      "name": "ROUND R2: agri fields & cycles crop cannot link to another farm field; same-farm link works and survives edit",
+      "failureMessages": [
+        "AssertionError: crop + own field \u2192 400: expected [ 200, 201 ] to include 400\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round2-agri-fields.test.ts:32:68\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round3-super-admin.test.ts",
+      "name": "ROUND R3: super-admin owner-only dairy: farm role is preserved at login and cleared at logout",
+      "failureMessages": [
+        "AssertionError: expected 404 to be less than 300\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round3-super-admin.test.ts:44:33\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round7-agri-fields-deep.test.ts",
+      "name": "ROUND R7: agri fields deep validation: negative/garbage acres rejected, duplicate name per farm 409, same name across farms OK",
+      "failureMessages": [
+        "AssertionError: absurd acres 1e12 \u2192 201: expected [ 400, 422 ] to include 201\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round7-agri-fields-deep.test.ts:24:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round7-agri-fields-deep.test.ts",
+      "name": "ROUND R7: agri fields deep rename collision \u2192 409; rename to free name works and crop link follows the id (not the name)",
+      "failureMessages": [
+        "AssertionError: expected 400 to be less than 300\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round7-agri-fields-deep.test.ts:51:34\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round9-backup-integrity.test.ts",
+      "name": "ROUND R9: backup integrity tampered backup: editing an amount inside the backup changes restored data (integrity check?)",
+      "failureMessages": [
+        "AssertionError: tampered amount silently restored (no integrity/signature check): expected { _id: 'e1', date: '2025-11-17', \u2026(9) } to be falsy\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round9-backup-integrity.test.ts:32:85\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/round9-backup-integrity.test.ts",
+      "name": "ROUND R9: backup integrity cross-app restore: agri backup into dairy (and flock backup into agri) is rejected, data untouched",
+      "failureMessages": [
+        "AssertionError: agri backup \u2192 dairy restore \u2192 200: expected [ 400, 409, 422 ] to include 200\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/round9-backup-integrity.test.ts:40:84\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/session-escalation-deep.test.ts",
+      "name": "DEEPEST: sessions, escalation, leakage, throttling dairy: token is revoked after logout",
+      "failureMessages": [
+        "AssertionError: pre-logout token still works after logout: expected 200 to be 401 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/session-escalation-deep.test.ts:60:82\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/session-escalation-deep.test.ts",
+      "name": "DEEPEST: sessions, escalation, leakage, throttling flock: token is revoked after logout",
+      "failureMessages": [
+        "AssertionError: pre-logout token still works after logout: expected 200 to be 401 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/session-escalation-deep.test.ts:60:82\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/session-escalation-deep.test.ts",
+      "name": "DEEPEST: sessions, escalation, leakage, throttling agri: token is revoked after logout",
+      "failureMessages": [
+        "AssertionError: pre-logout token still works after logout: expected 200 to be 401 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/session-escalation-deep.test.ts:60:82\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/session-escalation-deep.test.ts",
+      "name": "DEEPEST: sessions, escalation, leakage, throttling agri: mass assignment on create cannot forge id/role/farm ownership",
+      "failureMessages": [
+        "AssertionError: expected 400 to be 201 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/session-escalation-deep.test.ts:108:35\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/session-escalation-deep.test.ts",
+      "name": "DEEPEST: sessions, escalation, leakage, throttling dairy: changing password revokes previously issued tokens",
+      "failureMessages": [
+        "AssertionError: pre-password-change token still works: expected 200 to be 401 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/session-escalation-deep.test.ts:149:76\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/telegram-bot-deep.test.ts",
+      "name": "ROUND 15: telegram bot write-path a consumed link code cannot be reused by a second chat",
+      "failureMessages": [
+        "AssertionError: reused link code linked a second chat: expected 1 to be +0 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/telegram-bot-deep.test.ts:82:105\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/telegram-bot-deep.test.ts",
+      "name": "ROUND 15: telegram bot write-path bot expense amounts are bounded (no crore-scale single message)",
+      "failureMessages": [
+        "AssertionError: bot accepted a 999,999,999 expense from one chat message: expected 1 to be +0 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/telegram-bot-deep.test.ts:88:86\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/timing-reset-auto-deep.test.ts",
+      "name": "ROUND 7: timing, reset, auto-backup, cookies dairy: session cookie (if issued) is HttpOnly + SameSite",
+      "failureMessages": [
+        "AssertionError: expected 429 to be 200 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/timing-reset-auto-deep.test.ts:46:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/timing-reset-auto-deep.test.ts",
+      "name": "ROUND 7: timing, reset, auto-backup, cookies flock: session cookie (if issued) is HttpOnly + SameSite",
+      "failureMessages": [
+        "AssertionError: expected 429 to be 200 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/timing-reset-auto-deep.test.ts:46:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/timing-reset-auto-deep.test.ts",
+      "name": "ROUND 7: timing, reset, auto-backup, cookies agri: session cookie (if issued) is HttpOnly + SameSite",
+      "failureMessages": [
+        "AssertionError: expected 429 to be 200 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/timing-reset-auto-deep.test.ts:46:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-deep/timing-reset-auto-deep.test.ts",
+      "name": "ROUND 7: timing, reset, auto-backup, cookies restore-auto never reports fake success; workers are blocked",
+      "failureMessages": [
+        "AssertionError: expected [ 200, 201 ] to include 400\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1191:15)\n    at Proxy.<anonymous> (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/expect/dist/index.js:1029:14)\n    at Proxy.methodWrapper (file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/chai/index.js:1686:25)\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-deep/timing-reset-auto-deep.test.ts:89:26\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix crops full CRUD: create \u2192 update \u2192 delete \u2192 gone",
+      "failureMessages": [
+        "AssertionError: create crops: expected 400 to be 201 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:90:63\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix crops update rejects invalid values too",
+      "failureMessages": [
+        "AssertionError: crops update area_acres negative: expected 404 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:153:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix finance rejects empty body and missing required fields",
+      "failureMessages": [
+        "AssertionError: finance missing date: expected 201 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:117:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix inventory full CRUD: create \u2192 update \u2192 delete \u2192 gone",
+      "failureMessages": [
+        "AssertionError: create inventory: expected 400 to be 201 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:90:63\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix inventory update rejects invalid values too",
+      "failureMessages": [
+        "AssertionError: inventory update quantity negative: expected 404 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:153:77\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix suppliers rejects oversized strings; does not store script verbatim",
+      "failureMessages": [
+        "AssertionError: suppliers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:143:107\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix liabilities full CRUD: create \u2192 update \u2192 delete \u2192 gone",
+      "failureMessages": [
+        "AssertionError: update liabilities: expected 400 to be 200 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:95:63\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix liabilities rejects oversized strings; does not store script verbatim",
+      "failureMessages": [
+        "AssertionError: liabilities.creditor stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:143:107\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix laborers rejects oversized strings; does not store script verbatim",
+      "failureMessages": [
+        "AssertionError: laborers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:143:107\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix crops: rejects bad status enum and bad plant_date on create and update",
+      "failureMessages": [
+        "AssertionError: expected 404 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:174:127\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/agri.api-matrix.test.ts",
+      "name": "Agri API field matrix crop logs: irrigation/spray validation + ghost crop",
+      "failureMessages": [
+        "AssertionError: expected 400 to be 201 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/agri.api-matrix.test.ts:187:32\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/backup-import-export.test.ts",
+      "name": "Backup / import / export (all apps) flock junk restore is rejected and data survives",
+      "failureMessages": [
+        "AssertionError: flock junk restore {}: expected 200 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/backup-import-export.test.ts:51:98\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/backup-import-export.test.ts",
+      "name": "Backup / import / export (all apps) agri export \u2192 restore into a fresh instance round-trips the marker record",
+      "failureMessages": [
+        "AssertionError: agri backup contains marker: expected '{\"fields\":[{\"name\":\"Sector 1A\",\"acres\u2026' to contain 'mxmwjep66n'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/backup-import-export.test.ts:75:79\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix cows full CRUD: create \u2192 read \u2192 update \u2192 delete \u2192 404",
+      "failureMessages": [
+        "AssertionError: delete cows: expected 409 to be 200 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:100:59\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix cows rejects huge numbers and oversized strings",
+      "failureMessages": [
+        "AssertionError: cows.ageYears huge: expected 201 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix cows does not store script payloads verbatim",
+      "failureMessages": [
+        "AssertionError: cows.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:146:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix milk full CRUD: create \u2192 read \u2192 update \u2192 delete \u2192 404",
+      "failureMessages": [
+        "AssertionError: double-delete milk: expected 200 to be 404 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:104:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix milk rejects huge numbers and oversized strings",
+      "failureMessages": [
+        "AssertionError: milk.morning huge: expected 201 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix expenses rejects huge numbers and oversized strings",
+      "failureMessages": [
+        "AssertionError: expenses.amount huge: expected 201 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix health full CRUD: create \u2192 read \u2192 update \u2192 delete \u2192 404",
+      "failureMessages": [
+        "AssertionError: double-delete health: expected 200 to be 404 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:104:71\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix health rejects huge numbers and oversized strings",
+      "failureMessages": [
+        "AssertionError: health.cost huge: expected 201 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix buyers rejects huge numbers and oversized strings",
+      "failureMessages": [
+        "AssertionError: buyers.name 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:134:78\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix buyers does not store script payloads verbatim",
+      "failureMessages": [
+        "AssertionError: buyers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:146:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix suppliers rejects huge numbers and oversized strings",
+      "failureMessages": [
+        "AssertionError: suppliers.name 10k chars: expected 201 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:134:78\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix suppliers does not store script payloads verbatim",
+      "failureMessages": [
+        "AssertionError: suppliers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:146:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix labor workers rejects huge numbers and oversized strings",
+      "failureMessages": [
+        "AssertionError: labor workers.dailyWage huge: expected 201 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:129:69\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/dairy.api-matrix.test.ts",
+      "name": "Dairy API field matrix labor workers does not store script payloads verbatim",
+      "failureMessages": [
+        "AssertionError: labor workers.name stores <script> verbatim: expected '<script>alert(1)</script>' not to contain '<script>'\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/dairy.api-matrix.test.ts:146:83\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/api-matrix/flock.api-matrix.test.ts",
+      "name": "Flock API field matrix batch logs (all kinds) vaccination: create \u2192 invalid rejected \u2192 delete \u2192 gone",
+      "failureMessages": [
+        "AssertionError: vaccination negative value: expected 201 to be 400 // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/api-matrix/flock.api-matrix.test.ts:101:65\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/toolchain/fastcheck-invariants.test.ts",
+      "name": "TOOLCHAIN fast-check invariants P1: agri inventory quantity is never negative after any PUT quantity",
+      "failureMessages": [
+        "AssertionError: expected '' to be truthy\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/toolchain/fastcheck-invariants.test.ts:23:20\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/toolchain/security-scan.test.ts",
+      "name": "TOOLCHAIN security scan flock: CORS does not reflect arbitrary origins with credentials",
+      "failureMessages": [
+        "AssertionError: CORS reflects evil origin with credentials (acao=https://evil.example.com acac=true): expected true to be false // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/toolchain/security-scan.test.ts:38:144\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    },
+    {
+      "file": "tests/toolchain/security-scan.test.ts",
+      "name": "TOOLCHAIN security scan agri: CORS does not reflect arbitrary origins with credentials",
+      "failureMessages": [
+        "AssertionError: CORS reflects evil origin with credentials (acao=https://evil.example.com acac=true): expected true to be false // Object.is equality\n    at /home/user/ai-monorepo/.cache/chat-rerun/source/tests/toolchain/security-scan.test.ts:38:144\n    at processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at file:///home/user/ai-monorepo/.cache/chat-rerun/source/node_modules/@vitest/runner/dist/chunk-hooks.js:752:20"
+      ],
+      "classification": "UNTRIAGED historical assertion; may be stale fixture, policy expectation, setup contamination or application behavior; no production severity assigned"
+    }
+  ]
+}

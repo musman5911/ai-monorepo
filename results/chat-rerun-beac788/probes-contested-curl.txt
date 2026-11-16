@@ -1,0 +1,73 @@
+beac7883922f44eca3b7b43f91fce53e994638a5
+COMMAND ["bash", "tests/verification/contested-probes.sh"]
+CWD /home/user/ai-monorepo/.cache/chat-rerun/source
+Environment: direct localhost/test-memory unless script explicitly labels production/proxy; no real service tokens.
+================ A4: Set-Cookie on login ================
+-- Agri POST /api/login (form):
+(no Set-Cookie header)
+-- Flock POST /api/auth/login (json):
+(no Set-Cookie header)
+-- Dairy POST /api/auth/login (json):
+(no Set-Cookie header)
+================ C2: CORS reflection by environment ================
+-- Dairy, NODE_ENV=test (harness default), no FRONTEND_URL:
+(no ACAO)
+-- Dairy, NODE_ENV=production, no FRONTEND_URL:
+(no ACAO)
+================ E11: Agri automations role test ================
+-- worker PUT /api/settings/automations:
+403
+-- owner PUT /api/settings/automations with garbage payload:
+400
+-- owner GET /api/settings/automations (was garbage stored?):
+{"cron_enabled":true,"schedule":"0 8 * * *","alert_soil":true,"alert_finance":true,"alert_tasks":true,"recipient":"admin@agri.test"}
+================ N1/D4: Dairy double-delete semantics ================
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+  File "/usr/lib/python3.11/json/__init__.py", line 293, in load
+    return loads(fp.read(),
+           ^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.11/json/decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+-- DELETE /api/health/ (first):
+000
+-- DELETE same id again (double-delete):
+ 000
+DONE
+
+EXIT=0 TIMEOUT=False SECONDS=48.71
