@@ -418,6 +418,7 @@ const MetaSchema = new mongoose.Schema({
 
 // Farms of this project (dairy farms only). See docs/FARMS_AND_ROLES.md.
 const ArchiveJobSchema = new mongoose.Schema({
+  _id: { type: String },
   collection: { type: String, enum: ['milk', 'expenses'], required: true },
   retentionYears: { type: Number, required: true, min: 1 },
   cutoffDate: { type: String, required: true },
@@ -427,6 +428,7 @@ const ArchiveJobSchema = new mongoose.Schema({
   createdBy: { type: String, default: '' },
 }, { timestamps: true });
 const ArchiveRecordSchema = new mongoose.Schema({
+  _id: { type: String },
   jobId: { type: String, required: true },
   sourceCollection: { type: String, enum: ['milk', 'expenses'], required: true },
   sourceId: { type: String, required: true },

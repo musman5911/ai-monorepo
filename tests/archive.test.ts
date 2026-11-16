@@ -24,6 +24,12 @@ describe('Phase 11 shared archive server contracts', () => {
   it('registers Dairy archive job and snapshot models as farm-scoped in both DB modes', () => {
     for (const s of ['const ArchiveJobSchema = new mongoose.Schema','const ArchiveRecordSchema = new mongoose.Schema','ArchiveJob: ArchiveJobSchema','ArchiveRecord: ArchiveRecordSchema',"ArchiveJob = mongoose.model('ArchiveJob', ArchiveJobSchema)","ArchiveRecord = mongoose.model('ArchiveRecord', ArchiveRecordSchema)",'ArchiveJob, ArchiveRecord']) expect(dairyDb).toContain(s);
   });
+  it('uses UUID-compatible string IDs for archive jobs and snapshot records in all apps', () => {
+    for (const db of [dairyDb, flockDb, agriDb]) {
+      expect(db).toMatch(/const ArchiveJobSchema = new mongoose\\.Schema\\(\\{\\s*_id:\\s*\\{\\s*type:\\s*String\\s*\\}/);
+      expect(db).toMatch(/const ArchiveRecordSchema = new mongoose\\.Schema\\(\\{\\s*_id:\\s*\\{\\s*type:\\s*String\\s*\\}/);
+    }
+  });
   it('registers Flock and Agri archive models in memory and real database modes', () => {
     for (const s of ["const ArchiveJob = mongoose.model('MufArchiveJob', ArchiveJobSchema)", "const ArchiveRecord = mongoose.model('MufArchiveRecord', ArchiveRecordSchema)", 'MufArchiveJob: ArchiveJob', 'MufArchiveRecord: ArchiveRecord']) expect(flockDb).toContain(s);
     const flockExports = flockDb.match(/export\s*\{([^}]+)\}/)?.[1] ?? '';
