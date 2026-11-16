@@ -129,3 +129,6 @@ The corrected inventory records manager access for Dairy labor worker/attendance
 
 
 **Phase 19 Dairy Step 11 update (2026-11-16):** the owner reports all ten seeded Dairy role accounts passed their expected farm-visibility/archived-farm-denial checks. Cross-farm CRUD isolation between Farms 2 and 3 passed and both temporary test records were removed. Manager Admin Hub hides My Farms, Backup and Yearly Archive; owner access to My Farms, Backup and Yearly Archive remains visible. Dairy shop publication, actual archive/backup/restore, Agri/Flock browser checks and the restored-copy database track remain open. Phase 19 remains **In progress**. See [Phase 19 details](phase-19-final-testing-database.md).
+
+
+**Phase 19 Dairy public-shop checkpoint (2026-11-16):** the owner verified that a draft product stays hidden from the Incognito public shop, publishing makes it visible, and unpublishing hides it again. The temporary product was deleted and confirmed absent. The public-shop publication flow is complete; actual archive/restore and real backup/restore remain open. Phase 19 is still In progress. See [Phase 19 details](phase-19-final-testing-database.md).

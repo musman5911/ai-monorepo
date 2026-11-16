@@ -99,7 +99,7 @@ Run the build in each app that this phase touched (or `tools\build-all.bat` for 
 - [x] Dairy seeded role/farm visibility matrix: all ten owner/manager/worker test accounts produced the expected farm list or archived-farm denial.
 - [x] Dairy cross-farm CRUD isolation between Farm 2 and Farm 3: create, read, edit, delete and post-delete absence checks passed; both temporary test records were cleaned up.
 - [x] Dairy Admin Hub role visibility: manager cannot see My Farms, Backup or Yearly Archive; owner retains My Farms, Backup and Yearly Archive visibility.
-- [ ] Dairy public-shop product publication/unpublication browser flow.
+- [x] Dairy public-shop product publication/unpublication browser flow: draft hidden, published listing visible, unpublishing removed it from the public shop, and the temporary listing was deleted.
 - [ ] The standard checks above all pass (write the real results in `docs/PROGRESS.md`).
 - [ ] `docs/PROGRESS.md`, `docs/ROADMAP.md` and `docs/phases/README.md` are updated.
 
@@ -332,13 +332,13 @@ The owner tested the Dairy rich-seed role matrix through the browser using the d
 
 No farm records were changed during the role-visibility checks. Worker4 was subsequently re-tested after the login throttle cleared and passed; Worker5 and Worker6 were also tested. All ten seeded role accounts now have an observed result, recorded in the 2026-11-16 update below.
 
-**Remaining Dairy browser checks:** complete the MU Farms public-shop publication/unpublication flow, exercise owner-only archive/restore actions on disposable records, and perform the real backup/restore scenarios against a separately verified disposable target. The manager's New User form was inspected but not submitted.
+**Remaining Dairy browser checks:** exercise owner-only archive/restore actions on disposable records and perform the real backup/restore scenarios against a separately verified disposable target. The manager's New User form was inspected but not submitted.
 
 **Build and CI for the manager UI correction:** the owner pulled commit `20db59c`; the local Dairy frontend TypeScript/Vite build passed (3,224 modules transformed). GitHub Actions frontend workflow [43741459525](https://github.com/musman5911/ai-monorepo/actions/runs/43741459525) passed, including the three frontend builds. Quick workflow [43741459532](https://github.com/musman5911/ai-monorepo/actions/runs/43741459532) passed its test suite and source/documentation/security checks through the production dependency audit, but the final production dependency-audit step failed. Resolve that separate dependency finding and rerun the workflow before release sign-off.
 
 ## Remaining Phase 19 work after the 2026-11-15 checkpoint
 
-1. Complete the remaining Dairy-specific flows: public-shop product publication/unpublication, owner-only archive/restore actions, and real backup/restore behavior on a verified disposable target.
+1. Complete the remaining Dairy-specific flows: owner-only archive/restore actions and real backup/restore behavior on a verified disposable target. The public-shop product publication/unpublication flow is complete.
 2. Run the equivalent seeded-data browser and farm-isolation checks for Agri and Flock.
 3. Complete the restored-copy MongoDB track for all three apps: create fresh backups of disposable test data, restore each only into a separate `muf_phase19_<app>_<copy>` database, run the guarded migration dry run, apply and apply again, and compare counts and farm ownership before/after. No migration apply or restored-copy test is recorded as complete yet.
 4. Complete persistent backup/restore scenarios: Agri diary media; Dairy suppliers and payments; Flock image bytes/metadata; monthly chunks and legacy backup formats.
@@ -394,4 +394,20 @@ This update supersedes the pending Worker4/Worker5/Worker6 items in the 2026-11-
 
 The Admin Hub restriction is implemented in `dairy_farm/client/src/components/AdminPanel.tsx` and covered by `tests/dairy-admin-owner-sections.test.ts`. The frontend workflow on commit `beac788` passed: [GitHub Actions run 43891986764](https://github.com/musman5911/ai-monorepo/actions/runs/43891986764). The quick-check workflow on the same commit failed only at the production dependency-audit step: [GitHub Actions run 43891986654](https://github.com/musman5911/ai-monorepo/actions/runs/43891986654). Do not treat that workflow as fully passed.
 
-**Step 11 disposition:** the Dairy seeded role/farm matrix, cross-farm CRUD isolation and manager/owner Admin Hub visibility checks are complete based on the owner's browser observations. Dairy shop publication, actual archive/restore operations, and real backup/restore remain open. Phase 19 remains **In progress**; no production database was used.
+**Step 11 disposition:** the Dairy seeded role/farm matrix, cross-farm CRUD isolation, manager/owner Admin Hub visibility, and public-shop product publication/unpublication flow are complete based on the owner's browser observations. Actual archive/restore operations and real backup/restore remain open. Phase 19 remains **In progress**; no production database was used.
+
+
+## Step 11 public-shop publication verification (2026-11-16; owner-reported)
+
+The owner tested a temporary Dairy product named `PH19-DAIRY-SHOP-TEST` in the local Dairy public shop:
+
+| Action | Observed result | Status |
+|---|---|---|
+| Create and save with Publish unchecked | Product was present in the product manager as a draft and absent from the public Dairy category in an Incognito window. | Passed |
+| Enable Publish to MU Farms | Product appeared in the Incognito public shop. | Passed |
+| Disable Publish to MU Farms | Product disappeared from the Incognito public shop. | Passed |
+| Delete the temporary test product | Product was gone from the manager product list after deletion/refresh. | Passed |
+
+The owner reports that the seeded products were not changed. This verifies the draft/published visibility switch and cleanup in the local browser flow; it does not establish deployed cross-origin feed or WhatsApp order delivery behavior.
+
+**Dairy public-shop publication/unpublication flow: Complete.** Remaining Dairy work is the actual owner-only archive/restore operation and real backup/restore on a separately verified disposable target. Phase 19 remains **In progress**.

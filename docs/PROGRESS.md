@@ -566,3 +566,15 @@ The manager Admin Hub now hides My Farms and Backup; Reports remains visible but
 The correction is in commit `beac7883922f44eca3b7b43f91fce53e994638a5`, with regression coverage in `tests/dairy-admin-owner-sections.test.ts`. The frontend Actions run [43891986764](https://github.com/musman5911/ai-monorepo/actions/runs/43891986764) passed. The quick-check run [43891986654](https://github.com/musman5911/ai-monorepo/actions/runs/43891986654) failed at the production dependency-audit step; it is not a fully green run.
 
 **Disposition:** Dairy role/farm visibility, cross-farm CRUD isolation and manager/owner Admin Hub visibility are passed. Dairy shop publication and actual archive/backup/restore operations remain open. Agri/Flock browser validation and the restored-copy MongoDB migration and persistence scenarios also remain open. Phase 19 remains **In progress**.
+
+
+## Phase 19 Dairy public-shop verification (2026-11-16; owner-reported)
+
+The owner completed the Dairy product publication/unpublication browser test using the temporary product `PH19-DAIRY-SHOP-TEST`:
+
+- Saved as Draft: absent from the public shop in an Incognito window.
+- Published through Admin Hub → MU Farms products: appeared in the public shop.
+- Unpublished: disappeared from the public shop again.
+- Deleted the temporary product and confirmed it was gone from the manager product list.
+
+The owner reports no seeded products were modified. **Dairy public-shop publication/unpublication is complete.** Actual owner-only archive/restore and real backup/restore remain open. Agri/Flock browser validation, restored-copy MongoDB migrations and persistence tests, Flock concurrency/deletion-safety checks, database-cap measurements, and the production dependency-audit issue also remain open. Phase 19 stays **In progress**; this browser check used no production database.

@@ -155,3 +155,6 @@ The read-only audits for Agri, Dairy and Flock are all accepted. The final Flock
 
 
 **Phase 19 Dairy Step 11 update (2026-11-16):** all ten seeded Dairy role accounts now have expected visibility/denial results; cross-farm create/read/edit/delete isolation between Farms 2 and 3 passed and the temporary records were cleaned up. The manager no longer sees My Farms or Backup, and cannot see Yearly Archive; the owner still sees My Farms, Backup and Yearly Archive. Frontend CI passed on commit `beac788`; quick checks still fail at the production dependency-audit step. Dairy shop publication and actual archive/backup/restore operations remain open, as do Agri/Flock browser tests and the remaining restored-copy database tests. Phase 19 remains **In progress**. See [Phase 19 details](phases/phase-19-final-testing-database.md).
+
+
+**Phase 19 Dairy public-shop check (2026-11-16):** owner-reported browser verification passed for draft-hidden, published-visible and unpublished-hidden behavior in the Incognito public shop. The temporary `PH19-DAIRY-SHOP-TEST` item was deleted and confirmed absent. Dairy public-shop publication is complete; actual archive/restore and backup/restore remain open. Phase 19 remains **In progress**. See [Phase 19 details](phases/phase-19-final-testing-database.md).
