@@ -82,12 +82,14 @@ describe('Agri Phase 19 role and popup regressions', () => {
     expect(modal).toContain('MUF_Z.POPUP');
   });
 
-  it('shows the active farm role for the signed-in user in the Agri Users list', () => {
+  it('preserves canonical farm roles for all Agri Users list entries', () => {
     const admin = read('agri_farm/frontend/src/components/AdminMenu.tsx');
     const users = read('agri_farm/frontend/src/muf/admin/muf-admin-users.tsx');
-    expect(admin).toContain('farmRole: u.username === username ? farmRole : undefined');
-    expect(users).toContain('const role = user.farmRole || user.role');
-    expect(users).toContain("if (role === 'manager') return L('Manager')");
+    expect(admin).toContain('farmRole: u.farmRole || (u.username === username ? farmRole : undefined)');
+    expect(admin).toContain('farmIds: u.farmIds || []');
+    expect(users).toContain('export function resolveUserFarmRole');
+    expect(users).toContain("if (user.farmRole === 'manager') return 'manager'");
+    expect(users).toContain("if (user.role === 'admin') return hasAssignedFarms ? 'manager' : 'owner'");
   });
 
   it('limits Agri global farm settings and cross-farm sections to the owner', () => {
