@@ -94,3 +94,37 @@ jobs:
 
       - name: Audit production dependencies in all package sets
         run: npm run check-audit
+
+  flock-lock-multiprocess:
+    name: Flock MongoDB cross-process egg lock
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    services:
+      mongodb:
+        image: mongo:7
+        ports:
+          - 27017:27017
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok' || exit 1"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24
+
+      - name: Install Flock backend dependencies
+        working-directory: flock_farm/backend
+        run: npm ci
+
+      - name: Verify egg inventory lock across independent Node processes
+        working-directory: flock_farm/backend
+        env:
+          MUF_PHASE19_FLOCK_LOCK_URI: mongodb://127.0.0.1:27017/muf_phase19_flock_lock_ci
+          MUF_PHASE19_FLOCK_LOCK_FARM_ID: phase19-ci-farm
+        run: node scripts/check-egg-inventory-lock-multiprocess.mjs
