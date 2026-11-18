@@ -241,7 +241,7 @@ describe('Flock location settings farm scope', () => {
   it('keeps location reads and writes inside the authenticated farm context', () => {
     const routes = source('flock_farm/backend/routes/settings.js');
     expect(routes).toContain("router.get('/location', authRequired,");
-    expect(routes).toContain("router.put('/location', authRequired, requireRole('admin'),");
+    expect(routes).toContain("router.put('/location', authRequired, requireRole('owner'),");
     expect(routes).toContain("DataStore.findOne({ key: 'farm_location' })");
     expect(routes).not.toContain("router.get('/location', async");
     const inventory = source('docs/security/route-permission-inventory.md');
