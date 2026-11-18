@@ -1,7 +1,7 @@
 import express from 'express';
 const router = express.Router();
 import mongoose from 'mongoose';
-import { Cow, Milk, Expense, Rate, Health, Buyer, BuyerPayment, RateHistory, DailyLog, Sale, Meta, Laborer, LaborAttendance, LaborAdvance, Supplier, SupplierPayment, BreedingEvent, User, Farm, ArchiveJob, ArchiveRecord, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
+import { Cow, Milk, Expense, Rate, Health, Buyer, BuyerPayment, RateHistory, DailyLog, Sale, Meta, Laborer, LaborAttendance, LaborAdvance, Supplier, SupplierPayment, BreedingEvent, User, Farm, ArchiveJob, ArchiveRecord, PhotoAsset, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES } from '../db.js';
 import { protectUnscoped, ownerOnly } from '../middleware/auth.js';
 import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
 
@@ -24,6 +24,7 @@ async function restoreMissingFarms(payload) {
 import { sendMail, mailConfigured, mufEmail } from '../utils/mailer.js';
 import { MUF_ENV } from '../muf-env.mjs';
 import { withRestoreRecovery } from '../../../shared/muf-restore-recovery.mjs';
+import { serializePhotoAssets, restorePhotoAssets } from '../../../shared/muf-photo-asset-backup.mjs';
 
 // GET /api/backup — download full database as JSON
 router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
@@ -44,11 +45,13 @@ router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
       LaborAdvance.find().lean(), Supplier.find().lean(), SupplierPayment.find().lean(), BreedingEvent.find().lean(),
     ]);
     const farms = await Farm.find().lean();
+    const photoAssets = await PhotoAsset.find().lean();
     const backup = {
       exportDate: new Date().toISOString(),
       farmName: 'Usman Dairy Farm',
       version: 4,
       farms,
+      photoAssets: serializePhotoAssets(photoAssets),
       cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents,
       archiveJobs: await ArchiveJob.find().lean(), archiveRecords: await ArchiveRecord.find().lean()
     };
@@ -77,6 +80,7 @@ const COLLECTIONS = {
   breedingEvents: BreedingEvent,
   archiveJobs: ArchiveJob,
   archiveRecords: ArchiveRecord,
+  photoAssets: PhotoAsset,
 };
 
 function validateBackupPayload(payload) {
@@ -93,6 +97,7 @@ function validateBackupPayload(payload) {
   if (payload.farms !== undefined && (!Array.isArray(payload.farms) || payload.farms.some((farm) => !farm || typeof farm !== 'object' || Array.isArray(farm)))) {
     throw new Error('"farms" must be an array of records if present');
   }
+  if (Array.isArray(payload.photoAssets)) restorePhotoAssets(payload.photoAssets);
 }
 
 async function restoreCollections(payload, session) {
@@ -102,12 +107,13 @@ async function restoreCollections(payload, session) {
     // Only touch collections that are present AND are arrays with content intent.
     // Empty array still means "clear this collection" when the key is present.
     if (data === undefined || !Array.isArray(data)) continue;
+    const sourceData = key === 'photoAssets' ? restorePhotoAssets(data) : data;
     await Model.deleteMany({}, opts);
-    if (data.length > 0) {
+    if (sourceData.length > 0) {
       // insertMany in chunks to avoid huge single ops
       const chunkSize = 500;
-      for (let i = 0; i < data.length; i += chunkSize) {
-        const chunk = data.slice(i, i + chunkSize);
+      for (let i = 0; i < sourceData.length; i += chunkSize) {
+        const chunk = sourceData.slice(i, i + chunkSize);
         await Model.insertMany(chunk, { ...opts, ordered: false });
       }
     }

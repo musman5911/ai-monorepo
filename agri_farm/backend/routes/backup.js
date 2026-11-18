@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 // ─── Backup & restore (admin only) + monthly auto-backup ────────────────────
 import express from 'express';
-import { Setting, User, Farm, Field, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer, Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia } from '../db.js';
+import { Setting, User, Farm, Field, MUF_FARM_MODELS, MUF_FARM_SCOPED_NAMES, Crop, Finance, Task, Inventory, Liability, Irrigation, CropPhoto, Spray, Laborer, Attendance, LaborAdvance, Supplier, SupplierPayment, DiaryMedia, PhotoAsset } from '../db.js';
 import { protectUnscoped, ownerOnly } from '../middleware/auth.js';
 import { mufRunUnscoped, mufMigrateFarms, MUF_FULL_ROLE_VALUES } from '../muf-farms.mjs';
 import { HttpError, badRequest, notFound, asyncHandler } from '../utils/helpers.js';
@@ -9,6 +9,7 @@ import { sendEmail, mufEmail, mailConfigured } from '../utils/mailer.js';
 import { MUF_ENV } from '../muf-env.mjs';
 import { withRestoreRecovery } from '../../../shared/muf-restore-recovery.mjs';
 import { stringifyDocs as stringifyPlainBackupDocs, stringifyBackupUsers } from '../muf-backup-serialization.mjs';
+import { serializePhotoAssets, restorePhotoAssets } from '../../../shared/muf-photo-asset-backup.mjs';
 
 const router = express.Router();
 
@@ -49,6 +50,7 @@ const BACKUP_COLLECTIONS = [
   ['labor_advances', LaborAdvance],
   ['suppliers', Supplier],
   ['supplier_payments', SupplierPayment],
+  ['photo_assets', PhotoAsset],
 ];
 
 // Mongoose documents must be converted before spreading. Spreading a document
@@ -65,7 +67,7 @@ async function collectBackupPayload() {
   const payload = {};
   for (const [key, Model] of BACKUP_COLLECTIONS) {
     const docs = await Model.find({}).limit(100000);
-    payload[key] = stringifyDocs(docs);
+    payload[key] = key === 'photo_assets' ? serializePhotoAssets(docs) : stringifyDocs(docs);
   }
   payload.farms = stringifyDocs(await Farm.find({}).limit(10000));
   // Archive models are regular Mongoose models, not memory-db models. In MEMORY_MODE
@@ -87,10 +89,11 @@ async function collectBackupPayload() {
 
 async function restoreCollection(Model, data) {
   if (data == null) return false;
+  const sourceData = Model === PhotoAsset ? restorePhotoAssets(data) : data;
   await Model.deleteMany({});
-  if (!data.length) return true;
+  if (!sourceData.length) return true;
   const prepared = [];
-  for (const doc of data) {
+  for (const doc of sourceData) {
     const item = { ...doc };
     if (item._id) {
       if (/^[0-9a-fA-F]{24}$/.test(String(item._id))) {
@@ -203,6 +206,7 @@ function validateBackupPayload(payload) {
   // auxiliary farm/archive collections. A malformed optional section must not
   // be silently skipped or partially applied during a database-wide restore.
   const mutableKeys = [...knownKeys, 'farms', 'archiveJobs', 'archiveRecords'];
+  if (Array.isArray(payload.photo_assets)) restorePhotoAssets(payload.photo_assets);
   for (const key of mutableKeys.filter((k) => k in payload)) {
     const data = payload[key];
     if (!Array.isArray(data) || data.some((doc) => !doc || typeof doc !== 'object' || Array.isArray(doc))) {
