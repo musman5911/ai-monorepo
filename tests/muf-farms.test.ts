@@ -68,6 +68,57 @@ describe('farm deletion safety', () => {
   });
 });
 
+describe('farm deletion assignment safety', () => {
+  it('moves assigned managers and workers to the destination farm when their farm data is moved', async () => {
+    const store = createStore({
+      Farm: { paths: {}, options: { timestamps: true } },
+      User: { paths: {} },
+      Crop: { paths: {} },
+    });
+    await store.Farm.create({ _id: 'source-farm', name: 'Source farm', archived: false });
+    await store.Farm.create({ _id: 'destination-farm', name: 'Destination farm', archived: false });
+    await store.Farm.create({ _id: 'other-farm', name: 'Other farm', archived: false });
+    await store.User.create({ _id: 'manager-1', username: 'manager-1', role: 'manager', farmIds: ['source-farm', 'destination-farm', 'other-farm', 'source-farm'] });
+    await store.User.create({ _id: 'worker-1', username: 'worker-1', role: 'worker', farmIds: ['source-farm'] });
+    await store.Crop.create({ _id: 'crop-1', name: 'Wheat', farmId: 'source-farm' });
+
+    const response = mockResponse();
+    await createFarmDeleteHandler(store, ['Crop'])({
+      params: { id: 'source-farm' },
+      body: { confirmName: 'Source farm', moveToFarmId: 'destination-farm' },
+    }, response);
+
+    expect(response.statusCode).toBe(200);
+    expect((await store.User.findById('manager-1')).farmIds).toEqual(['destination-farm', 'other-farm']);
+    expect((await store.User.findById('worker-1')).farmIds).toEqual(['destination-farm']);
+    expect(await store.Crop.findOne({ farmId: 'source-farm' })).toBeNull();
+    expect(await store.Crop.findOne({ farmId: 'destination-farm' })).toMatchObject({ _id: 'crop-1' });
+  });
+
+  it('removes only the deleted farm assignment when its records are deliberately deleted', async () => {
+    const store = createStore({
+      Farm: { paths: {}, options: { timestamps: true } },
+      User: { paths: {} },
+      Crop: { paths: {} },
+    });
+    await store.Farm.create({ _id: 'source-farm', name: 'Source farm', archived: false });
+    await store.Farm.create({ _id: 'destination-farm', name: 'Destination farm', archived: false });
+    await store.User.create({ _id: 'worker-1', username: 'worker-1', role: 'worker', farmIds: ['source-farm', 'destination-farm'] });
+    await store.Crop.create({ _id: 'crop-1', name: 'Wheat', farmId: 'source-farm' });
+
+    const response = mockResponse();
+    await createFarmDeleteHandler(store, ['Crop'])({
+      params: { id: 'source-farm' },
+      body: { confirmName: 'Source farm', deleteData: true },
+    }, response);
+
+    expect(response.statusCode).toBe(200);
+    expect((await store.User.findById('worker-1')).farmIds).toEqual(['destination-farm']);
+    expect(await store.Crop.findOne({ farmId: 'source-farm' })).toBeNull();
+    expect(await store.Crop.findOne({ farmId: 'destination-farm' })).toBeNull();
+  });
+});
+
 describe('farm deletion data safety', () => {
   it('merges colliding DataStore buckets and moves non-colliding buckets before deleting a farm', async () => {
     const store = createStore({

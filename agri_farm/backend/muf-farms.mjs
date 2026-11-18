@@ -464,6 +464,7 @@ export function mufCreateFarmsRouter({ express, Farm, User, models, names, prote
         return res.status(400).json({ error: 'You cannot delete the last active farm', code: 'LAST_ACTIVE_FARM' });
       }
       const { total } = await mufCountFarmRecords(models, names, farm._id);
+      let moveAssignmentsTo = null;
       if (total > 0) {
         if (cleanName(req.body?.confirmName) !== cleanName(farm.name)) {
           return res.status(400).json({ error: 'Type the farm name to confirm', code: 'CONFIRM_NAME', records: total });
@@ -474,6 +475,7 @@ export function mufCreateFarmsRouter({ express, Farm, User, models, names, prote
           if (moveTo === sid(farm._id) || !destination || destination.archived) {
             return res.status(400).json({ error: 'Choose a different active farm to move the records to', code: 'INVALID_MOVE_TARGET' });
           }
+          moveAssignmentsTo = moveTo;
           await mufRunUnscoped(async () => {
             for (const n of names) {
               if (n === 'DataStore' && models[n]) {
@@ -493,9 +495,15 @@ export function mufCreateFarmsRouter({ express, Farm, User, models, names, prote
       }
       await mufRunUnscoped(async () => {
         for (const u of await User.find({}).lean()) {
-          const ids = (u.farmIds || []).map(sid);
+          const ids = [...new Set((u.farmIds || []).map(sid).filter(Boolean))];
           if (ids.includes(sid(farm._id))) {
-            await User.findByIdAndUpdate(u._id, { $set: { farmIds: ids.filter((x) => x !== sid(farm._id)) } });
+            const nextFarmIds = ids.filter((x) => x !== sid(farm._id));
+            // Moving a farm's records also moves its staff assignment; otherwise
+            // workers/managers lose access to the records just moved to the target.
+            if (moveAssignmentsTo && !nextFarmIds.includes(sid(moveAssignmentsTo))) {
+              nextFarmIds.push(sid(moveAssignmentsTo));
+            }
+            await User.findByIdAndUpdate(u._id, { $set: { farmIds: nextFarmIds } });
           }
         }
         await Farm.findByIdAndDelete(farm._id);
