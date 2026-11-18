@@ -320,8 +320,19 @@ describe('Dairy and Flock backup restore payload validation', () => {
     expect(dairyManual.indexOf('validateBackupPayload(payload)')).toBeGreaterThanOrEqual(0);
     expect(dairyManual.indexOf('validateBackupPayload(payload)')).toBeLessThan(dairyManual.indexOf('restoreMissingFarms(payload)'));
     const dairyAuto = dairy.split("router.post('/restore-auto',")[1] || '';
-    expect(dairyAuto.indexOf('validateBackupPayload(value.payload)')).toBeGreaterThanOrEqual(0);
-    expect(dairyAuto.indexOf('validateBackupPayload(value.payload)')).toBeLessThan(dairyAuto.indexOf('restoreMissingFarms(value.payload)'));
+    const dairyExpanded = dairyAuto.indexOf('const payload = await expandMonthlyPhotoPayload(value)');
+    const dairyValidated = dairyAuto.indexOf('validateBackupPayload(payload)');
+    expect(dairyExpanded).toBeGreaterThanOrEqual(0);
+    expect(dairyValidated).toBeGreaterThan(dairyExpanded);
+    expect(dairyValidated).toBeLessThan(dairyAuto.indexOf('restoreMissingFarms(payload)'));
+
+    const agri = source('agri_farm/backend/routes/backup.js');
+    const agriAuto = agri.split("router.post('/restore/auto',")[1] || '';
+    const agriExpanded = agriAuto.indexOf('const payload = await expandMonthlyPhotoPayload(value)');
+    const agriValidated = agriAuto.indexOf('validateBackupPayload(payload)');
+    expect(agriExpanded).toBeGreaterThanOrEqual(0);
+    expect(agriValidated).toBeGreaterThan(agriExpanded);
+    expect(agriValidated).toBeLessThan(agriAuto.indexOf('applyBackupPayload(payload)'));
 
     const flock = source('flock_farm/backend/routes/backup.js');
     expect(flock).toContain('function validateBackupPayload(payload)');
