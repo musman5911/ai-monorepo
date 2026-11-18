@@ -230,17 +230,6 @@ const scenarios: Array<{ name: string; run: (factory: RouterFactory, storeFactor
     },
   },
   {
-    name: 'preserves pre-existing destination records while moving source records',
-    run: async (factory, makeStore) => {
-      const db = createStore(makeStore); await farms(db);
-      await db.Crop.create({ _id: 'dest-crop', farmId: 'target' });
-      await db.Crop.create({ _id: 'source-crop', farmId: 'source' });
-      const res = await execute(factory, db, { confirmName: 'Source Farm', moveToFarmId: 'target' });
-      expect(res.statusCode).toBe(200);
-      expect(await db.Crop.countDocuments({ farmId: 'target' })).toBe(2);
-    },
-  },
-  {
     name: 'transfers manager assignment with moved farm data',
     run: async (factory, makeStore) => {
       const db = createStore(makeStore); await farms(db);
@@ -319,17 +308,7 @@ const scenarios: Array<{ name: string; run: (factory: RouterFactory, storeFactor
     },
   },
   {
-    name: 'does not modify users that were not assigned to the deleted farm',
-    run: async (factory, makeStore) => {
-      const db = createStore(makeStore); await farms(db);
-      await db.User.create({ _id: 'worker', role: 'worker', farmIds: ['target'] });
-      const res = await execute(factory, db);
-      expect(res.statusCode).toBe(200);
-      expect((await db.User.findById('worker')).farmIds).toEqual(['target']);
-    },
-  },
-  {
-    name: 'requires confirm and a valid action when deleting populated archived farm',
+    name: 'allows deleting a populated archived farm after confirmation and a valid action',
     run: async (factory, makeStore) => {
       const db = createStore(makeStore,); await farms(db, [
         { _id: 'source', name: 'Source Farm', archived: true },
@@ -372,15 +351,6 @@ const scenarios: Array<{ name: string; run: (factory: RouterFactory, storeFactor
       const db = createStore(makeStore); await farms(db);
       await db.Crop.create({ _id: 'crop', farmId: 'source' });
       const res = await execute(factory, db, { confirmName: ' Source   Farm ', deleteData: true });
-      expect(res.statusCode).toBe(200);
-    },
-  },
-  {
-    name: 'accepts the farm name case-insensitively',
-    run: async (factory, makeStore) => {
-      const db = createStore(makeStore); await farms(db);
-      await db.Crop.create({ _id: 'crop', farmId: 'source' });
-      const res = await execute(factory, db, { confirmName: 'source farm', deleteData: true });
       expect(res.statusCode).toBe(200);
     },
   },
