@@ -16,12 +16,15 @@ export function serializeBackupImages(images) {
       throw new TypeError('Every image backup row must have an ID.');
     }
     const { data, __v, ...metadata } = image;
-    return {
+    const base = {
       ...metadata,
       _id: String(image._id),
       farmId: String(image.farmId || ''),
-      dataBase64: toBuffer(data).toString('base64'),
     };
+    // Cloudinary-hosted images are backed up as provider references;
+    // MongoDB-hosted images must contain their full binary payload.
+    if (image.provider === 'cloudinary' && data == null) return base;
+    return { ...base, dataBase64: toBuffer(data).toString('base64') };
   });
 }
 
@@ -37,16 +40,26 @@ export function restoreBackupImages(rows) {
     if (source.farmId === undefined || source.farmId === null || !String(source.farmId).trim()) {
       throw new TypeError(`Image backup row ${index + 1} is missing its farm ID.`);
     }
-    if (typeof source.dataBase64 !== 'string') {
+    const { dataBase64, __v, ...metadata } = source;
+    const isCloudinary = (source.provider || 'mongodb') === 'cloudinary';
+    if (typeof dataBase64 !== 'string') {
+      if (isCloudinary) return { ...metadata, _id: String(source._id), farmId: String(source.farmId) };
       throw new TypeError(`Image backup row ${index + 1} has invalid base64 data.`);
     }
     // Decode/round-trip validation handles huge valid strings without a regex stack overflow.
-    const data = Buffer.from(source.dataBase64, 'base64');
-    if (data.toString('base64') !== source.dataBase64) {
+    const data = Buffer.from(dataBase64, 'base64');
+    if (data.toString('base64') !== dataBase64) {
       throw new TypeError(`Image backup row ${index + 1} has invalid base64 data.`);
     }
-    const { dataBase64, __v, ...metadata } = source;
-    return { ...metadata, _id: String(source._id), farmId: String(source.farmId), data };
+    if (!data.length && !isCloudinary) {
+      throw new TypeError(`Image backup row ${index + 1} is missing binary image data.`);
+    }
+    return {
+      ...metadata,
+      _id: String(source._id),
+      farmId: String(source.farmId),
+      ...(data.length ? { data } : {}),
+    };
   });
 }
 
@@ -55,15 +68,18 @@ export function splitBase64Image(image, imageIndex, chunkChars) {
     throw new TypeError('Image chunk size must be a positive multiple of four.');
   }
   const { dataBase64, ...metadata } = image;
-  if (typeof dataBase64 !== 'string') throw new TypeError('Serialized image is missing base64 data.');
-  const partCount = Math.max(1, Math.ceil(dataBase64.length / chunkChars));
+  const serializedBytes = typeof dataBase64 === 'string' ? dataBase64 : '';
+  if (!serializedBytes && (image.provider || 'mongodb') !== 'cloudinary') {
+    throw new TypeError('Serialized image is missing base64 data.');
+  }
+  const partCount = Math.max(1, Math.ceil(serializedBytes.length / chunkChars));
   return Array.from({ length: partCount }, (_, partIndex) => ({
     imageIndex,
     imageId: String(image._id),
     partIndex,
     partCount,
     metadata: partIndex === 0 ? metadata : null,
-    dataBase64Part: dataBase64.slice(partIndex * chunkChars, (partIndex + 1) * chunkChars),
+    dataBase64Part: serializedBytes.slice(partIndex * chunkChars, (partIndex + 1) * chunkChars),
   }));
 }
 

@@ -35,6 +35,28 @@ describe('Flock image backup binary preservation', () => {
     expect(restored.createdAt).toEqual(backup.createdAt);
   });
 
+  it('preserves Cloudinary image references without requiring local binary bytes', () => {
+    const [backup] = serializeBackupImages([{
+      _id: 'cloud-image',
+      farmId: 'farm-cloud',
+      kind: 'bird',
+      provider: 'cloudinary',
+      cloudinaryPublicId: 'muf/farm-cloud/bird-1',
+      secureUrl: 'https://res.cloudinary.com/example/image/upload/bird-1.jpg',
+      contentType: 'image/jpeg',
+      size: 4096,
+    }]);
+    expect(backup.cloudinaryPublicId).toBe('muf/farm-cloud/bird-1');
+    expect(backup).not.toHaveProperty('dataBase64');
+
+    const parts = splitBase64Image(backup, 0, 32);
+    expect(parts).toHaveLength(1);
+    const reassembled = assembleBase64ImageParts(parts, 0);
+    const [restored] = restoreBackupImages([reassembled]);
+    expect(restored.secureUrl).toBe(backup.secureUrl);
+    expect(restored.data).toBeUndefined();
+  });
+
   it('splits and reassembles large image data without changing bytes', () => {
     const dataBase64 = Buffer.from(Array.from({ length: 257 }, (_, i) => i % 256)).toString('base64');
     const image = { _id: 'image-a', farmId: 'farm-b', kind: 'diary', contentType: 'image/jpeg', dataBase64 };
