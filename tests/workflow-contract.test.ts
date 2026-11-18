@@ -14,8 +14,8 @@ describe('GitHub Actions quick-check workflow contract', () => {
   });
 
   it('runs the required quick checks exactly once and keeps long checks manual', () => {
-    const quickJob = workflow.split('  quick-checks:\\n')[1]?.split('  flock-lock-multiprocess:\\n')[0] || '';
-    const runCommands = [...quickJob.matchAll(/^\\s*run:\\s*(.*?)\\s*$/gm)].map((match) => match[1].trim());
+    const quickJob = workflow.split('  quick-checks:\n')[1]?.split('  flock-lock-multiprocess:\n')[0] || '';
+    const runCommands = [...quickJob.matchAll(/^\s*run:\s*(.*?)\s*$/gm)].map((match) => match[1].trim());
     expect(runCommands).toEqual([
       'npm ci',
       'npm ci',
