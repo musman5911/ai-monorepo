@@ -25,12 +25,12 @@ describe('Flock Admin Hub owner-only sections', () => {
     expect(menu).toContain("{section === 'reports' && (");
   });
 
-  it('restricts weather-location editing to owners in both UI and API', () => {
+  it('allows assigned managers to edit farm-scoped weather location, but not workers', () => {
     const settings = read('flock_farm/backend/routes/settings.js');
-    expect(menu).toContain("{isOwner && (");
+    expect(menu).toContain("{(isOwner || currentUser?.farmRole === 'manager') && (");
     expect(menu).toContain("title={L('Farm Location')}");
-    expect(settings).toContain("router.put('/location', authRequired, requireRole('owner')");
-    expect(settings).not.toContain("router.put('/location', authRequired, requireRole('admin')");
+    expect(settings).toContain("router.put('/location', authRequired, requireRole('admin')");
+    expect(settings).not.toContain("router.put('/location', authRequired, requireRole('worker')");
   });
 
   it('labels a manager as Manager in the main Flock header', () => {

@@ -474,7 +474,7 @@ export default function AdminMenu(props: AdminMenuProps) {
                 </MufAdminCard>
 
                 {/* Shared weather coordinates are an owner-only setting. */}
-                {isOwner && (
+                {(isOwner || currentUser?.farmRole === 'manager') && (
                 <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title={L('Farm Location')} subtitle={L('Set your farm coordinates for live weather')}>
                   <div className="space-y-3">
                     {farmLocCurrent && (
