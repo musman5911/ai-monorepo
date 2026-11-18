@@ -119,8 +119,13 @@ export default function AdminMenu(props: AdminMenuProps) {
     return () => { cancelled = true; };
   }, [open, section, currentUser?.farmRole]);
 
-  const canManageProducts = currentUser?.farmRole === 'owner' || currentUser?.farmRole === 'manager' || currentUser?.role === 'admin';
-  const visibleAdminTabs = ADMIN_TABS.filter((tab) => tab.id !== 'products' || canManageProducts);
+  const isOwner = currentUser?.farmRole === 'owner';
+  const canManageProducts = isOwner || currentUser?.farmRole === 'manager' || currentUser?.role === 'admin';
+  // My Farms, full-database Backup and destructive Database Utilities are owner-only.
+  const visibleAdminTabs = ADMIN_TABS.filter((tab) =>
+    (tab.id !== 'products' || canManageProducts) &&
+    (isOwner || !['farms', 'backup', 'danger'].includes(tab.id))
+  );
   const [eggPrice, setEggPrice] = useState(settings.defaultPricePerEgg.toString());
   const [vacInterval, setVacInterval] = useState(settings.vaccinationIntervalDays.toString());
   // Farm location
@@ -536,7 +541,7 @@ export default function AdminMenu(props: AdminMenuProps) {
               />
             )}
 
-            {section === 'farms' && <MyFarmsPanel />}
+            {section === 'farms' && isOwner && <MyFarmsPanel />}
             {section === 'products' && canManageProducts && <ProductManager kinds={[{ value: 'egg', label: 'Eggs' }, { value: 'bird', label: 'Birds' }]} getHeaders={() => {
               const token = getToken() || ''; let farmId = '';
               try { farmId = localStorage.getItem('muf_active_farm_flock') || ''; } catch { /* storage unavailable */ }
@@ -606,7 +611,7 @@ export default function AdminMenu(props: AdminMenuProps) {
               </MufAdminReports>
             )}
 
-            {section === 'backup' && (
+            {section === 'backup' && isOwner && (
               <div className="space-y-6">
                 <MufAdminCard icon={<Database className="w-5 h-5" />} title={L('Manual Backup')} subtitle={L('Download or share your farm data')}>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -720,7 +725,7 @@ export default function AdminMenu(props: AdminMenuProps) {
               </div>
             )}
 
-            {section === 'danger' && (
+            {section === 'danger' && isOwner && (
               <div className="max-w-xl mx-auto space-y-3">
                 <h3 className="text-sm font-bold font-display text-slate-800 dark:text-slate-100">
                   {L('Database Utilities')}

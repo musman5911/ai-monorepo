@@ -633,7 +633,11 @@ export default function AdminMenu({
         showAlert(detail ? `Database restore failed: ${detail}` : "Database restore failed. Ensure valid JSON structure.", true);
       }
     };
+    reader.onerror = () => {
+      showAlert("Could not read backup file. Please choose a valid JSON backup.", true);
+    };
     reader.readAsText(file);
+    e.target.value = '';
   };
 
   const filteredTabs = ADMIN_TABS.filter(tab => {

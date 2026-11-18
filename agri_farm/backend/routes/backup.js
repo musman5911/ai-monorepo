@@ -8,6 +8,7 @@ import { HttpError, badRequest, notFound, asyncHandler } from '../utils/helpers.
 import { sendEmail, mufEmail, mailConfigured } from '../utils/mailer.js';
 import { MUF_ENV } from '../muf-env.mjs';
 import { withRestoreRecovery } from '../../../shared/muf-restore-recovery.mjs';
+import { stringifyDocs as stringifyPlainBackupDocs, stringifyBackupUsers } from '../muf-backup-serialization.mjs';
 
 const router = express.Router();
 
@@ -50,8 +51,10 @@ const BACKUP_COLLECTIONS = [
   ['supplier_payments', SupplierPayment],
 ];
 
+// Mongoose documents must be converted before spreading. Spreading a document
+// exposes its internals rather than its schema fields and can leak nested user hashes.
 function stringifyDocs(docs) {
-  return docs.map((d) => ({ ...d, _id: String(d._id) }));
+  return stringifyPlainBackupDocs(docs);
 }
 
 function currentAutoBackupName(now = new Date()) {
@@ -78,11 +81,7 @@ async function collectBackupPayload() {
     payload.archiveRecords = [];
   }
   const usersList = await User.find({}).limit(100000);
-  payload.users = usersList.map((u) => {
-    const d = { ...u, _id: String(u._id) };
-    delete d.password;
-    return d;
-  });
+  payload.users = stringifyBackupUsers(usersList);
   return payload;
 }
 
