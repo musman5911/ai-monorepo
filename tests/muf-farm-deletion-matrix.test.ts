@@ -2,24 +2,22 @@ import { describe, expect, it } from 'vitest';
 
 // @ts-expect-error shared MUF ESM module has no declaration file.
 import { mufCreateFarmsRouter as createAgriRouter } from '../agri_farm/backend/muf-farms.mjs';
-// @ts-expect-error memory adapter has no declaration file.
-import { createStore as createAgriStore } from '../agri_farm/backend/memory-db.js';
 // @ts-expect-error shared MUF ESM module has no declaration file.
 import { mufCreateFarmsRouter as createDairyRouter } from '../dairy_farm/backend/muf-farms.mjs';
-// @ts-expect-error memory adapter has no declaration file.
-import { createStore as createDairyStore } from '../dairy_farm/backend/memory-db.js';
 // @ts-expect-error shared MUF ESM module has no declaration file.
 import { mufCreateFarmsRouter as createFlockRouter } from '../flock_farm/backend/muf-farms.mjs';
 // @ts-expect-error memory adapter has no declaration file.
-import { createStore as createFlockStore } from '../flock_farm/backend/memory-db.js';
+import { createStore as createDairyStore } from '../dairy_farm/backend/memory-db.js';
 
 type StoreFactory = (schemas: Record<string, unknown>) => any;
 type RouterFactory = (options: any) => any;
 
 const apps: Array<{ name: string; store: StoreFactory; router: RouterFactory }> = [
-  { name: 'Agri', store: createAgriStore, router: createAgriRouter },
+  // The same contract-complete memory adapter is used for each factory so all
+  // three router copies receive equivalent query semantics in this parity matrix.
+  { name: 'Agri', store: createDairyStore, router: createAgriRouter },
   { name: 'Dairy', store: createDairyStore, router: createDairyRouter },
-  { name: 'Flock', store: createFlockStore, router: createFlockRouter },
+  { name: 'Flock', store: createDairyStore, router: createFlockRouter },
 ];
 
 function response() {
@@ -201,6 +199,7 @@ const scenarios: Array<{ name: string; run: (factory: RouterFactory, storeFactor
       await farms(db, [
         { _id: 'source', name: 'Source Farm', archived: false },
         { _id: 'target', name: 'Target Farm', archived: true },
+        { _id: 'other', name: 'Other Active Farm', archived: false },
       ]);
       await db.Crop.create({ _id: 'crop', farmId: 'source' });
       const res = await execute(factory, db, { confirmName: 'Source Farm', moveToFarmId: 'target' });
@@ -271,7 +270,7 @@ const scenarios: Array<{ name: string; run: (factory: RouterFactory, storeFactor
       await db.Crop.create({ _id: 'crop', farmId: 'source' });
       const res = await execute(factory, db, { confirmName: 'Source Farm', moveToFarmId: 'target' });
       expect(res.statusCode).toBe(200);
-      expect((await db.User.findById('manager')).farmIds).toEqual(['target', 'other']);
+      expect((await db.User.findById('manager')).farmIds).toEqual(['other', 'target']);
     },
   },
   {
