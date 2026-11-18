@@ -313,7 +313,7 @@ router.post('/restore/auto', protectUnscoped, ...requireAdmin, asyncHandler(asyn
       // Capture the current state first. The target payload is already held in
       // memory, so refreshing the monthly slot does not lose the requested restore.
       const stored = await maybeRunMonthlyAutoBackup(true);
-      return stored.payload;
+      return expandMonthlyPhotoPayload(stored);
     },
     restore: () => applyBackupPayload(payload),
     rollback: (snapshot) => applyBackupPayload(snapshot),

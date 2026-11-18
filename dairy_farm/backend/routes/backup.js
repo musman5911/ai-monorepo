@@ -142,7 +142,7 @@ router.post('/restore', protectUnscoped, ...adminOnly, async (req, res) => {
         // The monthly slot is refreshed from a full current-state snapshot.
         // A failed snapshot aborts before any collection is cleared.
         const stored = await maybeRunMonthlyAutoBackup(true);
-        return stored.payload;
+        return expandMonthlyPhotoPayload(stored);
       },
       restore: async () => {
         let atomic = false;

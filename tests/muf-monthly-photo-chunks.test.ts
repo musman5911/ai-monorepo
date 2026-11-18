@@ -50,5 +50,7 @@ describe('MUF monthly photo backup chunks', () => {
     expect(dairy).toContain('const photoAssets = serializePhotoAssets(await PhotoAsset.find().lean());');
     expect(dairy).toContain('const payload = await expandMonthlyPhotoPayload(value);');
     expect(dairy).toContain("photoAssets: PhotoAsset");
+    expect(agri).not.toContain('return stored.payload;');
+    expect(dairy).not.toContain('return stored.payload;');
   });
 });
