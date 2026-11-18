@@ -247,6 +247,8 @@ export default function AdminMenu({
   }, [open]);
 
   const isAdmin = userRole === 'admin';
+  const isOwner = farmRole === 'owner';
+  const isManager = farmRole === 'manager';
 
   // --- Password Change ---
   const handleRequestPwCode = async () => {
@@ -636,6 +638,7 @@ export default function AdminMenu({
 
   const filteredTabs = ADMIN_TABS.filter(tab => {
     if (!isAdmin && tab.id !== 'general') return false;
+    if (isManager && ['farms', 'products', 'reports', 'backup'].includes(tab.id)) return false;
     return true;
   });
 
@@ -652,8 +655,8 @@ export default function AdminMenu({
         <MufAdminShell
           open={true}
           onClose={onClose}
-          title={isAdmin ? "Settings & Admin Hub" : "Worker Operations Hub"}
-          subtitle={isAdmin ? "Control Panel" : "Standard Access Portal"}
+          title={isOwner ? "Settings & Admin Hub" : isManager ? "Manager Operations Hub" : "Worker Operations Hub"}
+          subtitle={isOwner ? "Control Panel" : isManager ? "Farm Management" : "Standard Access Portal"}
           icon={isAdmin ? <Settings size={20} /> : <Users size={20} />}
           sections={filteredTabs}
           activeSection={activeTab}
@@ -717,8 +720,8 @@ export default function AdminMenu({
                   onSendEmailCode={async () => { setSendingEmailCode(true); try { await api.requestProfileCode(); setEmailCodeSent(true); setEmailMsg({ type: 'ok', text: 'Code sent to your email.' }); } catch (err) { setEmailMsg({ type: 'err', text: err.response?.data?.detail || 'Failed to send code.' }); } finally { setSendingEmailCode(false); } }}
                   onSubmitEmail={(e) => { e.preventDefault(); handleUpdateEmail(); }}
                 >
-                  {/* Farm Location (weather widget) */}
-                  <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title={L('Farm Location')} subtitle={L('Set your farm coordinates for live weather')}>
+                  {/* Changing the shared weather location is an owner-only setting. */}
+                  {isOwner && <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title={L('Farm Location')} subtitle={L('Set your farm coordinates for live weather')}>
                     <div className="space-y-3">
                       {farmLocCurrent && (
                         <p className="text-xs text-slate-500">
@@ -739,12 +742,12 @@ export default function AdminMenu({
                       <p className="text-[10px] text-slate-400">{L('Enter latitude, longitude. City is auto-detected.')}</p>
                       <MufAdminButton variant="secondary" size="md" onClick={() => handleSaveFarmLocation()}>{L('Save Location')}</MufAdminButton>
                     </div>
-                  </MufAdminCard>
+                  </MufAdminCard>}
                 </MufAdminGeneral>
               )}
 
                             {/* ─── TAB: USERS ─── */}
-              {activeTab === 'products' && isAdmin && <ProductManager kinds={[{ value: 'produce', label: 'Harvested produce' }]} apiRoot={import.meta.env.VITE_API_URL || '/api'} getHeaders={() => {
+              {activeTab === 'products' && isOwner && <ProductManager kinds={[{ value: 'produce', label: 'Harvested produce' }]} apiRoot={import.meta.env.VITE_API_URL || '/api'} getHeaders={() => {
                 let token = ''; let farmId = '';
                 try { token = localStorage.getItem('token') || ''; farmId = localStorage.getItem('muf_active_farm_agri') || ''; } catch { /* storage unavailable */ }
                 return { ...(token ? { Authorization: 'Bearer ' + token, 'X-Access-Token': token } : {}), ...(farmId ? { 'X-Farm-Id': farmId } : {}) };
@@ -1037,9 +1040,9 @@ export default function AdminMenu({
               )}
 
               {/* ─── TAB: REPORTS ─── */}
-              {activeTab === 'farms' && <MyFarmsPanel />}
+              {activeTab === 'farms' && isOwner && <MyFarmsPanel />}
 
-              {activeTab === 'reports' && (
+              {activeTab === 'reports' && isOwner && (
                 <MufAdminReports reportButtons={[]}>
                   <div className="space-y-4">
                     <div>
@@ -1067,7 +1070,7 @@ export default function AdminMenu({
               )}
 
               {/* ─── TAB: BACKUP ─── */}
-              {activeTab === 'backup' && (
+              {activeTab === 'backup' && isOwner && (
                 <div className="space-y-6 animate-fade-in">
                   {isAdmin ? (
                     <>

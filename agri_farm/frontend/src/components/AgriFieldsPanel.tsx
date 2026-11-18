@@ -3,6 +3,8 @@ import { Check, Pencil, Plus, Ruler, Trash2, X } from 'lucide-react';
 import * as api from '../api';
 import { useConfirm } from '../muf/core/muf-confirm';
 import { L } from '../i18n';
+import ModalPortal from '../muf/core/muf-portal';
+import { MUF_Z } from '../muf/core/muf-z';
 
 type FieldRecord = { _id: string; name: string; acres?: number; notes?: string };
 
@@ -78,7 +80,8 @@ export default function AgriFieldsPanel({ open, onClose, showAlert, onFieldsChan
 
   if (!open) return null;
   return (
-    <div className="fixed inset-0 z-[var(--muf-z-modal)] flex items-end sm:items-center justify-center bg-black/50 p-3" role="dialog" aria-modal="true" aria-labelledby="agri-fields-title">
+    <ModalPortal>
+    <div className="fixed inset-0 flex items-end sm:items-center justify-center bg-black/50 p-3" style={{ zIndex: MUF_Z.POPUP }} role="dialog" aria-modal="true" aria-labelledby="agri-fields-title">
       <section className="w-full max-w-2xl max-h-[85dvh] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
         <header className="mb-4 flex items-center justify-between gap-3">
           <div><h2 id="agri-fields-title" className="text-lg font-black">{L('Fields')}</h2><p className="text-xs text-slate-500">{L('Manage field names and acreage.')}</p></div>
@@ -103,5 +106,6 @@ export default function AgriFieldsPanel({ open, onClose, showAlert, onFieldsChan
         </div>
       </section>
     </div>
+    </ModalPortal>
   );
 }

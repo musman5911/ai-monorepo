@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Archive, Building2, ChevronDown, Plus, RotateCcw, Save, Settings, Trash2, Users } from 'lucide-react';
 import { L } from '../../i18n';
 
@@ -31,6 +31,7 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
   const [farmRole, setFarmRole] = useState('worker');
   const [loading, setLoading] = useState(true);
   const [open, setOpen] = useState(false);
+  const switcherRef = useRef<HTMLDivElement | null>(null);
   const [manageOpen, setManageOpen] = useState(false);
   const [users, setUsers] = useState<FarmUser[]>([]);
   const [selectedUserId, setSelectedUserId] = useState('');
@@ -100,6 +101,23 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
   }, [config, request]);
 
   useEffect(() => { void load(); }, [load]);
+
+  useEffect(() => {
+    if (!open) return;
+    const handlePointerDown = (event: PointerEvent) => {
+      const root = switcherRef.current;
+      if (root && event.target instanceof Node && !root.contains(event.target)) setOpen(false);
+    };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setOpen(false);
+    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('pointerdown', handlePointerDown);
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open]);
 
   const activeFarm = useMemo(() => farms.find((farm) => farm._id === activeFarmId), [farms, activeFarmId]);
   const isReadOnlyAll = farmRole === 'owner' && activeFarmId === 'all';
@@ -238,7 +256,7 @@ export default function MufFarmSwitcher({ app }: { app: AppKey }) {
   if (loading && farms.length === 0) return <span className="muf-farm-switcher-status">{L('Loading farms…')}</span>;
 
   return (
-    <div className="relative flex items-center gap-2">
+    <div ref={switcherRef} className="relative flex items-center gap-2">
       <div className="relative">
         <button type="button" className="muf-icon-button !w-auto !max-w-[190px] !px-3 flex items-center gap-2" onClick={() => setOpen((value) => !value)} aria-expanded={open} aria-label={L('Choose active farm')}>
           <Building2 size={16} />

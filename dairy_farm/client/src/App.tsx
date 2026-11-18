@@ -489,7 +489,7 @@ export default function App() {
                   <Shield size={18} />
                 )}
               </span>
-              <span><strong>Welcome - {username || "Admin"}</strong><small>{L('Administrator')}</small></span>
+              <span><strong>Welcome - {username || "Admin"}</strong><small>{farmRole === 'manager' ? L('Manager') : L('Administrator')}</small></span>
               <ChevronDown size={17} />
             </button>
           ) : (

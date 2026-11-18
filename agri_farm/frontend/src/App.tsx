@@ -2936,7 +2936,7 @@ function App() {
                     <Users size={18}/>
                   )}
                 </span>
-                <span><strong>{L('Welcome')} - {username}</strong><small>{userRole === 'admin' ? L('Administrator') : L('Worker')}</small></span>
+                <span><strong>{L('Welcome')} - {username}</strong><small>{farmRole === 'owner' ? L('Administrator') : farmRole === 'manager' ? L('Manager') : L('Worker')}</small></span>
                 <ChevronDown size={17}/>
               </button>
               <button className="muf-icon-button muf-logout" onClick={handleLogout} title={L('Logout')} aria-label={L('Logout')}><LogOut size={18}/></button>
@@ -4115,9 +4115,11 @@ function App() {
                             <div className="muf-row-actions">
                               {userRole === 'admin' && (
                                 <button
-                                  onClick={() => { setInvForm({ ...item, current_stock: item.current_stock.toString(), low_stock_threshold: item.low_stock_threshold.toString() }); setShowInventoryModal(true); }}
+                                  type="button"
+                                  onClick={() => { setInvForm({ _id: item._id, name: String(item.name || ''), category: item.category || 'fertilizer', current_stock: String(item.current_stock ?? 0), unit: item.unit || 'kg', low_stock_threshold: String(item.low_stock_threshold ?? 10) }); setShowInventoryModal(true); }}
                                   className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-farm-500 rounded-lg cursor-pointer transition-colors"
                                   title={L('Edit / Correct Stock Level')}
+                                  aria-label={`${L('Edit / Correct Stock Level')}: ${item.name || L('Inventory item')}`}
                                 >
                                   <Edit3 size={14} />
                                 </button>

@@ -41,3 +41,15 @@ describe('Dairy Admin Hub owner-only sections', () => {
     expect(backupRoutes).toMatch(/router\.post\(['"]\/restore-auto['"],\s*protectUnscoped,\s*\.\.\.adminOnly/);
   });
 });
+
+
+describe('Dairy canonical role presentation', () => {
+  it('labels managers as Managers while retaining owner-only admin sections', () => {
+    const app = readSource('dairy_farm/client/src/App.tsx');
+    const panel = readSource('dairy_farm/client/src/components/AdminPanel.tsx');
+    expect(app).toContain("farmRole === 'manager' ? L('Manager') : L('Administrator')");
+    expect(app).toContain('const isAdmin = role === "admin"');
+    expect(panel).toMatch(/const sections = isOwner\s*\? allSections\s*:\s*allSections\.filter/);
+    expect(panel).toContain("item.id !== 'farms' && item.id !== 'backup'");
+  });
+});

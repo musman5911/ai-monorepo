@@ -64,3 +64,58 @@ describe('Agri fields and crop-cycle screen contracts', () => {
     expect(urdu).toContain('"No season-linked finance data yet.": "ابھی موسم سے منسلک مالی معلومات موجود نہیں۔"');
   });
 });
+
+
+describe('Agri Phase 19 role and popup regressions', () => {
+  it('renders the Fields manager through the shared popup portal above the admin hub', () => {
+    const panel = read('agri_farm/frontend/src/components/AgriFieldsPanel.tsx');
+    expect(panel).toContain("import ModalPortal from '../muf/core/muf-portal'");
+    expect(panel).toContain("import { MUF_Z } from '../muf/core/muf-z'");
+    expect(panel).toContain('<ModalPortal>');
+    expect(panel).toContain('style={{ zIndex: MUF_Z.POPUP }}');
+    expect(panel).toContain('</ModalPortal>');
+    expect(panel).not.toContain('z-[var(--muf-z-modal)]');
+  });
+
+  it('limits Agri global farm settings and cross-farm sections to the owner', () => {
+    const admin = read('agri_farm/frontend/src/components/AdminMenu.tsx');
+    const locationRoutes = read('agri_farm/backend/routes/automations.js');
+    expect(admin).toContain("const isOwner = farmRole === 'owner'");
+    expect(admin).toContain("isManager && ['farms', 'products', 'reports', 'backup'].includes(tab.id)");
+    expect(admin).toContain('{isOwner && <MufAdminCard');
+    expect(admin).toContain("{activeTab === 'farms' && isOwner && <MyFarmsPanel />}");
+    expect(admin).toContain("{activeTab === 'reports' && isOwner && (");
+    expect(admin).toContain("{activeTab === 'backup' && isOwner && (");
+    expect(locationRoutes).toContain("router.put('/settings/location', protect, ownerOnly");
+  });
+
+  it('uses the canonical manager role in Agri and Dairy headers', () => {
+    const agri = read('agri_farm/frontend/src/App.tsx');
+    const dairy = read('dairy_farm/client/src/App.tsx');
+    expect(agri).toContain("farmRole === 'manager' ? L('Manager') : L('Worker')");
+    expect(dairy).toContain("farmRole === 'manager' ? L('Manager') : L('Administrator')");
+  });
+
+  it('opens inventory edits with safe defaults for incomplete legacy stock records', () => {
+    const app = read('agri_farm/frontend/src/App.tsx');
+    expect(app).toContain('current_stock: String(item.current_stock ?? 0)');
+    expect(app).toContain('low_stock_threshold: String(item.low_stock_threshold ?? 10)');
+    expect(app).toContain('type="button"');
+    expect(app).toContain('api.updateInventory(invForm._id, payload)');
+  });
+
+  it('dismisses the farm switcher on outside pointer and Escape in all three apps', () => {
+    const agri = read('agri_farm/frontend/src/muf/ui/muf-farm-switcher.tsx');
+    const dairy = read('dairy_farm/client/src/muf/ui/muf-farm-switcher.tsx');
+    const flock = read('flock_farm/client/src/muf/ui/muf-farm-switcher.tsx');
+    for (const source of [agri, dairy, flock]) {
+      expect(source).toContain('const switcherRef = useRef<HTMLDivElement | null>(null)');
+      expect(source).toContain("document.addEventListener('pointerdown', handlePointerDown)");
+      expect(source).toContain("document.addEventListener('keydown', handleKeyDown)");
+      expect(source).toContain('!root.contains(event.target)');
+      expect(source).toContain('ref={switcherRef}');
+    }
+    expect(dairy).toBe(agri);
+    expect(flock).toBe(agri);
+  });
+});
