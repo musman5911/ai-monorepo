@@ -14,7 +14,8 @@ describe('GitHub Actions quick-check workflow contract', () => {
   });
 
   it('runs the required quick checks exactly once and keeps long checks manual', () => {
-    const runCommands = [...workflow.matchAll(/^\s*run:\s*(.*?)\s*$/gm)].map((match) => match[1].trim());
+    const quickJob = workflow.split('  quick-checks:\\n')[1]?.split('  flock-lock-multiprocess:\\n')[0] || '';
+    const runCommands = [...quickJob.matchAll(/^\\s*run:\\s*(.*?)\\s*$/gm)].map((match) => match[1].trim());
     expect(runCommands).toEqual([
       'npm ci',
       'npm ci',
@@ -38,6 +39,13 @@ describe('GitHub Actions quick-check workflow contract', () => {
       'npm run check-audit',
     ]);
     expect(workflow).not.toMatch(/npm run build|build-all\.bat|check-workbench-runtime|audit-muf-design-system/);
+  });
+
+  it('runs the Flock multi-process lock check against an isolated local MongoDB service', () => {
+    expect(workflow).toContain('  flock-lock-multiprocess:');
+    expect(workflow).toContain('image: mongo:7');
+    expect(workflow).toContain('MUF_PHASE19_FLOCK_LOCK_URI: mongodb://127.0.0.1:27017/muf_phase19_flock_lock_ci');
+    expect(workflow).toContain('node scripts/check-egg-inventory-lock-multiprocess.mjs');
   });
 
   it('uses read-only repository permissions and embeds no credentials', () => {
