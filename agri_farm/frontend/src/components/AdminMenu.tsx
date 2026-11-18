@@ -772,7 +772,16 @@ export default function AdminMenu({
             )}
               {activeTab === 'users' && (
                 <MufAdminUsers
-                  users={users.map(u => ({ _id: u._id, username: u.username, role: u.role, email: u.email, displayName: u.username, active: true }))}
+                  users={users.map(u => ({
+                    _id: u._id,
+                    username: u.username,
+                    role: u.role,
+                    // The logged-in account can be an admin at the system level but a manager for this farm.
+                    farmRole: u.username === username ? farmRole : undefined,
+                    email: u.email,
+                    displayName: u.username,
+                    active: true,
+                  }))}
                   currentUsername={username || ''}
                   minPasswordLength={6}
                   onCreate={async (data) => {

@@ -67,14 +67,27 @@ describe('Agri fields and crop-cycle screen contracts', () => {
 
 
 describe('Agri Phase 19 role and popup regressions', () => {
-  it('renders the Fields manager through the shared popup portal above the admin hub', () => {
+  it('renders the Fields manager through the canonical animated MUF detail modal', () => {
     const panel = read('agri_farm/frontend/src/components/AgriFieldsPanel.tsx');
-    expect(panel).toContain("import ModalPortal from '../muf/core/muf-portal'");
-    expect(panel).toContain("import { MUF_Z } from '../muf/core/muf-z'");
-    expect(panel).toContain('<ModalPortal>');
-    expect(panel).toContain('style={{ zIndex: MUF_Z.POPUP }}');
-    expect(panel).toContain('</ModalPortal>');
-    expect(panel).not.toContain('z-[var(--muf-z-modal)]');
+    const modal = read('agri_farm/frontend/src/muf/core/muf-modal.tsx');
+    expect(panel).toContain("import DetailModal from '../muf/core/muf-modal'");
+    expect(panel).toContain('<DetailModal');
+    expect(panel).toContain("title={L('Manage Fields')}");
+    expect(panel).toContain('size="big"');
+    expect(panel).toContain('muf-primary-action');
+    expect(panel).not.toContain('fixed inset-0');
+    expect(modal).toContain('muf-pup-width-lg');
+    expect(modal).toContain('<AnimatePresence>');
+    expect(modal).toContain('initial={{ opacity: 0, scale: 0.97, y: 6 }}');
+    expect(modal).toContain('MUF_Z.POPUP');
+  });
+
+  it('shows the active farm role for the signed-in user in the Agri Users list', () => {
+    const admin = read('agri_farm/frontend/src/components/AdminMenu.tsx');
+    const users = read('agri_farm/frontend/src/muf/admin/muf-admin-users.tsx');
+    expect(admin).toContain('farmRole: u.username === username ? farmRole : undefined');
+    expect(users).toContain('const role = user.farmRole || user.role');
+    expect(users).toContain("if (role === 'manager') return L('Manager')");
   });
 
   it('limits Agri global farm settings and cross-farm sections to the owner', () => {

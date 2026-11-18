@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Check, Pencil, Plus, Ruler, Trash2, X } from 'lucide-react';
+import { Check, Pencil, Plus, Ruler, Trash2 } from 'lucide-react';
 import * as api from '../api';
 import { useConfirm } from '../muf/core/muf-confirm';
 import { L } from '../i18n';
-import ModalPortal from '../muf/core/muf-portal';
-import { MUF_Z } from '../muf/core/muf-z';
+import DetailModal from '../muf/core/muf-modal';
 
 type FieldRecord = { _id: string; name: string; acres?: number; notes?: string };
 
@@ -80,32 +79,41 @@ export default function AgriFieldsPanel({ open, onClose, showAlert, onFieldsChan
 
   if (!open) return null;
   return (
-    <ModalPortal>
-    <div className="fixed inset-0 flex items-end sm:items-center justify-center bg-black/50 p-3" style={{ zIndex: MUF_Z.POPUP }} role="dialog" aria-modal="true" aria-labelledby="agri-fields-title">
-      <section className="w-full max-w-2xl max-h-[85dvh] overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl dark:border-slate-700 dark:bg-slate-900">
-        <header className="mb-4 flex items-center justify-between gap-3">
-          <div><h2 id="agri-fields-title" className="text-lg font-black">{L('Fields')}</h2><p className="text-xs text-slate-500">{L('Manage field names and acreage.')}</p></div>
-          <button type="button" onClick={onClose} aria-label={L('Close fields')} className="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-slate-800"><X size={18}/></button>
-        </header>
-        <form onSubmit={submit} className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+    <DetailModal
+      open={open}
+      onClose={onClose}
+      title={L('Manage Fields')}
+      subtitle={L('Manage field names and acreage.')}
+      icon={<Ruler size={18} />}
+      iconBg="bg-emerald-100 text-emerald-700"
+      size="big"
+    >
+      <div className="space-y-5">
+        <form onSubmit={submit} className="grid grid-cols-1 gap-3 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-4 dark:border-emerald-900/40 dark:bg-emerald-950/20 sm:grid-cols-2">
           <div><label className="muf-label">{L('Field name')} *</label><input required className="muf-field" value={name} onChange={event => setName(event.target.value)} /></div>
           <div><label className="muf-label">{L('Acres')}</label><input min="0" step="0.01" type="number" className="muf-field" value={acres} onChange={event => setAcres(event.target.value)} /></div>
           <div className="sm:col-span-2"><label className="muf-label">{L('Notes')}</label><textarea rows={2} className="muf-field" value={notes} onChange={event => setNotes(event.target.value)} /></div>
           <div className="flex flex-wrap gap-2 sm:col-span-2">
-            <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-xl bg-farm-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-50">{editingId ? <Check size={15}/> : <Plus size={15}/>} {saving ? L('Saving...') : editingId ? L('Update field') : L('Add field')}</button>
-            {editingId && <button type="button" onClick={reset} className="rounded-xl border border-slate-300 px-4 py-2 text-xs font-bold dark:border-slate-700">{L('Cancel edit')}</button>}
+            <button type="submit" disabled={saving} className="muf-primary-action inline-flex items-center gap-2 rounded-xl bg-farm-600 px-4 py-2 text-xs font-bold text-white disabled:opacity-50">{editingId ? <Check size={15}/> : <Plus size={15}/>} {saving ? L('Saving...') : editingId ? L('Update field') : L('Add field')}</button>
+            {editingId && <button type="button" onClick={reset} className="muf-record-btn rounded-xl border border-slate-300 px-4 py-2 text-xs font-bold dark:border-slate-700">{L('Cancel edit')}</button>}
           </div>
         </form>
-        <div className="space-y-2">
-          {loading ? <p className="py-6 text-center text-xs text-slate-500">{L('Loading fields...')}</p> : fields.length === 0 ? <p className="py-6 text-center text-xs text-slate-500">{L('No fields yet. Add your first field above.')}</p> : fields.map(field => (
-            <article key={field._id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 p-3 dark:border-slate-700">
-              <div className="min-w-0"><p className="font-bold">{field.name}</p><p className="flex items-center gap-1 text-xs text-slate-500"><Ruler size={12}/>{Number(field.acres || 0).toLocaleString()} {L('acres')}</p>{field.notes && <p className="mt-1 break-words text-xs text-slate-500">{field.notes}</p>}</div>
-              <div className="flex shrink-0 gap-1"><button type="button" onClick={() => edit(field)} aria-label={L('Edit field')} className="rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-slate-800"><Pencil size={15}/></button><button type="button" onClick={() => void remove(field)} aria-label={L('Delete field')} className="rounded-lg p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"><Trash2 size={15}/></button></div>
-            </article>
-          ))}
-        </div>
-      </section>
-    </div>
-    </ModalPortal>
+
+        <section className="space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="muf-pup-head text-slate-800 dark:text-slate-100">{L('Fields')}</h3>
+            <span className="rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300">{fields.length}</span>
+          </div>
+          <div className="space-y-2">
+            {loading ? <p className="py-6 text-center text-xs text-slate-500">{L('Loading fields...')}</p> : fields.length === 0 ? <p className="rounded-xl border border-dashed border-slate-300 py-6 text-center text-xs text-slate-500 dark:border-slate-700">{L('No fields yet. Add your first field above.')}</p> : fields.map(field => (
+              <article key={field._id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-3 transition-colors hover:border-emerald-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-emerald-800">
+                <div className="min-w-0"><p className="font-bold">{field.name}</p><p className="flex items-center gap-1 text-xs text-slate-500"><Ruler size={12}/>{Number(field.acres || 0).toLocaleString()} {L('acres')}</p>{field.notes && <p className="mt-1 break-words text-xs text-slate-500">{field.notes}</p>}</div>
+                <div className="flex shrink-0 gap-1"><button type="button" onClick={() => edit(field)} aria-label={L('Edit field')} className="muf-record-btn rounded-lg p-2 hover:bg-slate-100 dark:hover:bg-slate-800"><Pencil size={15}/></button><button type="button" onClick={() => void remove(field)} aria-label={L('Delete field')} className="muf-record-btn rounded-lg p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30"><Trash2 size={15}/></button></div>
+              </article>
+            ))}
+          </div>
+        </section>
+      </div>
+    </DetailModal>
   );
 }
