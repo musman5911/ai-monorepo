@@ -1,6 +1,6 @@
 // ─── Farm settings (location for weather widget) ───────────────────
 // GET  /api/settings/location — open (no auth), used by weather widget
-// PUT  /api/settings/location — admin only, saves lat/lon/city
+// PUT  /api/settings/location — owner only, saves lat/lon/city
 import express from 'express';
 import DataStore from '../models/DataStore.js';
 import { authRequired, requireRole } from '../middleware/auth.js';
@@ -21,7 +21,7 @@ router.get('/location', authRequired, async (req, res) => {
   }
 });
 
-router.put('/location', authRequired, requireRole('admin'), async (req, res) => {
+router.put('/location', authRequired, requireRole('owner'), async (req, res) => {
   try {
     const rawDms = String(req.body?.raw_dms || '').trim();
     const lat = req.body?.lat;

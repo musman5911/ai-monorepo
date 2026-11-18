@@ -473,7 +473,8 @@ export default function AdminMenu(props: AdminMenuProps) {
                   </form>
                 </MufAdminCard>
 
-                {/* Farm Location (weather widget) */}
+                {/* Shared weather coordinates are an owner-only setting. */}
+                {isOwner && (
                 <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title={L('Farm Location')} subtitle={L('Set your farm coordinates for live weather')}>
                   <div className="space-y-3">
                     {farmLocCurrent && (
@@ -496,6 +497,7 @@ export default function AdminMenu(props: AdminMenuProps) {
                     <MufAdminButton variant="secondary" size="md" onClick={handleSaveLocation}>{L('Save Location')}</MufAdminButton>
                   </div>
                 </MufAdminCard>
+                )}
               </MufAdminGeneral>
             )}
 

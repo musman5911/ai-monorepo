@@ -788,6 +788,7 @@ export default function AdminMenu({
                     active: true,
                   }))}
                   currentUsername={username || ''}
+                  allowAdminCreation={isOwner}
                   minPasswordLength={6}
                   onCreate={async (data) => {
                     setWorkerForm({ username: data.username, password: data.password, role: data.role, email: data.email });

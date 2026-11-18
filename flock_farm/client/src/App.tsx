@@ -768,7 +768,7 @@ export default function App() {
               </span>
               <span>
                 <strong>{L('Welcome')} - {currentUser && typeof currentUser === 'object' ? currentUser.username : ''}</strong>
-                <small>{L('Administrator')}</small>
+                <small>{currentUser?.farmRole === 'manager' ? L('Manager') : currentUser?.farmRole === 'worker' ? L('Worker') : L('Administrator')}</small>
               </span>
               <ChevronDown size={17} />
             </button>

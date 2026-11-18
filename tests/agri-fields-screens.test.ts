@@ -101,6 +101,7 @@ describe('Agri Phase 19 role and popup regressions', () => {
     expect(admin).toContain("{activeTab === 'farms' && isOwner && <MyFarmsPanel />}");
     expect(admin).toContain("{activeTab === 'reports' && isOwner && (");
     expect(admin).toContain("{activeTab === 'backup' && isOwner && (");
+    expect(admin).toContain("allowAdminCreation={isOwner}");
     expect(locationRoutes).toContain("router.put('/settings/location', protect, ownerOnly");
   });
 

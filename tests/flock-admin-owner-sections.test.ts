@@ -25,6 +25,20 @@ describe('Flock Admin Hub owner-only sections', () => {
     expect(menu).toContain("{section === 'reports' && (");
   });
 
+  it('restricts weather-location editing to owners in both UI and API', () => {
+    const settings = read('flock_farm/backend/routes/settings.js');
+    expect(menu).toContain("{isOwner && (");
+    expect(menu).toContain("title={L('Farm Location')}");
+    expect(settings).toContain("router.put('/location', authRequired, requireRole('owner')");
+    expect(settings).not.toContain("router.put('/location', authRequired, requireRole('admin')");
+  });
+
+  it('labels a manager as Manager in the main Flock header', () => {
+    const app = read('flock_farm/client/src/App.tsx');
+    expect(app).toContain("currentUser?.farmRole === 'manager' ? L('Manager')");
+    expect(app).toContain("currentUser?.farmRole === 'worker' ? L('Worker') : L('Administrator')");
+  });
+
   it('keeps the server-side whole-database routes owner protected', () => {
     const backup = read('flock_farm/backend/routes/backup.js');
     const farms = read('flock_farm/backend/routes/farms.js');
