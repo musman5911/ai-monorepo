@@ -10,6 +10,7 @@ import { MUF_ENV } from '../muf-env.mjs';
 import { withRestoreRecovery } from '../../../shared/muf-restore-recovery.mjs';
 import { stringifyDocs as stringifyPlainBackupDocs, stringifyBackupUsers } from '../muf-backup-serialization.mjs';
 import { serializePhotoAssets, restorePhotoAssets } from '../../../shared/muf-photo-asset-backup.mjs';
+import { splitMonthlyPhotoAssets, assembleMonthlyPhotoAssets } from '../../../shared/muf-monthly-photo-chunks.mjs';
 
 const router = express.Router();
 
@@ -34,6 +35,47 @@ async function restoreMissingFarms(payload) {
 }
 
 const MONTHLY_AUTO_BACKUP_KEY = 'monthly_auto_backup';
+const MONTHLY_PHOTO_CHUNK_PREFIX = 'monthly_auto_backup_photo_chunk_';
+const MONTHLY_PHOTO_SECTION = 'photo_assets';
+
+async function saveMonthlyPhotoChunks(snapshotId, photos) {
+  const groups = splitMonthlyPhotoAssets(photos, snapshotId);
+  for (const group of groups) {
+    const key = MONTHLY_PHOTO_CHUNK_PREFIX + snapshotId + '_' + String(group.chunkIndex).padStart(5, '0');
+    await Setting.findOneAndUpdate(
+      { key },
+      { $set: { key, value: group } },
+      { upsert: true, new: true },
+    );
+  }
+  return groups.length;
+}
+
+async function expandMonthlyPhotoPayload(stored) {
+  const payload = { ...(stored?.payload || {}) };
+  if (!stored?.imageSnapshotId) return payload; // legacy monthly snapshots stored their photos inline
+  const docs = await Setting.find({}).lean();
+  const chunks = docs
+    .filter((doc) => String(doc.key || '').startsWith(MONTHLY_PHOTO_CHUNK_PREFIX)
+      && doc.value?.snapshotId === stored.imageSnapshotId)
+    .map((doc) => doc.value);
+  payload[MONTHLY_PHOTO_SECTION] = assembleMonthlyPhotoAssets(chunks, {
+    snapshotId: stored.imageSnapshotId,
+    chunkCount: stored.imageChunkCount,
+    imageCount: stored.imageCount,
+  });
+  return payload;
+}
+
+async function cleanOldMonthlyPhotoChunks(keepSnapshotId) {
+  const docs = await Setting.find({}).lean();
+  for (const doc of docs) {
+    if (String(doc.key || '').startsWith(MONTHLY_PHOTO_CHUNK_PREFIX)
+        && doc.value?.snapshotId !== keepSnapshotId) {
+      await Setting.deleteMany({ key: doc.key });
+    }
+  }
+}
 const BACKUP_COLLECTIONS = [
   ['fields', Field],
   ['crops', Crop],
@@ -145,16 +187,24 @@ async function maybeRunMonthlyAutoBackup(force = false) {
   if (!force && value.name === name && value.payload) {
     return value;
   }
+  const fullPayload = await collectBackupPayload();
+  const photos = fullPayload[MONTHLY_PHOTO_SECTION] || [];
+  const imageSnapshotId = new Date().toISOString().replace(/[^0-9A-Za-z]/g, '') + '_' + Math.random().toString(36).slice(2, 10);
+  const imageChunkCount = await saveMonthlyPhotoChunks(imageSnapshotId, photos);
   const stored = {
     name,
     created_at: now.toISOString(),
-    payload: await collectBackupPayload(),
+    imageSnapshotId,
+    imageChunkCount,
+    imageCount: photos.length,
+    payload: { ...fullPayload, [MONTHLY_PHOTO_SECTION]: [] },
   };
   await Setting.updateOne(
     { key: MONTHLY_AUTO_BACKUP_KEY },
     { $set: { value: stored } },
     { upsert: true },
   );
+  await cleanOldMonthlyPhotoChunks(imageSnapshotId);
   console.log(`💾 [Auto Backup] Saved ${name}`);
 
   try {
@@ -171,7 +221,7 @@ async function maybeRunMonthlyAutoBackup(force = false) {
           }),
           {
             filename: `${name}-agrifarm-backup.json`,
-            content: JSON.stringify(stored.payload, null, 2),
+            content: JSON.stringify(await expandMonthlyPhotoPayload(stored), null, 2),
           },
         );
         if (sent) {
@@ -228,7 +278,7 @@ router.post('/restore', protectUnscoped, ...requireAdmin, asyncHandler(async (re
     createSnapshot: async () => {
       // Persist the rollback point before touching any source collection.
       const stored = await maybeRunMonthlyAutoBackup(true);
-      return stored.payload;
+      return expandMonthlyPhotoPayload(stored);
     },
     restore: () => applyBackupPayload(payload),
     rollback: (snapshot) => applyBackupPayload(snapshot),
@@ -255,8 +305,8 @@ router.get('/backup/auto', protectUnscoped, ...requireAdmin, asyncHandler(async 
 router.post('/restore/auto', protectUnscoped, ...requireAdmin, asyncHandler(async (req, res) => {
   const existing = await Setting.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
   const value = (existing && existing.value) || {};
-  const payload = value.payload;
-  if (!payload) return notFound(res, 'No automatic monthly backup is stored yet.');
+  if (!value.payload) return notFound(res, 'No automatic monthly backup is stored yet.');
+  const payload = await expandMonthlyPhotoPayload(value);
   validateBackupPayload(payload);
   await withRestoreRecovery({
     createSnapshot: async () => {

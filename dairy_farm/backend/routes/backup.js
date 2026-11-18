@@ -25,6 +25,7 @@ import { sendMail, mailConfigured, mufEmail } from '../utils/mailer.js';
 import { MUF_ENV } from '../muf-env.mjs';
 import { withRestoreRecovery } from '../../../shared/muf-restore-recovery.mjs';
 import { serializePhotoAssets, restorePhotoAssets } from '../../../shared/muf-photo-asset-backup.mjs';
+import { splitMonthlyPhotoAssets, assembleMonthlyPhotoAssets } from '../../../shared/muf-monthly-photo-chunks.mjs';
 
 // GET /api/backup — download full database as JSON
 router.get('/', protectUnscoped, ...adminOnly, async (req, res) => {
@@ -203,6 +204,47 @@ router.post('/restore', protectUnscoped, ...adminOnly, async (req, res) => {
 // the DB itself (Meta collection) under the name auto-YYYY-MM. It runs at
 // server boot; if this month's snapshot already exists nothing happens.
 const MONTHLY_AUTO_BACKUP_KEY = 'monthly_auto_backup';
+const MONTHLY_PHOTO_CHUNK_PREFIX = 'monthly_auto_backup_photo_chunk_';
+const MONTHLY_PHOTO_SECTION = 'photoAssets';
+
+async function saveMonthlyPhotoChunks(snapshotId, photos) {
+  const groups = splitMonthlyPhotoAssets(photos, snapshotId);
+  for (const group of groups) {
+    const key = MONTHLY_PHOTO_CHUNK_PREFIX + snapshotId + '_' + String(group.chunkIndex).padStart(5, '0');
+    await Meta.findOneAndUpdate(
+      { key },
+      { $set: { key, value: group } },
+      { upsert: true, new: true },
+    );
+  }
+  return groups.length;
+}
+
+async function expandMonthlyPhotoPayload(stored) {
+  const payload = { ...(stored?.payload || {}) };
+  if (!stored?.imageSnapshotId) return payload; // legacy monthly snapshots stored their photos inline
+  const docs = await Meta.find({}).lean();
+  const chunks = docs
+    .filter((doc) => String(doc.key || '').startsWith(MONTHLY_PHOTO_CHUNK_PREFIX)
+      && doc.value?.snapshotId === stored.imageSnapshotId)
+    .map((doc) => doc.value);
+  payload[MONTHLY_PHOTO_SECTION] = assembleMonthlyPhotoAssets(chunks, {
+    snapshotId: stored.imageSnapshotId,
+    chunkCount: stored.imageChunkCount,
+    imageCount: stored.imageCount,
+  });
+  return payload;
+}
+
+async function cleanOldMonthlyPhotoChunks(keepSnapshotId) {
+  const docs = await Meta.find({}).lean();
+  for (const doc of docs) {
+    if (String(doc.key || '').startsWith(MONTHLY_PHOTO_CHUNK_PREFIX)
+        && doc.value?.snapshotId !== keepSnapshotId) {
+      await Meta.deleteMany({ key: doc.key });
+    }
+  }
+}
 
 async function collectBackupPayload() {
   const [cows, milk, expenses, rates, health, buyers, buyerPayments, rateHistory, dailyLogs, sales, laborers, laborAttendance, laborAdvances, suppliers, supplierPayments, breedingEvents] = await Promise.all([
@@ -211,8 +253,10 @@ async function collectBackupPayload() {
     Laborer.find().lean(), LaborAttendance.find().lean(), LaborAdvance.find().lean(), Supplier.find().lean(), SupplierPayment.find().lean(), BreedingEvent.find().lean(),
   ]);
   const farms = await Farm.find().lean();
+  const photoAssets = serializePhotoAssets(await PhotoAsset.find().lean());
   return {
     farms,
+    photoAssets,
     exportDate: new Date().toISOString(),
     farmName: 'Usman Dairy Farm',
     version: 3,
@@ -229,16 +273,24 @@ async function maybeRunMonthlyAutoBackup(force = false) {
   const existing = await Meta.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
   const value = (existing && existing.value) || {};
   if (!force && value.name === name && value.payload) return value;
+  const fullPayload = await collectBackupPayload();
+  const photos = fullPayload[MONTHLY_PHOTO_SECTION] || [];
+  const imageSnapshotId = new Date().toISOString().replace(/[^0-9A-Za-z]/g, '') + '_' + Math.random().toString(36).slice(2, 10);
+  const imageChunkCount = await saveMonthlyPhotoChunks(imageSnapshotId, photos);
   const stored = {
     name,
     createdAt: new Date().toISOString(),
-    payload: await collectBackupPayload(),
+    imageSnapshotId,
+    imageChunkCount,
+    imageCount: photos.length,
+    payload: { ...fullPayload, [MONTHLY_PHOTO_SECTION]: [] },
   };
   await Meta.findOneAndUpdate(
     { key: MONTHLY_AUTO_BACKUP_KEY },
     { $set: { key: MONTHLY_AUTO_BACKUP_KEY, value: stored } },
     { upsert: true, new: true }
   );
+  await cleanOldMonthlyPhotoChunks(imageSnapshotId);
   console.log(`💾 [Auto Backup] Saved ${name}`);
 
   // Silently email the snapshot to the admin so a copy lives OUTSIDE the
@@ -257,7 +309,7 @@ async function maybeRunMonthlyAutoBackup(force = false) {
           }),
           attachments: [{
             filename: `${name}-dairyfarm-backup.json`,
-            content: JSON.stringify(stored.payload, null, 2),
+            content: JSON.stringify(await expandMonthlyPhotoPayload(stored), null, 2),
             contentType: 'application/json',
           }],
         });
@@ -282,7 +334,7 @@ router.get('/auto', protectUnscoped, ...adminOnly, async (_req, res) => {
     const existing = await Meta.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
     if (!value || !value.payload) return res.json({ available: false });
-    res.json({ available: true, name: value.name, createdAt: value.createdAt, emailedTo: value.emailedTo || null, emailedAt: value.emailedAt || null, payload: value.payload });
+    res.json({ available: true, name: value.name, createdAt: value.createdAt, emailedTo: value.emailedTo || null, emailedAt: value.emailedAt || null, payload: await expandMonthlyPhotoPayload(value) });
   } catch (e) { res.status(500).json({ error: e.message }); }
 });
 
@@ -300,15 +352,16 @@ router.post('/restore-auto', protectUnscoped, ...adminOnly, async (_req, res) =>
     const existing = await Meta.findOne({ key: MONTHLY_AUTO_BACKUP_KEY });
     const value = (existing && existing.value) || null;
     if (!value || !value.payload) return res.status(404).json({ error: 'No auto-backup available yet' });
-    validateBackupPayload(value.payload);
+    const payload = await expandMonthlyPhotoPayload(value);
+    validateBackupPayload(payload);
     await withRestoreRecovery({
       createSnapshot: async () => {
         const stored = await maybeRunMonthlyAutoBackup(true);
-        return stored.payload;
+        return expandMonthlyPhotoPayload(stored);
       },
       restore: async () => {
-        await restoreMissingFarms(value.payload);
-        await restoreCollections(value.payload, null);
+        await restoreMissingFarms(payload);
+        await restoreCollections(payload, null);
         await tagAfterRestore();
       },
       rollback: async (snapshot) => {
