@@ -170,6 +170,7 @@ export type UserRole = 'admin' | 'worker';
 
 export interface AuthUser {
   farmRole?: 'owner' | 'manager' | 'worker';
+  farmIds?: string[];
   _id: string;
   username: string;
   role: UserRole;

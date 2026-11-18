@@ -776,8 +776,9 @@ export default function AdminMenu({
                     _id: u._id,
                     username: u.username,
                     role: u.role,
-                    // The logged-in account can be an admin at the system level but a manager for this farm.
-                    farmRole: u.username === username ? farmRole : undefined,
+                    // Preserve each user's canonical farm role; only use the session role as a self fallback.
+                    farmRole: u.farmRole || (u.username === username ? farmRole : undefined),
+                    farmIds: u.farmIds || [],
                     email: u.email,
                     displayName: u.username,
                     active: true,

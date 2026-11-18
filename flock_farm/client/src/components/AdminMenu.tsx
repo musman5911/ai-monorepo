@@ -496,7 +496,16 @@ export default function AdminMenu(props: AdminMenuProps) {
 
             {section === 'users' && currentUser && (
               <MufAdminUsers
-                users={users.map(u => ({ _id: u._id || u.username, username: u.username, role: u.role, farmRole: u.farmRole, email: u.email, displayName: u.displayName, active: u.active !== false }))}
+                users={users.map(u => ({
+                  _id: u._id || u.username,
+                  username: u.username,
+                  role: u.role,
+                  farmRole: u.farmRole,
+                  farmIds: u.farmIds || [],
+                  email: u.email,
+                  displayName: u.displayName,
+                  active: u.active !== false,
+                }))}
                 currentUsername={currentUser.username}
                 allowAdminCreation={currentUser.farmRole === 'owner'}
                 minPasswordLength={8}

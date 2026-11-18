@@ -20,6 +20,7 @@ export interface MufAdminUser {
   username: string;
   role: string;
   farmRole?: 'owner' | 'manager' | 'worker';
+  farmIds?: string[];
   email?: string;
   displayName?: string;
   active?: boolean;
@@ -48,17 +49,31 @@ interface MufAdminUsersProps {
 
 const inputClass = 'muf-field muf-admin-user-field w-full outline-none transition';
 
+// The API exposes legacy role="admin" for both owners and managers.
+ // Owners access all farms globally; managers have one or more assigned farmIds.
+ // Prefer the explicit farmRole and use farm assignments as a legacy-safe fallback.
+export function resolveUserFarmRole(user: Pick<MufAdminUser, 'farmRole' | 'farmIds' | 'role'>): 'owner' | 'manager' | 'worker' {
+  const hasAssignedFarms = Array.isArray(user.farmIds) && user.farmIds.length > 0;
+  if (user.farmRole === 'manager') return 'manager';
+  if (user.farmRole === 'worker') return 'worker';
+  if (user.farmRole === 'owner') return 'owner';
+  if (user.role === 'manager') return 'manager';
+  if (user.role === 'owner') return 'owner';
+  if (user.role === 'worker') return 'worker';
+  if (user.role === 'admin') return hasAssignedFarms ? 'manager' : 'owner';
+  return 'worker';
+}
+
 function getRoleLabel(user: MufAdminUser): string {
-  const role = user.farmRole || user.role;
+  const role = resolveUserFarmRole(user);
   if (role === 'owner') return L('Owner');
   if (role === 'manager') return L('Manager');
-  if (role === 'worker') return L('Worker');
-  return L('Admin');
+  return L('Worker');
 }
 
 function isElevatedRole(user: MufAdminUser): boolean {
-  const role = user.farmRole || user.role;
-  return role === 'owner' || role === 'manager' || role === 'admin';
+  const role = resolveUserFarmRole(user);
+  return role === 'owner' || role === 'manager';
 }
 
 export default function MufAdminUsers({

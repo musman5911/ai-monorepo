@@ -713,7 +713,11 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
           )}
           {section === 'users' && (
             <MufAdminUsers
-              users={users}
+              users={users.map((user) => ({
+                ...user,
+                farmRole: user.farmRole,
+                farmIds: user.farmIds || [],
+              }))}
               usersLoading={usersLoading}
               currentUsername={username || ''}
               allowAdminCreation={isOwner}

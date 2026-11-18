@@ -27,6 +27,7 @@ const USER_KEY = 'flockfarm_user';
 
 export interface AuthUser {
   farmRole?: 'owner' | 'manager' | 'worker';
+  farmIds?: string[];
   _id: string;
   username: string;
   role: 'admin' | 'worker';
