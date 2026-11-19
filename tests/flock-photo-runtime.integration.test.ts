@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { spawn } from 'node:child_process';
+import { readFileSync } from 'node:fs';
 import { createServer } from 'node:net';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -196,7 +197,7 @@ describe.sequential('Flock photo storage runtime API integration', () => {
 
 describe('Flock image farm resolution', () => {
   it('reads only the farmId outside farm scope before auth, not the image binary', () => {
-    const source = require('node:fs').readFileSync(path.join(backendRoot, 'routes', 'uploads.js'), 'utf8');
+    const source = readFileSync(path.join(backendRoot, 'routes', 'uploads.js'), 'utf8');
     expect(source).toContain("mufRunUnscoped(() => Image.findById(req.params.id).select('farmId').lean())");
   });
 });
