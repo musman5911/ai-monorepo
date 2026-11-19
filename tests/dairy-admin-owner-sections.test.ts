@@ -23,6 +23,12 @@ describe('Dairy Admin Hub owner-only sections', () => {
   });
 
 
+  it('shows the shared Farm Location editor only to Owners, matching the server route', () => {
+    expect(panel).toContain("{isOwner && <MufAdminCard");
+    expect(panel).toContain("title={L('Farm Location')}");
+    expect(readSource('dairy_farm/backend/routes/settings.js')).toContain("router.put('/location', protect, ownerOnly");
+  });
+
   it('shows floating success and error notices for manual JSON restore', () => {
     const restoreStart = panel.indexOf('async function handleRestore');
     const restoreEnd = panel.indexOf('reader.readAsText(file);', restoreStart);

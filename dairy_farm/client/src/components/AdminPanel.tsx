@@ -667,8 +667,8 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
                 </div>
               </MufAdminCard>
 
-              {/* Farm Location (weather widget) */}
-              <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title={L('Farm Location')} subtitle={L('Set your farm coordinates for live weather')}>
+              {/* Farm Location is a shared project-wide setting, so only Owners can edit it. */}
+              {isOwner && <MufAdminCard icon={<Globe2 className="w-5 h-5" />} title={L('Farm Location')} subtitle={L('Set your farm coordinates for live weather')}>
                 <div className="space-y-3">
                   {farmLocCurrent && (
                     <p className="text-xs text-slate-500">
@@ -689,7 +689,7 @@ export default function AdminPanel({ username, isOwner, onClose }: Props) {
                   <p className="text-[10px] text-slate-400">{L('Enter latitude, longitude (decimal degrees). City is auto-detected.')}</p>
                   <MufAdminButton variant="secondary" size="md" onClick={handleSaveLocation}>{L('Save Location')}</MufAdminButton>
                 </div>
-              </MufAdminCard>
+              </MufAdminCard>}
             </MufAdminGeneral>
           )}
 
