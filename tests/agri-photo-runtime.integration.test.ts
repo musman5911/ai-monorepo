@@ -40,10 +40,15 @@ async function request(route, { method = 'GET', token, body, selectedFarmId, raw
     throw new Error(`Agri API request failed: ${method} /api${route}; server exit=${serverProcess?.exitCode}; output:\n${serverOutput}\nOriginal error: ${String(error)}`);
   }
   if (rawResponse) return { response, data: null };
-  const raw = await response.text();
   let data = null;
-  try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
-  return { response, data };
+  let bodyBytes = null;
+  if ((response.headers.get('content-type') || '').startsWith('image/')) {
+    bodyBytes = Buffer.from(await response.arrayBuffer());
+  } else {
+    const raw = await response.text();
+    try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
+  }
+  return { response, data, bodyBytes };
 }
 
 async function waitUntilReady() {
@@ -162,7 +167,7 @@ describe.sequential('Agri diary media and photo runtime API integration', () => 
     });
     expect(loaded.response.status).toBe(200);
     expect(loaded.response.headers.get('content-type')).toContain('image/jpeg');
-    expect(Buffer.from(await loaded.response.arrayBuffer()).equals(bytes)).toBe(true);
+    expect(loaded.bodyBytes.equals(bytes)).toBe(true);
 
     const date = '2098-12-21';
     const saved = await request(`/diary-media/${date}`, {
