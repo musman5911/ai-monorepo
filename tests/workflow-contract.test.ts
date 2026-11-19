@@ -41,6 +41,15 @@ describe('GitHub Actions quick-check workflow contract', () => {
     expect(workflow).not.toMatch(/npm run build|build-all\.bat|check-workbench-runtime|audit-muf-design-system/);
   });
 
+  it('runs restored-copy migration dry-run and idempotence checks for all three apps on isolated MongoDB', () => {
+    expect(workflow).toContain('  phase19-restored-copy-migrations:');
+    expect(workflow).toContain('app: agri');
+    expect(workflow).toContain('app: dairy');
+    expect(workflow).toContain('app: flock');
+    expect(workflow).toContain('MUF_PHASE19_MIGRATION_MONGO_URI: mongodb://127.0.0.1:27017');
+    expect(workflow).toContain('node ../../tools/phase19-migration-mongo-integration.mjs');
+  });
+
   it('runs the Flock multi-process lock check against an isolated local MongoDB service', () => {
     expect(workflow).toContain('  flock-lock-multiprocess:');
     expect(workflow).toContain('image: mongo:7');
