@@ -5,6 +5,7 @@ import { authRequired, requireRole } from '../middleware/auth.js';
 import Image from '../models/Image.js';
 import { createMufStorage } from '../muf-storage.mjs';
 import { MUF_ENV } from '../muf-env.mjs';
+import { mufRunUnscoped } from '../muf-farms.mjs';
 import { createCloudinaryClient, cloudinaryConfigured } from '../muf-cloudinary.mjs';
 
 const router = express.Router();
@@ -83,7 +84,9 @@ function storageForCurrentFarm(req) {
 async function resolveImageFarm(req, _res, next) {
   try {
     if (mongoose.isValidObjectId(req.params.id)) {
-      const image = await Image.findById(req.params.id);
+      // Image URLs cannot carry X-Farm-Id, so discover only the owning farm
+      // outside request scope before authentication. Avoid loading the image bytes.
+      const image = await mufRunUnscoped(() => Image.findById(req.params.id).select('farmId').lean());
       if (image?.farmId) req.headers['x-farm-id'] = String(image.farmId);
     }
     return next();
