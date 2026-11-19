@@ -3,7 +3,7 @@ import { DiaryMedia } from '../db.js';
 import { protect } from '../middleware/auth.js';
 import { asyncHandler } from '../utils/helpers.js';
 import { cleanupOrphanPhotoAssets } from '../services/photo-assets.js';
-import { normalizeDiaryEntries, normalizeDiaryPhotos, normalizeDiaryMediaUpdate } from '../diary-media-validation.mjs';
+import { validDate, normalizeDiaryEntries, normalizeDiaryPhotos, normalizeDiaryMediaUpdate } from '../diary-media-validation.mjs';
 const router = express.Router();
 
 // Diary records and their attachments live in the farm database, not just UI state.
