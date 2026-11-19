@@ -53,7 +53,7 @@ async function waitUntilReady() {
       throw new Error(`Agri test server exited early with code ${serverProcess.exitCode}:\n${serverOutput}`);
     }
     try {
-      const response = await fetch(`${baseUrl}/api/auth/check`);
+      const response = await fetch(`${baseUrl}/api/login`);
       if (response.status < 500) return;
       lastError = `unexpected readiness status ${response.status}`;
     } catch (error) {
@@ -91,7 +91,7 @@ describe.sequential('Agri diary media and photo runtime API integration', () => 
     serverProcess.stderr.on('data', capture);
     await waitUntilReady();
 
-    const login = await request('/auth/login', {
+    const login = await request('/login', {
       method: 'POST',
       body: { username: 'admin', password: 'admin123' },
     });
