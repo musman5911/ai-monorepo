@@ -9,10 +9,12 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..'
 const backendRoot = path.join(repoRoot, 'flock_farm', 'backend');
 let serverProcess;
 let baseUrl = '';
+let ownerToken = '';
 let workerOneToken = '';
 let workerTwoToken = '';
 let farmOneId = '';
 let farmTwoId = '';
+let restoreProbeFarmId = '';
 let serverOutput = '';
 
 async function reservePort() {
@@ -114,7 +116,7 @@ describe.sequential('Flock photo storage runtime API integration', () => {
     serverProcess.stdout.on('data', capture);
     serverProcess.stderr.on('data', capture);
     await waitUntilReady();
-    const ownerToken = await login('admin', 'admin123');
+    ownerToken = await login('admin', 'admin123');
     workerOneToken = await login('worker', 'worker123');
     workerTwoToken = await login('worker2', 'worker2123');
 
@@ -179,6 +181,61 @@ describe.sequential('Flock photo storage runtime API integration', () => {
       body: form,
     });
     expect(response.status).toBe(403);
+  });
+
+  it('restores a full multi-farm backup and removes post-snapshot bucket rows', async () => {
+    const created = await request('/farms', {
+      method: 'POST',
+      token: ownerToken,
+      farmId: farmOneId,
+      body: { name: `Flock Restore Probe ${process.pid}`, location: 'Disposable runtime integration fixture' },
+    });
+    expect(created.response.status).toBe(201);
+    restoreProbeFarmId = String(created.data._id || created.data.id);
+    expect(restoreProbeFarmId).toBeTruthy();
+    expect(restoreProbeFarmId).not.toBe(farmOneId);
+    expect(restoreProbeFarmId).not.toBe(farmTwoId);
+
+    const emptyBefore = await request('/data/eggs', {
+      token: ownerToken,
+      farmId: restoreProbeFarmId,
+    });
+    expect(emptyBefore.response.status).toBe(200);
+    expect(emptyBefore.data.exists).toBe(false);
+    expect(emptyBefore.data.version).toBe(0);
+
+    const backup = await request('/backup', { token: ownerToken });
+    expect(backup.response.status).toBe(200);
+    expect(Array.isArray(backup.data.farmBuckets?.eggs)).toBe(true);
+    expect(backup.data.farmBuckets.eggs.some((row) => row.farmId === restoreProbeFarmId)).toBe(false);
+
+    const postSnapshotWrite = await request('/data/eggs', {
+      method: 'PUT',
+      token: ownerToken,
+      farmId: restoreProbeFarmId,
+      body: {
+        baseVersion: emptyBefore.data.version,
+        value: [{ id: 'after-snapshot-egg-row', date: '2026-11-19', totalEggsCollected: 17 }],
+      },
+    });
+    expect(postSnapshotWrite.response.status).toBe(200);
+    expect(postSnapshotWrite.data.exists).toBe(true);
+
+    const restored = await request('/backup/restore', {
+      method: 'POST',
+      token: ownerToken,
+      body: backup.data,
+    });
+    expect(restored.response.status).toBe(200);
+    expect(restored.data.recoverySnapshot).toBe('saved');
+
+    const afterRestore = await request('/data/eggs', {
+      token: ownerToken,
+      farmId: restoreProbeFarmId,
+    });
+    expect(afterRestore.response.status).toBe(200);
+    expect(afterRestore.data.exists).toBe(false);
+    expect(afterRestore.data.version).toBe(0);
   });
 
   it('rejects content-type and binary-signature mismatches', async () => {
