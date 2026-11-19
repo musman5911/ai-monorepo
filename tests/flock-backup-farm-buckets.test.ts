@@ -8,7 +8,7 @@ function makeDataStore() {
   return createStore({ DataStore: { paths: {}, options: { timestamps: true } } }).DataStore;
 }
 
-const BUCKET_KEYS = ['birds', 'expenses', 'feed', 'eggs', 'settings'];
+const BUCKET_KEYS = ['birds', 'expenses', 'feed', 'eggs', 'settings', 'farm_location'];
 
 describe('Flock multi-farm backup restoration', () => {
   it('fully replaces each farm bucket from a modern snapshot and bumps versions', async () => {
@@ -38,6 +38,41 @@ describe('Flock multi-farm backup restoration', () => {
     expect(await DataStore.findOne({ key: 'monthly_auto_backup' }).lean()).toMatchObject({ value: { name: 'auto-2026-11' } });
     expect(await DataStore.findOne({ key: 'monthly_auto_backup_image_chunk_snapshot_00000' }).lean()).not.toBeNull();
     expect(await DataStore.findOne({ key: '__flock_egg_inventory_lock__' }).lean()).not.toBeNull();
+  });
+
+  it('includes each farm\'s weather location in the restorable business buckets', async () => {
+    const DataStore = makeDataStore();
+    await DataStore.create({
+      key: 'farm_location', farmId: 'farm-a',
+      value: { raw_dms: 'old-a', lat: 33.1, lon: 72.1, city: 'Snapshot Farm A' }, version: 2,
+    });
+    await DataStore.create({
+      key: 'farm_location', farmId: 'farm-b',
+      value: { raw_dms: 'new-b', lat: 34.2, lon: 73.2, city: 'Post-snapshot Farm B' }, version: 5,
+    });
+
+    await restoreFlockFarmBuckets({
+      DataStore,
+      bucketKeys: BUCKET_KEYS,
+      defaultFarmId: 'farm-a',
+      farmBuckets: {
+        farm_location: [{
+          farmId: 'farm-a',
+          value: { raw_dms: 'old-a', lat: 33.1, lon: 72.1, city: 'Snapshot Farm A' },
+          version: 1,
+        }],
+      },
+      buckets: {},
+    });
+
+    expect(await DataStore.find({ key: 'farm_location' }).lean()).toHaveLength(1);
+    expect(await DataStore.findOne({ key: 'farm_location', farmId: 'farm-a' }).lean()).toMatchObject({
+      value: { raw_dms: 'old-a', lat: 33.1, lon: 72.1, city: 'Snapshot Farm A' },
+      version: 3,
+    });
+    const route = readFileSync(path.resolve(__dirname, '../flock_farm/backend/routes/backup.js'), 'utf8');
+    const bucketDeclaration = route.slice(route.indexOf('const BUCKET_KEYS'), route.indexOf('const BATCH_MODELS'));
+    expect(bucketDeclaration).toContain("'farm_location'");
   });
 
   it('uses snapshot version when there is no current row, preventing version reuse', async () => {

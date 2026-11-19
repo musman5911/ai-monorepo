@@ -204,10 +204,24 @@ describe.sequential('Flock photo storage runtime API integration', () => {
     expect(emptyBefore.data.exists).toBe(false);
     expect(emptyBefore.data.version).toBe(0);
 
+    const originalLocation = {
+      raw_dms: '33.1000, 72.1000', lat: 33.1, lon: 72.1, city: 'Snapshot Location',
+    };
+    const saveOriginalLocation = await request('/settings/location', {
+      method: 'PUT',
+      token: ownerToken,
+      farmId: restoreProbeFarmId,
+      body: originalLocation,
+    });
+    expect(saveOriginalLocation.response.status).toBe(200);
+
     const backup = await request('/backup', { token: ownerToken });
     expect(backup.response.status).toBe(200);
     expect(Array.isArray(backup.data.farmBuckets?.eggs)).toBe(true);
     expect(backup.data.farmBuckets.eggs.some((row) => row.farmId === restoreProbeFarmId)).toBe(false);
+    expect(backup.data.farmBuckets.farm_location).toContainEqual(
+      expect.objectContaining({ farmId: restoreProbeFarmId, value: originalLocation }),
+    );
 
     const postSnapshotWrite = await request('/data/eggs', {
       method: 'PUT',
@@ -220,6 +234,14 @@ describe.sequential('Flock photo storage runtime API integration', () => {
     });
     expect(postSnapshotWrite.response.status).toBe(200);
     expect(postSnapshotWrite.data.exists).toBe(true);
+
+    const changedLocation = await request('/settings/location', {
+      method: 'PUT',
+      token: ownerToken,
+      farmId: restoreProbeFarmId,
+      body: { raw_dms: '34.2000, 73.2000', lat: 34.2, lon: 73.2, city: 'Changed After Snapshot' },
+    });
+    expect(changedLocation.response.status).toBe(200);
 
     const restored = await request('/backup/restore', {
       method: 'POST',
@@ -236,6 +258,13 @@ describe.sequential('Flock photo storage runtime API integration', () => {
     expect(afterRestore.response.status).toBe(200);
     expect(afterRestore.data.exists).toBe(false);
     expect(afterRestore.data.version).toBe(0);
+
+    const restoredLocation = await request('/settings/location', {
+      token: ownerToken,
+      farmId: restoreProbeFarmId,
+    });
+    expect(restoredLocation.response.status).toBe(200);
+    expect(restoredLocation.data).toMatchObject(originalLocation);
   });
 
   it('rejects content-type and binary-signature mismatches', async () => {

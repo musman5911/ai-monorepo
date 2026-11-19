@@ -37,7 +37,7 @@ const MONTHLY_AUTO_BACKUP_KEY = 'monthly_auto_backup';
 const MONTHLY_IMAGE_CHUNK_PREFIX = 'monthly_auto_backup_image_chunk_';
 const MONTHLY_IMAGE_CHUNK_CHARS = 4 * 1024 * 1024;
 const BUCKET_KEYS = [
-  'birds', 'expenses', 'feed', 'eggs', 'settings',
+  'birds', 'expenses', 'feed', 'eggs', 'settings', 'farm_location',
   'vaccinations', 'customers', 'customerSales',
   'incubation', 'checklist', 'diary',
   'laborers', 'laborAttendance', 'laborAdvances',
