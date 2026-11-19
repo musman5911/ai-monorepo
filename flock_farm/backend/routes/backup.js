@@ -24,6 +24,7 @@ import Image from '../models/Image.js';
 import { serializeBackupImages, restoreBackupImages, splitBase64Image, assembleBase64ImageParts } from '../muf-backup-images.mjs';
 import { mufGetDefaultFarmId, mufIsOwner, mufRunUnscoped } from '../muf-farms.mjs';
 import { withRestoreRecovery } from '../../../shared/muf-restore-recovery.mjs';
+import { restoreFlockFarmBuckets } from '../muf-backup-data.mjs';
 
 const router = express.Router();
 
@@ -119,6 +120,16 @@ function validateBackupPayload(payload) {
     if (rows !== undefined && (!Array.isArray(rows) || rows.some((row) => !row || typeof row !== 'object' || Array.isArray(row) || typeof row.farmId !== 'string' || !row.farmId.trim()))) {
       throw new Error(`Backup farm bucket '${key}' must contain records with farmId.`);
     }
+    if (Array.isArray(rows)) {
+      const farmIds = new Set();
+      for (const row of rows) {
+        if (farmIds.has(row.farmId)) throw new Error(`Backup farm bucket '${key}' contains duplicate farm IDs.`);
+        farmIds.add(row.farmId);
+        if (row.version !== undefined && (!Number.isSafeInteger(row.version) || row.version < 0)) {
+          throw new Error(`Backup farm bucket '${key}' contains an invalid version.`);
+        }
+      }
+    }
   }
 }
 
@@ -127,8 +138,9 @@ async function restoreBackupPayload(payload) {
   // Validate the complete image section before any restore mutation. Older backups
   // without an images key remain compatible and leave current images untouched.
   const restoredImages = Array.isArray(payload.images) ? restoreBackupImages(payload.images) : null;
-  // Buckets: overwrite each present bucket, bumping the version so any
-  // logged-in clients get a clean 409 + reload instead of silent overwrite.
+  // Restore farmBuckets as a full snapshot: remove bucket documents that
+  // were created after the backup, then restore only the saved farm rows.
+  // Older single-farm backups still use the legacy default-farm-only path.
   if (Array.isArray(payload.farms)) {
     for (const farm of payload.farms) {
       const name = String(farm.name || '').trim();
@@ -142,23 +154,13 @@ async function restoreBackupPayload(payload) {
       }
     }
   }
-  for (const key of BUCKET_KEYS) {
-    const farmRows = payload.farmBuckets?.[key];
-    if (Array.isArray(farmRows)) {
-      for (const row of farmRows) {
-        if (!row?.farmId) continue;
-        const current = await DataStore.findOne({ key, farmId: String(row.farmId) });
-        if (current) await DataStore.findOneAndUpdate({ key, farmId: String(row.farmId) }, { $set: { value: row.value, version: (current.version || 0) + 1 } });
-        else await DataStore.create({ key, farmId: String(row.farmId), value: row.value, version: 1 });
-      }
-    } else if (payload.buckets && payload.buckets[key] !== undefined && payload.buckets[key] !== null) {
-      const farmId = mufGetDefaultFarmId();
-      if (!farmId) continue;
-      const current = await DataStore.findOne({ key, farmId });
-      if (current) await DataStore.findOneAndUpdate({ key, farmId }, { $set: { value: payload.buckets[key], version: (current.version || 0) + 1 } });
-      else await DataStore.create({ key, farmId, value: payload.buckets[key], version: 1 });
-    }
-  }
+  await restoreFlockFarmBuckets({
+    DataStore,
+    bucketKeys: BUCKET_KEYS,
+    farmBuckets: payload.farmBuckets,
+    buckets: payload.buckets,
+    defaultFarmId: mufGetDefaultFarmId(),
+  });
   // Batch collections: full replace
   for (const [name, Model] of Object.entries(BATCH_MODELS)) {
     if (!Array.isArray(payload[name])) continue;
