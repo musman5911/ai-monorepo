@@ -24,7 +24,7 @@ async function reservePort() {
   return port;
 }
 
-async function request(route, { method = 'GET', token, body, selectedFarmId, rawResponse = false } = {}) {
+async function request(route, { method = 'GET', token, body, selectedFarmId } = {}) {
   const headers = {};
   if (token) headers.Authorization = `Bearer ${token}`;
   if (selectedFarmId) headers['X-Farm-Id'] = selectedFarmId;
@@ -39,7 +39,6 @@ async function request(route, { method = 'GET', token, body, selectedFarmId, raw
   } catch (error) {
     throw new Error(`Agri API request failed: ${method} /api${route}; server exit=${serverProcess?.exitCode}; output:\n${serverOutput}\nOriginal error: ${String(error)}`);
   }
-  if (rawResponse) return { response, data: null };
   let data = null;
   let bodyBytes = null;
   if ((response.headers.get('content-type') || '').startsWith('image/')) {
@@ -163,7 +162,6 @@ describe.sequential('Agri diary media and photo runtime API integration', () => 
     const loaded = await request(photoPath.replace('/api', ''), {
       token: ownerToken,
       selectedFarmId: farmId,
-      rawResponse: true,
     });
     expect(loaded.response.status).toBe(200);
     expect(loaded.response.headers.get('content-type')).toContain('image/jpeg');
