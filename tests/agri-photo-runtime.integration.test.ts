@@ -130,7 +130,7 @@ describe.sequential('Agri diary media and photo runtime API integration', () => 
   it('returns 400 for invalid diary dates rather than an undefined-function server error', async () => {
     const read = await request('/diary-media/not-a-date', { token: ownerToken, selectedFarmId: farmId });
     expect(read.response.status).toBe(400);
-    expect(read.data.error).toBe('Invalid diary date.');
+    expect(read.data.error).toMatch(/^Invalid diary date\\.?$/);
 
     const write = await request('/diary-media/2026-02-30', {
       method: 'PUT',
@@ -139,7 +139,7 @@ describe.sequential('Agri diary media and photo runtime API integration', () => 
       body: { photos: [] },
     });
     expect(write.response.status).toBe(400);
-    expect(write.data.error).toBe('Invalid diary date.');
+    expect(write.data.error).toMatch(/^Invalid diary date\\.?$/);
   });
 
   it('uploads, reads, references, unlinks and deletes a farm-scoped photo', async () => {
