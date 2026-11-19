@@ -605,3 +605,19 @@ Supplier/payment verification on Hattar showed Feed Supplier 1 and its khata led
 The owner confirmed that the existing `auto-2026-11` monthly snapshot was available and its Download action enabled. The downloaded `auto-2026-11.json` was valid JSON version 3 and showed five farms, 19 cows, 420 milk records, 13 expenses, four suppliers, four supplier payments, 24 breeding events, one archive job and one archive record. The owner restored that existing snapshot, switched to Empty Trial Unit (Farm 5), confirmed that the post-snapshot `PH19-BACKUP-RESTORE-PROBE` expense had returned, then deleted only that temporary record. No new snapshot was created.
 
 **Dairy monthly automatic backup/restore: Passed; temporary data cleaned up.** This is separate from monthly chunk-format and legacy-backup testing, which remain open. The manual JSON restore notification fix is already committed in `1003462` and included in branch head `4115c398`; local pull/browser confirmation remains pending. Phase 19 remains **In progress**. No production data was used.
+
+
+## Phase 19 cross-app parity fixes and automated verification (2026-11-19)
+
+The Dairy-tested MUF permission rules were compared with Agri and Flock, and the following source gaps were corrected:
+
+- **Agri Manager Admin Hub:** Managers now see the farm-scoped Products and Reports areas, matching the existing owner/manager backend authorization and the Dairy/Flock pattern. My Farms, full-database Backup and Yearly Archive remain owner-only. Manager field management remains enabled.
+- **Dairy shared Farm Location:** the General screen now hides the location editor from Managers and Workers, matching the existing owner-only server route. The setting is project-global in Dairy.
+- **Agri Diary:** the date-validation helper is now exported and imported by the diary-media route. This repairs the invalid-date GET path that previously referenced an undefined function. Runtime coverage now exercises invalid date responses, image upload/read, diary reference protection, unlink and deletion in the disposable in-memory app.
+- **Flock full backup:** the farm-scoped `farm_location` DataStore key is now included in the full manual/monthly backup bucket list. A post-snapshot location edit is covered by the runtime restore test, which verifies that restore reinstates the saved coordinates. Internal monthly-backup, image-chunk and egg-lock keys are not added to the business backup list.
+
+The branch head is `131df3921016eed2f6b46c5324aba95790b7c009`. GitHub Actions completed successfully:
+- [MUF quick checks](https://github.com/musman5911/ai-monorepo/actions/runs/44567145692): 77 test files / 720 tests passed; 16 database safety tests and 13 seed-audit contract tests passed; route, role, farm-scope, archive and secret checks passed; production dependency audit reported zero vulnerabilities; the separate Flock MongoDB cross-process egg-lock job passed.
+- [MUF frontend checks](https://github.com/musman5911/ai-monorepo/actions/runs/44567145603): Agri, Dairy and Flock production builds and root source checks passed.
+
+**Verification boundary:** the Agri and Flock photo/backup runtime integration tests run against disposable in-memory app servers; the Flock lock CI job uses its dedicated local MongoDB service. These results do not claim that real Atlas restored-copy migrations or real Atlas backup restores have been executed. The guarded restored-copy migration/idempotence track and owner-visible Agri/Flock archive operations remain open. No production database was used or modified.

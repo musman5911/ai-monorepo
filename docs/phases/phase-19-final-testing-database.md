@@ -453,3 +453,14 @@ The owner confirmed that Admin Hub → Backup displayed `Last auto backup: auto-
 The owner restored the existing `auto-2026-11` snapshot using **Restore from it**. The owner then switched to Empty Trial Unit (Farm 5), confirmed that `PH19-BACKUP-RESTORE-PROBE` was present after the monthly restore, and deleted only that temporary test expense. This is the expected round-trip behavior because the probe had been created after the monthly snapshot was generated.
 
 **Dairy monthly automatic backup/restore: Passed; temporary probe cleaned up.** No new automatic snapshot was generated during the check. This closes the Dairy manual JSON and monthly automatic backup/restore browser flows, but does not cover monthly backup chunk formats or legacy backup formats. Phase 19 remains **In progress**; no production database was used.
+
+
+## Step 11 cross-app implementation parity and CI checkpoint (2026-11-19)
+
+The latest code audit compared the Dairy-tested role and Admin Hub rules against Agri and Flock. Agri Managers can now access farm-scoped Products and Reports in the UI because those APIs already authorize owner/manager; cross-app My Farms and full-database Backup remain owner-only, and Yearly Archive remains owner-only. Dairy's project-global Farm Location editor is now rendered only for Owners, matching its existing server authorization. Flock's farm-scoped `farm_location` DataStore record is now part of full backup snapshots and restoration.
+
+A source defect in Agri diary media was also fixed: the GET date route called `validDate` without importing it. The helper is exported and imported, and a disposable in-memory runtime test covers date validation and the photo upload/read/reference/unlink/delete lifecycle. Flock runtime coverage now verifies full multi-farm bucket replacement and that a changed location reverts to its snapshot value after full restore.
+
+At branch head `131df3921016eed2f6b46c5324aba95790b7c009`, both GitHub workflows passed. The root suite passed 77 files / 720 tests; the 16 database-safety and 13 seed-audit tests passed; the Flock independent-process MongoDB lock job passed; all three frontend builds passed; the production dependency audit reported zero vulnerabilities. See [quick checks](https://github.com/musman5911/ai-monorepo/actions/runs/44567145692) and [frontend checks](https://github.com/musman5911/ai-monorepo/actions/runs/44567145603).
+
+These are repository and disposable-CI checks, not proof of real Atlas restore/migration behaviour. The guarded restored-copy MongoDB dry-run/apply/idempotence checks and owner-visible Agri/Flock archive operations remain open. No production database was used.
