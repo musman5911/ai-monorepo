@@ -24,7 +24,7 @@ async function reservePort() {
   return port;
 }
 
-async function request(route, { method = 'GET', token, body, selectedFarmId } = {}) {
+async function request(route, { method = 'GET', token, body, selectedFarmId, rawResponse = false } = {}) {
   const headers = {};
   if (token) headers.Authorization = `Bearer ${token}`;
   if (selectedFarmId) headers['X-Farm-Id'] = selectedFarmId;
@@ -39,6 +39,7 @@ async function request(route, { method = 'GET', token, body, selectedFarmId } = 
   } catch (error) {
     throw new Error(`Agri API request failed: ${method} /api${route}; server exit=${serverProcess?.exitCode}; output:\n${serverOutput}\nOriginal error: ${String(error)}`);
   }
+  if (rawResponse) return { response, data: null };
   const raw = await response.text();
   let data = null;
   try { data = raw ? JSON.parse(raw) : null; } catch { data = raw; }
@@ -125,7 +126,7 @@ describe.sequential('Agri diary media and photo runtime API integration', () => 
   it('returns 400 for invalid diary dates rather than an undefined-function server error', async () => {
     const read = await request('/diary-media/not-a-date', { token: ownerToken, selectedFarmId: farmId });
     expect(read.response.status).toBe(400);
-    expect(read.data.error).toBe('Invalid diary date');
+    expect(read.data.error).toBe('Invalid diary date.');
 
     const write = await request('/diary-media/2026-02-30', {
       method: 'PUT',
@@ -134,7 +135,7 @@ describe.sequential('Agri diary media and photo runtime API integration', () => 
       body: { photos: [] },
     });
     expect(write.response.status).toBe(400);
-    expect(write.data.error).toBe('Invalid diary date');
+    expect(write.data.error).toBe('Invalid diary date.');
   });
 
   it('uploads, reads, references, unlinks and deletes a farm-scoped photo', async () => {
@@ -157,6 +158,7 @@ describe.sequential('Agri diary media and photo runtime API integration', () => 
     const loaded = await request(photoPath.replace('/api', ''), {
       token: ownerToken,
       selectedFarmId: farmId,
+      rawResponse: true,
     });
     expect(loaded.response.status).toBe(200);
     expect(loaded.response.headers.get('content-type')).toContain('image/jpeg');
