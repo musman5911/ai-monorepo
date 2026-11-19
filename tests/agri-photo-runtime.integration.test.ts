@@ -96,7 +96,7 @@ describe.sequential('Agri diary media and photo runtime API integration', () => 
       body: { username: 'admin', password: 'admin123' },
     });
     if (!login.response.ok) throw new Error(`Agri owner login failed: ${login.response.status} ${JSON.stringify(login.data)}`);
-    ownerToken = login.data.token;
+    ownerToken = login.data.access_token;
 
     const farms = await request('/farms', { token: ownerToken });
     expect(farms.response.status).toBe(200);
