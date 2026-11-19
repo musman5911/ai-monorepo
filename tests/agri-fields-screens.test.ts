@@ -96,7 +96,7 @@ describe('Agri Phase 19 role and popup regressions', () => {
     const admin = read('agri_farm/frontend/src/components/AdminMenu.tsx');
     const locationRoutes = read('agri_farm/backend/routes/automations.js');
     expect(admin).toContain("const isOwner = farmRole === 'owner'");
-    expect(admin).toContain("isManager && ['farms', 'products', 'reports', 'backup'].includes(tab.id)");
+    expect(admin).toContain("isManager && ['farms', 'backup'].includes(tab.id)");
     expect(admin).toContain('{isOwner && <MufAdminCard');
     expect(admin).toContain("{activeTab === 'farms' && isOwner && <MyFarmsPanel />}");
     expect(admin).toContain("{activeTab === 'reports' && isOwner && (");
