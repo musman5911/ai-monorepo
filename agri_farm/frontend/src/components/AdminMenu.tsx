@@ -642,7 +642,7 @@ export default function AdminMenu({
 
   const filteredTabs = ADMIN_TABS.filter(tab => {
     if (!isAdmin && tab.id !== 'general') return false;
-    if (isManager && ['farms', 'products', 'reports', 'backup'].includes(tab.id)) return false;
+    if (isManager && ['farms', 'backup'].includes(tab.id)) return false;
     return true;
   });
 
@@ -751,7 +751,7 @@ export default function AdminMenu({
               )}
 
                             {/* ─── TAB: USERS ─── */}
-              {activeTab === 'products' && isOwner && <ProductManager kinds={[{ value: 'produce', label: 'Harvested produce' }]} apiRoot={import.meta.env.VITE_API_URL || '/api'} getHeaders={() => {
+              {activeTab === 'products' && (isOwner || isManager) && <ProductManager kinds={[{ value: 'produce', label: 'Harvested produce' }]} apiRoot={import.meta.env.VITE_API_URL || '/api'} getHeaders={() => {
                 let token = ''; let farmId = '';
                 try { token = localStorage.getItem('token') || ''; farmId = localStorage.getItem('muf_active_farm_agri') || ''; } catch { /* storage unavailable */ }
                 return { ...(token ? { Authorization: 'Bearer ' + token, 'X-Access-Token': token } : {}), ...(farmId ? { 'X-Farm-Id': farmId } : {}) };
@@ -1057,7 +1057,7 @@ export default function AdminMenu({
               {/* ─── TAB: REPORTS ─── */}
               {activeTab === 'farms' && isOwner && <MyFarmsPanel />}
 
-              {activeTab === 'reports' && isOwner && (
+              {activeTab === 'reports' && (isOwner || isManager) && (
                 <MufAdminReports reportButtons={[]}>
                   <div className="space-y-4">
                     <div>
